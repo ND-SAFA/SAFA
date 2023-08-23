@@ -7,7 +7,9 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectDelta;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +40,11 @@ public class DeltaController extends BaseController {
     @GetMapping(AppRoutes.Delta.CALCULATE_PROJECT_DELTA)
     public ProjectDelta calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                               @PathVariable UUID targetVersionId) throws SafaError {
-        ProjectVersion baselineVersion = this.resourceBuilder.fetchVersion(baselineVersionId).withViewVersion();
-        ProjectVersion targetVersion = this.resourceBuilder.fetchVersion(targetVersionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion baselineVersion = this.resourceBuilder.fetchVersion(baselineVersionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
+        ProjectVersion targetVersion = this.resourceBuilder.fetchVersion(targetVersionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider.getDeltaService().calculateProjectDelta(baselineVersion, targetVersion);
     }
 }

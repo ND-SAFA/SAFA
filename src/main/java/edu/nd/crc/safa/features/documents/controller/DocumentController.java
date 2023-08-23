@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -62,7 +63,9 @@ public class DocumentController extends BaseDocumentController {
     public DocumentAppEntity createOrUpdateDocument(@PathVariable UUID versionId,
                                                     @RequestBody @Valid DocumentAppEntity documentAppEntity)
         throws SafaError {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         Project project = projectVersion.getProject();
 
         // Create or update: document base entity
@@ -115,15 +118,18 @@ public class DocumentController extends BaseDocumentController {
      */
     @GetMapping(AppRoutes.Documents.GET_PROJECT_DOCUMENTS)
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withViewVersion();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.documentService.getAppEntities(projectVersion, user);
     }
 
     @GetMapping(AppRoutes.Documents.GET_DOCUMENT_BY_ID)
     public DocumentAppEntity getDocumentById(@PathVariable UUID versionId,
                                              @PathVariable UUID documentId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         Document document = this.documentService.getDocumentById(documentId);
         return this.documentService.createDocumentAppEntity(document, projectVersion);
     }
@@ -144,7 +150,8 @@ public class DocumentController extends BaseDocumentController {
         Project project = document.getProject();
 
         // Step - Verify authorized user has permission to delete.
-        resourceBuilder.setProject(project).withEditProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        resourceBuilder.setProject(project).withPermission(ProjectPermission.EDIT, user);
 
         // Step - Delete document.
         this.documentRepository.delete(document);

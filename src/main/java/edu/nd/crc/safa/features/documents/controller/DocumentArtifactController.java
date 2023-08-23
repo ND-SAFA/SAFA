@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepositor
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -64,7 +65,9 @@ public class DocumentArtifactController extends BaseDocumentController {
                                                           @PathVariable UUID documentId,
                                                           @RequestBody List<ArtifactAppEntity> artifacts
     ) {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         Document document = getDocumentById(this.documentRepository, documentId);
         for (ArtifactAppEntity a : artifacts) {
             UUID artifactId = a.getId();
@@ -74,7 +77,6 @@ public class DocumentArtifactController extends BaseDocumentController {
             a.addDocumentId(document.getDocumentId());
         }
 
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
         layoutManager.generateDocumentLayout(document);
         List<UUID> artifactIds = artifacts
@@ -96,7 +98,9 @@ public class DocumentArtifactController extends BaseDocumentController {
     public void removeArtifactFromDocument(@PathVariable UUID versionId,
                                            @PathVariable UUID documentId,
                                            @PathVariable UUID artifactId) {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         Document document = getDocumentById(this.documentRepository, documentId);
         Artifact artifact = getArtifactById(artifactId);
         Optional<DocumentArtifact> documentArtifactQuery =

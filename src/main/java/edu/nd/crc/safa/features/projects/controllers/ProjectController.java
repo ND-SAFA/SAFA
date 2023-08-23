@@ -9,6 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -100,7 +101,9 @@ public class ProjectController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.DELETE_PROJECT_BY_ID)
     @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withOwnProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.DELETE, user).get();
         this.serviceProvider.getProjectRepository().delete(project);
     }
 }

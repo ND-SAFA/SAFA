@@ -19,8 +19,10 @@ import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IFileParser;
 import edu.nd.crc.safa.features.flatfiles.services.CheckArtifactNameService;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +102,9 @@ public class ParseDataFileController extends BaseController {
     @PostMapping(AppRoutes.Projects.Entities.CHECK_IF_ARTIFACT_EXISTS)
     public Map<String, Boolean> checkIfNameExists(@PathVariable UUID versionId,
                                                   @RequestBody ArtifactNameCheck artifactNameCheck) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         boolean artifactExists = checkArtifactNameService.doesArtifactExist(projectVersion, artifactNameCheck);
         Map<String, Boolean> response = new HashMap<>();
         response.put(ProjectVariables.ARTIFACT_EXISTS, artifactExists);

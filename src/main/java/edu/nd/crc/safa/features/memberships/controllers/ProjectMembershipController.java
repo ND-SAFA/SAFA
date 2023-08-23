@@ -14,10 +14,11 @@ import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.PermissionCheckerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,14 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectMembershipController extends BaseController {
 
-    private final PermissionCheckerService permissionCheckerService;
+    private final PermissionService permissionService;
 
     @Autowired
     public ProjectMembershipController(ResourceBuilder resourceBuilder,
                                        ServiceProvider serviceProvider,
-                                       PermissionCheckerService permissionCheckerService) {
+                                       PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
-        this.permissionCheckerService = permissionCheckerService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -57,8 +58,10 @@ public class ProjectMembershipController extends BaseController {
     public ProjectMemberAppEntity addOrUpdateProjectMembership(@PathVariable UUID projectId,
                                                                @RequestBody ProjectMembershipRequest request)
         throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         UserProjectMembership updatedProjectMembership = this.serviceProvider
             .getMemberService()
             .addOrUpdateProjectMembership(project, user, request.getMemberEmail(), request.getProjectRole());
@@ -78,7 +81,9 @@ public class ProjectMembershipController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
     public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider
             .getMemberService()
             .getProjectMembers(project)
@@ -105,7 +110,7 @@ public class ProjectMembershipController extends BaseController {
         Project project = projectMembership.getProject();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         if (!projectMembership.getMember().equals(user)) {
-            permissionCheckerService.requireAdminPermission(project, user);
+            permissionService.requirePermission(ProjectPermission.SHARE, project, user);
         }
 
         // Step - Verify last owner not being deleted.

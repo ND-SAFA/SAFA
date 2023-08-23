@@ -6,6 +6,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -46,9 +47,10 @@ public class ArtifactTypeController extends BaseController {
     public TypeAppEntity createArtifactType(@PathVariable UUID projectId,
                                             @RequestBody ArtifactType artifactType) throws SafaError {
 
-        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
-        TypeService typeService = serviceProvider.getTypeService();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.EDIT, user).get();
+        TypeService typeService = serviceProvider.getTypeService();
         artifactType = typeService.createArtifactType(project, artifactType.getName(), artifactType.getColor(), user);
         return new TypeAppEntity(artifactType);
     }
@@ -65,9 +67,10 @@ public class ArtifactTypeController extends BaseController {
     @PutMapping(AppRoutes.ArtifactType.UPDATE_ARTIFACT_TYPE)
     public TypeAppEntity updateArtifactType(@PathVariable UUID projectId, @PathVariable String artifactType,
                                             @RequestBody ArtifactType artifactTypeObj) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
-        TypeService typeService = serviceProvider.getTypeService();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.EDIT, user).get();
+        TypeService typeService = serviceProvider.getTypeService();
         artifactTypeObj = typeService.updateArtifactType(project, artifactTypeObj, user);
         return new TypeAppEntity(artifactTypeObj);
     }
@@ -88,9 +91,9 @@ public class ArtifactTypeController extends BaseController {
         }
 
         Project project = type.getProject();
-        this.resourceBuilder.setProject(project).withEditProject();
-
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        this.resourceBuilder.setProject(project).withPermission(ProjectPermission.EDIT, user);
+
         typeService.deleteArtifactType(type, user);
     }
 }

@@ -2,11 +2,12 @@ package edu.nd.crc.safa.authentication.builders;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.PermissionCheckerService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
@@ -21,90 +22,120 @@ import org.springframework.stereotype.Component;
 public class ResourceBuilder {
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
-    private final PermissionCheckerService permissionCheckerService;
-
-    Project project;
-    ProjectVersion projectVersion;
+    private final PermissionService permissionService;
 
     @Autowired
     public ResourceBuilder(ProjectRepository projectRepository,
                            ProjectVersionRepository projectVersionRepository,
-                           PermissionCheckerService permissionCheckerService) {
-        this.project = null;
-        this.projectVersion = null;
+                           PermissionService permissionService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
-        this.permissionCheckerService = permissionCheckerService;
+        this.permissionService = permissionService;
     }
 
-    public ResourceBuilder fetchProject(UUID projectId) throws SafaError {
-        this.project = this.projectRepository.findByProjectId(projectId);
-        if (this.project == null) {
+    /**
+     * Fetch a project by ID.
+     *
+     * @param projectId The ID of the project
+     * @return The project in a holder that allows for easy permission checking
+     * @throws SafaError If no project with that ID is found
+     */
+    public ObjectHolder<Project> fetchProject(UUID projectId) throws SafaError {
+        Project project = this.projectRepository.findByProjectId(projectId);
+        if (project == null) {
             throw new SafaError("Unable to find project with ID: %s.", projectId);
         }
-        return this;
+        return new ProjectHolder(project);
     }
 
-    public ResourceBuilder fetchVersion(UUID versionId) throws SafaError {
-        this.projectVersion = this.projectVersionRepository.findByVersionId(versionId);
-        if (this.projectVersion == null) {
+    /**
+     * Fetch a project version by ID.
+     *
+     * @param versionId The ID of the version.
+     * @return The project version in a holder that allows for easy permission checking
+     * @throws SafaError If no version with that ID is found
+     */
+    public ObjectHolder<ProjectVersion> fetchVersion(UUID versionId) throws SafaError {
+        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        if (projectVersion == null) {
             throw new SafaError("Unable to find project version with id: %s.", versionId);
         }
-        return this;
+        return new ProjectVersionHolder(projectVersion);
     }
 
-    public ResourceBuilder setProject(Project project) {
-        this.project = project;
-        return this;
+    /**
+     * Specify a project so that we can check permissions on it
+     *
+     * @param project The project
+     * @return A holder for the project
+     */
+    public ObjectHolder<Project> setProject(Project project) {
+        return new ProjectHolder(project);
     }
 
-    public Project withOwnProject() throws SafaError {
-        this.permissionCheckerService.requireOwnerPermission(project);
-        return this.project;
+    /**
+     * An ObjectHolder is used to be able to quickly check permissions on objects
+     *
+     * @param <T> The type being held
+     */
+    public abstract static class ObjectHolder<T> {
+
+        protected T value;
+
+        public ObjectHolder(T value) {
+            this.value = value;
+        }
+
+        /**
+         * Check the user has the given permission on the contained object.
+         *
+         * @param permission Permission to check
+         * @param user The user to check permission for
+         * @return This
+         * @throws SafaError If the user doesn't have the permission
+         */
+        public ObjectHolder<T> withPermission(Permission permission, SafaUser user) throws SafaError {
+            this.requirePermission(permission, user);
+            return this;
+        }
+
+        /**
+         * Get the contained value
+         *
+         * @return The value
+         */
+        public T get() {
+            return value;
+        }
+
+        /**
+         * Check that the user has a given permission for the held object and thrown an error if not.
+         *
+         * @param permission The permission to check
+         * @param user The user to check for
+         */
+        protected abstract void requirePermission(Permission permission, SafaUser user) throws SafaError;
     }
 
-    public Project withOwnProjectAs(SafaUser user) throws SafaError {
-        this.permissionCheckerService.requireOwnerPermission(project, user);
-        return this.project;
+    private class ProjectHolder extends ObjectHolder<Project> {
+        public ProjectHolder(Project project) {
+            super(project);
+        }
+
+        @Override
+        protected void requirePermission(Permission permission, SafaUser user) {
+            permissionService.requirePermission(permission, value, user);
+        }
     }
 
-    public Project withViewProject() throws SafaError {
-        this.permissionCheckerService.requireViewPermission(project);
-        return this.project;
-    }
+    private class ProjectVersionHolder extends ObjectHolder<ProjectVersion> {
+        public ProjectVersionHolder(ProjectVersion projectVersion) {
+            super(projectVersion);
+        }
 
-    public Project withViewProjectAs(SafaUser user) throws SafaError {
-        this.permissionCheckerService.requireViewPermission(project, user);
-        return this.project;
-    }
-
-    public Project withEditProject() {
-        this.permissionCheckerService.requireEditPermission(project);
-        return this.project;
-    }
-
-    public Project withEditProjectAs(SafaUser user) {
-        this.permissionCheckerService.requireEditPermission(project, user);
-        return this.project;
-    }
-
-    public ProjectVersion withViewVersion() {
-        this.permissionCheckerService.requireViewPermission(projectVersion.getProject());
-        return projectVersion;
-    }
-
-    public ProjectVersion withViewVersionAs(SafaUser user) {
-        this.permissionCheckerService.requireViewPermission(projectVersion.getProject(), user);
-        return projectVersion;
-    }
-
-    public ProjectVersion withEditVersion() {
-        this.permissionCheckerService.requireEditPermission(projectVersion.getProject());
-        return projectVersion;
-    }
-
-    public ProjectVersion withEditVersionAs(SafaUser user) {
-        this.permissionCheckerService.requireEditPermission(projectVersion.getProject(), user);
-        return projectVersion;
+        @Override
+        protected void requirePermission(Permission permission, SafaUser user) {
+            permissionService.requirePermission(permission, value.getProject(), user);
+        }
     }
 }

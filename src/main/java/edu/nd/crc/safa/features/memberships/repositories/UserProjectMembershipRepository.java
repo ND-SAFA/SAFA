@@ -21,4 +21,6 @@ public interface UserProjectMembershipRepository extends CrudRepository<UserProj
     Optional<UserProjectMembership> findByProjectAndMember(Project project, SafaUser user);
 
     List<UserProjectMembership> findByProjectAndRoleIn(Project project, List<ProjectRole> roles);
+
+    Optional<UserProjectMembership> findByUserAndProjectAndRole(SafaUser user, Project project, ProjectRole role);
 }

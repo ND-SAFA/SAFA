@@ -39,4 +39,9 @@ public class TeamProjectMembership {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "team_id")
     private Team team;
+
+    public TeamProjectMembership(Project project, Team team) {
+        this.project = project;
+        this.team = team;
+    }
 }

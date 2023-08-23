@@ -1,8 +1,9 @@
+from tgen.common.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
+    RANKING_EXPLANATION_TAG, \
+    RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
+    RANKING_PARENT_TAG, RANKING_SCORE_TAG
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
-    RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
-    RANKING_MAX_SCORE, \
-    RANKING_PARENT_SUMMARY_TAG, RANKING_PARENT_TAG, RANKING_SCORE_TAG
+
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
 DEFAULT_RANKING_GOAL = (
@@ -11,7 +12,9 @@ DEFAULT_RANKING_GOAL = (
     f"This software project is described under `{PromptUtil.format_as_markdown_header(PROJECT_SUMMARY_HEADER)}`. "
     f"You are tasked with performing software traceability for a parent artifact enclosed in <{RANKING_PARENT_TAG}></{RANKING_PARENT_TAG}> "
     f"against a list of candidate children artifacts under `{PromptUtil.format_as_markdown_header(DEFAULT_ARTIFACT_HEADER)}`. "
-    "Focus on identifying children artifacts that help implement the functionality of the parent artifact."
+    "The children have been selected for being similar to the parent, however, there are many false positives. "
+    "You're job is to distinguish the artifacts that are truly relevant to the parent's functionality. "
+    "Focus on understanding the children artifacts in the context of the system to help achieve this goal."
 )
 DEFAULT_RANKING_INSTRUCTIONS = (
     "\n\n# Instructions\n"

@@ -1,9 +1,8 @@
 from typing import Dict, List, Optional, Tuple, Union
 
+from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
-from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS, DEFAULT_THRESHOLD_SCORE
-from tgen.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator

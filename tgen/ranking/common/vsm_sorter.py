@@ -3,10 +3,11 @@ from typing import Callable, Dict, List
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import minmax_scale
 from tqdm import tqdm
 
-from tgen.common.util.celerystatus import CeleryStatus
-from tgen.constants import environment_constants
+from tgen.common.constants import environment_constants
+from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -47,7 +48,7 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
                                                                                                          layer_df=layer_df)})
     vsm_job = VSMJob(trainer_dataset_manager=trainer_dataset_manager, select_predictions=False)
     job_result = vsm_job.run()
-    assert job_result.status == CeleryStatus.SUCCESS, f"Sorting using VSM failed. {job_result.body}"
+    assert job_result.status == Status.SUCCESS, f"Sorting using VSM failed. {job_result.body}"
     vsm_result: TraceTrainOutput = job_result.body
     prediction_entries = vsm_result.prediction_output.prediction_entries
     unsorted_targets = {}
@@ -65,7 +66,7 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
 def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str],
                      model_name=DEFAULT_EMBEDDING_MODEL, return_scores: bool = False) -> Dict[str, str]:
     cache_dir = os.environ.get("HF_DATASETS_CACHE", None)
-    if environment_constants.IS_TEST or not os.path.exists(cache_dir):
+    if cache_dir is None or environment_constants.IS_TEST or not os.path.exists(cache_dir):
         cache_dir = None
     model = SentenceTransformer(model_name, cache_folder=cache_dir)
 
@@ -77,9 +78,13 @@ def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: 
         parent_body = artifact_map[parent_id]
         parent_embedding = model.encode([parent_body])
         scores = cosine_similarity(parent_embedding, children_embeddings)[0]
-        sorted_artifact_ids = [a for s, a in sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])]
+        sorted_children = sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])
+        sorted_artifact_ids = [c[1] for c in sorted_children]
+        sorted_artifact_scores = [c[0] for c in sorted_children]
+
         if return_scores:
-            parent2rankings[parent_id] = (sorted_artifact_ids, scores)
+            sorted_artifact_scores = minmax_scale(sorted_artifact_scores)
+            parent2rankings[parent_id] = (sorted_artifact_ids, sorted_artifact_scores)
         else:
             parent2rankings[parent_id] = sorted_artifact_ids
     return parent2rankings

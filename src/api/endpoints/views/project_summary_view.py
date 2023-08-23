@@ -1,5 +1,5 @@
-from api.endpoints.base.views.endpoint import async_endpoint
-from api.endpoints.project_summary.project_summary_serializer import ProjectSummaryRequest, \
+from api.endpoints.base.endpoint import async_endpoint
+from api.endpoints.serializers.project_summary_serializer import ProjectSummaryRequest, \
     ProjectSummarySerializer
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.status import Status

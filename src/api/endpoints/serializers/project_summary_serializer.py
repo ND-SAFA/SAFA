@@ -2,7 +2,7 @@ from typing import Dict, TypedDict
 
 from rest_framework import serializers
 
-from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 
 
 class ProjectSummaryRequest(TypedDict):

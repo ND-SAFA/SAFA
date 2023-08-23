@@ -4,8 +4,8 @@ from typing import Type, Union
 
 from api.constants.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, DEFAULT_SEARCH_QUERY_TAG, \
     DEFAULT_SEARCH_QUESTIONS
-from api.endpoints.base.views.endpoint import async_endpoint, endpoint
-from api.endpoints.predict.predict_serializer import PredictionSerializer, TraceRequest
+from api.endpoints.base.endpoint import async_endpoint, endpoint
+from api.endpoints.views.predict_serializer import PredictionSerializer, TraceRequest
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_FILTER, DEFAULT_SEARCH_MODEL, SEARCH_CHILD_TYPE, SEARCH_PARENT_TYPE

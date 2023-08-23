@@ -7,8 +7,8 @@ from rest_framework import serializers
 
 from api.constants.api_constants import MEDIUM_LENGTH
 from api.constants.celery_status import CeleryStatus
-from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
-from api.endpoints.base.views.endpoint import endpoint
+from api.endpoints.base.endpoint import endpoint
+from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from tgen.common.util.json_util import NpEncoder
 from tgen.common.util.logging.logger_manager import logger
 

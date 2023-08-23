@@ -1,8 +1,8 @@
 from typing import List
 
-from api.endpoints.base.views.endpoint import async_endpoint
-from api.endpoints.hgen.hgen_serializer import HGenRequest, HGenSerializer
-from api.endpoints.summarize.summarize_serializer import SummaryArtifactPayload
+from api.endpoints.base.endpoint import async_endpoint
+from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
+from api.endpoints.serializers.summarize_serializer import SummaryArtifactPayload
 from api.utils.view_util import ViewUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger

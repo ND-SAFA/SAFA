@@ -1,4 +1,4 @@
-from api.endpoints.predict.predict_serializer import PredictionSerializer
+from api.endpoints.views.predict_serializer import PredictionSerializer
 from api.tests.api_base_test import APIBaseTest
 from api.tests.test_data import TestData
 

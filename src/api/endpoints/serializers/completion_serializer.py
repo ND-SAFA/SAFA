@@ -3,7 +3,7 @@ from typing import Dict, TypedDict
 from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_LENGTH
-from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from api.utils.serializer_utility import SerializerUtility
 from tgen.variables.variable import Variable
 

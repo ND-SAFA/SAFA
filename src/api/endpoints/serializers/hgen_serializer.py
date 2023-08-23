@@ -3,7 +3,7 @@ from typing import Dict, List, TypedDict
 from rest_framework import serializers
 
 from api.constants.api_constants import MEDIUM_LENGTH, TEXT_LENGTH
-from api.endpoints.summarize.summarize_serializer import SummaryArtifactSerializer
+from api.endpoints.serializers.summarize_serializer import SummaryArtifactSerializer
 
 
 class HGenRequest(TypedDict):

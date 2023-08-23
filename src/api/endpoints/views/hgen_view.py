@@ -46,9 +46,9 @@ def perform_hgen(request: HGenRequest):
     :param request: The request containing cluster of artifacts to summarize.
     :return: The generated artifact(s).
     """
-    artifacts = request["artifacts"]
-    target_types = request["targetTypes"]
-    summary = request.get("summary", None)
+    artifacts = request.artifacts
+    target_types = request.target_types
+    summary = request.summary
     base_type, *other_types = target_types
     logger.info(f"Starting HGEN request for: {target_types}")
     trace_dataset_creator = TraceDatasetCreator(SummaryArtifactProjectReader(artifacts=artifacts))

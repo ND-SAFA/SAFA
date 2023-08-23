@@ -1,14 +1,18 @@
-from typing import Dict, List, TypedDict
+from dataclasses import dataclass
+from typing import Dict, List
 
 from rest_framework import serializers
 
 from api.constants.api_constants import MEDIUM_LENGTH, TEXT_LENGTH
-from api.endpoints.serializers.summarize_serializer import SummaryArtifactSerializer
+from api.endpoints.serializers.artifact_serializer import ArtifactSerializer
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dataframe_util import DataFrameUtil
 
 
-class HGenRequest(TypedDict):
+@dataclass
+class HGenRequest(BaseObject):
     artifacts: List[Dict]
-    targetTypes: List[str]
+    target_types: List[str]
     summary: str
 
 
@@ -17,7 +21,7 @@ class HGenSerializer(serializers.Serializer):
     Serializes the request for hierarchy generation
     """
 
-    artifacts = SummaryArtifactSerializer(help_text="List of artifacts to generate parent artifacts from.", many=True)
+    artifacts = ArtifactSerializer(many=True, help_text="List of source artifacts.")
     targetTypes = serializers.ListSerializer(
         help_text="List of target types to generate.",
         child=serializers.CharField(max_length=MEDIUM_LENGTH, help_text="The types of artifacts to generate."))
@@ -25,10 +29,10 @@ class HGenSerializer(serializers.Serializer):
                                     allow_null=True,
                                     allow_blank=False)
 
-    def create(self, validated_data):
-        artifact_serializer = SummaryArtifactSerializer(data=validated_data["artifacts"], many=True)
+    def create(self, validated_data) -> HGenRequest:
+        artifact_serializer = ArtifactSerializer(data=validated_data["artifacts"], many=True)
         artifact_serializer.is_valid(raise_exception=True)
         artifacts = artifact_serializer.save()
-        summary = validated_data.get("summary", None)
         target_types = validated_data["targetTypes"]
-        return HGenRequest(artifacts=artifacts, targetTypes=target_types, summary=summary)
+        summary = DataFrameUtil.get_optional_value(validated_data, "summary", allow_empty=False)
+        return HGenRequest(artifacts=artifacts, target_types=target_types, summary=summary)

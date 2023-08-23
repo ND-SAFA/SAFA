@@ -2,8 +2,10 @@ package edu.nd.crc.safa.features.memberships.services;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
@@ -38,13 +40,15 @@ public class ProjectMembershipService {
      * @param project The project the role applies to
      * @param role The role
      */
-    public void addUserRole(SafaUser user, Project project, ProjectRole role) {
+    public UserProjectMembership addUserRole(SafaUser user, Project project, ProjectRole role) {
         Optional<UserProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
         if (membershipOptional.isEmpty()) {
             UserProjectMembership newMembership = new UserProjectMembership(project, user, role);
-            userProjectMembershipRepo.save(newMembership);
+            return userProjectMembershipRepo.save(newMembership);
+        } else {
+            return membershipOptional.get();
         }
     }
 
@@ -82,13 +86,15 @@ public class ProjectMembershipService {
      * @param team The team to share the project with.
      * @param project The project to share.
      */
-    public void addTeamToProject(Team team, Project project) {
+    public TeamProjectMembership addTeamToProject(Team team, Project project) {
         Optional<TeamProjectMembership> membershipOptional =
                 teamProjectMembershipRepo.findByTeamAndProject(team, project);
 
         if (membershipOptional.isEmpty()) {
             TeamProjectMembership newMembership = new TeamProjectMembership(project, team);
-            teamProjectMembershipRepo.save(newMembership);
+            return teamProjectMembershipRepo.save(newMembership);
+        } else {
+            return membershipOptional.get();
         }
     }
 
@@ -168,6 +174,57 @@ public class ProjectMembershipService {
         projects.addAll(this.projectService.getProjectsOwnedByTeam(team));
 
         return projects;
+    }
 
+    /**
+     * Returns the list of teams that have access to a project.
+     *
+     * @param project The project
+     * @return The teams who can view the project
+     */
+    public List<TeamProjectMembership> getProjectTeams(Project project) {
+        List<TeamProjectMembership> teamMemberships = this.teamProjectMembershipRepo.findByProject(project);
+        teamMemberships.add(new TeamProjectMembership(project, project.getOwningTeam()));
+        return teamMemberships;
+    }
+
+    /**
+     * Returns list of members in given project for which the project was shared to them directly (rather than them
+     * being on a team that has access).
+     *
+     * @param project The project whose members are retrieved.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<UserProjectMembership> getDirectProjectMembers(Project project) {
+        return this.userProjectMembershipRepo.findByProject(project);
+    }
+
+    /**
+     * Returns list of all users who are associated with a given project, either because it was shared with
+     * them directly or they are on a team that has access.
+     *
+     * @param project The project whose members are retrieved.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<UserProjectMembership> getAllProjectMembers(Project project) {
+        List<UserProjectMembership> users = getDirectProjectMembers(project);
+        List<TeamProjectMembership> teams = getProjectTeams(project);
+
+        Set<SafaUser> seenUsers = new HashSet<>();
+        users.stream()
+                .map(UserProjectMembership::getMember)
+                .forEach(seenUsers::add);
+
+        teams.stream()
+                .map(TeamProjectMembership::getTeam)
+                .flatMap(team -> teamMembershipService.getUsersInTeam(team).stream())
+                .forEach(user -> {
+                    if (!seenUsers.contains(user)) {
+                        users.add(new UserProjectMembership(project, user, ProjectRole.NONE));
+                        seenUsers.add(user);
+                    }
+                });
+
+        return users;
     }
 }

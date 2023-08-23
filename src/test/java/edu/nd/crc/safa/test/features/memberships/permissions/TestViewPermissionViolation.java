@@ -6,7 +6,8 @@ import java.util.HashMap;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
 
 import org.json.JSONObject;
@@ -25,8 +26,8 @@ public class TestViewPermissionViolation extends AbstractPermissionViolationTest
     }
 
     @Override
-    protected ProjectRole getExpectedRole() {
-        return ProjectRole.EDITOR;
+    protected Permission getExpectedPermission() {
+        return ProjectPermission.EDIT;
     }
 
     static class Constants {

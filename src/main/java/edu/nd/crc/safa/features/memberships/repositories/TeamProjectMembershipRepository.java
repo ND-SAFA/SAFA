@@ -16,4 +16,6 @@ public interface TeamProjectMembershipRepository extends CrudRepository<TeamProj
     Optional<TeamProjectMembership> findByTeamAndProject(Team team, Project project);
 
     List<TeamProjectMembership> findByTeam(Team team);
+
+    List<TeamProjectMembership> findByProject(Project project);
 }

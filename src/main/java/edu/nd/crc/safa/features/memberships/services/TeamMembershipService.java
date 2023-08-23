@@ -77,4 +77,28 @@ public class TeamMembershipService {
                 .map(TeamMembership::getTeam)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Get all team membership objects associated with a team
+     *
+     * @param team The team
+     * @return The team memberships in that team
+     */
+    public List<TeamMembership> getTeamMemberships(Team team) {
+        return teamMembershipRepo.findByTeam(team);
+    }
+
+    /**
+     * Get all users within a team
+     *
+     * @param team The team
+     * @return The members of the team
+     */
+    public List<SafaUser> getUsersInTeam(Team team) {
+        return getTeamMemberships(team)
+                .stream()
+                .map(TeamMembership::getUser)
+                .distinct()
+                .collect(Collectors.toUnmodifiableList());
+    }
 }

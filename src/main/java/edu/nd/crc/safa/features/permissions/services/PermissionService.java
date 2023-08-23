@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
+import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
+import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
@@ -25,6 +27,8 @@ public class PermissionService {
     private final String PERMISSION_ERROR = "User does not have %s permission";
 
     private final OrganizationMembershipService orgMembershipService;
+    private final ProjectMembershipService projectMembershipService;
+    private final TeamMembershipService teamMembershipService;
 
     /**
      * Returns whether the user has the given permission within the given project.
@@ -136,6 +140,7 @@ public class PermissionService {
 
         Set<Permission> permissions = new HashSet<>();
         projectRoles.forEach(role -> permissions.addAll(role.getGrants()));
+        permissions.addAll(getUserPermissions(user, project.getOwningTeam()));
         return permissions;
     }
 
@@ -153,6 +158,7 @@ public class PermissionService {
 
         Set<Permission> permissions = new HashSet<>();
         teamRoles.forEach(role -> permissions.addAll(role.getGrants()));
+        permissions.addAll(getUserPermissions(user, team.getOrganization()));
         return permissions;
     }
 
@@ -182,7 +188,7 @@ public class PermissionService {
      * @return The list of roles the user has associated with that project
      */
     public List<ProjectRole> getUserRoles(SafaUser user, Project project) {
-        return List.of(ProjectRole.NONE);
+        return projectMembershipService.getUserRoles(user, project);
     }
 
     /**
@@ -195,7 +201,7 @@ public class PermissionService {
      * @return The list of roles the user has associated with that team
      */
     public List<TeamRole> getUserRoles(SafaUser user, Team team) {
-        return List.of(TeamRole.NONE);
+        return teamMembershipService.getUserRoles(user, team);
     }
 
     /**

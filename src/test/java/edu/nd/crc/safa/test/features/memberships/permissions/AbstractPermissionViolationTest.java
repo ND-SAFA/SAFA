@@ -2,7 +2,7 @@ package edu.nd.crc.safa.test.features.memberships.permissions;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
 
 import org.json.JSONObject;
@@ -20,9 +20,9 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
     protected abstract JSONObject performViolatingAction() throws Exception;
 
     /**
-     * @return {@link ProjectRole} representing role sharee is supposed to have to achieve action.
+     * @return {@link Permission} representing permission sharee is supposed to have to achieve action.
      */
-    protected abstract ProjectRole getExpectedRole();
+    protected abstract Permission getExpectedPermission();
 
     @Test
     protected void attemptProjectEdit() throws Exception {
@@ -34,7 +34,7 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
 
         // VP - Verify that message contains
         assertThat(message)
-            .containsIgnoringCase(getExpectedRole().toString())
+            .containsIgnoringCase(getExpectedPermission().getName())
             .containsIgnoringCase("permission");
     }
 }

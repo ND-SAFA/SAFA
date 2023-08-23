@@ -29,7 +29,7 @@ INSTRUCTIONS_GOAL = (
 )
 OVERVIEW = "Create a sub-section called `Overview` describing the main purpose of the system."
 ENTITIES = "Create a sub-section called `Entities`. Define all the major entities in the system."
-FEATURES = "Create a sub-section called `Features` outlining the major features of the system. "
+FEATURES = "Create a sub-section called `Features` outlining all features of the system. "
 MAJOR_COMPONENTS = (
     "Create a sub-section called `Modules`. "
     "In this high level section enumerate all the major modules in the system and give a brief descriptions of what they do for the system."

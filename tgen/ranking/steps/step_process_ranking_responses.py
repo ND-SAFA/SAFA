@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 from tgen.common.util.json_util import JsonUtil
 from tgen.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
@@ -16,11 +16,29 @@ ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 class ArtifactReasoning:
 
     def __init__(self, artifact_dict: Dict):
-        JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value, RANKING_EXPLANATION_TAG, RANKING_SCORE_TAG])
-        self.index = artifact_dict[RANKING_ID_TAG][0]
-        self.explanation = artifact_dict[RANKING_EXPLANATION_TAG][0].strip()
-        self.score = artifact_dict[RANKING_SCORE_TAG][0] / RANKING_MAX_SCORE
+        JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value])
+        self.index = self.get_optional(artifact_dict, RANKING_ID_TAG)
+        self.explanation = self.get_optional(artifact_dict, RANKING_EXPLANATION_TAG, lambda s: s.strip())
+        self.score = self.get_optional(artifact_dict, RANKING_SCORE_TAG, lambda s: s / RANKING_MAX_SCORE)
         self.artifact_id = None
+
+    @staticmethod
+    def get_optional(a_dict: Dict, key_name: str, post_process: Callable = None) -> Optional[Any]:
+        """
+        Returns optional value from dictionary.
+        :param a_dict: The dictionary to retrieve the value from.
+        :param key_name: The name of the optional key.
+        :param post_process: Any operation to perform after value is retrieved, if it exists.
+        :return: The optional value.
+        """
+        if post_process is None:
+            post_process = lambda p: p
+        optional_value = a_dict.get(key_name, None)
+        if optional_value:
+            value = optional_value[0]
+            value = post_process(value)
+            return value
+        return None
 
 
 class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):

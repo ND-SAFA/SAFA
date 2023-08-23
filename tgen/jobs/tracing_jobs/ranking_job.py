@@ -94,7 +94,7 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(artifact_df.get_type(parent_type).index)
         children_ids = list(artifact_df.get_type(child_type).index)
-        run_name = f"{child_type}2{parent_type}"
+        run_name = f"{child_type}({len(parent_ids)}) --> {parent_type} ({len(children_ids)})"
         logger.info(f"Starting to trace: {run_name}")
 
         pipeline_args = RankingArgs(run_name=run_name,

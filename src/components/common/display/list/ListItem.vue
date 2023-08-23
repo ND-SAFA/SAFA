@@ -39,7 +39,7 @@
     </q-item-section>
     <q-item-section
       v-if="!!slots.actions"
-      :class="props.actionCols ? `col-${props.actionCols}` : ''"
+      :class="props.actionCols ? `col-${props.actionCols}` : 'width-fit'"
     >
       <div @click.stop="">
         <slot name="actions" />

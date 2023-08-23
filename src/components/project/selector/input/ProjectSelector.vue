@@ -13,12 +13,7 @@
     @popup-show="handleReload"
   >
     <template #option="{ opt, itemProps }">
-      <list-item
-        v-bind="itemProps"
-        :title="opt.name"
-        :action-cols="2"
-        :data-cy-name="opt.name"
-      >
+      <list-item v-bind="itemProps" :title="opt.name" :data-cy-name="opt.name">
         <template #actions>
           <flex-box justify="end">
             <icon-button

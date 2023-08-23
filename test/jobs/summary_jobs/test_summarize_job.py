@@ -32,6 +32,15 @@ class TestSummarizeJob(BaseJobTest):
 
         self._test_run_success()
 
+    @mock_anthropic
+    def test_run_subset_of_artifacts(self, ai_manager: TestAIManager):
+        responses = self.get_summarize_responses()[:-1]
+
+        ai_manager.set_responses(responses)
+        job = SummarizeArtifactsJob(self.project.ARTIFACTS, is_subset=True)
+        job.run()
+        self.assert_output_on_success(job, job.result, resummarized=False)
+
     def get_summarize_responses(self, resummarize: bool = False) -> List:
         responses = []
         for artifact in GenerationTestProject.ARTIFACTS:
@@ -48,17 +57,21 @@ class TestSummarizeJob(BaseJobTest):
         responses.append(project_summary)
         return responses
 
-    def _assert_success(self, job: AbstractJob, job_result: JobResult):
+    def _assert_success(self, job: AbstractJob, job_result: JobResult, resummarized: bool = True):
         artifacts = job_result.body["artifacts"]
         for artifact_id, artifact in artifacts.items():
             artifact = EnumDict(artifact)
             expected_artifact = self.project.get_artifact(artifact_id)
-            self.assertIn(self.RESUMMARIZED, artifact[ArtifactKeys.SUMMARY])
+            if resummarized:
+                self.assertIn(self.RESUMMARIZED, artifact[ArtifactKeys.SUMMARY])
+            else:
+                self.assertNotIn(self.RESUMMARIZED, artifact[ArtifactKeys.SUMMARY])
             if FileUtil.is_code(expected_artifact[ArtifactKeys.ID.value]):
                 self.assertIn(self.CODE_SUMMARY, artifact[ArtifactKeys.SUMMARY])
             else:
                 self.assertIn(self.NL_SUMMARY, artifact[ArtifactKeys.SUMMARY])
-        self.assertEqual(f"{self.RESUMMARIZED} {self.PROJECT_SUMMARY}", job_result.body["summary"])
+        if resummarized:
+            self.assertEqual(f"{self.RESUMMARIZED} {self.PROJECT_SUMMARY}", job_result.body["summary"])
 
     def _get_job(self) -> AbstractJob:
         return SummarizeArtifactsJob(self.project.ARTIFACTS)

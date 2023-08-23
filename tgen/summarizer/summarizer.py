@@ -30,6 +30,21 @@ class Summarizer:
             if self.args.do_resummarize_project else initial_project_summary
         return PromptDataset(artifact_df=artifacts_df, project_summary=final_project_summary)
 
+    @staticmethod
+    def create_summarizer(args: SummarizerArgs, project_summary: str = None) -> ArtifactsSummarizer:
+        """
+        Creates a summarizer for the artifacts from the args
+        :param args: The summarizer args
+        :param project_summary: Optionally provide a summary of the project to use instead of the one in args
+        :return: The summarizer for the artifacts
+        """
+        if not project_summary:
+            project_summary = args.project_summary
+        summarizer = ArtifactsSummarizer(args.llm_manager_for_artifact_summaries,
+                                         project_summary=project_summary,
+                                         code_summary_type=args.code_summary_type)
+        return summarizer
+
     def _resummarize_artifacts(self, project_summary: str) -> ArtifactDataFrame:
         """
         Resummarizes the artifacts with the project summary
@@ -40,9 +55,7 @@ class Summarizer:
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: orig_artifact_df.index,
                                          ArtifactKeys.CONTENT: orig_artifact_df[ArtifactKeys.CONTENT],
                                          ArtifactKeys.LAYER_ID: orig_artifact_df[ArtifactKeys.LAYER_ID]})
-        summarizer = ArtifactsSummarizer(self.args.llm_manager_for_artifact_summaries,
-                                         project_summary=project_summary,
-                                         code_summary_type=self.args.code_summary_type)
+        summarizer = self.create_summarizer(self.args, project_summary)
         artifact_df.summarize_content(summarizer)
         return artifact_df
 

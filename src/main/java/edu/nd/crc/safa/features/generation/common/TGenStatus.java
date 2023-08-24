@@ -12,12 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TGenStatus {
     /**
-     * -1 = Failure
-     * 0 = Success
-     * 1 = Not Started
-     * 2 = In Progress
+     * The status of the celery job.
      */
-    int status;
+    CeleryStatus status;
     /**
      * Message corresponding with status, used for reading error message.
      */
@@ -26,4 +23,6 @@ public class TGenStatus {
      * The current logs of the job.
      */
     List<String> logs;
+
+
 }

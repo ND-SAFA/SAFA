@@ -5,9 +5,7 @@ import javax.validation.Valid;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
-import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.GenerationApi;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +28,6 @@ public class PromptController extends BaseController {
      */
     @PostMapping(AppRoutes.Prompts.COMPLETE)
     public TGenPromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request) {
-        SafaRequestBuilder safaRequestBuilder = this.serviceProvider.getSafaRequestBuilder();
-        GenerationApi controller = new GenerationApi(safaRequestBuilder);
-        return controller.generatePrompt(request);
+        return this.serviceProvider.getGenerationApi().generatePrompt(request);
     }
 }

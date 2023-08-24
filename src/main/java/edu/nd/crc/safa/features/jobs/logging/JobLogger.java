@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.jobs.logging.services.JobLoggingService;
 
+import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -17,6 +18,7 @@ import lombok.Setter;
  */
 public class JobLogger {
     private final JobLoggingService loggingService;
+    @Getter
     private final JobDbEntity job;
     @Setter
     private int stepNum;

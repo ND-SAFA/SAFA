@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.HGenJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
@@ -51,6 +52,18 @@ class TestJobStepNames extends ApplicationBaseTest {
     }
 
     @Test
+    void testHGenSteps() {
+        List<String> stepNames = JobSteps.getJobSteps(HGenJob.class);
+        String[] expectedStepNames = new String[]{
+            "Summarizing Project",
+            "Generating Artifacts",
+            "Committing Entities",
+            "Done"
+        };
+        testStepNames(expectedStepNames, stepNames);
+    }
+
+    @Test
     void testJiraProjectCreationSteps() {
         List<String> stepNames = JobSteps.getJobSteps(CreateProjectViaJiraJob.class);
         String[] expectedStepNames = getJiraStepNames();
@@ -63,6 +76,7 @@ class TestJobStepNames extends ApplicationBaseTest {
         String[] expectedStepNames = getJiraStepNames();
         testStepNames(expectedStepNames, stepNames);
     }
+
 
     private String[] getJiraStepNames() {
         return new String[]{

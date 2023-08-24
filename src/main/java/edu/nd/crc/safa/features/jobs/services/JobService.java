@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.generation.api.GenerationApi;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
@@ -17,6 +18,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameters;
@@ -26,7 +28,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 /**
  * Responsible for creating units-of-work to be used in JobController.
  */
+@AllArgsConstructor
 @Service
 @Scope("singleton")
 public class JobService {
@@ -42,24 +44,26 @@ public class JobService {
      */
     private static final Logger logger = LoggerFactory.getLogger(JobService.class);
 
-    /**
-     * Repository for creating job entities in the database.
-     */
-    JobDbRepository jobDbRepository;
-    /**
-     * Service used to add authenticated user to job.
-     */
-    SafaUserService safaUserService;
+    private final JobDbRepository jobDbRepository;
+    private final GenerationApi generationApi;
+    private final SafaUserService safaUserService;
 
-    @Autowired
-    public JobService(JobDbRepository jobDbRepository,
-                      SafaUserService safaUserService) {
-        this.jobDbRepository = jobDbRepository;
-        this.safaUserService = safaUserService;
-    }
-
+    /**
+     * Deletes the job with given ID. Terminates any task associated with the job.
+     *
+     * @param jobId The ID of the job.
+     */
     public void deleteJob(UUID jobId) {
+        Optional<JobDbEntity> optionalJobDbEntity = this.jobDbRepository.findById(jobId);
+        if (optionalJobDbEntity.isEmpty()) {
+            return;
+        }
+        JobDbEntity jobDbEntity = optionalJobDbEntity.get();
         this.jobDbRepository.deleteById(jobId);
+        UUID taskId = jobDbEntity.getTaskId();
+        if (taskId != null) {
+            this.generationApi.cancelJob(taskId);
+        }
     }
 
     /**

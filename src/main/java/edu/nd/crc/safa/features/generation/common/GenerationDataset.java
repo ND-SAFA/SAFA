@@ -1,9 +1,9 @@
 package edu.nd.crc.safa.features.generation.common;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,8 +22,7 @@ public class GenerationDataset {
     /**
      * Map of artifact type to artifact maps.
      */
-    @JsonProperty("artifact_layers")
-    Map<String, Map<String, String>> artifactLayers; // snake_case to match TGEN
+    List<GenerationArtifact> artifacts; // snake_case to match TGEN
     /**
      * List of layers being traced (child -> parent).
      */
@@ -33,8 +32,7 @@ public class GenerationDataset {
      * The trace links between artifacts in all artifact layers.
      */
     @Nullable
-    @JsonProperty("true_links")
-    List<GenerationLink> trueLinks;
+    List<GenerationLink> links;
     /**
      * Optional. Project summary.
      */
@@ -44,18 +42,23 @@ public class GenerationDataset {
     @JsonIgnore
     Map<String, List<String>> layerIds = new HashMap<>();
 
-    public GenerationDataset(Map<String, Map<String, String>> artifactLayers, List<TraceLayer> layers) {
-        this.artifactLayers = artifactLayers;
+    public GenerationDataset(List<GenerationArtifact> artifacts, List<TraceLayer> layers) {
+        this.artifacts = artifacts;
         this.layers = layers;
     }
 
-    public List<String> getArtifacts(String artifactType) {
-        if (!this.layerIds.containsKey(artifactType)) {
-            Map<String, String> artifactMap = this.artifactLayers.get(artifactType);
-            List<String> artifacts = new ArrayList<>(artifactMap.values());
-            this.layerIds.put(artifactType, artifacts);
-        }
-        return this.layerIds.get(artifactType);
+    public List<GenerationArtifact> getArtifacts(String artifactType) {
+        return this.artifacts
+            .stream()
+            .filter(a -> a.getLayerId().equals(artifactType))
+            .collect(Collectors.toList());
+    }
+
+    public List<String> getArtifactBodies(String artifactType) {
+        return this.getArtifacts(artifactType)
+            .stream()
+            .map(GenerationArtifact::getContent)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -65,9 +68,9 @@ public class GenerationDataset {
     public int getNumOfCandidates() {
         int nCandidates = 0;
         for (TraceLayer layer : this.layers) {
-            Map<String, String> childArtifactMap = this.artifactLayers.get(layer.getChild());
-            Map<String, String> parentArtifactMap = this.artifactLayers.get(layer.getParent());
-            nCandidates += childArtifactMap.size() * parentArtifactMap.size();
+            List<String> childArtifacts = this.getArtifactBodies(layer.getChild());
+            List<String> parentArtifacts = this.getArtifactBodies(layer.getParent());
+            nCandidates += childArtifacts.size() * parentArtifacts.size();
         }
         return nCandidates;
     }

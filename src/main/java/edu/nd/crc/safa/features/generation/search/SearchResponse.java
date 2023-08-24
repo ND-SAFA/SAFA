@@ -19,8 +19,4 @@ public class SearchResponse {
      * The matched artifact ids.
      */
     List<UUID> artifactIds = new ArrayList<>();
-    /**
-     * Artifact bodies of associated matched artifacts.
-     */
-    List<String> artifactBodies = new ArrayList<>();
 }

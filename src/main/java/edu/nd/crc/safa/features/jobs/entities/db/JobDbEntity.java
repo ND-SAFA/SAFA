@@ -112,6 +112,10 @@ public class JobDbEntity {
     @Type(type = "uuid-char")
     UUID completedEntityId;
 
+    @Column(name = "task_id", nullable = true)
+    @Type(type = "uuid-char")
+    UUID taskId;
+
     public JobDbEntity(SafaUser user,
                        String name,
                        Class<? extends AbstractJob> jobType,

@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.common.SafaRequestBuilder;
-import edu.nd.crc.safa.features.generation.GenerationApi;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.generation.api.GenerationApi;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class SummaryService {
-    SafaRequestBuilder safaRequestBuilder;
+    private final GenerationApi generationApi;
+    private final ArtifactService artifactService;
 
     /**
      * Generates summarize for artifacts.
@@ -31,22 +33,19 @@ public class SummaryService {
     }
 
     public List<String> generateSummaries(SummarizeRequestDTO request, JobLogger jobLogger) {
-        List<TGenSummaryArtifact> artifacts = new ArrayList<>();
-        for (TGenSummaryArtifact artifact : request.getArtifacts()) {
-            if (artifact.getId() == null) { // For non-artifacts, ad-hoc id is created for them.
-                artifact.setId(artifact.getName());
-            }
-            TGenSummaryArtifactType artifactType = TGenSummaryArtifactType.getArtifactType(artifact.getName());
-            artifact.setType(artifactType);
-            artifacts.add(artifact);
-        }
-        GenerationApi tgen = new GenerationApi(safaRequestBuilder);
-        TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts);
-        TGenSummaryResponse response = tgen.generateSummaries(tgenRequest, jobLogger);
+        List<ArtifactAppEntity> artifactAppEntities = artifactService.getAppEntitiesById(request.getProjectVersion(),
+            request.getArtifacts());
+        List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new).collect(Collectors.toList());
+        return generateSummaries(generationArtifacts, jobLogger);
+    }
+
+    public List<String> generateSummaries(List<GenerationArtifact> generationArtifacts, JobLogger jobLogger) {
+        TGenSummaryRequest tgenRequest = new TGenSummaryRequest(generationArtifacts);
+        TGenSummaryResponse response = this.generationApi.generateSummaries(tgenRequest, jobLogger);
 
         List<String> summaries = new ArrayList<>();
-        for (TGenSummaryArtifact artifact : response.getArtifacts().values()) {
-            summaries.add(artifact.getContent());
+        for (GenerationArtifact artifact : response.getArtifacts()) {
+            summaries.add(artifact.getSummary());
         }
         return summaries;
     }
@@ -69,13 +68,9 @@ public class SummaryService {
             return new ArrayList<>();
         }
         // Summaries returned in same order so id is not considered.
-        List<TGenSummaryArtifact> summaryArtifacts = codeArtifacts.stream().map(a -> new TGenSummaryArtifact(
-            a.getTraceableId(), // avoid using id if artifact is not yet created.
-            a.getName(),
-            a.getBody(),
-            TGenSummaryArtifactType.getArtifactType(a.getName()))
+        List<GenerationArtifact> generationArtifacts = codeArtifacts.stream().map(GenerationArtifact::new
         ).collect(Collectors.toList());
-        List<String> summarizedArtifacts = this.generateSummaries(new SummarizeRequestDTO(summaryArtifacts), logger);
+        List<String> summarizedArtifacts = this.generateSummaries(generationArtifacts, logger);
         for (int i = 0; i < codeArtifacts.size(); i++) {
             String artifactSummary = summarizedArtifacts.get(i);
             ArtifactAppEntity artifact = codeArtifacts.get(i);

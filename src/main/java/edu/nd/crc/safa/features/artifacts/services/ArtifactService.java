@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.artifacts.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -14,8 +16,8 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
 @AllArgsConstructor
+@Service
 public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
     private IVersionRepository<ArtifactVersion, ArtifactAppEntity> artifactVersionRepository;
 
@@ -29,10 +31,21 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         return versionToAppEntity(artifactVersions);
     }
-    
+
     public List<ArtifactAppEntity> getAppEntities(Project project) {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
             .retrieveVersionEntitiesByProject(project);
+        return versionToAppEntity(artifactVersions);
+    }
+
+    public List<ArtifactAppEntity> getAppEntitiesById(ProjectVersion projectVersion, List<UUID> artifactIds) {
+        List<ArtifactVersion> artifactVersions = new ArrayList<>();
+        for (UUID artifactId : artifactIds) {
+            Optional<ArtifactVersion> artifactVersionOptional =
+                this.artifactVersionRepository.findVersionEntityByProjectVersionAndBaseEntityId(projectVersion,
+                    artifactId);
+            artifactVersionOptional.ifPresent(a -> artifactVersions.add(a));
+        }
         return versionToAppEntity(artifactVersions);
     }
 

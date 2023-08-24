@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryRequest;
 import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryResponse;
 import edu.nd.crc.safa.features.generation.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.generation.prompt.TGenPromptResponse;
-import edu.nd.crc.safa.features.generation.summary.TGenSummaryRequest;
+import edu.nd.crc.safa.features.generation.summary.GenArtifactSummaryRequest;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryResponse;
 import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
@@ -67,7 +67,7 @@ public class GenerationApi implements ITraceGenerationController {
      * @param logger  Optional logger for relaying log messages.
      * @return TGen response.
      */
-    public TGenSummaryResponse generateSummaries(TGenSummaryRequest request, JobLogger logger) {
+    public TGenSummaryResponse generateArtifactSummaries(GenArtifactSummaryRequest request, JobLogger logger) {
         return artifactSummaryApi.sendSummarizeRequest(request, logger);
     }
 

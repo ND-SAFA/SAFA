@@ -27,14 +27,16 @@ public class SummarizeController extends BaseController {
     /**
      * Performs summary request.
      *
-     * @param request Defines content to summarize and model to do it with.
+     * @param versionId The version of the artifact to summarize.
+     * @param request   Defines content to summarize and model to do it with.
      * @return List of summaries.
      */
     @PostMapping(AppRoutes.Summarize.SUMMARIZE_ARTIFACTS)
     public List<String> summarizeArtifacts(@PathVariable UUID versionId,
-                                           @RequestBody @Valid SummarizeRequestDTO request) {
+                                           @RequestBody @Valid SummarizeArtifactRequestDTO request) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         request.setProjectVersion(projectVersion);
-        return serviceProvider.getSummaryService().generateSummaries(request);
+        request.setProjectSummary(projectVersion.getProject().getSpecification());
+        return serviceProvider.getSummaryService().generateArtifactSummaries(request);
     }
 }

@@ -16,11 +16,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SummarizeRequestDTO {
+public class SummarizeArtifactRequestDTO {
     /**
      * The artifacts to summarize and their type.
      */
     List<UUID> artifacts;
     @Nullable
     ProjectVersion projectVersion;
+    @Nullable
+    private String projectSummary;
+
+    public void setProjectSummary(String projectSummary) {
+        this.projectSummary = projectSummary == null || projectSummary.isEmpty() ? null : projectSummary;
+    }
 }

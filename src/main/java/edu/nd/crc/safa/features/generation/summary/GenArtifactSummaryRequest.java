@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class TGenSummaryRequest {
+public class GenArtifactSummaryRequest {
     /**
      * The artifacts to summarize.
      */
@@ -22,7 +22,7 @@ public class TGenSummaryRequest {
      */
     String projectSummary = null;
 
-    public TGenSummaryRequest(List<GenerationArtifact> artifacts) {
+    public GenArtifactSummaryRequest(List<GenerationArtifact> artifacts) {
         this.artifacts = artifacts;
     }
 }

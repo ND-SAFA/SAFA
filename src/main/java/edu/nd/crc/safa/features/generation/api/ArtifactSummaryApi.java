@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.generation.api;
 
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.RequestService;
-import edu.nd.crc.safa.features.generation.summary.TGenSummaryRequest;
+import edu.nd.crc.safa.features.generation.summary.GenArtifactSummaryRequest;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 
@@ -23,7 +23,7 @@ public class ArtifactSummaryApi {
      * @param logger  Optional. Job logger to store logs under.
      * @return Summary response.
      */
-    public TGenSummaryResponse sendSummarizeRequest(TGenSummaryRequest payload, JobLogger logger) {
+    public TGenSummaryResponse sendSummarizeRequest(GenArtifactSummaryRequest payload, JobLogger logger) {
         String predictEndpoint;
 
         int nArtifacts = payload.getArtifacts().size();

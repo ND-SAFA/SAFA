@@ -28,26 +28,23 @@ public class SummaryService {
      * @param request The summarization request.
      * @return List of summaries.
      */
-    public List<String> generateSummaries(SummarizeRequestDTO request) {
-        return generateSummaries(request, null);
+    public List<String> generateArtifactSummaries(SummarizeArtifactRequestDTO request) {
+        return generateArtifactSummaries(request, null);
     }
 
-    public List<String> generateSummaries(SummarizeRequestDTO request, JobLogger jobLogger) {
+    /**
+     * Generates summaries for defined artifacts at specified version.
+     *
+     * @param request   The request containing artifacts and project version.
+     * @param jobLogger The logger to store logs under.
+     * @return List of artifact summaries in the same order as the order ids given.
+     */
+    public List<String> generateArtifactSummaries(SummarizeArtifactRequestDTO request, JobLogger jobLogger) {
         List<ArtifactAppEntity> artifactAppEntities = artifactService.getAppEntitiesById(request.getProjectVersion(),
             request.getArtifacts());
         List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new).collect(Collectors.toList());
-        return generateSummaries(generationArtifacts, jobLogger);
-    }
-
-    public List<String> generateSummaries(List<GenerationArtifact> generationArtifacts, JobLogger jobLogger) {
-        TGenSummaryRequest tgenRequest = new TGenSummaryRequest(generationArtifacts);
-        TGenSummaryResponse response = this.generationApi.generateSummaries(tgenRequest, jobLogger);
-
-        List<String> summaries = new ArrayList<>();
-        for (GenerationArtifact artifact : response.getArtifacts()) {
-            summaries.add(artifact.getSummary());
-        }
-        return summaries;
+        GenArtifactSummaryRequest tgenRequest = new GenArtifactSummaryRequest(generationArtifacts, request.getProjectSummary());
+        return performGenArtifactSummaryRequest(tgenRequest, jobLogger);
     }
 
     /**
@@ -68,9 +65,9 @@ public class SummaryService {
             return new ArrayList<>();
         }
         // Summaries returned in same order so id is not considered.
-        List<GenerationArtifact> generationArtifacts = codeArtifacts.stream().map(GenerationArtifact::new
-        ).collect(Collectors.toList());
-        List<String> summarizedArtifacts = this.generateSummaries(generationArtifacts, logger);
+        List<GenerationArtifact> generationArtifacts = codeArtifacts.stream().map(GenerationArtifact::new).collect(Collectors.toList());
+        GenArtifactSummaryRequest request = new GenArtifactSummaryRequest(generationArtifacts);
+        List<String> summarizedArtifacts = this.performGenArtifactSummaryRequest(request, logger);
         for (int i = 0; i < codeArtifacts.size(); i++) {
             String artifactSummary = summarizedArtifacts.get(i);
             ArtifactAppEntity artifact = codeArtifacts.get(i);
@@ -78,5 +75,21 @@ public class SummaryService {
         }
 
         return codeArtifacts;
+    }
+
+    /**
+     * Performs the generation request to summarize artifacts.
+     *
+     * @param request   The request containing artifacts to summarize and potentially a project summary.
+     * @param jobLogger The logger to store logs under.
+     * @return The list of summaries.
+     */
+    private List<String> performGenArtifactSummaryRequest(GenArtifactSummaryRequest request, JobLogger jobLogger) {
+        TGenSummaryResponse response = this.generationApi.generateArtifactSummaries(request, jobLogger);
+        List<String> summaries = new ArrayList<>();
+        for (GenerationArtifact artifact : response.getArtifacts()) {
+            summaries.add(artifact.getSummary());
+        }
+        return summaries;
     }
 }

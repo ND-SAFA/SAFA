@@ -64,7 +64,7 @@ public class ProjectChanger {
      * Detects deleted entities by noting which entities are missing that were previously defined.
      *
      * @param projectEntities Artifact and trace links to set.
-     * @param user User making the request
+     * @param user            User making the request
      */
     public void setEntitiesAsCompleteSet(ProjectEntities projectEntities, SafaUser user) {
         List<ArtifactAppEntity> artifacts = projectEntities.getArtifacts();

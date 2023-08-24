@@ -42,8 +42,10 @@ public class SummaryService {
     public List<String> generateArtifactSummaries(SummarizeArtifactRequestDTO request, JobLogger jobLogger) {
         List<ArtifactAppEntity> artifactAppEntities = artifactService.getAppEntitiesById(request.getProjectVersion(),
             request.getArtifacts());
-        List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new).collect(Collectors.toList());
-        GenArtifactSummaryRequest tgenRequest = new GenArtifactSummaryRequest(generationArtifacts, request.getProjectSummary());
+        List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new)
+            .collect(Collectors.toList());
+        GenArtifactSummaryRequest tgenRequest = new GenArtifactSummaryRequest(generationArtifacts,
+            request.getProjectSummary());
         return performGenArtifactSummaryRequest(tgenRequest, jobLogger);
     }
 
@@ -65,7 +67,8 @@ public class SummaryService {
             return new ArrayList<>();
         }
         // Summaries returned in same order so id is not considered.
-        List<GenerationArtifact> generationArtifacts = codeArtifacts.stream().map(GenerationArtifact::new).collect(Collectors.toList());
+        List<GenerationArtifact> generationArtifacts = codeArtifacts.stream().map(GenerationArtifact::new)
+            .collect(Collectors.toList());
         GenArtifactSummaryRequest request = new GenArtifactSummaryRequest(generationArtifacts);
         List<String> summarizedArtifacts = this.performGenArtifactSummaryRequest(request, logger);
         for (int i = 0; i < codeArtifacts.size(); i++) {

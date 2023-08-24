@@ -83,8 +83,9 @@ public class SearchService {
     /**
      * Performs a search between source and target artifacts using TGEN tracing.
      *
-     * @param artifacts The artifacts containing queries and candidate artifacts.
-     * @param n         The top n matches to return.
+     * @param artifacts   The artifacts containing queries and candidate artifacts.
+     * @param n           The top n matches to return.
+     * @param searchTypes The artifact types to search against.
      * @return Target Artifact IDs that matched source artifacts.
      */
     public SearchResponse searchSourceLayer(List<ArtifactAppEntity> artifacts, List<String> searchTypes, int n) {
@@ -116,7 +117,8 @@ public class SearchService {
      * @param artifactTypes    The artifact types whose associated artifacts are being extracted.
      * @return The map between artifact id and body.
      */
-    private List<ArtifactAppEntity> constructTargetLayer(ProjectAppEntity projectAppEntity, List<String> artifactTypes) {
+    private List<ArtifactAppEntity> constructTargetLayer(ProjectAppEntity projectAppEntity,
+                                                         List<String> artifactTypes) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (String artifactTypeName : artifactTypes) {
             artifacts.addAll(projectAppEntity.getByArtifactType(artifactTypeName));

@@ -36,6 +36,7 @@ public class HGenService {
      *
      * @param projectVersion The version to retrieve artifacts in.
      * @param request        The request defining artifacts, clusters, and model.
+     * @param jobLogger      The logger used to store logs under.
      * @return List of generated artifacts.
      */
     public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequest request, JobLogger jobLogger) {

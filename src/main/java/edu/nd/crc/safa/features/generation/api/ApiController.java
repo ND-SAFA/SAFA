@@ -34,6 +34,7 @@ public class ApiController {
      * @param payload       The job to submit to TGEN.
      * @param responseClass The class for the job result.
      * @param <T>           The generic for the job result class.
+     * @param logger        The logger to store logs under.
      * @return Parsed TGEN response if job is successful.
      */
     public <T extends ITGenResponse> T performJob(String endpoint,

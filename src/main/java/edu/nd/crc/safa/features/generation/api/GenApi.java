@@ -45,14 +45,16 @@ public class GenApi implements ITraceGenerationController {
      */
     public String generateProjectSummary(ProjectSummaryRequest request, JobLogger logger) {
         String endpoint = TGenConfig.getEndpoint("project-summary");
-        ProjectSummaryResponse response = apiController.performJob(endpoint, request, ProjectSummaryResponse.class, logger);
+        ProjectSummaryResponse response = apiController.performJob(endpoint, request,
+            ProjectSummaryResponse.class, logger);
         return response.getSummary();
     }
 
     /**
      * Creates hierarchy of artifacts for artifacts.
      *
-     * @param request The request detailing clusters of artifacts.
+     * @param request   The request detailing clusters of artifacts.
+     * @param jobLogger The logger to store logs under.
      * @return The generated artifacts per cluster.
      */
     public HGenResponse generateHierarchy(TGenHGenRequest request, JobLogger jobLogger) {
@@ -113,7 +115,9 @@ public class GenApi implements ITraceGenerationController {
      * @param taskId The ID of the task to terminate.
      */
     public void cancelJob(UUID taskId) {
-        if (taskId == null) throw new AssertionError("Cannot terminate task with ID equal to null.");
+        if (taskId == null) {
+            throw new AssertionError("Cannot terminate task with ID equal to null.");
+        }
         String cancelEndpoint = TGenConfig.getEndpoint("cancel");
         TGenTask task = new TGenTask();
         task.setTaskId(taskId);

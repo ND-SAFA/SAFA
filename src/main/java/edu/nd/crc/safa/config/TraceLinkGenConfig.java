@@ -33,12 +33,6 @@ public class TraceLinkGenConfig {
         return new VSMController();
     }
 
-//    @Bean
-//    @Profile("!test")
-//    public ITraceGenerationController getTGen(@Autowired GenerationApi generationApi) {
-//        return generationApi;
-//    }
-
     @Autowired
     public void setEnvironment(Environment environment) {
         TraceLinkGenConfig.environment = environment;

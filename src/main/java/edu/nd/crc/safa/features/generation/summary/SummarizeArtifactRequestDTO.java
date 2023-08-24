@@ -3,6 +3,8 @@ package edu.nd.crc.safa.features.generation.summary;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -20,7 +22,8 @@ public class SummarizeArtifactRequestDTO {
     /**
      * The artifacts to summarize and their type.
      */
-    List<UUID> artifacts;
+    @NotEmpty
+    List<@NotNull UUID> artifacts;
     /**
      * The version of the artifacts to summarize.
      */

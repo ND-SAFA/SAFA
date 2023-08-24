@@ -1,6 +1,9 @@
 package edu.nd.crc.safa.features.generation.summary;
 
 import java.util.List;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 
@@ -16,10 +19,12 @@ public class GenArtifactSummaryRequest {
     /**
      * The artifacts to summarize.
      */
-    List<GenerationArtifact> artifacts;
+    @NotEmpty
+    List<@NotNull GenerationArtifact> artifacts;
     /**
      * The project summary.
      */
+    @Nullable
     String projectSummary = null;
 
     public GenArtifactSummaryRequest(List<GenerationArtifact> artifacts) {

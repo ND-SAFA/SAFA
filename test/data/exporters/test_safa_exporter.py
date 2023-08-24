@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 
+from tgen.common.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
@@ -43,6 +44,8 @@ class TestSafaExporter(BaseTest):
         """
         Tests the ability to export generated links with explanations.
         """
+        source_type = "source_type"
+        target_type = "target_type"
         source = "S1"
         target = "T2"
         score = 0.4
@@ -51,10 +54,10 @@ class TestSafaExporter(BaseTest):
         target_type = "target"
         trace_file_name = f"{source_type}2{target_type}.json"
 
-        artifact_layers = {
-            source_type: {f"S{i}": "dummy text" for i in range(3)},
-            target_type: {f"T{i}": "dummy text" for i in range(3)}
-        }
+        source_artifacts = [Artifact(id="S{i}", content="dummy text", layer_id=source_type) for i in range(3)]
+        target_artifacts = [Artifact(id="T{i}", content="dummy text", layer_id=target_type) for i in range(3)]
+
+        artifacts = source_artifacts + target_artifacts
         layers: List[TraceLayer] = [TraceLayer(child=source_type, parent=target_type)]
         true_links: List[TracePredictionEntry] = [{
             "source": source,
@@ -62,7 +65,7 @@ class TestSafaExporter(BaseTest):
             "score": score,
             "explanation": explanation
         }]
-        api_definition = ApiDefinition(artifacts=artifact_layers, layers=layers, true_links=true_links)
+        api_definition = ApiDefinition(artifacts=artifacts, layers=layers, links=true_links)
         api_project_reader = ApiProjectReader(api_definition=api_definition)
         trace_dataset_creator = TraceDatasetCreator(project_reader=api_project_reader)
         safa_exporter = SafaExporter(TEST_OUTPUT_DIR, dataset_creator=trace_dataset_creator)

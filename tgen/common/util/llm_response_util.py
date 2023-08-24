@@ -29,7 +29,7 @@ class LLMResponseUtil:
                 content = [LLMResponseUtil._parse_children(tag) for tag in tags]
             else:
                 content = [tag.contents[0] for tag in tags if len(tag.contents) > 0]
-            assert content
+            assert len(content) > 0, f"Found no tags ({tag_name}) in:\n{res}"
         except Exception:
             error = f"Unable to parse {tag_name}"
             logger.exception(error)

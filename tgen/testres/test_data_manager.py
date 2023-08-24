@@ -3,6 +3,7 @@ from typing import Dict, List, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.common.artifact import Artifact
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -137,9 +138,9 @@ class TestDataManager:
         layers = [TraceLayer(**params) for params in TestDataManager.get_path(TestDataManager.Keys.LAYERS)]
         links = [TracePredictionEntry(**params) for params in TestDataManager.get_path(TestDataManager.Keys.TRACES)]
         api_definition = ApiDefinition(
-            artifacts=TestDataManager.get_path(TestDataManager.Keys.ARTIFACTS),
+            artifacts=TestDataManager.get_artifacts(),
             layers=layers,
-            true_links=links
+            links=links
         )
         return ApiProjectReader(api_definition=api_definition)
 
@@ -159,3 +160,12 @@ class TestDataManager:
             n_candidates = len(parent_artifacts) * len(child_artifacts)
             n_candidates_total += n_candidates
         return n_candidates_total
+
+    @classmethod
+    def get_artifacts(cls) -> List[Artifact]:
+        artifacts = []
+        for artifact_type, artifacts_in_type in TestDataManager.DATA[TestDataManager.Keys.ARTIFACTS].items():
+            for artifact_id, artifact_body in artifacts_in_type.items():
+                artifact = Artifact(id=artifact_id, content=artifact_body, layer_id=artifact_type, summary=None)
+                artifacts.append(artifact)
+        return artifacts

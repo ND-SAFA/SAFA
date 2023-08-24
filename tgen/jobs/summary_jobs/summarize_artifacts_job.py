@@ -14,7 +14,7 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
     """
 
     def __init__(self, artifacts: List[Dict] = None, artifact_reader: ArtifactProjectReader = None,
-                 project_summary: str = None, export_dir: str = None, include_project_summary: bool = True,
+                 project_summary: str = None, export_dir: str = None, do_resummarize_project: bool = True,
                  is_subset: bool = False, job_args: JobArgs = None, **kwargs):
         """
         Summarizes a given dataset using the given summarizer
@@ -25,11 +25,11 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         :param is_subset: True if not all of the artifacts are provided
         :param job_args: The arguments to the job.
         """
-        self.include_project_summary = include_project_summary
+        self.include_project_summary = do_resummarize_project
         self.is_subset = is_subset
         super().__init__(artifacts=artifacts, artifact_reader=artifact_reader,
                          project_summary=project_summary, export_dir=export_dir, job_args=job_args,
-                         do_resummarize_project=include_project_summary,
+                         do_resummarize_project=do_resummarize_project,
                          **kwargs)
 
     def _run(self) -> Dict[Any, str]:
@@ -46,5 +46,5 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
             dataset = Summarizer(args).summarize()
             artifacts_df = dataset.artifact_df
             summary = dataset.project_summary if self.include_project_summary else None
-        artifacts = artifacts_df.reset_index().to_dict(orient='records')
+        artifacts = artifacts_df.to_dict(orient='records')
         return SummaryResponse(summary=summary, artifacts=artifacts)

@@ -14,11 +14,11 @@ class ApiDefinition(BaseObject):
     """
     artifacts: List[Artifact]
     layers: List[TraceLayer]
-    true_links: List[TracePredictionEntry] = None
+    links: List[TracePredictionEntry] = None
     summary: str = None
 
     def get_links(self) -> List[TracePredictionEntry]:
         """
         :return: Returns the trace links defined in API dataset.
         """
-        return [] if self.true_links is None else self.true_links
+        return [] if self.links is None else self.links

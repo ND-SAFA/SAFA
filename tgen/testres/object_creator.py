@@ -42,7 +42,7 @@ class ObjectCreator:
         "api_definition": {
             "artifact_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS]),
             "layers": TestDataManager.get_path([TestDataManager.Keys.LAYERS]),
-            "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
+            "links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
         }
     }
     dataset_creator_definition = {

@@ -6,7 +6,6 @@ class Artifact(TypedDict):
     Typed entity representing single artifact entry.
     """
     id: str
-    name: str
     content: str
     summary: Optional[str]
     layer_id: str

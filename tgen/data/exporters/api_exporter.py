@@ -3,6 +3,7 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 
+from tgen.common.artifact import Artifact
 from tgen.common.util.json_util import JsonUtil
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -24,7 +25,7 @@ class ApiExporter(AbstractDatasetExporter):
         :param export_path: The path to export the dataset to
         """
         super().__init__(dataset_creator=dataset_creator, dataset=dataset, export_path=export_path)
-        self.generated_layers: Dict[str, Dict[str, str]] = {}
+        self.artifacts: List[Artifact] = []
         self.true_links: List[TracePredictionEntry] = []
 
     def export(self, **kwargs) -> ApiDefinition:
@@ -35,18 +36,17 @@ class ApiExporter(AbstractDatasetExporter):
         dataset = self.get_dataset()
         links = dataset.trace_df.to_dict(orient="records")
         self.true_links: List[Dict] = [t for t in links if not np.isnan(t["score"]) and t["score"] > 0]
-        for link_id, artifact_row in dataset.artifact_df.itertuples():
-            self._add_artifact(artifact_row)
+        artifacts: List[Artifact] = dataset.artifact_df.reset_index().to_dict("records")
 
         layers = []
-        for i, layer_row in dataset.layer_df.iterrows():
-            parent_type = layer_row[LayerKeys.TARGET_TYPE.value]
-            child_type = layer_row[LayerKeys.SOURCE_TYPE.value]
+        for i, layer_row in dataset.layer_df.itertuples():
+            parent_type = layer_row[LayerKeys.TARGET_TYPE]
+            child_type = layer_row[LayerKeys.SOURCE_TYPE]
             layers.append(TraceLayer(parent=parent_type, child=child_type))
 
         definition = ApiDefinition(layers=layers,
-                                   artifacts=self.generated_layers,
-                                   true_links=self.true_links)
+                                   artifacts=artifacts,
+                                   links=self.true_links)
         if self.export_path:
             JsonUtil.save_to_json_file(definition, self.export_path)
 

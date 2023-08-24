@@ -2,13 +2,11 @@ from typing import List
 
 from api.endpoints.base.endpoint import async_endpoint
 from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
-from api.endpoints.serializers.summarize_serializer import SummaryArtifactPayload
 from api.utils.view_util import ViewUtil
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, ProjectData
@@ -25,12 +23,7 @@ class SummaryArtifactProjectReader(AbstractProjectReader):
         self.artifacts = artifacts
 
     def read_project(self) -> ProjectData:
-        def convert_to_artifact(a: SummaryArtifactPayload):
-            a_dict = {ArtifactKeys.ID: a["id"], ArtifactKeys.CONTENT: a["content"], ArtifactKeys.LAYER_ID: ARTIFACT_LAYER}
-            return EnumDict(a_dict)
-
-        artifacts = [convert_to_artifact(a) for a in self.artifacts]
-        artifact_df = ArtifactDataFrame(artifacts)
+        artifact_df = ArtifactDataFrame(self.artifacts)
         layer_df = LayerDataFrame()
         trace_df = TraceDataFrame()
         return artifact_df, trace_df, layer_df

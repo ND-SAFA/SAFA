@@ -123,7 +123,6 @@ def async_endpoint(serializer: Type[serializers.Serializer], pre_process: PrePro
                     s = serializer(data=data)
                     s.is_valid(raise_exception=True)
                     data = s.save()
-                    logger.info(f"Request: {type(data)}")
                     response = func(data, *other_args, **task_kwargs)
                     response_str = json.dumps(response, cls=NpEncoder)
                     response_dict = json.loads(response_str)

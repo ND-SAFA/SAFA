@@ -5,7 +5,7 @@ from celery.result import AsyncResult
 from django.http import JsonResponse
 from rest_framework import serializers
 
-from api.constants.api_constants import MEDIUM_LENGTH
+from api.constants.api_constants import MEDIUM_TEXT
 from api.constants.celery_status import CeleryStatus
 from api.endpoints.base.endpoint import endpoint
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
@@ -18,7 +18,7 @@ class ResultPayload(TypedDict):
 
 
 class ResultSerializer(AbstractSerializer[ResultPayload]):
-    task_id = serializers.CharField(max_length=MEDIUM_LENGTH, help_text="ID of task.")
+    task_id = serializers.CharField(max_length=MEDIUM_TEXT, help_text="ID of task.")
 
 
 def get_task_status(result: AsyncResult.status) -> Tuple[CeleryStatus, str]:

@@ -144,7 +144,7 @@ APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOW_ALL_ORIGINS = True
 
-ENV_MODE = os.environ.get("ENV_MODE", "local")
+ENV_MODE = os.environ.get("ENV_MODE", "development")
 logger.info(f"Running in {ENV_MODE} mode")
 """
 Celery Configuration Options

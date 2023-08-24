@@ -2,17 +2,17 @@ import { defineStore } from "pinia";
 
 import { computed, ref } from "vue";
 import {
-  GenerateArtifactSchema,
-  IOHandlerCallback,
   ArtifactSchema,
   ArtifactSummaryConfirmation,
+  GenerateArtifactSchema,
+  IOHandlerCallback,
 } from "@/types";
 import {
-  useApi,
-  projectStore,
-  artifactSaveStore,
   artifactApiStore,
+  artifactSaveStore,
   jobStore,
+  projectStore,
+  useApi,
 } from "@/hooks";
 import { createGeneratedArtifacts, createPrompt, createSummary } from "@/api";
 import { pinia } from "@/plugins";
@@ -46,7 +46,10 @@ export const useArtifactGenerationApi = defineStore(
     ): Promise<void> {
       await summaryGenerationApi.handleRequest(
         async () => {
-          const summary = await createSummary(artifact);
+          const summary = await createSummary(
+            projectStore.versionId,
+            artifact.id
+          );
 
           const clear = () => (summaryGenConfirm.value = undefined);
           const confirm = () =>

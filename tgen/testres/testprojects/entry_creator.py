@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
 from tgen.common.artifact import Artifact
@@ -58,42 +57,9 @@ class EntryCreator:
         :param layers_to_include: The layers to filter artifacts by.
         :return: List of entries.
         """
-        artifact_data = EntryCreator.read_artifact_layers(type_key, layers_to_include)
-        return EntryCreator.create_artifact_entries(artifact_data)
-
-    @staticmethod
-    def read_artifact_layers(type_key: TestDataManager.Keys, layer_indices: List[int] = None) -> List[LayerInstruction]:
-        """
-        Extracts the artifact data associated with type.
-        :param type_key: The key referring to source or target artifacts.
-        :param layer_indices: The set of artifacts within type to extract. If none, all sets are used.
-        :return: Data used to create entries using EntryCreator.
-        """
-        key_map = "child" if "source" == type_key else "parent"
-        artifact_layer_map = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
-        traced_layers = TestDataManager.get_path([TestDataManager.Keys.LAYERS])
-        entries = []
-        for layer_index, traced_layer in enumerate(traced_layers):
-            layer_name = traced_layer[key_map]
-            layer_artifacts = artifact_layer_map[layer_name]
-            layer_entries = []
-            for artifact in layer_artifacts.items():
-                layer_entries.append(artifact)
-            entries.append(layer_entries)
-        return deepcopy(entries)
-
-    @staticmethod
-    def create_artifact_entries(artifact_layers: List[Dict[str, str]]) -> List[Artifact]:
-        """
-        Creates artifact entries by extracting id and body from items.
-        :param artifact_layers: Items containing artifact ids and body per layer.
-        :return: artifact entries created.
-        """
-        artifacts = []
-        for artifact_items in artifact_layers:
-            for a_id, a_body in artifact_items:
-                artifacts.append(Artifact(id=id, content=a_body))
-        return artifacts
+        artifacts = TestDataManager.get_artifacts()
+        layer_artifacts = [a for a in artifacts if a["layer_id"] == type_key]
+        return layer_artifacts
 
     @staticmethod
     def create_trace_predictions(n_parents: int, n_children: int, scores: List[float] = None, labels: List[float] = None) -> List[

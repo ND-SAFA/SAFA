@@ -46,5 +46,5 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
             dataset = Summarizer(args).summarize()
             artifacts_df = dataset.artifact_df
             summary = dataset.project_summary if self.include_project_summary else None
-        artifacts = artifacts_df.to_dict(orient='records')
+        artifacts = artifacts_df.to_artifacts()
         return SummaryResponse(summary=summary, artifacts=artifacts)

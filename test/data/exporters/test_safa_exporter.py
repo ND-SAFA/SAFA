@@ -44,28 +44,21 @@ class TestSafaExporter(BaseTest):
         """
         Tests the ability to export generated links with explanations.
         """
-        source_type = "source_type"
-        target_type = "target_type"
         source = "S1"
         target = "T2"
         score = 0.4
         explanation = "EXPLANATION"
-        source_type = "source"
-        target_type = "target"
+        source_type = "source_type"
+        target_type = "target_type"
         trace_file_name = f"{source_type}2{target_type}.json"
 
-        source_artifacts = [Artifact(id="S{i}", content="dummy text", layer_id=source_type) for i in range(3)]
-        target_artifacts = [Artifact(id="T{i}", content="dummy text", layer_id=target_type) for i in range(3)]
+        source_artifacts = [Artifact(id=f"S{i}", content="dummy text", layer_id=source_type) for i in range(3)]
+        target_artifacts = [Artifact(id=f"T{i}", content="dummy text", layer_id=target_type) for i in range(3)]
 
         artifacts = source_artifacts + target_artifacts
         layers: List[TraceLayer] = [TraceLayer(child=source_type, parent=target_type)]
-        true_links: List[TracePredictionEntry] = [{
-            "source": source,
-            "target": target,
-            "score": score,
-            "explanation": explanation
-        }]
-        api_definition = ApiDefinition(artifacts=artifacts, layers=layers, links=true_links)
+        links: List[TracePredictionEntry] = [TracePredictionEntry(source=source, target=target, score=score, explanation=explanation)]
+        api_definition = ApiDefinition(artifacts=artifacts, layers=layers, links=links)
         api_project_reader = ApiProjectReader(api_definition=api_definition)
         trace_dataset_creator = TraceDatasetCreator(project_reader=api_project_reader)
         safa_exporter = SafaExporter(TEST_OUTPUT_DIR, dataset_creator=trace_dataset_creator)

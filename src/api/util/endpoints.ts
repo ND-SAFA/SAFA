@@ -149,7 +149,7 @@ export enum Endpoint {
 
   // Generation
 
-  summarize = "summarize",
+  summarize = "projects/versions/:versionId/artifacts/summarize",
   prompt = "prompt",
   generateArtifacts = "hgen/:versionId",
 }

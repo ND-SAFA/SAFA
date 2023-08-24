@@ -1,4 +1,3 @@
-import { ArtifactSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -7,18 +6,16 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  * @param artifact - The artifact to summarize.
  * @return The artifact summary.
  */
-export async function createSummary(artifact: ArtifactSchema): Promise<string> {
+export async function createSummary(
+  versionId: string,
+  artifactId: string
+): Promise<string> {
   const summaries = await authHttpClient<string[]>(
-    fillEndpoint(Endpoint.summarize),
+    fillEndpoint(Endpoint.summarize, { versionId }),
     {
       method: "POST",
       body: JSON.stringify({
-        artifacts: [
-          {
-            name: artifact.name,
-            content: artifact.body,
-          },
-        ],
+        artifacts: [artifactId],
       }),
     }
   );

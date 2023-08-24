@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.generation.api.GenerationApi;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
@@ -34,7 +34,7 @@ public class SearchService {
     private static final String PROMPT_KEY = "PROMPT";
     private static final String ARTIFACT_KEY = "artifacts";
     private static final double THRESHOLD = 0.5;
-    private final GenerationApi generationApi;
+    private final GenApi genApi;
 
     /**
      * Searches for artifacts in search types that match the given prompt.
@@ -92,15 +92,17 @@ public class SearchService {
         for (String searchType : searchTypes) {
             traceLayers.add(new TraceLayer(searchType, PROMPT_KEY));
         }
+        Map<String, ArtifactAppEntity> artifactMap = ProjectDataStructures.createArtifactNameMap(artifacts);
         List<GenerationArtifact> generationArtifacts = artifacts.stream()
             .map(GenerationArtifact::new).collect(Collectors.toList());
         GenerationDataset dataset = new GenerationDataset(generationArtifacts, traceLayers);
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
-        TGenTraceGenerationResponse response = this.generationApi.performSearch(payload, null);
+        TGenTraceGenerationResponse response = this.genApi.performSearch(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
             .map(GenerationLink::getSource)
-            .map(UUID::fromString)
+            .map(artifactMap::get)
+            .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
         int maxIndex = Math.min(matchedArtifactIds.size(), n);
         matchedArtifactIds = matchedArtifactIds.subList(0, maxIndex);

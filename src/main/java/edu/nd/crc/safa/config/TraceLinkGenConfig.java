@@ -14,12 +14,12 @@ import org.springframework.core.env.Environment;
  * Enables VSM to be used for unit tests while TGEN for production.
  */
 @Configuration
-public class TraceLinkGenerationConfig {
+public class TraceLinkGenConfig {
     private static Environment environment;
 
     @Autowired
-    public TraceLinkGenerationConfig(Environment environment) {
-        TraceLinkGenerationConfig.environment = environment;
+    public TraceLinkGenConfig(Environment environment) {
+        TraceLinkGenConfig.environment = environment;
     }
 
     public static boolean isTestEnvironment() {
@@ -41,6 +41,6 @@ public class TraceLinkGenerationConfig {
 
     @Autowired
     public void setEnvironment(Environment environment) {
-        TraceLinkGenerationConfig.environment = environment;
+        TraceLinkGenConfig.environment = environment;
     }
 }

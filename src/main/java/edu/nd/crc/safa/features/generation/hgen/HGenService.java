@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.generation.api.GenerationApi;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class HGenService {
-    private final GenerationApi generationApi;
+    private final GenApi genApi;
     private final ArtifactService artifactService;
 
     /**
@@ -45,7 +45,7 @@ public class HGenService {
         List<GenerationArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());
         TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes, request.getSummary());
 
-        GenerationDataset dataset = generationApi.generateHierarchy(tgenRequest, jobLogger);
+        GenerationDataset dataset = genApi.generateHierarchy(tgenRequest, jobLogger);
         ProjectCommit projectCommit = createHGenCommit(dataset, targetTypes);
         projectCommit.setCommitVersion(projectVersion);
 

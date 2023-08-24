@@ -28,6 +28,6 @@ public class PromptController extends BaseController {
      */
     @PostMapping(AppRoutes.Prompts.COMPLETE)
     public TGenPromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request) {
-        return this.serviceProvider.getGenerationApi().generatePrompt(request);
+        return this.serviceProvider.getGenApi().generatePrompt(request);
     }
 }

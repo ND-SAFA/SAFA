@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.api.GenerationApi;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
@@ -45,7 +45,7 @@ public class JobService {
     private static final Logger logger = LoggerFactory.getLogger(JobService.class);
 
     private final JobDbRepository jobDbRepository;
-    private final GenerationApi generationApi;
+    private final GenApi genApi;
     private final SafaUserService safaUserService;
 
     /**
@@ -62,7 +62,7 @@ public class JobService {
         this.jobDbRepository.deleteById(jobId);
         UUID taskId = jobDbEntity.getTaskId();
         if (taskId != null) {
-            this.generationApi.cancelJob(taskId);
+            this.genApi.cancelJob(taskId);
         }
     }
 

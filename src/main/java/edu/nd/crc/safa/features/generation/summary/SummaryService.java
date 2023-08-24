@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
-import edu.nd.crc.safa.features.generation.api.GenerationApi;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class SummaryService {
-    private final GenerationApi generationApi;
+    private final GenApi genApi;
     private final ArtifactService artifactService;
 
     /**
@@ -85,7 +85,7 @@ public class SummaryService {
      * @return The list of summaries.
      */
     private List<String> performGenArtifactSummaryRequest(GenArtifactSummaryRequest request, JobLogger jobLogger) {
-        TGenSummaryResponse response = this.generationApi.generateArtifactSummaries(request, jobLogger);
+        TGenSummaryResponse response = this.genApi.generateArtifactSummaries(request, jobLogger);
         List<String> summaries = new ArrayList<>();
         for (GenerationArtifact artifact : response.getArtifacts()) {
             summaries.add(artifact.getSummary());

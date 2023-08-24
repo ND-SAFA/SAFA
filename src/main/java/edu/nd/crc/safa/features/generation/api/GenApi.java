@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @AllArgsConstructor
-public class GenerationApi implements ITraceGenerationController {
+public class GenApi implements ITraceGenerationController {
     private final RequestService requestService;
     private final ApiController apiController;
     private final ArtifactSummaryApi artifactSummaryApi;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.generation.api.GenerationApi;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class ProjectSummaryService {
-    private final GenerationApi generationApi;
+    private final GenApi genApi;
     private final ProjectRepository projectRepository;
 
     /**
@@ -52,6 +52,6 @@ public class ProjectSummaryService {
         artifacts = artifacts.stream().filter(a -> a.getTraceString().length() > 0).collect(Collectors.toList());
         ProjectSummaryRequest request = new ProjectSummaryRequest(artifacts.stream().map(GenerationArtifact::new)
             .collect(Collectors.toList()));
-        return this.generationApi.generateProjectSummary(request, jobLogger);
+        return this.genApi.generateProjectSummary(request, jobLogger);
     }
 }

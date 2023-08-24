@@ -22,7 +22,7 @@ import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
-import edu.nd.crc.safa.features.generation.api.GenerationApi;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
 import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.search.SearchService;
@@ -158,7 +158,7 @@ public class ServiceProvider {
     // HTTP
     private final RequestService requestService;
     private final GraphQlService graphQlService;
-    private final GenerationApi generationApi;
+    private final GenApi genApi;
     // GitHub
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final GithubConnectionService githubConnectionService;

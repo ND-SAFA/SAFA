@@ -21,8 +21,14 @@ public class SummarizeArtifactRequestDTO {
      * The artifacts to summarize and their type.
      */
     List<UUID> artifacts;
+    /**
+     * The version of the artifacts to summarize.
+     */
     @Nullable
     ProjectVersion projectVersion;
+    /**
+     * The project summary.
+     */
     @Nullable
     private String projectSummary;
 

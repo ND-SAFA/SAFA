@@ -6,7 +6,7 @@ from api.utils.view_util import ViewUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, ProjectData
@@ -40,6 +40,8 @@ def perform_hgen(request: HGenRequest):
     :return: The generated artifact(s).
     """
     artifacts = request.artifacts
+    for a in artifacts:
+        a[ArtifactKeys.LAYER_ID] = ARTIFACT_LAYER
     target_types = request.target_types
     summary = request.summary
     base_type, *other_types = target_types

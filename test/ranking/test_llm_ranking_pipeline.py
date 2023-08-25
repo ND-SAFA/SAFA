@@ -1,4 +1,4 @@
-from tgen.common.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
+from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
     RANKING_PARENT_SUMMARY_TAG, \
     RANKING_SCORE_TAG
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame

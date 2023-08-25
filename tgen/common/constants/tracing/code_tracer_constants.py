@@ -1,0 +1,2 @@
+HEADER_EXTENSION = ".h"
+C_IMPLEMENTATION_EXTENSIONS = [".c", ".cc", ".cpp"]

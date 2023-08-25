@@ -1,6 +1,6 @@
 from typing import Dict
 
-from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
+from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys

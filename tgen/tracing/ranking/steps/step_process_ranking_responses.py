@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict, List, Optional
 
-from tgen.common.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
+from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
     RANKING_MAX_SCORE, RANKING_SCORE_TAG
 from tgen.common.util.json_util import JsonUtil
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry

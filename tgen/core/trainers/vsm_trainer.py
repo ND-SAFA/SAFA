@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 
 from tgen.common.constants.other_constants import VSM_THRESHOLD_DEFAULT
-from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
+from tgen.common.constants.tracing.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.ranking_util import RankingUtil

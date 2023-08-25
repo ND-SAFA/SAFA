@@ -11,13 +11,15 @@ from tgen.common.util.logging.logger_manager import logger
 class LLMResponseUtil:
 
     @staticmethod
-    def parse(res: str, tag_name: str, is_nested: bool = False, raise_exception: bool = False) -> List[Union[str, Dict]]:
+    def parse(res: str, tag_name: str, is_nested: bool = False, raise_exception: bool = False, return_res_on_failure: bool = False) -> \
+            List[Union[str, Dict]]:
         """
         Parses the LLM response for the given html tags
         :param res: The LLM response
         :param tag_name: The name of the tag to find
         :param is_nested: If True, the response contains nested tags so all Tag objects are returned, else just the single content
         :param raise_exception: if True, raises an exception if parsing fails
+        :param return_res_on_failure: Whether to return original response on failure.
         :return: Either a list of tags (if nested) or the content inside the tag (not nested)
         """
         soup = BeautifulSoup(res, features="lxml")
@@ -35,7 +37,7 @@ class LLMResponseUtil:
             logger.exception(error)
             if raise_exception:
                 raise Exception(error)
-            content = []
+            content = [res] if return_res_on_failure else []
         return [html.unescape(c) for c in content]
 
     @staticmethod

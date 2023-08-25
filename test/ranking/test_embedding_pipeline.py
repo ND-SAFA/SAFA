@@ -1,9 +1,9 @@
 from typing import Dict, List
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
-from tgen.ranking.ranking_args import RankingArgs
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
+from tgen.tracing.ranking.ranking_args import RankingArgs
 
 
 class TestEmbeddingPipeline(BaseTest):

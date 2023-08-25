@@ -9,7 +9,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.ranking.common.trace_layer import TraceLayer
+from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 
 class TestDataManager:

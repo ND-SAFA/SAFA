@@ -1,8 +1,8 @@
 from typing import Any, List, Optional
 
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.constants.deliminator_constants import NEW_LINE, TAB
-from tgen.common.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, RANKING_PARENT_TAG
+from tgen.common.constants.tracing.ranking_constants import DEFAULT_ARTIFACT_HEADER, RANKING_PARENT_TAG
+from tgen.common.util.prompt_util import PromptUtil
 
 
 def builder_method(func):

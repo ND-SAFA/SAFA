@@ -1,15 +1,15 @@
 import os
+import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Tuple, Union, Type
+from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union
 
 import yaml
 from yaml.loader import Loader, SafeLoader
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.util.json_util import JsonUtil
-import pickle
-from tgen.common.constants.deliminator_constants import F_SLASH, EMPTY_STRING
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
@@ -228,15 +228,6 @@ class FileUtil:
         """
         return os.path.dirname(file_path), os.path.basename(file_path)
 
-    def ls_jobs(path: str, **kwargs) -> List[str]:
-        """
-        Returns jobs in path.
-        :param path: The path to list jobs in.
-        :param kwargs: Additional parameters passed to ls filter.
-        :return: List of jobs in path.
-        """
-        return FileUtil.ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)
-
     @staticmethod
     def get_file_name(script_path: str, n_parents: int = 0, delimiter: str = "-"):
         """
@@ -356,3 +347,27 @@ class FileUtil:
         if path_or_ext in CODE_EXTENSIONS:
             return True
         return False
+
+    @staticmethod
+    def filter_by_ext(file_names: List[str], ext: Union[str, List[str]]) -> List[str]:
+        """
+        Returns the artifact ids with given extension.
+        :param file_names: The file names to filter.
+        :param ext: The extension(s) of the files to keep.
+        :return: List of files ending with extension.
+        """
+        if isinstance(ext, str):
+            ext = [ext]
+        code_ids = [p for p in file_names for e in ext if p.endswith(e)]
+        return code_ids
+
+    @staticmethod
+    def get_file_base_name(file_path: str):
+        """
+        Returns the file name without extension.
+        :param file_path: The path to the file.
+        :return: The name of the file without extension.
+        """
+        file_name = os.path.basename(file_path)
+        file_name_base, file_ext = os.path.splitext(file_name)
+        return file_name_base

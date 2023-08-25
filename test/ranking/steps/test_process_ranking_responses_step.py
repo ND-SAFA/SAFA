@@ -3,10 +3,10 @@ from unittest import TestCase
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_state import RankingState
-from tgen.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
-from tgen.ranking.steps.step_process_ranking_responses import ProcessRankingResponses
+from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
+from tgen.tracing.ranking.steps.step_process_ranking_responses import ProcessRankingResponses
 
 
 class TestProcessRankingResponsesStep(TestCase):

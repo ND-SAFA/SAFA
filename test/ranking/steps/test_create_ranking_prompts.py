@@ -1,10 +1,10 @@
 from typing import List
 
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
-from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
-from tgen.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
+from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_data_manager import TestDataManager
+from tgen.tracing.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
 
 
 class TestCreateRankingPrompts(BaseTest):

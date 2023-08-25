@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager
-from tgen.common.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, DEFAULT_COMPLETION_TOKENS, DEFAULT_LINK_THRESHOLD, \
+from tgen.common.constants.tracing.ranking_constants import DEFAULT_ARTIFACT_HEADER, DEFAULT_COMPLETION_TOKENS, DEFAULT_LINK_THRESHOLD, \
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
@@ -15,8 +15,8 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS, \
     DEFAULT_RANKING_QUESTIONS
-from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.tracing.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 
 
 @dataclass

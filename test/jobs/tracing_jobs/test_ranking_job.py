@@ -1,10 +1,10 @@
-from tgen.common.util.status import Status
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.common.util.status import Status
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
-from tgen.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_data_manager import TestDataManager
+from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 
 class TestRankingJob(BaseTest):

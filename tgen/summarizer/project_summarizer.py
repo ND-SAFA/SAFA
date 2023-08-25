@@ -1,6 +1,6 @@
 import os
 
-from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
+from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger

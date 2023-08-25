@@ -1,5 +1,5 @@
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
+from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt

@@ -3,9 +3,9 @@ from typing import Dict, List, Tuple
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
-from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
+from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 
 class CsvTestProject(AbstractTestProject):

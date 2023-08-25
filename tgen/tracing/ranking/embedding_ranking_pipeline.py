@@ -3,10 +3,10 @@ from typing import List
 
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceKeys
-from tgen.ranking.common.vsm_sorter import embedding_sorter
-from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.tracing.ranking.common.vsm_sorter import embedding_sorter
+from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.ranking_state import RankingState
 
 
 class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):

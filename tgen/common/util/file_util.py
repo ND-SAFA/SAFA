@@ -228,15 +228,6 @@ class FileUtil:
         """
         return os.path.dirname(file_path), os.path.basename(file_path)
 
-    def ls_jobs(path: str, **kwargs) -> List[str]:
-        """
-        Returns jobs in path.
-        :param path: The path to list jobs in.
-        :param kwargs: Additional parameters passed to ls filter.
-        :return: List of jobs in path.
-        """
-        return FileUtil.ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)
-
     @staticmethod
     def get_file_name(script_path: str, n_parents: int = 0, delimiter: str = "-"):
         """

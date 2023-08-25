@@ -65,6 +65,15 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
 
 def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str],
                      model_name=DEFAULT_EMBEDDING_MODEL, return_scores: bool = False) -> Dict[str, str]:
+    """
+    Sorts the children artifacts from most to least similar to the parent artifacts using embeddings.
+    :param parent_ids: The artifact ids of the parents.
+    :param child_ids: The artifact ids of the children.
+    :param artifact_map: Map of ID to artifact bodies.
+    :param model_name: The name of the embedding model to use.
+    :param return_scores: Whether to return the similarity scores (after min-max scaling per parent).
+    :return: Map of parent to list of sorted children.
+    """
     cache_dir = os.environ.get("HF_DATASETS_CACHE", None)
     if cache_dir is None or environment_constants.IS_TEST or not os.path.exists(cache_dir):
         cache_dir = None

@@ -1,9 +1,12 @@
+import os
 from typing import Callable, Dict, List
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import minmax_scale
 from tqdm import tqdm
 
+from tgen.common.constants import environment_constants
 from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -19,6 +22,7 @@ GenericSorter = Callable[
     [List[str], List[str], Dict], Dict[str, str]]  # source names, target names, artifact map -> sorted target names
 
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-roberta-large-v1"
+DEFAULT_SEARCH_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str]) -> Dict[str, List[str]]:
@@ -60,30 +64,38 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
 
 
 def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str],
-                     model_name=DEFAULT_EMBEDDING_MODEL, return_scores: bool = False, return_cache: bool = False) -> Dict[str, str]:
-    model = SentenceTransformer(model_name)
-    cache = {}
+                     model_name=DEFAULT_EMBEDDING_MODEL, return_scores: bool = False) -> Dict[str, str]:
+    """
+    Sorts the children artifacts from most to least similar to the parent artifacts using embeddings.
+    :param parent_ids: The artifact ids of the parents.
+    :param child_ids: The artifact ids of the children.
+    :param artifact_map: Map of ID to artifact bodies.
+    :param model_name: The name of the embedding model to use.
+    :param return_scores: Whether to return the similarity scores (after min-max scaling per parent).
+    :return: Map of parent to list of sorted children.
+    """
+    cache_dir = os.environ.get("HF_DATASETS_CACHE", None)
+    if cache_dir is None or environment_constants.IS_TEST or not os.path.exists(cache_dir):
+        cache_dir = None
+    model = SentenceTransformer(model_name, cache_folder=cache_dir)
 
-    def encode(artifact_id: str):
-        if artifact_id not in cache:
-            a_body = artifact_map[artifact_id]
-            a_embedding = model.encode([a_body])[0].tolist()
-            cache[artifact_id] = a_embedding
-        return cache[artifact_id]
-
-    children_embeddings = [encode(a_id) for a_id in tqdm(child_ids, "Creating children embeddings")]
+    children_bodies = [artifact_map[a_id] for a_id in child_ids]
+    children_embeddings = model.encode(children_bodies)
 
     parent2rankings = {}
     for parent_id in tqdm(parent_ids, desc="Performing Ranking Via Embeddings"):
-        parent_embedding = encode(parent_id)
-        scores = cosine_similarity([parent_embedding], children_embeddings)[0]
-        sorted_artifact_ids = [a for s, a in sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])]
+        parent_body = artifact_map[parent_id]
+        parent_embedding = model.encode([parent_body])
+        scores = cosine_similarity(parent_embedding, children_embeddings)[0]
+        sorted_children = sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])
+        sorted_artifact_ids = [c[1] for c in sorted_children]
+        sorted_artifact_scores = [c[0] for c in sorted_children]
+
         if return_scores:
-            parent2rankings[parent_id] = (sorted_artifact_ids, scores)
+            sorted_artifact_scores = minmax_scale(sorted_artifact_scores)
+            parent2rankings[parent_id] = (sorted_artifact_ids, sorted_artifact_scores)
         else:
             parent2rankings[parent_id] = sorted_artifact_ids
-    if return_cache:
-        return parent2rankings, cache
     return parent2rankings
 
 

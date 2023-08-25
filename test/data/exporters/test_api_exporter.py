@@ -24,9 +24,9 @@ class TestApiExporter(BaseTest):
         exported_api_definition_dict = JsonUtil.read_json_file(export_path)
         api_definition_dict = JsonUtil.as_dict(api_definition)
         api_definition_dict = DictUtil.convert_iterables_to_lists(api_definition_dict)
-        self.assertListEqual(exported_api_definition_dict["true_links"], api_definition_dict["true_links"])
+        self.assertListEqual(exported_api_definition_dict["links"], api_definition_dict["links"])
         self.assertListEqual(exported_api_definition_dict["layers"], api_definition_dict["layers"])
-        self.assertDictEqual(exported_api_definition_dict["artifact_layers"], api_definition_dict["artifact_layers"])
+        self.assertListEqual(exported_api_definition_dict["artifacts"], api_definition_dict["artifacts"])
         exported_dataset = TraceDatasetCreator(ApiProjectReader(api_definition), allowed_missing_sources=100,
                                                allowed_missing_targets=100, allowed_orphans=100).create()
         TestAssertions.verify_entities_in_df(self, self.df_as_queries(orig_dataset.artifact_df), exported_dataset.artifact_df)

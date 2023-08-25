@@ -1,22 +1,23 @@
-from typing import Dict, List, Set, Union, Optional
+from typing import Dict, List, Optional, Set, Union
 
 import pandas as pd
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.model_constants import get_efficient_default_llm_manager
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.model_constants import get_efficient_default_llm_manager
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
-from tgen.summarizer.summary_types import SummaryTypes
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, \
+    NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
+from tgen.summarizer.summary_types import SummaryTypes
 
 
 class ArtifactsSummarizer(BaseObject):
@@ -27,7 +28,7 @@ class ArtifactsSummarizer(BaseObject):
     SUMMARY_TAG = "summary"
 
     def __init__(self, llm_manager: AbstractLLMManager = None,
-                  code_or_exceeds_limit_only: bool = False,
+                 code_or_exceeds_limit_only: bool = False,
                  nl_summary_type: SummaryTypes = SummaryTypes.NL_BASE,
                  code_summary_type: SummaryTypes = SummaryTypes.CODE_BASE,
                  project_summary: str = None):
@@ -45,12 +46,14 @@ class ArtifactsSummarizer(BaseObject):
         self.prompt_args = self.llm_manager.prompt_args
         self.project_summary = project_summary
         code_prompts = code_summary_type.value
+        nl_prompts = nl_summary_type.value
         if project_summary:
+            nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
+            nl_prompts.insert(1, Prompt(project_summary))
             code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
             code_prompts.insert(1, Prompt(project_summary))
         self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
-        self.nl_prompt_builder = PromptBuilder(
-            prompts=nl_summary_type.value)
+        self.nl_prompt_builder = PromptBuilder(nl_prompts)
 
     def summarize_bulk(self, bodies: List[str], filenames: List[str] = None) -> List[str]:
         """

@@ -1,9 +1,8 @@
 import os
-import uuid
 from dataclasses import dataclass, field
 
+from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.constants.model_constants import get_efficient_default_llm_manager, get_best_default_llm_manager
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -42,6 +41,10 @@ class SummarizerArgs(PipelineArgs):
     """
     do_resummarize_project: bool = True
     """
+    Whether to summarize the artifacts before creating the project summary.
+    """
+    summarize_artifacts: bool = True
+    """
     Path to save to
     """
     export_dir: str = None
@@ -51,5 +54,6 @@ class SummarizerArgs(PipelineArgs):
         Perform post initialization tasks such as creating datasets
         :return: None
         """
-        self.export_dir = os.path.join(self.export_dir, "summaries", str(uuid.uuid4())) if self.export_dir else None
+        if self.export_dir:
+            os.makedirs(self.export_dir, exist_ok=True)
         self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)

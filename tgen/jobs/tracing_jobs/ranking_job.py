@@ -1,8 +1,8 @@
 from typing import Dict, List, Optional, Tuple, Union
 
+from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
-from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS, DEFAULT_THRESHOLD_SCORE
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -94,7 +94,7 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(artifact_df.get_type(parent_type).index)
         children_ids = list(artifact_df.get_type(child_type).index)
-        run_name = f"{child_type}2{parent_type}"
+        run_name = f"{child_type}({len(parent_ids)}) --> {parent_type} ({len(children_ids)})"
         logger.info(f"Starting to trace: {run_name}")
 
         pipeline_args = RankingArgs(run_name=run_name,
@@ -106,18 +106,19 @@ class RankingJob(AbstractJob):
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         predicted_entries = pipeline.run()
         self.project_summary = pipeline.state.project_summary
-        for entry in predicted_entries:
-            trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value])
-            trace_entry = self.dataset.trace_df.loc[trace_id]
-            label = trace_entry[TraceKeys.LABEL.value]
-            entry[TraceKeys.LABEL.value] = label
+        if self.dataset is not None and self.dataset.trace_df is not None:
+            for entry in predicted_entries:
+                trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value])
+                trace_entry = self.dataset.trace_df.loc[trace_id]
+                label = trace_entry[TraceKeys.LABEL.value]
+                entry[TraceKeys.LABEL.value] = label
 
         if self.select_top_predictions:
-            predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE.value] >= DEFAULT_THRESHOLD_SCORE]
+            predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE.value] >= pipeline_args.link_threshold]
         return predicted_entries
 
     @staticmethod
     def optional_eval(dataset, predictions):
-        if dataset is None:
+        if dataset is None or dataset.trace_df is None or len(dataset.trace_df.get_links_with_label(1)) == 0:
             return
         RankingUtil.evaluate_trace_predictions(dataset.trace_df, predictions)

@@ -101,11 +101,12 @@ class DataFrameUtil:
         return df_dict
 
     @staticmethod
-    def get_optional_value(row: pd.Series, col_name: Union[str, Enum]) -> Optional[Any]:
+    def get_optional_value(row: pd.Series, col_name: Union[str, Enum], allow_empty: bool = True) -> Optional[Any]:
         """
         Returns the column value if exists, otherwise None is returned.
         :param row: The row in the dataframe.
         :param col_name: The name of the column.
+        :param allow_empty: Whether to allow empty string. If false, None is returned on empty string.
         :return:
         """
         potential_value = row.get(col_name, None)
@@ -114,6 +115,9 @@ class DataFrameUtil:
                 if np.isnan(potential_value):
                     return None
                 return potential_value
+            if isinstance(potential_value, str):
+                if not allow_empty:
+                    return potential_value if len(potential_value) > 0 else None
             return potential_value
         else:
             return None

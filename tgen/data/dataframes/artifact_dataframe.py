@@ -1,10 +1,10 @@
-from typing import Any, Dict, List, Type, Tuple
+from typing import Any, Dict, List, Tuple, Type
 
 from tgen.common.artifact import Artifact
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
@@ -102,7 +102,9 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: The list of artifacts.
         """
         artifacts = [Artifact(id=artifact_id,
-                              content=artifact_row[StructuredKeys.Artifact.CONTENT])
+                              layer_id=artifact_row[ArtifactKeys.LAYER_ID],
+                              summary=artifact_row[ArtifactKeys.SUMMARY],
+                              content=artifact_row[ArtifactKeys.CONTENT])
                      for artifact_id, artifact_row in self.itertuples()]
         return artifacts
 
@@ -152,4 +154,3 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 ids.append(i)
                 content.append(artifact[ArtifactKeys.CONTENT])
         return ids, content
-

@@ -1,3 +1,5 @@
+import os
+
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
@@ -15,6 +17,8 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 
+PROJECT_SUMMARY_FILE_NAME = "project_summary.txt"
+
 
 class ProjectSummarizer(BaseObject):
 
@@ -28,16 +32,18 @@ class ProjectSummarizer(BaseObject):
         self.artifacts_df = summarizer_args.dataset.artifact_df
         self.llm_manager: AbstractLLMManager = summarizer_args.llm_manager_for_project_summary
         self.n_tokens = n_tokens
-        self.export_path = summarizer_args.export_dir
+        self.export_dir = summarizer_args.export_dir
+        self.args = summarizer_args
 
     def summarize(self) -> str:
         """
-        Creates the summary
-        :return: The summary of the project
+        Creates the project summary from the project artifacts.
+        :return: The summary of the project.
         """
         logger.log_title("Creating project specification.")
 
-        self.artifacts_df.summarize_content(ArtifactsSummarizer())
+        if self.args.summarize_artifacts:
+            self.artifacts_df.summarize_content(ArtifactsSummarizer())
 
         task_prompt: QuestionnairePrompt = SupportedPrompts.PROJECT_SUMMARY.value
         artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
@@ -54,6 +60,7 @@ class ProjectSummarizer(BaseObject):
         res = trainer.perform_prediction()
         summary = res.predictions[0][task_prompt.id][task_prompt.response_manager.response_tag]
         summary = res.original_response[0] if len(summary) == 0 else summary[0]
-        if self.export_path:
-            FileUtil.write(summary, self.export_path)
+        if self.export_dir:
+            summary_export_path = os.path.join(self.export_dir, PROJECT_SUMMARY_FILE_NAME)
+            FileUtil.write(summary, summary_export_path)
         return summary

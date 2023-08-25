@@ -2,11 +2,11 @@ import os
 import uuid
 from typing import List
 
+from tgen.common.constants.ranking_constants import DEFAULT_HGEN_LINK_THRESHOLD
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.status import Status
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -102,7 +102,8 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
         tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary,
                                  export_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_state.export_dir),
-                                 load_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_args.load_dir))
+                                 load_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_args.load_dir),
+                                 link_threshold=DEFAULT_HGEN_LINK_THRESHOLD)
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")
@@ -125,4 +126,4 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param directory: The main directory used by hgen
         :return: The full path
         """
-        return os.path.join(directory, "ranking") if directory else EMPTY_STRING
+        return os.path.join(directory, "ranking") if directory else None

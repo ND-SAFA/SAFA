@@ -7,4 +7,5 @@ class Artifact(TypedDict):
     """
     id: str
     content: str
+    layer_id: str
     summary: Optional[str]

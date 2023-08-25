@@ -4,7 +4,6 @@ from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExpo
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 
 
 class CreateDatasetsJob(AbstractJob):
@@ -16,6 +15,8 @@ class CreateDatasetsJob(AbstractJob):
         :param job_args: the arguments for the job
         :param trainer_dataset_manager: manages all datasets for the trainer
         """
+        if job_args is None:
+            job_args = JobArgs()
         job_args.save_dataset_splits = True
         super().__init__(job_args=job_args)
         self.trainer_dataset_manager = trainer_dataset_manager

@@ -6,7 +6,7 @@ from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
 GOAL = (
     "# Goal\nBelow is the set of software artifacts of a software system. "
-    f"The goal is to read through all the artifacts and create a thorough document "
+    f"The goal is to read through all the artifacts and create an exhaustive document "
     f"providing all the necessary details to hand off the project to another company."
 )
 INSTRUCTIONS_GOAL = (
@@ -17,8 +17,9 @@ INSTRUCTIONS_GOAL = (
     "\n\nInstructions: "
 )
 OVERVIEW = QuestionPrompt("Create a sub-section called `Overview` describing the main purpose of the system.")
-ENTITIES = QuestionPrompt("Create a sub-section called `Entities`. Define all the major entities in the system.")
-FEATURES = QuestionPrompt("Create a sub-section called `Features` outlining the major features of the system. ")
+FEATURES = QuestionPrompt("Create a sub-section called `Features` outlining all the features of the system. ")
+ENTITIES = QuestionPrompt("Create a sub-section called `Entities`. Define all the entities in the system.")
+
 MAJOR_COMPONENTS = QuestionPrompt(
     "Create a sub-section called `Modules`. "
     "In this high level section enumerate all the major modules in the system "
@@ -37,9 +38,9 @@ DATA_FLOW = QuestionPrompt(
     "the system fulfills all of its features (outlined in `Features`) using its components. "
     "Describe the interactions between modules and how data flows between them."
 )
-TASKS = [OVERVIEW, ENTITIES, FEATURES, MAJOR_COMPONENTS, COMPONENTS, DATA_FLOW]
+TASKS = [OVERVIEW, FEATURES, ENTITIES, MAJOR_COMPONENTS, COMPONENTS, DATA_FLOW]
 TASK_QUESTIONNAIRE = QuestionnairePrompt(TASKS, instructions=f"{GOAL}{NEW_LINE}{INSTRUCTIONS_GOAL}",
-                                         enumeration_chars=[str(i) for i in range(1, len(TASKS)+1)],
+                                         enumeration_chars=[str(i) for i in range(1, len(TASKS) + 1)],
                                          response_manager=PromptResponseManager(response_tag="document",
                                                                                 response_instructions_format="Enclose the final "
                                                                                                              "document inside of {}"))

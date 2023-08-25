@@ -1,15 +1,15 @@
 import os
+import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Tuple, Union, Type
+from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union
 
 import yaml
 from yaml.loader import Loader, SafeLoader
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.util.json_util import JsonUtil
-import pickle
-from tgen.common.constants.deliminator_constants import F_SLASH, EMPTY_STRING
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
@@ -356,3 +356,25 @@ class FileUtil:
         if path_or_ext in CODE_EXTENSIONS:
             return True
         return False
+
+    @staticmethod
+    def filter_by_ext(file_names: List[str], ext: str) -> List[str]:
+        """
+        Returns the artifact ids with given extension.
+        :param file_names: The file names to filter.
+        :param ext: The extension of the files to keep.
+        :return: List of files ending with extension.
+        """
+        code_ids = [p for p in file_names if p.endswith(ext)]
+        return code_ids
+
+    @staticmethod
+    def get_file_base_name(file_path: str):
+        """
+        Returns the file name without extension.
+        :param file_path: The path to the file.
+        :return: The name of the file without extension.
+        """
+        file_name = os.path.basename(file_path)
+        file_name_base, file_ext = os.path.splitext(file_name)
+        return file_name_base

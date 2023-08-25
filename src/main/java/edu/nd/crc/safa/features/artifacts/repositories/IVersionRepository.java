@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.artifacts.repositories;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -77,14 +78,17 @@ public interface IVersionRepository<
     /**
      * Saves the state of given app entity to given project version.
      *
-     * @param projectVersion The project version to save the changes to.
-     * @param a              The app entity whose state is saved.
-     * @param user           The user doing the update
+     * @param projectVersion  The project version to save the changes to.
+     * @param a               The app entity whose state is saved.
+     * @param user            The user doing the update
+     * @param entityHashTable A hash table of entities used to speed up retrieval.
+     *                        See {@link #createVersionEntityMap(ProjectVersion)}
      * @return String representing error message if one occurred.
      * @throws SafaError Throws error if saving changes fails.
      */
     Pair<V, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
-                                                         A a, SafaUser user) throws SafaError;
+                                                         A a, SafaUser user,
+                                                         Map<UUID, List<V>> entityHashTable) throws SafaError;
 
     /**
      * Saves given application entities to given version, saving removal entities for entities present in previous
@@ -109,12 +113,15 @@ public interface IVersionRepository<
      * @param projectVersion The project version associated with committed removal.
      * @param baseEntityName The name of the base entity whose removal is committed to given version.
      * @param user The user making the change
+     * @param entityHashTable A hash table of entities used to speed up retrieval.
+     *                        See {@link #createVersionEntityMap(ProjectVersion)}
      * @return CommitError if error occurred while deleting entity, null otherwise.
      */
     Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
         UUID baseEntityName,
-        SafaUser user);
+        SafaUser user,
+        Map<UUID, List<V>> entityHashTable);
 
     /**
      * Calculates and returns the delta between the versions
@@ -136,4 +143,13 @@ public interface IVersionRepository<
      * @param user The user doing the change
      */
     void updateTimInfo(ProjectVersion projectVersion, V versionEntity, V originalVersionEntity, SafaUser user);
+
+    /**
+     * Creates a map between entity ID and entity versions for all entities in the given project version.
+     * Precalculating this information speeds up retrieval of entities, which in turn speeds up commits.
+     *
+     * @param projectVersion The version to retrieve entities from.
+     * @return A map between entity ID and entity versions for all entities in the given project version.
+     */
+    Map<UUID, List<V>> createVersionEntityMap(ProjectVersion projectVersion);
 }

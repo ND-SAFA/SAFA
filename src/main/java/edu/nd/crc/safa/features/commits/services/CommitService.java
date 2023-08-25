@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.commits.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
@@ -168,15 +170,12 @@ public class CommitService {
         ProjectChange<A> change = new ProjectChange<>();
         List<CommitError> commitErrors;
 
+        Map<UUID, List<V>> entityHashTable = versionEntityRepository.createVersionEntityMap(projectVersion);
         // Define actions
         CommitAction<A, V> saveOrModifyAction = a ->
-            versionEntityRepository.commitAppEntityToProjectVersion(
-                projectVersion, a, user);
+            versionEntityRepository.commitAppEntityToProjectVersion(projectVersion, a, user, entityHashTable);
         CommitAction<A, V> deleteAction = a ->
-            versionEntityRepository.deleteVersionEntityByBaseEntityId(
-                projectVersion,
-                a.getId(),
-                user);
+            versionEntityRepository.deleteVersionEntityByBaseEntityId(projectVersion, a.getId(), user, entityHashTable);
 
         // Commit added entities
         EntityParsingResult<A, CommitError> addedResponse = commitActionOnAppEntities(

@@ -74,25 +74,53 @@ public abstract class GenericVersionRepository<
         return this.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
     }
 
-    /**
-     * Calculates contents of each artifact at given version and returns bodies at version.
-     *
-     * @param projectVersion - The version of the artifact bodies that are returned
-     * @return list of artifact bodies in project at given version
-     */
     @Override
     public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
-        ProjectVersion projectVersion,
-        UUID entityId) {
-        List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject())
-            .stream()
-            .filter(versionEntity -> versionEntity.getBaseEntityId().equals(entityId))
-            .collect(Collectors.toList());
-        Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
+        ProjectVersion projectVersion, UUID entityId) {
+
+        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion);
+        return findVersionEntityByProjectVersionAndBaseEntityId(projectVersion, entityId, entityHashTable);
+    }
+
+    /**
+     * Returns the version of the entity specified by entity id in given project version.
+     *
+     * @param projectVersion  The version of the entity to retrieve.
+     * @param entityId        The id of the base entity whose version is being retrieved.
+     * @param entityHashTable The map of entity ids to version entities. Used to speed up retrieval.
+     *                        See {@link #createVersionEntityMap(ProjectVersion)}.
+     * @return Optional of entity version at given project version.
+     */
+    public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
+        ProjectVersion projectVersion, UUID entityId, Map<UUID, List<VersionEntity>> entityHashTable) {
+
+        List<VersionEntity> versionEntities;
+        if (entityHashTable.containsKey(entityId)) {
+            versionEntities = entityHashTable.get(entityId);
+        } else {
+            versionEntities = List.of();
+        }
+
         entityHashTable.put(entityId, versionEntities);
         List<VersionEntity> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
             entityHashTable);
         return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
+    }
+
+    @Override
+    public Map<UUID, List<VersionEntity>> createVersionEntityMap(ProjectVersion projectVersion) {
+        Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
+        this.retrieveVersionEntitiesByProject(projectVersion.getProject())
+            .forEach(versionEntity -> {
+                if (entityHashTable.containsKey(versionEntity.getBaseEntityId())) {
+                    entityHashTable.get(versionEntity.getBaseEntityId()).add(versionEntity);
+                } else {
+                    List<VersionEntity> versionEntities = new ArrayList<>();
+                    versionEntities.add(versionEntity);
+                    entityHashTable.put(versionEntity.getBaseEntityId(), versionEntities);
+                }
+            });
+        return entityHashTable;
     }
 
     /**
@@ -105,22 +133,32 @@ public abstract class GenericVersionRepository<
      * @return String representing parser error if one occurred.
      */
     @Override
-    public Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
-                                                                            AppEntity appEntity, SafaUser user) {
+    public Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(
+        ProjectVersion projectVersion, AppEntity appEntity, SafaUser user,
+        Map<UUID, List<VersionEntity>> entityHashTable) {
+
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
+            long time = System.nanoTime();
             BaseEntity baseEntity = this.createOrUpdateRelatedEntities(projectVersion, appEntity, user);
+            System.out.println("    Create Entity: " + (System.nanoTime() - time) / 1000000.0 + "ms");
+            long subTime = System.nanoTime();
 
             VersionEntity versionEntity = this.instantiateVersionEntityFromAppEntity(
                 projectVersion,
                 baseEntity,
                 appEntity);
+            System.out.println("    Create Version Entity: " + (System.nanoTime() - subTime) / 1000000.0 + "ms");
+            subTime = System.nanoTime();
 
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
-                createOrUpdateVersionEntity(versionEntity, user);
+                createOrUpdateVersionEntity(versionEntity, user, entityHashTable);
+                System.out.println("    Update Version Entity: " + (System.nanoTime() - subTime) / 1000000.0 + "ms");
                 UUID baseEntityId = baseEntity.getBaseEntityId();
                 appEntity.setId(baseEntityId);
             }
 
+            System.out.println("Commit time: " + (System.nanoTime() - time) / 1000000.0 + "ms");
+            System.out.println();
             return Optional.of(versionEntity);
         };
         UUID baseEntityId = appEntity.getId();
@@ -129,9 +167,8 @@ public abstract class GenericVersionRepository<
 
     @Override
     public Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
-        ProjectVersion projectVersion,
-        UUID baseEntityId,
-        SafaUser user) {
+        ProjectVersion projectVersion, UUID baseEntityId, SafaUser user,
+        Map<UUID, List<VersionEntity>> entityHashTable) {
 
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
             Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
@@ -142,7 +179,7 @@ public abstract class GenericVersionRepository<
                     projectVersion,
                     baseEntity,
                     null);
-                this.createOrUpdateVersionEntity(removedVersionEntity, user);
+                this.createOrUpdateVersionEntity(removedVersionEntity, user, entityHashTable);
                 return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
             } else {
                 return Optional.empty();
@@ -214,16 +251,19 @@ public abstract class GenericVersionRepository<
         SafaUser user) {
 
         List<UUID> processedAppEntities = new ArrayList<>();
+        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion);
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
             .map(appEntity -> {
+                long time = System.nanoTime();
                 Pair<VersionEntity, CommitError> commitResponse =
-                    this.commitAppEntityToProjectVersion(projectVersion, appEntity, user);
+                    this.commitAppEntityToProjectVersion(projectVersion, appEntity, user, entityHashTable);
                 if (commitResponse.getValue1() == null) {
                     UUID baseEntityId = commitResponse.getValue0().getBaseEntityId();
                     processedAppEntities.add(baseEntityId);
                     appEntity.setId(baseEntityId);
                 }
+                System.out.println("TOTAL Commit time: " + (System.nanoTime() - time) / 1000000.0 + "ms");
                 return commitResponse;
             })
             .collect(Collectors.toList());
@@ -233,10 +273,8 @@ public abstract class GenericVersionRepository<
                     projectVersion.getProject())
                 .stream()
                 .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
-                .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(
-                    projectVersion,
-                    baseEntity.getBaseEntityId(),
-                    user))
+                .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(projectVersion, baseEntity.getBaseEntityId(),
+                    user, entityHashTable))
                 .collect(Collectors.toList());
             response.addAll(removedVersionEntities);
         }
@@ -244,18 +282,29 @@ public abstract class GenericVersionRepository<
         return response;
     }
 
-    private void createOrUpdateVersionEntity(VersionEntity versionEntity, SafaUser user) throws SafaError {
+    private void createOrUpdateVersionEntity(VersionEntity versionEntity, SafaUser user,
+                                             Map<UUID, List<VersionEntity>> entityHashTable) throws SafaError {
         try {
+
+            long time = System.nanoTime();
             this.findExistingVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
                 versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
+            System.out.println("        Find existing entity: " + (System.nanoTime() - time) / 1000000.0 + "ms");
+            time = System.nanoTime();
 
             Optional<VersionEntity> previousEntity =
                 findVersionEntityByProjectVersionAndBaseEntityId(versionEntity.getProjectVersion(),
-                    versionEntity.getBaseEntityId());
+                    versionEntity.getBaseEntityId(), entityHashTable);
+            System.out.println("        Find existing version entity: "
+                + (System.nanoTime() - time) / 1000000.0 + "ms");
+            time = System.nanoTime();
 
             this.save(versionEntity);
+            System.out.println("        Save: " + (System.nanoTime() - time) / 1000000.0 + "ms");
+            time = System.nanoTime();
 
             this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null), user);
+            System.out.println("        Update TIM: " + (System.nanoTime() - time) / 1000000.0 + "ms");
         } catch (Exception e) {
             e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();

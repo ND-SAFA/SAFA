@@ -25,7 +25,7 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         :param is_subset: True if not all of the artifacts are provided
         :param job_args: The arguments to the job.
         """
-        self.include_project_summary = do_resummarize_project
+        self.do_resummarize_project = do_resummarize_project
         self.is_subset = is_subset
         super().__init__(artifacts=artifacts, artifact_reader=artifact_reader,
                          project_summary=project_summary, export_dir=export_dir, job_args=job_args,
@@ -45,6 +45,6 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         else:
             dataset = Summarizer(args).summarize()
             artifacts_df = dataset.artifact_df
-            summary = dataset.project_summary if self.include_project_summary else None
+            summary = dataset.project_summary if self.do_resummarize_project else None
         artifacts = artifacts_df.to_artifacts()
         return SummaryResponse(summary=summary, artifacts=artifacts)

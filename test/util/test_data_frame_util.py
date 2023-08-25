@@ -1,5 +1,6 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
+import numpy as np
 import pandas as pd
 
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -48,6 +49,23 @@ class TestDataFrameUtil(BaseTest):
         query_df = DataFrameUtil.add_optional_column(df, "new-col", "two")
         self.assertListEqual(["name", "new-col"], list(query_df.columns))
         self.assertListEqual(["two"], list(query_df["new-col"]))
+
+    def test_get_optional_value(self):
+        """
+        Tests the correctness of the get optional value method.
+        """
+        entry = {"A": 1, "B": "HI", "C": np.NAN, "D": ""}
+        df = pd.DataFrame([entry])
+
+        def assert_value(key_name: str, v: Any, **kwargs):
+            value = DataFrameUtil.get_optional_value(df.iloc[0], key_name, **kwargs)
+            self.assertEqual(value, v)
+
+        assert_value("A", 1)
+        assert_value("B", "HI")
+        assert_value("C", None)
+        assert_value("D", "")
+        assert_value("D", None, allow_empty=False)
 
     def verify_rename_columns(self, source_entries: List[Dict], target_entries: List[Dict], conversion: Dict = None) -> None:
         """

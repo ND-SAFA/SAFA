@@ -7,7 +7,7 @@
           "artifact_reader": {
             "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
           },
-          "export_path": "[OUTPUT_PATH]/project-summaries/[CURRENT_PROJECT].txt"
+          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/project-summaries"
         }
       ]
     }

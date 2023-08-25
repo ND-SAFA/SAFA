@@ -3,15 +3,18 @@
     {
       "jobs": [
         {
-          "object_type": "EXPORT_DATASET",
-          "trace_dataset_creator": {
-            "project_reader": {
-              "object_type": "HUB",
-              "name": "cm1"
-            },
-            "remove_orphans": true
+          "object_type": "CREATE_DATASETS",
+          "format_type": "SAFA",
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
+            }
           },
-          "export_path": "~/desktop/safa/datasets/safa/cm1"
+          "export_path": "[DATA_PATH]/[CURRENT_PROJECT]/exported"
         }
       ]
     }

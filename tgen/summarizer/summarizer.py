@@ -1,10 +1,12 @@
-from copy import deepcopy
+import os
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
+
+ARTIFACT_FILE_NAME = "artifacts.csv"
 
 
 class Summarizer:
@@ -25,7 +27,8 @@ class Summarizer:
             if not self.args.project_summary else self.args.project_summary
         artifacts_df = self._resummarize_artifacts(initial_project_summary)
         if self.args.export_dir:
-            artifacts_df.to_csv(self.args.export_dir)
+            artifact_export_path = os.path.join(self.args.export_dir, ARTIFACT_FILE_NAME)
+            artifacts_df.to_csv(artifact_export_path)
         final_project_summary = self._create_project_summary(artifact_df=artifacts_df) \
             if self.args.do_resummarize_project else initial_project_summary
         return PromptDataset(artifact_df=artifacts_df, project_summary=final_project_summary)

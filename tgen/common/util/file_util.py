@@ -349,14 +349,16 @@ class FileUtil:
         return False
 
     @staticmethod
-    def filter_by_ext(file_names: List[str], ext: str) -> List[str]:
+    def filter_by_ext(file_names: List[str], ext: Union[str, List[str]]) -> List[str]:
         """
         Returns the artifact ids with given extension.
         :param file_names: The file names to filter.
-        :param ext: The extension of the files to keep.
+        :param ext: The extension(s) of the files to keep.
         :return: List of files ending with extension.
         """
-        code_ids = [p for p in file_names if p.endswith(ext)]
+        if isinstance(ext, str):
+            ext = [ext]
+        code_ids = [p for p in file_names for e in ext if p.endswith(e)]
         return code_ids
 
     @staticmethod

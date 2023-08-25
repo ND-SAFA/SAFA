@@ -10,10 +10,10 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_state import RankingState
-from tgen.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 DATA_TOO_LITTLE_INPUTS = "Missing required dataset_creator or artifact_df + layer_ids."
 DATA_TOO_MANY_INPUTS = "Expected only one of dataset_creator or artifact_df + layer_ids to be defined."

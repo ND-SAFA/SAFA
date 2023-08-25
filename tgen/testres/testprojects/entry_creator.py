@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple
 from tgen.common.artifact import Artifact
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.test_data_manager import TestDataManager
+from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 ArtifactInstruction = Tuple[Any, str]
 LayerInstruction = List[ArtifactInstruction]

@@ -4,7 +4,7 @@ from typing import List
 from tgen.common.artifact import Artifact
 from tgen.common.util.base_object import BaseObject
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
-from tgen.ranking.common.trace_layer import TraceLayer
+from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 
 @dataclass

@@ -9,7 +9,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.ranking.common.trace_layer import TraceLayer
+from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 
 class AbstractTestProject:

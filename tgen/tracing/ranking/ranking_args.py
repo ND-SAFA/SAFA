@@ -15,8 +15,8 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS, \
     DEFAULT_RANKING_QUESTIONS
-from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.tracing.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 
 
 @dataclass

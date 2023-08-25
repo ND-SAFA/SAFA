@@ -1,7 +1,7 @@
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
-from tgen.ranking.steps.sort_children_step import SortChildren
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.tracing.ranking.steps.sort_children_step import SortChildren
 
 
 class TestSortChildrenStep(BaseTest):

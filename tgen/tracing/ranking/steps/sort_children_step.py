@@ -1,7 +1,7 @@
-from tgen.ranking.common.vsm_sorter import registered_sorters
-from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.tracing.ranking.common.vsm_sorter import registered_sorters
+from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.ranking_state import RankingState
 
 
 class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):

@@ -1,9 +1,9 @@
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.ranking_state import RankingState
 
 
 class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):

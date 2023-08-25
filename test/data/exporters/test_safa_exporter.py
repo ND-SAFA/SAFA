@@ -13,10 +13,10 @@ from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 
 class TestSafaExporter(BaseTest):

@@ -130,8 +130,8 @@ class ArtifactsSummarizer(BaseObject):
         if res is None:
             batch_responses = [EMPTY_STRING]
         else:
-            parsed_responses = [LLMResponseUtil.parse(r, ArtifactsSummarizer.SUMMARY_TAG)[0] if ArtifactsSummarizer.SUMMARY_TAG in r
-                                else r for r in res.batch_responses]
+            parsed_responses = [LLMResponseUtil.parse(r, ArtifactsSummarizer.SUMMARY_TAG, return_res_on_failure=True)[0] for r in
+                                res.batch_responses]
             batch_responses = [r.strip() for r in parsed_responses]
 
         return batch_responses

@@ -1,10 +1,10 @@
 from tgen.common.util.logging.logger_manager import logger
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.summarizer.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
+from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.ranking_state import RankingState
 
 
 class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):

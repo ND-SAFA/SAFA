@@ -1,5 +1,7 @@
 from typing import Callable, Dict, List, Union
 
+from tgen.common.util.llm_response_util import LLMResponseUtil
+
 
 class TestAIManager:
     def __init__(self,
@@ -76,9 +78,13 @@ class TestAIManager:
         """
         start_body_tag = "</summary>"
         end_body_tag = "Assistant:"
-        body_start = p.find(start_body_tag)
-        body_end = p.find(end_body_tag)
-        artifact_body = p[body_start + len(start_body_tag): body_end].strip()
+        artifact_body = LLMResponseUtil.parse(p, "artifact")
+        if len(artifact_body) == 0:
+            body_start = p.find(start_body_tag)
+            body_end = p.find(end_body_tag)
+            artifact_body = p[body_start + len(start_body_tag): body_end].strip()
+        else:
+            artifact_body = artifact_body[0].strip()
         summary = f"<summary>Summary of {artifact_body}</summary>"
         return summary
 

@@ -40,6 +40,7 @@ SCORE_INSTRUCTIONS = (
     "\n        * 4 = Artifact performs an indirect function related to parent artifact"
     "\n        * 1 = Related to distant or unrelated functionality of parent artifact."
 )
+
 QUESTION2_INSTRUCTIONS = (
         "Starting with artifact ID 0, answer the following questions for each artifact within {}"
         "\n    1. Provide the ID of the artifact being processed within {}. "

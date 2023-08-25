@@ -94,16 +94,11 @@ public abstract class GenericVersionRepository<
     public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
         ProjectVersion projectVersion, UUID entityId, Map<UUID, List<VersionEntity>> entityHashTable) {
 
-        List<VersionEntity> versionEntities;
-        if (entityHashTable.containsKey(entityId)) {
-            versionEntities = entityHashTable.get(entityId);
-        } else {
-            versionEntities = List.of();
-        }
+        Map<UUID, List<VersionEntity>> justThisEntityMap = new HashMap<>();
+        justThisEntityMap.put(entityId, entityHashTable.getOrDefault(entityId, List.of()));
 
-        entityHashTable.put(entityId, versionEntities);
         List<VersionEntity> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
-            entityHashTable);
+            justThisEntityMap);
         return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
 
@@ -138,27 +133,19 @@ public abstract class GenericVersionRepository<
         Map<UUID, List<VersionEntity>> entityHashTable) {
 
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
-            long time = System.nanoTime();
             BaseEntity baseEntity = this.createOrUpdateRelatedEntities(projectVersion, appEntity, user);
-            System.out.println("    Create Entity: " + (System.nanoTime() - time) / 1000000.0 + "ms");
-            long subTime = System.nanoTime();
 
             VersionEntity versionEntity = this.instantiateVersionEntityFromAppEntity(
                 projectVersion,
                 baseEntity,
                 appEntity);
-            System.out.println("    Create Version Entity: " + (System.nanoTime() - subTime) / 1000000.0 + "ms");
-            subTime = System.nanoTime();
 
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity, user, entityHashTable);
-                System.out.println("    Update Version Entity: " + (System.nanoTime() - subTime) / 1000000.0 + "ms");
                 UUID baseEntityId = baseEntity.getBaseEntityId();
                 appEntity.setId(baseEntityId);
             }
 
-            System.out.println("Commit time: " + (System.nanoTime() - time) / 1000000.0 + "ms");
-            System.out.println();
             return Optional.of(versionEntity);
         };
         UUID baseEntityId = appEntity.getId();
@@ -255,7 +242,6 @@ public abstract class GenericVersionRepository<
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
             .map(appEntity -> {
-                long time = System.nanoTime();
                 Pair<VersionEntity, CommitError> commitResponse =
                     this.commitAppEntityToProjectVersion(projectVersion, appEntity, user, entityHashTable);
                 if (commitResponse.getValue1() == null) {
@@ -263,7 +249,6 @@ public abstract class GenericVersionRepository<
                     processedAppEntities.add(baseEntityId);
                     appEntity.setId(baseEntityId);
                 }
-                System.out.println("TOTAL Commit time: " + (System.nanoTime() - time) / 1000000.0 + "ms");
                 return commitResponse;
             })
             .collect(Collectors.toList());
@@ -286,25 +271,16 @@ public abstract class GenericVersionRepository<
                                              Map<UUID, List<VersionEntity>> entityHashTable) throws SafaError {
         try {
 
-            long time = System.nanoTime();
             this.findExistingVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
                 versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
-            System.out.println("        Find existing entity: " + (System.nanoTime() - time) / 1000000.0 + "ms");
-            time = System.nanoTime();
 
             Optional<VersionEntity> previousEntity =
                 findVersionEntityByProjectVersionAndBaseEntityId(versionEntity.getProjectVersion(),
                     versionEntity.getBaseEntityId(), entityHashTable);
-            System.out.println("        Find existing version entity: "
-                + (System.nanoTime() - time) / 1000000.0 + "ms");
-            time = System.nanoTime();
 
             this.save(versionEntity);
-            System.out.println("        Save: " + (System.nanoTime() - time) / 1000000.0 + "ms");
-            time = System.nanoTime();
 
             this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null), user);
-            System.out.println("        Update TIM: " + (System.nanoTime() - time) / 1000000.0 + "ms");
         } catch (Exception e) {
             e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();

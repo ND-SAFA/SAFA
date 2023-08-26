@@ -1,8 +1,10 @@
 from typing import Dict, List
 
-from tgen.common.constants.tracing.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, HEADER_EXTENSION
+from tgen.common.constants.tracing.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
+    DEFAULT_RENAME_CHILDREN, HEADER_EXTENSION, HEADER_FILE_EXPLANATION
 from tgen.common.util.file_util import FileUtil
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
@@ -19,31 +21,45 @@ class CodeTracer:
         """
         self.trace_dataset = trace_dataset
 
-    def trace(self) -> List[TracePredictionEntry]:
+    def add_code_traces(self, rename_children: bool = DEFAULT_RENAME_CHILDREN) -> None:
         """
-        Traces the code files in the trace dataset
-        :return:
+        Adds trace links between code files.
+        :return: None (modifies the trace dataset).
         """
+        # TODO allow user to supply new name for child layer if renaming
         artifact_df = self.trace_dataset.artifact_df
         artifact_ids = list(artifact_df.index)
 
-        header_links = self.trace_header_files(artifact_ids)
+        h_files = FileUtil.filter_by_ext(artifact_ids, HEADER_EXTENSION)
+        implementation_files = FileUtil.filter_by_ext(artifact_ids, C_IMPLEMENTATION_EXTENSIONS)
+        header_links = CodeTracer.trace_by_base_names(h_files, implementation_files)
+
+        if rename_children:
+            self.rename_child_files(implementation_files, h_files)
 
         # TODO: Add conditions for other programming languages
-        links: List[TracePredictionEntry] = header_links
-        return links
 
-    @staticmethod
-    def trace_header_files(file_paths: List[str]) -> List[TracePredictionEntry]:
+        links = header_links
+        self.trace_dataset.trace_df.add_links(links)
+
+    def rename_child_files(self, parent_ids: List[str], child_ids: List[str],
+                           child_layer_id: str = DEFAULT_CHILD_LAYER_ID):
         """
-        Traces C-based implementation files to their header files.
-        :param file_paths: The file paths to trace.
-        :return: List of trace links.
+        Updates the children artifact to have a specified layer id if it matches any of the parent artifacts.
+        :param parent_ids: The list of parent ids.
+        :param child_ids: The list of children ids.
+        :param child_layer_id: The layer id to rename the children to.
+        :return: None (modifies artifact data frame).
         """
-        h_files = FileUtil.filter_by_ext(file_paths, HEADER_EXTENSION)
-        implementation_files = FileUtil.filter_by_ext(file_paths, C_IMPLEMENTATION_EXTENSIONS)
-        links = CodeTracer.trace_by_base_names(h_files, implementation_files)
-        return links
+        parent_layer_ids = set([self.trace_dataset.artifact_df.get_artifact(p_id)[ArtifactKeys.LAYER_ID] for p_id in parent_ids])
+        for c_id in child_ids:
+            c_artifact = self.trace_dataset.artifact_df.get_artifact(c_id)
+            if c_artifact[ArtifactKeys.LAYER_ID] in parent_layer_ids:
+                self.trace_dataset.artifact_df.update_value(column2update=ArtifactKeys.LAYER_ID,
+                                                            id2update=c_id,
+                                                            new_value=child_layer_id)
+        for p_layer_id in parent_layer_ids:
+            self.trace_dataset.layer_df.add_layer(source_type=child_layer_id, target_type=p_layer_id)
 
     @staticmethod
     def trace_by_base_names(child_paths: List[str], parent_paths: List[str]) -> List[TracePredictionEntry]:
@@ -64,7 +80,8 @@ class CodeTracer:
                         t_link = TracePredictionEntry(source=child_path,
                                                       target=parent_path,
                                                       score=1,
-                                                      explanation="Files have the same name.")
+                                                      label=1,
+                                                      explanation=HEADER_FILE_EXPLANATION)
                         links.append(t_link)
         return links
 

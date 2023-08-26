@@ -17,7 +17,7 @@ class TracePredictionEntry(TypedDict):
     source: str
     target: str
     score: Optional[float]
-    label: Optional[float]
+    label: Optional[int]
     explanation: Optional[str]
 
 

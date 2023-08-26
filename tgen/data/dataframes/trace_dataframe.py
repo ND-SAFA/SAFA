@@ -72,8 +72,8 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: None (data frame is modified).
         """
         for link in links:
-            self.add_link(source_id=link["source"], target_id=link["target"], label=link["label"], score=link["score"],
-                          explanation=link["explanation"])
+            self.add_link(source_id=link["source"], target_id=link["target"], label=link["label"], score=link.get("score", None),
+                          explanation=link.get("explanation", None))
 
     def add_link(self, source_id: str, target_id: str, label: int = 0, score: float = np.NAN, explanation: str = None) -> EnumDict:
         """

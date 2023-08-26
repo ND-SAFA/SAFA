@@ -1,10 +1,13 @@
-from typing import Dict, List
+import os
+from typing import Dict, List, Set
 
 from tgen.common.constants.tracing.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
-    DEFAULT_RENAME_CHILDREN, HEADER_EXTENSION, HEADER_FILE_EXPLANATION
+    DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION, PACKAGE_EXPLANATION, PACKAGE_TYPE
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
@@ -21,6 +24,10 @@ class CodeTracer:
         """
         self.trace_dataset = trace_dataset
 
+    def trace(self):
+        self.add_code_traces()
+        self.add_package_nodes()
+
     def add_code_traces(self, rename_children: bool = DEFAULT_RENAME_CHILDREN) -> None:
         """
         Adds trace links between code files.
@@ -30,20 +37,55 @@ class CodeTracer:
         artifact_df = self.trace_dataset.artifact_df
         artifact_ids = list(artifact_df.index)
 
-        h_files = FileUtil.filter_by_ext(artifact_ids, HEADER_EXTENSION)
+        header_files = FileUtil.filter_by_ext(artifact_ids, HEADER_EXTENSIONS)
         implementation_files = FileUtil.filter_by_ext(artifact_ids, C_IMPLEMENTATION_EXTENSIONS)
-        header_links = CodeTracer.trace_by_base_names(h_files, implementation_files)
+        header_links = CodeTracer.trace_by_base_names(header_files, implementation_files)
 
         if rename_children:
-            self.rename_child_files(implementation_files, h_files)
+            self._rename_child_files(implementation_files, header_files)
 
         # TODO: Add conditions for other programming languages
 
         links = header_links
         self.trace_dataset.trace_df.add_links(links)
 
-    def rename_child_files(self, parent_ids: List[str], child_ids: List[str],
-                           child_layer_id: str = DEFAULT_CHILD_LAYER_ID):
+    def add_package_nodes(self, package_type: str = PACKAGE_TYPE) -> None:
+        """
+        Extracts packages and adds them as artifacts.
+        :return: None (artifact data frame is modified)
+        """
+        artifact_ids = self.trace_dataset.artifact_df.index
+        artifact_ids_set = set(artifact_ids)
+        packages = CodeTracer.extract_packages(artifact_ids)
+        original_artifact_types = self.trace_dataset.artifact_df[ArtifactKeys.LAYER_ID.value].unique()
+
+        links = []
+        trace_ids = set()
+        for parent_node, children in packages.items():
+            if parent_node not in artifact_ids_set:
+                CodeTracer.add_package(self.trace_dataset, artifact_ids_set, parent_node, package_type)
+            for child_node in children:
+                if child_node not in artifact_ids_set:
+                    CodeTracer.add_package(self.trace_dataset, artifact_ids_set, child_node, package_type)
+                trace_id = TraceDataFrame.generate_link_id(source_id=child_node, target_id=parent_node)
+                if trace_id not in trace_ids:
+                    trace_entry = TracePredictionEntry(
+                        source=child_node,
+                        target=parent_node,
+                        label=1,
+                        explanation=PACKAGE_EXPLANATION
+                    )
+                    links.append(trace_entry)
+                    trace_ids.add(trace_id)
+                else:
+                    logger.info(f"Found duplicate package relationship: {parent_node} -> {child_node}")
+        self.trace_dataset.trace_df.add_links(links)
+        self.trace_dataset.layer_df.add_layer(source_type=package_type, target_type=package_type)
+        for original_artifact_type in original_artifact_types:
+            self.trace_dataset.layer_df.add_layer(source_type=original_artifact_type, target_type=package_type)
+
+    def _rename_child_files(self, parent_ids: List[str], child_ids: List[str],
+                            child_layer_id: str = DEFAULT_CHILD_LAYER_ID):
         """
         Updates the children artifact to have a specified layer id if it matches any of the parent artifacts.
         :param parent_ids: The list of parent ids.
@@ -60,6 +102,37 @@ class CodeTracer:
                                                             new_value=child_layer_id)
         for p_layer_id in parent_layer_ids:
             self.trace_dataset.layer_df.add_layer(source_type=child_layer_id, target_type=p_layer_id)
+
+    @staticmethod
+    def add_package(trace_dataset: TraceDataset, artifact_ids_set: Set[str], package_name: str, package_type: str):
+        trace_dataset.artifact_df.add_artifact(artifact_id=package_name,
+                                               layer_id=package_type,
+                                               content="",
+                                               summary="")
+        artifact_ids_set.add(package_name)
+
+    @staticmethod
+    def extract_packages(file_paths: List[str]) -> Dict[str, List[str]]:
+        """
+        Extracts the list of packages references in the list of file paths.
+        :param file_paths: The file paths to source code.
+        :return: List of unique packages.
+        """
+        packages = {}
+        for file_path in file_paths:
+            file_packages = FileUtil.split_into_parts(file_path)
+            for i in range(0, len(file_packages) - 1):
+                parent = file_packages[i]
+                child = file_packages[i + 1]
+                if i == len(file_packages) - 2:
+                    child = os.path.join(*file_packages)
+                if parent not in packages:
+                    packages[parent] = set()
+                if child not in packages[parent]:
+                    packages[parent].add(child)
+
+        packages = {p: list(c) for p, c in packages.items()}
+        return packages
 
     @staticmethod
     def trace_by_base_names(child_paths: List[str], parent_paths: List[str]) -> List[TracePredictionEntry]:

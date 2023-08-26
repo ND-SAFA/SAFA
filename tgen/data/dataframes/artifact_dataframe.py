@@ -46,7 +46,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return ArtifactKeys
 
-    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1, summary: bool = EMPTY_STRING) -> EnumDict:
+    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1, summary: str = EMPTY_STRING) -> EnumDict:
         """
         Adds artifact to dataframe
         :param artifact_id: The id of the Artifact

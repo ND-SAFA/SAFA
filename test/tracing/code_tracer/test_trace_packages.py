@@ -23,12 +23,12 @@ class TestCodeTracerUtil(BaseTest):
         self.assertEqual(7, len(trace_dataset.artifact_df))
         self.assertEqual(6, len(trace_dataset.trace_df))
 
-        TestCodeTracerUtil.assert_package_exists(self, trace_dataset, ["src", "abc", "def", "ghi"])
+        TestCodeTracerUtil.assert_package_exists(self, trace_dataset, ["src", "src/abc", "src/def", "src/ghi"])
         TestCodeTracerUtil.check_links(self, trace_dataset, {
-            "src": ["abc", "def", "ghi"],
-            "abc": ["src/abc/some_class.h"],
-            "def": ["src/def/some_class.cpp"],
-            "ghi": ["src/ghi/some_class.cc"]
+            "src": ["src/abc", "src/def", "src/ghi"],
+            "src/abc": ["src/abc/some_class.h"],
+            "src/def": ["src/def/some_class.cpp"],
+            "src/ghi": ["src/ghi/some_class.cc"]
         })
 
     def test_extract_packages(self):
@@ -43,16 +43,16 @@ class TestCodeTracerUtil(BaseTest):
         self.assertEqual(3, len(packages))
         self.assertIn("src", packages)
         self.assertEqual(2, len(packages["src"]))
-        self.assertIn("data", packages["src"])
-        self.assertIn("loader", packages["src"])
+        self.assertIn("src/data", packages["src"])
+        self.assertIn("src/loader", packages["src"])
 
-        self.assertIn("data", packages)
-        self.assertEqual(1, len(packages["data"]))
-        self.assertIn("src/data/data_module.py", packages["data"])
+        self.assertIn("src/data", packages)
+        self.assertEqual(1, len(packages["src/data"]))
+        self.assertIn("src/data/data_module.py", packages["src/data"])
 
-        self.assertIn("loader", packages)
-        self.assertEqual(1, len(packages["loader"]))
-        self.assertIn("src/loader/data_loader.py", packages["loader"])
+        self.assertIn("src/loader", packages)
+        self.assertEqual(1, len(packages["src/loader"]))
+        self.assertIn("src/loader/data_loader.py", packages["src/loader"])
 
     @staticmethod
     def check_links(tc: TestCase, trace_dataset: TraceDataset, links: Dict[str, List[str]]):

@@ -122,10 +122,8 @@ class CodeTracer:
         for file_path in file_paths:
             file_packages = FileUtil.split_into_parts(file_path)
             for i in range(0, len(file_packages) - 1):
-                parent = file_packages[i]
-                child = file_packages[i + 1]
-                if i == len(file_packages) - 2:
-                    child = os.path.join(*file_packages)
+                parent = os.path.join(*file_packages[:i + 1])
+                child = os.path.join(*file_packages[:i + 2])
                 if parent not in packages:
                     packages[parent] = set()
                 if child not in packages[parent]:

@@ -30,10 +30,16 @@ class TGenLogger(Logger):
         title_formatted = TGenLogger.__create_title(title)
         self.info(title_formatted)
 
+    def log_step(self, step: str) -> None:
+        step_formatted = TGenLogger.__create_step(step)
+        self.info(step_formatted)
+
     @staticmethod
     def __create_title(title: str):
-        prefix_len = int((TGenLogger.DEFAULT_TITLE_LENGTH - len(title)) / 2)
-        prefix_len = max(prefix_len, 0)
-        title_border = '-' * prefix_len
-        title = f"{title_border} {title} {title_border}".strip()
+        title = f"# {title}".strip()
         return title
+
+    @staticmethod
+    def __create_step(step: str):
+        formatted_step = f"## {step}"
+        return formatted_step

@@ -7,11 +7,12 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_assertions import TestAssertions
 from tgen.tracing.code.code_tracer import CodeTracer
 from tgen.tracing.code.package_tracer import PackageTracer
 
 
-class TestCodeTracerUtil(BaseTest):
+class TestPackageTracer(BaseTest):
 
     def test_add_package_nodes(self):
         """
@@ -23,14 +24,19 @@ class TestCodeTracerUtil(BaseTest):
 
         self.assertEqual(7, len(trace_dataset.artifact_df))
         self.assertEqual(6, len(trace_dataset.trace_df))
+        self.assertEqual(2, len(trace_dataset.layer_df))
 
-        TestCodeTracerUtil.assert_package_exists(self, trace_dataset, ["src", "src/abc", "src/def", "src/ghi"])
-        TestCodeTracerUtil.check_links(self, trace_dataset, {
+        TestPackageTracer.assert_package_exists(self, trace_dataset, ["src", "src/abc", "src/def", "src/ghi"])
+        TestPackageTracer.check_links(self, trace_dataset, {
             "src": ["src/abc", "src/def", "src/ghi"],
             "src/abc": ["src/abc/some_class.h"],
             "src/def": ["src/def/some_class.cpp"],
             "src/ghi": ["src/ghi/some_class.cc"]
         })
+        TestAssertions.verify_entities_in_df([
+            {"source": DEFAULT_PACKAGE_ARTIFACT_TYPE, "target": DEFAULT_PACKAGE_ARTIFACT_TYPE},
+            {"source": CodeTracerTestUtil.code_artifact_type, "target": DEFAULT_PACKAGE_ARTIFACT_TYPE}
+        ], trace_dataset.layer_df)
 
     def test_extract_packages(self):
         """

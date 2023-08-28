@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.tracing.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
@@ -20,43 +20,40 @@ class PackageTracer:
     """
 
     @staticmethod
-    def add_package_nodes(trace_dataset: TraceDataset, package_type: str = DEFAULT_PACKAGE_ARTIFACT_TYPE) -> None:
+    def add_package_nodes(trace_dataset: TraceDataset, package_artifact_type: str = DEFAULT_PACKAGE_ARTIFACT_TYPE) -> None:
         """
         Extracts packages and adds them as artifacts.
         :return: None (artifact data frame is modified)
         """
         artifact_ids = trace_dataset.artifact_df.index
-        original_artifact_types = trace_dataset.artifact_df[ArtifactKeys.LAYER_ID.value].unique()
-
-        PackageTracer._add_packages_as_artifacts(trace_dataset, package_type)
-        trace_dataset.layer_df.add_layer(source_type=package_type, target_type=package_type)
-        for original_artifact_type in original_artifact_types:
-            trace_dataset.layer_df.add_layer(source_type=original_artifact_type, target_type=package_type)
-
-    @staticmethod
-    def _add_packages_as_artifacts(trace_dataset: TraceDataset, package_artifact_type=DEFAULT_PACKAGE_ARTIFACT_TYPE):
-        """
-        Adds code packages as artifacts to trace dataset.
-        :param package_artifact_type: The artifact type for the packages.
-        :param trace_dataset: The dataset to modify.
-        :return: None (dataset is modified in place).
-        """
-        artifact_ids = trace_dataset.artifact_df.index
         package_hierarchy, packages = PackageTracer._extract_package_hierarchy(artifact_ids)
 
-        links = []
-        trace_ids = set()
-        artifact_ids_set = set(artifact_ids)
+        PackageTracer._add_package_artifacts(trace_dataset, packages, package_artifact_type)
+        PackageTracer._add_package_links(trace_dataset, package_hierarchy)
 
-        for package in packages:
-            trace_dataset.artifact_df.add_artifact(artifact_id=package,
-                                                   layer_id=package_artifact_type,
-                                                   content=EMPTY_STRING,
-                                                   summary=EMPTY_STRING)
-            artifact_ids_set.add(package)
+    @staticmethod
+    def _add_package_links(trace_dataset: TraceDataset, package_hierarchy: Dict[str, List[str]]) -> None:
+        """
+        Adds trace link package hierarchy to trace dataset. Layer data frame is updated along with trace links.
+        :param trace_dataset: The trace dataset containing the package artifacts and the one to add the links to.
+        :param package_hierarchy: The hierarchy of packages and source code files.
+        :return: None (dataset is modified).
+        """
+        layer_ids = set()
+        trace_ids = set()
+        links = []
 
         for parent_node, children in package_hierarchy.items():
             for child_node in children:
+                # Adds layer if missing
+                parent_layer_id = trace_dataset.artifact_df.get_artifact(parent_node)[ArtifactKeys.LAYER_ID]
+                child_layer_id = trace_dataset.artifact_df.get_artifact(child_node)[ArtifactKeys.LAYER_ID]
+                layer_id = f"{parent_layer_id}2{child_layer_id}"
+                if layer_id not in layer_ids:
+                    trace_dataset.layer_df.add_layer(source_type=child_layer_id, target_type=parent_layer_id)
+                    layer_ids.add(layer_id)
+
+                # Adds trace link if not added
                 trace_id = TraceDataFrame.generate_link_id(source_id=child_node, target_id=parent_node)
                 if trace_id not in trace_ids:
                     trace_entry = TracePredictionEntry(
@@ -70,6 +67,23 @@ class PackageTracer:
                 else:
                     logger.info(f"Found duplicate package relationship: {parent_node} -> {child_node}")
         trace_dataset.trace_df.add_links(links)
+
+    @staticmethod
+    def _add_package_artifacts(trace_dataset: TraceDataset, packages: Iterable[str], package_artifact_type: str):
+        """
+        Adds the packages as artifacts to trace dataset.
+        :param trace_dataset: The dataset to add the packages to.
+        :param packages: List of package names to add.
+        :param package_artifact_type: The artifact type of the package.
+        :return: None (dataset is modified in place).
+        """
+        artifact_ids_set = set(trace_dataset.artifact_df.index)
+        for package in packages:
+            trace_dataset.artifact_df.add_artifact(artifact_id=package,
+                                                   layer_id=package_artifact_type,
+                                                   content=EMPTY_STRING,
+                                                   summary=EMPTY_STRING)
+            artifact_ids_set.add(package)
 
     @staticmethod
     def _extract_package_hierarchy(file_paths: List[str]) -> Tuple[Dict[str, List[str]], set[str]]:

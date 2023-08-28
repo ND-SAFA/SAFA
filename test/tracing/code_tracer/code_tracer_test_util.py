@@ -5,12 +5,13 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
 class CodeTracerTestUtil:
+    code_artifact_type = "Code"
     h_file_name = "src/abc/some_class.h"
     cpp_file_name = "src/def/some_class.cpp"
     cc_file_name = "src/ghi/some_class.cc"
-    artifacts = [{"id": h_file_name, "content": "", "layer_id": "Code", "summary": ""},
-                 {"id": cpp_file_name, "content": "", "layer_id": "Code", "summary": ""},
-                 {"id": cc_file_name, "content": "", "layer_id": "Code", "summary": ""}]
+    artifacts = [{"id": h_file_name, "content": "", "layer_id": code_artifact_type, "summary": ""},
+                 {"id": cpp_file_name, "content": "", "layer_id": code_artifact_type, "summary": ""},
+                 {"id": cc_file_name, "content": "", "layer_id": code_artifact_type, "summary": ""}]
 
     @classmethod
     def get_trace_dataset(cls) -> TraceDataset:

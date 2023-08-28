@@ -2,17 +2,16 @@ from typing import Dict, List, Optional, TypedDict
 
 import anthropic
 
-from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.thread_util import ThreadUtil
-from tgen.common.constants import environment_constants
-from tgen.common.constants.anthropic_constants import ANTHROPIC_MAX_RE_ATTEMPTS, ANTHROPIC_MAX_THREADS
+from tgen.common.constants import anthropic_constants, environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.environment_constants import ANTHROPIC_KEY
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
-from tgen.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.testres.mocking.mock_anthropic import MockAnthropicClient
 
 
@@ -104,8 +103,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 
         ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
                                         thread_work,
-                                        n_threads=ANTHROPIC_MAX_THREADS,
-                                        max_attempts=ANTHROPIC_MAX_RE_ATTEMPTS)
+                                        n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
+                                        max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS)
 
         for res in global_responses:
             if res and res.get("exception", EMPTY_STRING):

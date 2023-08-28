@@ -1,7 +1,8 @@
 import os
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Tuple
 
-from tgen.common.constants.tracing.code_tracer_constants import PACKAGE_EXPLANATION, PACKAGE_TYPE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.tracing.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
@@ -19,7 +20,7 @@ class PackageTracer:
     """
 
     @staticmethod
-    def add_package_nodes(trace_dataset: TraceDataset, package_type: str = PACKAGE_TYPE) -> None:
+    def add_package_nodes(trace_dataset: TraceDataset, package_type: str = DEFAULT_PACKAGE_ARTIFACT_TYPE) -> None:
         """
         Extracts packages and adds them as artifacts.
         :return: None (artifact data frame is modified)
@@ -27,20 +28,18 @@ class PackageTracer:
         artifact_ids = trace_dataset.artifact_df.index
         original_artifact_types = trace_dataset.artifact_df[ArtifactKeys.LAYER_ID.value].unique()
 
-        PackageTracer._create_package_artifacts(trace_dataset, package_type)
+        PackageTracer._add_packages_as_artifacts(trace_dataset, package_type)
         trace_dataset.layer_df.add_layer(source_type=package_type, target_type=package_type)
         for original_artifact_type in original_artifact_types:
             trace_dataset.layer_df.add_layer(source_type=original_artifact_type, target_type=package_type)
 
     @staticmethod
-    def _create_package_artifacts(trace_dataset: TraceDataset, package_type=PACKAGE_TYPE):
+    def _add_packages_as_artifacts(trace_dataset: TraceDataset, package_artifact_type=DEFAULT_PACKAGE_ARTIFACT_TYPE):
         """
-
-        :param artifact_ids:
-        :param package_hierarchy:
-        :param package_type:
-        :param trace_dataset:
-        :return:
+        Adds code packages as artifacts to trace dataset.
+        :param package_artifact_type: The artifact type for the packages.
+        :param trace_dataset: The dataset to modify.
+        :return: None (dataset is modified in place).
         """
         artifact_ids = trace_dataset.artifact_df.index
         package_hierarchy, packages = PackageTracer._extract_package_hierarchy(artifact_ids)
@@ -50,7 +49,11 @@ class PackageTracer:
         artifact_ids_set = set(artifact_ids)
 
         for package in packages:
-            PackageTracer._add_package_artifact(trace_dataset, artifact_ids_set, package, package_type)
+            trace_dataset.artifact_df.add_artifact(artifact_id=package,
+                                                   layer_id=package_artifact_type,
+                                                   content=EMPTY_STRING,
+                                                   summary=EMPTY_STRING)
+            artifact_ids_set.add(package)
 
         for parent_node, children in package_hierarchy.items():
             for child_node in children:
@@ -67,14 +70,6 @@ class PackageTracer:
                 else:
                     logger.info(f"Found duplicate package relationship: {parent_node} -> {child_node}")
         trace_dataset.trace_df.add_links(links)
-
-    @staticmethod
-    def _add_package_artifact(trace_dataset: TraceDataset, artifact_ids_set: Set[str], package_name: str, package_type: str):
-        trace_dataset.artifact_df.add_artifact(artifact_id=package_name,
-                                               layer_id=package_type,
-                                               content="",
-                                               summary="")
-        artifact_ids_set.add(package_name)
 
     @staticmethod
     def _extract_package_hierarchy(file_paths: List[str]) -> Tuple[Dict[str, List[str]], set[str]]:

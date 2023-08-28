@@ -11,15 +11,15 @@ from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
-from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.model_manager import ModelManager
+from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
 
 class PromptDataset(iDataset):
@@ -259,5 +259,5 @@ class PromptDataset(iDataset):
         """
         try:
             return getattr(self.trace_dataset, item)
-        except Exception:
+        except Exception as e:
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")

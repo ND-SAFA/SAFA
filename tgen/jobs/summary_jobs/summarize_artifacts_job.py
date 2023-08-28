@@ -59,11 +59,11 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
             summary = args.dataset.project_summary if self.do_resummarize_project else None
 
         if use_traces_to_summarize:
-            args.dataset.artifacts_df = self._convert_artifact_content_back(args.dataset.artifact_df, orig_artifacts_df)
+            args.dataset.artifact_df = self._convert_artifact_content_back(args.dataset.artifact_df, orig_artifacts_df)
             artifact_export_path = os.path.join(args.export_dir, ARTIFACT_FILE_NAME)
-            args.dataset.artifacts_df.to_csv(artifact_export_path)
+            args.dataset.artifact_df.to_csv(artifact_export_path)
 
-        artifacts = args.dataset.artifacts_df.to_artifacts()
+        artifacts = args.dataset.artifact_df.to_artifacts()
         return SummaryResponse(summary=summary, artifacts=artifacts)
 
     @staticmethod

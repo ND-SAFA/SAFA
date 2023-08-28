@@ -12,5 +12,5 @@ class TestPromptDataset(BaseTest):
     @staticmethod
     def get_prompt_dataset_from_artifact_df() -> PromptDataset:
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
-        artifacts_df = artifact_project_reader.read_project()
-        return PromptDataset(artifact_df=artifacts_df)
+        artifact_df = artifact_project_reader.read_project()
+        return PromptDataset(artifact_df=artifact_df)

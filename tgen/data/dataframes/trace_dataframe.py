@@ -1,6 +1,9 @@
-from typing import Any, Dict, Type
+from typing import Any, Dict, List, Type
+
+import numpy as np
 
 from tgen.common.util.enum_util import EnumDict
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 
@@ -62,16 +65,39 @@ class TraceDataFrame(AbstractProjectDataFrame):
                 link_ids.append(TraceDataFrame.generate_link_id(row[TraceKeys.SOURCE], row[TraceKeys.TARGET]))
             self[TraceKeys.LINK_ID] = link_ids
 
-    def add_link(self, source_id: str, target_id: str, label: int = 0) -> EnumDict:
+    def add_links(self, links: List[TracePredictionEntry]) -> None:
+        """
+        Adds links to data frame.
+        :param links: The trace predictions to add.
+        :return: None (data frame is modified).
+        """
+        for link in links:
+            self.add_link(source_id=link["source"], target_id=link["target"], label=link["label"], score=link.get("score", None),
+                          explanation=link.get("explanation", None))
+
+    def add_link(self, source_id: str, target_id: str, label: int = 0, score: float = np.NAN, explanation: str = None) -> EnumDict:
         """
         Adds link to dataframe
         :param source_id: The id of the source
         :param target_id: The id of the target
         :param label: The label of the link (1 if True link, 0 otherwise)
+        :param score: The score of the generated links.
         :return: The newly added link
         """
         link_id = TraceDataFrame.generate_link_id(source_id, target_id)
-        return self.add_new_row(self.link_as_dict(source_id, target_id, label, link_id))
+        return self.add_or_update_row(
+            self.link_as_dict(source_id=source_id, target_id=target_id, label=label, link_id=link_id, score=score,
+                              explanation=explanation))
+
+    def get_links(self) -> List[EnumDict]:
+        """
+        Returns the links in the data frame.
+        :return: Traces in data frame.
+        """
+        links = []
+        for link_id in self.index:
+            links.append(self.get_link(link_id))
+        return links
 
     def get_link(self, link_id: int = None, source_id: str = None, target_id: str = None) -> EnumDict:
         """
@@ -87,17 +113,20 @@ class TraceDataFrame(AbstractProjectDataFrame):
         return self.get_row(link_id)
 
     @staticmethod
-    def link_as_dict(source_id: str, target_id: str, label: int = 0, link_id: int = None) -> Dict[TraceKeys, Any]:
+    def link_as_dict(source_id: str, target_id: str, label: int = 0, link_id: int = None, score: float = np.NAN,
+                     explanation: str = None) -> Dict[TraceKeys, Any]:
         """
         Creates a dictionary mapping column names to the corresponding link information
         :param source_id: The id of the source artifact
         :param target_id: The id of the target artifact
         :param label: The label of the link (1 if True link, 0 otherwise)
         :param link_id: The id of the link
+        :param score: The score of the generated link.
         :return: A dictionary mapping column names to the corresponding link information
         """
         dict_ = EnumDict({TraceKeys.LINK_ID: link_id} if link_id else {})
-        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id, TraceKeys.LABEL: label})
+        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id, TraceKeys.LABEL: label, TraceKeys.SCORE: score,
+                      TraceKeys.EXPLANATION: explanation})
         return dict_
 
     @staticmethod

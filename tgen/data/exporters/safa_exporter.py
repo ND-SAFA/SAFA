@@ -123,8 +123,8 @@ class SafaExporter(AbstractDatasetExporter):
         target_artifacts = self.artifact_type_to_artifacts[target_type]
         trace_ids = [TraceDataFrame.generate_link_id(source_id, target_id)
                      for source_id in source_artifacts.index for target_id in target_artifacts.index]
-        filtered_trace_df = trace_df.filter_by_index(trace_ids)
-        return filtered_trace_df
+        trace_df_layer = trace_df.filter_by_index(trace_ids)
+        return trace_df_layer
 
     def create_tim(self) -> None:
         """

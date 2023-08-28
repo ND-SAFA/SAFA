@@ -371,3 +371,14 @@ class FileUtil:
         file_name = os.path.basename(file_path)
         file_name_base, file_ext = os.path.splitext(file_name)
         return file_name_base
+
+    @staticmethod
+    def split_into_parts(file_path: str) -> List[str]:
+        """
+        Splits path into list of directories and file name (last element).
+        :param file_path: The path to split.
+        :return: Parts that make up the path.
+        """
+        file_path = os.path.normpath(file_path)
+        parts = file_path.split(os.sep)
+        return parts

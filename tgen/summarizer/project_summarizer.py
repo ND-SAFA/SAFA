@@ -4,6 +4,7 @@ from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE,
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -12,8 +13,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_TASKS
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 
@@ -45,21 +45,25 @@ class ProjectSummarizer(BaseObject):
         if self.args.summarize_artifacts:
             self.artifact_df.summarize_content(ArtifactsSummarizer())
 
-        task_prompt: QuestionnairePrompt = SupportedPrompts.PROJECT_SUMMARY.value
-        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
-                                               build_method=MultiArtifactPrompt.BuildMethod.XML,
-                                               include_ids=True)
-        prompt_builder = PromptBuilder(prompts=[task_prompt, artifacts_prompt])
+        summary = ""
+        for task_title, task_prompt in PROJECT_SUMMARY_TASKS:
+            logger.log_step(f"Creating section {task_title}")
+            artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
+                                                   build_method=MultiArtifactPrompt.BuildMethod.XML,
+                                                   include_ids=True)
+            prompt_builder = PromptBuilder(prompts=[task_prompt, artifacts_prompt])
 
-        self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
-        self.llm_manager.llm_args.temperature = 0
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
-                                                                                  PromptDataset(artifact_df=self.artifact_df)})
-        trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
-                                             prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
-        res = trainer.perform_prediction()
-        summary = res.predictions[0][task_prompt.id][task_prompt.response_manager.response_tag]
-        summary = res.original_response[0] if len(summary) == 0 else summary[0]
+            self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
+            self.llm_manager.llm_args.temperature = 0
+            trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
+                                                                                      PromptDataset(artifact_df=self.artifact_df)})
+            trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
+                                                 prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
+            res = trainer.perform_prediction()
+            task_body = res.original_response[0]
+            task_section = f"{PromptUtil.as_markdown_header(task_title)}\n{task_body}"
+            summary += task_section if len(task_section) == 0 else f"\n{task_section}"
+
         if self.export_dir:
             summary_export_path = os.path.join(self.export_dir, PROJECT_SUMMARY_FILE_NAME)
             FileUtil.write(summary, summary_export_path)

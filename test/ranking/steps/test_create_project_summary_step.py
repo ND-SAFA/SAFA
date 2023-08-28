@@ -1,6 +1,9 @@
+from typing import Any, List, Union
+
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
@@ -11,7 +14,7 @@ class TestCreateProjectSummary(BaseTest):
     """
     Requirements: https://www.notion.so/nd-safa/step_create_project_summary-e67877b280d144ec8007a2062a2d3936?pvs=4
     """
-    PROJECT_SUMMARY = "project summary"
+    PROJECT_SUMMARY = MockResponses.project_summary_responses
 
     @mock_anthropic
     def test_generate_project_summary(self, ai_manager: TestAIManager):
@@ -19,7 +22,7 @@ class TestCreateProjectSummary(BaseTest):
         Tests the generation of a project summary.
         """
         ai_manager.mock_summarization()
-        ai_manager.set_responses([self.PROJECT_SUMMARY])
+        ai_manager.set_responses(MockResponses.project_summary_responses)
         args, state = RankingPipelineTest.create_ranking_structures()
         step = CreateProjectSummary()
         self.assert_result(args, state, step)
@@ -41,7 +44,11 @@ class TestCreateProjectSummary(BaseTest):
         self.assert_result(args, state, step, expected_value=None)
 
     def assert_result(self, args: RankingArgs, state: RankingState, step: CreateProjectSummary,
-                      expected_value: str = PROJECT_SUMMARY):
+                      expected_value: Union[Any, List[str]] = PROJECT_SUMMARY):
         self.assertEqual(state.project_summary, None)
         step.run(args, state)
-        self.assertEqual(state.project_summary, expected_value)
+        if isinstance(expected_value, list):
+            for ev in expected_value:
+                self.assertIn(ev, state.project_summary)
+        else:
+            self.assertEqual(state.project_summary, expected_value)

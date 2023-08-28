@@ -1,21 +1,20 @@
-from typing import Dict, List, Any
+from collections import OrderedDict
+from typing import Any, Dict, List
 
+from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, SPACE, COMMA
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
-from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.delta.delta_util import get_prediction_output
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-
-from collections import OrderedDict
 
 
 class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
@@ -36,10 +35,10 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :return: None
         """
         logger.log_with_title("STEP 3 - Generating Complete Change Summary")
-        artifacts_df = self._create_diff_artifacts_df(state)
+        artifact_df = self._create_diff_artifact_df(state)
         task_prompt: QuestionnairePrompt = SupportedPrompts.DELTA_CHANGE_SUMMARY_QUESTIONNAIRE.value
 
-        output = self._get_output(args, state, artifacts_df, task_prompt)
+        output = self._get_output(args, state, artifact_df, task_prompt)
         state.change_summary_output = output
 
         low_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 1)
@@ -90,7 +89,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         return change_type_mapping
 
     @staticmethod
-    def _create_diff_artifacts_df(state: DeltaState, include_impact: bool = False) -> ArtifactDataFrame:
+    def _create_diff_artifact_df(state: DeltaState, include_impact: bool = False) -> ArtifactDataFrame:
         """
         Creates a dataframe of artifacts representing the diff summary for each changed file
         :param state: The current state of the delta summarizer
@@ -105,16 +104,16 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
             DataFrameUtil.append(artifacts, EnumDict({ArtifactKeys.ID: filenames,
                                                       ArtifactKeys.CONTENT: content,
                                                       ArtifactKeys.LAYER_ID: OverviewChangeSummaryStep.LAYER_ID}))
-        artifacts_df = ArtifactDataFrame(artifacts)
-        return artifacts_df
+        artifact_df = ArtifactDataFrame(artifacts)
+        return artifact_df
 
     @staticmethod
-    def _get_output(args: DeltaArgs, state: DeltaState, artifacts_df: ArtifactDataFrame, task_prompt: QuestionnairePrompt) -> Dict:
+    def _get_output(args: DeltaArgs, state: DeltaState, artifact_df: ArtifactDataFrame, task_prompt: QuestionnairePrompt) -> Dict:
         """
         Gets the output for the model for creating the summary
         :param args: The arguments used for the delta summarizer
         :param state: The current state of the delta summarizer
-        :param artifacts_df: A dataframe containing the diff summary for each change
+        :param artifact_df: A dataframe containing the diff summary for each change
         :param task_prompt: The prompt used to generate the output
         :return: The output from the model's predictions
         """
@@ -127,7 +126,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                        xml_tags={"file-change": ["filename", "description"]}),
                    task_prompt
                    ]
-        output = get_prediction_output(args, artifacts_df, state, categories=categories,
+        output = get_prediction_output(args, artifact_df, state, categories=categories,
                                        prompts=prompts)
         return output[0][task_prompt.id]
 

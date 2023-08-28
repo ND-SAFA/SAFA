@@ -8,13 +8,13 @@ from tgen.common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKEN
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.question_prompt import QuestionPrompt
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
@@ -78,7 +78,7 @@ class TestPromptDataset(BaseTest):
 
         prompt = QuestionPrompt("Tell me about these artifacts:")
         prompt_builder = PromptBuilder([prompt, MultiArtifactPrompt()])
-        prompts_df = traces_prompt_dataset.get_prompt_dataframe(prompt_builder,prompt_args=llm_manager.prompt_args)
+        prompts_df = traces_prompt_dataset.get_prompt_dataframe(prompt_builder, prompt_args=llm_manager.prompt_args)
         self.assertEqual(len(prompts_df), 1)
 
     def test_to_dataframe(self):
@@ -135,8 +135,8 @@ class TestPromptDataset(BaseTest):
     @staticmethod
     def get_prompt_dataset_from_artifact_df() -> PromptDataset:
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
-        artifacts_df = artifact_project_reader.read_project()
-        return PromptDataset(artifact_df=artifacts_df)
+        artifact_df = artifact_project_reader.read_project()
+        return PromptDataset(artifact_df=artifact_df)
 
     @staticmethod
     def get_dataset_from_prompt_df():

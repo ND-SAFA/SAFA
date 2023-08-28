@@ -29,7 +29,7 @@ class ProjectSummarizer(BaseObject):
         :param n_tokens: The token limit for the LLM
         """
         super().__init__()
-        self.artifacts_df = summarizer_args.dataset.artifact_df
+        self.artifact_df = summarizer_args.dataset.artifact_df
         self.llm_manager: AbstractLLMManager = summarizer_args.llm_manager_for_project_summary
         self.n_tokens = n_tokens
         self.export_dir = summarizer_args.export_dir
@@ -43,7 +43,7 @@ class ProjectSummarizer(BaseObject):
         logger.log_title("Creating project specification.")
 
         if self.args.summarize_artifacts:
-            self.artifacts_df.summarize_content(ArtifactsSummarizer())
+            self.artifact_df.summarize_content(ArtifactsSummarizer())
 
         task_prompt: QuestionnairePrompt = SupportedPrompts.PROJECT_SUMMARY.value
         artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
@@ -54,7 +54,7 @@ class ProjectSummarizer(BaseObject):
         self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
         self.llm_manager.llm_args.temperature = 0
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
-                                                                                  PromptDataset(artifact_df=self.artifacts_df)})
+                                                                                  PromptDataset(artifact_df=self.artifact_df)})
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
                                              prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
         res = trainer.perform_prediction()

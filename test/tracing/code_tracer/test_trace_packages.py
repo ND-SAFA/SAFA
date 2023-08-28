@@ -2,7 +2,7 @@ from typing import Dict, List
 from unittest import TestCase
 
 from test.tracing.code_tracer.code_tracer_test_util import CodeTracerTestUtil
-from tgen.common.constants.tracing.code_tracer_constants import PACKAGE_EXPLANATION, PACKAGE_TYPE
+from tgen.common.constants.tracing.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -69,4 +69,4 @@ class TestCodeTracerUtil(BaseTest):
         for p in packages:
             artifact = trace_dataset.artifact_df.get_artifact(p)
             tc.assertIsNotNone(artifact)
-            tc.assertEqual(PACKAGE_TYPE, artifact[ArtifactKeys.LAYER_ID])
+            tc.assertEqual(DEFAULT_PACKAGE_ARTIFACT_TYPE, artifact[ArtifactKeys.LAYER_ID])

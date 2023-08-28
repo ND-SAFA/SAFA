@@ -80,7 +80,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Reads artifacts in project converting each to its own data frame.
         :return:  Mapping between artifacts' name and its reader.
         """
-        artifacts_df = ArtifactDataFrame()
+        artifact_df = ArtifactDataFrame()
         artifact_definitions = self._get_artifact_definitions()
         for artifact_type, artifact_definition in artifact_definitions.items():
             artifact_reader = EntityReader(self.get_project_path(),
@@ -88,8 +88,8 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
                                            conversions=self.get_project_conversions())
             artifact_type_df = artifact_reader.read_entities()
             artifact_type_df[StructuredKeys.Artifact.LAYER_ID.value] = artifact_type
-            artifacts_df = pd.concat([artifacts_df, artifact_type_df], ignore_index=True)
-        final_df = ArtifactDataFrame(artifacts_df)
+            artifact_df = pd.concat([artifact_df, artifact_type_df], ignore_index=True)
+        final_df = ArtifactDataFrame(artifact_df)
         if self.summarizer:
             final_df.summarize_content(self.summarizer)
         return final_df

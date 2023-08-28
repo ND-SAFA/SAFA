@@ -228,8 +228,8 @@ class PromptDataset(iDataset):
 
     def _has_trace_data(self) -> bool:
         """
-        Returns True when project data in the form of an artifacts_df or trace_dataset has been provided, else False
-        :return: True when project data in the form of an artifacts_df or trace_dataset has been provided, else False
+        Returns True when project data in the form of an artifact_df or trace_dataset has been provided, else False
+        :return: True when project data in the form of an artifact_df or trace_dataset has been provided, else False
         """
         return not (self.artifact_df is None and self.trace_dataset is None)
 

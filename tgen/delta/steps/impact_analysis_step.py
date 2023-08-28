@@ -1,14 +1,13 @@
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.delta.steps.overview_change_summary_step import OverviewChangeSummaryStep
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
 class ImpactAnalysisStep(OverviewChangeSummaryStep):
-
     IMPACT_TITLE = "Potential Impact"
 
     def _run(self, args: DeltaArgs, state: DeltaState) -> None:
@@ -19,10 +18,10 @@ class ImpactAnalysisStep(OverviewChangeSummaryStep):
         :return: None
         """
         impact_task_prompt: QuestionnairePrompt = SupportedPrompts.DELTA_IMPACTS.value
-        artifacts_df_with_impact = self._create_diff_artifacts_df(state, include_impact=True)
+        artifact_df_with_impact = self._create_diff_artifact_df(state, include_impact=True)
         if not state.impact:
-            state.impact = self._get_output(args, state, artifacts_df_with_impact,
-                                                impact_task_prompt)[impact_task_prompt.response_manager.response_tag][0]
+            state.impact = self._get_output(args, state, artifact_df_with_impact,
+                                            impact_task_prompt)[impact_task_prompt.response_manager.response_tag][0]
         state.save(self.get_step_name())
         impact_section = [PromptUtil.format_as_markdown_header(ImpactAnalysisStep.IMPACT_TITLE),
                           state.impact]

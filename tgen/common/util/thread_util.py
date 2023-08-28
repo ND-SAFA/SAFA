@@ -5,8 +5,8 @@ from typing import Any, Callable, List, Union
 
 from tqdm import tqdm
 
-from tgen.common.util.logging.logger_manager import logger
 from tgen.common.constants.threading_constants import THREAD_SLEEP
+from tgen.common.util.logging.logger_manager import logger
 
 
 class ThreadUtil:
@@ -38,7 +38,7 @@ class ThreadUtil:
             item_queue.put(i)
 
         progress_bar = tqdm(total=len(iterable), desc=title)
-        global_state = {"successful": True}
+        global_state = {"successful": True, "exception": None}
 
         def thread_body() -> None:
             """
@@ -49,26 +49,28 @@ class ThreadUtil:
                 item = item_queue.get()
                 if collect_results:
                     index, item = item
-                    
+
                 attempts = 0
                 successful_local = False
                 while not successful_local and attempts < max_attempts and global_state["successful"]:
                     if attempts > 0:
                         logger.info(f"Re-trying request...")
                     try:
+                        attempts += 1
                         thread_result = thread_work(item)
                         successful_local = True
                         if collect_results:
                             result_list[index] = thread_result
                     except Exception as e:
-                        logger.exception(e)
-                        logger.info(f"Request failed, retrying in {thread_sleep} seconds.")
-                        time.sleep(thread_sleep)
+                        if attempts >= max_attempts and not successful_local:
+                            global_state["successful"] = False
+                            global_state["exception"] = e
+                            return
+                        else:
+                            logger.exception(e)
+                            logger.info(f"Request failed, retrying in {thread_sleep} seconds.")
+                            time.sleep(thread_sleep)
 
-                    attempts += 1
-                if attempts >= max_attempts and not successful_local:
-                    global_state["successful"] = False
-                    raise ValueError(f"A thread executed {attempts} out of {max_attempts}.")
                 progress_bar.update()
 
         threads = []
@@ -80,6 +82,6 @@ class ThreadUtil:
             t.join()
 
         if not global_state["successful"]:
-            raise ValueError("At least one thread reached the maximum re-tries.")
+            raise global_state["exception"]
         if collect_results:
             return result_list

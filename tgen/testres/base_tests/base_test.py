@@ -8,10 +8,10 @@ from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
+from tgen.common.constants import anthropic_constants, environment_constants, open_ai_constants
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.logger_manager import LoggerManager
 from tgen.common.util.random_util import RandomUtil
-from tgen.common.constants import environment_constants
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
@@ -44,6 +44,11 @@ class BaseTest(TestCase):
     def setUpClass(cls):
         super(BaseTest, cls).setUpClass()
         environment_constants.IS_TEST = True
+
+        anthropic_constants.ANTHROPIC_MAX_THREADS = 1
+        anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS = 1
+        open_ai_constants.OPENAI_MAX_THREADS = 1
+        open_ai_constants.OPENAI_MAX_ATTEMPTS = 1
         RandomUtil.set_seed(42)
         if BaseTest.configure_logging:
             config = LoggerConfig(output_dir=TEST_OUTPUT_DIR)

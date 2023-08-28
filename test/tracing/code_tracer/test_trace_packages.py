@@ -4,6 +4,7 @@ from unittest import TestCase
 from test.tracing.code_tracer.code_tracer_test_util import CodeTracerTestUtil
 from tgen.common.constants.tracing.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_test import BaseTest
@@ -33,9 +34,10 @@ class TestPackageTracer(BaseTest):
             "src/def": ["src/def/some_class.cpp"],
             "src/ghi": ["src/ghi/some_class.cc"]
         })
-        TestAssertions.verify_entities_in_df([
-            {"source": DEFAULT_PACKAGE_ARTIFACT_TYPE, "target": DEFAULT_PACKAGE_ARTIFACT_TYPE},
-            {"source": CodeTracerTestUtil.code_artifact_type, "target": DEFAULT_PACKAGE_ARTIFACT_TYPE}
+        TestAssertions.verify_entities_in_df(self, [
+            {LayerKeys.SOURCE_TYPE.value: DEFAULT_PACKAGE_ARTIFACT_TYPE, LayerKeys.TARGET_TYPE.value: DEFAULT_PACKAGE_ARTIFACT_TYPE},
+            {LayerKeys.SOURCE_TYPE.value: CodeTracerTestUtil.code_artifact_type,
+             LayerKeys.TARGET_TYPE.value: DEFAULT_PACKAGE_ARTIFACT_TYPE}
         ], trace_dataset.layer_df)
 
     def test_extract_packages(self):

@@ -22,7 +22,7 @@ def builder_method(func):
 class RankingPromptBuilder:
 
     def __init__(self, goal: str = "", query: str = "", instructions: str = "",
-                 body_title: str = PromptUtil.format_as_markdown_header(DEFAULT_ARTIFACT_HEADER),
+                 body_title: str = PromptUtil.as_markdown_header(DEFAULT_ARTIFACT_HEADER),
                  section_delimiter: str = NEW_LINE * 3,
                  query_tag: str = RANKING_PARENT_TAG):
         """

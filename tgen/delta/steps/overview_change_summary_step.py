@@ -43,9 +43,9 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
 
         low_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 1)
         user_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 2)
-        state.overview_section = [PromptUtil.format_as_markdown_header(OverviewChangeSummaryStep.OVERVIEW_TITLE),
+        state.overview_section = [PromptUtil.as_markdown_header(OverviewChangeSummaryStep.OVERVIEW_TITLE),
                                   low_level_summary,
-                                  PromptUtil.format_as_markdown_header(OverviewChangeSummaryStep.USER_LEVEL_SUMMARY_TITLE),
+                                  PromptUtil.as_markdown_header(OverviewChangeSummaryStep.USER_LEVEL_SUMMARY_TITLE),
                                   user_level_summary]
 
         change_types = self._create_change_type_mapping(state.change_summary_output, task_prompt)
@@ -58,11 +58,11 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param change_types: The dictionary containing changes for each change type
         :return: The list of all parts of the change details summary
         """
-        change_details = [PromptUtil.format_as_markdown_header(OverviewChangeSummaryStep.CHANGE_DETAILS_TITLE)]
+        change_details = [PromptUtil.as_markdown_header(OverviewChangeSummaryStep.CHANGE_DETAILS_TITLE)]
         for change_type, changes in change_types.items():
             if len(changes) < 1:
                 continue
-            change_details.append(PromptUtil.format_as_markdown_header(change_type.title(), level=2))
+            change_details.append(PromptUtil.as_markdown_header(change_type.title(), level=2))
             for change, filenames in changes.items():
                 change_details.append(PromptUtil.format_as_bullet_point(change))
                 for filename in filenames:
@@ -121,7 +121,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
             [ct.value.lower() for ct in ChangeType.get_granular_change_type_categories()])
         prompts = [SupportedPrompts.DELTA_CHANGE_SUMMARY_STARTER.value,
                    MultiArtifactPrompt(
-                       prompt_prefix=PromptUtil.format_as_markdown_header("CHANGES:"),
+                       prompt_prefix=PromptUtil.as_markdown_header("CHANGES:"),
                        build_method=MultiArtifactPrompt.BuildMethod.XML,
                        xml_tags={"file-change": ["filename", "description"]}),
                    task_prompt

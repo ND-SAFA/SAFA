@@ -8,8 +8,8 @@ class TestPromptUtil(BaseTest):
         self.assertEqual(PromptUtil.create_xml("tag", "content"), "<tag>content</tag>")
 
     def test_format_as_markdown(self):
-        self.assertEqual(PromptUtil.format_as_markdown_header("original"), "# original")
-        self.assertEqual(PromptUtil.format_as_markdown_header("original", level=2), "## original")
+        self.assertEqual(PromptUtil.as_markdown_header("original"), "# original")
+        self.assertEqual(PromptUtil.as_markdown_header("original", level=2), "## original")
 
     def test_strip_new_lines_and_extra_spaces(self):
         self.assertEqual(PromptUtil.strip_new_lines_and_extra_space("  \ntest\n "), "test")
@@ -28,4 +28,3 @@ class TestPromptUtil(BaseTest):
         lowest_level = PromptUtil.format_as_bullet_point("lowest-level", level=4)
         self.assertIn(bullets[0], lowest_level)
         self.assertEqual(3, lowest_level.count("\t"))
-

@@ -2,9 +2,9 @@ from copy import deepcopy
 from string import ascii_uppercase
 from typing import Any, Dict, List, Union
 
+from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, COMMA, SPACE
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
@@ -97,10 +97,10 @@ class QuestionnairePrompt(Prompt):
         :return: The instructions for a multi-step task
         """
         n_questions = len(question_prompts)
-        enumerations_for_task = f'{COMMA}{SPACE}'.join(enumeration_chars[:n_questions-1])
+        enumerations_for_task = f'{COMMA}{SPACE}'.join(enumeration_chars[:n_questions - 1])
         base_instructions = f"Below are {len(question_prompts)} steps to complete. " \
-                            f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions-1]}"
-        instructions = [PromptUtil.format_as_markdown_header('TASKS:'), PromptUtil.format_as_markdown_italics(base_instructions)]
+                            f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions - 1]}"
+        instructions = [PromptUtil.as_markdown_header('TASKS:'), PromptUtil.format_as_markdown_italics(base_instructions)]
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
     def __repr__(self) -> str:

@@ -7,7 +7,8 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.tracing.code_tracer import CodeTracer
+from tgen.tracing.code.code_tracer import CodeTracer
+from tgen.tracing.code.package_tracer import PackageTracer
 
 
 class TestCodeTracerUtil(BaseTest):
@@ -39,20 +40,20 @@ class TestCodeTracerUtil(BaseTest):
             "src/data/data_module.py",
             "src/loader/data_loader.py"
         ]
-        packages = CodeTracer.extract_packages(file_paths)
-        self.assertEqual(3, len(packages))
-        self.assertIn("src", packages)
-        self.assertEqual(2, len(packages["src"]))
-        self.assertIn("src/data", packages["src"])
-        self.assertIn("src/loader", packages["src"])
+        package_hierarchy, package_set = PackageTracer._extract_package_hierarchy(file_paths)
+        self.assertEqual(3, len(package_hierarchy))
+        self.assertIn("src", package_hierarchy)
+        self.assertEqual(2, len(package_hierarchy["src"]))
+        self.assertIn("src/data", package_hierarchy["src"])
+        self.assertIn("src/loader", package_hierarchy["src"])
 
-        self.assertIn("src/data", packages)
-        self.assertEqual(1, len(packages["src/data"]))
-        self.assertIn("src/data/data_module.py", packages["src/data"])
+        self.assertIn("src/data", package_hierarchy)
+        self.assertEqual(1, len(package_hierarchy["src/data"]))
+        self.assertIn("src/data/data_module.py", package_hierarchy["src/data"])
 
-        self.assertIn("src/loader", packages)
-        self.assertEqual(1, len(packages["src/loader"]))
-        self.assertIn("src/loader/data_loader.py", packages["src/loader"])
+        self.assertIn("src/loader", package_hierarchy)
+        self.assertEqual(1, len(package_hierarchy["src/loader"]))
+        self.assertIn("src/loader/data_loader.py", package_hierarchy["src/loader"])
 
     @staticmethod
     def check_links(tc: TestCase, trace_dataset: TraceDataset, links: Dict[str, List[str]]):

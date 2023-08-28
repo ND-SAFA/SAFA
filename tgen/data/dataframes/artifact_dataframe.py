@@ -57,7 +57,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         row_as_dict = {ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
                        ArtifactKeys.SUMMARY: summary if summary else self._SUMMARY_DEFAULT}
-        return self.add_new_row(row_as_dict)
+        return self.add_or_update_row(row_as_dict)
 
     def get_artifact(self, artifact_id: Any) -> EnumDict:
         """

@@ -1,7 +1,7 @@
 from test.tracing.code_tracer.code_tracer_test_util import CodeTracerTestUtil
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.tracing.code_tracer import CodeTracer
+from tgen.tracing.code.code_tracer import CodeTracer
 
 
 class TestCodeTracer(BaseTest):

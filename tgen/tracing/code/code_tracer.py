@@ -1,14 +1,12 @@
-import os
-from typing import Dict, List, Set
+from typing import Dict, List
 
 from tgen.common.constants.tracing.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
-    DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION, PACKAGE_EXPLANATION, PACKAGE_TYPE
+    DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION, PACKAGE_TYPE
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.tracing.code.package_tracer import PackageTracer
 
 
 class CodeTracer:
@@ -54,35 +52,7 @@ class CodeTracer:
         Extracts packages and adds them as artifacts.
         :return: None (artifact data frame is modified)
         """
-        artifact_ids = self.trace_dataset.artifact_df.index
-        artifact_ids_set = set(artifact_ids)
-        packages = CodeTracer.extract_packages(artifact_ids)
-        original_artifact_types = self.trace_dataset.artifact_df[ArtifactKeys.LAYER_ID.value].unique()
-
-        links = []
-        trace_ids = set()
-        for parent_node, children in packages.items():
-            if parent_node not in artifact_ids_set:
-                CodeTracer.add_package(self.trace_dataset, artifact_ids_set, parent_node, package_type)
-            for child_node in children:
-                if child_node not in artifact_ids_set:
-                    CodeTracer.add_package(self.trace_dataset, artifact_ids_set, child_node, package_type)
-                trace_id = TraceDataFrame.generate_link_id(source_id=child_node, target_id=parent_node)
-                if trace_id not in trace_ids:
-                    trace_entry = TracePredictionEntry(
-                        source=child_node,
-                        target=parent_node,
-                        label=1,
-                        explanation=PACKAGE_EXPLANATION
-                    )
-                    links.append(trace_entry)
-                    trace_ids.add(trace_id)
-                else:
-                    logger.info(f"Found duplicate package relationship: {parent_node} -> {child_node}")
-        self.trace_dataset.trace_df.add_links(links)
-        self.trace_dataset.layer_df.add_layer(source_type=package_type, target_type=package_type)
-        for original_artifact_type in original_artifact_types:
-            self.trace_dataset.layer_df.add_layer(source_type=original_artifact_type, target_type=package_type)
+        PackageTracer.add_package_nodes(self.trace_dataset)
 
     def _rename_child_files(self, parent_ids: List[str], child_ids: List[str],
                             child_layer_id: str = DEFAULT_CHILD_LAYER_ID):
@@ -102,35 +72,6 @@ class CodeTracer:
                                                             new_value=child_layer_id)
         for p_layer_id in parent_layer_ids:
             self.trace_dataset.layer_df.add_layer(source_type=child_layer_id, target_type=p_layer_id)
-
-    @staticmethod
-    def add_package(trace_dataset: TraceDataset, artifact_ids_set: Set[str], package_name: str, package_type: str):
-        trace_dataset.artifact_df.add_artifact(artifact_id=package_name,
-                                               layer_id=package_type,
-                                               content="",
-                                               summary="")
-        artifact_ids_set.add(package_name)
-
-    @staticmethod
-    def extract_packages(file_paths: List[str]) -> Dict[str, List[str]]:
-        """
-        Extracts the list of packages references in the list of file paths.
-        :param file_paths: The file paths to source code.
-        :return: List of unique packages.
-        """
-        packages = {}
-        for file_path in file_paths:
-            file_packages = FileUtil.split_into_parts(file_path)
-            for i in range(0, len(file_packages) - 1):
-                parent = os.path.join(*file_packages[:i + 1])
-                child = os.path.join(*file_packages[:i + 2])
-                if parent not in packages:
-                    packages[parent] = set()
-                if child not in packages[parent]:
-                    packages[parent].add(child)
-
-        packages = {p: list(c) for p, c in packages.items()}
-        return packages
 
     @staticmethod
     def trace_by_base_names(child_paths: List[str], parent_paths: List[str]) -> List[TracePredictionEntry]:

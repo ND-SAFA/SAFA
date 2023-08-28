@@ -5,7 +5,7 @@ from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.tracing.code_tracer import CodeTracer
+from tgen.tracing.code.code_tracer import CodeTracer
 
 
 class TraceCodeJob(AbstractJob):

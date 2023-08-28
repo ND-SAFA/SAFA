@@ -85,9 +85,9 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: The newly added link
         """
         link_id = TraceDataFrame.generate_link_id(source_id, target_id)
-        assert link_id not in self.index, f"Trace link exists in data frame, updating trace links is not currently supported."
-        return self.add_new_row(self.link_as_dict(source_id=source_id, target_id=target_id, label=label, link_id=link_id, score=score,
-                                                  explanation=explanation))
+        return self.add_or_update_row(
+            self.link_as_dict(source_id=source_id, target_id=target_id, label=label, link_id=link_id, score=score,
+                              explanation=explanation))
 
     def get_links(self) -> List[EnumDict]:
         """

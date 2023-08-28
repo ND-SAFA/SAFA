@@ -75,7 +75,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         if self.index_name() is not None and not self.columns.empty and self.index.name != self.index_name():
             self.set_index(self.index_name(), inplace=True)
 
-    def add_new_row(self, row_as_dict: Dict[Union[Enum, str], Any]) -> EnumDict:
+    def add_or_update_row(self, row_as_dict: Dict[Union[Enum, str], Any]) -> EnumDict:
         """
         Adds row to dataframe
         :param row_as_dict: Dictionary mapping column name to its value

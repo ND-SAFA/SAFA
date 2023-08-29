@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
@@ -43,25 +42,23 @@ public class JobService {
      * Logger used for job services.
      */
     private static final Logger logger = LoggerFactory.getLogger(JobService.class);
-
     private final JobDbRepository jobDbRepository;
-    private final GenApi genApi;
     private final SafaUserService safaUserService;
 
     /**
      * Deletes the job with given ID. Terminates any task associated with the job.
      *
      * @param jobId The ID of the job.
+     * @return The deleted job entity.
      */
-    public void deleteJob(UUID jobId) {
+    public JobDbEntity deleteJob(UUID jobId) {
         Optional<JobDbEntity> optionalJobDbEntity = this.jobDbRepository.findById(jobId);
-        optionalJobDbEntity.ifPresent(jobDbEntity -> {
-            UUID taskId = jobDbEntity.getTaskId();
-            this.jobDbRepository.deleteById(jobId);
-            if (taskId != null) {
-                this.genApi.cancelJob(taskId);
-            }
-        });
+        if (optionalJobDbEntity.isEmpty()) {
+            return null;
+        }
+        JobDbEntity jobDbEntity = optionalJobDbEntity.get();
+        this.jobDbRepository.deleteById(jobId);
+        return jobDbEntity;
     }
 
     /**

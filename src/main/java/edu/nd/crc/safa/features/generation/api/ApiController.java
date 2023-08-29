@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
-import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
@@ -25,8 +24,7 @@ public class ApiController {
     private static final int HOURS = 3600;
     private static final int MAX_DURATION = 4 * HOURS; // 4 hours
     private final RequestService requestService;
-    private final JobDbRepository jobDbRepository;
-    private final JobService jobService;
+    private JobService jobService;
 
     /**
      * Submits job to TGen and polls status until job is completed or has failed.

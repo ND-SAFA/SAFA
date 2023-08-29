@@ -32,9 +32,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class GenApi implements ITraceGenerationController {
     private final RequestService requestService;
-    private final ApiController apiController;
     private final ArtifactSummaryApi artifactSummaryApi;
     private final GenerateLinksApi generateLinksApi;
+    private final ApiController apiController;
 
     /**
      * Generates project summary.

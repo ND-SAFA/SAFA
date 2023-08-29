@@ -10,6 +10,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
@@ -17,6 +18,7 @@ import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.CreateProjectByJsonPayload;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -48,6 +50,7 @@ public class JobController extends BaseController {
 
     private final JobService jobService;
     private final SafaUserService safaUserService;
+    private final GenApi genApi;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
@@ -55,6 +58,7 @@ public class JobController extends BaseController {
         super(resourceBuilder, serviceProvider);
         this.jobService = serviceProvider.getJobService();
         this.safaUserService = serviceProvider.getSafaUserService();
+        this.genApi = serviceProvider.getGenApi();
     }
 
     /**
@@ -76,7 +80,13 @@ public class JobController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Jobs.Meta.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
-        this.jobService.deleteJob(jobId);
+        JobDbEntity jobDbEntity = this.jobService.deleteJob(jobId);
+        if (jobDbEntity != null) {
+            UUID taskId = jobDbEntity.getTaskId();
+            if (taskId != null) {
+                this.genApi.cancelJob(taskId);
+            }
+        }
         this.serviceProvider.getNotificationService().broadcastChange(
             EntityChangeBuilder
                 .create(jobId)
@@ -114,10 +124,10 @@ public class JobController extends BaseController {
     /**
      * Create a new project via flat file upload.
      *
-     * @param files The flat files to be parsed and uploaded.
-     * @param name The name of the new project
+     * @param files       The flat files to be parsed and uploaded.
+     * @param name        The name of the new project
      * @param description The description for the new project
-     * @param summarize Whether to summarize code artifacts on upload.
+     * @param summarize   Whether to summarize code artifacts on upload.
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */

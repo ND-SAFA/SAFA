@@ -127,10 +127,10 @@ export function traceModelOptions(): SelectOption[] {
  */
 export function projectRoleOptions(): SelectOption[] {
   return [
-    createEnumOption(ProjectRole.OWNER),
-    createEnumOption(ProjectRole.ADMIN),
-    createEnumOption(ProjectRole.EDITOR),
-    createEnumOption(ProjectRole.VIEWER),
+    createEnumOption(ProjectRole.VIEWER, "View project data"),
+    createEnumOption(ProjectRole.EDITOR, "Edit data within a project version"),
+    createEnumOption(ProjectRole.ADMIN, "Manage project versions and metadata"),
+    createEnumOption(ProjectRole.OWNER, "Full ownership of the project"),
   ];
 }
 

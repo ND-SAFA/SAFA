@@ -70,6 +70,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-account-circle";
     case "organization":
       return "mdi-domain";
+    case "permission":
+      return "mdi-account-cog";
     case "search":
       return "mdi-magnify";
     case "code":

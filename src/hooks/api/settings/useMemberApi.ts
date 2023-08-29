@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, MembershipSchema, ProjectRole } from "@/types";
+import { removeMatches } from "@/util";
 import {
   useApi,
   getProjectApiStore,
@@ -70,6 +71,43 @@ export const useMemberApi = defineStore("memberApi", () => {
   }
 
   /**
+   * Updates the role of a member.
+   *
+   * @param projectId - The project to add this user to.
+   * @param memberEmail - The email of the given user.
+   * @param projectRole - The role to set for the given user.
+   * @param callbacks - Callbacks for the request.
+   */
+  async function handleSaveRole(
+    projectId: string,
+    memberEmail: string,
+    projectRole: ProjectRole,
+    callbacks: IOHandlerCallback
+  ): Promise<void> {
+    await memberApi.handleRequest(
+      async () => {
+        const member = await saveProjectMember(
+          projectId,
+          memberEmail,
+          projectRole
+        );
+
+        membersStore.updateMembers([
+          member,
+          ...removeMatches(membersStore.members, "projectMembershipId", [
+            member.projectMembershipId,
+          ]),
+        ]);
+      },
+      callbacks,
+      {
+        success: `Member is now an ${projectRole}: ${memberEmail}`,
+        error: `Unable to change member to ${projectRole}: ${memberEmail}`,
+      }
+    );
+  }
+
+  /**
    * Opens a confirmation modal to delete the given member.
    *
    * @param member - The member to delete.
@@ -107,6 +145,7 @@ export const useMemberApi = defineStore("memberApi", () => {
     handleReload,
     handleInvite,
     handleDelete,
+    handleSaveRole,
   };
 });
 

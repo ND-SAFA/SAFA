@@ -27,3 +27,17 @@ export interface ProjectMemberModalProps extends OpenableProps {
    */
   projectId?: string;
 }
+
+/**
+ * The props for displaying a project member edit role button.
+ */
+export interface MemberRoleButtonProps {
+  /**
+   * The project id to edit the member of.
+   */
+  projectId: string;
+  /**
+   * The member to edit, setting edit mode.
+   */
+  member: MembershipSchema;
+}

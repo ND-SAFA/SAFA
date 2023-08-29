@@ -10,10 +10,8 @@
       row-key="email"
       addable
       :deletable="isAdmin"
-      :editable="isAdmin"
       :loading="memberApiStore.loading"
       @row:add="handleAdd"
-      @row:edit="handleEdit"
       @row:delete="handleDelete"
       @refresh="handleRefresh"
     >
@@ -28,11 +26,16 @@
       </template>
 
       <template #cell-actions="{ row }">
+        <member-role-button
+          v-if="isAdmin"
+          :member="row"
+          :project-id="projectStore.projectId"
+        />
         <icon-button
-          v-if="membersColumns.length > 1 && row.email === userEmail"
+          v-if="row.email === userEmail"
           icon="leave"
           tooltip="Leave project"
-          data-cy="button-selector-leave"
+          data-cy="button-member-leave"
           @click="handleDelete(row)"
         />
       </template>
@@ -40,7 +43,6 @@
     <project-member-modal
       :open="modalOpen"
       :project-id="projectStore.projectId"
-      :member="editedMember"
       :email="addedMember"
       @close="handleClose"
       @submit="handleClose"
@@ -71,10 +73,10 @@ import {
 } from "@/hooks";
 import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
+import MemberRoleButton from "./MemberRoleButton.vue";
 
 const props = defineProps<MinimalProps>();
 
-const editedMember = ref<MembershipSchema>();
 const addedMember = ref<string | null>(null);
 const modalOpen = ref(false);
 
@@ -106,7 +108,6 @@ async function handleRefresh(): Promise<void> {
  */
 function handleClose(): void {
   addedMember.value = "";
-  editedMember.value = undefined;
   modalOpen.value = false;
 }
 
@@ -116,15 +117,6 @@ function handleClose(): void {
  */
 function handleAdd(email: string | null): void {
   addedMember.value = email;
-  modalOpen.value = true;
-}
-
-/**
- * Opens the edit member modal.
- * @param member - The member to edit.
- */
-function handleEdit(member: MembershipSchema): void {
-  editedMember.value = member;
   modalOpen.value = true;
 }
 

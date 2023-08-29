@@ -27,6 +27,7 @@ export type IconVariant =
   | "back"
   | "account"
   | "organization"
+  | "permission"
   | "search"
   | "code"
   | "create-artifact"

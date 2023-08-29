@@ -24,11 +24,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ProjectMemberModalProps } from "@/types";
+import { InviteMemberModalProps } from "@/types";
 import { Modal } from "@/components/common";
 import InviteMemberInputs from "./InviteMemberInputs.vue";
 
-const props = defineProps<ProjectMemberModalProps>();
+const props = defineProps<InviteMemberModalProps>();
 
 const emit = defineEmits<{
   (e: "close"): void;

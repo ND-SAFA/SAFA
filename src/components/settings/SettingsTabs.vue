@@ -6,7 +6,7 @@
     </template>
     <tab-list v-model="tab" :tabs="tabs">
       <template #members>
-        <project-member-table />
+        <member-table variant="project" />
       </template>
       <template #upload>
         <upload-new-version :open="tab === 'upload'" />
@@ -43,7 +43,7 @@ import {
 } from "@/components/project";
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
-import { ProjectMemberTable } from "@/components/members";
+import { MemberTable } from "@/components/members";
 
 const tab = ref(SettingsTabTypes.members);
 

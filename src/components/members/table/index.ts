@@ -1,1 +1,1 @@
-export { default as ProjectMemberTable } from "./ProjectMemberTable.vue";
+export { default as MemberTable } from "./MemberTable.vue";

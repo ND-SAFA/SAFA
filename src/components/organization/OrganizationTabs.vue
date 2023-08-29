@@ -6,15 +6,10 @@
     </template>
     <tab-list v-model="tab" :tabs="tabs">
       <template #members>
-        <panel-card
-          title="Members"
-          subtitle="Manage organization members and permissions."
-        >
-        </panel-card>
+        <member-table variant="organization" />
       </template>
       <template #teams>
-        <panel-card title="Teams" subtitle="Manage teams and permissions.">
-        </panel-card>
+        <team-tab />
       </template>
     </tab-list>
   </sidebar-grid>
@@ -33,11 +28,13 @@ export default {
 import { ref } from "vue";
 import { OrganizationTabTypes } from "@/types";
 import { organizationTabTypes } from "@/util";
-import { TabList, SidebarGrid, PanelCard } from "@/components/common";
+import { TabList, SidebarGrid } from "@/components/common";
 import {
   OrganizationButtons,
   OrganizationDisplay,
 } from "@/components/organization/display";
+import { MemberTable } from "@/components/members";
+import { TeamTab } from "@/components/organization/team";
 
 const tabs = organizationTabTypes();
 

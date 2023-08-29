@@ -1,9 +1,5 @@
 <template>
-  <panel-card
-    title="Project Members"
-    :subtitle="subtitle"
-    :minimal="props.minimal"
-  >
+  <panel-card :title="title" :subtitle="subtitle" :minimal="props.minimal">
     <template #title-actions>
       <text-button
         v-if="addMode"
@@ -63,16 +59,16 @@
 
 <script lang="ts">
 /**
- * List the members of given project within the settings.
+ * A table for managing members of a project, team, or organization.
  */
 export default {
-  name: "ProjectMemberTable",
+  name: "MemberTable",
 };
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { MembershipSchema, MinimalProps, ProjectRole } from "@/types";
+import { capitalize, computed, ref } from "vue";
+import { MembershipSchema, MemberTableProps, ProjectRole } from "@/types";
 import { membersColumns } from "@/util";
 import {
   logStore,
@@ -93,10 +89,12 @@ import {
   MemberRoleButton,
 } from "@/components/members/save";
 
-const props = defineProps<MinimalProps>();
+const props = defineProps<MemberTableProps>();
 
 const addedMember = ref<string | null>(null);
 const addMode = ref(false);
+
+const title = computed(() => `${capitalize(props.variant)} Members`);
 
 const project = computed(() => projectStore.project);
 
@@ -113,7 +111,9 @@ const ownerCount = computed(
 );
 
 const subtitle = computed(() =>
-  addMode.value ? "Invite a new member." : "Manage and invite project members."
+  addMode.value
+    ? `Invite a new ${props.variant} member.`
+    : `Manage and invite ${props.variant} members.`
 );
 
 /**

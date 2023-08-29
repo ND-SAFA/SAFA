@@ -1,15 +1,6 @@
 <template>
   <panel-card title="My Organization">
-    <template #title-actions>
-      <icon-button tooltip="Switch organizations" icon="organization">
-        <icon variant="down" size="xs" style="width: 10px" />
-        <q-menu>
-          <list>
-            <list-item clickable title="Other Organization" />
-          </list>
-        </q-menu>
-      </icon-button>
-    </template>
+    <typography value="<Organization information will be displayed here>" />
   </panel-card>
 </template>
 
@@ -23,11 +14,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-import {
-  PanelCard,
-  IconButton,
-  List,
-  ListItem,
-  Icon,
-} from "@/components/common";
+import { PanelCard, Typography } from "@/components/common";
 </script>

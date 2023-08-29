@@ -1,4 +1,4 @@
-import { IconVariant, URLQuery } from "@/types";
+import { IconVariant, ThemeColor, URLQuery } from "@/types";
 
 /**
  * Defines a navigation option that links to a page.
@@ -24,6 +24,10 @@ export interface NavOption {
    * If true, this option will be hidden.
    */
   disabled?: boolean;
+  /**
+   * The color to display for this option.
+   */
+  color?: ThemeColor;
   /**
    * The navigation path corresponding to this option.
    */

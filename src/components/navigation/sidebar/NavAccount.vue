@@ -9,17 +9,11 @@
     <notifications />
 
     <list-item
-      :to="Routes.ORG"
-      icon="organization"
-      title="My Organization"
-      class="q-py-sm"
-    />
-
-    <list-item
-      :to="Routes.ACCOUNT"
-      icon="account"
-      title="My Account"
-      class="q-py-sm"
+      v-for="option in options"
+      :to="option.path"
+      :icon="option.icon"
+      :title="option.label"
+      :color="option.color"
     />
   </div>
 </template>
@@ -34,8 +28,28 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { NavOption } from "@/types";
 import { Routes } from "@/router";
 import { ListItem } from "@/components/common";
 import SavingIcon from "./SavingIcon.vue";
 import Notifications from "./Notifications.vue";
+
+const currentRoute = useRoute();
+
+const options = computed<NavOption[]>(() => [
+  {
+    label: "My Organization",
+    icon: "organization",
+    path: Routes.ORG,
+    color: Routes.ORG === currentRoute.path ? "primary" : "text",
+  },
+  {
+    label: "My Account",
+    icon: "account",
+    path: Routes.ACCOUNT,
+    color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",
+  },
+]);
 </script>

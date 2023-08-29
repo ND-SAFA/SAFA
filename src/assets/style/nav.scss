@@ -103,10 +103,14 @@
 
 .nav-job-icon {
   position: relative;
-  top: 5px;
-  left: 5px;
+  bottom: 4px;
+  right: 16px;
   width: 0;
   height: 0;
+}
+
+.nav-job-badge {
+  z-index: 1000;
 }
 
 .nav-mode-select {

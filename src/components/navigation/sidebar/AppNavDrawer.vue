@@ -5,7 +5,7 @@
     elevated
     :breakpoint="0"
     :width="260"
-    :mini-width="60"
+    :mini-width="65"
     :mini="!sidebarOpen"
   >
     <flex-box

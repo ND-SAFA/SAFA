@@ -9,10 +9,17 @@
           size="md"
         />
       </div>
-      <icon variant="notification" size="sm" />
-      <q-badge v-if="displayUpdates" :color="color" floating rounded>
-        {{ updates }}
-      </q-badge>
+      <div>
+        <icon variant="notification" size="sm" color="text" />
+        <q-badge
+          v-if="displayUpdates"
+          :color="color"
+          rounded
+          floating
+          :label="updates"
+          class="nav-job-badge"
+        />
+      </div>
 
       <q-menu v-model="open">
         <list v-if="displayRecentJobs" class="nav-notifications q-pa-sm">

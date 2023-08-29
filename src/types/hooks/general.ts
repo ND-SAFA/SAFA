@@ -8,6 +8,7 @@ export enum PanelType {
   errorDisplay = "errorDisplay",
   detailsPanel = "detailsPanel",
   projectSaver = "projectSaver",
+  projectEditor = "projectEditor",
   projectDeleter = "projectDeleter",
   artifactCreator = "artifactCreator",
   traceCreator = "traceCreator",
@@ -57,6 +58,7 @@ export interface PanelStateMap {
   [PanelType.appPanel]: boolean;
   [PanelType.detailsPanel]: DetailsOpenState;
   [PanelType.projectSaver]: boolean;
+  [PanelType.projectEditor]: boolean;
   [PanelType.projectDeleter]: boolean;
   [PanelType.artifactCreator]: ArtifactCreatorOpenState;
   [PanelType.traceCreator]: TraceCreatorOpenState;

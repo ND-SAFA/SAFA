@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { IdentifierSchema } from "@/types";
+import { IdentifierSchema, PanelType } from "@/types";
 import { createProjectIdentifier } from "@/util";
 import { appStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -48,13 +48,20 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
      */
     selectIdentifier(
       identifier: IdentifierSchema | undefined,
-      mode: "save" | "delete"
+      mode: "save" | "edit" | "delete"
     ): void {
       this.baseIdentifier = identifier;
       this.resetIdentifier();
 
-      appStore.isOpen[mode === "save" ? "projectSaver" : "projectDeleter"] =
-        true;
+      const panelName = (
+        {
+          save: "projectSaver",
+          edit: "projectEditor",
+          delete: "projectDeleter",
+        } as Record<"save" | "edit" | "delete", PanelType>
+      )[mode];
+
+      appStore.isOpen[panelName] = true;
     },
   },
 });

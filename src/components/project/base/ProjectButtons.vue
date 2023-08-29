@@ -57,7 +57,7 @@ const display = computed(() => permissionStore.projectAllows("editor"));
  * Opens the edit modal.
  */
 function handleEdit(): void {
-  identifierSaveStore.selectIdentifier(projectStore.project, "save");
+  identifierSaveStore.selectIdentifier(projectStore.project, "edit");
 }
 
 /**

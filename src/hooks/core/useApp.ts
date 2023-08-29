@@ -35,6 +35,7 @@ export const useApp = defineStore("app", {
       [PanelType.appPanel]: true,
       [PanelType.detailsPanel]: false,
       [PanelType.projectSaver]: false,
+      [PanelType.projectEditor]: false,
       [PanelType.projectDeleter]: false,
       [PanelType.artifactCreator]: false,
       [PanelType.traceCreator]: false,
@@ -60,6 +61,12 @@ export const useApp = defineStore("app", {
      */
     isProjectCreatorOpen(): boolean {
       return this.isOpen[PanelType.projectSaver];
+    },
+    /**
+     * @return Whether the project editor is open.
+     */
+    isProjectEditorOpen(): boolean {
+      return this.isOpen[PanelType.projectEditor];
     },
     /**
      * @return Whether the project deleter is open.

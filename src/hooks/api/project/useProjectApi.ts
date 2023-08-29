@@ -47,6 +47,11 @@ export const useProjectApi = defineStore("projectApi", () => {
           identifier.projectId ? identifier : project
         );
 
+        if (project.projectId === projectStore.projectId) {
+          projectStore.project.name = project.name;
+          projectStore.project.description = project.description;
+        }
+
         return project;
       },
       callbacks,

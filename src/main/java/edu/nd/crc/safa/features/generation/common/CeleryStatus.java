@@ -23,7 +23,7 @@ public enum CeleryStatus {
     /**
      * @return Whether the task has succeeded based on its status.
      */
-    public boolean hasSucceeded() {
+    public boolean hasCompleted() {
         return this == SUCCESS;
     }
 }

@@ -15,7 +15,6 @@ import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AllArgsConstructor;
-import org.javatuples.Pair;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -41,105 +40,109 @@ public class ApiController {
                                                   Object payload,
                                                   Class<T> responseClass,
                                                   JobLogger logger) {
-        String statusEndpoint = TGenConfig.getEndpoint("status");
-        String resultEndpoint = TGenConfig.getEndpoint("results");
-
-        long startTime = System.currentTimeMillis();
-        long endTime;
-
-        boolean jobFinshed = false;
-        TGenStatus tGenStatus = null;
-        int currentLogIndex = 0;
-        JobLogEntry jobEntry = null;
-        Pair<Integer, JobLogEntry> logResponse;
-        String error = "No current error.";
-        int retries = 0;
-        int maxRetries = 3;
-
-        // Create task
-        TGenTask task = this.requestService.sendPost(endpoint, payload, TGenTask.class);
+        TGenTask<T> task = this.requestService.sendPost(endpoint, payload, TGenTask.class);
+        task.setResponseClass(responseClass);
         if (logger != null) {
             JobDbEntity job = logger.getJob();
             job.setTaskId(task.getTaskId());
             this.jobDbRepository.save(job);
         }
 
-
-        while (!jobFinshed) {
-            try {
-                endTime = System.currentTimeMillis();
-                long duration = (endTime - startTime) / 1000; // Duration in seconds
-                if (duration >= MAX_DURATION) {
-                    jobFinshed = true;
-                    error = String.format("Worker has reached the maximum allowed duration of %s seconds.",
-                        MAX_DURATION);
-                }
-                tGenStatus = this.requestService.sendPost(statusEndpoint, task, TGenStatus.class);
-                List<String> logs = tGenStatus.getLogs();
-                logResponse = writeLogs(logger, logs, currentLogIndex, jobEntry);
-                currentLogIndex = logResponse.getValue0();
-                jobEntry = logResponse.getValue1();
-            } catch (Exception e) {
-                retries++;
-                if (retries >= maxRetries) {
-                    log(logger, e.getMessage());
-                    error = "This job has reached the maximum number of retries.";
-                    log(logger, error);
-                    throw new SafaError(error);
-                } else {
-                    log(logger, e.getMessage());
-                    log(logger, "Status call for job failed, retrying...");
-                    sleep(WAIT_SECONDS);
-                }
-            }
-
-            if (tGenStatus == null) {
-                throw new SafaError("Received null status from job.");
-            } else if (tGenStatus.getStatus().hasFailed()) {
-                jobFinshed = true;
-                error = tGenStatus.getMessage();
-            } else if (tGenStatus.getStatus().hasSucceeded()) {
-                T response = this.requestService.sendPost(resultEndpoint, task, responseClass);
-                logResponse = writeLogs(logger, response.getLogs(), currentLogIndex, jobEntry);
-                if (logger != null) {
-                    JobDbEntity job = logger.getJob();
-                    job.setTaskId(null);
-                    this.jobDbRepository.save(job);
-                }
-                return response;
-            } else {
-                sleep(WAIT_SECONDS);
-            }
-        }
-        throw new SafaError(error);
+        return pollTGenTask(task, status -> writeLogs(logger, status), MAX_DURATION, WAIT_SECONDS);
     }
 
     /**
-     * Writes the latest logs to the job logger.
+     * Polls the task status until complete. Throws error if failure occurs to job or while getting status.
      *
-     * @param logs            List of logs incoming from TGEN.
-     * @param currentLogIndex The index of the current log to write.
-     * @param jobLog          The job entry to log under.
-     * @return The new current log index and the updated job log.
+     * @param task     The task to wait until its completion.
+     * @param timeout  The maximum amount of seconds to wait for task to complete.
+     * @param waitTime The time to wait between status requests.
+     * @param <T>      The class of the response of the task.
+     * @return The job result.
      */
-    private Pair<Integer, JobLogEntry> writeLogs(JobLogger logger,
-                                                 List<String> logs,
-                                                 int currentLogIndex,
-                                                 JobLogEntry jobLog) {
+    private <T> T pollTGenTask(TGenTask<T> task, TaskHandler taskHandler, long timeout, int waitTime) {
+        pollWithTimeout(() -> {
+            TGenStatus taskStatus = getTaskStatus(task);
+            taskHandler.handleTask(taskStatus);
+            if (taskStatus.getStatus().hasFailed()) {
+                throw new SafaError(taskStatus.getMessage());
+            }
+            return taskStatus.getStatus().hasCompleted();
+        }, timeout, waitTime);
+        return getJobResult(task, task.getResponseClass());
+    }
+
+    /**
+     * Gets the result of the task.
+     *
+     * @param task          The task that has been completed.
+     * @param responseClass The class of the task result.
+     * @param <T>           The type of class of the task result.
+     * @return The response of the job.
+     */
+    private <T> T getJobResult(TGenTask task, Class<T> responseClass) {
+        String resultEndpoint = TGenConfig.getEndpoint("results");
+        T response = this.requestService.sendPost(resultEndpoint, task, responseClass);
+        return response;
+    }
+
+    /**
+     * Repeatedly calls task handler until is successfully exits. Throws error if handler exceeds the timeout time.
+     *
+     * @param statusHandler Callable to check on the job status.
+     * @param timeout       The number of seconds before timeout error is thrown.
+     * @param waitTime      The number of seconds to wait between status calls.
+     */
+    private void pollWithTimeout(StatusHandler statusHandler, long timeout, int waitTime) {
+        long startTime = System.currentTimeMillis();
+        long endTime;
+
+        boolean result;
+        do {
+            result = statusHandler.statusHandler();
+            endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime) / 1000; // Duration in seconds
+            if (duration >= timeout) {
+                String error = String.format("Worker has reached the maximum allowed duration of %s seconds.", MAX_DURATION);
+                throw new SafaError(error);
+            }
+            sleep(waitTime);
+        } while (!result);
+    }
+
+    /**
+     * Returns whether job has finished.
+     *
+     * @param task The task associated with job to check.
+     * @return True if job is done, false otherwise. Error is thrown if job has failed.
+     */
+    private <T> TGenStatus getTaskStatus(TGenTask<T> task) {
+        String statusEndpoint = TGenConfig.getEndpoint("status");
+        TGenStatus tGenStatus = this.requestService.sendPost(statusEndpoint, task, TGenStatus.class);
+        if (tGenStatus.getStatus().hasFailed()) {
+            throw new SafaError(tGenStatus.getMessage());
+        }
+        return tGenStatus;
+    }
+
+    /**
+     * Writes the latest logs in the task status to the logger.
+     */
+    private void writeLogs(JobLogger logger, TGenStatus status) {
+        List<String> logs = status.getLogs();
+        int currentLogIndex = status.getCurrentLogIndex();
+
         if (currentLogIndex >= logs.size()) {
-            return new Pair<>(currentLogIndex, jobLog);
+            return;
         }
         String currentLog = String.join("\n", logs.subList(currentLogIndex, logs.size()));
         if (currentLog.length() > 0) {
-            if (jobLog == null) {
-                jobLog = log(logger, currentLog);
-            } else {
-                jobLog = logger.addToLog(jobLog, currentLog);
-            }
-
-            return new Pair(logs.size(), jobLog);
+            JobLogEntry jobLog = status.getJobLogEntry();
+            jobLog = jobLog == null ? log(logger, currentLog) : logger.addToLog(jobLog, currentLog);
+            currentLogIndex = logs.size();
+            status.setJobLogEntry(jobLog);
+            status.setCurrentLogIndex(currentLogIndex);
         }
-        return new Pair(currentLogIndex, jobLog);
     }
 
     /**

@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER, \
     PS_DEFAULT_SAVE_PROGRESS, PS_FILE_NAME, PS_STATE_FILE_NAME
 from tgen.common.util.file_util import FileUtil
@@ -46,22 +46,25 @@ class ProjectSummary:
         if self.save_progress:
             self.save()
 
-    def get_summary(self, headers: List[str] = PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER,
+    def get_summary(self, section_titles: List[str] = PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER,
                     raise_exception_on_not_found: bool = False):
         """
         Creates summary in the order of the headers given.
-        :param headers: The headers in the order they should appear.
+        :param section_titles: The headers in the order they should appear.
         :param raise_exception_on_not_found: Whether to raise an error if a header if not in the map.
         :return: String representing project summary.
         """
         summary = EMPTY_STRING
-        for header in headers:
-            if header in self.ps_state:
-                header_body = self.ps_state[header]
-                summary += f"{PromptUtil.as_markdown_header(header)}\n{header_body}"
+        for section_title in section_titles:
+            if section_title in self.ps_state:
+                section_body = self.ps_state[section_title]
+                section = f"{PromptUtil.as_markdown_header(section_title)}{NEW_LINE}{section_body}"
+                if len(summary) > 0:
+                    section = NEW_LINE + section
+                summary += section
             else:
                 if raise_exception_on_not_found:
-                    raise Exception(f"Header {header} is not in: {self.ps_state}")
+                    raise Exception(f"Header {section_title} is not in: {self.ps_state}")
 
         return summary.strip()
 

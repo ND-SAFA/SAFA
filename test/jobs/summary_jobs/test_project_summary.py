@@ -1,5 +1,6 @@
 from unittest import skip
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.status import Status
 from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
@@ -28,9 +29,13 @@ class TestProjectSummaryJob(BaseTest):
         project_summary_response: SummaryResponse = job.result.body
         project_summary = project_summary_response["summary"]
 
+        sections = [ps for ps in project_summary.split("#") if len(ps.strip()) > 0]
+        sections = [ps.split(NEW_LINE) for ps in sections]
+        sections = {ps[0].strip(): ps[1].strip() for ps in sections}
+
         for section_title, section_body in MOCK_PS_RES_MAP.items():
-            self.assertIn(section_body, project_summary)
-            self.assertIn(f"# {section_title}", project_summary)
+            self.assertIn(section_title, sections)
+            self.assertEqual(section_body, sections[section_title])
 
     @skip
     def test_artifacts_present(self):

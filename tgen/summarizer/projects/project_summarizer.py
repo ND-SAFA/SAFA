@@ -2,7 +2,6 @@ from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS
 from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -71,10 +70,7 @@ class ProjectSummarizer(BaseObject):
             parsed_response = id2res[prompt_builder._prompts[-1].id][task_tag]
 
             task_body = parsed_response[0] if len(parsed_response) <= 1 else "\n".join(parsed_response)
-            task_section = f"{PromptUtil.as_markdown_header(task_title)}\n{task_body}"
-            task_section_body = task_section if len(task_section) == 0 else f"\n{task_section}"
-
-            project_summary.set_section_body(task_title, task_section_body)
+            project_summary.set_section_body(task_title, task_body)
             project_summary.save()
 
         summary = project_summary.get_summary(raise_exception_on_not_found=True)

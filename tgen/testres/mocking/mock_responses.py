@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_DATA_FLOW_TITLE, PS_ENTITIES_TITLE, \
     PS_FEATURE_TITLE, \
     PS_NOTES_TAG, \
@@ -35,3 +37,12 @@ class MockResponses:
                                  project_subsytem,
                                  project_flow,
                                  project_overview]
+
+    def __getattr__(self, item: str):
+        """
+        Returns a copy of the requested attribute.
+        :param item: The name of the attribute.
+        :return: The value of the attribute.
+        """
+        item_value = super().__getattribute__(item)
+        return deepcopy(item_value)

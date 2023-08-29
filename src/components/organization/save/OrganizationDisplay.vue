@@ -12,14 +12,14 @@
 
     <div v-if="!editMode">
       <flex-box full-width>
-        <attribute-chip value="<3> Teams" />
-        <attribute-chip value="<15> Members" />
-        <attribute-chip value="<30> Projects" />
+        <attribute-chip value="<#> Teams" />
+        <attribute-chip value="<#> Members" />
+        <attribute-chip value="<#> Projects" />
       </flex-box>
 
       <typography variant="caption" value="Description" />
       <br />
-      <typography value="<Organization information will be displayed here>" />
+      <typography value="<Organization information>" />
     </div>
 
     <save-organization-inputs v-else />

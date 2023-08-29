@@ -35,16 +35,25 @@
           <q-td align="end">
             <typography :value="quasarProps.row.projects.length" />
           </q-td>
-          <q-td align="end"> </q-td>
+          <q-td align="end">
+            <typography value="<role>" />
+            <typography value="<leave>" />
+            <typography value="<remove>" />
+          </q-td>
         </q-tr>
         <q-tr
           v-show="expanded.includes(quasarProps.row.id)"
           :props="quasarProps"
         >
-          <q-td colspan="100%"></q-td>
+          <q-td colspan="100%">
+            <typography value="<Team members>" />
+            <br />
+            <typography value="<Team projects>" />
+          </q-td>
         </q-tr>
       </template>
     </data-table>
+    <typography value="<add>" />
   </panel-card>
 </template>
 

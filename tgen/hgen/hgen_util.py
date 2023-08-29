@@ -98,7 +98,7 @@ def get_predictions(prompt_builder: PromptBuilder,
         if isinstance(tags_for_response, set) and len(tags_for_response) == 1 else tags_for_response
     base_name, file_name = os.path.split(export_path) if export_path else (EMPTY_STRING, EMPTY_STRING)
 
-    load_path = os.path.join(hgen_args.load_dir, file_name) if file_name else EMPTY_STRING
+    load_path = FileUtil.add_ext(os.path.join(hgen_args.load_dir, file_name), FileUtil.YAML_EXT) if file_name else EMPTY_STRING
     if os.path.exists(load_path):
         predictions = FileUtil.read_yaml(load_path)
     else:
@@ -131,7 +131,7 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
     :param generate_names: If True, generates names for the new artifacts
     :return: The dataframe of generated artifacts
     """
-    new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(uuid.uuid4()) for _ in artifact_generations],
+    new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(artifact_generations))],
                                          ArtifactKeys.CONTENT: artifact_generations,
                                          ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
 
@@ -188,19 +188,20 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
     generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
                                                                                                        QuestionnairePrompt) \
         else task_prompt.response_manager
-    generation_step_response_manager.formatter = lambda tag, val: val.strip().strip(NEW_LINE)
+    if generation_step_response_manager.formatter is None:
+        generation_step_response_manager.formatter = lambda tag, val: val.strip().strip(NEW_LINE)
 
-    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header("{artifact_type}S:"),
+    artifact_type = hgen_args.source_type if not artifact_type else artifact_type
+    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                           include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
-    artifact_type = hgen_args.source_type if not artifact_type else artifact_type
-    artifact_prompt.format_value(artifact_type=artifact_type.upper())
     prompts = [base_prompt, artifact_prompt]
 
     task_preface = f"{NEW_LINE}{PromptUtil.as_markdown_header('TASKS:')}{NEW_LINE}"
     if summary_prompt:
         if combine_summary_and_task_prompts:
             task_prompt = QuestionnairePrompt(question_prompts=[summary_prompt, task_prompt],
+                                              prompt_id = task_prompt.id,
                                               use_multi_step_task_instructions=True)
         else:
             summary_prompt.value = task_preface + summary_prompt.value

@@ -5,10 +5,10 @@ from tgen.common.util.supported_enum import SupportedEnum
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY, NL_SUMMARY
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_QUESTIONNAIRE
-from tgen.prompts.supported_prompts.delta_prompts import ADDED_PROMPT, CHANGE_SUMMARY_QUESTIONNAIRE, CHANGE_SUMMARY_STARTER_PROMPT, \
-    DELETED_PROMPT, DIFF_SUMMARY_QUESTIONNAIRE, DIFF_SUMMARY_STARTER_PROMPT, IMPACTS_PROMPT
+from tgen.prompts.supported_prompts.delta_prompts import DIFF_SUMMARY_QUESTIONNAIRE, DIFF_SUMMARY_STARTER_PROMPT, \
+    CHANGE_SUMMARY_STARTER_PROMPT, CHANGE_SUMMARY_QUESTIONNAIRE, IMPACTS_PROMPT, ADDED_PROMPT, DELETED_PROMPT
 from tgen.prompts.supported_prompts.hgen_prompts import FORMAT_QUESTIONNAIRE, GENERATION_PROMPT, INSTRUCTION_CREATION_PROMPT, \
-    REFINE_PROMPT, REFINE_QUESTIONNAIRE
+    REFINE_PROMPT, REFINE_TASKS
 
 
 class SupportedPrompts(SupportedEnum):
@@ -16,7 +16,7 @@ class SupportedPrompts(SupportedEnum):
     HGEN_INSTRUCTIONS = INSTRUCTION_CREATION_PROMPT
     HGEN_GENERATION = GENERATION_PROMPT
     HGEN_REFINEMENT = REFINE_PROMPT
-    HGEN_REFINE_QUESTIONNAIRE = REFINE_QUESTIONNAIRE
+    HGEN_REFINE_TASKS = REFINE_TASKS
     HGEN_FORMAT_QUESTIONNAIRE = FORMAT_QUESTIONNAIRE
 
     # ---------- TGEN ----------------

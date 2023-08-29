@@ -1,3 +1,4 @@
+import copy
 import traceback
 from abc import ABC
 from copy import deepcopy
@@ -218,9 +219,9 @@ class BaseObject(ABC):
         if expected_type:
             cls._assert_type(param_value, expected_type, param_name)
         for obj_meta in obj_meta_list:
-            meta_out = deepcopy(obj_meta)
+            meta_out = copy.deepcopy(obj_meta) if is_experimental else obj_meta
             inner_param_value = cls._get_value_of_variable(param_value, expected_type)[0]
-            inner_param_value = deepcopy(inner_param_value)
+            inner_param_value = copy.deepcopy(inner_param_value) if is_experimental else inner_param_value
             meta_out.add_param(param_name, inner_param_value,
                                is_experimental=is_experimental,
                                children_experimental_vars=children_experimental_vars)

@@ -16,7 +16,7 @@ class QuestionnairePrompt(Prompt):
 
     def __init__(self, question_prompts: Union[List[Prompt], Dict[int, Prompt]], instructions: str = EMPTY_STRING,
                  response_manager: PromptResponseManager = None, enumeration_chars: List[str] = ascii_uppercase,
-                 use_multi_step_task_instructions: bool = False):
+                 use_multi_step_task_instructions: bool = False, prompt_id: str = None):
         """
         Initializes the questionnaire with the instructions and the questions that will make up the prompt
         :param question_prompts: The list of question prompts to include in the questionnaire
@@ -35,7 +35,7 @@ class QuestionnairePrompt(Prompt):
             self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
         if use_multi_step_task_instructions:
             instructions = self._create_multi_step_task_instructions(enumeration_chars, question_prompts)
-        super().__init__(instructions, response_manager=response_manager)
+        super().__init__(instructions, response_manager=response_manager, prompt_id=prompt_id)
 
     def get_response_tags_for_question(self, question_index: int) -> Union[str, List[str]]:
         """

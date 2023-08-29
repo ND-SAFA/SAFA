@@ -28,7 +28,8 @@ class MultiArtifactPrompt(Prompt):
                  build_method: BuildMethod = BuildMethod.NUMBERED,
                  include_ids: bool = True,
                  xml_tags: Dict = None,
-                 data_type: DataType = DataType.ARTIFACT):
+                 data_type: DataType = DataType.ARTIFACT,
+                 starting_num: int = 1):
         """
         Constructor for making a prompt containing many artifacts.
         :param prompt_prefix: The prefix to attach to prompt.
@@ -36,6 +37,7 @@ class MultiArtifactPrompt(Prompt):
         :param include_ids: If True, includes artifact ids
         :param xml_tags: If building using XML, specify the names of the tags as such {outer_tag: [id_tag, body_tag]}
         :param data_type: Whether the data is coming from artifacts or traces
+        :param starting_num: The number to start the artifacts at if using numbered build method
         """
         self.build_method = build_method
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
@@ -43,6 +45,7 @@ class MultiArtifactPrompt(Prompt):
         self.include_ids = include_ids
         self.data_type = data_type
         self.xml_tags = xml_tags
+        self.starting_num = starting_num
         super().__init__(value=prompt_prefix)
 
     @overrides(Prompt)
@@ -55,13 +58,15 @@ class MultiArtifactPrompt(Prompt):
         """
         prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         if self.build_method in self.build_methods:
-            artifacts = self.build_methods[self.build_method](artifacts, include_ids=self.include_ids, xml_tags=self.xml_tags)
+            artifacts = self.build_methods[self.build_method](artifacts, include_ids=self.include_ids,
+                                                              xml_tags=self.xml_tags, starting_num=self.starting_num)
             return f"{prompt}{artifacts}"
         else:
             raise NameError(f"Unknown Build Method: {self.build_method}")
 
     @staticmethod
-    def _build_as_numbered(artifacts: List[EnumDict], include_ids: bool = False, **kwargs) -> str:
+    def _build_as_numbered(artifacts: List[EnumDict], include_ids: bool = False,
+                           starting_num: int = 1, **kwargs) -> str:
         """
         Formats the artifacts as follows:
         1. ID: BODY
@@ -72,12 +77,12 @@ class MultiArtifactPrompt(Prompt):
         """
         numbered_format = "{}. {}"
         artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
-        formatted_artifacts = [numbered_format.format(i + 1, artifact_prompt.build(artifact=artifact))
+        formatted_artifacts = [numbered_format.format(i + starting_num, artifact_prompt.build(artifact=artifact))
                                for i, artifact in enumerate(artifacts)]
         return NEW_LINE.join(formatted_artifacts)
 
     @staticmethod
-    def _build_as_xml(artifacts: List[ArtifactPrompt], xml_tags: Dict, include_ids: bool = True):
+    def _build_as_xml(artifacts: List[ArtifactPrompt], xml_tags: Dict, include_ids: bool = True, **kwargs):
         """
         Formats the artifacts as follows:
         <artifact>

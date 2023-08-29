@@ -90,7 +90,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         artifact_map = {}
         for name, row in self.itertuples():
-            content = DataFrameUtil.get_optional_value(row, ArtifactKeys.SUMMARY)
+            content = DataFrameUtil.get_optional_value_from_df(row, ArtifactKeys.SUMMARY)
             if content is None or len(content) == 0:
                 content = row[ArtifactKeys.CONTENT]
             artifact_map[name] = content

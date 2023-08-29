@@ -58,7 +58,7 @@ class TestDataFrameUtil(BaseTest):
         df = pd.DataFrame([entry])
 
         def assert_value(key_name: str, v: Any, **kwargs):
-            value = DataFrameUtil.get_optional_value(df.iloc[0], key_name, **kwargs)
+            value = DataFrameUtil.get_optional_value_from_df(df.iloc[0], key_name, **kwargs)
             self.assertEqual(value, v)
 
         assert_value("A", 1)

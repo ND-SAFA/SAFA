@@ -25,16 +25,14 @@ class HGenState(State):
     Step 3 - Artifact generation
     """
     generated_artifact_content: List[str] = None  # The content generated from the questionnaire.
+    n_generations: int = 0 # number of runs of artifact generation
     summary: str = None  # The summary of all the source artifacts.
 
     """
-    Optional Step - Refine 1
+    Optional Step - Refine content on rerun of hgen
     """
-    # refinement_number: int = 1  # The current refinement step
-    # refinement_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
-    # # The questionnaire containing all the artifacts.
-
-    refined_content: List[str] = None  # The refined output.
+    all_generated_content: List[str] = None # All generated content across all runs
+    refined_content: List[str] = None  # The final selected artifact content
 
     """
     Step 4 - Dataset Construction

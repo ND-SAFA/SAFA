@@ -46,8 +46,7 @@ class LLMTrainer(AbstractTrainer):
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(self.llm_manager,
-                                                             prompt_builder=self.prompt_builder,
-                                                             summarizer=self.summarizer)
+                                                             prompt_builder=self.prompt_builder)
         custom_params = {}
         instructions = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
@@ -57,8 +56,7 @@ class LLMTrainer(AbstractTrainer):
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
             custom_params[OpenAIParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 self.llm_manager,
-                prompt_builder=self.prompt_builder,
-                summarizer=self.summarizer)
+                prompt_builder=self.prompt_builder)
 
         res = self.llm_manager.make_fine_tune_request(completion_type=completion_type, training_file=training_file_id,
                                                       instructions=instructions, **custom_params)
@@ -74,14 +72,12 @@ class LLMTrainer(AbstractTrainer):
         """
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompt_df = dataset.get_prompt_dataframe(summarizer=self.summarizer,
-                                                 prompt_builder=self.prompt_builder,
+        prompt_df = dataset.get_prompt_dataframe(prompt_builder=self.prompt_builder,
                                                  prompt_args=self.llm_manager.prompt_args)
         if self.llm_manager.llm_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
         first_prompt = prompt_df[PromptKeys.PROMPT][0]
         logger.debug(first_prompt)
-
         res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
                                                        prompt=list(prompt_df[PromptKeys.PROMPT]))
         if isinstance(res, ClassificationResponse):

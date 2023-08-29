@@ -98,6 +98,8 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         and the newly generated upper-level artifacts
         :return: The dataframe containing new and old trace links
         """
+        if not hgen_args.generate_trace_links:
+            return TraceDataFrame()
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
         tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary,

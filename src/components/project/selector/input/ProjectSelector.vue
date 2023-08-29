@@ -8,7 +8,7 @@
     :options="getProjectApiStore.allProjects"
     option-value="projectId"
     option-label="name"
-    class="nav-input"
+    :class="className"
     color="primary"
     @popup-show="handleReload"
   >
@@ -73,11 +73,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import {
   getProjectApiStore,
   identifierSaveStore,
   permissionStore,
+  projectStore,
   useTheme,
 } from "@/hooks";
 import { FlexBox, IconButton, ListItem, TextButton } from "@/components/common";
@@ -87,6 +88,9 @@ const { darkMode } = useTheme();
 
 const projectInviteId = ref<string>();
 
+const className = computed(() =>
+  projectStore.isProjectDefined ? "nav-input nav-multi-input-left" : "nav-input"
+);
 /**
  * Reloads the project list and resets any selected project.
  */

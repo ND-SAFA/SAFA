@@ -9,7 +9,7 @@
     label="Version"
     :options="allVersions"
     option-value="versionId"
-    class="nav-input nav-version q-mx-sm"
+    class="nav-input nav-version nav-multi-input-right q-mr-sm"
     color="accent"
     @popup-show="getVersionApiStore.handleReload"
   >

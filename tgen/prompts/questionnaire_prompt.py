@@ -103,6 +103,14 @@ class QuestionnairePrompt(Prompt):
         instructions = [PromptUtil.as_markdown_header('TASKS:'), PromptUtil.format_as_markdown_italics(base_instructions)]
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
+    def set_instructions(self, instructions: str) -> None:
+        """
+        Sets the string as the instructions for the questionnaire.
+        :param instructions: The prefix to the questions.
+        :return: None
+        """
+        self.value = instructions
+
     def __repr__(self) -> str:
         """
         Creates a representation of the questionnaire as a string

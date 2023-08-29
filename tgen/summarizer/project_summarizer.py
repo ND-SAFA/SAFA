@@ -12,8 +12,10 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_TASKS
+from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_CONTEXT_PROMPT, PROJECT_SUMMARY_TAGS, \
+    PROJECT_SUMMARY_TASKS
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 
@@ -46,12 +48,19 @@ class ProjectSummarizer(BaseObject):
             self.artifact_df.summarize_content(ArtifactsSummarizer())
 
         summary = ""
-        for task_title, task_prompt in PROJECT_SUMMARY_TASKS:
-            logger.log_step(f"Creating section {task_title}")
+        for task_title, task_prompt in PROJECT_SUMMARY_TASKS.items():
+            logger.log_step(f"Creating section: `{task_title}`")
             artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
                                                    build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                    include_ids=True)
-            prompt_builder = PromptBuilder(prompts=[task_prompt, artifacts_prompt])
+            prompt_builder = PromptBuilder(prompts=[PROJECT_SUMMARY_CONTEXT_PROMPT,
+                                                    artifacts_prompt,
+                                                    task_prompt])
+
+            if len(summary) > 0:
+                prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{summary}"), 1)
+
+            task_prompt.set_instructions(f"\n\n# Questions\n")
 
             self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
             self.llm_manager.llm_args.temperature = 0
@@ -59,12 +68,16 @@ class ProjectSummarizer(BaseObject):
                                                                                       PromptDataset(artifact_df=self.artifact_df)})
             trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
                                                  prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
+            task_tag = PROJECT_SUMMARY_TAGS[task_title]
             res = trainer.perform_prediction()
-            task_body = res.original_response[0]
+            id2res = prompt_builder.parse_responses(res.original_response[0])
+            parsed_response = id2res[prompt_builder._prompts[-1].id][task_tag]
+
+            task_body = parsed_response[0] if len(parsed_response) <= 1 else "\n".join(parsed_response)
             task_section = f"{PromptUtil.as_markdown_header(task_title)}\n{task_body}"
             summary += task_section if len(task_section) == 0 else f"\n{task_section}"
 
-        if self.export_dir:
-            summary_export_path = os.path.join(self.export_dir, PROJECT_SUMMARY_FILE_NAME)
-            FileUtil.write(summary, summary_export_path)
+            if self.export_dir:
+                summary_export_path = os.path.join(self.export_dir, PROJECT_SUMMARY_FILE_NAME)
+                FileUtil.write(summary, summary_export_path)
         return summary

@@ -1,5 +1,5 @@
 <template>
-  <list-item to="" title="Notifications" clickable @click="open = true">
+  <list-item to="" title="Notifications" clickable @click="handleOpen">
     <template #icon>
       <div class="nav-job-icon">
         <q-circular-progress
@@ -132,7 +132,8 @@ const color = computed(() => (inProgressJobs.value ? "primary" : "secondary"));
 /**
  * Sets all messages to viewed on open.
  */
-function handleClearNewMessages() {
+function handleOpen() {
+  open.value = true;
   viewedMessages.value = notifications.value.length;
 }
 

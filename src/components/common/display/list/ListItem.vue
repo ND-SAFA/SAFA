@@ -25,7 +25,7 @@
         <typography
           v-if="!!props.iconTitle"
           :value="props.iconTitle"
-          variant="caption"
+          variant="small"
           align="center"
         />
       </flex-box>

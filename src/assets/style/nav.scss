@@ -13,18 +13,6 @@
   100% { opacity: 1; }
 }
 
-.icon-safa {
-  animation: fadeIn 1s;
-
-  &.clickable {
-    height: 42pt;
-  }
-
-  & > * {
-    fill: $color-primary;
-  }
-}
-
 // Navigation - Inputs
 
 .nav-mode-selected {
@@ -143,9 +131,11 @@
   bottom: 0;
 }
 
-#logo-safa {
+.icon-safa {
+  animation: fadeIn 1s;
+
   .cls-2, .cls-3 {
-    fill: none;
+    fill: $color-background;
     stroke: $color-primary;
     stroke-miterlimit: 10;
   }
@@ -160,6 +150,31 @@
 
   circle {
     r: 6px;
+  }
+
+  &.logo {
+    height: 60px;
+    width: 60px;
+
+    //.cls-2, .cls-3 {
+    //  fill: $color-background;
+    //}
+    //
+    //.cls-2 {
+    //  stroke-width: 6px;
+    //}
+    //
+    //.cls-3, line, path {
+    //  stroke-width: 16px;
+    //}
+  }
+
+  &.clickable {
+    height: 42pt;
+  }
+
+  & > * {
+    fill: $color-primary;
   }
 }
 

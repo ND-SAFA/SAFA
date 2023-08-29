@@ -9,7 +9,7 @@
     :mini="!sidebarOpen"
   >
     <flex-box
-      v-if="sidebarOpen"
+      v-show="sidebarOpen"
       full-width
       justify="between"
       align="center"
@@ -26,7 +26,7 @@
       />
     </flex-box>
     <flex-box
-      v-else
+      v-show="!sidebarOpen"
       justify="center"
       align="center"
       full-width
@@ -34,11 +34,10 @@
       class="nav-sidebar-header"
     >
       <icon-button
-        icon="nav-toggle"
+        icon="safa"
         tooltip="Open sidebar"
         color="primary"
         data-cy="button-sidebar-open"
-        :rotate="180"
         @click="sidebarOpen = true"
       />
     </flex-box>

@@ -1,41 +1,60 @@
 import os
-from typing import List
+from copy import deepcopy
+from typing import List, Dict, Generator
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER, \
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER, \
     PS_DEFAULT_SAVE_PROGRESS, PS_FILE_NAME, PS_STATE_FILE_NAME
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_MAP
 
 
 class ProjectSummary:
     def __init__(self, export_dir: str = None, save_progress: bool = PS_DEFAULT_SAVE_PROGRESS,
-                 project_summary_file_name: str = PS_FILE_NAME, state_file_name: str = PS_STATE_FILE_NAME):
+                 project_summary_file_name: str = PS_FILE_NAME, state_file_name: str = PS_STATE_FILE_NAME,
+                 project_summary_sections: List[str] = DEFAULT_PROJECT_SUMMARY_SECTIONS,
+                 new_sections: Dict[str, QuestionnairePrompt] = None):
         """
         Constructs project summary to save at export path.
         :param export_dir: The path to the directory to export to.
         :param project_summary_file_name: The name of the file to save summary to.
         :param save_progress: Whether to save anytime there are changes to the project summary.
+        :param project_summary_sections: The titles of the sections that make up the project summary
+        :param new_sections: Mapping of title to prompt for any non-standard sections to include in the summary
         """
         self.ps_state = {}
         self.export_dir = export_dir
         self.save_progress = save_progress
         self.ps_file_name = project_summary_file_name
         self.state_file_name = state_file_name
+        self.project_summary_sections = project_summary_sections
+        self.new_sections = new_sections if new_sections else {}
 
-    @staticmethod
-    def get_generation_iterator():
+    def get_generation_iterator(self) -> Generator:
         """
         Creates iterator for section titles and questions.
         :return: Iterator for each title and prompt.
         """
-        for section_title in PROJECT_SUMMARY_SECTIONS:
-            section_prompt = PROJECT_SUMMARY_MAP[section_title]
+        for section_title in self.project_summary_sections:
+            section_prompt = self.get_section_prompt_by_title(section_title)
             yield section_title, section_prompt
 
-    def set_section_body(self, title: str, body: str):
+    def get_section_prompt_by_title(self, title: str) -> QuestionnairePrompt:
+        """
+        Gets the prompt for creating the section by its title
+        :param title: The title of the section
+        :return: The prompt for creating the section
+        """
+        section_prompt = PROJECT_SUMMARY_MAP.get(title, None)
+        if not section_prompt:
+            assert title in self.new_sections, f"Must provide the prompt to use for creating the section: {title}"
+            section_prompt = self.new_sections[title]
+        return section_prompt
+
+    def set_section_body(self, title: str, body: str) -> None:
         """
         Sets the body of a project section.
         :param title: The title of a section.
@@ -47,7 +66,7 @@ class ProjectSummary:
             self.save()
 
     def get_summary(self, section_titles: List[str] = PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER,
-                    raise_exception_on_not_found: bool = False):
+                    raise_exception_on_not_found: bool = False) -> str:
         """
         Creates summary in the order of the headers given.
         :param section_titles: The headers in the order they should appear.

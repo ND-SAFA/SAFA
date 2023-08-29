@@ -21,6 +21,8 @@ PS_QUESTIONS_HEADER = "\n\n# Questions\n"
 PS_FILE_NAME = "project_summary.txt"
 PS_STATE_FILE_NAME = "project_summary_state.json"
 
+CUSTOM_TITLE_TAG = "title"
+
 """
 Defaults 
 """
@@ -30,7 +32,7 @@ PS_DEFAULT_SAVE_PROGRESS = True
 """
 Mappings
 """
-PROJECT_SUMMARY_SECTIONS = [
+DEFAULT_PROJECT_SUMMARY_SECTIONS = [
     PS_FEATURE_TITLE,
     PS_ENTITIES_TITLE,
     PS_SUBSYSTEM_TITLE,

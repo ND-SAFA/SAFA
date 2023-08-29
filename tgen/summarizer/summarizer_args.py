@@ -1,11 +1,15 @@
 import os
 from dataclasses import dataclass, field
 
+from typing import List, Dict
+
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.summarizer.summary_types import SummaryTypes
 
@@ -36,6 +40,14 @@ class SummarizerArgs(PipelineArgs):
     A manual project summary to use instead of creating one
     """
     project_summary: str = None
+    """
+    The titles of the sections that make up the project summary 
+    """
+    project_summary_sections: List[str] = field(default_factory=lambda: DEFAULT_PROJECT_SUMMARY_SECTIONS)
+    """
+    Mapping of title to prompt for any non-standard sections to include in the summary
+    """
+    new_sections: Dict[str, QuestionnairePrompt] = field(default_factory=dict)
     """
     If True, resummarizes the project with the new artifact summaries
     """

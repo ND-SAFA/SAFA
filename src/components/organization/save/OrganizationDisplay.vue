@@ -12,9 +12,9 @@
 
     <div v-if="!editMode">
       <flex-box full-width>
-        <attribute-chip value="3 Teams" />
-        <attribute-chip value="15 Members" />
-        <attribute-chip value="30 Projects" />
+        <attribute-chip value="<3> Teams" />
+        <attribute-chip value="<15> Members" />
+        <attribute-chip value="<30> Projects" />
       </flex-box>
 
       <typography variant="caption" value="Description" />

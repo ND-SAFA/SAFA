@@ -14,6 +14,7 @@
       :to="option.path"
       :icon="option.icon"
       :title="option.label"
+      :subtitle="option.subtitle"
       :color="option.color"
     />
   </div>
@@ -32,6 +33,7 @@ export default {
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { NavOption } from "@/types";
+import { sessionStore } from "@/hooks";
 import { Routes } from "@/router";
 import { ListItem } from "@/components/common";
 import SavingIcon from "./SavingIcon.vue";
@@ -48,6 +50,7 @@ const options = computed<NavOption[]>(() => [
   },
   {
     label: "My Account",
+    subtitle: sessionStore.user?.email,
     icon: "account",
     path: Routes.ACCOUNT,
     color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",

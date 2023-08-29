@@ -29,6 +29,10 @@ export interface NavOption {
    */
   color?: ThemeColor;
   /**
+   * The subtitle to display for this option, beneath the label.
+   */
+  subtitle?: string;
+  /**
    * The navigation path corresponding to this option.
    */
   path: string | { path: string; query: URLQuery };

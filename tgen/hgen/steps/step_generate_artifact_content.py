@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
@@ -16,6 +17,8 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
+    TASK_PROMPT_ID = str(uuid.uuid5(uuid.NAMESPACE_DNS, 'seed'))
+
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates the content for the new artifacts.
@@ -27,20 +30,23 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         summary_questionnaire = GenerateArtifactContentStep.construct_questionnaire_for_summary(state)
 
         source_layer_only_dataset = state.source_dataset
-        export_path = os.path.join(state.export_dir, "artifact_gen_response.yaml") if state.export_dir else None
+        filename = "artifact_gen_response"
+        if state.n_generations > 0:
+            filename = f"{filename}_{state.n_generations}"
+        export_path = os.path.join(state.export_dir, filename) if state.export_dir else None
 
-        task_prompt = QuestionPrompt(TASK_INSTRUCTIONS,
-                                     response_manager=PromptResponseManager(
-                                         response_instructions_format=f"Enclose each {args.target_type} in " + "{}",
-                                         response_tag=convert_spaces_to_dashes(f"{args.target_type}"))
+        task_prompt = Prompt(TASK_INSTRUCTIONS,
+                             prompt_id=self.TASK_PROMPT_ID,
+                             response_manager=PromptResponseManager(
+                                 response_instructions_format=f"Enclose each {args.target_type} in " + "{}",
+                                 response_tag=convert_spaces_to_dashes(f"{args.target_type}"))
 
-                                     )
+                             )
         task_prompt.format_value(format=state.format_of_artifacts, description=state.description_of_artifact)
         summary_tag = summary_questionnaire.response_manager.response_tag
         generated_artifacts_tag = task_prompt.response_manager.response_tag
         prompt_builder = get_prompt_builder_for_generation(args, task_prompt, summary_prompt=summary_questionnaire,
                                                            combine_summary_and_task_prompts=True)
-        task_prompt = prompt_builder.get_prompt(-1)
         if args.system_summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.format_as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{args.system_summary}")
@@ -54,6 +60,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                  return_first=False,
                                                  export_path=export_path)[0]
         state.generated_artifact_content = generation_predictions[generated_artifacts_tag]
+        state.n_generations += 1
         if len(generation_predictions[summary_tag]) > 0:
             state.summary = generation_predictions[summary_tag][0]
         else:

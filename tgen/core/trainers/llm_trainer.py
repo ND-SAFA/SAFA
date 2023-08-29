@@ -74,14 +74,12 @@ class LLMTrainer(AbstractTrainer):
         """
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompt_df = dataset.get_prompt_dataframe(summarizer=self.summarizer,
-                                                 prompt_builder=self.prompt_builder,
+        prompt_df = dataset.get_prompt_dataframe(prompt_builder=self.prompt_builder,
                                                  prompt_args=self.llm_manager.prompt_args)
         if self.llm_manager.llm_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
         first_prompt = prompt_df[PromptKeys.PROMPT][0]
         logger.debug(first_prompt)
-
         res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
                                                        prompt=list(prompt_df[PromptKeys.PROMPT]))
         if isinstance(res, ClassificationResponse):

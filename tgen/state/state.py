@@ -54,17 +54,18 @@ class State(BaseObject):
         self.completed_steps.add(step_name)
         self.save(step_name)
 
-    def save(self, step_name: str) -> bool:
+    def save(self, step_name: str, run_num: int = 1) -> bool:
         """
         Saves the current state
         :param step_name: The step name that the pipeline is currently at
+        :param run_num: The number of times the step has been run
         :return: True if saved successfully else False
         """
         if self.export_dir is None:
             return False
 
         try:
-            save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name)
+            save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
             as_dict = {k: (v.as_creator(self._get_path_to_state_checkpoint(self.export_dir), k)
                            if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()}
             YamlUtil.write(as_dict, save_path)
@@ -117,11 +118,12 @@ class State(BaseObject):
         return val
 
     @staticmethod
-    def _get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING) -> str:
+    def _get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1) -> str:
         """
         Gets the path to the checkpoint for the state corresponding to the given step name
         :param directory: The directory that the checkpoints live in
         :param step_name: The name of the step that corresponds with the desired state
+        :param run_num: The number of times the step has been run
         :return: The path to the checkpoint for the state corresponding to the given step name
         """
         if os.path.split(directory)[-1] != State._checkpoint_dir:
@@ -129,14 +131,17 @@ class State(BaseObject):
         FileUtil.create_dir_safely(directory)
         if not step_name:
             return directory
-        return os.path.join(directory, State._get_filename(step_name))
+        return os.path.join(directory, State._get_filename(step_name, run_num))
 
     @staticmethod
-    def _get_filename(step: Any) -> str:
+    def _get_filename(step: Any, run_num: int = 1) -> str:
         """
         Returns the filename for the given step
         :param step: The name of the step
+        :param run_num: The number of times the step has been run
         :return: The filename for the given step
         """
         step = DASH.join(SeparateJoinedWordsStep.separate_camel_case_word(step)).lower()
+        if run_num > 1:
+            step = f"{step}-{run_num}"
         return f"state-{step}.yaml"

@@ -58,6 +58,7 @@ class MultiLayerHGenJob(AbstractJob):
                                                    target_type=next_target_type,
                                                    dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
                                                    system_summary=current_hgen_job.hgen.state.summary,
+                                                   optimize_with_reruns=False,
                                                    load_dir=EMPTY_STRING)
         init_params = ParamSpecs.create_from_method(HGenArgs.__init__).param_names
         new_params = {name: new_params[name] for name in init_params}

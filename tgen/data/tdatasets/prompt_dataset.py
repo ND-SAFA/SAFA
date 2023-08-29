@@ -114,13 +114,11 @@ class PromptDataset(iDataset):
                 os.remove(export_path)
         return self.project_file_id
 
-    def get_prompt_dataframe(self, prompt_builder: PromptBuilder = None, prompt_args: PromptArgs = None,
-                             summarizer: ArtifactsSummarizer = None) -> PromptDataFrame:
+    def get_prompt_dataframe(self, prompt_builder: PromptBuilder = None, prompt_args: PromptArgs = None) -> PromptDataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
         :param prompt_args: The arguments for properly formatting the prompt
         :param prompt_builder: The generator of prompts for the dataset
-        :param summarizer: If provided, summarizes prompts that exceed the token limit
         :return: The prompt dataframe containing prompts and completions
         """
         if self.prompt_df is None or (prompt_builder and prompt_args):

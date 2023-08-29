@@ -64,6 +64,18 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     system_summary: str = None
     """
+    If True, re-runs hgen multiple times to get the best results across runs
+    """
+    optimize_with_reruns: bool = False
+    """
+    Number of re-runs of hgen to get the best results across runs
+    """
+    n_reruns: int = 4
+    """
+    If True, automatically generates trace links between the new hgen layers and the source
+    """
+    generate_trace_links: bool = True
+    """
     The llm manager to use for each prediction step
     """
     llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)

@@ -23,6 +23,7 @@
         l="1"
         align="center"
         ellipsis
+        color="text"
       />
     </flex-box>
 

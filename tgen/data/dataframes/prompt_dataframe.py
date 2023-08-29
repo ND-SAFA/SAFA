@@ -1,7 +1,7 @@
 from typing import Type
 
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 
@@ -34,5 +34,5 @@ class PromptDataFrame(AbstractProjectDataFrame):
         :param completion: The completion/response
         :return: The prompt and completion pair
         """
-        return self.add_new_row({PromptKeys.PROMPT: prompt,
-                                 PromptKeys.COMPLETION: completion})
+        return self.add_or_update_row({PromptKeys.PROMPT: prompt,
+                                       PromptKeys.COMPLETION: completion})

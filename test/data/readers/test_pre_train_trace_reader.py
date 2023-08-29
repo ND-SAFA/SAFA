@@ -1,5 +1,4 @@
 import os
-
 from typing import List
 
 from tgen.common.util.file_util import FileUtil
@@ -7,13 +6,13 @@ from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
 from tgen.testres.mocking.mock_openai import mock_openai
 from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
 
 
 class TestPreTrainingTraceReader(BaseTest):
@@ -58,11 +57,12 @@ class TestPreTrainingTraceReader(BaseTest):
         """
         return PreTrainTraceReader(cls.get_project_path())
 
-    def verify_project_data_frames(self, artifacts_df, traces_df, layer_df, lines, summarized_lines: List = None) -> None:
+    def verify_project_data_frames(self, artifact_df, traces_df, layer_df, lines, summarized_lines: List = None) -> None:
         """
         Verifies dataframes are as expected
         :return: None
         """
+
         def compare_lines(expected_lines, column):
             expected = expected_lines[i].strip()
             result = row[column].strip()
@@ -70,9 +70,9 @@ class TestPreTrainingTraceReader(BaseTest):
 
         with open(self.get_project_path()) as file:
             expected_artifacts = file.readlines()
-        self.assertEqual(len(expected_artifacts), len(artifacts_df.index))
+        self.assertEqual(len(expected_artifacts), len(artifact_df.index))
         self.assertEqual(len(traces_df[traces_df[TraceKeys.LABEL] == 1]), len(traces_df[traces_df[TraceKeys.LABEL] == 0]))
-        for i, row in artifacts_df.itertuples():
+        for i, row in artifact_df.itertuples():
             compare_lines(lines, ArtifactKeys.CONTENT)
             if summarized_lines:
                 compare_lines(summarized_lines, ArtifactKeys.SUMMARY)

@@ -126,16 +126,16 @@ class PromptTestProject:
             test_case.assertIn(artifact_content, prompt, **params)
 
     @staticmethod
-    def verify_prompts_safa_project_artifacts(test_case: BaseTest, prompt_df: PromptDataFrame, artifacts_df: ArtifactDataFrame,
+    def verify_prompts_safa_project_artifacts(test_case: BaseTest, prompt_df: PromptDataFrame, artifact_df: ArtifactDataFrame,
                                               **params):
         """
         Verifies the correct prompts are made from the test SAFA project
         :param test_case: The test calling the method
         :param prompt_df: The prompt dataframe to verify
-        :param artifacts_df: The artifacts dataframe used to create the prompts
+        :param artifact_df: The artifacts dataframe used to create the prompts
         :return:
         """
-        test_case.assertEqual(len(artifacts_df), len(prompt_df), **params)
-        for i, (id_, row) in enumerate(artifacts_df.itertuples()):
+        test_case.assertEqual(len(artifact_df), len(prompt_df), **params)
+        for i, (id_, row) in enumerate(artifact_df.itertuples()):
             prompt = prompt_df.get_row(i)
             test_case.assertIn(row["content"], prompt[PromptKeys.PROMPT], **params)

@@ -7,8 +7,8 @@ import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
 
-from tgen.common.util.enum_util import EnumDict, EnumUtil
 from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.enum_util import EnumDict, EnumUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 
@@ -75,7 +75,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         if self.index_name() is not None and not self.columns.empty and self.index.name != self.index_name():
             self.set_index(self.index_name(), inplace=True)
 
-    def add_new_row(self, row_as_dict: Dict[Union[Enum, str], Any]) -> EnumDict:
+    def add_or_update_row(self, row_as_dict: Dict[Union[Enum, str], Any]) -> EnumDict:
         """
         Adds row to dataframe
         :param row_as_dict: Dictionary mapping column name to its value
@@ -229,7 +229,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         if not isinstance(column2update, str):
             column2update = column2update.value
-        self.loc[self[self.index.name] == id2update, column2update] = new_value
+        self.loc[self.index == id2update, column2update] = new_value
 
     def update_values(self, column2update: Union[str, Enum], ids2update: List[str], new_values: List[Any]) -> None:
         """

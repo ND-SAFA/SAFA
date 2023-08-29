@@ -214,4 +214,15 @@ public class JobService {
         job.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
         jobLauncher.run(job, jobParameters);
     }
+
+    /**
+     * Sets the current task ID on given job.
+     *
+     * @param jobDbEntity The job to update.
+     * @param taskId      The task ID to add to job.
+     */
+    public void setJobTask(JobDbEntity jobDbEntity, UUID taskId) {
+        jobDbEntity.setTaskId(taskId);
+        this.jobDbRepository.save(jobDbEntity);
+    }
 }

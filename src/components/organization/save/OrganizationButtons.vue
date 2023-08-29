@@ -8,7 +8,13 @@
       </flex-box>
     </q-btn-dropdown>
     <separator vertical />
-    <text-button text label="Edit" icon="edit" data-cy="button-org-edit" />
+    <text-button
+      text
+      label="Edit"
+      icon="edit"
+      data-cy="button-org-edit"
+      @click="appStore.openPanel(PanelType.organizationEditor)"
+    />
     <separator vertical />
     <text-button
       text
@@ -29,5 +35,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { PanelType } from "@/types";
+import { appStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 </script>

@@ -32,7 +32,7 @@ import { TabList, SidebarGrid } from "@/components/common";
 import {
   OrganizationButtons,
   OrganizationDisplay,
-} from "@/components/organization/display";
+} from "@/components/organization/save";
 import { MemberTable } from "@/components/members";
 import { TeamTab } from "@/components/organization/team";
 

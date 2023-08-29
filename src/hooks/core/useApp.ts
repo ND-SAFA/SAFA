@@ -34,6 +34,7 @@ export const useApp = defineStore("app", {
     isOpen: {
       [PanelType.appPanel]: true,
       [PanelType.detailsPanel]: false,
+      [PanelType.organizationEditor]: false,
       [PanelType.projectSaver]: false,
       [PanelType.projectEditor]: false,
       [PanelType.projectDeleter]: false,
@@ -55,6 +56,12 @@ export const useApp = defineStore("app", {
      */
     isDetailsPanelOpen(): DetailsOpenState {
       return this.isOpen[PanelType.detailsPanel];
+    },
+    /**
+     * @return Whether the organization editor is open.
+     */
+    isOrgEditorOpen(): boolean {
+      return this.isOpen[PanelType.organizationEditor];
     },
     /**
      * @return Whether the project creator is open.

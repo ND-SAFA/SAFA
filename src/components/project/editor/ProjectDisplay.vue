@@ -84,8 +84,8 @@ import {
   FlexBox,
   Icon,
   TextButton,
+  ExpansionItem,
 } from "@/components/common";
-import ExpansionItem from "@/components/common/display/list/ExpansionItem.vue";
 import SaveProjectInputs from "./SaveProjectInputs.vue";
 
 const editMode = computed(() => appStore.isProjectEditorOpen);

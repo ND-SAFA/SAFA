@@ -10,6 +10,7 @@
 
     <list-item
       v-for="option in options"
+      :key="option.label"
       :to="option.path"
       :icon="option.icon"
       :title="option.label"

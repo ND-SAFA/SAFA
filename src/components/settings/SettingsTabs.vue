@@ -26,7 +26,7 @@
  * Tabs for changing project settings.
  */
 export default {
-  name: "TracePredictionTabs",
+  name: "SettingsTabs",
 };
 </script>
 

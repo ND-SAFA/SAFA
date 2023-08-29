@@ -1,5 +1,7 @@
 <template>
-  <private-page title="My Organization"> </private-page>
+  <private-page full-window title="My Organization">
+    <organization-tabs />
+  </private-page>
 </template>
 
 <script lang="ts">
@@ -12,5 +14,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { PrivatePage } from "@/components";
+import { PrivatePage, OrganizationTabs } from "@/components";
 </script>

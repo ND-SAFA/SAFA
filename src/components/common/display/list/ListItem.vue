@@ -27,6 +27,7 @@
           :value="props.iconTitle"
           variant="small"
           align="center"
+          :color="props.color"
         />
       </flex-box>
     </q-item-section>

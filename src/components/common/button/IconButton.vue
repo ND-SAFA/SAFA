@@ -13,6 +13,7 @@
     <q-tooltip :delay="props.tooltipDelay || 200">
       {{ tooltip }}
     </q-tooltip>
+    <slot />
   </q-btn>
 </template>
 

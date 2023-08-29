@@ -8,6 +8,7 @@ import {
   LoaderTabTypes,
   ModelShareType,
   ModelType,
+  OrganizationTabTypes,
   ProjectRole,
   ProjectTableTabTypes,
   SafetyCaseType,
@@ -35,9 +36,7 @@ export function createEnumOption(
 }
 
 /**
- * Returns display names for each document type.
- *
- * @return The select option names and ids.
+ * @return display names for each document type.
  */
 export function documentTypeOptions(): SelectOption[] {
   return [
@@ -50,9 +49,7 @@ export function documentTypeOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for each safety case type.
- *
- * @return The select option names and ids.
+ * @return display names for each safety case type.
  */
 export function safetyCaseOptions(): SelectOption[] {
   return [
@@ -64,18 +61,14 @@ export function safetyCaseOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for each logic type.
- *
- * @return The select option names and ids.
+ * @return display names for each logic type.
  */
 export function logicTypeOptions(): SelectOption[] {
   return [createEnumOption(FTANodeType.AND), createEnumOption(FTANodeType.OR)];
 }
 
 /**
- * Returns display names for each delta type.
- *
- * @return The select option names and ids.
+ * @return display names for each delta type.
  */
 export function deltaTypeOptions(): SelectOption[] {
   return [
@@ -87,9 +80,7 @@ export function deltaTypeOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for each trace count type.
- *
- * @return The select option names and ids.
+ * @return display names for each trace count type.
  */
 export function traceCountOptions(): SelectOption[] {
   return [
@@ -100,9 +91,7 @@ export function traceCountOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for each approval type.
- *
- * @return The select option names and ids.
+ * @return display names for each approval type.
  */
 export function approvalTypeOptions(): SelectOption[] {
   return [
@@ -113,9 +102,7 @@ export function approvalTypeOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for each trace model type.
- *
- * @return The select option names and ids.
+ * @return display names for each trace model type.
  */
 export function traceModelOptions(): SelectOption[] {
   return [
@@ -136,9 +123,7 @@ export function traceModelOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for project role type.
- *
- * @return The select option names and ids.
+ * @return display names for project role type.
  */
 export function projectRoleOptions(): SelectOption[] {
   return [
@@ -150,9 +135,7 @@ export function projectRoleOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for model share options.
- *
- * @return The select option names and ids.
+ * @return display names for model share options.
  */
 export function modelShareOptions(): SelectOption[] {
   return [
@@ -162,9 +145,7 @@ export function modelShareOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for project creator tabs.
- *
- * @return The select option names and ids.
+ * @return display names for project creator tabs.
  */
 export function creatorTabOptions(): SelectOption[] {
   return [
@@ -175,9 +156,7 @@ export function creatorTabOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for project loader tabs.
- *
- * @return The select option names and ids.
+ * @return display names for project loader tabs.
  */
 export function loaderTabOptions(): SelectOption[] {
   return [
@@ -187,9 +166,7 @@ export function loaderTabOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for trace prediction tabs.
- *
- * @return The select option names and ids.
+ * @return display names for trace prediction tabs.
  */
 export function tracePredictionTabOptions(): SelectOption[] {
   return [
@@ -200,9 +177,7 @@ export function tracePredictionTabOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for project settings tabs.
- *
- * @return The select option names and ids.
+ * @return display names for project settings tabs.
  */
 export function settingsTabOptions(): SelectOption[] {
   return [
@@ -214,9 +189,7 @@ export function settingsTabOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for model training tabs.
- *
- * @return The select option names and ids.
+ * @return display names for model training tabs.
  */
 export function trainingTabOptions(): SelectOption[] {
   return [
@@ -228,9 +201,7 @@ export function trainingTabOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for table view tabs.
- *
- * @return The select option names and ids.
+ * @return display names for table view tabs.
  */
 export function tableViewTabOptions(): SelectOption[] {
   return [
@@ -241,9 +212,7 @@ export function tableViewTabOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for attribute types.
- *
- * @return The select option names and ids.
+ * @return display names for attribute types.
  */
 export function attributeTypeOptions(): SelectOption[] {
   return [
@@ -260,9 +229,7 @@ export function attributeTypeOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for search modes.
- *
- * @return The select option names, descriptions, and ids.
+ * @return display names for search modes.
  */
 export function searchModeOptions(): SearchSelectOption[] {
   return [
@@ -286,5 +253,15 @@ export function searchModeOptions(): SearchSelectOption[] {
       placeholder: "Search current artifacts...",
       artifactSearch: true,
     },
+  ];
+}
+
+/**
+ * @return display names for organizations tabs.
+ */
+export function organizationTabTypes(): SelectOption[] {
+  return [
+    createEnumOption(OrganizationTabTypes.members, "Members"),
+    createEnumOption(OrganizationTabTypes.teams, "Teams"),
   ];
 }

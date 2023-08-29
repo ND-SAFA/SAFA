@@ -7,6 +7,7 @@ import {
   HomeView,
   LoginView,
   MyAccountView,
+  MyOrganizationView,
   ProjectCreatorView,
   ProjectSelectorView,
   ProjectSettingsView,
@@ -32,6 +33,7 @@ export enum Routes {
   TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
+  ORG = "/organization",
   SEARCH = "/search",
 
   DEMO = "/demo",
@@ -88,6 +90,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.ACCOUNT,
     name: "My Account",
     component: MyAccountView,
+  },
+  {
+    path: Routes.ORG,
+    name: "My Organization",
+    component: MyOrganizationView,
   },
   {
     path: Routes.HOME,

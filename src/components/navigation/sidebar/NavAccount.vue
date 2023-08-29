@@ -12,11 +12,15 @@
       </template>
     </list-item>
 
-    <separator />
+    <list-item
+      :to="Routes.ORG"
+      icon="organization"
+      title="My Organization"
+      class="q-py-sm"
+    />
 
     <list-item
       :to="Routes.ACCOUNT"
-      color="primary"
       icon="account"
       title="My Account"
       class="q-py-sm"
@@ -35,7 +39,7 @@ export default {
 
 <script setup lang="ts">
 import { Routes } from "@/router";
-import { ListItem, Separator } from "@/components/common";
+import { ListItem } from "@/components/common";
 import SavingIcon from "./SavingIcon.vue";
 import Notifications from "./Notifications.vue";
 </script>

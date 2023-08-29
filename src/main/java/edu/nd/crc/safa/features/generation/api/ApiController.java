@@ -50,7 +50,6 @@ public class ApiController {
         return result;
     }
 
-
     /**
      * Polls the task status until complete. Throws error if failure occurs to job or while getting status.
      *
@@ -103,7 +102,8 @@ public class ApiController {
             endTime = System.currentTimeMillis();
             long duration = (endTime - startTime) / 1000; // Duration in seconds
             if (duration >= timeout) {
-                String error = String.format("Worker has reached the maximum allowed duration of %s seconds.", MAX_DURATION);
+                String error = String.format("Worker has reached the maximum allowed duration of %s seconds.",
+                    MAX_DURATION);
                 throw new SafaError(error);
             }
             sleep(waitTime);

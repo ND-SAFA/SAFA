@@ -6,7 +6,7 @@
   >
     <list>
       <list-item
-        v-for="item in projects"
+        v-for="item in visibleProjects"
         :key="item.name"
         :title="item.name"
         :subtitle="getRepositoryTime(item)"
@@ -79,6 +79,14 @@ import {
 } from "@/components/common";
 
 const projects = ref<GitHubProjectSchema[]>([]);
+
+const visibleProjects = computed(() =>
+  integrationsStore.gitHubProject?.name
+    ? projects.value.filter(
+        ({ name }) => name === integrationsStore.gitHubProject?.name
+      )
+    : projects.value
+);
 
 const organizationName = computed(
   () => integrationsStore.gitHubOrganization?.name

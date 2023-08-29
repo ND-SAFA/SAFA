@@ -1,7 +1,7 @@
 <template>
   <panel-card
     title="Project Members"
-    subtitle="Edit and invite project members."
+    subtitle="Manage and invite project members."
     :minimal="props.minimal"
   >
     <selector-table

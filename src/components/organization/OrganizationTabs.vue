@@ -6,10 +6,15 @@
     </template>
     <tab-list v-model="tab" :tabs="tabs">
       <template #members>
-        <panel-card title="Members"> </panel-card>
+        <panel-card
+          title="Members"
+          subtitle="Manage organization members and permissions."
+        >
+        </panel-card>
       </template>
       <template #teams>
-        <panel-card title="Teams"> </panel-card>
+        <panel-card title="Teams" subtitle="Manage teams and permissions.">
+        </panel-card>
       </template>
     </tab-list>
   </sidebar-grid>

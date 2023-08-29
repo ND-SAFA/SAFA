@@ -40,7 +40,7 @@ class PromptUtil:
         return f"*{original_string}*"
 
     @staticmethod
-    def format_as_markdown_header(original_string: str, level: int = 1) -> str:
+    def as_markdown_header(original_string: str, level: int = 1) -> str:
         """
         Formats the string as markdown header
         :param original_string: The string to format

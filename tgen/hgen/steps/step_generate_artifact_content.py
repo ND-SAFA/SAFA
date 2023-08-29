@@ -1,17 +1,17 @@
 import os
 import uuid
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.hgen.hgen_args import HGenArgs, PredictionStep
+from tgen.hgen.hgen_state import HGenState
+from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
-from tgen.hgen.hgen_args import HGenArgs, PredictionStep
-from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
@@ -48,7 +48,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         prompt_builder = get_prompt_builder_for_generation(args, task_prompt, summary_prompt=summary_questionnaire,
                                                            combine_summary_and_task_prompts=True)
         if args.system_summary:
-            overview_of_system_prompt = Prompt(f"{PromptUtil.format_as_markdown_header('Overview of System:')}"
+            overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{args.system_summary}")
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
         generation_predictions = get_predictions(prompt_builder,

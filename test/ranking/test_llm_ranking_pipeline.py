@@ -5,6 +5,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.tracing.ranking.ranking_args import RankingArgs
@@ -34,10 +35,8 @@ class TestLLMRankingPipeline(BaseTest):
         Tests that pipeline correctly constructs the ranked predictions.
         """
         ai_manager.mock_summarization()
-        ai_manager.set_responses([
-            "<document>project_summary</document>",
-            TEST_RESPONSE
-        ])
+        ai_manager.set_responses(MockResponses.project_summary_responses +
+                                 [TEST_RESPONSE])
         args = self.create_args()
         pipeline = LLMRankingPipeline(args)
         prediction_entries = pipeline.run()

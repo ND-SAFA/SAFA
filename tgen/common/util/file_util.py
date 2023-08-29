@@ -382,3 +382,15 @@ class FileUtil:
         file_path = os.path.normpath(file_path)
         parts = file_path.split(os.sep)
         return parts
+
+    @staticmethod
+    def get_str_or_read(path: str):
+        """
+        Returns file content if path otherwise string is returned.
+        :param path: The path to a file or a string.
+        :return: The string value of the file or string.
+        """
+        try:
+            return FileUtil.read_file(path)
+        except Exception as e:
+            return path

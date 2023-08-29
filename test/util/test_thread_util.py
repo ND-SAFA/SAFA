@@ -66,4 +66,4 @@ class TestThreadUtil(BaseTest):
                                             max_attempts=max_attempts,
                                             thread_sleep=thread_sleep)
 
-        self.assert_error(try_threading, ValueError, "maximum re-tries.")
+        self.assert_error(try_threading, ValueError, "This is a test error.")

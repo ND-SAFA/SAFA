@@ -23,7 +23,7 @@ class ImpactAnalysisStep(OverviewChangeSummaryStep):
             state.impact = self._get_output(args, state, artifact_df_with_impact,
                                             impact_task_prompt)[impact_task_prompt.response_manager.response_tag][0]
         state.save(self.get_step_name())
-        impact_section = [PromptUtil.format_as_markdown_header(ImpactAnalysisStep.IMPACT_TITLE),
+        impact_section = [PromptUtil.as_markdown_header(ImpactAnalysisStep.IMPACT_TITLE),
                           state.impact]
         all_sections = state.overview_section + impact_section + state.change_details_section
         state.final_summary = NEW_LINE.join(all_sections)

@@ -6,11 +6,11 @@ from typing import Any, Dict, List, Set, Type, Union
 
 import pandas as pd
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -18,6 +18,12 @@ from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporte
 from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.idataset import iDataset
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.hgen.hgen_args import HGenArgs, PredictionStep
+from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
@@ -25,12 +31,6 @@ from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.idataset import iDataset
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.hgen_args import HGenArgs, PredictionStep
-from tgen.models.llm.llm_task import LLMCompletionType
 
 TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
 SAVE_DATASET_DIRNAME = "final_generated_dataset"
@@ -192,12 +192,12 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
         generation_step_response_manager.formatter = lambda tag, val: val.strip().strip(NEW_LINE)
 
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type
-    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown_header(f"{artifact_type.upper()}S:"),
+    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                           include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
     prompts = [base_prompt, artifact_prompt]
 
-    task_preface = f"{NEW_LINE}{PromptUtil.format_as_markdown_header('TASKS:')}{NEW_LINE}"
+    task_preface = f"{NEW_LINE}{PromptUtil.as_markdown_header('TASKS:')}{NEW_LINE}"
     if summary_prompt:
         if combine_summary_and_task_prompts:
             task_prompt = QuestionnairePrompt(question_prompts=[summary_prompt, task_prompt],

@@ -16,10 +16,10 @@
 
 <script lang="ts">
 /**
- * A modal for inviting or editing project members.
+ * A modal for inviting project members.
  */
 export default {
-  name: "ProjectMemberModal",
+  name: "InviteMemberModal",
 };
 </script>
 

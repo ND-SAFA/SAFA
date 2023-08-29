@@ -36,7 +36,7 @@
     </template>
   </selector-table>
 
-  <project-member-modal
+  <invite-member-modal
     :open="!!projectInviteId"
     :project-id="projectInviteId"
     @close="projectInviteId = undefined"
@@ -75,7 +75,7 @@ import {
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
-import { ProjectMemberModal } from "@/components/settings";
+import { InviteMemberModal } from "@/components/members";
 
 const props = defineProps<ProjectSelectorTableProps>();
 

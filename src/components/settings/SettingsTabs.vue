@@ -43,7 +43,7 @@ import {
 } from "@/components/project";
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
-import { ProjectMemberTable } from "./members";
+import { ProjectMemberTable } from "@/components/members";
 
 const tab = ref(SettingsTabTypes.members);
 

@@ -1,7 +1,7 @@
 <template>
   <panel-card
     title="Project Members"
-    subtitle="Manage and invite project members."
+    :subtitle="subtitle"
     :minimal="props.minimal"
   >
     <template #title-actions>
@@ -88,8 +88,10 @@ import {
   IconButton,
   TextButton,
 } from "@/components/common";
-import InviteMemberInputs from "./InviteMemberInputs.vue";
-import MemberRoleButton from "./MemberRoleButton.vue";
+import {
+  InviteMemberInputs,
+  MemberRoleButton,
+} from "@/components/members/save";
 
 const props = defineProps<MinimalProps>();
 
@@ -108,6 +110,10 @@ const userEmail = computed(() => sessionStore.user?.email);
 
 const ownerCount = computed(
   () => rows.value.filter((member) => member.role === ProjectRole.OWNER).length
+);
+
+const subtitle = computed(() =>
+  addMode.value ? "Invite a new member." : "Manage and invite project members."
 );
 
 /**

@@ -1,7 +1,6 @@
 export * from "./common";
 export * from "./account";
 export * from "./project";
-export * from "./settings";
 export * from "./artifactType";
 export * from "./traceMatrix";
 export * from "./artifact";
@@ -13,4 +12,6 @@ export * from "./models";
 export * from "./delta";
 export * from "./attributes";
 export * from "./search";
+export * from "./members";
+export * from "./settings";
 export * from "./organization";

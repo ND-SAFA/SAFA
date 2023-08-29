@@ -53,7 +53,7 @@
         icon="add"
         @click="identifierSaveStore.selectIdentifier(undefined, 'save')"
       />
-      <project-member-modal
+      <invite-member-modal
         :open="!!projectInviteId"
         :project-id="projectInviteId"
         @close="projectInviteId = undefined"
@@ -82,7 +82,7 @@ import {
   useTheme,
 } from "@/hooks";
 import { FlexBox, IconButton, ListItem, TextButton } from "@/components/common";
-import { ProjectMemberModal } from "@/components/settings";
+import { InviteMemberModal } from "@/components/members";
 
 const { darkMode } = useTheme();
 

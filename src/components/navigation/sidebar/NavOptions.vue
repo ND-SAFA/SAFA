@@ -7,6 +7,7 @@
         :data-cy="'button-nav-' + item.label"
         :icon="item.icon"
         :title="item.label"
+        :icon-title="item.iconTitle"
       />
     </template>
   </list>
@@ -24,10 +25,11 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { NavOption } from "@/types";
-import { projectStore } from "@/hooks";
+import { appStore, projectStore } from "@/hooks";
 import { QueryParams, Routes } from "@/router";
 import { List, ListItem, Separator } from "@/components/common";
 
+const sidebarOpen = computed(() => appStore.isAppPanelOpen);
 const hideProjectOptions = computed(() => !projectStore.isProjectDefined);
 
 const options = computed(() => {
@@ -38,16 +40,19 @@ const options = computed(() => {
   const items: NavOption[] = [
     {
       label: "Create Project",
+      iconTitle: !sidebarOpen.value ? "Create" : undefined,
       icon: "nav-create",
       path: Routes.PROJECT_CREATOR,
     },
     {
       label: "Open Project",
+      iconTitle: !sidebarOpen.value ? "Projects" : undefined,
       icon: "nav-open",
       path: Routes.MY_PROJECTS,
     },
     {
       label: "Project View",
+      iconTitle: !sidebarOpen.value ? "View" : undefined,
       icon: "nav-artifact",
       disabled: hideProjectOptions.value,
       divider: true,
@@ -55,6 +60,7 @@ const options = computed(() => {
     },
     {
       label: "Settings",
+      iconTitle: !sidebarOpen.value ? "Settings" : undefined,
       icon: "nav-settings",
       disabled: hideProjectOptions.value,
       path: { path: Routes.PROJECT_SETTINGS, query },

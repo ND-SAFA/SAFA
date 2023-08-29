@@ -13,6 +13,10 @@ export interface NavOption {
    */
   icon: IconVariant;
   /**
+   * A name to optionally display below the icon.
+   */
+  iconTitle?: string;
+  /**
    * If true, a divider will be displayed above this option.
    */
   divider?: boolean;

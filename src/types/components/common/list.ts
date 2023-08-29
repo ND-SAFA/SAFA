@@ -83,6 +83,10 @@ export interface ListItemProps
    */
   iconId?: string;
   /**
+   * A name to optionally display below the icon.
+   */
+  iconTitle?: string;
+  /**
    * The item tooltip.
    * If set to true, a tooltip will be generated based on the title and subtitle.
    */

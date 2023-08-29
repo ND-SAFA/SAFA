@@ -7,10 +7,11 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.summary_jobs.summarize_artifacts_job import SummarizeArtifactsJob
+from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_SECTIONS
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MockResponses
+from tgen.testres.mocking.mock_responses import MOCK_PS_RES_MAP, MockResponses, create
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
 
@@ -52,7 +53,7 @@ class TestSummarizeJob(BaseJobTest):
             responses.append(PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, summary))
         project_summary_components = MockResponses.project_summary_responses
         if resummarize:
-            project_summary_components = [f"{self.RESUMMARIZED} {ps}" for ps in project_summary_components]
+            project_summary_components = [create(t, body_prefix=f"{self.RESUMMARIZED} ") for t in PROJECT_SUMMARY_SECTIONS]
         responses.extend(project_summary_components)
         return responses
 
@@ -71,8 +72,8 @@ class TestSummarizeJob(BaseJobTest):
             else:
                 self.assertIn(self.NL_SUMMARY, artifact[ArtifactKeys.SUMMARY])
         if resummarized:
-            for ev in MockResponses.project_summary_responses:
-                self.assertIn(f"{self.RESUMMARIZED} {ev}", job_result.body["summary"])
+            for ps_section_body in MOCK_PS_RES_MAP.values():
+                self.assertIn(f"{self.RESUMMARIZED} {ps_section_body}", job_result.body["summary"])
 
     def _get_job(self) -> AbstractJob:
         return SummarizeArtifactsJob(self.project.ARTIFACTS)

@@ -14,3 +14,7 @@ PS_SUBSYSTEM_TAG = "sub-system"
 
 PS_DATA_FLOW_TITLE = "Data Flow"
 PS_DATA_FLOW_TAG = "data-flow"
+
+PS_QUESTIONS_HEADER = "\n\n# Questions\n"
+PROJECT_SUMMARY_FILE_NAME = "project_summary.txt"
+PS_DEFAULT_SAVE_PROGRESS = True

@@ -14,7 +14,7 @@ from tgen.delta.steps.impact_analysis_step import ImpactAnalysisStep
 from tgen.delta.steps.individual_diff_summary_step import IndividualDiffSummaryStep
 from tgen.delta.steps.overview_change_summary_step import OverviewChangeSummaryStep
 from tgen.delta.steps.project_summary_step import ProjectSummaryStep
-from tgen.summarizer.project_summarizer import ProjectSummarizer
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager

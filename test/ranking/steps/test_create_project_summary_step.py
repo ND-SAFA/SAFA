@@ -3,7 +3,7 @@ from typing import Any, List, Union
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MockResponses
+from tgen.testres.mocking.mock_responses import MOCK_PS_RES_MAP, MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
@@ -14,7 +14,7 @@ class TestCreateProjectSummary(BaseTest):
     """
     Requirements: https://www.notion.so/nd-safa/step_create_project_summary-e67877b280d144ec8007a2062a2d3936?pvs=4
     """
-    PROJECT_SUMMARY = MockResponses.project_summary_responses
+    PROJECT_SUMMARY = list(MOCK_PS_RES_MAP.values())
 
     @mock_anthropic
     def test_generate_project_summary(self, ai_manager: TestAIManager):

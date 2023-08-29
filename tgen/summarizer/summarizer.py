@@ -3,7 +3,7 @@ import os
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from tgen.summarizer.project_summarizer import ProjectSummarizer
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 
 ARTIFACT_FILE_NAME = "artifacts.csv"

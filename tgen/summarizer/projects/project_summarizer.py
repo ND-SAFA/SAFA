@@ -1,8 +1,6 @@
-import os
-
+from tgen.common.constants.project_summary_constants import PS_QUESTIONS_HEADER
 from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
@@ -14,12 +12,11 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_CONTEXT_PROMPT, PROJECT_SUMMARY_TAGS, \
-    PROJECT_SUMMARY_TASKS
+from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_CONTEXT_PROMPT, \
+    PROJECT_SUMMARY_TAGS
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.projects.project_summary import ProjectSummary
 from tgen.summarizer.summarizer_args import SummarizerArgs
-
-PROJECT_SUMMARY_FILE_NAME = "project_summary.txt"
 
 
 class ProjectSummarizer(BaseObject):
@@ -47,8 +44,8 @@ class ProjectSummarizer(BaseObject):
         if self.args.summarize_artifacts:
             self.artifact_df.summarize_content(ArtifactsSummarizer())
 
-        summary = ""
-        for task_title, task_prompt in PROJECT_SUMMARY_TASKS.items():
+        project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True)
+        for task_title, task_prompt in project_summary.get_generation_iterator():
             logger.log_step(f"Creating section: `{task_title}`")
             artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
                                                    build_method=MultiArtifactPrompt.BuildMethod.XML,
@@ -57,10 +54,11 @@ class ProjectSummarizer(BaseObject):
                                                     artifacts_prompt,
                                                     task_prompt])
 
-            if len(summary) > 0:
-                prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{summary}"), 1)
+            if project_summary.has_summary():
+                current_summary = project_summary.get_summary()
+                prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}"), 1)
 
-            task_prompt.set_instructions(f"\n\n# Questions\n")
+            task_prompt.set_instructions(PS_QUESTIONS_HEADER)
 
             self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
             self.llm_manager.llm_args.temperature = 0
@@ -75,9 +73,10 @@ class ProjectSummarizer(BaseObject):
 
             task_body = parsed_response[0] if len(parsed_response) <= 1 else "\n".join(parsed_response)
             task_section = f"{PromptUtil.as_markdown_header(task_title)}\n{task_body}"
-            summary += task_section if len(task_section) == 0 else f"\n{task_section}"
+            task_section_body = task_section if len(task_section) == 0 else f"\n{task_section}"
 
-            if self.export_dir:
-                summary_export_path = os.path.join(self.export_dir, PROJECT_SUMMARY_FILE_NAME)
-                FileUtil.write(summary, summary_export_path)
+            project_summary.set_section_body(task_title, task_section_body)
+            project_summary.save()
+
+        summary = project_summary.get_summary(raise_exception_on_not_found=True)
         return summary

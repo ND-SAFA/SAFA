@@ -8,6 +8,22 @@ from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
+PROJECT_SUMMARY_SECTIONS = [
+    PS_FEATURE_TITLE,
+    PS_ENTITIES_TITLE,
+    PS_SUBSYSTEM_TITLE,
+    PS_DATA_FLOW_TITLE,
+    PS_OVERVIEW_TITLE
+]
+
+PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER = [
+    PS_OVERVIEW_TITLE,
+    PS_FEATURE_TITLE,
+    PS_ENTITIES_TITLE,
+    PS_SUBSYSTEM_TITLE,
+    PS_DATA_FLOW_TITLE
+]
+
 PROJECT_SUMMARY_CONTEXT_PROMPT = Prompt((
     "# Goal\n"
     "You are creating an complete document detailing the software system below."
@@ -24,7 +40,7 @@ PROJECT_SUMMARY_TAGS = {
     PS_DATA_FLOW_TITLE: PS_DATA_FLOW_TAG
 }
 
-PROJECT_SUMMARY_TASKS = {
+PROJECT_SUMMARY_MAP = {
     PS_OVERVIEW_TITLE: QuestionnairePrompt(question_prompts=[
         QuestionPrompt("Write a set of bullet points indicating what is important in the system.",
                        response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
@@ -33,7 +49,7 @@ PROJECT_SUMMARY_TASKS = {
                        "Assume your reader is someone unfamiliar with the system.",
                        response_manager=PromptResponseManager(response_tag=PS_OVERVIEW_TAG))
     ]),
-    "Features": QuestionnairePrompt(question_prompts=[
+    PS_FEATURE_TITLE: QuestionnairePrompt(question_prompts=[
         QuestionPrompt("Make a list of all the different features present in the system.",
                        response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
         QuestionPrompt("Using your notes, list all the features of the system as formal system requirements. "
@@ -41,14 +57,14 @@ PROJECT_SUMMARY_TASKS = {
                        "Be as thorough as you possibly can.",
                        response_manager=PromptResponseManager(response_tag=PS_FEATURE_TAG))
     ]),
-    "Entities": QuestionnairePrompt(question_prompts=[
+    PS_ENTITIES_TITLE: QuestionnairePrompt(question_prompts=[
         QuestionPrompt("For each feature, list all the domain entities that are needed for it.",
                        response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
         QuestionPrompt("Using your notes, create a comprehensive list of all domain entities used in the system. "
                        "Format each entity as `{name}: {description}`.",
                        response_manager=PromptResponseManager(response_tag=PS_ENTITIES_TAG))
     ]),
-    "Sub-Systems": QuestionnairePrompt(question_prompts=[
+    PS_SUBSYSTEM_TITLE: QuestionnairePrompt(question_prompts=[
         QuestionPrompt("Create a set of sub-systems that group the similar features. "
                        "Similar features will use related domain entities and work to accomplish shared goals. "
                        "For each sub-system describe: "
@@ -61,7 +77,7 @@ PROJECT_SUMMARY_TASKS = {
                        response_manager=PromptResponseManager(response_tag=PS_SUBSYSTEM_TAG,
                                                               response_instructions_format="Enclose each sub-system in {}."))
     ]),
-    "Data Flow": QuestionnairePrompt(question_prompts=[
+    PS_DATA_FLOW_TITLE: QuestionnairePrompt(question_prompts=[
         QuestionPrompt("For each feature, describe:"
                        "\n    - What input data does it need?"
                        "\n    - What output data does it produce?"
@@ -73,4 +89,3 @@ PROJECT_SUMMARY_TASKS = {
             response_manager=PromptResponseManager(response_tag="data-flow"))
     ])
 }
-PROJECT_SUMMARY_SECTIONS = list(PROJECT_SUMMARY_TASKS.keys())

@@ -1,9 +1,8 @@
-from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TITLE, PS_ENTITIES_TITLE, \
+from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_DATA_FLOW_TITLE, PS_ENTITIES_TITLE, \
     PS_FEATURE_TITLE, \
     PS_NOTES_TAG, \
     PS_OVERVIEW_TITLE, PS_SUBSYSTEM_TITLE
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_TAGS
 
 MOCK_PS_RES_MAP = {
     PS_OVERVIEW_TITLE: "project_overview",

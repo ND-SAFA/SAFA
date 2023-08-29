@@ -8,22 +8,6 @@ from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
-PROJECT_SUMMARY_SECTIONS = [
-    PS_FEATURE_TITLE,
-    PS_ENTITIES_TITLE,
-    PS_SUBSYSTEM_TITLE,
-    PS_DATA_FLOW_TITLE,
-    PS_OVERVIEW_TITLE
-]
-
-PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER = [
-    PS_OVERVIEW_TITLE,
-    PS_FEATURE_TITLE,
-    PS_ENTITIES_TITLE,
-    PS_SUBSYSTEM_TITLE,
-    PS_DATA_FLOW_TITLE
-]
-
 PROJECT_SUMMARY_CONTEXT_PROMPT = Prompt((
     "# Goal\n"
     "You are creating an complete document detailing the software system below."
@@ -31,14 +15,6 @@ PROJECT_SUMMARY_CONTEXT_PROMPT = Prompt((
     f"The goal is to read through all the artifacts and the current document progress "
     f"to accurately and exhaustively answer the questions."
 ))
-
-PROJECT_SUMMARY_TAGS = {
-    PS_OVERVIEW_TITLE: PS_OVERVIEW_TAG,
-    PS_FEATURE_TITLE: PS_FEATURE_TAG,
-    PS_ENTITIES_TITLE: PS_ENTITIES_TAG,
-    PS_SUBSYSTEM_TITLE: PS_SUBSYSTEM_TAG,
-    PS_DATA_FLOW_TITLE: PS_DATA_FLOW_TAG
-}
 
 PROJECT_SUMMARY_MAP = {
     PS_OVERVIEW_TITLE: QuestionnairePrompt(question_prompts=[
@@ -82,10 +58,10 @@ PROJECT_SUMMARY_MAP = {
                        "\n    - What input data does it need?"
                        "\n    - What output data does it produce?"
                        "\n    - What features does it depend on?",
-                       response_manager=PromptResponseManager(response_tag="notes")),
+                       response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
         QuestionPrompt(
             "Using your notes, create a polished description of how data flows throughout the system to accomplish all of its features. "
             "Use an activate voice and group your thoughts into 2-3 paragraphs.",
-            response_manager=PromptResponseManager(response_tag="data-flow"))
+            response_manager=PromptResponseManager(response_tag=PS_DATA_FLOW_TAG))
     ])
 }

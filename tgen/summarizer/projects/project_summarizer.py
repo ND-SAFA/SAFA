@@ -1,4 +1,4 @@
-from tgen.common.constants.project_summary_constants import PS_QUESTIONS_HEADER
+from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_QUESTIONS_HEADER
 from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
@@ -12,8 +12,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_CONTEXT_PROMPT, \
-    PROJECT_SUMMARY_TAGS
+from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_CONTEXT_PROMPT
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.projects.project_summary import ProjectSummary
 from tgen.summarizer.summarizer_args import SummarizerArgs

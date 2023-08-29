@@ -1,5 +1,6 @@
 from typing import List
 
+from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -7,7 +8,6 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.summary_jobs.summarize_artifacts_job import SummarizeArtifactsJob
-from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_SECTIONS
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic

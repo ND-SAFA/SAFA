@@ -1,26 +1,29 @@
 import os
 from typing import List
 
-from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_FILE_NAME, PS_DEFAULT_SAVE_PROGRESS
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER, \
+    PS_DEFAULT_SAVE_PROGRESS, PS_FILE_NAME, PS_STATE_FILE_NAME
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_MAP, \
-    PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
+from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_MAP
 
 
 class ProjectSummary:
-    def __init__(self, export_dir: str = None, project_summary_file_name: str = PROJECT_SUMMARY_FILE_NAME,
-                 save_progress: bool = PS_DEFAULT_SAVE_PROGRESS):
+    def __init__(self, export_dir: str = None, save_progress: bool = PS_DEFAULT_SAVE_PROGRESS,
+                 project_summary_file_name: str = PS_FILE_NAME, state_file_name: str = PS_STATE_FILE_NAME):
         """
         Constructs project summary to save at export path.
         :param export_dir: The path to the directory to export to.
         :param project_summary_file_name: The name of the file to save summary to.
         :param save_progress: Whether to save anytime there are changes to the project summary.
         """
-        self.header_map = {}
+        self.ps_state = {}
         self.export_dir = export_dir
-        self.artifact_file_name = project_summary_file_name
         self.save_progress = save_progress
+        self.ps_file_name = project_summary_file_name
+        self.state_file_name = state_file_name
 
     @staticmethod
     def get_generation_iterator():
@@ -39,7 +42,7 @@ class ProjectSummary:
         :param body: The body of the section.
         :return: None
         """
-        self.header_map[title] = body
+        self.ps_state[title] = body
         if self.save_progress:
             self.save()
 
@@ -51,32 +54,43 @@ class ProjectSummary:
         :param raise_exception_on_not_found: Whether to raise an error if a header if not in the map.
         :return: String representing project summary.
         """
-        summary = ""
+        summary = EMPTY_STRING
         for header in headers:
-            if header in self.header_map:
-                header_body = self.header_map[header]
+            if header in self.ps_state:
+                header_body = self.ps_state[header]
                 summary += f"{PromptUtil.as_markdown_header(header)}\n{header_body}"
             else:
                 if raise_exception_on_not_found:
-                    raise Exception(f"Header {header} is not in: {self.header_map}")
+                    raise Exception(f"Header {header} is not in: {self.ps_state}")
 
         return summary.strip()
-
-        summary_export_path = os.path.join(self.export_dir, PROJECT_SUMMARY_FILE_NAME)
-        FileUtil.write(summary, summary_export_path)
 
     def has_summary(self) -> bool:
         """
         :return: Returns whether summary has any content.
         """
-        return len(self.header_map) > 0
+        return len(self.ps_state) > 0
 
     def save(self) -> None:
         """
-        Saves the project summary to its export path.
+        Saves the project summary and state to the export directory.
         :return: None
         """
         if self.export_dir:
             summary = self.get_summary()
-            summary_export_path = os.path.join(self.export_dir, PROJECT_SUMMARY_FILE_NAME)
-            FileUtil.write(summary, summary_export_path)
+            ps_file_path = os.path.join(self.export_dir, self.ps_file_name)
+            ps_state_path = os.path.join(self.export_dir, self.state_file_name)
+
+            FileUtil.write(summary, ps_file_path)
+            FileUtil.write(self.ps_state, ps_state_path)
+
+    def load(self, load_dir: str = None) -> None:
+        """
+        Loads project summary from the directory.
+        :param load_dir: Path to directory containing project summary.
+        :return: None
+        """
+        if load_dir is None:
+            load_dir = self.export_dir
+        ps_state_path = os.path.join(load_dir, self.state_file_name)
+        self.ps_state = JsonUtil.read_json_file(ps_state_path)

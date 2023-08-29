@@ -1,20 +1,20 @@
 <template>
-  <div>
-    <div class="nav-job-icon">
-      <q-circular-progress
-        v-if="displayInProgressJobs"
-        :color="color"
-        indeterminate
-        size="md"
-      />
-    </div>
-    <q-btn round flat @click="handleClearNewMessages">
-      <icon variant="notification" />
-      <q-tooltip :delay="200">View notifications</q-tooltip>
+  <list-item to="" title="Notifications" clickable @click="open = true">
+    <template #icon>
+      <div class="nav-job-icon">
+        <q-circular-progress
+          v-if="displayInProgressJobs"
+          :color="color"
+          indeterminate
+          size="md"
+        />
+      </div>
+      <icon variant="notification" size="sm" />
       <q-badge v-if="displayUpdates" :color="color" floating rounded>
         {{ updates }}
       </q-badge>
-      <q-menu>
+
+      <q-menu v-model="open">
         <list v-if="displayRecentJobs" class="nav-notifications q-pa-sm">
           <typography variant="caption" value="Jobs" />
 
@@ -87,8 +87,8 @@
           </list-item>
         </list>
       </q-menu>
-    </q-btn>
-  </div>
+    </template>
+  </list-item>
 </template>
 
 <script lang="ts">
@@ -108,6 +108,7 @@ import { navigateTo, Routes } from "@/router";
 import { Typography, Icon, List, ListItem } from "@/components/common";
 
 const viewedMessages = ref(0);
+const open = ref(false);
 
 const notifications = computed(() => logStore.notifications);
 const newNotifications = computed(() =>

@@ -6,11 +6,7 @@
       </template>
     </list-item>
 
-    <list-item to="" title="Notifications">
-      <template #icon>
-        <notifications />
-      </template>
-    </list-item>
+    <notifications />
 
     <list-item
       :to="Routes.ORG"

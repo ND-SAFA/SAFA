@@ -110,7 +110,7 @@ class DataFrameUtil:
         :return: The column value if exists, otherwise None is returned.
         """
         potential_value = row.get(col_name, None)
-        return DataFrameUtil.get_optional_value(allow_empty, potential_value)
+        return DataFrameUtil.get_optional_value(potential_value, allow_empty)
 
     @staticmethod
     def get_optional_value(potential_value: Any, allow_empty: bool = True) -> Optional[Any]:

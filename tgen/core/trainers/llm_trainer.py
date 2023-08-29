@@ -46,8 +46,7 @@ class LLMTrainer(AbstractTrainer):
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(self.llm_manager,
-                                                             prompt_builder=self.prompt_builder,
-                                                             summarizer=self.summarizer)
+                                                             prompt_builder=self.prompt_builder)
         custom_params = {}
         instructions = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
@@ -57,8 +56,7 @@ class LLMTrainer(AbstractTrainer):
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
             custom_params[OpenAIParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 self.llm_manager,
-                prompt_builder=self.prompt_builder,
-                summarizer=self.summarizer)
+                prompt_builder=self.prompt_builder)
 
         res = self.llm_manager.make_fine_tune_request(completion_type=completion_type, training_file=training_file_id,
                                                       instructions=instructions, **custom_params)

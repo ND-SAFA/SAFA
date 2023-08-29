@@ -95,18 +95,15 @@ class PromptDataset(iDataset):
         prompt_df.to_json(export_path, orient='records', lines=True)
         return export_path, should_delete
 
-    def get_project_file_id(self, llm_manager: AbstractLLMManager, prompt_builder: PromptBuilder = None,
-                            summarizer: ArtifactsSummarizer = None) -> str:
+    def get_project_file_id(self, llm_manager: AbstractLLMManager, prompt_builder: PromptBuilder = None) -> str:
         """
         Gets the project file id used by open_ai
         :param llm_manager: The manager of the model that will use the prompts dataset
         :param prompt_builder: The generator of prompts for the dataset
-        :param summarizer: If provided, summarizes prompts that exceed the token limit
         :return: The project file id used by open_ai
         """
         if not self.project_file_id:
-            prompt_df = self.get_prompt_dataframe(prompt_builder=prompt_builder, prompt_args=llm_manager.prompt_args,
-                                                  summarizer=summarizer)
+            prompt_df = self.get_prompt_dataframe(prompt_builder=prompt_builder, prompt_args=llm_manager.prompt_args)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
             res = llm_manager.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id

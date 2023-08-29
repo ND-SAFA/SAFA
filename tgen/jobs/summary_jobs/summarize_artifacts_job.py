@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import pandas as pd
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
@@ -35,6 +36,7 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         self.do_resummarize_project = do_resummarize_project
         self.is_subset = is_subset
         self.trace_df = None if trace_file_path is None else TraceDataFrame(pd.read_csv(trace_file_path))
+        project_summary = FileUtil.get_str_or_read(project_summary)
         super().__init__(artifacts=artifacts, artifact_reader=artifact_reader,
                          project_summary=project_summary, export_dir=export_dir, job_args=job_args,
                          do_resummarize_project=do_resummarize_project,

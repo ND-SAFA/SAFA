@@ -83,7 +83,7 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
             context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
             prompt_builder.add_prompt(Prompt(context_formatted))
 
-        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown_header(args.artifact_header),
+        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(args.artifact_header),
                                                       build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                       include_ids=True))
 

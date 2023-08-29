@@ -70,8 +70,8 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                 content.append(parent)
             if include_original:
                 original = args.dataset.artifact_df.get_artifact(a_id)[ArtifactKeys.CONTENT]
-                content.extend([PromptUtil.format_as_markdown_header(IndividualDiffSummaryStep.ORIGINAL_TITLE), original])
-            content.extend([PromptUtil.format_as_markdown_header(IndividualDiffSummaryStep.DIFF_TITLE), filename2diffs[a_id]])
+                content.extend([PromptUtil.as_markdown_header(IndividualDiffSummaryStep.ORIGINAL_TITLE), original])
+            content.extend([PromptUtil.as_markdown_header(IndividualDiffSummaryStep.DIFF_TITLE), filename2diffs[a_id]])
             contents.append(f'{NEW_LINE}{NEW_LINE.join(content)}{NEW_LINE}')
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ids,
                                          ArtifactKeys.CONTENT: contents,
@@ -116,5 +116,5 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                    for i, link in links.itertuples()]
         content = NEW_LINE.join(parents)
         if content:
-            return f"{PromptUtil.format_as_markdown_header(IndividualDiffSummaryStep.CONTEXT_TITLE)}{NEW_LINE}{content}"
+            return f"{PromptUtil.as_markdown_header(IndividualDiffSummaryStep.CONTEXT_TITLE)}{NEW_LINE}{content}"
         return EMPTY_STRING

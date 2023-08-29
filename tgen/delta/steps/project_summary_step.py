@@ -2,7 +2,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.summarizer.project_summarizer import ProjectSummarizer
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 
 

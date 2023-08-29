@@ -96,7 +96,6 @@ class CodeTracer:
                     for parent_path in parent_map[child_base]:
                         t_link = TracePredictionEntry(source=child_path,
                                                       target=parent_path,
-                                                      score=1,
                                                       label=1,
                                                       explanation=HEADER_FILE_EXPLANATION)
                         links.append(t_link)

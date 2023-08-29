@@ -6,7 +6,7 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.base_summarizer_job import BaseSummarizerJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.summarizer.project_summarizer import ProjectSummarizer
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 
 
 class ProjectSummaryJob(BaseSummarizerJob):

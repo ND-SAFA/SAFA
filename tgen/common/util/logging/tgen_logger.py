@@ -1,6 +1,7 @@
 from logging import Logger
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.util.prompt_util import PromptUtil
 
 
 class TGenLogger(Logger):
@@ -30,10 +31,31 @@ class TGenLogger(Logger):
         title_formatted = TGenLogger.__create_title(title)
         self.info(title_formatted)
 
+    def log_step(self, step: str) -> None:
+        """
+        Logs the message as a new step.
+        :param step: The name of the step.
+        :return: None
+        """
+        step_formatted = TGenLogger.__create_step(step)
+        self.info(step_formatted)
+
     @staticmethod
     def __create_title(title: str):
-        prefix_len = int((TGenLogger.DEFAULT_TITLE_LENGTH - len(title)) / 2)
-        prefix_len = max(prefix_len, 0)
-        title_border = '-' * prefix_len
-        title = f"{title_border} {title} {title_border}".strip()
+        """
+        Logs the message as a new title in the logs.
+        :param title: The title name.
+        :return: Title formatted as markdown header.
+        """
+        title = f"{PromptUtil.as_markdown_header(title)}".strip()
         return title
+
+    @staticmethod
+    def __create_step(step: str) -> str:
+        """
+        Logs the message as a new step in the logs.
+        :param step: The name of the step.
+        :return: Step formatted as markdown header.
+        """
+        formatted_step = f"{PromptUtil.as_markdown_header(step, 2)}"
+        return formatted_step

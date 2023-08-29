@@ -1,5 +1,5 @@
+from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import NEW_LINE, COMMA, EMPTY_STRING
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -56,7 +56,7 @@ DIFF_SUMMARY_STARTER_PROMPT = Prompt(f"You are an expert on a software project a
                                                      f"{NEW_LINE}" + "{context}")
 DIFF_SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=DIFF_SUMMARY_TASKS,
-    instructions=f"{PromptUtil.format_as_markdown_header('TASKS:')}{NEW_LINE}"
+    instructions=f"{PromptUtil.as_markdown_header('TASKS:')}{NEW_LINE}"
                  f"Complete the following tasks based on your understanding of the change to this project. ")
 
 CHANGE_SUMMARY_STARTER_PROMPT = Prompt(
@@ -95,7 +95,7 @@ CHANGE_SUMMARY_TASKS = {
 
 CHANGE_SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=CHANGE_SUMMARY_TASKS,
-    instructions=f"{NEW_LINE}{PromptUtil.format_as_markdown_header(f'TASKS:')}{NEW_LINE}"
+    instructions=f"{NEW_LINE}{PromptUtil.as_markdown_header(f'TASKS:')}{NEW_LINE}"
                  f"Complete the following tasks based on your understanding of the changes to this project. ")
 
 IMPACTS_PROMPT = Prompt("TASK: Based on your understanding of the system, the changes, and their potential impacts, "

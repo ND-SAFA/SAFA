@@ -25,7 +25,7 @@ import { computed } from "vue";
 import { PanelType } from "@/types";
 import { projectApiStore, identifierSaveStore, appStore } from "@/hooks";
 import { Modal } from "@/components/common";
-import { SaveProjectInputs } from "../base";
+import SaveProjectInputs from "./SaveProjectInputs.vue";
 
 const open = computed(() => appStore.isProjectCreatorOpen);
 const isUpdate = computed(() => identifierSaveStore.isUpdate);

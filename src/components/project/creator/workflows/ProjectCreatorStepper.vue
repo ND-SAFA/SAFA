@@ -48,7 +48,7 @@ import { StepperStep } from "@/types";
 import { createProjectApiStore, projectSaveStore } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
 import { TimTree } from "@/components/graph";
-import { ProjectIdentifierInput } from "@/components/project/base";
+import { ProjectIdentifierInput } from "@/components/project/save";
 import { FilePanelList } from "@/components/project/creator/steps";
 
 const currentRoute = useRoute();

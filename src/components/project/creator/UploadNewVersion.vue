@@ -31,7 +31,7 @@ import { ref, watch } from "vue";
 import { OpenableProps } from "@/types";
 import { createVersionApiStore, projectStore } from "@/hooks";
 import { SwitchInput, PanelCard, TextButton } from "@/components/common";
-import { ProjectFilesInput } from "../base";
+import { ProjectFilesInput } from "../save";
 
 const props = defineProps<OpenableProps>();
 

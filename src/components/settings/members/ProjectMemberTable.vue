@@ -4,7 +4,18 @@
     subtitle="Manage and invite project members."
     :minimal="props.minimal"
   >
+    <template #title-actions>
+      <text-button
+        v-if="addMode"
+        text
+        label="Cancel"
+        icon="cancel"
+        @click="handleClose"
+      />
+    </template>
+
     <selector-table
+      v-if="!addMode"
       :columns="membersColumns"
       :rows="rows"
       row-key="email"
@@ -40,12 +51,12 @@
         />
       </template>
     </selector-table>
-    <project-member-modal
-      :open="modalOpen"
+
+    <invite-member-inputs
+      v-else
       :project-id="projectStore.projectId"
       :email="addedMember"
-      @close="handleClose"
-      @submit="handleClose"
+      @save="handleClose"
     />
   </panel-card>
 </template>
@@ -71,14 +82,19 @@ import {
   projectStore,
   sessionStore,
 } from "@/hooks";
-import { PanelCard, SelectorTable, IconButton } from "@/components/common";
-import ProjectMemberModal from "./ProjectMemberModal.vue";
+import {
+  PanelCard,
+  SelectorTable,
+  IconButton,
+  TextButton,
+} from "@/components/common";
+import InviteMemberInputs from "./InviteMemberInputs.vue";
 import MemberRoleButton from "./MemberRoleButton.vue";
 
 const props = defineProps<MinimalProps>();
 
 const addedMember = ref<string | null>(null);
-const modalOpen = ref(false);
+const addMode = ref(false);
 
 const project = computed(() => projectStore.project);
 
@@ -108,7 +124,7 @@ async function handleRefresh(): Promise<void> {
  */
 function handleClose(): void {
   addedMember.value = "";
-  modalOpen.value = false;
+  addMode.value = false;
 }
 
 /**
@@ -117,7 +133,7 @@ function handleClose(): void {
  */
 function handleAdd(email: string | null): void {
   addedMember.value = email;
-  modalOpen.value = true;
+  addMode.value = true;
 }
 
 /**

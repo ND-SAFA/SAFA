@@ -23,10 +23,10 @@
 
 <script lang="ts">
 /**
- * A modal for inviting or editing project members.
+ * A dropdown button for editing member roles.
  */
 export default {
-  name: "ProjectMemberModal",
+  name: "MemberRoleButton",
 };
 </script>
 

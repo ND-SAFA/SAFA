@@ -29,6 +29,20 @@ export interface ProjectMemberModalProps extends OpenableProps {
 }
 
 /**
+ * The props for inputs to invite a new member to a project.
+ */
+export interface InviteMemberInputsProps {
+  /**
+   * The email to invite, setting add mode.
+   */
+  email?: string | null;
+  /**
+   * The project id to invite the member to, if in add mode.
+   */
+  projectId?: string;
+}
+
+/**
  * The props for displaying a project member edit role button.
  */
 export interface MemberRoleButtonProps {

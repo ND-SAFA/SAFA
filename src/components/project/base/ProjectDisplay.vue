@@ -11,43 +11,51 @@
     </template>
 
     <div v-if="!editMode">
-      <typography variant="caption" :value="versionLabel" />
-      <br />
+      <flex-box full-width justify="between">
+        <attribute-chip :value="versionLabel" />
+        <div>
+          <attribute-chip :value="artifactLabel" icon="artifact" />
+          <attribute-chip :value="traceLabel" icon="trace" />
+        </div>
+      </flex-box>
+
+      <typography variant="caption" value="Description" />
       <typography
         ep="p"
         variant="expandable"
         :value="description"
         default-expanded
       />
-      <div class="q-mt-md">
-        <flex-box wrap b="2">
-          <div class="q-mb-sm">
-            <attribute-chip :value="artifactLabel" icon="artifact" />
-          </div>
-          <div class="q-mb-sm">
-            <attribute-chip :value="traceLabel" icon="trace" />
-          </div>
-        </flex-box>
+
+      <expansion-item label="Artifact Types">
         <flex-box
-          v-for="direction in typeDirections"
-          :key="direction[0]"
-          wrap
-          b="2"
-          align="center"
+          v-for="[parent, children] in artifactTypeMap"
+          :key="parent"
+          column
+          t="2"
         >
-          <attribute-chip artifact-type :value="direction[0]" />
-          <flex-box wrap>
+          <attribute-chip artifact-type :value="parent" />
+          <flex-box l="4">
             <icon
               class="q-mx-xs q-mt-xs"
               size="sm"
-              color="primary"
+              color="text"
               variant="trace"
+              :rotate="-90"
             />
-            <attribute-chip artifact-type :value="direction[1]" />
+            <flex-box column>
+              <attribute-chip
+                v-for="child in children"
+                :key="child"
+                artifact-type
+                :value="child"
+              />
+            </flex-box>
           </flex-box>
         </flex-box>
-      </div>
+      </expansion-item>
     </div>
+
     <save-project-inputs
       v-else
       @save="appStore.closePanel(PanelType.projectEditor)"
@@ -77,6 +85,7 @@ import {
   Icon,
   TextButton,
 } from "@/components/common";
+import ExpansionItem from "@/components/common/display/list/ExpansionItem.vue";
 import SaveProjectInputs from "./SaveProjectInputs.vue";
 
 const editMode = computed(() => appStore.isProjectEditorOpen);
@@ -97,7 +106,18 @@ const description = computed(
   () => project.value.description || "No Description."
 );
 
-const typeDirections = computed(() =>
-  timStore.traceMatrices.map((matrix) => [matrix.sourceType, matrix.targetType])
+const artifactTypeMap = computed(() =>
+  Object.entries(
+    timStore.traceMatrices.reduce(
+      (acc, matrix) => ({
+        ...acc,
+        [matrix.targetType]: [
+          ...(acc[matrix.targetType] || []),
+          matrix.sourceType,
+        ],
+      }),
+      {} as Record<string, string[]>
+    )
+  )
 );
 </script>

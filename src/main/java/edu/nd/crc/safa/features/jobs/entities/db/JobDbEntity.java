@@ -113,7 +113,6 @@ public class JobDbEntity {
     UUID completedEntityId;
 
     @Column(name = "task_id", nullable = true)
-    @Type(type = "uuid-char")
     UUID taskId;
 
     public JobDbEntity(SafaUser user,

@@ -55,15 +55,13 @@ public class JobService {
      */
     public void deleteJob(UUID jobId) {
         Optional<JobDbEntity> optionalJobDbEntity = this.jobDbRepository.findById(jobId);
-        if (optionalJobDbEntity.isEmpty()) {
-            return;
-        }
-        JobDbEntity jobDbEntity = optionalJobDbEntity.get();
-        this.jobDbRepository.deleteById(jobId);
-        UUID taskId = jobDbEntity.getTaskId();
-        if (taskId != null) {
-            this.genApi.cancelJob(taskId);
-        }
+        optionalJobDbEntity.ifPresent(jobDbEntity -> {
+            UUID taskId = jobDbEntity.getTaskId();
+            this.jobDbRepository.deleteById(jobId);
+            if (taskId != null) {
+                this.genApi.cancelJob(taskId);
+            }
+        });
     }
 
     /**

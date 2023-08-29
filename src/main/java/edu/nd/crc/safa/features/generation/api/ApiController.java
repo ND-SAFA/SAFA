@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.generation.api;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import edu.nd.crc.safa.config.TGenConfig;
@@ -8,7 +9,6 @@ import edu.nd.crc.safa.features.common.RequestService;
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
@@ -44,12 +44,12 @@ public class ApiController {
                                                   JobLogger logger) {
         TGenTask<T> task = this.requestService.sendPost(endpoint, payload, TGenTask.class);
         task.setResponseClass(responseClass);
-        if (logger != null) {
-            JobDbEntity job = logger.getJob();
-            this.jobService.setJobTask(job, task.getTaskId());
-        }
-        return pollTGenTask(task, status -> writeLogs(logger, status), MAX_DURATION, WAIT_SECONDS);
+        setTaskId(logger, task.getTaskId());
+        T result = pollTGenTask(task, status -> writeLogs(logger, status), MAX_DURATION, WAIT_SECONDS);
+        setTaskId(logger, null);
+        return result;
     }
+
 
     /**
      * Polls the task status until complete. Throws error if failure occurs to job or while getting status.
@@ -169,5 +169,17 @@ public class ApiController {
             return logger.log(message);
         }
         return null;
+    }
+
+    /**
+     * Sets the current task on job associated with logger.
+     *
+     * @param logger The logger potentially containing job.
+     * @param taskID The ID of the task to associated with job.
+     */
+    private void setTaskId(JobLogger logger, UUID taskID) {
+        if (logger != null) {
+            this.jobService.setJobTask(logger.getJob(), taskID);
+        }
     }
 }

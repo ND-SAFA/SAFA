@@ -1,4 +1,4 @@
 ALTER TABLE job
-    ADD COLUMN task_id VARCHAR(255) NULL;
+    ADD COLUMN task_id BINARY(16) NULL;
 
 

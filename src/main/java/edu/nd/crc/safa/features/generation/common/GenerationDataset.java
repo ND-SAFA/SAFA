@@ -68,8 +68,8 @@ public class GenerationDataset {
     public int getNumOfCandidates() {
         int nCandidates = 0;
         for (TraceLayer layer : this.layers) {
-            List<String> childArtifacts = this.getArtifactBodies(layer.getChild());
-            List<String> parentArtifacts = this.getArtifactBodies(layer.getParent());
+            List<GenerationArtifact> childArtifacts = this.getArtifacts(layer.getChild());
+            List<GenerationArtifact> parentArtifacts = this.getArtifacts(layer.getParent());
             nCandidates += childArtifacts.size() * parentArtifacts.size();
         }
         return nCandidates;

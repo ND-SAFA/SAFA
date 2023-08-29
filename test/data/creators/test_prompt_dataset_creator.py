@@ -5,21 +5,21 @@ from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.mocking.mock_openai import mock_openai
 from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 
@@ -41,7 +41,8 @@ class TestPromptDatasetCreator(BaseTest):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
-                                                          summarizer=ArtifactsSummarizer(llm_manager, code_or_exceeds_limit_only=False))
+                                                          summarizer=ArtifactsSummarizer(llm_manager,
+                                                                                         code_or_exceeds_limit_only=False))
 
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=ArtifactTestProject.get_artifact_entries())
 
@@ -104,9 +105,9 @@ class TestPromptDatasetCreator(BaseTest):
         prompt_dataset: PromptDataset = dataset_creator.create()
         for row in expected_entries:
             row[ArtifactKeys.SUMMARY.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
-        artifacts_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \
+        artifact_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \
             else prompt_dataset.trace_dataset.artifact_df
-        TestAssertions.verify_entities_in_df(self, expected_entries, artifacts_df)
+        TestAssertions.verify_entities_in_df(self, expected_entries, artifact_df)
 
     @staticmethod
     def get_prompt_dataset_creator(**params):

@@ -5,9 +5,10 @@
         {
           "object_type": "ARTIFACT_SUMMARY",
           "artifact_reader": {
-            "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+            "project_path": "[DATA_PATH]/[CURRENT_PROJECT]/safa-export"
           },
-          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/summaries"
+          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/summaries",
+          "trace_file_path": "[DATA_PATH]/[CURRENT_PROJECT]/df-export/trace_df.csv"
         }
       ]
     }

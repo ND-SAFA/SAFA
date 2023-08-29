@@ -1,11 +1,18 @@
+import os
+from copy import deepcopy
 from typing import Any, Dict, List
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+import pandas as pd
+
+from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.base_summarizer_job import BaseSummarizerJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
-from tgen.summarizer.summarizer import Summarizer
+from tgen.summarizer.summarizer import ARTIFACT_FILE_NAME, Summarizer
 
 
 class SummarizeArtifactsJob(BaseSummarizerJob):
@@ -15,7 +22,7 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
 
     def __init__(self, artifacts: List[Dict] = None, artifact_reader: ArtifactProjectReader = None,
                  project_summary: str = None, export_dir: str = None, do_resummarize_project: bool = True,
-                 is_subset: bool = False, job_args: JobArgs = None, **kwargs):
+                 is_subset: bool = False, job_args: JobArgs = None, trace_file_path: str = None, **kwargs):
         """
         Summarizes a given dataset using the given summarizer
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content
@@ -27,6 +34,7 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         """
         self.do_resummarize_project = do_resummarize_project
         self.is_subset = is_subset
+        self.trace_df = None if trace_file_path is None else TraceDataFrame(pd.read_csv(trace_file_path))
         super().__init__(artifacts=artifacts, artifact_reader=artifact_reader,
                          project_summary=project_summary, export_dir=export_dir, job_args=job_args,
                          do_resummarize_project=do_resummarize_project,
@@ -38,13 +46,49 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         :return: The job result containing all artifacts mapped to their summarized content
         """
         args = self.create_summarizer_args()
+        use_traces_to_summarize = self.trace_df is not None
+        orig_artifact_df = args.dataset.artifact_df
+        if use_traces_to_summarize:
+            args.dataset = PromptDataset(artifact_df=self._get_artifacts_to_summarize(orig_artifact_df, self.trace_df))
+
         if self.is_subset and not self.project_summary:
             summary = None
-            artifacts_df = ArtifactDataFrame(self.artifacts)
-            artifacts_df.summarize_content(Summarizer.create_summarizer(args))
+            args.dataset.artifact_df.summarize_content(Summarizer.create_summarizer(args))
         else:
-            dataset = Summarizer(args).summarize()
-            artifacts_df = dataset.artifact_df
-            summary = dataset.project_summary if self.do_resummarize_project else None
-        artifacts = artifacts_df.to_artifacts()
+            args.dataset = Summarizer(args).summarize()
+            summary = args.dataset.project_summary if self.do_resummarize_project else None
+
+        if use_traces_to_summarize:
+            args.dataset.artifact_df = self._convert_artifact_content_back(args.dataset.artifact_df, orig_artifact_df)
+            artifact_export_path = os.path.join(args.export_dir, ARTIFACT_FILE_NAME)
+            args.dataset.artifact_df.to_csv(artifact_export_path)
+
+        artifacts = args.dataset.artifact_df.to_artifacts()
         return SummaryResponse(summary=summary, artifacts=artifacts)
+
+    @staticmethod
+    def _convert_artifact_content_back(new_artifact_df: ArtifactDataFrame, orig_artifact_df: ArtifactDataFrame) -> ArtifactDataFrame:
+        """
+        Converts the content of the newly summarized artifacts back to the original content (pre-combining source, target content)
+        :param new_artifact_df: The newly summarized artifacts
+        :param orig_artifact_df: The original artifacts
+        :return: The summarized artifacts with the original content
+        """
+        orig_artifact_df[ArtifactKeys.SUMMARY] = new_artifact_df[ArtifactKeys.SUMMARY]
+        return orig_artifact_df
+
+    @staticmethod
+    def _get_artifacts_to_summarize(artifact_df: ArtifactDataFrame, trace_df: TraceDataFrame) -> ArtifactDataFrame:
+        """
+        Combines the content of the source and targets for all trace links and updates the target to have the combined content
+        :param artifact_df: The original artifacts
+        :param trace_df: The traces between artifacts
+        :return: The version of the artifacts to summarize
+        """
+        artifacts2summarize = deepcopy(artifact_df)
+        for i, trace in trace_df.itertuples():
+            source = artifact_df.get_artifact(trace[TraceKeys.SOURCE])
+            target = artifact_df.get_artifact(trace[TraceKeys.TARGET])
+            content = f"{source[ArtifactKeys.CONTENT]}{NEW_LINE}{target[ArtifactKeys.CONTENT]}"
+            artifacts2summarize.update_value(column2update=ArtifactKeys.CONTENT, id2update=trace[TraceKeys.TARGET], new_value=content)
+        return artifacts2summarize

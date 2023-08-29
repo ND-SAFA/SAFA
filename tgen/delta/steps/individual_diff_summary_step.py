@@ -1,19 +1,19 @@
 from typing import Dict, List
 
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import NEW_LINE, DASH, EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
-from tgen.prompts.artifact_prompt import ArtifactPrompt
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.delta.delta_util import get_prediction_output
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
@@ -40,21 +40,21 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                 continue
             logger.info(f"Getting diff summaries for {change_type.value} files.")
             ids = list(diffs.keys())
-            artifacts_df = self._create_artifacts_df_from_diff(args, diffs, ids, include_original=change_type == ChangeType.MODIFIED)
+            artifact_df = self._create_artifact_df_from_diff(args, diffs, ids, include_original=change_type == ChangeType.MODIFIED)
             questionnaire: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value
             if change_type in self.CHANGE_TYPE_TO_QUESTION_PROMPT:
                 questionnaire.question_prompts = [self.CHANGE_TYPE_TO_QUESTION_PROMPT[change_type].value] \
                                                  + questionnaire.question_prompts[-2:]
-            output = get_prediction_output(args, artifacts_df, state, prompts=[SupportedPrompts.DIFF_SUMMARY_STARTER.value,
-                                                                               ArtifactPrompt(include_id=False),
-                                                                               questionnaire])
+            output = get_prediction_output(args, artifact_df, state, prompts=[SupportedPrompts.DIFF_SUMMARY_STARTER.value,
+                                                                              ArtifactPrompt(include_id=False),
+                                                                              questionnaire])
 
             state.diff_summaries.update(self._parse_output(ids, output, questionnaire))
             state.save(self.get_step_name())
 
     @staticmethod
-    def _create_artifacts_df_from_diff(args: DeltaArgs, filename2diffs: Dict[str, str], ids: List[str],
-                                       include_original: bool = True) -> ArtifactDataFrame:
+    def _create_artifact_df_from_diff(args: DeltaArgs, filename2diffs: Dict[str, str], ids: List[str],
+                                      include_original: bool = True) -> ArtifactDataFrame:
         """
         Creates a dataset from the file diffs
         :param args: The arguments for the delta summarizer

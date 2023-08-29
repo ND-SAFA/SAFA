@@ -27,12 +27,12 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         Reads a text file and converts to the trace format
         :return:
         """
-        artifacts_df = self._get_artifacts_df(self.data_file)
+        artifact_df = self._get_artifact_df(self.data_file)
         if self.summarizer is not None:
-            artifacts_df.summarize_content(self.summarizer)
-        trace_df = self._get_trace_df(list(artifacts_df.index))
+            artifact_df.summarize_content(self.summarizer)
+        trace_df = self._get_trace_df(list(artifact_df.index))
         layer_df = self._get_layer_dataframe()
-        return artifacts_df, trace_df, layer_df
+        return artifact_df, trace_df, layer_df
 
     def get_project_name(self) -> str:
         """
@@ -44,7 +44,7 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         return proj_name
 
     @staticmethod
-    def _get_artifacts_df(data_file: str) -> ArtifactDataFrame:
+    def _get_artifact_df(data_file: str) -> ArtifactDataFrame:
         """
         Gets the dataframe of artifacts (paragraphs)
         :param data_file: The data file to use for the project

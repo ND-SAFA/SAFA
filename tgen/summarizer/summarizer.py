@@ -25,13 +25,13 @@ class Summarizer:
         """
         initial_project_summary = self._create_project_summary(self.args.dataset.artifact_df) \
             if not self.args.project_summary else self.args.project_summary
-        artifacts_df = self._resummarize_artifacts(initial_project_summary)
+        artifact_df = self._resummarize_artifacts(initial_project_summary)
         if self.args.export_dir:
             artifact_export_path = os.path.join(self.args.export_dir, ARTIFACT_FILE_NAME)
-            artifacts_df.to_csv(artifact_export_path)
-        final_project_summary = self._create_project_summary(artifact_df=artifacts_df) \
+            artifact_df.to_csv(artifact_export_path)
+        final_project_summary = self._create_project_summary(artifact_df=artifact_df) \
             if self.args.do_resummarize_project else initial_project_summary
-        return PromptDataset(artifact_df=artifacts_df, project_summary=final_project_summary)
+        return PromptDataset(artifact_df=artifact_df, project_summary=final_project_summary)
 
     @staticmethod
     def create_summarizer(args: SummarizerArgs, project_summary: str = None) -> ArtifactsSummarizer:

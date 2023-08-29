@@ -46,7 +46,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return ArtifactKeys
 
-    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1, summary: bool = EMPTY_STRING) -> EnumDict:
+    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1, summary: str = EMPTY_STRING) -> EnumDict:
         """
         Adds artifact to dataframe
         :param artifact_id: The id of the Artifact
@@ -57,7 +57,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         row_as_dict = {ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
                        ArtifactKeys.SUMMARY: summary if summary else self._SUMMARY_DEFAULT}
-        return self.add_new_row(row_as_dict)
+        return self.add_or_update_row(row_as_dict)
 
     def get_artifact(self, artifact_id: Any) -> EnumDict:
         """

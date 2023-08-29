@@ -1,8 +1,8 @@
 import mock
 
+from tgen.common.constants.deliminator_constants import SPACE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import SPACE
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -59,7 +59,7 @@ class TestProjectSummaryStep(BaseTest):
     def test_steps(self):
         self.assert_project_summary_step()
         self.assert_individual_diff_summary_step()
-        self.assert_create_diff_artifacts_df()
+        self.assert_create_diff_artifact_df()
         self.assert_overview_change_summary_step()
         self.assert_impact_analysis_step()
 
@@ -137,8 +137,8 @@ class TestProjectSummaryStep(BaseTest):
             self.assertIn("summary", summary)
             self.assertIn("impact", summary)
 
-    def assert_create_diff_artifacts_df(self):
-        df = OverviewChangeSummaryStep._create_diff_artifacts_df(self.DELTA_STATE)
+    def assert_create_diff_artifact_df(self):
+        df = OverviewChangeSummaryStep._create_diff_artifact_df(self.DELTA_STATE)
         self.assertIn("existing_file.py", df)
         modified_content = df.get_artifact("existing_file.py")[ArtifactKeys.CONTENT].lower()
         self._assert_modified_file_summary(modified_content)
@@ -155,7 +155,7 @@ class TestProjectSummaryStep(BaseTest):
             self.assertIn("summary", content)
             self.assertNotIn("impact", content)
 
-        df_with_impact = OverviewChangeSummaryStep._create_diff_artifacts_df(self.DELTA_STATE, include_impact=True)
+        df_with_impact = OverviewChangeSummaryStep._create_diff_artifact_df(self.DELTA_STATE, include_impact=True)
         for i, artifact in df_with_impact.itertuples():
             self.assertIn("impact", artifact[ArtifactKeys.CONTENT].lower())
 
@@ -194,11 +194,11 @@ class TestProjectSummaryStep(BaseTest):
         unknown_change_type = OverviewChangeSummaryStep._match_change_type(["unknown"], change_type_mappings)
         self.assertEqual(unknown_change_type, OverviewChangeSummaryStep.UNKNOWN_CHANGE_TYPE_KEY)
 
-    def test_create_artifacts_df_from_diff(self):
+    def test_create_artifact_df_from_diff(self):
         modified_filename = modified_file
-        modified_df = IndividualDiffSummaryStep._create_artifacts_df_from_diff(self.DELTA_ARGS,
-                                                                               ids=[modified_filename],
-                                                                               filename2diffs=DIFFS[ChangeType.MODIFIED.value])
+        modified_df = IndividualDiffSummaryStep._create_artifact_df_from_diff(self.DELTA_ARGS,
+                                                                              ids=[modified_filename],
+                                                                              filename2diffs=DIFFS[ChangeType.MODIFIED.value])
         self.assertIn(modified_filename, modified_df)
         content = modified_df.get_artifact(modified_filename)[ArtifactKeys.CONTENT]
         self.assertIn(f"{IndividualDiffSummaryStep.CONTEXT_TITLE}\ncontext for child", content)
@@ -206,10 +206,10 @@ class TestProjectSummaryStep(BaseTest):
         self.assertIn(f"{IndividualDiffSummaryStep.DIFF_TITLE}\n{DIFFS[ChangeType.MODIFIED.value][modified_filename]}", content)
 
         added_filename = added_file
-        added_df = IndividualDiffSummaryStep._create_artifacts_df_from_diff(self.DELTA_ARGS,
-                                                                            ids=[added_filename],
-                                                                            filename2diffs=DIFFS[ChangeType.ADDED.value],
-                                                                            include_original=False)
+        added_df = IndividualDiffSummaryStep._create_artifact_df_from_diff(self.DELTA_ARGS,
+                                                                           ids=[added_filename],
+                                                                           filename2diffs=DIFFS[ChangeType.ADDED.value],
+                                                                           include_original=False)
         self.assertIn(added_filename, added_df)
         content = added_df.get_artifact(added_filename)[ArtifactKeys.CONTENT]
         self.assertNotIn(f"{IndividualDiffSummaryStep.CONTEXT_TITLE}", content)

@@ -39,4 +39,11 @@ public class TGenStatus {
     @Nullable
     JobLogEntry jobLogEntry;
 
+    public void update(TGenStatus status) {
+        this.status = status.status;
+        this.message = status.message;
+        this.logs = status.logs;
+        this.currentLogIndex = status.currentLogIndex > 0 ? status.currentLogIndex : this.currentLogIndex;
+        this.jobLogEntry = status.jobLogEntry != null ? status.jobLogEntry : this.jobLogEntry;
+    }
 }

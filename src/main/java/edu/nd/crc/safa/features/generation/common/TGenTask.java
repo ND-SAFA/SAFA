@@ -23,4 +23,14 @@ public class TGenTask<T> {
     @Nullable
     Class<T> responseClass;
 
+    @Nullable
+    TGenStatus status;
+
+    public void updateStatus(TGenStatus tGenStatus) {
+        if (status == null) {
+            this.status = tGenStatus;
+        } else {
+            this.status.update(tGenStatus);
+        }
+    }
 }

@@ -43,7 +43,7 @@ public class ApiController {
         TGenTask<T> task = this.requestService.sendPost(endpoint, payload, TGenTask.class);
         task.setResponseClass(responseClass);
         setTaskId(logger, task.getTaskId());
-        T result = pollTGenTask(task, status -> writeLogs(logger, status), MAX_DURATION, WAIT_SECONDS);
+        T result = pollTGenTask(task, t -> writeLogs(logger, t), MAX_DURATION, WAIT_SECONDS);
         setTaskId(logger, null);
         return result;
     }
@@ -59,12 +59,13 @@ public class ApiController {
      */
     private <T> T pollTGenTask(TGenTask<T> task, TaskHandler taskHandler, long timeout, int waitTime) {
         pollWithTimeout(() -> {
-            TGenStatus taskStatus = getTaskStatus(task);
-            taskHandler.handleTask(taskStatus);
-            if (taskStatus.getStatus().hasFailed()) {
-                throw new SafaError(taskStatus.getMessage());
+            updateTaskStatus(task);
+            taskHandler.handleTask(task);
+            TGenStatus status = task.getStatus();
+            if (status.getStatus().hasFailed()) {
+                throw new SafaError(status.getMessage());
             }
-            return taskStatus.getStatus().hasCompleted();
+            return status.getStatus().hasCompleted();
         }, timeout, waitTime);
         return getJobResult(task, task.getResponseClass());
     }
@@ -77,10 +78,9 @@ public class ApiController {
      * @param <T>           The type of class of the task result.
      * @return The response of the job.
      */
-    private <T> T getJobResult(TGenTask task, Class<T> responseClass) {
+    private <T> T getJobResult(TGenTask<T> task, Class<T> responseClass) {
         String resultEndpoint = TGenConfig.getEndpoint("results");
-        T response = this.requestService.sendPost(resultEndpoint, task, responseClass);
-        return response;
+        return this.requestService.sendPost(resultEndpoint, task, responseClass);
     }
 
     /**
@@ -112,21 +112,25 @@ public class ApiController {
      * Returns whether job has finished.
      *
      * @param task The task associated with job to check.
-     * @return True if job is done, false otherwise. Error is thrown if job has failed.
      */
-    private <T> TGenStatus getTaskStatus(TGenTask<T> task) {
+    private void updateTaskStatus(TGenTask task) {
         String statusEndpoint = TGenConfig.getEndpoint("status");
         TGenStatus tGenStatus = this.requestService.sendPost(statusEndpoint, task, TGenStatus.class);
+
         if (tGenStatus.getStatus().hasFailed()) {
             throw new SafaError(tGenStatus.getMessage());
         }
-        return tGenStatus;
+        task.updateStatus(tGenStatus);
     }
 
     /**
      * Writes the latest logs in the task status to the logger.
      */
-    private void writeLogs(JobLogger logger, TGenStatus status) {
+    private void writeLogs(JobLogger logger, TGenTask task) {
+        TGenStatus status = task.getStatus();
+        if (status == null) {
+            return;
+        }
         List<String> logs = status.getLogs();
         int currentLogIndex = status.getCurrentLogIndex();
 
@@ -137,8 +141,8 @@ public class ApiController {
         if (currentLog.length() > 0) {
             JobLogEntry jobLog = status.getJobLogEntry();
             jobLog = jobLog == null ? log(logger, currentLog) : logger.addToLog(jobLog, currentLog);
-            currentLogIndex = logs.size();
             status.setJobLogEntry(jobLog);
+            currentLogIndex = logs.size();
             status.setCurrentLogIndex(currentLogIndex);
         }
     }

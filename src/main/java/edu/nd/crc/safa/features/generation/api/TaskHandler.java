@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.generation.api;
 
-import edu.nd.crc.safa.features.generation.common.TGenStatus;
+import edu.nd.crc.safa.features.generation.common.TGenTask;
 
 interface TaskHandler {
     /**
@@ -8,5 +8,5 @@ interface TaskHandler {
      *
      * @param task The new task status.
      */
-    void handleTask(TGenStatus task);
+    void handleTask(TGenTask task);
 }

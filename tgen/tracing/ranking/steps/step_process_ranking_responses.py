@@ -3,8 +3,10 @@ from typing import Any, Callable, Dict, List, Optional
 from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
     RANKING_MAX_SCORE, RANKING_SCORE_TAG
 from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.state.state import State
 from tgen.tracing.ranking.ranking_args import RankingArgs
@@ -62,6 +64,7 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         sorted_parent2children = state.sorted_parent2children
         parent2index: Dict[str, int] = {p: i for i, p in enumerate(parent_ids)}
         child_entries = []
+        child_entries_set = set()
         for parent_name, prompt_response in zip(parent_ids, batch_responses):
             related_children = sorted_parent2children[parent_name]
             parent_index = parent2index[parent_name]
@@ -71,21 +74,30 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
             artifact_dicts = parsed_tags[RANKING_ARTIFACT_TAG]
             parsed_entries = []
             for a_parsed_dict in artifact_dicts:
-                a_reasoning = ArtifactReasoning(a_parsed_dict)
-                a_reasoning.artifact_id = related_children[a_reasoning.index]
-                parsed_entries.append(a_reasoning)
+                try:
+                    a_reasoning = ArtifactReasoning(a_parsed_dict)
+                    a_reasoning.artifact_id = related_children[a_reasoning.index]
+                    parsed_entries.append(a_reasoning)
+                except Exception as e:
+                    logger.exception(e)
+                    logger.info(f"Unable to parse: {a_parsed_dict}")
 
             parsed_entries: List[ArtifactReasoning] = sorted(parsed_entries, key=lambda a: (a.score, -a.index), reverse=True)
 
             # Step - Store results
             for e in parsed_entries:
+                child_name = e.artifact_id
+                trace_id = TraceDataFrame.generate_link_id(source_id=child_name, target_id=parent_name)
+                if trace_id in child_entries_set:
+                    continue
                 child_entry = TracePredictionEntry(
-                    source=e.artifact_id,
+                    source=child_name,
                     target=parent_name,
                     score=e.score,
                     explanation=e.explanation
                 )
                 child_entries.append(child_entry)
+                child_entries_set.add(trace_id)
         state.children_entries = child_entries
         return child_entries
 

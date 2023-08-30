@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
-from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -49,6 +49,10 @@ class SummarizerArgs(PipelineArgs):
     """
     new_sections: Dict[str, QuestionnairePrompt] = field(default_factory=dict)
     """
+    The list of the section titles in the order they should appear in the project summary
+    """
+    section_order: List[str] = field(default_factory=lambda: DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER)
+    """
     If True, resummarizes the project with the new artifact summaries
     """
     do_resummarize_project: bool = True
@@ -60,6 +64,10 @@ class SummarizerArgs(PipelineArgs):
     Path to save to
     """
     export_dir: str = None
+    """
+    If True, only summarizes the code
+    """
+    summarize_code_only: bool = True
 
     def __post_init__(self) -> None:
         """

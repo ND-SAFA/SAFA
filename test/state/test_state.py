@@ -38,7 +38,7 @@ class TestState(BaseTest):
         self.assertEqual(state.format_of_artifacts, HGenTestConstants.format_)
         self.assertIsInstance(state.original_dataset, PromptDataset)
         self.assertIsInstance(state.source_dataset, PromptDataset)
-        self.assertIsInstance(state.dataset, TraceDataset)
+        self.assertIsInstance(state.final_dataset, TraceDataset)
 
         # failed to find a state so initialize empty
         file_not_found_state = HGenState.load_latest(TEST_STATE_PATH, ["UnknownStep"])
@@ -75,4 +75,4 @@ class TestState(BaseTest):
         self.assertSetEqual(set(orig_state.original_dataset.artifact_df.index), set(reloaded_dataset_original.artifact_df.index))
         reloaded_dataset_source = assert_check_type("source_dataset", reloaded_attrs["source_dataset"])
         self.assertSetEqual(set(orig_state.source_dataset.artifact_df.index), set(reloaded_dataset_source.artifact_df.index))
-        self.assertEqual(orig_state.dataset, reloaded_attrs["dataset"])
+        self.assertEqual(orig_state.final_dataset, reloaded_attrs["dataset"])

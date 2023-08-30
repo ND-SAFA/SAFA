@@ -37,4 +37,4 @@ class HGenState(State):
     """
     Step 4 - Dataset Construction
     """
-    dataset: TraceDataset = None  # The final dataset with generated artifacts.
+    final_dataset: PromptDataset = None  # The final dataset with generated artifacts.

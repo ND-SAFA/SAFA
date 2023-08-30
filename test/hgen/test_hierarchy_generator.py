@@ -50,9 +50,9 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df))
 
         export_path = TEST_OUTPUT_DIR
-        safa_save_path = save_dataset_checkpoint(self.HGEN_STATE.dataset, export_path, filename="dir", exporter_class=SafaExporter)
+        safa_save_path = save_dataset_checkpoint(self.HGEN_STATE.final_dataset, export_path, filename="dir", exporter_class=SafaExporter)
         saved_safa_dataset = TraceDatasetCreator(StructuredProjectReader(project_path=safa_save_path)).create()
-        assert_dataset(saved_safa_dataset, self.HGEN_STATE.dataset)
+        assert_dataset(saved_safa_dataset, self.HGEN_STATE.final_dataset)
         csv_save_path = save_dataset_checkpoint(self.HGEN_STATE.source_dataset, export_path, filename="artifacts")
         saved_csv_dataset = ArtifactDataFrame(pd.read_csv(csv_save_path))
         self.assertSetEqual(set(saved_csv_dataset.index), set(self.HGEN_STATE.source_dataset.artifact_df.index))
@@ -109,20 +109,20 @@ class TestHierarchyGenerator(BaseTest):
         step = CreateHGenDatasetStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         for id_, link in self.HGEN_STATE.original_dataset.trace_dataset.trace_df.itertuples():
-            found_link = self.HGEN_STATE.dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE], target_id=link[TraceKeys.TARGET])
+            found_link = self.HGEN_STATE.final_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE], target_id=link[TraceKeys.TARGET])
             self.assertIsNotNone(found_link)
         for name in expected_names:
-            self.assertIn(name, self.HGEN_STATE.dataset.artifact_df.index)
-            new_artifact = self.HGEN_STATE.dataset.artifact_df.get_artifact(artifact_id=name)
+            self.assertIn(name, self.HGEN_STATE.final_dataset.artifact_df.index)
+            new_artifact = self.HGEN_STATE.final_dataset.artifact_df.get_artifact(artifact_id=name)
             self.assertEqual(new_artifact[ArtifactKeys.LAYER_ID], self.HGEN_ARGS.target_type)
             for orig_id, orig_artifact in self.HGEN_STATE.original_dataset.artifact_df.itertuples():
-                self.assertIn(orig_id, self.HGEN_STATE.dataset.artifact_df.index)
+                self.assertIn(orig_id, self.HGEN_STATE.final_dataset.artifact_df.index)
                 if orig_artifact[ArtifactKeys.LAYER_ID] == self.HGEN_ARGS.source_layer_id:
-                    q = DataFrameUtil.query_df(self.HGEN_STATE.dataset.trace_df, {"source": orig_id, "target": name})
+                    q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.trace_df, {"source": orig_id, "target": name})
                     self.assertEqual(len(q), 1)
         for i, layer in self.HGEN_STATE.original_dataset.trace_dataset.layer_df.itertuples():
-            q = DataFrameUtil.query_df(self.HGEN_STATE.dataset.layer_df, layer)
+            q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df, layer)
             self.assertEqual(len(q), 1)
-        q = DataFrameUtil.query_df(self.HGEN_STATE.dataset.layer_df, {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
-                                                                      LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
+        q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df, {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
+                                                                            LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)

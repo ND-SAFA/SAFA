@@ -1,13 +1,15 @@
-from typing import Any, Dict, List, Tuple, Type
+from typing import Any, Dict, List, Tuple, Type, Set, Union, Iterable
 
 from tgen.common.artifact import Artifact
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+import pandas as pd
 
 ArtifactKeys = StructuredKeys.Artifact
 
@@ -67,7 +69,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return self.get_row(artifact_id)
 
-    def get_type(self, type_name: str):
+    def get_type(self, type_name: str) -> pd.DataFrame:
         """
         Returns data frame with artifacts of given type.
         :param type_name: The type to filter by.
@@ -125,13 +127,14 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         self.loc[artifact_id][ArtifactKeys.CONTENT.value] = new_body
 
-    def summarize_content(self, summarizer: ArtifactsSummarizer) -> List[str]:
+    def summarize_content(self, summarizer: ArtifactsSummarizer, re_summarize: bool = False) -> List[str]:
         """
         Summarizes the content in the artifact df
         :param summarizer: The summarizer to use
+        :param re_summarize: True if old summaries should be replaced
         :return: The summaries
         """
-        if self[ArtifactKeys.SUMMARY.value].isna().any():
+        if re_summarize or not self.is_summarized():
             missing_all = self[ArtifactKeys.SUMMARY].isna().all()
             if missing_all:
                 summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
@@ -141,6 +144,32 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 summaries = summarizer.summarize_bulk(bodies=content, filenames=ids)
                 self.update_values(ArtifactKeys.SUMMARY, ids, summaries)
         return self[ArtifactKeys.SUMMARY]
+
+    def is_summarized(self, layer_ids: Union[str, Iterable[str]] = None) -> bool:
+        """
+        Checks if the artifacts (or artifacts in given layer) are summarized
+        :param layer_ids: The layer to check if it is summarized
+        :return: True if the artifacts (or artifacts in given layer) are summarized
+        """
+        if not isinstance(layer_ids, set):
+            layer_ids = set(layer_ids) if isinstance(layer_ids, list) else {layer_ids}
+        for layer_id in layer_ids:
+            df = self if not layer_id else self.get_type(layer_id)
+            summaries = df[ArtifactKeys.SUMMARY.value]
+            if DataFrameUtil.contains_na(summaries):
+                return False
+        return True
+
+    def get_code_layers(self) -> Set[str]:
+        """
+        Gets the id of all code layers
+        :return: A set of the ids of all code layers
+        """
+        code_layers = set()
+        for i, artifact in self.itertuples():
+            if FileUtil.is_code(i):
+                code_layers.add(artifact[ArtifactKeys.LAYER_ID])
+        return code_layers
 
     def _find_missing_summaries(self) -> Tuple[List, List]:
         """

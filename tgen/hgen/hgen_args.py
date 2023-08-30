@@ -64,6 +64,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     system_summary: str = None
     """
+    If True, re-summarizes artifacts with a summary of the project 
+    """
+    create_new_code_summaries: bool = False
+    """
     If True, re-runs hgen multiple times to get the best results across runs
     """
     optimize_with_reruns: bool = False

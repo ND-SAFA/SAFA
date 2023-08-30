@@ -1,4 +1,5 @@
 from tgen.common.constants.deliminator_constants import NEW_LINE, COMMA
+from tgen.common.constants.project_summary_constants import PS_NOTES_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
@@ -47,19 +48,22 @@ GENERATION_PROMPT = Prompt("You are an engineer working on a software system and
 SUMMARY_INSTRUCTIONS = "Using the {source_type}, write a comprehensive summary of this system focusing on the technical details " \
                        "and design aspects needed to understand the functionality. " \
                        "In your summary, consider the following questions as guidelines to help extract useful information: "
-TASK_INSTRUCTIONS = "Next, use this summary to identify the main features and functionality provided by the system. " \
-                    "Then, reverse engineer a set of {target_type} that cover each of these features and functionalities. " \
-                    "The {target_type} should include some technical details but " \
-                    "avoid directly copying details verbatim from the {source_type}. " \
-                    "Importantly, the {target_type} should be specific to certain functionalities/features and not too broad. " \
-                    "Do not make up any information " \
-                    "- all details in the {target_type} must accurately reflect the provided {source_type}. " \
-                    "{description} " \
-                    "Each {target_type} should use a consistent format. Use this format as a guideline: " \
-                    "{format} " \
-                    "Make sure the {target_type} are concise but technically detailed, " \
-                    "avoid ambiguous language, and only include information contained in the {source_type}. " \
-                    "Ensure that all features and functionality are included in the {target_type}s. "
+GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
+    QuestionPrompt("Identify the main features and functionality provided by the {source_type} and system summary. "),
+    QuestionPrompt("Then, reverse engineer a set of {target_type} "
+                   "that cover each of these features and functionalities. "),
+    QuestionPrompt("The {target_type} should include some technical details "
+                   "but avoid directly copying details verbatim from the {source_type}. "),
+    QuestionPrompt("Importantly, the {target_type} should be specific to certain functionalities/features and not too broad. "),
+    QuestionPrompt("Do not make up any information "
+                   "- all details in the {target_type} must accurately reflect the provided {source_type}. "),
+    QuestionPrompt("{description} "),
+    QuestionPrompt("Each {target_type} should use a consistent format. Use this format as a guideline: "
+                   "{format} "),
+    QuestionPrompt("Make sure the {target_type} are concise but technically detailed"),
+    QuestionPrompt("Avoid ambiguous language, and only include information contained in the {source_type}. "),
+    QuestionPrompt("Ensure that all features and functionality are included in the {target_type}s.")],
+    enumeration_chars=["-"])
 
 REFINE_PROMPT = Prompt("You are an engineer that is an expert on a software system and your goal is to refine "
                        "{target_type}s. There are many duplicate {target_type} between the new and original {target_type}s "
@@ -100,3 +104,18 @@ REFINE_TASKS = QuestionnairePrompt(instructions="Carefully review the v1 and v2 
                                                 "Make sure you understand each one.",
                                    enumeration_chars=["-"],
                                    question_prompts=REFINE_STEPS)
+
+SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
+    question_prompts=[
+        QuestionPrompt(
+            "Write a set of bullet points that extracts the information that would be important for creating {target_type}s.",
+            response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+        QuestionPrompt(
+            "Come up with title for the section that would encapsulate the information contained in your notes. ",
+            response_manager=PromptResponseManager(response_tag="title")),
+        QuestionPrompt("Using your notes, write a polished description for the section "
+                       "that is specifically focused on detailing the "
+                       "information necessary for the {target_type}s. "
+                       "The section will not create the {target_type}s themselves "
+                       "but it will be useful to the other engineers who make them.",
+                       response_manager=PromptResponseManager(response_tag="new-section-body"))])

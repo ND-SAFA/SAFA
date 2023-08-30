@@ -131,3 +131,12 @@ class DataFrameUtil:
             return potential_value
         else:
             return None
+
+    @staticmethod
+    def contains_na(df: pd.DataFrame) -> bool:
+        """
+        Returns whether the dataframe contains any NAN values
+        :param df: The dataframe to evaluate
+        :return: True if the dataframe contains any NAN values
+        """
+        return df.isna().any()

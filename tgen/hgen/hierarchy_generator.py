@@ -5,6 +5,7 @@ from typing import Type
 
 from tgen.common.util.base_object import BaseObject
 from tgen.data.exporters.safa_exporter import SafaExporter
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -42,7 +43,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         """
         return HGenState
 
-    def run(self) -> TraceDataset:
+    def run(self) -> PromptDataset:
         """
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
@@ -52,7 +53,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
 
         super().run()
 
-        dataset = self.state.dataset
+        dataset = self.state.final_dataset
         assert dataset is not None, f"Final dataset is not set."
         save_path = save_dataset_checkpoint(dataset, export_path, filename=SAVE_DATASET_DIRNAME)
         save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)

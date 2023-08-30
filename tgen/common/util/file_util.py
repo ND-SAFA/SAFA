@@ -13,7 +13,7 @@ from tgen.common.util.json_util import JsonUtil
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
-                   "PL", "R", "PY", "JAVA"]
+                   "PL", "R", "PY", "JAVA", "VUE", "CC"]
 
 
 class FileUtil:

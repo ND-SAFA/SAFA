@@ -1,3 +1,5 @@
+from copy import copy
+
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG
 from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
@@ -42,11 +44,14 @@ class ProjectSummarizer(BaseObject):
         logger.log_title("Creating project specification.")
 
         if self.args.summarize_artifacts:
-            self.artifact_df.summarize_content(ArtifactsSummarizer())
+            summarizer = ArtifactsSummarizer(llm_manager=self.args.llm_manager_for_artifact_summaries,
+                                             code_or_exceeds_limit_only=self.args.summarize_code_only)
+            self.artifact_df.summarize_content(summarizer)
 
-        project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True)
+        project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True, summary_args=self.args)
         for task_title, task_prompt in project_summary.get_generation_iterator():
             logger.log_step(f"Creating section: `{task_title}`")
+            task_id = copy(task_title)
             assert isinstance(task_prompt, QuestionnairePrompt), f"Expected section {task_title} prompt " \
                                                                  f"to be a {QuestionnairePrompt.__class__.__name__}"
             task_tag = task_prompt.get_response_tags_for_question(-1)
@@ -73,11 +78,11 @@ class ProjectSummarizer(BaseObject):
             parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
             body_res = parsed_responses[task_tag]
 
-            if CUSTOM_TITLE_TAG in body_res:
-                task_title = body_res[CUSTOM_TITLE_TAG][0]
+            if CUSTOM_TITLE_TAG in parsed_responses:
+                task_title = parsed_responses[CUSTOM_TITLE_TAG][0]
 
             task_body = body_res[0] if len(body_res) <= 1 else NEW_LINE.join(body_res)
-            project_summary.set_section_body(task_title, task_body)
+            project_summary.set_section_body(task_id, task_title, task_body)
             project_summary.save()
 
         summary = project_summary.get_summary(raise_exception_on_not_found=True)

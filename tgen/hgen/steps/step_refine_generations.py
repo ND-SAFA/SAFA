@@ -67,8 +67,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                base_prompt=SupportedPrompts.HGEN_REFINEMENT,
                                                                artifact_type=f"V1 {hgen_args.target_type}")
             prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
-            refined_artifacts = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown_header(f"V2 "
-                                                                                                       f"{hgen_args.target_type}"),
+            refined_artifacts = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"V2 {hgen_args.target_type}"),
                                                     build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                                     include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                                     starting_num=len(refined_artifact_content) + 1) \
@@ -94,7 +93,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         except Exception as e:
             logger.exception("Refining the artifact content failed. Using original content instead.")
-            selected_artifacts = selected_artifacts
+            selected_artifacts = refined_artifact_content
         return selected_artifacts
 
     @staticmethod

@@ -64,8 +64,9 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
             final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
 
-            dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
-        state.dataset = dataset
+            dataset = PromptDataset(trace_dataset=TraceDataset(combined_artifact_df, final_trace_df, final_layer_df),
+                                    project_summary=state.summary)
+        state.final_dataset = dataset
 
     @staticmethod
     def _get_target_layer_id(hgen_args: HGenArgs, original_dataset_complete: PromptDataset) -> str:

@@ -90,7 +90,7 @@ class LLMTrainer(AbstractTrainer):
 
     def cleanup(self) -> None:
         """
-        performs any necessary cleanup at the end of the job
+        Performs any necessary cleanup at the end of the job
         :return: None
         """
         pass

@@ -1,3 +1,4 @@
+from tgen.common.constants.deliminator_constants import NEW_LINE, COMMA
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
@@ -58,49 +59,44 @@ TASK_INSTRUCTIONS = "Next, use this summary to identify the main features and fu
                     "{format} " \
                     "Make sure the {target_type} are concise but technically detailed, " \
                     "avoid ambiguous language, and only include information contained in the {source_type}. " \
-                    "Ensure that all features and functionality are included in the {target_types}s. "
+                    "Ensure that all features and functionality are included in the {target_type}s. "
 
-REFINE_PROMPT = Prompt("You are an engineering working on a software system and your goal is to refine "
-                       "{target_type}s. You are given a summary of the system: ")
+REFINE_PROMPT = Prompt("You are an engineer that is an expert on a software system and your goal is to refine "
+                       "{target_type}s. There are many duplicate {target_type} between the new and original {target_type}s "
+                       "so you must minimize the number of duplicates and select only the best artifacts to remain. "
+                       "You are given a summary of the system: ")
 REFINE_STEPS = {
-    1: QuestionPrompt("Check that each {target_type} is at the appropriate level of detail for the intended audience. "
-                      "Ensure that each {target_type} contains enough context for someone unfamiliar with the system to understand, "
-                      "but make sure that details are specific to this system and not contain general, uninformative details "
-                      "that are true of all systems and a skilled practitioner would already know."
-                      "The {target_type} should be understandable and clear to all team members. Avoid ambiguous or vague language "
-                      "and do not be overly verbose. "),
-    2: QuestionPrompt(
-        "Ensure the {target_type} conveys only meaningful and relevant information. "
-        "Details included should focus on specifics relevant to this system, "
-        "rather than general information applicable to many systems. "
-        "Note that the inclusion of some technical terminology does not automatically make a {target_type} system-specific. "
-        "Evaluate whether the concepts are generally applicable across systems "
-        "or truly specific to the design and behavior of this particular system. "
-        "If any details or {target_type} are applicable across most systems remove them."),
-    3: QuestionPrompt(
-        "Verify there is a clear and singular purpose or goal for the {target_type}. "
-        "Remove or condense any overlapping or redundant information across {target_type}s."
-        "Make sure the {target_type} is independent of others, allowing work to be done in parallel."),
-    4: QuestionPrompt(
-        "Confirm the {target_type} is in a standard format and style consistent with the type of {target_type}."),
-    5: QuestionPrompt(
-        "Check that the {target_type} is technically and grammatically correct. "
-        "There should be no spelling, punctuation or syntax errors."),
-    6: QuestionPrompt(
-        "First, for each {target_type} either provide a justification of why it already satisfies these criteria "
-        "or provide what would need to be changed for it to satisfy the criteria.",
-        response_manager=PromptResponseManager(response_tag="justification")),
-    7: QuestionPrompt("Finally, output the revised list of the {target_type} using your justifications. "
-                      "If a {target_type}s already satisfies these criteria, output the original {target_type}. "
-                      "Otherwise, replace it with a refined version using your analysis. "
-                      "Provide the {target_type} in the same format(s) as the originals "
-                      "or remove it entirely if it is redundant or does not contain meaningful information. "
-                      "The goal is to produce a streamlined set of high-quality {target_type}s with a clear and aligned purpose. "
-                      "Output your list of {target_type}s in a comma-deliminated list. ",
-                      response_manager=PromptResponseManager(response_tag="final-solution",
-                                                             required_tag_ids=REQUIRE_ALL_TAGS))
+    1: QuestionPrompt("Compare each version of {target_type}s to identify duplicates and overlaps. "
+                      "Only some of the {target_type} are overlapping, and some new functionality has been introduced in each version."
+                      "Two {target_type} overlap if they describe substantially the same feature or functionality. "),
+    2: QuestionPrompt("Create a set of unique {target_type}s that describe unique functionality "
+                      "and do NOT have significant overlap in their descriptions with the other {target_type}s."),
+    3: QuestionnairePrompt(instructions="When duplicate/overlapping {target_type}s"
+                                        " are found, choose the best version to keep using these criteria:",
+                           question_prompts=[QuestionPrompt("Most complete and detailed description"),
+                                             QuestionPrompt("Clearer articulation of the desired functionality")],
+                           enumeration_chars=["*"]),
+    4: QuestionnairePrompt(instructions="Consolidate the {target_type}s into a master list "
+                                        "containing only the selected best versions. "
+                                        "The consolidated list should have:",
+                           question_prompts=[QuestionPrompt("No redundant or overlapping {target_type}s"),
+                                             QuestionPrompt("ALL unique functionality represented across both versions")],
+                           enumeration_chars=["*"]),
+    5: QuestionPrompt("Map and document where duplicates were found and the selection rationale. "
+                      "Add comments explaining the elimination decisions. "
+                      "Add comments explaining why remaining {target_types} are unique. ",
+                      response_manager=PromptResponseManager(response_tag="notes")),
+    6: QuestionPrompt("Output just the {target_type} numbers for the refined list in the specified format:"
+                      "\n* Comma delimited numbers",
+                      response_manager=PromptResponseManager(response_tag="selected-artifacts",
+                                                             response_instructions_format="\n* Enclosed in {} XML tags.",
+                                                             expected_response_type=int,
+                                                             formatter=lambda tag, val: [v.strip().strip(NEW_LINE)
+                                                                                         for v in val.split(COMMA)])
+                      )
+
 }
-REFINE_QUESTIONNAIRE = QuestionnairePrompt(instructions="Review each {target_type} carefully to ensure high quality. "
-                                                        "For each {target_type}:",
-                                           enumeration_chars=["-"],
-                                           question_prompts=REFINE_STEPS)
+REFINE_TASKS = QuestionnairePrompt(instructions="Carefully review the v1 and v2 {target_type} lists. "
+                                                "Make sure you understand each one.",
+                                   enumeration_chars=["-"],
+                                   question_prompts=REFINE_STEPS)

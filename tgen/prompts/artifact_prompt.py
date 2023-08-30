@@ -1,6 +1,7 @@
 from enum import Enum, auto
 from typing import Union, Dict, List
 
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
@@ -53,7 +54,7 @@ class ArtifactPrompt(Prompt):
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]
         artifact_id = artifact.get(StructuredKeys.Artifact.ID.value, EMPTY_STRING)
-        content = artifact.get(StructuredKeys.Artifact.SUMMARY, None)
+        content = DataFrameUtil.get_optional_value(artifact.get(StructuredKeys.Artifact.SUMMARY, None))
         if not content:
             content = artifact[StructuredKeys.Artifact.CONTENT]
         artifact = build_method(artifact_id=artifact_id, artifact_body=content, xml_tags=self.xml_tags,

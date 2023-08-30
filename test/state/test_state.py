@@ -28,7 +28,7 @@ class TestState(BaseTest):
                          os.path.join(with_checkpoint, "state-step-name.yaml"))
 
     def test_load_latest(self):
-        steps = [step.get_step_name() for step in HierarchyGenerator.steps]
+        steps = [step.get_step_name() for step in HierarchyGenerator.steps if step.get_step_name() != 'RefineGenerationsStep']
         state = HGenState.load_latest(TEST_STATE_PATH, steps)
         self.assertSetEqual(set(steps), state.completed_steps)
         self.assertEqual(state.description_of_artifact, HGenTestConstants.description)

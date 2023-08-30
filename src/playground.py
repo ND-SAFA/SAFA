@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "api.server.settings"
 
-from api.endpoints.predict.predict_serializer import TraceRequest
-from api.endpoints.predict.predict_view import create_predict_definition
+from api.endpoints.views.predict_serializer import TraceRequest
+from api.endpoints.views.predict_view import create_predict_definition
 from api.utils.view_util import ViewUtil
 from tgen.server.api.api_definition import ApiDefinition
 from tgen.testres.definition_creator import DefinitionCreator

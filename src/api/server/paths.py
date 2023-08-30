@@ -9,12 +9,7 @@ def load_paths():
 
     API_PATH = os.path.join(REPO_PATH, "src")
     TGEN_PATH = os.path.join(REPO_PATH, "tgen")
-    modified = False
     if TGEN_PATH not in sys.path:
         sys.path.append(TGEN_PATH)
-        modified = True
     if API_PATH not in sys.path:
         sys.path.append(API_PATH)
-        modified = True
-    if modified:
-        print("PATHS:", sys.path)

@@ -144,7 +144,7 @@ APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOW_ALL_ORIGINS = True
 
-ENV_MODE = os.environ.get("ENV_MODE", "local")
+ENV_MODE = os.environ.get("ENV_MODE", "development")
 logger.info(f"Running in {ENV_MODE} mode")
 """
 Celery Configuration Options
@@ -153,7 +153,7 @@ CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
-
+CELERYD_HIJACK_ROOT_LOGGER = False
 if ENV_MODE == "local":
     CELERY_TASK_ALWAYS_EAGER = True
 

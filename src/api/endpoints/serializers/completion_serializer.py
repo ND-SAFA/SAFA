@@ -2,7 +2,8 @@ from typing import Dict, TypedDict
 
 from rest_framework import serializers
 
-from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
+from api.constants.api_constants import LONG_TEXT
+from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from api.utils.serializer_utility import SerializerUtility
 from tgen.variables.variable import Variable
 
@@ -19,7 +20,7 @@ class CompletionSerializer(AbstractSerializer):
     """
     Serialized the generation payload
     """
-    prompt = serializers.CharField(max_length=10000, trim_whitespace=False, help_text="Prompt for LLM to answer.")
+    prompt = serializers.CharField(max_length=LONG_TEXT, trim_whitespace=False, help_text="Prompt for LLM to answer.")
 
     def create(self, validated_data: Dict) -> Dict[str, Variable]:
         """

@@ -1,8 +1,8 @@
 from typing import TypedDict
 
-from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
-from api.endpoints.base.serializers.dataset_serializer import DatasetSerializer
-from tgen.server.api.api_definition import ApiDefinition
+from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.serializers.dataset_serializer import DatasetSerializer
+from tgen.data.readers.definitions.api_definition import ApiDefinition
 
 
 class TraceRequest(TypedDict):

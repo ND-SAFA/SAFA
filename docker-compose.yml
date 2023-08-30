@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  tgen-rabbitmq:
-    container_name: tgen-rabbitmq
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    build:
-      context: .
-      dockerfile: rabbitmq.Dockerfile
-    networks:
-      - app_network
-
   tgen-server:
     container_name: tgen-server
     build:

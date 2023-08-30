@@ -20,12 +20,12 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from api.endpoints.completion.completion_view import perform_completion
-from api.endpoints.hgen.hgen_view import perform_hgen
-from api.endpoints.jobs.result_view import get_result, get_status
-from api.endpoints.predict.predict_view import perform_prediction, perform_search
-from api.endpoints.project_summary.project_summary_view import perform_project_summary
-from api.endpoints.summarize.summarize_view import perform_summarization_job, perform_summarization_sync
+from api.endpoints.views.completion_view import perform_completion
+from api.endpoints.views.hgen_view import perform_hgen
+from api.endpoints.views.predict_view import perform_prediction, perform_search
+from api.endpoints.views.project_summary_view import perform_project_summary
+from api.endpoints.views.result_view import cancel_job, get_result, get_status
+from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
 
 HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
 
@@ -58,5 +58,6 @@ urlpatterns = [
     path('summarize-sync/', perform_summarization_sync),
     path('hgen/', perform_hgen),
     path('status/', get_status),
+    path('cancel/', cancel_job),
     path('results/', get_result)
 ]

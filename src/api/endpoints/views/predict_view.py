@@ -2,20 +2,22 @@ import json
 import os.path
 from typing import Type, Union
 
-from api.constants.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, DEFAULT_SEARCH_LINK_TAG, \
-    DEFAULT_SEARCH_QUERY_TAG
-from api.endpoints.base.views.endpoint import async_endpoint, endpoint
-from api.endpoints.predict.predict_serializer import PredictionSerializer, TraceRequest
+from api.constants.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, DEFAULT_SEARCH_QUERY_TAG, \
+    DEFAULT_SEARCH_QUESTIONS
+from api.endpoints.base.endpoint import async_endpoint, endpoint
+from api.endpoints.views.predict_serializer import PredictionSerializer, TraceRequest
 from api.utils.view_util import ViewUtil
+from tgen.common.constants.dataset_constants import NO_CHECK
+from tgen.common.constants.tracing.ranking_constants import DEFAULT_SEARCH_FILTER, DEFAULT_SEARCH_MODEL, SEARCH_CHILD_TYPE, \
+    SEARCH_PARENT_TYPE
 from tgen.common.util.json_util import NpEncoder
-from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.dataset_constants import NO_CHECK
-from tgen.constants.tgen_constants import DEFAULT_SEARCH_FILTER, DEFAULT_SEARCH_MODEL, SEARCH_CHILD_TYPE, SEARCH_PARENT_TYPE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.jobs.tracing_jobs.tracing_job import TracingJob
+from tgen.tracing.ranking.common.vsm_sorter import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -27,7 +29,6 @@ def perform_tracing_job(dataset: ApiDefinition, job: Union[Type[RankingJob], Typ
     prediction_result = ViewUtil.run_job(tracing_job)
 
     result = json.dumps(prediction_result, cls=NpEncoder)
-    logger.info("\n\n" + result)
 
     return {"predictions": prediction_result.prediction_entries}
 
@@ -50,11 +51,14 @@ def perform_search(prediction_payload: TraceRequest):
                                RankingJob,
                                generate_summary=False,
                                project_summary=summary,
+                               ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
                                max_children_per_query=DEFAULT_SEARCH_FILTER,
-                               model=DEFAULT_SEARCH_MODEL,
+                               ranking_llm_model=DEFAULT_SEARCH_MODEL,
                                select_top_predictions=False,
                                ranking_goal=DEFAULT_SEARCH_GOAL,
                                ranking_instructions=DEFAULT_SEARCH_INSTRUCTIONS,
                                query_tag=DEFAULT_SEARCH_QUERY_TAG,
-                               links_tag=DEFAULT_SEARCH_LINK_TAG,
+                               ranking_questions=DEFAULT_SEARCH_QUESTIONS,
+                               sorter="embedding",
+                               embedding_model=DEFAULT_SEARCH_EMBEDDING_MODEL,
                                layer_ids=[SEARCH_PARENT_TYPE, SEARCH_CHILD_TYPE])

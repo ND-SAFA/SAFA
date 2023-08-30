@@ -24,7 +24,7 @@ class SummarizeSerializer(AbstractSerializer):
     projectSummary = serializers.CharField(max_length=LONG_TEXT, help_text="The project summary to include in the summarization.",
                                            required=False, allow_null=True, allow_blank=True)
 
-    def create(self, validated_data):
+    def create(self, validated_data) -> SummarizeRequest:
         summary_serializer = ArtifactSerializer(many=True, data=validated_data["artifacts"])
         summary_serializer.is_valid(raise_exception=True)
         summary_artifacts = summary_serializer.save()

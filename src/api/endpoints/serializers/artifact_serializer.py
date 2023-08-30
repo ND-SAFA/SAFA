@@ -18,7 +18,7 @@ class ArtifactSerializer(AbstractSerializer):
                                     allow_blank=True)
 
     def create(self, validated_data: Dict):
-        summary = DataFrameUtil.get_optional_value(validated_data, "summary", allow_empty=False)
+        summary = DataFrameUtil.get_optional_value_from_df(validated_data, "summary", allow_empty=False)
         return EnumDict({
             ArtifactKeys.ID: validated_data["id"],
             ArtifactKeys.CONTENT: validated_data["content"],

@@ -1,5 +1,6 @@
-from api.endpoints.summary.summary_serializer import SummarizeSerializer
+from api.endpoints.serializers.summarize_serializer import SummarizeRequest, SummarizeSerializer
 from api.tests.api_base_test import APIBaseTest
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 
 
 class TestSummarySerializer(APIBaseTest):
@@ -15,17 +16,21 @@ class TestSummarySerializer(APIBaseTest):
         artifact_id = "RE-28"
         artifact_body = "This is the body of an artifact."
         data = {
-            "artifacts": {
-                artifact_id: {
+            "artifacts": [
+                {
+                    "id": artifact_id,
                     "content": artifact_body,
-                    "type": chunker_type
+                    "layer_id": chunker_type
                 }
-            }
+            ]
         }
 
         serializer = SummarizeSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-        validated_payload = serializer.save()
-        validated_artifacts = validated_payload["artifacts"]
+        validated_payload: SummarizeRequest = serializer.save()
+        validated_artifacts = validated_payload.artifacts
         self.assertEqual(1, len(validated_artifacts))
-        self.assertEqual("NL", validated_artifacts[artifact_id]["type"])
+        artifact = validated_artifacts[0]
+        self.assertEqual(chunker_type, artifact[ArtifactKeys.LAYER_ID.value])
+        self.assertEqual(artifact_body, artifact[ArtifactKeys.CONTENT.value])
+        self.assertEqual(artifact_id, artifact[ArtifactKeys.ID.value])

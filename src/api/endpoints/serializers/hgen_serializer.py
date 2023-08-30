@@ -35,5 +35,5 @@ class HGenSerializer(serializers.Serializer):
         artifact_serializer.is_valid(raise_exception=True)
         artifacts = artifact_serializer.save()
         target_types = validated_data["targetTypes"]
-        summary = DataFrameUtil.get_optional_value(validated_data, "summary", allow_empty=False)
+        summary = DataFrameUtil.get_optional_value_from_df(validated_data, "summary", allow_empty=False)
         return HGenRequest(artifacts=artifacts, target_types=target_types, summary=summary)

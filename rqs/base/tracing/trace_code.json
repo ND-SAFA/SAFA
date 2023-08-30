@@ -4,7 +4,7 @@
       "jobs": [
         {
           "object_type": "TRACE_CODE",
-          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]",
+          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/code-traces",
           "dataset_creator": {
             "object_type": "TRACE",
             "project_reader": {

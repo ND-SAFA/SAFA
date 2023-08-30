@@ -7,7 +7,7 @@ from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.serializers.artifact_serializer import ArtifactSerializer
 from api.endpoints.serializers.trace_layer_serializer import TraceLayerSerializer
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.ranking.common.trace_layer import TraceLayer
+from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 
 class DatasetPayload(TypedDict):

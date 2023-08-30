@@ -1,4 +1,4 @@
-from tgen.common.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_ID_TAG, RANKING_SCORE_TAG
+from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_ID_TAG, RANKING_SCORE_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.supported_prompts.default_ranking_prompts import SCORE_INSTRUCTIONS
@@ -6,7 +6,7 @@ from tgen.prompts.supported_prompts.default_ranking_prompts import SCORE_INSTRUC
 DEFAULT_SEARCH_GOAL = "You are a search bar for a software system. " \
                       "Below is a search query followed by the software artifacts in the system. " \
                       "Rank artifacts from most to least related to the search query."
-DEFAULT_SEARCH_INSTRUCTIONS = f"{PromptUtil.format_as_markdown_header('Instructions')}\n"
+DEFAULT_SEARCH_INSTRUCTIONS = f"{PromptUtil.as_markdown_header('Instructions')}\n"
 DEFAULT_SEARCH_QUERY_TAG = "query"
 DEFAULT_SEARCH_LINK_TAG = "search-results"
 

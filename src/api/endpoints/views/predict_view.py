@@ -8,14 +8,16 @@ from api.endpoints.base.endpoint import async_endpoint, endpoint
 from api.endpoints.views.predict_serializer import PredictionSerializer, TraceRequest
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.dataset_constants import NO_CHECK
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_FILTER, DEFAULT_SEARCH_MODEL, SEARCH_CHILD_TYPE, SEARCH_PARENT_TYPE
+from tgen.common.constants.tracing.ranking_constants import DEFAULT_SEARCH_FILTER, DEFAULT_SEARCH_MODEL, SEARCH_CHILD_TYPE, \
+    SEARCH_PARENT_TYPE
 from tgen.common.util.json_util import NpEncoder
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.jobs.tracing_jobs.tracing_job import TracingJob
-from tgen.ranking.common.vsm_sorter import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.tracing.ranking.common.vsm_sorter import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -49,6 +51,7 @@ def perform_search(prediction_payload: TraceRequest):
                                RankingJob,
                                generate_summary=False,
                                project_summary=summary,
+                               ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
                                max_children_per_query=DEFAULT_SEARCH_FILTER,
                                ranking_llm_model=DEFAULT_SEARCH_MODEL,
                                select_top_predictions=False,

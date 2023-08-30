@@ -6,7 +6,6 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.HGenJob;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -41,6 +40,6 @@ public class HGenJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected Class<? extends AbstractJob> getJobType() {
-        return GenerateLinksJob.class;
+        return HGenJob.class;
     }
 }

@@ -1,0 +1,46 @@
+package edu.nd.crc.safa.features.generation.common;
+
+import javax.annotation.Nullable;
+
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * The artifact representation for summarization.
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class GenerationArtifact {
+    /**
+     * The identifier of the artifact.
+     */
+    @Nullable
+    String id;
+    /**
+     * The content to summarize.
+     */
+    String content;
+    /**
+     * The artifact summary.
+     */
+    String summary;
+    /**
+     * The layer this artifact belongs to
+     */
+    @JsonProperty("layer_id")
+    String layerId;
+
+    public GenerationArtifact(ArtifactAppEntity artifact) {
+        this.id = artifact.getName();
+        this.content = artifact.getBody();
+        this.summary = artifact.getSummary();
+        this.layerId = artifact.getType();
+    }
+}

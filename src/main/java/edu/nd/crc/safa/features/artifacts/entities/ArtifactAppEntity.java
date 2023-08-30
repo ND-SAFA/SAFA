@@ -10,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -104,6 +105,16 @@ public class ArtifactAppEntity implements IAppEntity {
         this.attributes = attributes;
     }
 
+    public ArtifactAppEntity(GenerationArtifact artifact) {
+        this.name = artifact.getId();
+        this.body = artifact.getContent();
+        this.summary = artifact.getSummary();
+        this.type = artifact.getLayerId();
+        if (this.summary == null) {
+            this.summary = ""; // Enforces constraint that summary must be some defined string.
+        }
+    }
+
     public void addDocumentId(UUID documentId) {
         this.documentIds.add(documentId);
     }
@@ -124,20 +135,6 @@ public class ArtifactAppEntity implements IAppEntity {
             return this.summary;
         } else {
             return this.body;
-        }
-    }
-
-    /**
-     * Attempts to create a unique identifier from the id or name of the artifact.
-     *
-     * @return Returns some unique identifier to artifact.
-     */
-    @JsonIgnore
-    public String getTraceableId() {
-        if (this.id != null) {
-            return this.id.toString();
-        } else {
-            return this.name;
         }
     }
 

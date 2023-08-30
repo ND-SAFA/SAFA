@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameters;
@@ -26,7 +27,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 /**
  * Responsible for creating units-of-work to be used in JobController.
  */
+@AllArgsConstructor
 @Service
 @Scope("singleton")
 public class JobService {
@@ -41,25 +42,23 @@ public class JobService {
      * Logger used for job services.
      */
     private static final Logger logger = LoggerFactory.getLogger(JobService.class);
+    private final JobDbRepository jobDbRepository;
+    private final SafaUserService safaUserService;
 
     /**
-     * Repository for creating job entities in the database.
+     * Deletes the job with given ID. Terminates any task associated with the job.
+     *
+     * @param jobId The ID of the job.
+     * @return The deleted job entity.
      */
-    JobDbRepository jobDbRepository;
-    /**
-     * Service used to add authenticated user to job.
-     */
-    SafaUserService safaUserService;
-
-    @Autowired
-    public JobService(JobDbRepository jobDbRepository,
-                      SafaUserService safaUserService) {
-        this.jobDbRepository = jobDbRepository;
-        this.safaUserService = safaUserService;
-    }
-
-    public void deleteJob(UUID jobId) {
-        this.jobDbRepository.deleteById(jobId);
+    public JobDbEntity deleteJob(UUID jobId) {
+        Optional<JobDbEntity> optionalJobDbEntity = this.jobDbRepository.findById(jobId);
+        if (optionalJobDbEntity.isEmpty()) {
+            return null;
+        }
+        JobDbEntity jobDbEntity = optionalJobDbEntity.get();
+        this.jobDbRepository.delete(jobDbEntity);
+        return jobDbEntity;
     }
 
     /**
@@ -209,5 +208,16 @@ public class JobService {
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
         job.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
         jobLauncher.run(job, jobParameters);
+    }
+
+    /**
+     * Sets the current task ID on given job.
+     *
+     * @param jobDbEntity The job to update.
+     * @param taskId      The task ID to add to job.
+     */
+    public void setJobTask(JobDbEntity jobDbEntity, UUID taskId) {
+        jobDbEntity.setTaskId(taskId);
+        this.jobDbRepository.save(jobDbEntity);
     }
 }

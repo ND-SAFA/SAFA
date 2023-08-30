@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.prompt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
@@ -19,5 +20,9 @@ public class TGenPromptResponse implements ITGenResponse {
      * The completion to prompt.
      */
     String completion;
-    List<String> logs;
+
+    @Override
+    public List<String> getLogs() {
+        return new ArrayList<>();
+    }
 }

@@ -48,4 +48,11 @@ public class SearchRequest {
      */
     @Nullable
     List<String> relatedTypes = new ArrayList<>();
+
+    public void setRelatedTypes(List<String> relatedTypes) {
+        if (relatedTypes == null) {
+            relatedTypes = new ArrayList<>();
+        }
+        this.relatedTypes = relatedTypes;
+    }
 }

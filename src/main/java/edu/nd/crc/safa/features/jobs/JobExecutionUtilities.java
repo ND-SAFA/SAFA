@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.config.TraceLinkGenerationConfig;
+import edu.nd.crc.safa.config.TraceLinkGenConfig;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStepImplementation;
@@ -22,7 +22,7 @@ public interface JobExecutionUtilities {
      */
     static <T extends AbstractJob> List<JobStepImplementation> getSteps(Class<T> jobClass) {
         List<JobStepImplementation> jobSteps = new ArrayList<>();
-        boolean isTest = TraceLinkGenerationConfig.isTestEnvironment();
+        boolean isTest = TraceLinkGenConfig.isTestEnvironment();
         for (Method method : jobClass.getMethods()) {
             IJobStep jobStep = method.getAnnotation(IJobStep.class);
             if (jobStep == null || (isTest && jobStep.requiredGeneration())) {

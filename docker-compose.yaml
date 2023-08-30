@@ -2,17 +2,15 @@ version: '3'
 services:
   bend:
     depends_on: [ "mysql" ]
-    image: "safa_api:latest"
-    container_name: safa_api
+    container_name: bend
     build: .
-    hostname: safa_api
     ports:
       - 3000:80
-    environment:
-      - TGEN_ENDPOINT=https://localhost
-      - DB_URL=jdbc:mysql://mysql/safa-db
     networks:
       - safa
+    environment:
+      - TGEN_ENDPOINT=http://localhost:4000
+      - DB_URL=jdbc:mysql://mysql/safa-db
   mysql:
     image: mysql:8.0
     hostname: mysql
@@ -27,6 +25,8 @@ services:
     networks:
       - safa
 
+volumes:
+  db_data:
 networks:
   safa:
 

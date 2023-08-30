@@ -59,7 +59,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
         List<ArtifactAppEntity> artifacts = serviceProvider.getArtifactService().getAppEntities(project);
 
         // We should have the correct number of artifacts and links
-        Assertions.assertEquals(initialArtifactCount + diffArtifactsCount,artifacts.size());
+        Assertions.assertEquals(initialArtifactCount + diffArtifactsCount, artifacts.size());
 
         for (ArtifactAppEntity artifact : artifacts) {
             if (artifact.getType().equals(type.getName())) {

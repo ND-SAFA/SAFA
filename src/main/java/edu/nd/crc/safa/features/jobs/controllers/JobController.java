@@ -83,9 +83,7 @@ public class JobController extends BaseController {
         JobDbEntity jobDbEntity = this.jobService.deleteJob(jobId);
         if (jobDbEntity != null) {
             UUID taskId = jobDbEntity.getTaskId();
-            if (taskId != null) {
-                this.genApi.cancelJob(taskId);
-            }
+            this.genApi.cancelJob(taskId);
         }
         this.serviceProvider.getNotificationService().broadcastChange(
             EntityChangeBuilder

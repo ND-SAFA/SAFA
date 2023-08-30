@@ -57,7 +57,7 @@ public class JobService {
             return null;
         }
         JobDbEntity jobDbEntity = optionalJobDbEntity.get();
-        this.jobDbRepository.deleteById(jobId);
+        this.jobDbRepository.delete(jobDbEntity);
         return jobDbEntity;
     }
 

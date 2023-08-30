@@ -116,7 +116,7 @@ public class GenApi implements ITraceGenerationController {
      */
     public void cancelJob(UUID taskId) {
         if (taskId == null) {
-            throw new AssertionError("Cannot terminate task with ID equal to null.");
+            return;
         }
         String cancelEndpoint = TGenConfig.getEndpoint("cancel");
         TGenTask task = new TGenTask();

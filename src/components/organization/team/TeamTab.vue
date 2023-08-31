@@ -40,7 +40,14 @@
         </selector-table>
       </template>
       <template #2>
-        <team-member-table />
+        <typography variant="subtitle" el="h3" :value="steps[1].title" />
+        <separator b="2" />
+        <expansion-item default-opened label="Members">
+          <team-member-table />
+        </expansion-item>
+        <expansion-item label="Projects">
+          <project-selector-table :open="currentStep === 2" />
+        </expansion-item>
       </template>
     </stepper>
   </panel-card>
@@ -71,8 +78,12 @@ import {
   IconButton,
   Stepper,
   SelectorTable,
+  ExpansionItem,
+  Typography,
+  Separator,
 } from "@/components/common";
-import TeamMemberTable from "@/components/members/table/TeamMemberTable.vue";
+import { TeamMemberTable } from "@/components/members";
+import { ProjectSelectorTable } from "@/components/project";
 
 const defaultTeamListStep = (): StepperStep => ({
   title: "Teams",

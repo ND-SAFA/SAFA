@@ -15,6 +15,7 @@
       :columns="membersColumns"
       :rows="rows"
       row-key="email"
+      :item-name="itemName"
       addable
       :deletable="isAdmin"
       :loading="memberApiStore.loading"
@@ -63,9 +64,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { capitalize, computed, ref } from "vue";
+import { computed, ref } from "vue";
 import { MembershipSchema, MemberTableProps, MemberRole } from "@/types";
-import { membersColumns } from "@/util";
+import { capitalizeSentence, membersColumns } from "@/util";
 import {
   logStore,
   memberApiStore,
@@ -91,7 +92,8 @@ const addedMember = ref<string | null>(null);
 const addMode = ref(false);
 
 const name = computed(() => props.entity.entityType?.toLowerCase() || "");
-const title = computed(() => `${capitalize(name.value)} Members`);
+const itemName = computed(() => `${name.value} member`);
+const title = computed(() => capitalizeSentence(itemName.value) + "s");
 
 const isAdmin = computed(() =>
   permissionStore.projectAllows("admin", projectStore.project)

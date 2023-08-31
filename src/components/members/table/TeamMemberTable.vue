@@ -1,6 +1,4 @@
 <template>
-  <typography variant="subtitle" el="h3" value="Team members" />
-  <separator />
   <member-table minimal :entity="entity" />
 </template>
 
@@ -17,8 +15,6 @@ export default {
 import { computed } from "vue";
 import { MemberEntitySchema } from "@/types";
 import { projectStore } from "@/hooks";
-import Separator from "@/components/common/display/content/Separator.vue";
-import { Typography } from "@/components";
 import MemberTable from "./MemberTable.vue";
 
 const entity = computed(

@@ -60,7 +60,7 @@
             value="There are no notifications in the current session."
           />
         </div>
-        <list v-else class="nav-notifications q-pa-sm">
+        <list v-else class="nav-notifications q-pa-sm q-mb-sm">
           <typography variant="caption" value="Notifications" />
 
           <list-item

@@ -8,7 +8,7 @@
     :columns="columns"
     :rows="rows"
     row-key="projectId"
-    item-name="Project"
+    item-name="version"
     data-cy="table-version"
     @refresh="handleReload"
     @row:add="addOpen = true"

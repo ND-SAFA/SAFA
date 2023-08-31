@@ -9,7 +9,7 @@
     :columns="columns"
     :rows="rows"
     row-key="projectId"
-    item-name="Project"
+    item-name="project"
     data-cy="table-project"
     @refresh="handleReload"
     @row:add="identifierSaveStore.selectIdentifier(undefined, 'save')"

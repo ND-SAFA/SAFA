@@ -3,6 +3,7 @@ import { ref } from "vue";
 import SockJS from "sockjs-client";
 import Stomp, { Client, Message, Subscription } from "webstomp-client";
 
+import { StompApiHook } from "@/types";
 import { logStore } from "@/hooks";
 import {
   MAX_RECONNECT_ATTEMPTS,
@@ -12,9 +13,9 @@ import {
 import { pinia } from "@/plugins";
 
 /**
- * The singleton client for connecting to the backend websocket server.
+ * The hook with a client for connecting to the backend websocket server.
  */
-export const useStompApi = defineStore("stompApi", () => {
+export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   const stompClient = ref<Client>();
   const socket = ref<WebSocket>();
   const reconnectInterval = ref<NodeJS.Timeout>();
@@ -51,14 +52,6 @@ export const useStompApi = defineStore("stompApi", () => {
     return stompClient.value;
   }
 
-  /**
-   * Connects to BEND websocket server and tries to reconnect if
-   * the connection fails.
-   *
-   * @param maxReconnectAttempts - The number of times to reconnect before failing.
-   * @param reconnectWaitTime - The number of milliseconds to wait before reconnecting.
-   * @param isReconnect - Whether this is a reconnect attempt.
-   */
   function connectStomp(
     maxReconnectAttempts: number = MAX_RECONNECT_ATTEMPTS,
     reconnectWaitTime: number = RECONNECT_WAIT_TIME,
@@ -120,12 +113,6 @@ export const useStompApi = defineStore("stompApi", () => {
     });
   }
 
-  /**
-   * Subscribes to a websocket destination and returns the subscription.
-   *
-   * @param destination - The destination url to subscribe to.
-   * @param callback - The callback to run when a message is received.
-   */
   async function subscribeToStomp(
     destination: string,
     callback?: (message: Message) => void
@@ -139,9 +126,6 @@ export const useStompApi = defineStore("stompApi", () => {
     return stomp.subscribe(destination, callback);
   }
 
-  /**
-   * Clears all subscriptions of the current user.
-   */
   function clearStompSubscriptions(): void {
     const stomp = getStomp();
 
@@ -153,7 +137,6 @@ export const useStompApi = defineStore("stompApi", () => {
   }
 
   return {
-    getStomp,
     connectStomp,
     subscribeToStomp,
     clearStompSubscriptions,

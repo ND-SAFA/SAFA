@@ -40,7 +40,7 @@ class PromptResponseManager:
     """
     :param expected_responses: A dictionary mapping the tag id to the expected responses for that tag
     """
-    expected_responses: Union[List, Dict[str, List]] = field(default_factory=dict)
+    expected_responses: Union[List, Dict[str, Set]] = field(default_factory=dict)
     """
     :param formatter: A method that takes in the tag id and returns the correct format for the associated response
     """
@@ -139,7 +139,7 @@ class PromptResponseManager:
         if isinstance(self.response_tag, dict):
             for parent, child_tags in self.response_tag.items():
                 values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
-                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in child_tags} for val in values]
+                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in child_tags + [parent]} for val in values]
                 output[self._tag2id[parent]] = values
         else:
             tags, _ = self._convert2list(self.response_tag)

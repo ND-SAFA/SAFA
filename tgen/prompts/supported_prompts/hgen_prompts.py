@@ -43,7 +43,7 @@ FORMAT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[DEFINITION_PROMPT, 
                                            enumeration_chars=["-"])
 
 GENERATION_PROMPT = Prompt("You are an engineer working on a software system and your goal is to reverse engineer "
-                           "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
+                           "{target_type}s from {source_type}s. You are given a list of ids and descriptions of the "
                            "{source_type}s in the system below. ")
 SUMMARY_INSTRUCTIONS = "Using the {source_type}, write a comprehensive summary of this system focusing on the technical details " \
                        "and design aspects needed to understand the functionality. " \

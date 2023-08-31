@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import List
+from typing import List, Dict
 
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_HGEN_LINK_THRESHOLD
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -37,7 +37,6 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         if os.path.exists(proj_path):
             dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
         else:
-            artifact_generations = state.refined_content if state.refined_content else state.generated_artifact_content
             original_dataset_complete = state.original_dataset
 
             original_artifact_df = original_dataset_complete.artifact_df
@@ -50,12 +49,15 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
             target_layer_id = CreateHGenDatasetStep._get_target_layer_id(args, original_dataset_complete)
 
-            new_artifact_df = create_artifact_df_from_generated_artifacts(args, artifact_generations, target_layer_id)
+            generated_artifacts, predicted_links = list(state.refined_content.keys()), list(state.refined_content.values())
+            new_artifact_df = create_artifact_df_from_generated_artifacts(args, generated_artifacts, target_layer_id)
+            artifact_id_to_link_predictions = {name: predicted_links[i] for i, name in enumerate(new_artifact_df.index)}
             save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
 
             new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, target_layer_id)
             combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
-            new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state, combined_artifact_df)
+            new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state, combined_artifact_df,
+                                                                                           artifact_id_to_link_predictions)
             save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
                                     export_path, filename="generated_dataset_checkpoint")
 
@@ -93,10 +95,15 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     @staticmethod
     def _create_trace_df_with_generated_artifacts(hgen_args: HGenArgs, hgen_state: HGenState,
-                                                  artifact_df: ArtifactDataFrame) -> TraceDataFrame:
+                                                  artifact_df: ArtifactDataFrame,
+                                                  artifact_id_to_link_predictions: Dict[str, List[str]]) -> TraceDataFrame:
         """
         Creates a dataframe of traces including the new trace links between the original lower-level artifacts
         and the newly generated upper-level artifacts
+        :param hgen_args: The arguments to the hierarchy generator
+        :param hgen_state: The current state of hgen
+        :param artifact_df: The dataframe containing the generated artifacts
+        :param artifact_id_to_link_predictions: A dictionary mapping artifact id to the links that were predicted for it
         :return: The dataframe containing new and old trace links
         """
         if not hgen_args.generate_trace_links:
@@ -106,7 +113,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary,
                                  export_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_state.export_dir),
                                  load_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_args.load_dir),
-                                 link_threshold=DEFAULT_HGEN_LINK_THRESHOLD)
+                                 link_threshold=DEFAULT_HGEN_LINK_THRESHOLD, parent2children=artifact_id_to_link_predictions)
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")

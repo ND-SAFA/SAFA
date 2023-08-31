@@ -4,6 +4,7 @@ import { computed, ref } from "vue";
 import {
   IOHandlerCallback,
   PasswordChangeSchema,
+  SessionApiHook,
   UserPasswordSchema,
 } from "@/types";
 import { DEMO_ACCOUNT } from "@/util";
@@ -31,7 +32,7 @@ import { useApi } from "@/hooks/api/core/useApi";
 /**
  * Creates a store for handling session API requests.
  */
-export const useSessionApi = defineStore("sessionApi", () => {
+export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   const createdAccount = ref(false);
   const passwordSubmitted = ref(false);
   const sessionApi = useApi("sessionApi")();
@@ -51,20 +52,12 @@ export const useSessionApi = defineStore("sessionApi", () => {
     "Unable to update password."
   );
 
-  /**
-   * Resets the session API state.
-   */
   function handleReset(): void {
     createdAccount.value = false;
     passwordSubmitted.value = false;
     sessionApi.handleReset();
   }
 
-  /**
-   * Attempts to create a new account.
-   *
-   * @param user - The user to create.
-   */
   async function handleCreateAccount(user: UserPasswordSchema): Promise<void> {
     await sessionApi.handleRequest(async () => {
       await createUser(user);
@@ -73,11 +66,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Attempts to send a password reset email.
-   *
-   * @param email - The email to send the reset to.
-   */
   async function handlePasswordReset(email: string): Promise<void> {
     await sessionApi.handleRequest(async () => {
       await createPasswordReset({ email });
@@ -86,12 +74,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Attempts to reset a user's password.
-   *
-   * @param newPassword - The password and token to reset with.
-   * @param resetToken - The token to reset with.
-   */
   async function handlePasswordUpdate(
     newPassword: string,
     resetToken: string
@@ -106,11 +88,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Attempts to log a user in.
-   *
-   * @param user - The user to log in.
-   */
   async function handleLogin(user: UserPasswordSchema): Promise<void> {
     await sessionApi.handleRequest(async () => {
       const session = await createLoginSession(user);
@@ -138,9 +115,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Logs in to the demo account and opens the demo project.
-   */
   async function handleDemoLogin(): Promise<void> {
     permissionStore.isDemo = true;
 
@@ -151,11 +125,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     );
   }
 
-  /**
-   * Logs a user out to the login screen.
-   *
-   * @param sendLogoutRequest - Whether to send the API request to log out.
-   */
   async function handleLogout(sendLogoutRequest = false): Promise<void> {
     await sessionApi.handleRequest(async () => {
       document.cookie = "";
@@ -171,10 +140,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Verifies the stored authentication token, and loads the last project if routing to the artifact tree.
-   * @throws If the authentication token is invalid.
-   */
   async function handleAuthentication(): Promise<void> {
     sessionStore.user = await getCurrentUser();
 
@@ -185,12 +150,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     await getProjectApiStore.handleReload({});
   }
 
-  /**
-   * Updates a user's password.
-   *
-   * @param password - The old and new password.
-   * @param callbacks - The callbacks to run on success or error.
-   */
   async function handleChangePassword(
     password: PasswordChangeSchema,
     callbacks: IOHandlerCallback
@@ -202,11 +161,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Confirms and deletes a user's account.
-   *
-   * @param password - The user's current password.
-   */
   function handleDeleteAccount(password: string): void {
     logStore.confirm(
       "Delete your account?",

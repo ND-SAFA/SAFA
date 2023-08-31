@@ -1,5 +1,6 @@
 <template>
   <details-panel panel="displayTraceMatrix">
+    <trace-matrix-buttons />
     <trace-matrix-content />
     <trace-matrix-traces />
     <trace-matrix-artifacts />
@@ -21,5 +22,6 @@ import {
   TraceMatrixContent,
   TraceMatrixTraces,
   TraceMatrixArtifacts,
+  TraceMatrixButtons,
 } from "@/components/traceMatrix/display";
 </script>

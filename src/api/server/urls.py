@@ -20,6 +20,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
+from api.constants.config import TGEN_START_MSG
 from api.endpoints.views.completion_view import perform_completion
 from api.endpoints.views.hgen_view import perform_hgen
 from api.endpoints.views.predict_view import perform_prediction, perform_search
@@ -27,11 +28,9 @@ from api.endpoints.views.project_summary_view import perform_project_summary
 from api.endpoints.views.result_view import cancel_job, get_result, get_status
 from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
 
-HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
-
 
 def homePageView(request):
-    return HttpResponse(HOME_PAGE_CONTENT)
+    return HttpResponse(TGEN_START_MSG)
 
 
 schema_view = get_schema_view(

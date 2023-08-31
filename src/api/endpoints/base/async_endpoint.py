@@ -5,8 +5,8 @@ from typing import Type
 from celery import Task, shared_task
 from rest_framework import serializers
 
+from api.constants.config import TGEN_START_MSG
 from api.endpoints.base.endpoint import PostProcessType, PreProcessType, endpoint, endpoint_postprocess, endpoint_preprocess
-from api.server.settings import TGEN_START_MSG
 from tgen.common.util.json_util import NpEncoder
 from tgen.common.util.logging.logger_manager import logger
 

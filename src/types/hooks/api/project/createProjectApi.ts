@@ -1,4 +1,4 @@
-import { ComputedRef } from "vue/dist/vue";
+import { ComputedRef } from "vue";
 import { IOHandlerCallback, ProjectSchema } from "@/types";
 
 /**

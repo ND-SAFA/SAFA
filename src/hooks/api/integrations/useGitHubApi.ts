@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed, ref } from "vue";
 import {
+  GitHubApiHook,
   GitHubOrganizationSchema,
   GitHubProjectSchema,
   IOHandlerCallback,
@@ -18,7 +19,7 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useGitHubApi = defineStore("gitHubApi", () => {
+export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
   const githubApi = useApi("githubApi");
 
   const organizationList = ref<GitHubOrganizationSchema[]>([]);
@@ -26,16 +27,10 @@ export const useGitHubApi = defineStore("gitHubApi", () => {
 
   const loading = computed(() => githubApi.loading);
 
-  /**
-   * Opens the GitHub authentication window.
-   */
   function handleAuthRedirect(): void {
     authorizeGitHub();
   }
 
-  /**
-   * Clears the saved GitHub credentials.
-   */
   async function handleDeleteCredentials(): Promise<void> {
     await githubApi.handleRequest(async () => {
       await deleteGitHubCredentials();
@@ -43,11 +38,6 @@ export const useGitHubApi = defineStore("gitHubApi", () => {
     });
   }
 
-  /**
-   * Handles GitHub authentication when the app loads.
-   *
-   * @param callbacks - Called once the action is complete.
-   */
   async function handleVerifyCredentials(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
@@ -89,11 +79,6 @@ export const useGitHubApi = defineStore("gitHubApi", () => {
     );
   }
 
-  /**
-   * Loads GitHub projects and creates related organizations.
-   *
-   * @param callbacks - Called once the action is complete.
-   */
   async function handleLoadProjects(
     callbacks: IOHandlerCallback<GitHubProjectSchema[]> = {}
   ): Promise<void> {

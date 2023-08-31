@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import {
   IOHandlerCallback,
+  JiraApiHook,
   JiraOrganizationSchema,
   JiraProjectSchema,
 } from "@/types";
@@ -19,7 +20,7 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useJiraApi = defineStore("jiraApi", () => {
+export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
   const jiraApi = useApi("jiraApi");
 
   const organizationList = ref<JiraOrganizationSchema[]>([]);
@@ -27,26 +28,15 @@ export const useJiraApi = defineStore("jiraApi", () => {
 
   const loading = computed(() => jiraApi.loading);
 
-  /**
-   * Opens the Jira authentication window.
-   */
   function handleAuthRedirect(): void {
     authorizeJira();
   }
 
-  /**
-   * Clears the saved Jira credentials.
-   */
   async function handleDeleteCredentials(): Promise<void> {
     await deleteJiraCredentials();
     integrationsStore.validJiraCredentials = false;
   }
 
-  /**
-   * Handles Jira authentication when the app loads.
-   *
-   * @param callbacks - Called once the action is complete.
-   */
   async function handleVerifyCredentials(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
@@ -90,11 +80,6 @@ export const useJiraApi = defineStore("jiraApi", () => {
     );
   }
 
-  /**
-   * Loads Jira installations.
-   *
-   * @param callbacks - Called once the action is complete.
-   */
   async function handleLoadOrganizations(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
@@ -104,11 +89,6 @@ export const useJiraApi = defineStore("jiraApi", () => {
     }, callbacks);
   }
 
-  /**
-   * Loads Jira projects and sets the currently selected cloud id.
-   *
-   * @param callbacks - Called once the action is complete.
-   */
   async function handleLoadProjects(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {

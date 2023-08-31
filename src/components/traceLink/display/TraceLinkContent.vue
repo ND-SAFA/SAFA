@@ -11,6 +11,7 @@
           :value="explanation"
           variant="expandable"
           default-expanded
+          :collapse-length="0"
         />
       </div>
 

@@ -2,7 +2,12 @@
   <div>
     <div v-if="!!explanation">
       <typography variant="caption" value="Explanation" />
-      <typography :value="explanation" variant="expandable" default-expanded />
+      <typography
+        :value="explanation"
+        variant="expandable"
+        default-expanded
+        :collapse-length="0"
+      />
     </div>
 
     <q-splitter v-if="!showOnly" v-model="splitterModel">

@@ -144,8 +144,8 @@ APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOW_ALL_ORIGINS = True
 
-ENV_MODE = os.environ.get("ENV_MODE", "development")
-logger.info(f"Running in {ENV_MODE} mode")
+ENV_NAME = os.environ.get("ENV_MODE", "development")
+logger.info(f"Environment: {ENV_NAME}")
 """
 Celery Configuration Options
 """
@@ -154,7 +154,7 @@ CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
 CELERYD_HIJACK_ROOT_LOGGER = False
-if ENV_MODE == "local":
+if ENV_NAME == "local":
     CELERY_TASK_ALWAYS_EAGER = True
 
 

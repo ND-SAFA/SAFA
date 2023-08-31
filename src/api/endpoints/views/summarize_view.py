@@ -1,4 +1,5 @@
-from api.endpoints.base.endpoint import async_endpoint, endpoint
+from api.endpoints.base.async_endpoint import async_endpoint
+from api.endpoints.base.endpoint import endpoint
 from api.endpoints.serializers.summarize_serializer import SummarizeRequest, SummarizeSerializer
 from api.utils.view_util import ViewUtil
 from tgen.jobs.summary_jobs.summarize_artifacts_job import SummarizeArtifactsJob

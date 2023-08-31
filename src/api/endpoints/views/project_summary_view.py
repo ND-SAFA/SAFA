@@ -1,4 +1,4 @@
-from api.endpoints.base.endpoint import async_endpoint
+from api.endpoints.base.async_endpoint import async_endpoint
 from api.endpoints.serializers.project_summary_serializer import ProjectSummaryRequest, \
     ProjectSummarySerializer
 from tgen.common.util.status import Status

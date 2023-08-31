@@ -1,6 +1,6 @@
 from typing import List
 
-from api.endpoints.base.endpoint import async_endpoint
+from api.endpoints.base.async_endpoint import async_endpoint
 from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
 from api.utils.view_util import ViewUtil
 from tgen.common.util.logging.logger_manager import logger

@@ -19,6 +19,9 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
+/**
+ * A hook for managing GitHub API requests.
+ */
 export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
   const githubApi = useApi("githubApi");
 

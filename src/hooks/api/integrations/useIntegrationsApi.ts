@@ -14,6 +14,9 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
+/**
+ * A hook for managing integrations API requests.
+ */
 export const useIntegrationsApi = defineStore(
   "integrationsApi",
   (): IntegrationsApiHook => {

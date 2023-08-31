@@ -17,6 +17,9 @@ import {
 import { createGeneratedArtifacts, createPrompt, createSummary } from "@/api";
 import { pinia } from "@/plugins";
 
+/**
+ * A hook for managing artifact generation API requests.
+ */
 export const useArtifactGenerationApi = defineStore(
   "artifactGenerationApi",
   () => {
@@ -34,12 +37,6 @@ export const useArtifactGenerationApi = defineStore(
     const summaryGenLoading = computed(() => summaryGenerationApi.loading);
     const artifactGenLoading = computed(() => artifactGenerationApi.loading);
 
-    /**
-     * Generates a summary for an artifact, and updates the app state.
-     *
-     * @param artifact - The artifact to summarize.
-     * @param callbacks - The callbacks to use for the action.
-     */
     async function handleGenerateSummary(
       artifact: ArtifactSchema,
       callbacks: IOHandlerCallback = {}
@@ -72,12 +69,6 @@ export const useArtifactGenerationApi = defineStore(
       );
     }
 
-    /**
-     * Generates the name of an artifact based on the body.
-     * Uses the artifact currently being edited, and updates the edited artifact name to the response.
-     *
-     * @param callbacks - The callbacks to use for the action.
-     */
     async function handleGenerateName(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
@@ -96,12 +87,6 @@ export const useArtifactGenerationApi = defineStore(
       );
     }
 
-    /**
-     * Generates the body of an artifact based on an artifact prompt.
-     * Uses the artifact currently being edited, and updates the edited artifact body to the response.
-     *
-     * @param callbacks - The callbacks to use for the action.
-     */
     async function handleGenerateBody(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
@@ -118,12 +103,6 @@ export const useArtifactGenerationApi = defineStore(
       );
     }
 
-    /**
-     * Generates parent artifacts based on child artifacts, and stores the generated artifacts.
-     *
-     * @param configuration - The configuration for generating the artifacts.
-     * @param callbacks - The callbacks for the action.
-     */
     async function handleGenerateArtifacts(
       configuration: GenerateArtifactSchema,
       callbacks: IOHandlerCallback

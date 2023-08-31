@@ -20,6 +20,9 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
+/**
+ * A hook for managing Jira API requests.
+ */
 export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
   const jiraApi = useApi("jiraApi");
 

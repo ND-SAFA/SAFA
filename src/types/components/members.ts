@@ -1,4 +1,9 @@
-import { MembershipSchema, MinimalProps, OpenableProps } from "@/types";
+import {
+  MemberEntitySchema,
+  MembershipSchema,
+  MinimalProps,
+  OpenableProps,
+} from "@/types";
 
 /**
  * The props for inputs to invite a new member to a project.
@@ -9,9 +14,9 @@ export interface InviteMemberInputsProps {
    */
   email?: string | null;
   /**
-   * The project id to invite the member to.
+   * The entity to invite the member to.
    */
-  projectId?: string;
+  entity: MemberEntitySchema;
 }
 
 /**
@@ -26,10 +31,6 @@ export interface InviteMemberModalProps
  */
 export interface MemberRoleButtonProps {
   /**
-   * The project id to edit the member of.
-   */
-  projectId: string;
-  /**
    * The member to edit, setting edit mode.
    */
   member: MembershipSchema;
@@ -40,7 +41,7 @@ export interface MemberRoleButtonProps {
  */
 export interface MemberTableProps extends MinimalProps {
   /**
-   * The type of members being managed.
+   * The type of entities in this table.
    */
-  variant: "project" | "team" | "organization";
+  entity: MemberEntitySchema;
 }

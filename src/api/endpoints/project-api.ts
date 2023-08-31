@@ -6,7 +6,7 @@ import {
   MembershipSchema,
   VersionDeltaSchema,
   ProjectSchema,
-  ProjectRole,
+  MemberRole,
 } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
@@ -107,7 +107,7 @@ export async function getProjectMembers(
 export async function saveProjectMember(
   projectId: string,
   memberEmail: string,
-  projectRole: ProjectRole
+  projectRole: MemberRole
 ): Promise<MembershipSchema> {
   return authHttpClient<MembershipSchema>(
     fillEndpoint(Endpoint.getProjectMembers, {

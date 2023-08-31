@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { MembershipSchema, ProjectSchema } from "@/types";
+import { MemberEntitySchema, MembershipSchema, ProjectSchema } from "@/types";
 import { removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import projectStore from "./useProject";
@@ -11,7 +11,7 @@ import projectStore from "./useProject";
 export const useMembers = defineStore("members", {
   state: () => ({
     /**
-     * List of members and their roles in the project.
+     * List of members and their roles in the current project.
      */
     members: [] as MembershipSchema[],
   }),
@@ -27,16 +27,22 @@ export const useMembers = defineStore("members", {
      * Updates the current project members.
      *
      * @param updatedMembers - The updated members.
+     * @param entity - The entity to store the members of.
      */
-    updateMembers(updatedMembers: MembershipSchema[]): void {
+    updateMembers(
+      updatedMembers: MembershipSchema[],
+      entity: MemberEntitySchema
+    ): void {
       const ids = updatedMembers.map((member) => member.projectMembershipId);
 
-      this.members = [
-        ...removeMatches(this.members, "projectMembershipId", ids),
-        ...updatedMembers,
-      ];
+      if (entity.entityType === "PROJECT") {
+        this.members = [
+          ...removeMatches(this.members, "projectMembershipId", ids),
+          ...updatedMembers,
+        ];
 
-      projectStore.project.members = this.members;
+        projectStore.project.members = this.members;
+      }
     },
     /**
      * Deletes from the current project members.

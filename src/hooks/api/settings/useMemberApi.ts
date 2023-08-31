@@ -4,8 +4,8 @@ import { computed } from "vue";
 import {
   IOHandlerCallback,
   MemberApiHook,
+  MemberEntitySchema,
   MembershipSchema,
-  ProjectRole,
 } from "@/types";
 import { removeMatches } from "@/util";
 import {
@@ -13,7 +13,6 @@ import {
   getProjectApiStore,
   logStore,
   membersStore,
-  projectStore,
   sessionStore,
 } from "@/hooks";
 import {
@@ -31,66 +30,80 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
 
   const loading = computed(() => memberApi.loading);
 
-  async function handleReload(): Promise<void> {
+  async function handleReload(entity: MemberEntitySchema): Promise<void> {
+    if (!entity.entityId) return;
+
     await memberApi.handleRequest(
       async () => {
-        const members = await getProjectMembers(projectStore.projectId);
+        if (entity.entityType === "PROJECT") {
+          const members = await getProjectMembers(entity.entityId || "");
 
-        membersStore.updateMembers(members);
+          membersStore.updateMembers(members, entity);
+        }
       },
       { error: `Unable to get members` }
     );
   }
 
   async function handleInvite(
-    projectId: string,
-    memberEmail: string,
-    projectRole: ProjectRole,
+    member: MembershipSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
     await memberApi.handleRequest(
       async () => {
-        const member = await saveProjectMember(
-          projectId,
-          memberEmail,
-          projectRole
-        );
+        if (member.entityType === "PROJECT") {
+          const invitedMember = await saveProjectMember(
+            member.entityId || "",
+            member.email,
+            member.role
+          );
 
-        membersStore.updateMembers([...membersStore.members, member]);
+          membersStore.updateMembers(
+            [...membersStore.members, invitedMember],
+            member
+          );
+        }
       },
       {
         ...callbacks,
-        success: `Member has been added: ${memberEmail}`,
-        error: `Unable save member: ${memberEmail}`,
+        success: `Member has been added: ${member.email}`,
+        error: `Unable save member: ${member.email}`,
       }
     );
   }
 
   async function handleSaveRole(
-    projectId: string,
-    memberEmail: string,
-    projectRole: ProjectRole,
+    member: MembershipSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
     await memberApi.handleRequest(
       async () => {
-        const member = await saveProjectMember(
-          projectId,
-          memberEmail,
-          projectRole
-        );
+        if (member.entityType === "PROJECT") {
+          const updatedMember = await saveProjectMember(
+            member.entityId || "",
+            member.email,
+            member.role
+          );
 
-        membersStore.updateMembers([
-          member,
-          ...removeMatches(membersStore.members, "projectMembershipId", [
-            member.projectMembershipId,
-          ]),
-        ]);
+          membersStore.updateMembers(
+            [
+              updatedMember,
+              ...removeMatches(membersStore.members, "projectMembershipId", [
+                updatedMember.projectMembershipId,
+              ]),
+            ],
+            member
+          );
+        }
       },
       {
         ...callbacks,
-        success: `Member is now an ${projectRole}: ${memberEmail}`,
-        error: `Unable to change member to ${projectRole}: ${memberEmail}`,
+        success: `Member is now an ${member.role.toLowerCase()}: ${
+          member.email
+        }`,
+        error: `Unable to change member to ${member.role.toLowerCase()}: ${
+          member.email
+        }`,
       }
     );
   }
@@ -101,25 +114,27 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
         ? "yourself"
         : `"${member.email}"`;
 
-    logStore.confirm(
-      "Remove User from Project",
-      `Are you sure you want to remove ${email} from this project?`,
-      async (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+    if (member.entityType === "PROJECT") {
+      logStore.confirm(
+        "Remove User from Project",
+        `Are you sure you want to remove ${email} from this project?`,
+        async (isConfirmed: boolean) => {
+          if (!isConfirmed) return;
 
-        await memberApi.handleRequest(
-          async () => {
-            await deleteProjectMember(member);
-            membersStore.deleteMembers([member.projectMembershipId]);
-            await getProjectApiStore.handleReload();
-          },
-          {
-            success: `Deleted a member: ${member.email}`,
-            error: `Unable to delete member: ${member.email}`,
-          }
-        );
-      }
-    );
+          await memberApi.handleRequest(
+            async () => {
+              await deleteProjectMember(member);
+              membersStore.deleteMembers([member.projectMembershipId]);
+              await getProjectApiStore.handleReload();
+            },
+            {
+              success: `Deleted a member: ${member.email}`,
+              error: `Unable to delete member: ${member.email}`,
+            }
+          );
+        }
+      );
+    }
   }
 
   return {

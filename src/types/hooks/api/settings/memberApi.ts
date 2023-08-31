@@ -1,5 +1,9 @@
 import { ComputedRef } from "vue";
-import { IOHandlerCallback, MembershipSchema, ProjectRole } from "@/types";
+import {
+  IOHandlerCallback,
+  MemberEntitySchema,
+  MembershipSchema,
+} from "@/types";
 
 /**
  * A hook for calling member API endpoints.
@@ -10,35 +14,29 @@ export interface MemberApiHook {
    */
   loading: ComputedRef<boolean>;
   /**
-   * Updates the current project's members.
-   */
-  handleReload(): Promise<void>;
-  /**
-   * Adds a user to a project and logs the status.
+   * Updates the stored members for a project, team, or organization.
    *
-   * @param projectId - The project to add this user to.
-   * @param memberEmail - The email of the given user.
-   * @param projectRole - The role to set for the given user.
+   * @param entity - The entity to load the members of.
+   */
+  handleReload(entity: MemberEntitySchema): Promise<void>;
+  /**
+   * Invites a user to a project, team, or organization.
+   *
+   * @param member - The member to invite.
    * @param callbacks - Callbacks for the request.
    */
   handleInvite(
-    projectId: string,
-    memberEmail: string,
-    projectRole: ProjectRole,
+    member: MembershipSchema,
     callbacks: IOHandlerCallback
   ): Promise<void>;
   /**
    * Updates the role of a member.
    *
-   * @param projectId - The project to add this user to.
-   * @param memberEmail - The email of the given user.
-   * @param projectRole - The role to set for the given user.
+   * @param member - The member to update the role of.
    * @param callbacks - Callbacks for the request.
    */
   handleSaveRole(
-    projectId: string,
-    memberEmail: string,
-    projectRole: ProjectRole,
+    member: MembershipSchema,
     callbacks: IOHandlerCallback
   ): Promise<void>;
   /**

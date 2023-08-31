@@ -127,7 +127,10 @@ export const useNotificationApi = defineStore(
           });
           break;
         case EntityType.MEMBERS:
-          membersStore.updateMembers(project.members);
+          membersStore.updateMembers(project.members, {
+            entityType: "PROJECT",
+            entityId: project.projectId,
+          });
           break;
         case EntityType.VERSION:
           return getVersionApiStore.handleLoad(versionId);

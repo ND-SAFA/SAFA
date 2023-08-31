@@ -4,7 +4,7 @@ import {
   IdentifierSchema,
   OrganizationPermissionType,
   ProjectPermissionType,
-  ProjectRole,
+  MemberRole,
 } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -24,15 +24,15 @@ export const usePermission = defineStore("permissionStore", {
        */
       projectRoleMap: {
         viewer: [
-          ProjectRole.VIEWER,
-          ProjectRole.EDITOR,
-          ProjectRole.ADMIN,
-          ProjectRole.OWNER,
+          MemberRole.VIEWER,
+          MemberRole.EDITOR,
+          MemberRole.ADMIN,
+          MemberRole.OWNER,
         ],
-        editor: [ProjectRole.EDITOR, ProjectRole.ADMIN, ProjectRole.OWNER],
-        admin: [ProjectRole.ADMIN, ProjectRole.OWNER],
-        owner: [ProjectRole.OWNER],
-      } as Record<ProjectPermissionType, ProjectRole[]>,
+        editor: [MemberRole.EDITOR, MemberRole.ADMIN, MemberRole.OWNER],
+        admin: [MemberRole.ADMIN, MemberRole.OWNER],
+        owner: [MemberRole.OWNER],
+      } as Record<ProjectPermissionType, MemberRole[]>,
     };
   },
   actions: {

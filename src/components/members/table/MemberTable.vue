@@ -33,11 +33,7 @@
       </template>
 
       <template #cell-actions="{ row }">
-        <member-role-button
-          v-if="isAdmin"
-          :member="row"
-          :project-id="projectStore.projectId"
-        />
+        <member-role-button v-if="isAdmin" :member="row" />
         <icon-button
           v-if="row.email === userEmail"
           icon="leave"
@@ -50,7 +46,7 @@
 
     <invite-member-inputs
       v-else
-      :project-id="projectStore.projectId"
+      :entity="props.entity"
       :email="addedMember"
       @save="handleClose"
     />
@@ -68,7 +64,7 @@ export default {
 
 <script setup lang="ts">
 import { capitalize, computed, ref } from "vue";
-import { MembershipSchema, MemberTableProps, ProjectRole } from "@/types";
+import { MembershipSchema, MemberTableProps, MemberRole } from "@/types";
 import { membersColumns } from "@/util";
 import {
   logStore,
@@ -94,12 +90,11 @@ const props = defineProps<MemberTableProps>();
 const addedMember = ref<string | null>(null);
 const addMode = ref(false);
 
-const title = computed(() => `${capitalize(props.variant)} Members`);
-
-const project = computed(() => projectStore.project);
+const name = computed(() => props.entity.entityType?.toLowerCase() || "");
+const title = computed(() => `${capitalize(name.value)} Members`);
 
 const isAdmin = computed(() =>
-  permissionStore.projectAllows("admin", project.value)
+  permissionStore.projectAllows("admin", projectStore.project)
 );
 
 const rows = computed(() => membersStore.members);
@@ -107,22 +102,22 @@ const rows = computed(() => membersStore.members);
 const userEmail = computed(() => sessionStore.user?.email);
 
 const ownerCount = computed(
-  () => rows.value.filter((member) => member.role === ProjectRole.OWNER).length
+  () => rows.value.filter((member) => member.role === MemberRole.OWNER).length
 );
 
 const subtitle = computed(() =>
   addMode.value
-    ? `Invite a new ${props.variant} member.`
-    : `Manage and invite ${props.variant} members.`
+    ? `Invite a new ${name.value} member.`
+    : `Manage and invite ${name.value} members.`
 );
 
 /**
  * Loads the project's members.
  */
 async function handleRefresh(): Promise<void> {
-  if (project.value.projectId === "") return;
+  if (projectStore.projectId === "") return;
 
-  await memberApiStore.handleReload();
+  await memberApiStore.handleReload(props.entity);
 }
 
 /**
@@ -147,8 +142,8 @@ function handleAdd(email: string | null): void {
  * @param member - The member to delete.
  */
 function handleDelete(member: MembershipSchema): void {
-  if (member.role === ProjectRole.OWNER && ownerCount.value === 1) {
-    logStore.onInfo("You cannot remove the only owner of this project.");
+  if (member.role === MemberRole.OWNER && ownerCount.value === 1) {
+    logStore.onInfo("You cannot remove the only owner.");
   } else {
     memberApiStore.handleDelete(member);
   }

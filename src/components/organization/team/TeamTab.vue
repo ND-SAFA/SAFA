@@ -10,50 +10,39 @@
       />
     </template>
 
-    <data-table
-      v-if="!addMode"
-      :expanded="expanded"
-      :columns="teamColumns"
-      :rows="rows"
-      :loading="loading"
-      row-key="id"
+    <stepper
+      v-model="currentStep"
+      hide-actions
+      :steps="steps"
+      data-cy="team-stepper"
     >
-      <template #body="quasarProps">
-        <q-tr :props="quasarProps">
-          <q-td class="data-table-cell-300">
-            <icon-button
-              tooltip="Toggle expand"
-              :icon="expanded.includes(quasarProps.row.id) ? 'down' : 'up'"
-              class="q-mr-md"
-              @click="handleToggleExpand(quasarProps as any)"
-            />
-            <typography :value="quasarProps.row.name" />
-          </q-td>
-          <q-td align="end">
-            <typography :value="quasarProps.row.members.length" />
-          </q-td>
-          <q-td align="end">
-            <typography :value="quasarProps.row.projects.length" />
-          </q-td>
-          <q-td align="end">
-            <typography value="<role>" />
-            <typography value="<leave>" />
-            <typography value="<remove>" />
-          </q-td>
-        </q-tr>
-        <q-tr
-          v-show="expanded.includes(quasarProps.row.id)"
-          :props="quasarProps"
+      <template #1>
+        <selector-table
+          v-if="!addMode"
+          v-model:selected="selectedTeams"
+          addable
+          deletable
+          :columns="teamColumns"
+          :rows="rows"
+          :loading="loading"
+          row-key="id"
+          item-name="team"
         >
-          <q-td colspan="100%">
-            <typography value="<Team members>" />
-            <br />
-            <typography value="<Team projects>" />
-          </q-td>
-        </q-tr>
+          <template #cell-actions="{ row }">
+            <icon-button
+              v-if="displayLeave(row)"
+              icon="leave"
+              tooltip="Leave team"
+              data-cy="button-selector-leave"
+              @click="handleLeave(row)"
+            />
+          </template>
+        </selector-table>
       </template>
-    </data-table>
-    <typography value="<add>" />
+      <template #2>
+        <team-member-table />
+      </template>
+    </stepper>
   </panel-card>
 </template>
 
@@ -68,37 +57,78 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { StepperStep, TeamSchema } from "@/types";
 import { teamColumns } from "@/util";
+import {
+  memberApiStore,
+  membersStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import {
   PanelCard,
   TextButton,
-  DataTable,
   IconButton,
-  Typography,
+  Stepper,
+  SelectorTable,
 } from "@/components/common";
+import TeamMemberTable from "@/components/members/table/TeamMemberTable.vue";
+
+const defaultTeamListStep = (): StepperStep => ({
+  title: "Teams",
+  done: false,
+});
+
+const defaultTeamStep = (): StepperStep => ({
+  title: "Select a Team",
+  done: false,
+});
+
+const currentStep = ref(1);
+const steps = ref<StepperStep[]>([defaultTeamListStep(), defaultTeamStep()]);
+const selectedTeam = ref<TeamSchema>();
 
 const loading = ref(false);
 const addMode = ref(false);
-const expanded = ref<string[]>([]);
 
-const subtitle = computed(() =>
-  addMode.value ? "Create a new team." : "Manage teams and permissions."
-);
-
-const rows = [
+const rows: TeamSchema[] = [
   {
     id: "1",
     name: "Team 1",
-    members: "12345",
-    projects: "123",
+    members: membersStore.members,
+    projects: [projectStore.projectIdentifier],
   },
   {
     id: "2",
     name: "Team 2",
-    members: "123",
-    projects: "1",
+    members: membersStore.members,
+    projects: [projectStore.projectIdentifier],
   },
 ];
+
+const selectedTeams = computed({
+  get() {
+    return selectedTeam.value ? [selectedTeam.value] : [];
+  },
+  set(teams: TeamSchema[]) {
+    selectedTeam.value = teams[0];
+
+    if (teams[0]) {
+      currentStep.value = 2;
+      steps.value[0].done = true;
+      steps.value[1] = {
+        title: teams[0].name,
+        done: false,
+      };
+    } else {
+      steps.value = [defaultTeamListStep(), defaultTeamStep()];
+    }
+  },
+});
+
+const subtitle = computed(() =>
+  addMode.value ? "Create a new team." : "Manage teams and permissions."
+);
 
 /**
  * Closes the add team form and resets entered data.
@@ -108,22 +138,26 @@ function handleClose() {
 }
 
 /**
- * Toggles the expanded state of a row.
- * @param quasarProps - The row to toggle.
+ * Whether to display the leave button for a team.
  */
-function handleToggleExpand(quasarProps: {
-  row: { id: string };
-  expand: boolean;
-}): void {
-  const { id } = quasarProps.row;
-  const idx = expanded.value.indexOf(id);
+function displayLeave(team: TeamSchema): boolean {
+  const member = team.members.find(
+    ({ email }) => email === sessionStore.userEmail
+  );
 
-  if (idx === -1) {
-    expanded.value.push(id);
-  } else {
-    expanded.value.splice(idx, 1);
-  }
+  return !!member && team.members.length > 1;
+}
 
-  quasarProps.expand = !quasarProps.expand;
+/**
+ * Leaves the selected team.
+ */
+function handleLeave(team: TeamSchema) {
+  const member = team.members.find(
+    ({ email }) => email === sessionStore.userEmail
+  );
+
+  if (!member) return;
+
+  memberApiStore.handleDelete(member);
 }
 </script>

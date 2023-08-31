@@ -9,7 +9,7 @@ import {
   ModelShareType,
   ModelType,
   OrganizationTabTypes,
-  ProjectRole,
+  MemberRole,
   ProjectTableTabTypes,
   SafetyCaseType,
   SearchMode,
@@ -123,14 +123,14 @@ export function traceModelOptions(): SelectOption[] {
 }
 
 /**
- * @return display names for project role type.
+ * @return display names for member role types.
  */
-export function projectRoleOptions(): SelectOption[] {
+export function memberRoleOptions(): SelectOption[] {
   return [
-    createEnumOption(ProjectRole.VIEWER, "View project data"),
-    createEnumOption(ProjectRole.EDITOR, "Edit data within a project version"),
-    createEnumOption(ProjectRole.ADMIN, "Manage project versions and metadata"),
-    createEnumOption(ProjectRole.OWNER, "Full ownership of the project"),
+    createEnumOption(MemberRole.VIEWER, "View project data"),
+    createEnumOption(MemberRole.EDITOR, "Edit data within a project version"),
+    createEnumOption(MemberRole.ADMIN, "Manage project versions and metadata"),
+    createEnumOption(MemberRole.OWNER, "Full ownership of the project"),
   ];
 }
 

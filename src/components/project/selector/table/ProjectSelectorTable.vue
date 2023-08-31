@@ -58,7 +58,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
-  ProjectRole,
+  MemberRole,
   ProjectSelectorTableProps,
 } from "@/types";
 import {
@@ -126,10 +126,10 @@ function handleReload() {
 function handleLeave(project: IdentifierSchema) {
   const member = sessionStore.getProjectMember(project);
   const ownerCount = project.members.filter(
-    (member) => member.role === ProjectRole.OWNER
+    (member) => member.role === MemberRole.OWNER
   ).length;
 
-  if (!member || (member.role === ProjectRole.OWNER && ownerCount === 1)) {
+  if (!member || (member.role === MemberRole.OWNER && ownerCount === 1)) {
     logStore.onInfo("You cannot remove the only owner of this project.");
   } else {
     memberApiStore.handleDelete(member);

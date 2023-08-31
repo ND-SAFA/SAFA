@@ -14,7 +14,7 @@
           clickable
           :title="role.id"
           :subtitle="role.name"
-          @click="handleSave(role.id as ProjectRole)"
+          @click="handleSave(role.id as MemberRole)"
         />
       </list>
     </q-menu>
@@ -32,25 +32,28 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { MemberRoleButtonProps, ProjectRole } from "@/types";
-import { projectRoleOptions } from "@/util";
+import { MemberRoleButtonProps, MemberRole } from "@/types";
+import { memberRoleOptions } from "@/util";
 import { memberApiStore } from "@/hooks";
 import { IconButton, ListItem, Icon, List } from "@/components/common";
 
 const props = defineProps<MemberRoleButtonProps>();
 
-const projectRoles = projectRoleOptions();
+const projectRoles = memberRoleOptions();
 
 const loading = ref(false);
 
 /**
  * Updates the project member's role.
  */
-function handleSave(role: ProjectRole) {
+function handleSave(role: MemberRole) {
   loading.value = true;
 
-  memberApiStore.handleSaveRole(props.projectId, props.member.email, role, {
-    onComplete: () => (loading.value = false),
-  });
+  memberApiStore.handleSaveRole(
+    { ...props.member, role },
+    {
+      onComplete: () => (loading.value = false),
+    }
+  );
 }
 </script>

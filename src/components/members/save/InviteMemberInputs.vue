@@ -9,18 +9,18 @@
     <select-input
       v-model="userRole"
       label="Role"
-      :options="projectRoles"
+      :options="roles"
       :option-label="(opt) => `${opt.id}: ${opt.name}`"
       option-value="id"
       option-to-value
       class="q-mb-lg"
       data-cy="input-member-role"
     />
-    <project-input v-model="projectIds" multiple />
+    <project-input v-model="entityIds" multiple />
     <flex-box full-width justify="end" t="2">
       <text-button
         :disabled="!isValid"
-        label="Invite member"
+        :label="submitLabel"
         color="primary"
         data-cy="button-invite-member"
         @click="handleSave"
@@ -31,7 +31,7 @@
 
 <script lang="ts">
 /**
- * Inputs for inviting a new project member.
+ * Inputs for inviting a new member to a project, team, or organization.
  */
 export default {
   name: "InviteMemberInputs",
@@ -40,8 +40,8 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { InviteMemberInputsProps, ProjectRole } from "@/types";
-import { projectRoleOptions } from "@/util";
+import { InviteMemberInputsProps, MemberRole } from "@/types";
+import { memberRoleOptions } from "@/util";
 import { memberApiStore } from "@/hooks";
 import {
   ProjectInput,
@@ -57,11 +57,15 @@ const emit = defineEmits<{
   (e: "save"): void;
 }>();
 
-const projectRoles = projectRoleOptions();
+const roles = memberRoleOptions();
 
-const projectIds = ref<string[]>([]);
+const entityIds = ref<string[]>([]);
 const userEmail = ref("");
-const userRole = ref<ProjectRole>();
+const userRole = ref<MemberRole>();
+
+const submitLabel = computed(
+  () => `Invite to ${props.entity.entityType?.toLowerCase() || ""}`
+);
 
 const emailErrorMessage = computed(() => {
   if (
@@ -78,7 +82,7 @@ const isValid = computed(
   () =>
     userEmail.value.length > 0 &&
     !emailErrorMessage.value &&
-    projectIds.value.length > 0 &&
+    entityIds.value.length > 0 &&
     !!userRole.value
 );
 
@@ -86,17 +90,26 @@ const isValid = computed(
  * Invites a member to the selected projects.
  */
 function handleSave() {
-  projectIds.value.forEach((projectId) => {
+  entityIds.value.forEach((entityId) => {
     if (!isValid.value || !userRole.value) return;
 
-    memberApiStore.handleInvite(projectId, userEmail.value, userRole.value, {
-      onSuccess: () => emit("save"),
-    });
+    memberApiStore.handleInvite(
+      {
+        projectMembershipId: "",
+        email: userEmail.value,
+        role: userRole.value,
+        entityType: "PROJECT",
+        entityId,
+      },
+      {
+        onSuccess: () => emit("save"),
+      }
+    );
   });
 }
 
 onMounted(() => {
-  projectIds.value = props.projectId ? [props.projectId] : [];
+  entityIds.value = props.entity.entityId ? [props.entity.entityId] : [];
   userEmail.value = props.email || "";
 });
 </script>

@@ -6,7 +6,7 @@
     </template>
     <tab-list v-model="tab" :tabs="tabs">
       <template #members>
-        <member-table variant="organization" />
+        <org-member-table />
       </template>
       <template #teams>
         <team-tab />
@@ -33,7 +33,7 @@ import {
   OrganizationButtons,
   OrganizationDisplay,
 } from "@/components/organization/save";
-import { MemberTable } from "@/components/members";
+import { OrgMemberTable } from "@/components/members";
 import { TeamTab } from "@/components/organization/team";
 
 const tabs = organizationTabTypes();

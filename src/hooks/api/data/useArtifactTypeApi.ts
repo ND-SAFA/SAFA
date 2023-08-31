@@ -20,7 +20,12 @@ export const useArtifactTypeApi = defineStore("artifactTypeApi", () => {
           ? await editArtifactType(projectStore.projectId, artifactType)
           : await createArtifactType(projectStore.projectId, artifactType);
 
-        timStore.addOrUpdateArtifactTypes([updatedArtifactType]);
+        timStore.addOrUpdateArtifactTypes([
+          {
+            ...updatedArtifactType,
+            count: artifactType.count,
+          },
+        ]);
       },
       {
         success: `Saved artifact type: ${artifactType.name}`,

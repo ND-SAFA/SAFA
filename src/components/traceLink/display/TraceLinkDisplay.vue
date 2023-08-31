@@ -1,22 +1,30 @@
 <template>
   <div>
-    <flex-box v-if="!showOnly" full-width y="1" justify="between" :wrap="false">
-      <artifact-body-display
-        v-if="sourceArtifact"
-        :artifact="sourceArtifact"
-        display-title
-        display-divider
-        default-expanded
-      />
-      <separator vertical />
-      <artifact-body-display
-        v-if="targetArtifact"
-        :artifact="targetArtifact"
-        display-title
-        display-divider
-        default-expanded
-      />
-    </flex-box>
+    <div v-if="!!explanation">
+      <typography variant="caption" value="Explanation" />
+      <typography :value="explanation" variant="expandable" default-expanded />
+    </div>
+
+    <q-splitter v-if="!showOnly" v-model="splitterModel">
+      <template #before>
+        <artifact-body-display
+          v-if="sourceArtifact"
+          :artifact="sourceArtifact"
+          display-title
+          display-divider
+          default-expanded
+        />
+      </template>
+      <template #after>
+        <artifact-body-display
+          v-if="targetArtifact"
+          :artifact="targetArtifact"
+          display-title
+          display-divider
+          default-expanded
+        />
+      </template>
+    </q-splitter>
 
     <artifact-content-display
       v-else-if="showOnlyArtifact"
@@ -35,13 +43,20 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { TraceLinkDisplayProps } from "@/types";
+import { computed, ref } from "vue";
+import { TraceLinkDisplayProps, TraceType } from "@/types";
 import { artifactStore } from "@/hooks";
-import { ArtifactBodyDisplay, FlexBox, Separator } from "@/components/common";
+import {
+  ArtifactBodyDisplay,
+  FlexBox,
+  Separator,
+  Typography,
+} from "@/components/common";
 import { ArtifactContentDisplay } from "@/components/artifact/display";
 
 const props = defineProps<TraceLinkDisplayProps>();
+
+const splitterModel = ref(50);
 
 const sourceArtifact = computed(() =>
   artifactStore.getArtifactById(props.trace.sourceId)
@@ -52,5 +67,10 @@ const targetArtifact = computed(() =>
 
 const showOnlyArtifact = computed(() =>
   props.showOnly === "source" ? sourceArtifact.value : targetArtifact.value
+);
+
+const generated = computed(() => props.trace.traceType === TraceType.GENERATED);
+const explanation = computed(() =>
+  generated.value ? props.trace.explanation : undefined
 );
 </script>

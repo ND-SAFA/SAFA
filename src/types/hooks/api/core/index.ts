@@ -1,2 +1,2 @@
-export * from "./core";
-export * from "./session";
+export * from "./coreApi";
+export * from "./sessionApi";

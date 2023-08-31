@@ -13,8 +13,9 @@ import {
 } from "@/hooks";
 import { persistCommit } from "@/api";
 import { pinia } from "@/plugins";
+import { CommitApiHook } from "@/types/hooks/api/commit";
 
-export const useCommitApi = defineStore("commitApi", () => {
+export const useCommitApi = defineStore("commitApi", (): CommitApiHook => {
   const commitApi = useApi("commitApi");
 
   /**
@@ -31,11 +32,28 @@ export const useCommitApi = defineStore("commitApi", () => {
   }
 
   /**
-   * Saves commit to the application store, and persist the commit.
+   * Applies all artifact changes from a commit.
    *
-   * @param commitOrCb - The commit to save, or a callback to create it.
-   * @return The saved commit.
+   * @param commit - The commit to apply.
    */
+  async function applyArtifactChanges(commit: CommitSchema): Promise<void> {
+    artifactStore.addOrUpdateArtifacts([
+      ...commit.artifacts.added,
+      ...commit.artifacts.modified,
+    ]);
+    artifactStore.deleteArtifacts(commit.artifacts.removed);
+    traceStore.addOrUpdateTraceLinks([
+      ...commit.traces.added,
+      ...commit.traces.modified,
+    ]);
+    traceStore.deleteTraceLinks(commit.traces.removed);
+
+    if (commit.traces.modified.length === 0) return;
+
+    // Reload generated links if any are modified.
+    await traceGenerationApiStore.handleReload();
+  }
+
   async function handleSave(
     commitOrCb: CommitSchema | ((builder: CommitBuilder) => CommitBuilder)
   ): Promise<CommitSchema | undefined> {
@@ -74,9 +92,6 @@ export const useCommitApi = defineStore("commitApi", () => {
     );
   }
 
-  /**
-   * Undoes the last commit.
-   */
   async function handleUndo(): Promise<void> {
     await commitApi.handleRequest(
       async () => {
@@ -96,9 +111,6 @@ export const useCommitApi = defineStore("commitApi", () => {
     );
   }
 
-  /**
-   * Reattempts the last undone commit.
-   */
   async function handleRedo(): Promise<void> {
     await commitApi.handleRequest(
       async () => {
@@ -116,29 +128,6 @@ export const useCommitApi = defineStore("commitApi", () => {
         onComplete: () => (appStore.isSaving = false),
       }
     );
-  }
-
-  /**
-   * Applies all artifact changes from a commit.
-   *
-   * @param commit - The commit to apply.
-   */
-  async function applyArtifactChanges(commit: CommitSchema): Promise<void> {
-    artifactStore.addOrUpdateArtifacts([
-      ...commit.artifacts.added,
-      ...commit.artifacts.modified,
-    ]);
-    artifactStore.deleteArtifacts(commit.artifacts.removed);
-    traceStore.addOrUpdateTraceLinks([
-      ...commit.traces.added,
-      ...commit.traces.modified,
-    ]);
-    traceStore.deleteTraceLinks(commit.traces.removed);
-
-    if (commit.traces.modified.length === 0) return;
-
-    // Reload generated links if any are modified.
-    await traceGenerationApiStore.handleReload();
   }
 
   return {

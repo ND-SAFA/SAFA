@@ -9,7 +9,6 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
-from tgen.prompts.supported_prompts.hgen_prompts import GENERATATION_QUESTIONNAIRE
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
@@ -30,6 +29,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         filename = "artifact_gen_response"
         if state.n_generations > 0:
             filename = f"{filename}_{state.n_generations}"
+            args.hgen_llm_manager_best.llm_args.temperature = 0.25
         export_path = os.path.join(state.export_dir, filename) if state.export_dir else None
 
         task_prompt = SupportedPrompts.HGEN_GENERATION_QUESTIONNAIRE.value

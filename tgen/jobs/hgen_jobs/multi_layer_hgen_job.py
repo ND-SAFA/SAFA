@@ -1,10 +1,9 @@
 from typing import List
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.status import Status
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -15,13 +14,15 @@ from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 
 class MultiLayerHGenJob(AbstractJob):
 
-    def __init__(self, starting_hgen_job: BaseHGenJob, target_types: List[str], job_args: JobArgs = None):
+    def __init__(self, starting_hgen_job: BaseHGenJob, target_types: List[str] = None, job_args: JobArgs = None):
         """
         Initializes the job with args needed for hierarchy generator
         :param starting_hgen_job: The initial hgen job to run to get the first layer of artifacts
         :param target_types: The list of target types going up the hierarchy
         :param job_args: The arguments need for the job
         """
+        if target_types is None:
+            target_types = []
         self.starting_hgen_job = starting_hgen_job
         if len(target_types) > 0 and self.starting_hgen_job.get_hgen_args().target_type == target_types[0]:
             # target types should not include start target type

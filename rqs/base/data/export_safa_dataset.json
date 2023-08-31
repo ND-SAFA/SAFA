@@ -10,7 +10,7 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "TRACE",
+              "object_type": "ARTIFACT",
               "project_reader": {
                 "object_type": "STRUCTURE",
                 "project_path": "~/desktop/safa/datasets/open-source/drone"

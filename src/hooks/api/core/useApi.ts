@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { ApiHook, RequestConfig } from "@/types";
 import { LOGOUT_ERROR } from "@/util";
 import { appStore, logStore, sessionApiStore } from "@/hooks";
@@ -73,7 +73,13 @@ export const useApi = (id: string) =>
       }
     }
 
-    return { loading, error, errorMessage, handleRequest, handleReset };
+    return {
+      loading,
+      error,
+      errorMessage,
+      handleRequest,
+      handleReset,
+    };
   });
 
 export default (id: string) => useApi(id)(pinia);

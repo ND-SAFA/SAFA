@@ -1,5 +1,5 @@
 import { ComputedRef, Ref } from "vue";
-import { IOHandlerCallback } from "@/types";
+import { IOHandlerCallback } from "@/types/api";
 
 /**
  * Configuration details for a api request.
@@ -19,6 +19,9 @@ export interface RequestConfig<T> extends IOHandlerCallback<T> {
   useAppLoad?: boolean;
 }
 
+/**
+ * A hook for calling API endpoints.
+ */
 export interface ApiHook {
   /**
    * Whether this request manager is loading a request.

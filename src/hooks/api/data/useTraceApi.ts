@@ -74,8 +74,8 @@ export const useTraceApi = defineStore("traceApi", () => {
         traceStore.addOrUpdateTraceLinks(createdLinks);
         subtreeStore.addTraceSubtree(traceLink);
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Created a new trace link: ${sourceName} -> ${targetName}`,
         error: `Unable to create trace link: ${sourceName} -> ${targetName}`,
       }
@@ -120,8 +120,6 @@ export const useTraceApi = defineStore("traceApi", () => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-      },
-      {
         success: `Trace link approved: ${traceLink.sourceName} -> ${traceLink.targetName}`,
         error: `Unable to approve trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
       }
@@ -154,8 +152,6 @@ export const useTraceApi = defineStore("traceApi", () => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-      },
-      {
         success: `Trace link declined: ${traceLink.sourceName} -> ${traceLink.targetName}`,
         error: `Unable to decline trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
       }
@@ -186,8 +182,6 @@ export const useTraceApi = defineStore("traceApi", () => {
               unreviewed.map(
                 (link) => (link.approvalStatus = ApprovalType.UNREVIEWED)
               ),
-          },
-          {
             useAppLoad: true,
             success: `Removed unreviewed trace links: ${unreviewed.length}`,
             error: `Unable to clear unreviewed trace links: ${unreviewed.length}`,
@@ -224,8 +218,6 @@ export const useTraceApi = defineStore("traceApi", () => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-      },
-      {
         useAppLoad: true,
         success: `Trace link unreviewed: ${traceLink.sourceName} -> ${traceLink.targetName}`,
         error: `Unable to unreview trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,

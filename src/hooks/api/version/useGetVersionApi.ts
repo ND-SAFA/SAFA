@@ -107,7 +107,6 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
           [QueryParams.VERSION]: versionId,
         });
       },
-      {},
       { useAppLoad: true }
     );
   }

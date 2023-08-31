@@ -195,7 +195,8 @@ export const useSessionApi = defineStore("sessionApi", () => {
     password: PasswordChangeSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await sessionApi.handleRequest(() => savePassword(password), callbacks, {
+    await sessionApi.handleRequest(() => savePassword(password), {
+      ...callbacks,
       success: "Your password has been updated.",
       error: "Unable to update your password.",
     });
@@ -213,13 +214,10 @@ export const useSessionApi = defineStore("sessionApi", () => {
       async (isConfirmed) => {
         if (!isConfirmed) return;
 
-        await sessionApi.handleRequest(
-          () => deleteAccount(password),
-          {
-            onSuccess: () => handleLogout(),
-          },
-          { error: "Unable to delete your account." }
-        );
+        await sessionApi.handleRequest(() => deleteAccount(password), {
+          onSuccess: () => handleLogout(),
+          error: "Unable to delete your account.",
+        });
       }
     );
   }

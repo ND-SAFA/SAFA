@@ -33,7 +33,6 @@ export const useMemberApi = defineStore("memberApi", () => {
 
         membersStore.updateMembers(members);
       },
-      {},
       { error: `Unable to get members` }
     );
   }
@@ -62,8 +61,8 @@ export const useMemberApi = defineStore("memberApi", () => {
 
         membersStore.updateMembers([...membersStore.members, member]);
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Member has been added: ${memberEmail}`,
         error: `Unable save member: ${memberEmail}`,
       }
@@ -99,8 +98,8 @@ export const useMemberApi = defineStore("memberApi", () => {
           ]),
         ]);
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Member is now an ${projectRole}: ${memberEmail}`,
         error: `Unable to change member to ${projectRole}: ${memberEmail}`,
       }
@@ -130,7 +129,6 @@ export const useMemberApi = defineStore("memberApi", () => {
             membersStore.deleteMembers([member.projectMembershipId]);
             await getProjectApiStore.handleReload();
           },
-          {},
           {
             success: `Deleted a member: ${member.email}`,
             error: `Unable to delete member: ${member.email}`,

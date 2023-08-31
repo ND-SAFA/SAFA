@@ -22,7 +22,6 @@ export const useArtifactTypeApi = defineStore("artifactTypeApi", () => {
 
         timStore.addOrUpdateArtifactTypes([updatedArtifactType]);
       },
-      {},
       {
         success: `Saved artifact type: ${artifactType.name}`,
         error: `Unable to save artifact type: ${artifactType.name}`,

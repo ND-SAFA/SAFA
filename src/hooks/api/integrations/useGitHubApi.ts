@@ -81,8 +81,9 @@ export const useGitHubApi = defineStore("gitHubApi", () => {
           }
         }
       },
-      { onSuccess, onError },
       {
+        onSuccess,
+        onError,
         error: accessCode ? "Unable to save GitHub access code." : undefined,
       }
     );

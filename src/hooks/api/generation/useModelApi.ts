@@ -50,8 +50,8 @@ export const useModelApi = defineStore("modelApi", () => {
 
         return createdModel;
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Model has been saved: ${model.name}.`,
         error: `Unable to save model: ${model.name}`,
       }
@@ -78,7 +78,6 @@ export const useModelApi = defineStore("modelApi", () => {
               models: projectStore.models.filter(({ id }) => id !== model.id),
             });
           },
-          {},
           {
             success: `Model has been deleted: ${model.name}`,
             error: `Unable to delete model: ${model.name}`,
@@ -102,7 +101,6 @@ export const useModelApi = defineStore("modelApi", () => {
   ): Promise<void> {
     await modelApi.handleRequest(
       async () => shareModel(targetProject, model, shareMethod),
-      {},
       {
         success: `Successfully shared model: "${model.name}`,
         error: `Unable to share model: "${model.name}`,

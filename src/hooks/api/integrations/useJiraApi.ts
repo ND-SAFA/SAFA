@@ -82,8 +82,9 @@ export const useJiraApi = defineStore("jiraApi", () => {
           }
         }
       },
-      { onSuccess, onError },
       {
+        onSuccess,
+        onError,
         error: accessCode ? "Unable to save Jira access code." : undefined,
       }
     );

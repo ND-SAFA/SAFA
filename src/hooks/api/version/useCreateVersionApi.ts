@@ -39,8 +39,8 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
           return createRevisionVersion(projectId);
         }
       },
-      callbacks,
       {
+        ...callbacks,
         useAppLoad: true,
         success: `Created a new version.`,
         error: "Unable to create a new version.",
@@ -84,8 +84,8 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
 
           await navigateTo(Routes.UPLOAD_STATUS);
         },
-      },
-      { useAppLoad: true }
+        useAppLoad: true,
+      }
     );
   }
 

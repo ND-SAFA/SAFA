@@ -73,8 +73,8 @@ const useDocumentApi = defineStore("documentApi", () => {
         await documentStore.removeDocument(document);
         await handleCreate(name, type, artifactIds);
       },
-      callbacks,
       {
+        ...callbacks,
         useAppLoad: true,
         success: `Document has been created: ${name}`,
         error: `Cannot create document: ${name}`,
@@ -117,8 +117,8 @@ const useDocumentApi = defineStore("documentApi", () => {
             await deleteDocument(document);
             await documentStore.removeDocument(document);
           },
-          callbacks,
           {
+            ...callbacks,
             useAppLoad: true,
             success: `Document has been deleted: ${name}`,
             error: `Unable to delete document: ${name}`,
@@ -162,8 +162,8 @@ const useDocumentApi = defineStore("documentApi", () => {
         isUpdate
           ? handleUpdate(document)
           : handleCreate(name, type, artifactIds),
-      callbacks,
       {
+        ...callbacks,
         useAppLoad: true,
         success: isUpdate
           ? `Document has been edited: ${name}`

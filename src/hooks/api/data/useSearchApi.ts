@@ -38,7 +38,6 @@ export const useSearchApi = defineStore("searchApi", () => {
 
         await documentStore.addDocument(document);
       },
-      {},
       { useAppLoad: true, error: "Unable to display search results." }
     );
   }

@@ -58,8 +58,8 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
 
         await jobApiStore.handleCreate(job);
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Integration data is being synced: ${installation.installationId}. 
        You'll receive a notification once data has completed syncing.`,
         error: `Unable to sync integration data.`,

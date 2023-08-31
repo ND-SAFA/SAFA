@@ -112,7 +112,6 @@ export const useJobApi = defineStore("jobApi", () => {
 
         jobStore.selectedJob = jobs[0];
       },
-      {},
       { useAppLoad: true }
     );
   }

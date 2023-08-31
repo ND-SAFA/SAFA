@@ -38,8 +38,8 @@ export const useLayoutApi = defineStore("layoutApi", () => {
           );
         }
       },
-      callbacks,
       {
+        ...callbacks,
         useAppLoad: true,
         success: "The current layout has been updated.",
         error: "Unable to update the current layout.",

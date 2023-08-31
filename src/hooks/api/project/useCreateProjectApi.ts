@@ -45,8 +45,6 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
           onSuccess?.();
         },
         onError,
-      },
-      {
         useAppLoad: true,
         success: `Project is being created: ${name}`,
         error: `Unable to import project: ${name}`,
@@ -93,8 +91,6 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
           await navigateTo(Routes.UPLOAD_STATUS);
           callbacks.onSuccess?.();
         },
-      },
-      {
         useAppLoad: true,
         success: `Project has been created: ${project.name}`,
         error: `Unable to create project: ${project.name}`,
@@ -129,8 +125,6 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
           onSuccess?.();
         },
         onError,
-      },
-      {
         useAppLoad: true,
         success: `Jira project has been created: ${projectId}`,
         error: `Unable to import jira project: ${projectId}`,
@@ -170,8 +164,6 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
           onSuccess?.();
         },
         onError,
-      },
-      {
         useAppLoad: true,
         success: `GitHub project has been created: ${repositoryName}`,
         error: `Unable to import GitHub project: ${repositoryName}`,

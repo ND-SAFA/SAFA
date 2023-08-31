@@ -54,8 +54,8 @@ export const useProjectApi = defineStore("projectApi", () => {
 
         return project;
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Project has been saved: ${identifier.name}`,
         error: `Unable to save project: ${identifier.name}`,
       }
@@ -109,8 +109,8 @@ export const useProjectApi = defineStore("projectApi", () => {
         // Clear the current project if it has been deleted.
         await setProjectApiStore.handleClear();
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Project has been deleted: ${project.name}`,
         error: `Unable to delete project: ${project.name}`,
       }
@@ -137,8 +137,8 @@ export const useProjectApi = defineStore("projectApi", () => {
 
         await deleteVersionApi.handleRequest(
           async () => deleteProjectVersion(version.versionId),
-          callbacks,
           {
+            ...callbacks,
             success: `Version has been deleted: ${name}`,
             error: `Unable to delete version: ${name}`,
           }

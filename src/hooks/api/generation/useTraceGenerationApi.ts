@@ -71,8 +71,10 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
           declinedIds,
         });
       },
-      callbacks,
-      { useAppLoad: true }
+      {
+        ...callbacks,
+        useAppLoad: true,
+      }
     );
   }
 
@@ -101,8 +103,8 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
 
         await jobApiStore.handleCreate(job);
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`,
         error: `Unable to generate new trace links: ${matricesName}`,
       }
@@ -133,8 +135,8 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
 
         await jobApiStore.handleCreate(job);
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Started training model on: ${matricesName}. You'll receive a notification once complete.`,
         error: `Unable to train model on: ${matricesName}`,
       }

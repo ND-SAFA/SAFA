@@ -40,8 +40,8 @@ export const useDeltaApi = defineStore("deltaApi", () => {
 
         await deltaStore.setDeltaPayload(delta, targetVersion);
       },
-      callbacks,
       {
+        ...callbacks,
         success: "Delta state was updated successfully.",
         error: "Unable to set delta state.",
       }

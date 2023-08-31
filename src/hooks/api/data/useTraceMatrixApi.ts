@@ -27,7 +27,6 @@ export const useTraceMatrixApi = defineStore("traceMatrixApi", () => {
 
         timStore.addTraceMatrix(sourceTypeName, targetTypeName);
       },
-      {},
       {
         success: `Created trace matrix: ${sourceTypeName} -> ${targetTypeName}`,
         error: `Unable to create trace matrix: ${sourceTypeName} -> ${targetTypeName}`,
@@ -55,7 +54,6 @@ export const useTraceMatrixApi = defineStore("traceMatrixApi", () => {
 
         timStore.deleteTraceMatrix(sourceTypeName, targetTypeName);
       },
-      {},
       {
         success: `Deleted trace matrix: ${sourceTypeName} -> ${targetTypeName}`,
         error: `Unable to delete trace matrix: ${sourceTypeName} -> ${targetTypeName}`,

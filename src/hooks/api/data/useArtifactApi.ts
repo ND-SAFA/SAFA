@@ -107,8 +107,8 @@ export const useArtifactApi = defineStore("artifactApi", () => {
           }
         }
       },
-      callbacks,
       {
+        ...callbacks,
         success: isUpdate
           ? `Edited artifact: ${artifact.name}`
           : `Created a new artifact: ${artifact.name}`,
@@ -168,8 +168,8 @@ export const useArtifactApi = defineStore("artifactApi", () => {
             artifactStore.deleteArtifacts([artifact]);
             traceStore.deleteTraceLinks(relatedTraces);
           },
-          callbacks,
           {
+            ...callbacks,
             success: `Deleted artifact: ${artifact.name}`,
             error: `Unable to delete artifact: ${artifact.name}`,
           }

@@ -45,8 +45,8 @@ export const useAttributeApi = defineStore("attributeApi", () => {
           attributesStore.updateAttribute(createdAttribute);
         }
       },
-      callbacks,
       {
+        ...callbacks,
         success: isUpdate
           ? `Edited attribute: ${attribute.label}`
           : `Created attribute: ${attribute.label}`,
@@ -77,8 +77,8 @@ export const useAttributeApi = defineStore("attributeApi", () => {
 
             attributesStore.deleteAttribute(attribute);
           },
-          callbacks,
           {
+            ...callbacks,
             success: `Deleted attribute: ${attribute.label}`,
             error: `Unable to delete attribute: ${attribute.label}`,
           }
@@ -111,8 +111,8 @@ export const useAttributeApi = defineStore("attributeApi", () => {
 
         return savedLayout;
       },
-      callbacks,
       {
+        ...callbacks,
         success: isUpdate
           ? `Edited attribute layout: ${layout.name}`
           : `Created attribute layout: ${layout.name}`,
@@ -143,8 +143,8 @@ export const useAttributeApi = defineStore("attributeApi", () => {
 
             attributesStore.deleteLayout(layout);
           },
-          callbacks,
           {
+            ...callbacks,
             success: `Deleted attribute layout: ${layout.name}`,
             error: `Unable to delete attribute layout: ${layout.name}`,
           }

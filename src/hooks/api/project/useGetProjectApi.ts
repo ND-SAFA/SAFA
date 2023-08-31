@@ -64,8 +64,10 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
       async () => {
         allProjects.value = await getProjects();
       },
-      callbacks,
-      { error: "Unable to load your projects." }
+      {
+        ...callbacks,
+        error: "Unable to load your projects.",
+      }
     );
   }
 

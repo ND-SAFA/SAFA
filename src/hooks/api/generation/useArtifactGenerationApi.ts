@@ -65,8 +65,8 @@ export const useArtifactGenerationApi = defineStore(
 
           summaryGenConfirm.value = { summary, confirm, clear };
         },
-        callbacks,
         {
+          ...callbacks,
           error: `Failed to generate summary: ${artifact.name}`,
         }
       );
@@ -89,8 +89,8 @@ export const useArtifactGenerationApi = defineStore(
             `Generate a 3 word name for:\n\`\`\`\n${artifact.body}\n\`\`\``
           );
         },
-        callbacks,
         {
+          ...callbacks,
           error: `Failed to generate name based on the body: ${artifact.name}`,
         }
       );
@@ -111,8 +111,8 @@ export const useArtifactGenerationApi = defineStore(
         async () => {
           artifact.body = await createPrompt(artifact.body);
         },
-        callbacks,
         {
+          ...callbacks,
           error: `Failed to generate body based on prompt: ${artifact.name}`,
         }
       );
@@ -137,8 +137,8 @@ export const useArtifactGenerationApi = defineStore(
 
           jobStore.updateJob(job);
         },
-        callbacks,
         {
+          ...callbacks,
           success:
             "Artifacts are being generated. You'll receive an update when they have been created.",
           error: "Unable to generate artifacts.",

@@ -1,7 +1,12 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import { IOHandlerCallback, MembershipSchema, ProjectRole } from "@/types";
+import {
+  IOHandlerCallback,
+  MemberApiHook,
+  MembershipSchema,
+  ProjectRole,
+} from "@/types";
 import { removeMatches } from "@/util";
 import {
   useApi,
@@ -18,14 +23,14 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useMemberApi = defineStore("memberApi", () => {
+/**
+ * A hook for managing member API requests.
+ */
+export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
   const memberApi = useApi("memberApi");
 
   const loading = computed(() => memberApi.loading);
 
-  /**
-   * Returns the current project's members.
-   */
   async function handleReload(): Promise<void> {
     await memberApi.handleRequest(
       async () => {
@@ -37,14 +42,6 @@ export const useMemberApi = defineStore("memberApi", () => {
     );
   }
 
-  /**
-   * Adds a user to a project and logs the status.
-   *
-   * @param projectId - The project to add this user to.
-   * @param memberEmail - The email of the given user.
-   * @param projectRole - The role to set for the given user.
-   * @param callbacks - Callbacks for the request.
-   */
   async function handleInvite(
     projectId: string,
     memberEmail: string,
@@ -69,14 +66,6 @@ export const useMemberApi = defineStore("memberApi", () => {
     );
   }
 
-  /**
-   * Updates the role of a member.
-   *
-   * @param projectId - The project to add this user to.
-   * @param memberEmail - The email of the given user.
-   * @param projectRole - The role to set for the given user.
-   * @param callbacks - Callbacks for the request.
-   */
   async function handleSaveRole(
     projectId: string,
     memberEmail: string,
@@ -106,11 +95,6 @@ export const useMemberApi = defineStore("memberApi", () => {
     );
   }
 
-  /**
-   * Opens a confirmation modal to delete the given member.
-   *
-   * @param member - The member to delete.
-   */
   function handleDelete(member: MembershipSchema): void {
     const email =
       sessionStore.user?.email === member.email

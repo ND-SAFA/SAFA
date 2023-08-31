@@ -1,18 +1,16 @@
 import { defineStore } from "pinia";
 
-import { IOHandlerCallback } from "@/types";
+import { IOHandlerCallback, LayoutApiHook } from "@/types";
 import { useApi, documentStore, logStore, projectStore } from "@/hooks";
 import { createLayout } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useLayoutApi = defineStore("layoutApi", () => {
+/**
+ * A hook for managing layout API requests.
+ */
+export const useLayoutApi = defineStore("layoutApi", (): LayoutApiHook => {
   const layoutApi = useApi("layoutApi");
 
-  /**
-   * Handles regenerating and storing the layout for the current project version and document.
-   *
-   * @param callbacks - Callbacks to handle the result of the operation.
-   */
   async function handleRegenerate(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {

@@ -1,12 +1,15 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import { IOHandlerCallback, VersionSchema } from "@/types";
+import { DeltaApiHook, IOHandlerCallback, VersionSchema } from "@/types";
 import { useApi, deltaStore, projectStore, getVersionApiStore } from "@/hooks";
 import { getProjectDelta } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useDeltaApi = defineStore("deltaApi", () => {
+/**
+ * A hook for managing delta API requests.
+ */
+export const useDeltaApi = defineStore("deltaApi", (): DeltaApiHook => {
   const deltaApi = useApi("deltaApi");
 
   const loading = computed(() => deltaApi.loading);
@@ -19,12 +22,6 @@ export const useDeltaApi = defineStore("deltaApi", () => {
     );
   });
 
-  /**
-   * Sets a project delta.
-   *
-   * @param targetVersion - The target version of the project.
-   * @param callbacks - Callbacks for the request.
-   */
   async function handleCreate(
     targetVersion?: VersionSchema,
     callbacks: IOHandlerCallback = {}

@@ -1,10 +1,17 @@
 import { defineStore } from "pinia";
 
-import { ApprovalType, ArtifactSchema, TraceLinkSchema } from "@/types";
+import {
+  ApprovalType,
+  ArtifactSchema,
+  TraceLinkSchema,
+  ArtifactCommitApiHook,
+} from "@/types";
 import { commitApiStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import { ArtifactCommitApiHook } from "@/types/hooks/api/commit";
 
+/**
+ * A hook for managing artifact commit API requests.
+ */
 export const useArtifactCommitApi = defineStore(
   "artifactCommitApi",
   (): ArtifactCommitApiHook => {

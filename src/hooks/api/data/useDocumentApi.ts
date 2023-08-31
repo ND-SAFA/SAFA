@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { DocumentType, IOHandlerCallback, DocumentSchema } from "@/types";
+import {
+  DocumentType,
+  IOHandlerCallback,
+  DocumentSchema,
+  DocumentApiHook,
+} from "@/types";
 import { createDocument, preserveObjectKeys } from "@/util";
 import {
   useApi,
@@ -18,16 +23,12 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
-const useDocumentApi = defineStore("documentApi", () => {
+/**
+ * A hook for managing document API requests.
+ */
+const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
   const documentApi = useApi("documentApi");
 
-  /**
-   * Creates a new document and updates app state.
-   *
-   * @param name - The document name create.
-   * @param type - The document type create.
-   * @param artifactIds - The artifacts shown in the document.
-   */
   async function handleCreate(
     name: string,
     type: DocumentType,
@@ -56,12 +57,6 @@ const useDocumentApi = defineStore("documentApi", () => {
     });
   }
 
-  /**
-   * Creates a new document from an existing document and updates app state.
-   *
-   * @param document - The document to create.
-   * @param callbacks - The callbacks to call on success, error, and complete.
-   */
   async function handleCreatePreset(
     document: DocumentSchema,
     callbacks: IOHandlerCallback = {}
@@ -82,11 +77,6 @@ const useDocumentApi = defineStore("documentApi", () => {
     );
   }
 
-  /**
-   * Updates an existing document and updates app state.
-   *
-   * @param document - The document to edit.
-   */
   async function handleUpdate(document: DocumentSchema): Promise<void> {
     await documentApi.handleRequest(async () => {
       const versionId = projectStore.versionIdWithLog;
@@ -96,12 +86,6 @@ const useDocumentApi = defineStore("documentApi", () => {
     });
   }
 
-  /**
-   * Deletes the document and updates app state.
-   * Switches documents if the current one has been deleted.
-   *
-   * @param callbacks - The callbacks to call on success, error, and complete.
-   */
   function handleDelete(callbacks: IOHandlerCallback): void {
     const document = documentSaveStore.editedDocument;
     const { name } = document;
@@ -128,12 +112,6 @@ const useDocumentApi = defineStore("documentApi", () => {
     );
   }
 
-  /**
-   * Updates the artifact for the all documents.
-   *
-   * @param versionId - The project version to load documents for.
-   * @param artifacts - The full list of artifacts.
-   */
   async function handleReload(
     versionId = projectStore.versionId,
     artifacts = projectStore.project.artifacts
@@ -147,11 +125,6 @@ const useDocumentApi = defineStore("documentApi", () => {
     });
   }
 
-  /**
-   * Creates or updates a document, updates app state, and logs the result.
-   *
-   * @param callbacks - The callbacks to call on success, error, and complete.
-   */
   async function handleSave(callbacks: IOHandlerCallback): Promise<void> {
     const document = documentSaveStore.finalizedDocument;
     const isUpdate = documentSaveStore.isUpdate;
@@ -175,11 +148,6 @@ const useDocumentApi = defineStore("documentApi", () => {
     );
   }
 
-  /**
-   * Switches documents and updates the currently saved document.
-   *
-   * @param document - The current document.
-   */
   async function handleSwitch(document: DocumentSchema): Promise<void> {
     await documentApi.handleRequest(async () => {
       await documentStore.switchDocuments(document);

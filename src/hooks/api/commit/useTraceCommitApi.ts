@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
 
-import { ApprovalType, TraceLinkSchema } from "@/types";
+import { ApprovalType, TraceLinkSchema, TraceCommitApiHook } from "@/types";
 import { commitApiStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import { TraceCommitApiHook } from "@/types/hooks/api/commit";
 
+/**
+ * A hook for managing trace commit API requests.
+ */
 export const useTraceCommitApi = defineStore(
   "traceCommitApi",
   (): TraceCommitApiHook => {

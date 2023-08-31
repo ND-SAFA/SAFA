@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { GraphMode } from "@/types";
+import { GraphMode, SearchApiHook } from "@/types";
 import { createDocument } from "@/util";
 import {
   useApi,
@@ -12,12 +12,12 @@ import {
 import { getProjectSearchQuery } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useSearchApi = defineStore("searchApi", () => {
+/**
+ * A hook for managing search API requests.
+ */
+export const useSearchApi = defineStore("searchApi", (): SearchApiHook => {
   const searchApi = useApi("searchApi");
 
-  /**
-   * Handles searching a project, and updating the UI to display the search results.
-   */
   async function handleSearch(): Promise<void> {
     await searchApi.handleRequest(
       async () => {

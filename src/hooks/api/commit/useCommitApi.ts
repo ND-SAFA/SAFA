@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { CommitSchema } from "@/types";
+import { CommitSchema, CommitApiHook } from "@/types";
 import { CommitBuilder } from "@/util";
 import {
   appStore,
@@ -13,8 +13,10 @@ import {
 } from "@/hooks";
 import { persistCommit } from "@/api";
 import { pinia } from "@/plugins";
-import { CommitApiHook } from "@/types/hooks/api/commit";
 
+/**
+ * A hook for managing commit API requests.
+ */
 export const useCommitApi = defineStore("commitApi", (): CommitApiHook => {
   const commitApi = useApi("commitApi");
 

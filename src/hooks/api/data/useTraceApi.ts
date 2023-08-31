@@ -8,6 +8,7 @@ import {
   TraceLinkSchema,
   TraceType,
   IOHandlerCallback,
+  TraceApiHook,
 } from "@/types";
 import {
   useApi,
@@ -20,7 +21,7 @@ import {
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
-export const useTraceApi = defineStore("traceApi", () => {
+export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
   const createTraceApi = useApi("traceApi");
   const approveTraceApi = useApi("approveTraceApi");
   const unreviewTraceApi = useApi("unreviewTraceApi");
@@ -39,13 +40,6 @@ export const useTraceApi = defineStore("traceApi", () => {
       (id) => id !== traceId
     ));
 
-  /**
-   * Creates a new trace link.
-   *
-   * @param source - The artifact to link from.
-   * @param target - The artifact to link to.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleCreate(
     source: ArtifactSchema | ArtifactCytoElementData,
     target: ArtifactSchema | ArtifactCytoElementData,
@@ -82,9 +76,6 @@ export const useTraceApi = defineStore("traceApi", () => {
     );
   }
 
-  /**
-   * Creates a new trace link between all source to all target artifacts in the saved trace store.
-   */
   async function handleCreateAll(): Promise<void> {
     for (const target of traceSaveStore.targets) {
       for (const source of traceSaveStore.sources) {
@@ -95,12 +86,6 @@ export const useTraceApi = defineStore("traceApi", () => {
     }
   }
 
-  /**
-   * Processes link approvals, setting the app state to loading in between, and updating trace links afterwards.
-   *
-   * @param traceLink - The trace link to process.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleApprove(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
@@ -126,12 +111,6 @@ export const useTraceApi = defineStore("traceApi", () => {
     );
   }
 
-  /**
-   * Processes link declines, setting the app state to loading in between, and updating trace links afterwards.
-   *
-   * @param traceLink - The trace link to process.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleDecline(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
@@ -158,9 +137,6 @@ export const useTraceApi = defineStore("traceApi", () => {
     );
   }
 
-  /**
-   * Declines all unreviewed links, setting the app state to loading in between, and updating trace links.
-   */
   async function handleDeclineAll(): Promise<void> {
     await logStore.confirm(
       "Clear Unreviewed Links",
@@ -191,12 +167,6 @@ export const useTraceApi = defineStore("traceApi", () => {
     );
   }
 
-  /**
-   * Processes link unreview, setting the app state to loading in between, and updating trace links afterwards.
-   *
-   * @param traceLink - The trace link to process.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleUnreview(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
@@ -225,12 +195,6 @@ export const useTraceApi = defineStore("traceApi", () => {
     );
   }
 
-  /**
-   * Deletes a trace link after confirmation.
-   *
-   * @param traceLink - The trace link to delete.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleDelete(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback

@@ -30,7 +30,7 @@ import { pinia } from "@/plugins";
 import { useApi } from "@/hooks/api/core/useApi";
 
 /**
- * Creates a store for handling session API requests.
+ * A store for handling session API requests.
  */
 export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   const createdAccount = ref(false);

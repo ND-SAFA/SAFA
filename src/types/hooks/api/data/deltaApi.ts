@@ -1,4 +1,4 @@
-import { Ref } from "vue";
+import { ComputedRef } from "vue";
 import { IOHandlerCallback, VersionSchema } from "@/types";
 
 /**
@@ -8,11 +8,11 @@ export interface DeltaApiHook {
   /**
    * Whether the request is loading.
    */
-  loading: Ref<boolean>;
+  loading: ComputedRef<boolean>;
   /**
    * The versions of the current project that delta can be performed against.
    */
-  deltaVersions: Ref<VersionSchema[]>;
+  deltaVersions: ComputedRef<VersionSchema[]>;
   /**
    * Sets a project delta.
    *

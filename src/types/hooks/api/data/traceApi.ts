@@ -1,4 +1,4 @@
-import { Ref } from "vue";
+import { ComputedRef, Ref } from "vue";
 import {
   ArtifactCytoElementData,
   ArtifactSchema,
@@ -17,19 +17,19 @@ export interface TraceApiHook {
   /**
    * Whether the create request is loading.
    */
-  createLoading: Ref<boolean>;
+  createLoading: ComputedRef<boolean>;
   /**
    * Whether the approval request is loading.
    */
-  approveLoading: Ref<boolean>;
+  approveLoading: ComputedRef<boolean>;
   /**
    * Whether the decline request is loading.
    */
-  declineLoading: Ref<boolean>;
+  declineLoading: ComputedRef<boolean>;
   /**
    * Whether the unreview request is loading.
    */
-  unreviewLoading: Ref<boolean>;
+  unreviewLoading: ComputedRef<boolean>;
   /**
    * Creates a new trace link.
    *

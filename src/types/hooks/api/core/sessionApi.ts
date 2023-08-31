@@ -1,4 +1,4 @@
-import { Ref } from "vue/dist/vue";
+import { ComputedRef, Ref } from "vue";
 import {
   IOHandlerCallback,
   PasswordChangeSchema,
@@ -12,11 +12,11 @@ export interface SessionApiHook {
   /**
    * Whether this request manager is loading a request.
    */
-  loading: Ref<boolean>;
+  loading: ComputedRef<boolean>;
   /**
    * Whether the most recent request had an error.
    */
-  error: Ref<boolean>;
+  error: ComputedRef<boolean>;
   /**
    * Whether a new account was created.
    */
@@ -29,15 +29,15 @@ export interface SessionApiHook {
   /**
    * An error message for account creation.
    */
-  createErrorMessage: Ref<string | false>;
+  createErrorMessage: ComputedRef<string | false>;
   /**
    * An error message for password changes.
    */
-  passwordErrorMessage: Ref<string | false>;
+  passwordErrorMessage: ComputedRef<string | false>;
   /**
    * An error message for login.
    */
-  loginErrorMessage: Ref<string | false>;
+  loginErrorMessage: ComputedRef<string | false>;
 
   /**
    * Resets the session API state.

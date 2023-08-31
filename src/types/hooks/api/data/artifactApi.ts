@@ -1,4 +1,4 @@
-import { Ref } from "vue";
+import { ComputedRef, Ref } from "vue";
 import { ArtifactSchema, IOHandlerCallback } from "@/types";
 
 /**
@@ -8,11 +8,11 @@ export interface ArtifactApiHook {
   /**
    * Whether the artifact is currently being saved.
    */
-  saveLoading: Ref<boolean>;
+  saveLoading: ComputedRef<boolean>;
   /**
    * Whether the artifact is currently being deleted.
    */
-  deleteLoading: Ref<boolean>;
+  deleteLoading: ComputedRef<boolean>;
   /**
    * Whether the artifact name is currently being verified.
    */
@@ -20,7 +20,7 @@ export interface ArtifactApiHook {
   /**
    * An error message about the artifact name, or false if there is no error.
    */
-  nameError: Ref<string | false>;
+  nameError: ComputedRef<string | false>;
 
   /**
    * Verifies that the edited artifact's name is unique.

@@ -183,6 +183,6 @@ if os.environ.get("BACKEND_ACCESS_ID", None):
         'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
         'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}'
     }
-TGEN_BAR = "-" * 25
+TGEN_BAR = "-" * 250
 TGEN_VERSION = "2.0.0"
 TGEN_START_MSG = f"{TGEN_BAR}\nWelcome to SAFA's generation server.\nRunning v{TGEN_VERSION}\n{TGEN_BAR}"

@@ -40,6 +40,7 @@ export enum Endpoint {
 
   // Jobs
   createProjectJob = "jobs/projects",
+  createProjectThroughFlatFiles = "jobs/projects/upload",
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
   getUserJobs = "jobs",
   deleteJobById = "jobs/:jobId",
@@ -78,9 +79,13 @@ export enum Endpoint {
   sync = "projects/versions/:versionId/changes",
 
   // Types
-  getProjectArtifactTypes = "projects/:projectId/artifactTypes",
-  createOrUpdateArtifactType = "projects/:projectId/artifactTypes",
-  deleteArtifactType = "projects/:projectId/artifactTypes/:typeId",
+  createArtifactType = "projects/:projectId/artifactTypes",
+  editArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
+  deleteArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
+
+  // Trace Matrices
+  createTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
+  deleteTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
 
   // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
@@ -126,11 +131,6 @@ export enum Endpoint {
   parseArtifactFile = "projects/parse/artifacts/:artifactType",
   parseTraceFile = "projects/parse/traces",
 
-  // Trace Matrices
-  createTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
-  deleteTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
-  retrieveTraceMatrices = "projects/:projectId/matrices",
-
   // Warnings
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
 
@@ -149,7 +149,7 @@ export enum Endpoint {
 
   // Generation
 
-  summarize = "summarize",
+  summarize = "projects/versions/:versionId/artifacts/summarize",
   prompt = "prompt",
   generateArtifacts = "hgen/:versionId",
 }

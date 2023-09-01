@@ -1,6 +1,6 @@
 <template>
   <div>
-    <panel-card :title="parentTitle">
+    <panel-card :title="parentTitle" collapsable>
       <template #title-actions>
         <text-button
           v-if="displayActions"
@@ -46,7 +46,7 @@
       />
     </panel-card>
 
-    <panel-card :title="childTitle">
+    <panel-card :title="childTitle" collapsable>
       <template #title-actions>
         <text-button
           v-if="displayActions"
@@ -109,9 +109,8 @@ import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
 import {
   appStore,
   artifactStore,
-  projectStore,
+  permissionStore,
   selectionStore,
-  sessionStore,
   subtreeStore,
   traceStore,
 } from "@/hooks";
@@ -119,15 +118,13 @@ import {
   Typography,
   IconButton,
   PanelCard,
-  ArtifactBodyDisplay,
   TextButton,
   List,
   ListItem,
 } from "@/components/common";
+import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
-const displayActions = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 
@@ -162,7 +159,7 @@ const childTitle = computed(() =>
 );
 
 /**
- * Determines the className of the link to a parent artifact.
+ * Determines the className of the link to another artifact.
  * @param artifactName - The artifact to select the link to.
  * @returns The className for the link.
  */

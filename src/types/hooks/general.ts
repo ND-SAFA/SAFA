@@ -1,17 +1,14 @@
 import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
 
 /**
- * Enumerates the allowed trace link directions between artifact types.
- */
-export type ArtifactTypeDirections = Record<string, string[]>;
-
-/**
  * Enumerates types of panels.
  */
 export enum PanelType {
   appPanel = "appPanel",
   errorDisplay = "errorDisplay",
   detailsPanel = "detailsPanel",
+  projectSaver = "projectSaver",
+  projectDeleter = "projectDeleter",
   artifactCreator = "artifactCreator",
   traceCreator = "traceCreator",
   traceLinkDraw = "traceLinkDraw",
@@ -50,6 +47,7 @@ export type DetailsOpenState =
   | "saveTrace"
   | "generateTrace"
   | "displayArtifactLevel"
+  | "saveArtifactLevel"
   | "displayTraceMatrix";
 
 /**
@@ -58,6 +56,8 @@ export type DetailsOpenState =
 export interface PanelStateMap {
   [PanelType.appPanel]: boolean;
   [PanelType.detailsPanel]: DetailsOpenState;
+  [PanelType.projectSaver]: boolean;
+  [PanelType.projectDeleter]: boolean;
   [PanelType.artifactCreator]: ArtifactCreatorOpenState;
   [PanelType.traceCreator]: TraceCreatorOpenState;
   [PanelType.errorDisplay]: boolean;

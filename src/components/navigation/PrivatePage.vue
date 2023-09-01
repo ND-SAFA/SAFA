@@ -43,6 +43,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { PrivatePageProps } from "@/types";
 import { sessionStore } from "@/hooks";
 import {
   FlexBox,
@@ -51,13 +52,7 @@ import {
   BackButton,
 } from "@/components/common";
 
-const props = defineProps<{
-  fullWindow?: boolean;
-  graph?: boolean;
-  title?: string;
-  subtitle?: string;
-  backToProject?: boolean;
-}>();
+const props = defineProps<PrivatePageProps>();
 
 const doDisplay = computed(() => sessionStore.doesSessionExist);
 

@@ -13,17 +13,17 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GraphElementType, GraphMode, TimEdgeCytoElement } from "@/types";
+import {
+  GraphElementType,
+  GraphMode,
+  TimEdgeCytoElement,
+  TimLinkProps,
+} from "@/types";
 import { getTraceId, sanitizeNodeId } from "@/util";
 import { documentStore, selectionStore, useTheme } from "@/hooks";
-import { CyElement } from "../base";
+import { CyElement } from "@/components/graph/base";
 
-const props = defineProps<{
-  sourceType: string;
-  targetType: string;
-  count: number;
-  generated?: boolean;
-}>();
+const props = defineProps<TimLinkProps>();
 
 const { darkMode } = useTheme();
 

@@ -31,7 +31,7 @@
 
 <script lang="ts">
 /**
- * ProjectMemberModal
+ * A modal for inviting or editing project members.
  */
 export default {
   name: "ProjectMemberModal",
@@ -40,9 +40,9 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { MembershipSchema, ProjectRole } from "@/types";
+import { ProjectMemberModalProps, ProjectRole } from "@/types";
 import { projectRoleOptions } from "@/util";
-import { memberApiStore, projectStore } from "@/hooks";
+import { memberApiStore } from "@/hooks";
 import {
   Modal,
   ProjectInput,
@@ -51,10 +51,7 @@ import {
   TextButton,
 } from "@/components/common";
 
-const props = defineProps<{
-  open: boolean;
-  member?: MembershipSchema;
-}>();
+const props = defineProps<ProjectMemberModalProps>();
 
 const emit = defineEmits<{
   (e: "close"): void;
@@ -100,8 +97,8 @@ const isValid = computed(
  * Resets all modal data.
  */
 function handleReset(): void {
-  projectIds.value = [projectStore.projectId];
-  userEmail.value = props.member?.email || "";
+  projectIds.value = props.projectId ? [props.projectId] : [];
+  userEmail.value = props.email || props.member?.email || "";
   userRole.value = props.member?.role;
 }
 

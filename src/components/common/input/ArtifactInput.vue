@@ -61,15 +61,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ArtifactInput, TimArtifactLevelSchema } from "@/types";
+import { ArtifactInput, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts, sortSelectedArtifactsToTop } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
-import {
-  Typography,
-  ArtifactBodyDisplay,
-  AttributeChip,
-} from "@/components/common/display";
+import { Typography, AttributeChip } from "@/components/common/display";
 import { TypeButtons } from "@/components/common/button";
+import ArtifactBodyDisplay from "@/components/artifact/display/ArtifactBodyDisplay.vue";
 
 const props = defineProps<ArtifactInput>();
 
@@ -132,8 +129,8 @@ function filterOptions(
  * @param allOptions - All possible types.
  */
 function handleTypeChange(
-  option: TimArtifactLevelSchema,
-  allOptions: TimArtifactLevelSchema[]
+  option: ArtifactTypeSchema,
+  allOptions: ArtifactTypeSchema[]
 ): void {
   if (hiddenTypes.value.length === 0) {
     hiddenTypes.value = allOptions

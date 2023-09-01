@@ -64,16 +64,13 @@ export default {
 import { computed, watch } from "vue";
 import {
   artifactGenerationApiStore,
-  projectStore,
+  permissionStore,
   selectionStore,
-  sessionStore,
 } from "@/hooks";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
 
-const displayActions = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

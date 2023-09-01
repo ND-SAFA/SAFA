@@ -158,8 +158,6 @@ export enum DataCy {
   traceSaveDirectionsChip = "chip-type-direction",
   traceSaveSubmitButton = "button-trace-save",
 
-  traceTargetButton = "button-trace-target",
-  traceSourceButton = "button-trace-source",
   traceUnreviewButton = "button-trace-unreview",
   traceApproveButton = "button-trace-approve",
   traceDeclineButton = "button-trace-decline",
@@ -193,7 +191,6 @@ export enum DataCy {
   treeNode = "tree-node",
   treeNodeName = "tree-node-name",
   treeNodeType = "tree-node-type",
-  treeNodeBody = "tree-node-body",
   treeSelectedNode = "tree-node-selected",
 
   // Artifact Search
@@ -206,7 +203,8 @@ export enum DataCy {
   // Type Options
 
   typeOptionsIconButton = "button-type-options-icon",
-  artifactLevelContent = "panel-artifact-type",
+  artifactTypePanel = "panel-artifact-type",
+  artifactTypeSavePanel = "panel-save-artifact-type",
   artifactLevelOptions = "panel-artifact-type-options",
 
   // Project settings
@@ -297,11 +295,9 @@ export enum DataCy {
   attributeLayoutDeleteAttributeButton = "button-attribute-layout-delete-attribute",
   attributeLayoutDeleteButton = "button-attribute-layout-delete",
   attributeLayoutConfirmDeleteButton = "button-confirm-modal",
-}
 
-export enum DataIds {
-  rightClickAddArtifact = "#add-artifact",
-  rightClickDuplicateArtifact = "#duplicate-artifact",
-  rightClickHideSubtree = "#hide-subtree",
-  rightClickShowSubtree = "#show-subtree",
+  // Graph Menu
+  rightClickAddArtifact = "button-add-artifact",
+  rightClickAddTrace = "button-add-trace",
+  rightClickToggleSubtree = "button-toggle-subtree",
 }

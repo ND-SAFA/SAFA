@@ -1,4 +1,4 @@
-import { CommitSchema, GenerateArtifactSchema } from "@/types";
+import { GenerateArtifactSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -11,8 +11,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 export function createGeneratedArtifacts(
   config: GenerateArtifactSchema,
   versionId: string
-): Promise<CommitSchema> {
-  return authHttpClient<CommitSchema>(
+): Promise<JobSchema> {
+  return authHttpClient<JobSchema>(
     fillEndpoint(Endpoint.generateArtifacts, { versionId }),
     {
       method: "POST",

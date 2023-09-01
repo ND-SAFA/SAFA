@@ -52,12 +52,8 @@ export default {
 import { computed } from "vue";
 import { TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
-import {
-  ArtifactBodyDisplay,
-  AttributeChip,
-  PanelCard,
-  Typography,
-} from "@/components/common";
+import { AttributeChip, PanelCard, Typography } from "@/components/common";
+import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
 const traceLink = computed(() => selectionStore.selectedTraceLink);
 

@@ -38,18 +38,18 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { StepperStep, IdentifierSchema, VersionSchema } from "@/types";
+import {
+  StepperStep,
+  IdentifierSchema,
+  VersionSchema,
+  MinimalProps,
+} from "@/types";
 import { versionToString } from "@/util";
 import { getVersionApiStore, projectStore } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
 import { ProjectSelectorTable, VersionSelectorTable } from "./table";
 
-const props = defineProps<{
-  /**
-   * Whether to display minimal information.
-   */
-  minimal?: boolean;
-}>();
+const props = defineProps<MinimalProps>();
 
 const defaultProjectStep = (): StepperStep => ({
   title: "Select a Project",

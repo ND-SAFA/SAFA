@@ -35,12 +35,14 @@ describe("Artifact Types", () => {
       cy.switchToTimView();
 
       cy.getNode(type).click();
+      cy.clickButtonWithName("Edit Type");
+
       cy.getCy(DataCy.typeOptionsIconButton).within(() => {
         cy.get("button").last().click();
       });
 
-      cy.getCy(DataCy.artifactLevelContent).within(() => {
-        cy.get("i").first().should("have.class", "mdi-alpha-a-box-outline");
+      cy.getCy(DataCy.artifactTypeSavePanel).within(() => {
+        cy.get("i").last().should("have.class", "mdi-book-open");
       });
     });
   });

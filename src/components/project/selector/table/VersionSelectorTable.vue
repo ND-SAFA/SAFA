@@ -2,7 +2,7 @@
   <selector-table
     v-model:selected="selectedItems"
     :minimal="props.minimal"
-    addable
+    :addable="addable"
     :deletable="deletable"
     :loading="getVersionApiStore.getLoading"
     :columns="columns"
@@ -11,15 +11,15 @@
     item-name="Project"
     data-cy="table-version"
     @refresh="handleReload"
-    @row:add="handleOpenAdd"
-    @row:delete="handleOpenDelete"
+    @row:add="addOpen = true"
+    @row:delete="handleDelete"
   >
     <template #bottom>
-      <version-creator
+      <create-version-modal
         :open="addOpen"
         :project="props.project"
         @close="addOpen = false"
-        @create="handleConfirmAdd"
+        @create="handleAdd"
       />
     </template>
   </selector-table>
@@ -36,36 +36,18 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { IdentifierSchema, VersionSchema } from "@/types";
+import { VersionSchema, VersionSelectorTableProps } from "@/types";
 import { actionsColumn, versionColumns } from "@/util";
 import {
   projectApiStore,
   getVersionApiStore,
   projectStore,
-  sessionStore,
+  permissionStore,
 } from "@/hooks";
 import { SelectorTable } from "@/components/common";
-import { VersionCreator } from "@/components/project/creator";
+import { CreateVersionModal } from "@/components/project/creator";
 
-const props = defineProps<{
-  /**
-   * The project to select a version from.
-   */
-  project: IdentifierSchema;
-  /**
-   * Whether this component is currently in view.
-   * The content will be reloaded when opened.
-   */
-  open: boolean;
-  /**
-   * Whether to display minimal information.
-   */
-  minimal?: boolean;
-  /**
-   * If true, the current version will be hidden.
-   */
-  hideCurrentVersion?: boolean;
-}>();
+const props = defineProps<VersionSelectorTableProps>();
 
 const emit = defineEmits<{
   /**
@@ -100,8 +82,14 @@ const rows = computed(() =>
     : versions.value
 );
 
+const addable = computed(() =>
+  permissionStore.projectAllows("admin", props.project)
+);
+
 const deletable = computed(
-  () => sessionStore.isEditor(props.project) && versions.value.length > 1
+  () =>
+    permissionStore.projectAllows("admin", props.project) &&
+    versions.value.length > 1
 );
 
 /**
@@ -114,16 +102,9 @@ function handleReload() {
 }
 
 /**
- * Opens the add version modal.
- */
-function handleOpenAdd() {
-  addOpen.value = true;
-}
-
-/**
  * Closes the add version modal and adds the created version.
  */
-function handleConfirmAdd(version: VersionSchema) {
+function handleAdd(version: VersionSchema) {
   versions.value = [version, ...versions.value];
   addOpen.value = false;
 }
@@ -132,7 +113,7 @@ function handleConfirmAdd(version: VersionSchema) {
  * Attempts to delete the version.
  * @param version - The version to delete.
  */
-function handleOpenDelete(version: VersionSchema) {
+function handleDelete(version: VersionSchema) {
   projectApiStore.handleDeleteVersion(version, {
     onSuccess: () => {
       versions.value = versions.value.filter(

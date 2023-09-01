@@ -34,6 +34,8 @@ export const useApp = defineStore("app", {
     isOpen: {
       [PanelType.appPanel]: true,
       [PanelType.detailsPanel]: false,
+      [PanelType.projectSaver]: false,
+      [PanelType.projectDeleter]: false,
       [PanelType.artifactCreator]: false,
       [PanelType.traceCreator]: false,
       [PanelType.errorDisplay]: false,
@@ -52,6 +54,18 @@ export const useApp = defineStore("app", {
      */
     isDetailsPanelOpen(): DetailsOpenState {
       return this.isOpen[PanelType.detailsPanel];
+    },
+    /**
+     * @return Whether the project creator is open.
+     */
+    isProjectCreatorOpen(): boolean {
+      return this.isOpen[PanelType.projectSaver];
+    },
+    /**
+     * @return Whether the project deleter is open.
+     */
+    isProjectDeleterOpen(): boolean {
+      return this.isOpen[PanelType.projectDeleter];
     },
     /**
      * @return Whether the artifact creator is open.

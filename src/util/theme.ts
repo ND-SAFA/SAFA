@@ -38,6 +38,17 @@ export enum Colors {
 }
 
 /**
+ * The gradient colors used in the theme.
+ */
+export const ThemeGradient = {
+  nodeGradient1: Colors.gradient1,
+  nodeGradient2: Colors.gradient2,
+  nodeGradient3: Colors.gradient3,
+  nodeGradient4: Colors.gradient4,
+  nodeGradient5: Colors.gradient5,
+};
+
+/**
  * Defines all colors in the theme.
  */
 export const ThemeColors = {
@@ -69,11 +80,7 @@ export const ThemeColors = {
   nodeDefault: Colors.brownDark,
   nodeGenerated: Colors.brown,
 
-  nodeGradient1: Colors.gradient1,
-  nodeGradient2: Colors.gradient2,
-  nodeGradient3: Colors.gradient3,
-  nodeGradient4: Colors.gradient4,
-  nodeGradient5: Colors.gradient5,
+  ...ThemeGradient,
 };
 
 /**
@@ -103,6 +110,8 @@ export const lightPalette: Record<string, string> = {
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
+
+  ...ThemeGradient,
 };
 
 /**
@@ -132,32 +141,21 @@ export const darkPalette: Record<string, string> = {
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
+
+  ...ThemeGradient,
 };
 
-const typeColorMap: Record<string, string> = {};
-
 /**
- * Returns the color for the given type.
- * @param type - The type to get the color for.
+ * Returns the color code based on a type color name.
+ * @param colorName - The color name to get the color for.
  * @return The color.
  */
-export function getTypeColor(type = ""): string {
-  if (!typeColorMap[type]) {
-    const remainingColors = [
-      ThemeColors.nodeGradient1,
-      ThemeColors.nodeGradient2,
-      ThemeColors.nodeGradient3,
-      ThemeColors.nodeGradient4,
-      ThemeColors.nodeGradient5,
-    ].filter((color) => !Object.values(typeColorMap).includes(color));
-
-    typeColorMap[type] =
-      remainingColors.length === 0
-        ? ThemeColors.primary
-        : remainingColors[Math.floor(Math.random() * remainingColors.length)];
-  }
-
-  return typeColorMap[type];
+export function convertTypeToColor(
+  colorName: keyof typeof ThemeGradient | string
+): string {
+  return (
+    (ThemeGradient as Record<string, string>)[colorName] || ThemeColors.primary
+  );
 }
 
 /**
@@ -184,22 +182,31 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @return The color.
  */
 export function getEnumColor(
-  state: ApprovalType | ArtifactDeltaState | DeltaType | MessageType | string
+  state:
+    | ApprovalType
+    | ArtifactDeltaState
+    | DeltaType
+    | MessageType
+    | JobStatus
+    | string
 ): ThemeColor {
   switch (state) {
     case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
+    case JobStatus.COMPLETED:
     case MessageType.success:
     case "added":
       return "added";
     case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
+    case JobStatus.IN_PROGRESS:
     case MessageType.info:
     case MessageType.update:
     case "modified":
       return "modified";
     case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
+    case JobStatus.FAILED:
     case MessageType.error:
     case "removed":
       return "removed";
@@ -207,24 +214,5 @@ export function getEnumColor(
       return "warning";
     default:
       return "unchanged";
-  }
-}
-
-/**
- * Returns the color of a job status.
- *
- * @param status - The job status to get the color of.
- * @returns The display color.
- */
-export function getJobStatusColor(status: JobStatus): ThemeColor {
-  switch (status) {
-    case JobStatus.COMPLETED:
-      return "primary";
-    case JobStatus.IN_PROGRESS:
-      return "secondary";
-    case JobStatus.FAILED:
-      return "negative";
-    default:
-      return "";
   }
 }

@@ -50,6 +50,10 @@ export interface IconButtonProps
    */
   tooltipDelay?: number;
   /**
+   * The icon id to render on this button.
+   */
+  iconId?: string;
+  /**
    * Whether to render this button as a fab.
    */
   fab?: boolean;
@@ -92,4 +96,20 @@ export interface TextButtonProps
    * If true, the button label will be hidden.
    */
   hideLabel?: boolean;
+}
+
+/**
+ * The props for the artifact type button group component.
+ */
+export interface TypeButtonProps {
+  /**
+   * Whether the buttons are visible by default.
+   * @default false
+   */
+  defaultVisible?: boolean;
+  /**
+   * Which type buttons are not active.
+   * Defaults to all buttons being active.
+   */
+  hiddenTypes: string[];
 }

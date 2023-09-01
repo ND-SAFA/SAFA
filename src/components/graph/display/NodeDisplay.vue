@@ -8,9 +8,23 @@
     @mouseup="mouseUpTime = new Date().getTime()"
     @click="handleClick"
   >
-    <div v-if="props.title" class="cy-node-title" data-cy="tree-node-type">
-      <typography variant="subtitle" :value="props.title" bold />
-    </div>
+    <flex-box
+      v-if="props.title"
+      class="cy-node-title"
+      justify="center"
+      align="center"
+      data-cy="tree-node-type"
+    >
+      <icon :id="iconId" :color="iconColor" size="sm" />
+      <typography
+        variant="subtitle"
+        :value="props.title"
+        bold
+        l="1"
+        align="center"
+        ellipsis
+      />
+    </flex-box>
 
     <separator
       v-if="props.separator"
@@ -43,39 +57,11 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ThemeColor } from "@/types";
-import { Separator, Typography } from "@/components/common";
+import { NodeDisplayProps } from "@/types";
+import { timStore } from "@/hooks";
+import { Separator, Typography, Icon, FlexBox } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * The type of node to display.
-   */
-  variant: "tim" | "artifact" | "footer" | "sidebar" | "menu";
-  /**
-   * The color of the node to display.
-   */
-  color: ThemeColor | string;
-  /**
-   * The title of the node to display above the separator.
-   */
-  title?: string;
-  /**
-   * The subtitle of the node to display below the separator.
-   */
-  subtitle?: string;
-  /**
-   * Whether to display a separator between the title and subtitle.
-   */
-  separator?: boolean;
-  /**
-   * The body content to display.
-   */
-  body?: string;
-  /**
-   * Whether the node is selected.
-   */
-  selected?: boolean;
-}>();
+const props = defineProps<NodeDisplayProps>();
 
 const emit = defineEmits<{
   (event: "click"): void;
@@ -110,6 +96,14 @@ const cardStyle = computed(() =>
 );
 const separatorStyle = computed(() =>
   props.color.includes("#") ? `background-color: ${props.color};` : undefined
+);
+
+const iconId = computed(() =>
+  props.title ? timStore.getTypeIcon(props.title) : undefined
+);
+
+const iconColor = computed(() =>
+  props.title ? timStore.getTypeColor(props.title) : undefined
 );
 
 /**

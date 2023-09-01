@@ -10,6 +10,7 @@
       <icon-button
         tooltip="Create artifact"
         icon="create-artifact"
+        data-cy="button-add-artifact"
         @click="
           appStore.openArtifactCreatorTo({ isNewArtifact: true });
           handleCloseMenu();
@@ -18,6 +19,7 @@
       <icon-button
         tooltip="Create trace link"
         icon="create-trace"
+        data-cy="button-add-trace"
         @click="
           appStore.openDetailsPanel('saveTrace');
           handleCloseMenu();
@@ -36,6 +38,7 @@
         tooltip="Generate artifacts"
         icon="generate-artifacts"
         color="primary"
+        data-cy="button-generate-artifact"
         @click="
           appStore.openDetailsPanel('generateArtifact');
           handleCloseMenu();
@@ -45,6 +48,7 @@
         tooltip="Generate trace links"
         icon="generate-traces"
         color="primary"
+        data-cy="button-generate-trace"
         @click="
           appStore.openDetailsPanel('generateTrace');
           handleCloseMenu();
@@ -65,7 +69,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { appStore, projectStore, sessionStore } from "@/hooks";
+import { appStore, permissionStore } from "@/hooks";
 import { toggleDrawMode } from "@/cytoscape";
 import { FlexBox, IconButton, Separator } from "@/components/common";
 import { NodeDisplay } from "../display";
@@ -74,5 +78,5 @@ const handleCloseMenu = inject<() => void>("menu-close");
 
 const drawMode = computed(() => appStore.isCreateLinkEnabled);
 
-const display = computed(() => sessionStore.isEditor(projectStore.project));
+const display = computed(() => permissionStore.projectAllows("editor"));
 </script>

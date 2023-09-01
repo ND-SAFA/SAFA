@@ -1,4 +1,14 @@
 /**
+ * The types of permissions allowed on an organization.
+ */
+export type OrganizationPermissionType = "navigation" | "viewer" | "editor";
+
+/**
+ * The types of permissions allowed on a project.
+ */
+export type ProjectPermissionType = "viewer" | "editor" | "admin" | "owner";
+
+/**
  * Represents a member in a given project
  */
 export interface MembershipSchema {

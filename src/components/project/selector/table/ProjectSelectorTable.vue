@@ -3,7 +3,7 @@
     v-model:selected="selectedItems"
     :minimal="props.minimal"
     addable
-    editable
+    :editable="isEditable"
     :deletable="isDeletable"
     :loading="getProjectApiStore.loading"
     :columns="columns"
@@ -12,32 +12,36 @@
     item-name="Project"
     data-cy="table-project"
     @refresh="handleReload"
-    @row:add="handleOpenAdd"
-    @row:edit="handleOpenEdit"
-    @row:delete="handleOpenDelete"
+    @row:add="identifierSaveStore.selectIdentifier(undefined, 'save')"
+    @row:edit="identifierSaveStore.selectIdentifier($event, 'save')"
+    @row:delete="identifierSaveStore.selectIdentifier($event, 'delete')"
   >
     <template #cell-actions="{ row }">
       <icon-button
+        v-if="isEditable(row)"
+        :small="props.minimal"
+        :tooltip="`Invite to ${row.name}`"
+        icon="invite"
+        data-cy="button-project-invite"
+        @click="projectInviteId = row.projectId"
+      />
+      <icon-button
         v-if="row.members.length > 1"
+        :small="props.minimal"
         icon="leave"
         tooltip="Leave project"
         data-cy="button-selector-leave"
         @click="handleLeave(row)"
       />
     </template>
-    <template #bottom>
-      <confirm-project-delete
-        :open="deleteOpen"
-        @close="deleteOpen = false"
-        @confirm="handleConfirmDelete"
-      />
-      <project-identifier-modal
-        :open="saveOpen"
-        @close="saveOpen = false"
-        @save="handleConfirmSave"
-      />
-    </template>
   </selector-table>
+
+  <project-member-modal
+    :open="!!projectInviteId"
+    :project-id="projectInviteId"
+    @close="projectInviteId = undefined"
+    @submit="projectInviteId = undefined"
+  />
 </template>
 
 <script lang="ts">
@@ -52,7 +56,11 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { IdentifierSchema, ProjectRole } from "@/types";
+import {
+  IdentifierSchema,
+  ProjectRole,
+  ProjectSelectorTableProps,
+} from "@/types";
 import {
   actionsColumn,
   projectExpandedColumns,
@@ -63,22 +71,13 @@ import {
   identifierSaveStore,
   logStore,
   memberApiStore,
+  permissionStore,
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
-import { ConfirmProjectDelete, ProjectIdentifierModal } from "../../base";
+import { ProjectMemberModal } from "@/components/settings";
 
-const props = defineProps<{
-  /**
-   * Whether this component is currently in view.
-   * The content will be reloaded when opened.
-   */
-  open: boolean;
-  /**
-   * Whether to display minimal information.
-   */
-  minimal?: boolean;
-}>();
+const props = defineProps<ProjectSelectorTableProps>();
 
 const emit = defineEmits<{
   /**
@@ -90,8 +89,7 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
-const saveOpen = ref(false);
-const deleteOpen = ref(false);
+const projectInviteId = ref<string>();
 
 const selectedItems = computed({
   get() {
@@ -116,58 +114,9 @@ const rows = computed(() => getProjectApiStore.allProjects);
  */
 function handleReload() {
   selected.value = undefined;
+  projectInviteId.value = undefined;
 
   getProjectApiStore.handleReload();
-}
-
-/**
- * Returns whether a project is deletable.
- * @param project - The project to check.
- * @return Whether it can be deleted.
- */
-function isDeletable(project: IdentifierSchema): boolean {
-  return sessionStore.isOwner(project);
-}
-
-/**
- * Opens the add project modal.
- */
-function handleOpenAdd() {
-  identifierSaveStore.baseIdentifier = undefined;
-  saveOpen.value = true;
-}
-
-/**
- * Opens the edit project modal.
- * @param project - The project to edit.
- */
-function handleOpenEdit(project: IdentifierSchema) {
-  identifierSaveStore.baseIdentifier = project;
-  saveOpen.value = true;
-}
-
-/**
- * Opens the delete project modal.
- * @param project - The project to delete.
- */
-function handleOpenDelete(project: IdentifierSchema) {
-  identifierSaveStore.baseIdentifier = project;
-  deleteOpen.value = true;
-}
-
-/**
- * Closes the delete project modal.
- */
-function handleConfirmDelete() {
-  deleteOpen.value = false;
-  selectedItems.value = [];
-}
-
-/**
- * Closes the save project modal.
- */
-function handleConfirmSave() {
-  saveOpen.value = false;
 }
 
 /**
@@ -175,9 +124,7 @@ function handleConfirmSave() {
  * @param project - The project to leave.
  */
 function handleLeave(project: IdentifierSchema) {
-  const member = project.members.find(
-    (member) => member.email === sessionStore.user?.email
-  );
+  const member = sessionStore.getProjectMember(project);
   const ownerCount = project.members.filter(
     (member) => member.role === ProjectRole.OWNER
   ).length;
@@ -187,6 +134,24 @@ function handleLeave(project: IdentifierSchema) {
   } else {
     memberApiStore.handleDelete(member);
   }
+}
+
+/**
+ * Whether the current user can edit the project.
+ * @param project - The project to check.
+ * @returns Whether the current user can edit the project.
+ */
+function isEditable(project: IdentifierSchema): boolean {
+  return permissionStore.projectAllows("editor", project);
+}
+
+/**
+ * Whether the current user can delete the project.
+ * @param project - The project to check.
+ * @returns Whether the current user can delete the project.
+ */
+function isDeletable(project: IdentifierSchema): boolean {
+  return permissionStore.projectAllows("owner", project);
 }
 
 /**

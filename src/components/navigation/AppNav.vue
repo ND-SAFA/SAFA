@@ -1,10 +1,12 @@
 <template>
-  <div :data-cy="isLoggedIn ? 'is-logged-in' : ''">
-    <app-nav-drawer v-if="isLoggedIn" />
-    <app-nav-bar v-if="isLoggedIn" />
-    <details-drawer v-if="isLoggedIn" />
+  <div :data-cy="displayNavigation ? 'is-logged-in' : ''">
+    <app-nav-drawer v-if="displaySidebar" />
+    <app-nav-bar v-if="displayNavigation" />
+    <details-drawer v-if="displayNavigation" />
     <snackbar />
     <app-confirm-modal :message="confirmationMessage" />
+    <save-project-modal />
+    <delete-project-modal />
   </div>
 </template>
 
@@ -19,13 +21,19 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { logStore, sessionStore } from "@/hooks";
+import { logStore, permissionStore, sessionStore } from "@/hooks";
 import { AppConfirmModal } from "@/components/common";
+import { SaveProjectModal, DeleteProjectModal } from "@/components/project";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";
 import Snackbar from "./Snackbar.vue";
 
-const isLoggedIn = computed(() => sessionStore.doesSessionExist);
+const displayNavigation = computed(() => sessionStore.doesSessionExist);
+const displaySidebar = computed(
+  () =>
+    displayNavigation.value && permissionStore.organizationAllows("navigation")
+);
+
 const confirmationMessage = computed(() => logStore.confirmation);
 </script>

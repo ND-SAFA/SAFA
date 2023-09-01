@@ -1,7 +1,7 @@
 export * from "./authentication";
+export * from "./tim";
 export * from "./artifact";
 export * from "./warning";
-export * from "./artifact-types";
 export * from "./files";
 export * from "./document";
 export * from "./membership";
@@ -12,7 +12,6 @@ export * from "./delta";
 export * from "./model";
 export * from "./attribute";
 export * from "./installations";
-export * from "./tim";
 export * from "./search";
 export * from "./hgen";
 export * from "./subtree";

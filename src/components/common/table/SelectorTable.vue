@@ -23,8 +23,14 @@
         <searchbar
           v-model="searchText"
           :label="searchLabel"
+          :hint="props.searchHint"
           data-cy="input-selector-search"
-        />
+          @enter="emit('row:add', searchText)"
+        >
+          <template #append="{ search }">
+            <slot name="search-append" :search="search" />
+          </template>
+        </searchbar>
         <icon-button
           tooltip="Refresh"
           icon="graph-refresh"
@@ -41,17 +47,19 @@
           <slot name="cell-actions" :row="row" />
           <icon-button
             v-if="isEditEnabled(row)"
+            :small="props.minimal"
             icon="edit"
             :tooltip="editLabel"
             data-cy="button-selector-edit"
-            @click="$emit('row:edit', row)"
+            @click="emit('row:edit', row)"
           />
           <icon-button
             v-if="isDeleteEnabled(row)"
+            :small="props.minimal"
             icon="delete"
             :tooltip="deleteLabel"
             data-cy="button-selector-delete"
-            @click="$emit('row:delete', row)"
+            @click="emit('row:delete', row)"
           />
         </flex-box>
       </q-td>
@@ -64,7 +72,7 @@
         icon="add"
         :tooltip="addLabel"
         data-cy="button-selector-add"
-        @click="$emit('row:add')"
+        @click="emit('row:add', null)"
       />
       <slot name="bottom" />
     </template>
@@ -96,7 +104,7 @@ const emit = defineEmits<{
   (e: "refresh"): void;
   (e: "row:edit", row: TableRow): void;
   (e: "row:delete", row: TableRow): void;
-  (e: "row:add"): void;
+  (e: "row:add", searchText: string | null): void;
 }>();
 
 const selectedRows = useVModel(props, "selected");

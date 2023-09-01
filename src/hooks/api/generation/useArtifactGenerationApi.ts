@@ -2,18 +2,17 @@ import { defineStore } from "pinia";
 
 import { computed, ref } from "vue";
 import {
-  GenerateArtifactSchema,
-  IOHandlerCallback,
   ArtifactSchema,
   ArtifactSummaryConfirmation,
+  GenerateArtifactSchema,
+  IOHandlerCallback,
 } from "@/types";
 import {
-  useApi,
-  artifactStore,
-  projectStore,
-  traceStore,
-  artifactSaveStore,
   artifactApiStore,
+  artifactSaveStore,
+  jobStore,
+  projectStore,
+  useApi,
 } from "@/hooks";
 import { createGeneratedArtifacts, createPrompt, createSummary } from "@/api";
 import { pinia } from "@/plugins";
@@ -47,7 +46,10 @@ export const useArtifactGenerationApi = defineStore(
     ): Promise<void> {
       await summaryGenerationApi.handleRequest(
         async () => {
-          const summary = await createSummary(artifact);
+          const summary = await createSummary(
+            projectStore.versionId,
+            artifact.id
+          );
 
           const clear = () => (summaryGenConfirm.value = undefined);
           const confirm = () =>
@@ -128,17 +130,17 @@ export const useArtifactGenerationApi = defineStore(
     ): Promise<void> {
       await artifactGenerationApi.handleRequest(
         async () => {
-          const commit = await createGeneratedArtifacts(
+          const job = await createGeneratedArtifacts(
             configuration,
             projectStore.versionId
           );
 
-          artifactStore.addOrUpdateArtifacts(commit.artifacts.added);
-          traceStore.addOrUpdateTraceLinks(commit.traces.added);
+          jobStore.updateJob(job);
         },
         callbacks,
         {
-          success: "Successfully generated artifacts.",
+          success:
+            "Artifacts are being generated. You'll receive an update when they have been created.",
           error: "Unable to generate artifacts.",
         }
       );

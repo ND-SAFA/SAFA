@@ -29,30 +29,14 @@ import {
   ArtifactSchema,
   EntityModificationSchema,
   TraceLinkSchema,
-  DeltaType,
   SelectOption,
+  ArtifactDeltaButtonGroupProps,
 } from "@/types";
 import { capitalize, getEnumColor } from "@/util";
 import { ExpansionItem } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
-const props = defineProps<{
-  /**
-   * The change type for this group.
-   */
-  deltaType: DeltaType;
-  /**
-   * A collection of all items with this type of change, keyed by id.
-   */
-  items: Record<
-    string,
-    ArtifactSchema | EntityModificationSchema<ArtifactSchema> | TraceLinkSchema
-  >;
-  /**
-   *  If true, items will be interpreted as traces instead of artifacts.
-   */
-  isTraces?: boolean;
-}>();
+const props = defineProps<ArtifactDeltaButtonGroupProps>();
 
 const emit = defineEmits<{
   (e: "click", id: string): void;
@@ -67,6 +51,9 @@ const className = computed(
   () => `rounded q-mb-sm bd-${getEnumColor(props.deltaType)}`
 );
 
+/**
+ * Converts all delta artifacts and traces into a list of select options.
+ */
 const itemFields = computed<SelectOption[]>(() => {
   const items = Object.values(props.items);
 

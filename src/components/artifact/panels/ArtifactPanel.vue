@@ -2,6 +2,9 @@
   <details-panel panel="displayArtifact">
     <artifact-buttons />
     <artifact-content />
+    <artifact-traces />
+    <artifact-documents />
+    <artifact-errors />
   </details-panel>
 </template>
 
@@ -16,5 +19,11 @@ export default {
 
 <script setup lang="ts">
 import { DetailsPanel } from "@/components/common";
-import { ArtifactButtons, ArtifactContent } from "../display";
+import {
+  ArtifactButtons,
+  ArtifactContent,
+  ArtifactDocuments,
+  ArtifactTraces,
+  ArtifactErrors,
+} from "@/components/artifact/display";
 </script>

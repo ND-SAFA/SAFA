@@ -36,25 +36,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TraceLinkSchema } from "@/types";
+import { TraceLinkDisplayProps } from "@/types";
 import { artifactStore } from "@/hooks";
-import {
-  ArtifactBodyDisplay,
-  ArtifactContentDisplay,
-  FlexBox,
-  Separator,
-} from "@/components/common";
+import { ArtifactBodyDisplay, FlexBox, Separator } from "@/components/common";
+import { ArtifactContentDisplay } from "@/components/artifact/display";
 
-const props = defineProps<{
-  /**
-   * The trace link to display.
-   */
-  trace: TraceLinkSchema;
-  /**
-   * Whether to display only the source or target artifact.
-   */
-  showOnly?: "source" | "target";
-}>();
+const props = defineProps<TraceLinkDisplayProps>();
 
 const sourceArtifact = computed(() =>
   artifactStore.getArtifactById(props.trace.sourceId)

@@ -45,7 +45,7 @@
               v-if="canEdit(opt.name)"
               v-close-popup
               small
-              icon="more"
+              icon="edit"
               :tooltip="`Edit ${opt.name}`"
               data-cy="button-document-select-edit"
               @click="handleEditOpen(opt)"
@@ -81,14 +81,14 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { DocumentSchema } from "@/types";
+import { DEFAULT_VIEW_NAME } from "@/util";
 import {
   appStore,
   deltaStore,
   documentApiStore,
   documentSaveStore,
   documentStore,
-  projectStore,
-  sessionStore,
+  permissionStore,
   useTheme,
 } from "@/hooks";
 import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
@@ -114,7 +114,11 @@ const disabled = computed(() => deltaStore.inDeltaView);
  * @return Whether saving is allowed.
  */
 function canSave(doc = document.value): boolean {
-  return doc.name !== "Default" && !doc.documentId;
+  return (
+    doc.name !== DEFAULT_VIEW_NAME &&
+    !doc.documentId &&
+    permissionStore.projectAllows("editor")
+  );
 }
 
 /**
@@ -123,7 +127,7 @@ function canSave(doc = document.value): boolean {
  * @return Whether editing is allowed.
  */
 function canEdit(name = ""): boolean {
-  return name !== "Default" && sessionStore.isEditor(projectStore.project);
+  return name !== DEFAULT_VIEW_NAME && permissionStore.projectAllows("editor");
 }
 
 /**

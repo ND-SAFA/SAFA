@@ -1,5 +1,5 @@
 export { default as jobStore } from "./useJobs";
-export { default as typeOptionsStore } from "./useTypeOptions";
+export { default as timStore } from "./useTIM";
 export { default as artifactStore } from "./useArtifacts";
 export { default as traceStore } from "./useTraces";
 export { default as warningStore } from "./useWarnings";

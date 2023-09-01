@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="!isDisabled">
+  <flex-box>
     <separator vertical inset nav x="1" />
     <icon-button
       v-for="definition in viewButtons"
@@ -7,6 +7,7 @@
       color="primary"
       :tooltip="definition.label"
       :icon="definition.icon"
+      :disabled="definition.disabled"
       :data-cy="definition.dataCy"
       @click="definition.handler"
     />
@@ -26,27 +27,41 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { IconVariant } from "@/types";
-import { layoutApiStore, layoutStore } from "@/hooks";
+import {
+  layoutApiStore,
+  layoutStore,
+  permissionStore,
+  useScreen,
+} from "@/hooks";
 import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { IconButton, FlexBox, Separator } from "@/components/common";
 
-const viewButtons = [
-  {
-    handler: () => cyZoomIn(),
-    label: "Zoom In",
-    icon: "graph-zoom-in" as IconVariant,
-    dataCy: "button-nav-graph-zoom-in",
-  },
-  {
-    handler: () => cyZoomOut(),
-    label: "Zoom Out",
-    icon: "graph-zoom-out" as IconVariant,
-    dataCy: "button-nav-graph-zoom-out",
-  },
+const { smallWindow } = useScreen();
+
+const viewButtons = computed(() => [
+  ...(smallWindow
+    ? []
+    : [
+        {
+          handler: () => cyZoomIn(),
+          label: "Zoom In",
+          icon: "graph-zoom-in" as IconVariant,
+          disabled: layoutStore.isTableMode,
+          dataCy: "button-nav-graph-zoom-in",
+        },
+        {
+          handler: () => cyZoomOut(),
+          label: "Zoom Out",
+          icon: "graph-zoom-out" as IconVariant,
+          disabled: layoutStore.isTableMode,
+          dataCy: "button-nav-graph-zoom-out",
+        },
+      ]),
   {
     handler: () => cyCenterNodes(true),
     label: "Center Graph",
     icon: "graph-center" as IconVariant,
+    disabled: layoutStore.isTableMode,
     dataCy: "button-nav-graph-center",
   },
   {
@@ -59,9 +74,9 @@ const viewButtons = [
     },
     label: "Regenerate Layout",
     icon: "graph-refresh" as IconVariant,
+    disabled:
+      layoutStore.isTableMode || !permissionStore.projectAllows("editor"),
     dataCy: "button-nav-graph-refresh",
   },
-];
-
-const isDisabled = computed(() => layoutStore.isTableMode);
+]);
 </script>

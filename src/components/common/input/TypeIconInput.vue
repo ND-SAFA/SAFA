@@ -1,18 +1,14 @@
 <template>
   <div class="overflow-hidden">
-    <typography
-      bold
-      color="primary"
-      class="q-mr-xs"
-      :value="props.artifactLevel.name"
-    />
-    <typography secondary value="Icon" />
+    <typography variant="caption" color="primary" value="Icon" />
     <br />
     <q-btn-toggle
       v-model="icon"
       flat
+      style="flex-wrap: wrap"
       :options="iconOptions"
       :disable="!allowEditing"
+      :toggle-color="currentColor"
       data-cy="button-type-options-icon"
     />
   </div>
@@ -30,33 +26,39 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactLevelInputProps } from "@/types";
-import { allTypeIcons } from "@/util";
-import { artifactTypeApiStore, projectStore, sessionStore } from "@/hooks";
+import { TypeIcons } from "@/util";
+import { artifactTypeApiStore, permissionStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
 
-const iconOptions = allTypeIcons.map((icon) => ({
-  icon,
-  label: "",
-  value: icon,
-}));
+const currentColor = computed(() => props.artifactType.color);
 
-const allowEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
+const iconOptions = computed(() =>
+  TypeIcons.map((icon) => {
+    const selected = props.artifactType.icon === icon;
+
+    return {
+      icon,
+      label: "",
+      value: icon,
+      text: !selected,
+      outlined: selected,
+      class: selected ? "nav-mode-selected" : "",
+    };
+  })
 );
+
+const allowEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const icon = computed({
   get(): string {
-    return allTypeIcons[props.artifactLevel.iconIndex];
+    return props.artifactType.icon;
   },
   set(iconId: string) {
-    props.artifactLevel.iconIndex = allTypeIcons.indexOf(iconId);
+    props.artifactType.icon = iconId;
 
-    artifactTypeApiStore.handleSaveIcon({
-      ...props.artifactLevel,
-      icon: iconId,
-    });
+    artifactTypeApiStore.handleSave(props.artifactType);
   },
 });
 </script>

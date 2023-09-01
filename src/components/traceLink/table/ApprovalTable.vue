@@ -105,8 +105,8 @@ import {
 import {
   approvalStore,
   appStore,
+  permissionStore,
   projectStore,
-  sessionStore,
   subtreeStore,
   traceApiStore,
   traceGenerationApiStore,
@@ -139,9 +139,7 @@ const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
 const groupBy = ref<string | undefined>("targetName");
 
-const displayActions = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const rows = computed(() => approvalStore.traceLinks);
 

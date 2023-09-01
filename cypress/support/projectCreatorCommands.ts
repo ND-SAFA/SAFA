@@ -1,6 +1,7 @@
 import {
   DataCy,
   miniProjectFiles,
+  genProjectFiles,
   Routes,
   simpleProjectFilesMap,
   testProject,
@@ -20,7 +21,7 @@ Cypress.Commands.add("initEmptyProject", () => {
     .clickButton(DataCy.creationUploadButton);
 });
 
-Cypress.Commands.add("initProject", (waitForComplete = true) => {
+Cypress.Commands.add("initProject", (waitForComplete = true, generateData) => {
   cy.dbResetJobs().dbResetProjects();
 
   cy.visit(Routes.PROJECT_CREATOR + "?tab=bulk")
@@ -28,7 +29,10 @@ Cypress.Commands.add("initProject", (waitForComplete = true) => {
     .locationShouldEqual(Routes.PROJECT_CREATOR);
 
   cy.setProjectIdentifier("bulk")
-    .uploadFiles(DataCy.creationBulkFilesInput, ...miniProjectFiles)
+    .uploadFiles(
+      DataCy.creationBulkFilesInput,
+      ...(generateData ? genProjectFiles : miniProjectFiles)
+    )
     .clickButton(DataCy.creationUploadButton);
 
   if (!waitForComplete) return;

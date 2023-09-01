@@ -46,6 +46,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
+import { TimTreeProps } from "@/types";
 import { appStore, layoutStore, projectSaveStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
 import { FlexBox, TextButton } from "@/components/common";
@@ -53,9 +54,7 @@ import PanelCard from "@/components/common/layout/PanelCard.vue";
 import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 
-const props = defineProps<{
-  visible: boolean;
-}>();
+const props = defineProps<TimTreeProps>();
 
 const className = computed(() => {
   if (!props.visible) {

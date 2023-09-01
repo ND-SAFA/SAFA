@@ -1,6 +1,24 @@
+/**
+ * The id of the default layout that is automatically generated.
+ */
+export const DEFAULT_LAYOUT_ID = "default";
+
+/**
+ * The name to display for the default view that shows everything.
+ */
+export const DEFAULT_VIEW_NAME = "All Artifacts";
+
 export const LOGOUT_ERROR = "Session has timed out. Please log back in.";
 
 /**
  * The amount of nodes at which we need to do graph optimizations.
  */
 export const LARGE_NODE_COUNT = 100;
+
+/**
+ * The demo user's account.
+ */
+export const DEMO_ACCOUNT = {
+  email: "view@safa.ai",
+  password: "safa!",
+};

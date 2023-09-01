@@ -22,6 +22,12 @@ $color-unchanged: var(--q-unchanged);
 $color-node-default: var(--q-nodeDefault);
 $color-node-generated: var(--q-nodeGenerated);
 
+$color-node-gradient1: var(--q-nodeGradient1);
+$color-node-gradient2: var(--q-nodeGradient2);
+$color-node-gradient3: var(--q-nodeGradient3);
+$color-node-gradient4: var(--q-nodeGradient4);
+$color-node-gradient5: var(--q-nodeGradient5);
+
 // Background Palette Tags
 
 .bg-transparent {
@@ -90,6 +96,26 @@ $color-node-generated: var(--q-nodeGenerated);
   border: 1px solid $color-unchanged !important;
 }
 
+.bd-nodeGradient1 {
+  border: 1px solid $color-node-gradient1 !important;
+}
+
+.bd-nodeGradient2 {
+  border: 1px solid $color-node-gradient2 !important;
+}
+
+.bd-nodeGradient3 {
+  border: 1px solid $color-node-gradient3 !important;
+}
+
+.bd-nodeGradient4 {
+  border: 1px solid $color-node-gradient4 !important;
+}
+
+.bd-nodeGradient5 {
+  border: 1px solid $color-node-gradient5 !important;
+}
+
 // Text Palette Tags
 
 .text-text {
@@ -100,10 +126,62 @@ $color-node-generated: var(--q-nodeGenerated);
   color: $color-caption !important;
 }
 
+.text-added {
+  color: $color-added !important;
+}
+
+.text-modified {
+  color: $color-modified !important;
+}
+
+.text-removed {
+  color: $color-removed !important;
+}
+
+.text-warning {
+  color: $color-warning !important;
+}
+
 .text-nodeDefault {
   color: $color-node-default !important;
 }
 
 .text-nodeGenerated {
   color: $color-node-generated !important;
+}
+
+.text-nodeGradient1 {
+  color: $color-node-gradient1 !important;
+}
+
+.text-nodeGradient2 {
+  color: $color-node-gradient2 !important;
+}
+
+.text-nodeGradient3 {
+  color: $color-node-gradient3 !important;
+}
+
+.text-nodeGradient4 {
+  color: $color-node-gradient4 !important;
+}
+
+.text-nodeGradient5 {
+  color: $color-node-gradient5 !important;
+}
+
+.text-added {
+  color: $color-added !important;
+}
+
+.text-modified {
+  color: $color-modified !important;
+}
+
+.text-removed {
+  color: $color-removed !important;
+}
+
+.text-unchanged {
+  color: $color-unchanged !important;
 }

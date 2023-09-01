@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import {
   ApprovalType,
-  ArtifactLevelSchema,
+  MatrixSchema,
   FlatTraceLink,
   IOHandlerCallback,
   ModelType,
@@ -80,22 +80,22 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
    * Generates links between sets of artifact types and adds them to the project.
    *
    * @param method - The base model to generate with.
-   * @param artifactLevels - An array of source and target artifact types to generate traces between.
+   * @param matrices - An array of source and target artifact types to generate traces between.
    * @param callbacks - The callbacks to use for the action.
    */
   async function handleGenerate(
     method: ModelType | undefined,
-    artifactLevels: ArtifactLevelSchema[],
+    matrices: MatrixSchema[],
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    const matricesName = artifactLevels
+    const matricesName = matrices
       .map(({ source, target }) => `${source} -> ${target}`)
       .join(", ");
 
     await traceGenerationApi.handleRequest(
       async () => {
         const job = await createGeneratedLinks({
-          requests: [createGeneratedMatrix(artifactLevels, method)],
+          requests: [createGeneratedMatrix(matrices, method)],
           projectVersion: projectStore.version,
         });
 
@@ -113,24 +113,22 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
    * Trains models on created trace links.
    *
    * @param model - The model to train.
-   * @param artifactLevels - An array of source and target artifact types to train on traces between.
+   * @param matrices - An array of source and target artifact types to train on traces between.
    * @param callbacks - The callbacks to use for the action.
    */
   async function handleTrain(
     model: GenerationModelSchema,
-    artifactLevels: ArtifactLevelSchema[],
+    matrices: MatrixSchema[],
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    const matricesName = artifactLevels
+    const matricesName = matrices
       .map(({ source, target }) => `${source} -> ${target}`)
       .join(", ");
 
     await traceGenerationApi.handleRequest(
       async () => {
         const job = await createModelTraining(projectStore.projectId, {
-          requests: [
-            createGeneratedMatrix(artifactLevels, model.baseModel, model),
-          ],
+          requests: [createGeneratedMatrix(matrices, model.baseModel, model)],
         });
 
         await jobApiStore.handleCreate(job);

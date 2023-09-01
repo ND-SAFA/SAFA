@@ -27,6 +27,7 @@
       <save-trace-link-panel />
       <generate-trace-link-panel />
       <artifact-level-panel />
+      <save-artifact-level-panel />
       <trace-matrix-panel />
       <artifact-generation-panel />
     </div>
@@ -64,7 +65,11 @@ import {
   SaveTraceLinkPanel,
   GenerateTraceLinkPanel,
 } from "@/components/traceLink/panels";
-import { ArtifactLevelPanel, TraceMatrixPanel } from "@/components/tim";
+import {
+  ArtifactLevelPanel,
+  SaveArtifactLevelPanel,
+} from "@/components/artifactType";
+import { TraceMatrixPanel } from "@/components/traceMatrix";
 
 const { smallWindow } = useScreen();
 
@@ -97,6 +102,8 @@ const title = computed(() => {
       return "Generate Trace Links";
     case "displayArtifactLevel":
       return "Artifact Type";
+    case "saveArtifactLevel":
+      return "Save Artifact Type";
     case "displayTraceMatrix":
       return "Trace Matrix";
     default:
@@ -106,8 +113,10 @@ const title = computed(() => {
 
 const width = computed(() => {
   if (smallWindow.value) {
-    return 400;
+    return 500;
   } else if (
+    openState.value === "displayArtifactLevel" ||
+    openState.value === "displayTraceMatrix" ||
     openState.value === "displayTrace" ||
     openState.value === "displayArtifact" ||
     openState.value === "saveArtifact"
@@ -119,7 +128,7 @@ const width = computed(() => {
   ) {
     return 800;
   } else {
-    return 400;
+    return 500;
   }
 });
 

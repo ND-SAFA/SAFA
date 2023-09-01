@@ -12,6 +12,12 @@
         label="Create an empty project"
         data-cy="toggle-create-empty-project"
       />
+      <br />
+      <switch-input
+        v-model="summarize"
+        label="Generate artifact summaries"
+        data-cy="toggle-create-summarize"
+      />
       <project-files-input
         v-if="!emptyFiles"
         v-model="selectedFiles"
@@ -42,16 +48,16 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, withDefaults } from "vue";
+import { ProjectIdentifierProps } from "@/types";
 import { createProjectApiStore, identifierSaveStore } from "@/hooks";
 import { SwitchInput, TextButton } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 const props = withDefaults(
-  defineProps<{
-    dataCyName?: string;
-    dataCyDescription?: string;
-  }>(),
+  defineProps<
+    Pick<ProjectIdentifierProps, "dataCyName" | "dataCyDescription">
+  >(),
   {
     dataCyName: "input-project-name",
     dataCyDescription: "input-project-description",
@@ -64,6 +70,7 @@ const emit = defineEmits<{
 
 const selectedFiles = ref<File[]>([]);
 const emptyFiles = ref(false);
+const summarize = ref(false);
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
 
@@ -88,6 +95,7 @@ async function handleCreate() {
   await createProjectApiStore.handleBulkImport(
     identifier.value,
     selectedFiles.value,
+    summarize.value,
     {
       onSuccess: () => {
         selectedFiles.value = [];

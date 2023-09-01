@@ -34,12 +34,10 @@ export default {
 import { computed, watch } from "vue";
 import { SearchMode } from "@/types";
 import { searchModeOptions } from "@/util";
-import { projectStore, searchStore, sessionStore } from "@/hooks";
+import { permissionStore, searchStore } from "@/hooks";
 import { ListItem, Separator } from "@/components/common";
 
-const displayEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const modeOptions = computed(() =>
   displayEditing.value ? searchModeOptions() : [searchModeOptions()[2]]

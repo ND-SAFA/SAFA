@@ -119,7 +119,18 @@
 
 .nav-saving-icon {
   position: relative;
-  right: 23px;
+  width: 0;
+  height: 0;
+  right: 4px;
+  bottom: 2px;
+}
+
+.nav-job-icon {
+  position: relative;
+  top: 5px;
+  left: 5px;
+  width: 0;
+  height: 0;
 }
 
 .nav-mode-select {
@@ -136,16 +147,32 @@
   &-open {
     padding-left: 10px;
     padding-right: 10px;
-
-    img {
-      width: 200px !important;
-    }
   }
 }
 
 .nav-account {
   position: absolute;
   bottom: 0;
+}
+
+#logo-safa {
+  .cls-2, .cls-3 {
+    fill: none;
+    stroke: $color-primary;
+    stroke-miterlimit: 10;
+  }
+
+  .cls-2 {
+    stroke-width: 4px;
+  }
+
+  .cls-3 {
+    stroke-width: 10px;
+  }
+
+  circle {
+    r: 6px;
+  }
 }
 
 // Navigation - Notifications

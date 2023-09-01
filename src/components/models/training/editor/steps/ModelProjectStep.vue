@@ -28,20 +28,18 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ArtifactLevelSchema, GenerationModelSchema } from "@/types";
+import { MatrixSchema, GenerationModelProps } from "@/types";
 import { traceGenerationApiStore } from "@/hooks";
 import { Typography, TextButton } from "@/components/common";
 import { TraceMatrixCreator } from "@/components/traceLink";
 
-const props = defineProps<{
-  model: GenerationModelSchema;
-}>();
+const props = defineProps<GenerationModelProps>();
 
 const emit = defineEmits<{
   (e: "submit"): void;
 }>();
 
-const matrices = ref<ArtifactLevelSchema[]>([{ source: "", target: "" }]);
+const matrices = ref<MatrixSchema[]>([{ source: "", target: "" }]);
 
 const isValid = computed(() =>
   matrices.value

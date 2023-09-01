@@ -2,6 +2,7 @@
   <panel-card
     title="Project Members"
     subtitle="Edit and invite project members."
+    :minimal="props.minimal"
   >
     <selector-table
       :columns="membersColumns"
@@ -11,11 +12,21 @@
       :deletable="isAdmin"
       :editable="isAdmin"
       :loading="memberApiStore.loading"
-      @row:add="modalOpen = true"
+      @row:add="handleAdd"
       @row:edit="handleEdit"
       @row:delete="handleDelete"
       @refresh="handleRefresh"
     >
+      <template #search-append="{ search }">
+        <icon-button
+          v-if="!!search"
+          small
+          tooltip="Invite member"
+          icon="invite"
+          @click="handleAdd(search)"
+        />
+      </template>
+
       <template #cell-actions="{ row }">
         <icon-button
           v-if="membersColumns.length > 1 && row.email === userEmail"
@@ -28,9 +39,11 @@
     </selector-table>
     <project-member-modal
       :open="modalOpen"
+      :project-id="projectStore.projectId"
       :member="editedMember"
-      @close="modalOpen = false"
-      @submit="modalOpen = false"
+      :email="addedMember"
+      @close="handleClose"
+      @submit="handleClose"
     />
   </panel-card>
 </template>
@@ -46,24 +59,30 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { MembershipSchema, ProjectRole } from "@/types";
+import { MembershipSchema, MinimalProps, ProjectRole } from "@/types";
 import { membersColumns } from "@/util";
 import {
   logStore,
   memberApiStore,
   membersStore,
+  permissionStore,
   projectStore,
   sessionStore,
 } from "@/hooks";
 import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
 
+const props = defineProps<MinimalProps>();
+
 const editedMember = ref<MembershipSchema>();
+const addedMember = ref<string | null>(null);
 const modalOpen = ref(false);
 
 const project = computed(() => projectStore.project);
 
-const isAdmin = computed(() => sessionStore.isAdmin(project.value));
+const isAdmin = computed(() =>
+  permissionStore.projectAllows("admin", project.value)
+);
 
 const rows = computed(() => membersStore.members);
 
@@ -80,6 +99,24 @@ async function handleRefresh(): Promise<void> {
   if (project.value.projectId === "") return;
 
   await memberApiStore.handleReload();
+}
+
+/**
+ * Clears all member modal state.
+ */
+function handleClose(): void {
+  addedMember.value = "";
+  editedMember.value = undefined;
+  modalOpen.value = false;
+}
+
+/**
+ * Opens the invite member modal.
+ * @param email - The member email to invite.
+ */
+function handleAdd(email: string | null): void {
+  addedMember.value = email;
+  modalOpen.value = true;
 }
 
 /**

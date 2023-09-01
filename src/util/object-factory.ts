@@ -20,7 +20,7 @@ import {
   AttributeSchema,
   AttributeType,
   AttributeLayoutSchema,
-  ArtifactLevelSchema,
+  MatrixSchema,
   GeneratedMatrixSchema,
 } from "@/types";
 
@@ -92,7 +92,7 @@ export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
     traces: project?.traces || [],
     projectVersion: project?.projectVersion,
     artifactTypes: project?.artifactTypes || [],
-    typeDirections: project?.typeDirections || {},
+    traceMatrices: project?.traceMatrices || [],
     documents: project?.documents || [],
     warnings: project?.warnings || {},
     layout: project?.layout || {},
@@ -134,6 +134,7 @@ export function createArtifact(
     summary: artifact?.summary || "",
     body: artifact?.body || "",
     type: artifact?.type || "",
+    isCode: artifact?.isCode || false,
     documentType: artifact?.documentType || DocumentType.ARTIFACT_TREE,
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
@@ -282,7 +283,7 @@ export function createAttributeLayout(
  * @param model - If a custom model is used,
  */
 export function createGeneratedMatrix(
-  artifactLevels: ArtifactLevelSchema[],
+  artifactLevels: MatrixSchema[],
   method?: ModelType,
   model?: GenerationModelSchema
 ): GeneratedMatrixSchema {

@@ -53,32 +53,30 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
+import {
+  GraphMode,
+  GraphElementType,
+  TimNodeCytoElement,
+  TimNodeProps,
+} from "@/types";
 import { sanitizeNodeId } from "@/util";
 import {
+  timStore,
   appStore,
   documentStore,
-  projectStore,
   selectionStore,
-  sessionStore,
-  typeOptionsStore,
   useTheme,
+  permissionStore,
 } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, IconButton, Separator } from "@/components";
 
-const props = defineProps<{
-  artifactType: string;
-  count: number;
-  icon?: string;
-}>();
+const props = defineProps<TimNodeProps>();
 
 const { darkMode } = useTheme();
 
-const displayEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const selected = computed(
   () => selectionStore.selectedArtifactLevelType === props.artifactType
@@ -86,9 +84,7 @@ const selected = computed(
 
 const style = computed(() => (selected.value ? "z-index: 10;" : "z-index: 1;"));
 
-const color = computed(
-  () => typeOptionsStore.getArtifactLevel(props.artifactType)?.color || ""
-);
+const color = computed(() => timStore.getTypeColor(props.artifactType));
 
 const countLabel = computed(() =>
   props.count === 1 ? "1 Artifact" : `${props.count} Artifacts`

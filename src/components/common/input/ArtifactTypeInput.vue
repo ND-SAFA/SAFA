@@ -39,7 +39,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch, withDefaults } from "vue";
 import { ArtifactTypeInputProps } from "@/types";
-import { artifactStore, typeOptionsStore, useVModel } from "@/hooks";
+import { artifactStore, timStore, useVModel } from "@/hooks";
 import { AttributeChip, Typography } from "@/components/common/display";
 
 const props = withDefaults(defineProps<ArtifactTypeInputProps>(), {
@@ -56,7 +56,7 @@ const emit = defineEmits<{
 
 const model = useVModel(props, "modelValue");
 
-const options = ref(typeOptionsStore.artifactTypes);
+const options = ref(timStore.typeNames);
 
 const optionCount = computed(() =>
   props.showCount && typeof model.value === "string"
@@ -79,11 +79,11 @@ function filter(
 ): void {
   update(() => {
     if (!searchText) {
-      options.value = typeOptionsStore.artifactTypes;
+      options.value = timStore.typeNames;
     } else {
       const lowercaseSearchText = searchText.toLowerCase();
 
-      options.value = typeOptionsStore.artifactTypes.filter((type) =>
+      options.value = timStore.typeNames.filter((type) =>
         (type?.toLowerCase() || "").includes(lowercaseSearchText)
       );
     }
@@ -91,7 +91,7 @@ function filter(
 }
 
 watch(
-  () => typeOptionsStore.artifactTypes,
-  (artifactTypes) => (options.value = artifactTypes)
+  () => timStore.typeNames,
+  (typeNames) => (options.value = typeNames)
 );
 </script>

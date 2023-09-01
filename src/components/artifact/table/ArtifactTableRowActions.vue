@@ -1,16 +1,22 @@
 <template>
   <flex-box>
     <icon-button
+      icon="view-tree"
+      :tooltip="`View artifacts related to '${artifact.name}'`"
+      data-cy="button-artifact-tree-icon"
+      @click="handleOpenTree"
+    />
+    <icon-button
       icon="trace"
       :rotate="-90"
-      :tooltip="`Add Parent To '${artifact.name}'`"
+      :tooltip="`Add parent to '${artifact.name}'`"
       data-cy="button-artifact-parent-icon"
       @click="handleLinkParent"
     />
     <icon-button
       icon="trace"
       :rotate="90"
-      :tooltip="`Add Child To '${artifact.name}'`"
+      :tooltip="`Add child to '${artifact.name}'`"
       data-cy="button-artifact-child-icon"
       @click="handleLinkChild"
     />
@@ -39,13 +45,17 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ArtifactSchema } from "@/types";
-import { appStore, artifactApiStore, selectionStore } from "@/hooks";
+import { ArtifactProps, GraphMode } from "@/types";
+import {
+  appStore,
+  artifactApiStore,
+  documentStore,
+  layoutStore,
+  selectionStore,
+} from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
-const props = defineProps<{
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<ArtifactProps>();
 
 /**
  * Opens the edit artifact window.
@@ -62,6 +72,14 @@ function handleEdit() {
  */
 function handleDelete() {
   artifactApiStore.handleDelete(props.artifact);
+}
+
+/**
+ * Opens tree view with the current artifact selected.
+ */
+function handleOpenTree(): void {
+  documentStore.addDocumentOfNeighborhood(props.artifact);
+  layoutStore.mode = GraphMode.tree;
 }
 
 /**

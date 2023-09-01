@@ -1,4 +1,4 @@
-import { DataCy, Routes, simpleProjectFiles } from "@/fixtures";
+import { DataCy, miniProjectFiles, Routes } from "@/fixtures";
 
 const validUser = Cypress.env("validUser");
 
@@ -59,10 +59,13 @@ describe("Project Versions", () => {
 
       cy.uploadFiles(
         DataCy.versionUploadFilesInput,
-        ...simpleProjectFiles
+        ...miniProjectFiles
       ).clickButton(DataCy.versionUploadFilesButton);
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.jobStatus, "first", 10000).should(
+        "contain.text",
+        "Completed"
+      );
     });
   });
 });

@@ -57,7 +57,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ArtifactLevelSchema } from "@/types";
+import { MatrixSchema, TraceMatrixCreatorProps } from "@/types";
 import { artifactStore, traceStore, useVModel } from "@/hooks";
 import {
   ArtifactTypeInput,
@@ -68,12 +68,10 @@ import {
   PanelCard,
 } from "@/components/common";
 
-const props = defineProps<{
-  modelValue: ArtifactLevelSchema[];
-}>();
+const props = defineProps<TraceMatrixCreatorProps>();
 
 defineEmits<{
-  (e: "update:modelValue", value: ArtifactLevelSchema[]): void;
+  (e: "update:modelValue", value: MatrixSchema[]): void;
 }>();
 
 const model = useVModel(props, "modelValue");
@@ -82,7 +80,7 @@ const model = useVModel(props, "modelValue");
  * Returns displayable characteristics on a matrix of artifacts.
  * @param matrix - The matrix to get details for.
  */
-function getMatrixDetails(matrix: ArtifactLevelSchema): string[] {
+function getMatrixDetails(matrix: MatrixSchema): string[] {
   const artifactsByType = artifactStore.allArtifactsByType;
   const sources = artifactsByType[matrix.source] || [];
   const targets = artifactsByType[matrix.target] || [];
@@ -114,7 +112,7 @@ function handleCreateMatrix(): void {
  */
 function handleRemoveMatrix(idx: number) {
   model.value = model.value.filter(
-    (_: ArtifactLevelSchema, currentIdx: number) => currentIdx !== idx
+    (_: MatrixSchema, currentIdx: number) => currentIdx !== idx
   );
 }
 </script>

@@ -1,13 +1,24 @@
 import { IconVariant } from "@/types";
 
-export const defaultTypeIcon = "mdi-alpha-a-box-outline";
+export const DefaultTypeIcon = "mdi-alpha-a-box-outline";
 
-export const allTypeIcons = [
+export const TypeIcons = [
   "mdi-clipboard-text",
   "mdi-math-compass",
   "mdi-hazard-lights",
   "mdi-pine-tree-fire",
-  "mdi-alpha-a-box-outline",
+  "mdi-alpha-a-box",
+  "mdi-text-box-multiple",
+  "mdi-code-braces-box",
+  "mdi-drawing-box",
+  "mdi-folder",
+  "mdi-file-table",
+  "mdi-database",
+  "mdi-application-cog",
+  "mdi-account-box-multiple",
+  "mdi-book-lock",
+  "mdi-message",
+  "mdi-book-open",
 ];
 
 /**
@@ -35,6 +46,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-alert-circle-outline";
     case "error":
       return "mdi-alert-circle-outline";
+    case "invite":
+      return "mdi-account-plus-outline";
     case "success":
       return "mdi-check-circle-outline";
     case "artifact":

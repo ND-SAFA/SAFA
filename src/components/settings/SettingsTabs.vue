@@ -34,7 +34,7 @@ export default {
 import { computed, ref } from "vue";
 import { SettingsTabTypes } from "@/types";
 import { settingsTabOptions } from "@/util";
-import { projectStore, sessionStore } from "@/hooks";
+import { permissionStore } from "@/hooks";
 import { TabList, SidebarGrid } from "@/components/common";
 import {
   UploadNewVersion,
@@ -48,7 +48,7 @@ import { ProjectMemberTable } from "./members";
 const tab = ref(SettingsTabTypes.members);
 
 const tabs = computed(() =>
-  sessionStore.isEditor(projectStore.project)
+  permissionStore.projectAllows("editor")
     ? settingsTabOptions()
     : [settingsTabOptions()[0]]
 );

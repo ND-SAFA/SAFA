@@ -9,7 +9,6 @@ export * from "./enum-helper";
 export * from "./object-factory";
 export * from "./sub-tree-operations";
 export * from "./icons";
-export * from "./tim-factory";
 export * from "./job-helper";
 export * from "./table-helper";
 export * from "./table-headers";

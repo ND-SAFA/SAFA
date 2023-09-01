@@ -42,9 +42,9 @@
         data-cy="panel-trace-directions"
       >
         <type-direction-input
-          v-for="level in artifactLevels"
-          :key="level.typeId"
-          :artifact-level="level"
+          v-for="type in artifactTypes"
+          :key="type.typeId"
+          :artifact-type="type"
         />
       </expansion-item>
 
@@ -85,11 +85,11 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import {
+  timStore,
   appStore,
   artifactStore,
   traceApiStore,
   traceSaveStore,
-  typeOptionsStore,
 } from "@/hooks";
 import {
   Typography,
@@ -100,13 +100,13 @@ import {
   PanelCard,
   TextButton,
   DetailsPanel,
-  ArtifactBodyDisplay,
+  Separator,
 } from "@/components/common";
-import Separator from "@/components/common/display/content/Separator.vue";
+import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
 const loading = ref(false);
 
-const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
+const artifactTypes = computed(() => timStore.artifactTypes);
 
 const sourceArtifact = computed(() =>
   traceSaveStore.sourceIds

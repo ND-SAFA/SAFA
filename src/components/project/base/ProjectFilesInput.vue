@@ -46,7 +46,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { ArtifactLevelSchema, TimJsonSchema } from "@/types";
+import { MatrixSchema, ProjectFilesInputProps, TimJsonSchema } from "@/types";
 import { useVModel } from "@/hooks";
 import {
   FileInput,
@@ -55,10 +55,7 @@ import {
   ExpansionItem,
 } from "@/components/common";
 
-const props = defineProps<{
-  modelValue: File[];
-  dataCy?: string;
-}>();
+const props = defineProps<ProjectFilesInputProps>();
 
 defineEmits<{
   (e: "update:modelValue", files: File[]): void;
@@ -67,7 +64,7 @@ defineEmits<{
 const selectedFiles = useVModel(props, "modelValue");
 const tim = ref<TimJsonSchema | undefined>(undefined);
 const artifactTypes = ref<string[]>([]);
-const traceMatrices = ref<ArtifactLevelSchema[]>([]);
+const traceMatrices = ref<MatrixSchema[]>([]);
 
 /**
  * @return Generated artifact types based on file names.
@@ -102,7 +99,7 @@ const errorMessage = computed(() =>
  * @param matrix - The matrix to name.
  * @return The display name.
  */
-function getMatrixName(matrix: ArtifactLevelSchema): string {
+function getMatrixName(matrix: MatrixSchema): string {
   return `${matrix.source} to ${matrix.target}`;
 }
 

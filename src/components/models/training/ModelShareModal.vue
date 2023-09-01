@@ -31,7 +31,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ModelShareType } from "@/types";
+import { ModelShareType, OpenableProps } from "@/types";
 import { modelShareOptions } from "@/util";
 import { modelApiStore, modelSaveStore } from "@/hooks";
 import {
@@ -41,9 +41,7 @@ import {
   TextButton,
 } from "@/components/common";
 
-const props = defineProps<{
-  open: boolean;
-}>();
+const props = defineProps<OpenableProps>();
 
 const emit = defineEmits<{
   (e: "close"): void;

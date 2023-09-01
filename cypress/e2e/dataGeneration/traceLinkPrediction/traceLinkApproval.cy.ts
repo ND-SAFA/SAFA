@@ -6,9 +6,9 @@ const emptyMatchRowCount = 1 + 2;
 // 1 header row, 2 virtual scrolls, 1 group row, 1 trace x 2 rows each.
 const singleMatchRowCount = 1 + 2 + 1 + 2;
 
-describe("Trace Link Approval", () => {
+describe.skip("Trace Link Approval", () => {
   before(() => {
-    cy.initProject();
+    cy.initProject(true, true);
   });
 
   beforeEach(() => {

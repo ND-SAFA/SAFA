@@ -23,25 +23,10 @@ import {
   computed,
   Ref,
 } from "vue";
-import {
-  Selector,
-  Core,
-  ElementDefinition,
-  Position,
-  EventObject,
-} from "cytoscape";
-import { CytoEvent, GraphElementType } from "@/types";
+import { Selector, Core, Position, EventObject } from "cytoscape";
+import { CyElementProps, CytoEvent, GraphElementType } from "@/types";
 
-const props = defineProps<{
-  /**
-   * The element to display.
-   */
-  definition: ElementDefinition;
-  /**
-   * Any styles to attach to the positioning wrapper.
-   */
-  style?: string;
-}>();
+const props = defineProps<CyElementProps>();
 
 const emit = defineEmits<{
   (e: "click", event: EventObject): void;

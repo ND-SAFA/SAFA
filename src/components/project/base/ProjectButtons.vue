@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="doDisplay" wrap t="2" class="settings-buttons">
+  <flex-box v-if="display" wrap t="2" class="settings-buttons">
     <q-btn-group flat>
       <text-button
         text
@@ -29,16 +29,6 @@
       data-cy="button-settings-delete"
       @click="handleDelete"
     />
-    <project-identifier-modal
-      :open="isEditOpen"
-      @close="isEditOpen = false"
-      @save="isEditOpen = false"
-    />
-    <confirm-project-delete
-      :open="isDeleteOpen"
-      @close="isDeleteOpen = false"
-      @confirm="isDeleteOpen = false"
-    />
   </flex-box>
 </template>
 
@@ -52,36 +42,29 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   identifierSaveStore,
+  permissionStore,
   projectApiStore,
   projectStore,
-  sessionStore,
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
-import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
-import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 
-const isEditOpen = ref(false);
-const isDeleteOpen = ref(false);
-
-const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
+const display = computed(() => permissionStore.projectAllows("editor"));
 
 /**
  * Opens the edit modal.
  */
 function handleEdit(): void {
-  identifierSaveStore.baseIdentifier = projectStore.project;
-  isEditOpen.value = true;
+  identifierSaveStore.selectIdentifier(projectStore.project, "save");
 }
 
 /**
  * Opens the edit modal.
  */
 function handleDelete(): void {
-  identifierSaveStore.baseIdentifier = projectStore.project;
-  isDeleteOpen.value = true;
+  identifierSaveStore.selectIdentifier(projectStore.project, "delete");
 }
 
 /**

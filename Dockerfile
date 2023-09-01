@@ -21,6 +21,7 @@ RUN python3 api/manage.py collectstatic --noinput
 
 ### COPy
 ADD load.py /app/
+COPY changelog /changelog
 
 # Finalize
 EXPOSE 80

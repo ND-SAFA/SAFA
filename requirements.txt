@@ -9,3 +9,4 @@ celery~=5.2.7
 mock~=5.0.1
 setuptools~=58.1.0
 boto3~=1.26.136
+markdown==3.4.4

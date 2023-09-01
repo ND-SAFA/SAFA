@@ -14,13 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+import markdown
 from django.http import HttpResponse
 from django.urls import path, re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from api.constants.config import TGEN_START_MSG
+from api.constants.config import get_current_version, get_home_page
 from api.endpoints.views.completion_view import perform_completion
 from api.endpoints.views.hgen_view import perform_hgen
 from api.endpoints.views.predict_view import perform_prediction, perform_search
@@ -29,16 +30,21 @@ from api.endpoints.views.result_view import cancel_job, get_result, get_status
 from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
 
 
+def wrap_html(body: str):
+    markdown_body = markdown.markdown(body)
+    return f"<html><body>{markdown_body}</body></html>"
+
+
 def homePageView(request):
-    return HttpResponse(TGEN_START_MSG)
+    home_page = get_home_page()
+    return HttpResponse(wrap_html(home_page))
 
 
 schema_view = get_schema_view(
     openapi.Info(
         title="TGen API",
-        default_version='v1',
-        description="TGen is SAFA's Trace Generation server. It allows for the creation of deep learning models, "
-                    "the training of these models, and the prediction of new trace links.",
+        default_version=f"{get_current_version()}",
+        description="TGen is SAFA's Trace Generation server.",
         contact=openapi.Contact(email="alberto@safa.ai"),
     ),
     public=True,

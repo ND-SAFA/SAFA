@@ -5,7 +5,7 @@ from typing import Type
 from celery import Task, shared_task
 from rest_framework import serializers
 
-from api.constants.config import TGEN_START_MSG
+from api.constants.config import get_api_header
 from api.endpoints.base.endpoint import PostProcessType, PreProcessType, endpoint, endpoint_postprocess, endpoint_preprocess
 from tgen.common.util.json_util import NpEncoder
 from tgen.common.util.logging.logger_manager import logger
@@ -60,7 +60,7 @@ def async_endpoint(serializer: Type[serializers.Serializer], pre_process: PrePro
 
             def run_job():
                 try:
-                    logger.info(TGEN_START_MSG)
+                    logger.info(get_api_header())
                     data, *other_args = task_args
                     s = serializer(data=data)
                     s.is_valid(raise_exception=True)

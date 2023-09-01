@@ -193,8 +193,9 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
 
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type
     artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
-                                          build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
-                                          include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
+                                          build_method=MultiArtifactPrompt.BuildMethod.XML,
+                                          include_ids=True, data_type=MultiArtifactPrompt.DataType.ARTIFACT,
+                                          xml_tags={convert_spaces_to_dashes(artifact_type.lower()): ["id", "description"]})
     prompts = [base_prompt, artifact_prompt]
 
     task_preface = f"{NEW_LINE}{PromptUtil.as_markdown_header('TASKS:')}{NEW_LINE}"

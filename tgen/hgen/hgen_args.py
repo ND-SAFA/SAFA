@@ -100,3 +100,4 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
+        self.generate_trace_links = True

@@ -4,7 +4,7 @@
       "jobs": [
         {
           "object_type": "CREATE_DATASETS",
-          "export_path": "~/desktop/safa/datasets/Dronology",
+          "export_path": "[DATA_PATH]/[CURRENT_PROJECT]/safa",
           "format_type": "SAFA",
           "job_args": {
           },
@@ -13,7 +13,7 @@
               "object_type": "ARTIFACT",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/open-source/drone"
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
               }
             }
           }

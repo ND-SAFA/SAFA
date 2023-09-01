@@ -55,7 +55,6 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                          summarize_artifacts=args.create_new_code_summaries
                                                              or not dataset.artifact_df.is_summarized(code_layers),
                                          project_summary_sections=[PS_ENTITIES_TITLE,
-                                                                   PS_SUBSYSTEM_TITLE,
                                                                    PS_DATA_FLOW_TITLE,
                                                                    PS_OVERVIEW_TITLE,
                                                                    self.HGEN_SECTION_TITLE],

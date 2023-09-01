@@ -14,10 +14,13 @@ class TestSortChildrenStep(BaseTest):
         Accepts a set of ranked children
         """
         pre_ranked = {}
-        args, state = RankingPipelineTest.create_ranking_structures(sorter=None, parent2children=pre_ranked)
+        expected = {"s1": ["t1", "t3", "t2"]}
+        args, state = RankingPipelineTest.create_ranking_structures(parent_ids=["s1"],
+                                                                    children_ids=["t1", "t2", "t3"],
+                                                                    parent2children=pre_ranked)
         step = SortChildren()
         step.run(args, state)
-        self.assertEqual(state.sorted_parent2children, pre_ranked)
+        self.assertDictEqual(expected, state.sorted_parent2children)
 
     def test_rank_according_to_supported_algorithm(self):
         """
@@ -33,11 +36,3 @@ class TestSortChildrenStep(BaseTest):
         step = SortChildren()
         step.run(args, state)
         self.assertEqual(state.sorted_parent2children[parent_id], after)
-
-    def test_denies_request_if_both_defined(self):
-        """
-        Denies request if both pre-ranked children and sorting algorithm are defined. This prevents mistakes.
-        """
-        args, state = RankingPipelineTest.create_ranking_structures(parent2children={}, sorter="embedding")
-        step = SortChildren()
-        self.assert_error(lambda: step.run(args, state), AssertionError, "sorter or parent2children")

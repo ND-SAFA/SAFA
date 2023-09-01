@@ -106,7 +106,9 @@ class RankingJob(AbstractJob):
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         predicted_entries = pipeline.run()
         self.project_summary = pipeline.state.project_summary
-        if self.dataset is not None and self.dataset.trace_df is not None:
+        has_positive_links = self.dataset is not None and self.dataset.trace_df is not None and len(
+            self.dataset.trace_df.get_links_with_label(1)) > 1
+        if has_positive_links:
             for entry in predicted_entries:
                 trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value])
                 trace_entry = self.dataset.trace_df.loc[trace_id]

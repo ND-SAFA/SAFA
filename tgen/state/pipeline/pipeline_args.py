@@ -11,4 +11,5 @@ class PipelineArgs(BaseObject):
     """
     export_dir: str = None
     load_dir: str = EMPTY_STRING
+    interactive_mode: bool = False
 

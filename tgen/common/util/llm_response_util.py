@@ -5,7 +5,9 @@ from typing import Dict, List, Union
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.prompt_util import PromptUtil
 
 
 class LLMResponseUtil:
@@ -57,6 +59,8 @@ class LLMResponseUtil:
             elif isinstance(child, NavigableString):
                 tag_name = tag.name
                 content = child
+                if not PromptUtil.strip_new_lines_and_extra_space(content):
+                    continue
             else:
                 continue
             if tag_name not in children:

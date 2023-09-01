@@ -31,7 +31,7 @@ class PromptUtil:
         return f"{prefix}{opening_tag}{tag_content}</{tag_name}>{suffix}"
 
     @staticmethod
-    def format_as_markdown_italics(original_string: str) -> str:
+    def as_markdown_italics(original_string: str) -> str:
         """
         Formats the string as markdown italics
         :param original_string: The string to format
@@ -50,7 +50,7 @@ class PromptUtil:
         return f"{'#' * level} {original_string}"
 
     @staticmethod
-    def format_as_bullet_point(original_string: str, level: int = 1) -> str:
+    def as_bullet_point(original_string: str, level: int = 1) -> str:
         """
         Formats the string as markdown bullet
         :param original_string: The string to format
@@ -62,10 +62,19 @@ class PromptUtil:
         return f"{TAB * level}{bullets[level % 3]} {original_string}"
 
     @staticmethod
+    def indent_for_markdown(original_string: str) -> str:
+        """
+        Formats the string as indented in markdown
+        :param original_string: The string to format
+        :return: The string indented as markdown
+        """
+        return f"    {original_string}"
+
+    @staticmethod
     def strip_new_lines_and_extra_space(original_string) -> str:
         """
         Removes new lines and extra leading or trailing spaces from the string
         :param original_string: The original string
         :return: The string without new lines or leading or trailing spaces
         """
-        return original_string.replace(NEW_LINE, SPACE).strip()
+        return original_string.strip(NEW_LINE).strip()

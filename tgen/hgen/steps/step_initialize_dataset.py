@@ -26,9 +26,9 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         export_path = state.export_dir
         original_dataset_complete = args.dataset_for_sources
-        if not state.summary:
-            original_dataset_complete = self._summarize(args)
-            state.summary = original_dataset_complete.project_summary
+        if not original_dataset_complete.project_summary or args.create_new_code_summaries:
+            original_dataset_complete = self._summarize(args, project_summary=original_dataset_complete.project_summary)
+        state.summary = original_dataset_complete.project_summary
         save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
 
         source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
@@ -36,7 +36,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.source_dataset = source_layer_only_dataset
         state.original_dataset = original_dataset_complete
 
-    def _summarize(self, args: HGenArgs) -> PromptDataset:
+    def _summarize(self, args: HGenArgs, project_summary: str = None) -> PromptDataset:
         """
         Summarizes the project and artifacts
         :param args: The arguments to hgen
@@ -47,9 +47,10 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         hgen_section_questionnaire.format_value(target_type=args.target_type)
         new_sections = {self.HGEN_SECTION_TITLE: hgen_section_questionnaire}
 
+        project_summary = project_summary if project_summary else args.system_summary
         code_layers = dataset.artifact_df.get_code_layers()
         summarizer_args = SummarizerArgs(dataset=dataset,
-                                         project_summary=args.system_summary,
+                                         project_summary=project_summary,
                                          summarize_code_only=True,
                                          do_resummarize_project=True,
                                          summarize_artifacts=args.create_new_code_summaries

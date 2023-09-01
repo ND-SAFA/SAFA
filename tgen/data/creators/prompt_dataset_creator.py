@@ -1,3 +1,8 @@
+import os
+
+from pydantic.class_validators import Optional
+
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -41,8 +46,22 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         artifact_df = df if isinstance(df, ArtifactDataFrame) else None
         prompt_df = df if isinstance(df, PromptDataFrame) else None
         trace_dataset = self.trace_dataset_creator.create() if self.trace_dataset_creator else None
+        project_summary = self._read_project_summary()
         return PromptDataset(prompt_df=prompt_df, artifact_df=artifact_df, trace_dataset=trace_dataset,
-                             project_file_id=self.project_file_id, data_export_path=self.data_export_path)
+                             project_file_id=self.project_file_id, data_export_path=self.data_export_path,
+                             project_summary=project_summary)
+
+    def _read_project_summary(self) -> Optional[str]:
+        """
+        Reads the project summary if it exists
+        :return: The project summary
+        """
+        project_reader = self.project_reader if self.project_reader else self.trace_dataset_creator.project_reader
+        project_summary_path = os.path.join(project_reader.project_path, PROJECT_SUMMARY_FILENAME)
+        if not os.path.exists(project_summary_path):
+            return None
+        project_summary = FileUtil.read_file(project_summary_path, raise_exception=False)
+        return project_summary
 
     def get_name(self) -> str:
         """

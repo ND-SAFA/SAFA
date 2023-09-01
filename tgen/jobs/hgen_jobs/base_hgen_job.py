@@ -27,7 +27,7 @@ class BaseHGenJob(AbstractJob):
         :return: The result of the job
         """
         generated_dataset: PromptDataset = self.hgen.run()
-        return generated_dataset.trace_dataset
+        return generated_dataset.trace_dataset if isinstance(generated_dataset, PromptDataset) else generated_dataset
 
     def get_hgen_args(self) -> HGenArgs:
         """

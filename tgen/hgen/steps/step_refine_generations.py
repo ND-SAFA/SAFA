@@ -37,8 +37,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generate_artifact_content_step = GenerateArtifactContentStep()
         for i in tqdm(range(max(state.n_generations, 1) + 1, args.n_reruns + 1),
                       desc=f"Re-running generations of {args.target_type}s"):
-            generate_artifact_content_step.run(args, state, force_run=True)
-            state.save(generate_artifact_content_step.get_step_name(), run_num=i)
+            generate_artifact_content_step.run(args, state, re_run=True)
             all_generation_predictions.update(state.generation_predictions)
             refined_content = self.perform_refinement(args, state.generation_predictions,
                                                       refined_content,
@@ -67,7 +66,8 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             prompt_builder = get_prompt_builder_for_generation(hgen_args,
                                                                questionnaire,
                                                                base_prompt=SupportedPrompts.HGEN_REFINEMENT,
-                                                               artifact_type=f"V1 {hgen_args.target_type}")
+                                                               artifact_type=f"V1 {hgen_args.target_type}",
+                                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED)
             prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
             refined_artifacts = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"V2 {hgen_args.target_type}"),
                                                     build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,

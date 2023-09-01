@@ -10,4 +10,5 @@ ALLOWED_ORPHANS_DEFAULT = -1
 NO_CHECK = -1
 CACHE_DIR_NAME = "HuggingFace"
 TRACE_THRESHOLD = 0.5
+PROJECT_SUMMARY_FILENAME = "project_summary.txt"
 EXCLUDED_FILES = ["__init__.py", ".DS_Store", ""]

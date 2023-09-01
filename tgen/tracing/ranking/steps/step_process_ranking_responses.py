@@ -25,21 +25,24 @@ class ArtifactReasoning:
         JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value])
         self.index = self.get_optional(artifact_dict, RANKING_ID_TAG)
         self.explanation = self.get_optional(artifact_dict, RANKING_EXPLANATION_TAG, lambda s: s.strip())
-        self.score = self.get_optional(artifact_dict, RANKING_SCORE_TAG, lambda s: s / RANKING_MAX_SCORE)
+        self.score = self.get_optional(artifact_dict, RANKING_SCORE_TAG, lambda s: s / RANKING_MAX_SCORE, default_value=0)
         self.artifact_id = None
 
     @staticmethod
-    def get_optional(a_dict: Dict, key_name: str, post_process: Callable = None) -> Optional[Any]:
+    def get_optional(a_dict: Dict, key_name: str, post_process: Callable = None, default_value=None) -> Optional[Any]:
         """
         Returns optional value from dictionary.
         :param a_dict: The dictionary to retrieve the value from.
         :param key_name: The name of the optional key.
         :param post_process: Any operation to perform after value is retrieved, if it exists.
+        :param default_value: The value to use if none exists.
         :return: The optional value.
         """
         if post_process is None:
             post_process = lambda p: p
-        optional_value = a_dict.get(key_name, None)
+        optional_value = a_dict.get(key_name, [])
+        if len(optional_value) == 0:
+            optional_value = [default_value]
         if optional_value:
             value = optional_value[0]
             value = post_process(value)

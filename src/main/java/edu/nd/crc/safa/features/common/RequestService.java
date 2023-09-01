@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
  */
 @AllArgsConstructor
 @Service
-public class SafaRequestBuilder {
+public class RequestService {
     protected final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private final WebClient webClient;
     private final int DEFAULT_TIMEOUT = 60 * 60; // 1 Hour
@@ -102,7 +102,7 @@ public class SafaRequestBuilder {
         Mono<String> responseMono = request.exchangeToMono(response -> {
             if (response.statusCode().is2xxSuccessful()) {
                 return response.bodyToMono(String.class);
-            } else if (response.statusCode().is4xxClientError()) {
+            } else if (response.statusCode().isError()) {
                 return response.bodyToMono(String.class).flatMap(body -> {
                     String error = parseResponse(body, String.class);
                     return Mono.error(new RuntimeException(error));

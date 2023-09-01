@@ -7,25 +7,24 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.features.types.ArtifactType;
-import edu.nd.crc.safa.features.types.TypeAppEntity;
-import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import org.json.JSONObject;
 
 public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
-    String editTypePath = AppRoutes.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE;
-    ArtifactType artifactType = new ArtifactType(project, Constants.name);
+    ArtifactType artifactType = new ArtifactType(project, Constants.name, "");
 
     protected UUID createEntity() throws Exception {
         JSONObject createdType = SafaRequest
-            .withRoute(editTypePath)
+            .withRoute(AppRoutes.ArtifactType.CREATE_ARTIFACT_TYPE)
             .withProject(project)
             .postWithJsonObject(artifactType);
         UUID typeId = UUID.fromString(createdType.getString("typeId"));
-        artifactType.setTypeId(typeId);
+        artifactType.setId(typeId);
         return typeId;
     }
 
@@ -41,9 +40,10 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
     protected void updateEntity() throws Exception {
         artifactType.setIcon(Constants.newIconName);
         SafaRequest
-            .withRoute(editTypePath)
+            .withRoute(AppRoutes.ArtifactType.UPDATE_ARTIFACT_TYPE)
             .withProject(project)
-            .postWithJsonObject(artifactType);
+            .withArtifactType(artifactType.getName())
+            .putWithJsonObject(artifactType);
     }
 
     protected void verifyUpdatedEntity(TypeAppEntity retrievedEntity) {

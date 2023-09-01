@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.generation.projectsummary;
 
-import java.util.Map;
+import java.util.List;
+
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,5 +13,5 @@ public class ProjectSummaryRequest {
     /**
      * The artifacts in the project to summarize project with.
      */
-    Map<String, String> artifacts;
+    List<GenerationArtifact> artifacts;
 }

@@ -4,26 +4,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.matrices.entities.TraceMatrix;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.traces.entities.db.TraceMatrixEntry;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface TraceMatrixRepository extends CrudRepository<TraceMatrix, UUID> {
-    List<TraceMatrix> findByProject(Project project);
+public interface TraceMatrixRepository extends CrudRepository<TraceMatrixEntry, UUID> {
+    Optional<TraceMatrixEntry> getByProjectVersionAndSourceTypeAndTargetType(ProjectVersion projectVersion,
+                                                                             ArtifactType sourceType,
+                                                                             ArtifactType targetType);
 
-    default Optional<TraceMatrix> queryForMatrixInProject(Project project,
-                                                          String sourceArtifactTypeName,
-                                                          String targetArtifactTypeName) {
-        return findByProjectAndSourceArtifactTypeNameAndTargetArtifactTypeName(project,
-            sourceArtifactTypeName,
-            targetArtifactTypeName);
-    }
+    Optional<TraceMatrixEntry> getById(UUID id);
 
-    Optional<TraceMatrix> findByProjectAndSourceArtifactTypeNameAndTargetArtifactTypeName(
-        Project project,
-        String sourceArtifactTypeName,
-        String targetArtifactTypeName);
+    List<TraceMatrixEntry> getByProjectVersion(ProjectVersion projectVersion);
 }

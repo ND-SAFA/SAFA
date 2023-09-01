@@ -15,6 +15,8 @@ import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SubtreeAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 public class ProjectGraph {
     Map<UUID, ArtifactNode> artifactsMap = new HashMap<>();
@@ -39,15 +41,28 @@ public class ProjectGraph {
         }
 
         for (TraceAppEntity trace : traces) {
-            ArtifactNode sourceNode = artifactsMap.get(trace.getSourceId());
-            ArtifactNode targetNode = artifactsMap.get(trace.getTargetId());
-            addRelationship(targetNode, sourceNode);
+            if (traceLinkIsVisible(trace)) {
+                ArtifactNode sourceNode = artifactsMap.get(trace.getSourceId());
+                ArtifactNode targetNode = artifactsMap.get(trace.getTargetId());
+                addRelationship(targetNode, sourceNode);
+            }
         }
 
         for (ArtifactNode item : artifactsMap.values()) {
             calculateSingleSubtree(item);
             calculateSingleSupertree(item);
         }
+    }
+
+    /**
+     * Return whether a trace link should be displayed
+     *
+     * @param trace The trace link
+     * @return Whether we should display the trace
+     */
+    private boolean traceLinkIsVisible(TraceAppEntity trace) {
+        return trace.isVisible()
+            && (trace.getTraceType() == TraceType.MANUAL || trace.getApprovalStatus() != ApprovalStatus.DECLINED);
     }
 
     /**

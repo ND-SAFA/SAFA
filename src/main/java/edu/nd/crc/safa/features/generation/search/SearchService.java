@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.generation.search;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +9,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.common.SafaRequestBuilder;
-import edu.nd.crc.safa.features.generation.GenerationApi;
+import edu.nd.crc.safa.features.generation.api.GenApi;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.generation.common.TraceLayer;
@@ -20,7 +19,6 @@ import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.graph.ArtifactNode;
 import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
-import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
@@ -32,11 +30,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class SearchService {
+    private static final String PROMPT_TYPE = "PROMPT_TYPE";
     private static final String PROMPT_KEY = "PROMPT";
     private static final String ARTIFACT_KEY = "artifacts";
     private static final double THRESHOLD = 0.5;
-    ProjectRetrievalService projectRetrievalService;
-    SafaRequestBuilder safaRequestBuilder;
+    private final GenApi genApi;
 
     /**
      * Searches for artifacts in search types that match the given prompt.
@@ -49,11 +47,13 @@ public class SearchService {
      */
     public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt,
                                               List<String> searchTypes, int n) {
-        Map<String, String> promptLayer = new HashMap<>();
-        promptLayer.put(PROMPT_KEY, prompt);
-        Map<UUID, String> artifactMap = constructTargetLayer(projectAppEntity, searchTypes);
-        Map<String, String> artifactLayer = convertArtifactMapToLayer(artifactMap);
-        return searchSourceLayer(promptLayer, artifactLayer, n);
+        ArtifactAppEntity promptArtifact = new ArtifactAppEntity();
+        promptArtifact.setName(PROMPT_KEY);
+        promptArtifact.setBody(prompt);
+        promptArtifact.setType(PROMPT_KEY);
+        List<ArtifactAppEntity> artifacts = constructTargetLayer(projectAppEntity, searchTypes);
+        artifacts.add(promptArtifact);
+        return searchSourceLayer(artifacts, searchTypes, n);
     }
 
     /**
@@ -70,79 +70,60 @@ public class SearchService {
                                                 List<String> searchTypes, int n) {
         Map<UUID, ArtifactAppEntity> artifactIdMap = ProjectDataStructures.createArtifactMap(
             projectAppEntity.getArtifacts());
-        Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
-        Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
-        return searchSourceLayer(
-            convertArtifactMapToLayer(sourceLayer),
-            convertArtifactMapToLayer(targetLayer), n);
+        List<ArtifactAppEntity> queries = artifactIds.stream().map(artifactIdMap::get)
+            .collect(Collectors.toList());
+        queries.forEach(a -> a.setType(PROMPT_KEY));
+        List<ArtifactAppEntity> candidateArtifacts = constructTargetLayer(projectAppEntity, searchTypes);
+        List<ArtifactAppEntity> artifacts = new ArrayList<>();
+        artifacts.addAll(queries);
+        artifacts.addAll(candidateArtifacts);
+        return searchSourceLayer(artifacts, searchTypes, n);
     }
 
     /**
      * Performs a search between source and target artifacts using TGEN tracing.
      *
-     * @param promptLayer   Source artifacts mapping id to body.
-     * @param artifactLayer Target artifacts mapping id to body.
-     * @param n             The top n matches to return.
+     * @param artifacts   The artifacts containing queries and candidate artifacts.
+     * @param n           The top n matches to return.
+     * @param searchTypes The artifact types to search against.
      * @return Target Artifact IDs that matched source artifacts.
      */
-    public SearchResponse searchSourceLayer(Map<String, String> promptLayer,
-                                            Map<String, String> artifactLayer, int n) {
-        Map<String, Map<String, String>> artifactLayers = new HashMap<>();
-        artifactLayers.put(PROMPT_KEY, promptLayer);
-        artifactLayers.put(ARTIFACT_KEY, artifactLayer);
-
-        TraceLayer layer = new TraceLayer(ARTIFACT_KEY, PROMPT_KEY);
-        GenerationDataset dataset = new GenerationDataset(artifactLayers, List.of(layer));
+    public SearchResponse searchSourceLayer(List<ArtifactAppEntity> artifacts, List<String> searchTypes, int n) {
+        List<TraceLayer> traceLayers = new ArrayList<>();
+        for (String searchType : searchTypes) {
+            traceLayers.add(new TraceLayer(searchType, PROMPT_KEY));
+        }
+        Map<String, ArtifactAppEntity> artifactMap = ProjectDataStructures.createArtifactNameMap(artifacts);
+        List<GenerationArtifact> generationArtifacts = artifacts.stream()
+            .map(GenerationArtifact::new).collect(Collectors.toList());
+        GenerationDataset dataset = new GenerationDataset(generationArtifacts, traceLayers);
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
-        GenerationApi tgen = new GenerationApi(this.safaRequestBuilder);
-        TGenTraceGenerationResponse response = tgen.performSearch(payload, null);
+        TGenTraceGenerationResponse response = this.genApi.performSearch(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
             .map(GenerationLink::getSource)
-            .map(UUID::fromString)
+            .map(artifactMap::get)
+            .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
         int maxIndex = Math.min(matchedArtifactIds.size(), n);
         matchedArtifactIds = matchedArtifactIds.subList(0, maxIndex);
-        List<String> matchedArtifactBodies = matchedArtifactIds
-            .stream().map(UUID::toString)
-            .map(artifactLayer::get)
-            .collect(Collectors.toList());
-        return new SearchResponse(matchedArtifactIds, matchedArtifactBodies);
+        return new SearchResponse(matchedArtifactIds);
     }
 
     /**
-     * Creates an artifact layer of artifacts whose Ids are specified.
-     *
-     * @param artifactIds   The ids of the artifacts to include in the layer.
-     * @param artifactIdMap Map of id to artifacts to extract from.
-     * @return Mapping between id and body of selected artifacts.
-     */
-    private Map<UUID, String> createArtifactLayerFromIds(List<UUID> artifactIds,
-                                                         Map<UUID, ArtifactAppEntity> artifactIdMap) {
-        Map<UUID, String> sourceLayer = new HashMap<>();
-        for (UUID artifactId : artifactIds) {
-            sourceLayer.put(artifactId, artifactIdMap.get(artifactId).getBody());
-        }
-        return sourceLayer;
-    }
-
-    /**
-     * Creates artifact level extracted from artifacts types and project entities.
+     * Extracts the artifacts of associated type and converts them to
      *
      * @param projectAppEntity The project at a certain version containing artifacts and traces.
      * @param artifactTypes    The artifact types whose associated artifacts are being extracted.
      * @return The map between artifact id and body.
      */
-    private Map<UUID, String> constructTargetLayer(ProjectAppEntity projectAppEntity, List<String> artifactTypes) {
-        Map<UUID, String> targetLayer = new HashMap<>();
+    private List<ArtifactAppEntity> constructTargetLayer(ProjectAppEntity projectAppEntity,
+                                                         List<String> artifactTypes) {
+        List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (String artifactTypeName : artifactTypes) {
-            List<ArtifactAppEntity> artifacts = projectAppEntity.getByArtifactType(artifactTypeName);
-            artifacts
-                .stream()
-                .filter(a -> a.getTraceString().length() > 0)
-                .forEach(a -> targetLayer.put(a.getId(), a.getTraceString()));
+            artifacts.addAll(projectAppEntity.getByArtifactType(artifactTypeName));
         }
-        return targetLayer;
+        return artifacts;
     }
 
     /**
@@ -173,11 +154,6 @@ public class SearchService {
             relatedArtifacts.addAll(neighborIds);
         }
         return new ArrayList<>(relatedArtifacts);
-    }
-
-    private Map<String, String> convertArtifactMapToLayer(Map<UUID, String> artifactMap) {
-        return artifactMap.entrySet().stream()
-            .collect(Collectors.toMap(entry -> entry.getKey().toString(), Map.Entry::getValue));
     }
 }
 

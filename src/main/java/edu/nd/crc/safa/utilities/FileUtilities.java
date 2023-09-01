@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,6 +39,52 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
     public static final String URL_SEP = "/";
+
+    public static final PathMatcher[] CODE_MATCHERS = {
+        FileSystems.getDefault().getPathMatcher(
+            "glob:*.{"
+            + "asm,"
+            + "c,"
+            + "cc,"
+            + "cfg,"
+            + "cmake,"
+            + "cpp,"
+            + "cs,"
+            + "css,"
+            + "cxx,"
+            + "glsl,"
+            + "go,"
+            + "h,"
+            + "hpp,"
+            + "htm,"
+            + "html,"
+            + "hxx,"
+            + "java,"
+            + "js,"
+            + "json,"
+            + "jsx,"
+            + "php,"
+            + "py,"
+            + "rb,"
+            + "resx,"
+            + "s,"
+            + "sass,"
+            + "scss,"
+            + "sh,"
+            + "sql,"
+            + "swift,"
+            + "ts,"
+            + "tsx,"
+            + "vue,"
+            + "vb,"
+            + "xml,"
+            + "yaml,"
+            + "yml"
+            + "}"),
+        FileSystems.getDefault().getPathMatcher("glob:CMakeLists.txt"),
+        FileSystems.getDefault().getPathMatcher("glob:.gitignore"),
+        FileSystems.getDefault().getPathMatcher("glob:.gitmodules")
+    };
 
     public static CSVParser readCSVFile(String pathToFile) throws IOException {
         File csvData = new File(pathToFile);
@@ -262,5 +311,21 @@ public class FileUtilities {
             assert in != null;
             return new String(in.readAllBytes());
         }
+    }
+
+    /**
+     * Returns whether a filename represents a code file type that we are aware of.
+     *
+     * @param path The path of the file
+     * @return Whether the file is a code file
+     */
+    public static boolean isCodeFile(Path path) {
+        Path filename = path.getFileName();
+        for (PathMatcher matcher : CODE_MATCHERS) {
+            if (matcher.matches(filename)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

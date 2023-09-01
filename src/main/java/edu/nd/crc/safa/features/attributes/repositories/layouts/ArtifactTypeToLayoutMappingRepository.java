@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.attributes.entities.db.layouts.ArtifactTypeToLayoutMapping;
 import edu.nd.crc.safa.features.attributes.entities.db.layouts.AttributeLayout;
-import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 
 import org.springframework.data.repository.CrudRepository;
 

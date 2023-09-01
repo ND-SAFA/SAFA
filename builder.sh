@@ -52,7 +52,7 @@ function build {
 
 function run {
   setGoogleCredentials
-  if [ -z "$my_var" ]; then
+  if [ -n "$2" ]; then
     echo "Running with environment: $2"
     source $2
   fi

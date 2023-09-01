@@ -24,6 +24,18 @@ public class ProjectDataStructures {
     }
 
     /**
+     * Create map from artifact name to artifact.
+     *
+     * @param artifacts The artifact to include in map.
+     * @return Map of artifacts.
+     */
+    public static Map<String, ArtifactAppEntity> createArtifactNameMap(List<ArtifactAppEntity> artifacts) {
+        Map<String, ArtifactAppEntity> artifactMap = new HashMap<>();
+        artifacts.forEach(a -> artifactMap.put(a.getName(), a));
+        return artifactMap;
+    }
+
+    /**
      * Creates map of artifact to tracing content.
      *
      * @param artifacts List of artifacts to include in layer.

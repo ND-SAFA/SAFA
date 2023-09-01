@@ -56,7 +56,8 @@ public class HGenJob extends CommitJob {
         HGenService hGenService = this.serviceProvider.getHGenService();
         String summary = this.projectVersion.getProject().getSpecification();
         this.hGenRequest.setSummary(summary);
-        ProjectCommit projectCommit = hGenService.generateHierarchy(this.projectVersion, this.hGenRequest);
+        ProjectCommit projectCommit = hGenService.generateHierarchy(this.projectVersion, this.hGenRequest,
+            this.getDbLogger());
         this.setProjectCommit(projectCommit);
     }
 }

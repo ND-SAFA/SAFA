@@ -30,7 +30,8 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ArtifactType {
         public static final String GET_PROJECT_ARTIFACT_TYPES = Projects.ROOT + "/{projectId}/artifactTypes";
-        public static final String CREATE_OR_UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
+        public static final String CREATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
+        public static final String UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES + "/{artifactType}";
         public static final String DELETE_ARTIFACT_TYPE = Projects.ROOT + "/artifactTypes/{typeId}";
     }
 
@@ -119,8 +120,10 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Projects {
-            public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + AppRoutes.Projects.ROOT;
-            public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";
+            public static final String PROJECT_JOBS_ROOT = JOBS_PREFIX + AppRoutes.Projects.ROOT;
+            public static final String CREATE_PROJECT_VIA_JSON = PROJECT_JOBS_ROOT;
+            public static final String PROJECT_BULK_UPLOAD = PROJECT_JOBS_ROOT + "/upload";
+            public static final String UPDATE_PROJECT_VIA_FLAT_FILES = PROJECT_JOBS_ROOT + "/versions/{versionId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -184,11 +187,9 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class TraceMatrix {
-        public static final String GET_TRACE_MATRICES = Projects.ROOT + "/{projectId}/matrices";
-        public static final String CREATE_TRACE_MATRIX = Projects.ROOT + "/{projectId}/matrices/"
-            + "{sourceArtifactTypeName}/{targetArtifactTypeName}";
-        public static final String DELETE_TRACE_MATRIX = Projects.ROOT + "/{projectId}/matrices/"
-            + "{sourceArtifactTypeName}/{targetArtifactTypeName}";
+        public static final String BASE = Projects.ROOT + "/{projectVersionId}/matrices";
+        public static final String BY_SOURCE_AND_TARGET_TYPES = BASE + "/{sourceTypeName}/{targetTypeName}";
+        public static final String BY_ID = BASE + "/{traceMatrixId}";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -270,7 +271,7 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Summarize {
-        public static final String SUMMARIZE_ARTIFACTS = "/summarize";
+        public static final String SUMMARIZE_ARTIFACTS = Projects.ROOT + "/versions/{versionId}/artifacts/summarize";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

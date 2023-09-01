@@ -27,9 +27,11 @@ import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
+import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
 import edu.nd.crc.safa.features.traces.services.TraceService;
-import edu.nd.crc.safa.features.types.TypeAppEntity;
-import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -66,6 +68,7 @@ public class ProjectRetrievalService {
     private final AttributeService attributeService;
     private final AttributeLayoutService attributeLayoutService;
     private final SafaUserService safaUserService;
+    private final TraceMatrixService traceMatrixService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
@@ -110,7 +113,10 @@ public class ProjectRetrievalService {
         ProjectGraph graph = new ProjectGraph(entities);
         Map<UUID, SubtreeAppEntity> subtrees = graph.getSubtreeInfo();
 
-        return new ProjectAppEntity(projectVersion,
+        List<TraceMatrixAppEntity> traceMatrices = traceMatrixService.getAppEntities(projectVersion, user);
+
+        return new ProjectAppEntity(
+            projectVersion,
             entities.getArtifacts(),
             entities.getTraces(),
             projectMembers,
@@ -122,7 +128,8 @@ public class ProjectRetrievalService {
             layout,
             attributes,
             attributeLayouts,
-            subtrees);
+            subtrees,
+            traceMatrices);
     }
 
     /**

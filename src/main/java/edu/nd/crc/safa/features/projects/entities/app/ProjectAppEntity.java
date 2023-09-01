@@ -22,7 +22,8 @@ import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.types.TypeAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -76,6 +77,8 @@ public class ProjectAppEntity implements IAppEntity {
 
     private Map<UUID, SubtreeAppEntity> subtrees;
 
+    private List<TraceMatrixAppEntity> traceMatrices;
+
     public ProjectAppEntity() {
         this.name = "";
         this.description = "";
@@ -90,6 +93,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.attributes = new ArrayList<>();
         this.attributeLayouts = new ArrayList<>();
         this.subtrees = new HashMap<>();
+        this.traceMatrices = new ArrayList<>();
         this.lastEdited = LocalDateTime.now();
     }
 
@@ -105,7 +109,8 @@ public class ProjectAppEntity implements IAppEntity {
                             Map<UUID, LayoutPosition> layout,
                             List<CustomAttributeAppEntity> attributes,
                             List<AttributeLayoutAppEntity> attributeLayouts,
-                            Map<UUID, SubtreeAppEntity> subtrees) {
+                            Map<UUID, SubtreeAppEntity> subtrees,
+                            List<TraceMatrixAppEntity> traceMatrices) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
         this.lastEdited = project.getLastEdited();
@@ -124,6 +129,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.attributes = attributes;
         this.attributeLayouts = attributeLayouts;
         this.subtrees = subtrees;
+        this.traceMatrices = traceMatrices;
     }
 
     public ProjectAppEntity(ProjectCommit projectCommit) {

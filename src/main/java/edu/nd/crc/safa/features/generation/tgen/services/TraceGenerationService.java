@@ -1,12 +1,10 @@
 package edu.nd.crc.safa.features.generation.tgen.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.TraceLayer;
 import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
@@ -16,7 +14,6 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
-import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -41,21 +38,28 @@ public class TraceGenerationService {
      */
     public static GenerationDataset extractPayload(TracingRequest tracingRequest,
                                                    ProjectAppEntity projectAppEntity) {
-        Map<String, Map<String, String>> artifactLayers = new HashMap<>();
         List<TraceLayer> layers = new ArrayList<>();
+        List<GenerationArtifact> generationArtifacts = new ArrayList<>();
+
         for (ArtifactLevelRequest artifactLevelRequest : tracingRequest.getArtifactLevels()) {
             String childType = artifactLevelRequest.getSource();
             String parentType = artifactLevelRequest.getTarget();
 
-            for (String artifactType : List.of(childType, parentType)) {
-                artifactLayers.computeIfAbsent(artifactType, t -> {
-                    List<ArtifactAppEntity> artifacts = projectAppEntity.getByArtifactType(t);
-                    return ProjectDataStructures.createArtifactLayer(artifacts);
-                });
-            }
+            List<GenerationArtifact> childArtifacts = projectAppEntity
+                .getByArtifactType(childType)
+                .stream()
+                .map(GenerationArtifact::new)
+                .collect(Collectors.toList());
+            List<GenerationArtifact> parentArtifacts = projectAppEntity
+                .getByArtifactType(parentType)
+                .stream()
+                .map(GenerationArtifact::new)
+                .collect(Collectors.toList());
+            generationArtifacts.addAll(childArtifacts);
+            generationArtifacts.addAll(parentArtifacts);
             layers.add(new TraceLayer(childType, parentType));
         }
-        return new GenerationDataset(artifactLayers, layers);
+        return new GenerationDataset(generationArtifacts, layers);
     }
 
     public List<TraceAppEntity> generateTraceLinks(TraceGenerationRequest traceGenerationRequest,

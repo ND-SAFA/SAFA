@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.types;
+package edu.nd.crc.safa.features.types.entities.db;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -41,8 +41,8 @@ public class ArtifactType implements Serializable {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
-    @Column(name = "type_id")
-    UUID typeId;
+    @Column(name = "id")
+    private UUID id;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,18 +51,22 @@ public class ArtifactType implements Serializable {
         nullable = false
     )
     @JsonIgnore
-    Project project;
+    private Project project;
 
     @Column(name = "name", nullable = false)
-    String name;
+    private String name;
 
     @Column(name = "icon", nullable = false)
-    String icon;
+    private String icon;
 
-    public ArtifactType(Project project, String name) {
+    @Column(name = "color", nullable = false)
+    private String color;
+
+    public ArtifactType(Project project, String name, String color) {
         this.project = project;
         this.name = name;
         this.icon = DefaultArtifactTypeIcons.getArtifactIcon(name);
+        this.color = color;
     }
 
     @Override

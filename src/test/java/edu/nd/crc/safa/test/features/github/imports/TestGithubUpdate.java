@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.github.base.AbstractGithubTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
@@ -59,7 +59,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
         List<ArtifactAppEntity> artifacts = serviceProvider.getArtifactService().getAppEntities(project);
 
         // We should have the correct number of artifacts and links
-        Assertions.assertEquals(initialArtifactCount + diffArtifactsCount,artifacts.size());
+        Assertions.assertEquals(initialArtifactCount + diffArtifactsCount, artifacts.size());
 
         for (ArtifactAppEntity artifact : artifacts) {
             if (artifact.getType().equals(type.getName())) {

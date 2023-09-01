@@ -21,6 +21,7 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -128,6 +129,10 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
 
     public String getTypeName() {
         return this.artifact.getType().getName();
+    }
+
+    public ArtifactType getType() {
+        return this.artifact.getType();
     }
 
     /**

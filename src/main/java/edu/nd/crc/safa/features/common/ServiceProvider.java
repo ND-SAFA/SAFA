@@ -4,7 +4,6 @@ import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
@@ -23,6 +22,7 @@ import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
 import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.search.SearchService;
@@ -37,6 +37,7 @@ import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraParsingService;
 import edu.nd.crc.safa.features.jobs.logging.services.JobLoggingService;
+import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
@@ -52,9 +53,9 @@ import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
 import edu.nd.crc.safa.features.traces.services.TraceService;
-import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.DefaultProjectCreatorService;
@@ -96,7 +97,6 @@ public class ServiceProvider {
     // Versions
     private final VersionService versionService;
     // Types
-    private final ArtifactTypeRepository artifactTypeRepository;
     private final TypeService typeService;
     // Artifact
     private final ArtifactRepository artifactRepository;
@@ -114,8 +114,7 @@ public class ServiceProvider {
     private final TraceService traceService;
     private final TraceGenerationService traceGenerationService;
     private final TraceLinkRepository traceLinkRepository;
-    // Matrix
-    private final TraceMatrixRepository traceMatrixRepository;
+    private final TraceMatrixService traceMatrixService;
     // Changes
     private final ProjectVersionRepository projectVersionRepository;
     private final CommitErrorRepository commitErrorRepository;
@@ -141,7 +140,6 @@ public class ServiceProvider {
     // JIRA
     private final JiraAccessCredentialsRepository jiraAccessCredentialsRepository;
     private final JiraConnectionService jiraConnectionService;
-    private final JobService jobService;
     private final JiraParsingService jiraParsingService;
     private final JiraProjectRepository jiraProjectRepository;
     // Delta
@@ -158,13 +156,16 @@ public class ServiceProvider {
     private final PasswordEncoder passwordEncoder;
     private final DefaultProjectCreatorService defaultProjectCreatorService;
     // HTTP
-    private final SafaRequestBuilder safaRequestBuilder;
+    private final RequestService requestService;
     private final GraphQlService graphQlService;
+    private final GenApi genApi;
     // GitHub
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final GithubConnectionService githubConnectionService;
     private final GithubProjectRepository githubProjectRepository;
     private final GithubGraphQlService githubGraphQlService;
+    private final JobService jobService;
+    private final JobDbRepository jobRepository;
     // Jobs
     JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     private JobLoggingService jobLoggingService;

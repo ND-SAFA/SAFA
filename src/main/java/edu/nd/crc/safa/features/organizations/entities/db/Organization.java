@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -32,6 +33,10 @@ public class Organization {
     @Column
     private String name;
 
+    @Column(columnDefinition = "mediumtext")
+    @Lob
+    private String description;
+
     @JoinColumn(name = "owner_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
@@ -46,8 +51,9 @@ public class Organization {
     @Column
     private UUID fullOrgTeamId;
 
-    public Organization(String name, SafaUser owner, String paymentTier, boolean personalOrg) {
+    public Organization(String name, String description, SafaUser owner, String paymentTier, boolean personalOrg) {
         this.name = name;
+        this.description = description;
         this.owner = owner;
         this.paymentTier = paymentTier;
         this.personalOrg = personalOrg;

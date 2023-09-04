@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS organization
 (
     id                 BINARY(16)   NOT NULL PRIMARY KEY,
     name               VARCHAR(255) NOT NULL,
+    description        MEDIUMTEXT   NOT NULL,
     owner_id           VARCHAR(255) NOT NULL,
     payment_tier       VARCHAR(255) NOT NULL,
     personal_org       BOOLEAN      NOT NULL,

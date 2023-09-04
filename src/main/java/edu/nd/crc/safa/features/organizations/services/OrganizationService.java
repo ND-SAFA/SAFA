@@ -27,22 +27,22 @@ public class OrganizationService {
     /**
      * Create a new organization. This will also create a new team for the organization.
      *
-     * @param name The name of the organization
-     * @param owner The owner of the organization
-     * @param paymentTier The payment tier of the organization
-     * @param personalOrg Whether the organization is a personal organization
+     * @param organization The new organization data structure.
      * @return The newly created organization
      */
-    public Organization createNewOrganization(String name, SafaUser owner, String paymentTier, boolean personalOrg) {
-        Organization organization = new Organization(name, owner, paymentTier, personalOrg);
+    public Organization createNewOrganization(Organization organization) {
+        if (organization.getId() != null) {
+            throw new IllegalArgumentException("Cannot create a new organization with an ID");
+        }
+
         organization = organizationRepo.save(organization);  // Save once so it gets an id
 
-        Team orgTeam = teamService.createNewTeam(name, organization, true);
+        Team orgTeam = teamService.createNewTeam(organization.getName(), organization, true);
         organization.setFullOrgTeamId(orgTeam.getId());
         organization = organizationRepo.save(organization);  // Save again to add the team ID
 
-        teamMembershipService.addUserRole(owner, orgTeam, TeamRole.ADMIN);
-        organizationMembershipService.addUserRole(owner, organization, OrganizationRole.ADMIN);
+        teamMembershipService.addUserRole(organization.getOwner(), orgTeam, TeamRole.ADMIN);
+        organizationMembershipService.addUserRole(organization.getOwner(), organization, OrganizationRole.ADMIN);
 
         return organization;
     }

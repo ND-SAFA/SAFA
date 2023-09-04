@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.test.common;
 
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.junit.jupiter.api.BeforeEach;

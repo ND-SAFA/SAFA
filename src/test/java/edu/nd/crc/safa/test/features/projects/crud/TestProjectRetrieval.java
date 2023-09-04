@@ -29,10 +29,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
      */
     @Test
     void retrieveMultipleProjects() throws Exception {
-        SafaUser otherUser = new SafaUser();
-        otherUser.setEmail("doesNotExist@gmail.com");
-        otherUser.setPassword("somePassword");
-        this.safaUserRepository.save(otherUser);
+        SafaUser otherUser = safaUserService.createUser("doesNotExist@gmail.com", "somePassword");
 
         dbEntityBuilder
             .newProject("firstProject")

@@ -7,12 +7,14 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceMatrixEntry;
 import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.services.TypeService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TraceMatrixController extends BaseController {
 
-    private TraceMatrixService traceMatrixService;
-    private TypeService typeService;
+    private final TraceMatrixService traceMatrixService;
+    private final TypeService typeService;
 
     @Autowired
     public TraceMatrixController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
@@ -39,7 +41,9 @@ public class TraceMatrixController extends BaseController {
     public TraceMatrixAppEntity createNewTraceMatrixEntry(@PathVariable UUID projectVersionId,
                                                           @PathVariable String sourceTypeName,
                                                           @PathVariable String targetTypeName) {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         ArtifactType sourceType = typeService.getArtifactType(projectVersion.getProject(), sourceTypeName);
         ArtifactType targetType = typeService.getArtifactType(projectVersion.getProject(), targetTypeName);
         TraceMatrixEntry newEntry = traceMatrixService.createEntry(projectVersion, sourceType, targetType);
@@ -50,7 +54,9 @@ public class TraceMatrixController extends BaseController {
     public void deleteTraceMatrixEntry(@PathVariable UUID projectVersionId,
                                                        @PathVariable String sourceTypeName,
                                                        @PathVariable String targetTypeName) {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         ArtifactType sourceType = typeService.getArtifactType(projectVersion.getProject(), sourceTypeName);
         ArtifactType targetType = typeService.getArtifactType(projectVersion.getProject(), targetTypeName);
         Optional<TraceMatrixEntry> entryOptional = traceMatrixService.getEntry(projectVersion, sourceType, targetType);
@@ -60,7 +66,9 @@ public class TraceMatrixController extends BaseController {
 
     @DeleteMapping(AppRoutes.TraceMatrix.BY_ID)
     public void deleteTraceMatrixEntry(@PathVariable UUID projectVersionId, @PathVariable UUID traceMatrixId) {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         Optional<TraceMatrixEntry> entryOptional = traceMatrixService.getEntry(traceMatrixId);
         TraceMatrixEntry entry = entryOptional.orElseThrow(this::createMissingEntryException);
 

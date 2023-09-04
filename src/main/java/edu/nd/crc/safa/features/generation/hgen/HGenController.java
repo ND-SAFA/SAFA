@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.builders.HGenJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -36,8 +37,9 @@ public class HGenController extends BaseController {
     @PostMapping(AppRoutes.HGen.GENERATE)
     public JobAppEntity generateHierarchy(@PathVariable UUID versionId,
                                           @RequestBody @Valid HGenRequest request) throws Exception {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         SafaUser currentUser = this.serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, currentUser).get();
         HGenJobBuilder jobBuilder = new HGenJobBuilder(this.serviceProvider, projectVersion, request, currentUser);
         return jobBuilder.perform();
     }

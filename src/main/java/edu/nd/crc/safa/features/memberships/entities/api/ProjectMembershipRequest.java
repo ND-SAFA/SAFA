@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.memberships.entities.api;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 
 /**
  * The request sent from FEND to request a project membership be added or updated.

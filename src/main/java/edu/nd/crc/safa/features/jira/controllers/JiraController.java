@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.jobs.builders.ImportIntoProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -120,7 +121,8 @@ public class JiraController extends BaseController {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, principal).get();
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, orgId);
         UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
             this.serviceProvider,
@@ -151,7 +153,8 @@ public class JiraController extends BaseController {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, principal).get();
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, orgId);
         ImportIntoProjectViaJiraBuilder updateProjectViaJira = new ImportIntoProjectViaJiraBuilder(
             this.serviceProvider,

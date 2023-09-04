@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.installations.InstallationDTO;
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Repository;
 public interface ProjectRepository extends CrudRepository<Project, UUID> {
 
     Project findByProjectId(UUID projectId);
+
+    List<Project> findByOwningTeam(Team owningTeam);
 
     @Query(value =
         "SELECT new edu.nd.crc.safa.features.installations.InstallationDTO("

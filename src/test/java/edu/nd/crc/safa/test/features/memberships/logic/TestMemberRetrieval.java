@@ -2,7 +2,7 @@ package edu.nd.crc.safa.test.features.memberships.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
 
 import org.json.JSONArray;
@@ -24,11 +24,16 @@ public class TestMemberRetrieval extends AbstractSharingTest {
         assertThat(members.length()).isEqualTo(2);
 
         // Step - Retrieve member JSON
-        JSONObject memberJson = members.getJSONObject(1);
+        JSONObject memberJson = null;
+        for (int i = 0; i < members.length(); ++i) {
+            JSONObject object = members.getJSONObject(i);
+            if (object.has("email") && object.getString("email").equals(Sharee.email)) {
+                memberJson = object;
+            }
+        }
 
         // VP - Verify email of other member
-        String otherMemberEmail = memberJson.getString("email");
-        assertThat(otherMemberEmail).isEqualTo(Sharee.email);
+        assertThat(memberJson).isNotNull();
 
         // VP - Verify role of other member
         String memberRole = memberJson.getString("role");

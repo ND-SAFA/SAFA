@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -44,8 +45,9 @@ public class GeneratedLinkController extends BaseController {
      */
     @GetMapping(value = AppRoutes.Links.GET_GENERATED_LINKS_IN_PROJECT_VERSION)
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider
             .getTraceService()
             .getAppEntities(projectVersion, user, (t) -> true)
@@ -61,8 +63,9 @@ public class GeneratedLinkController extends BaseController {
      */
     @PostMapping(AppRoutes.Links.ADD_BATCH)
     public void addBatchOfLinks(@PathVariable UUID versionId) {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         List<TraceAppEntity> links = this.serviceProvider
             .getTraceService()
             .getAppEntities(projectVersion, user, t -> true)

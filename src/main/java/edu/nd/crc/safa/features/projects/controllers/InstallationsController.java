@@ -8,7 +8,9 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.installations.InstallationDTO;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,7 +47,8 @@ public class InstallationsController extends BaseController {
         )
     )
     public List<InstallationDTO> getInstallationsByProject(@PathVariable("id") UUID id) {
-        this.resourceBuilder.fetchProject(id).withViewProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        this.resourceBuilder.fetchProject(id).withPermission(ProjectPermission.VIEW, user);
         return this.projectRepository.findInstallationsByProjectId(id);
     }
 

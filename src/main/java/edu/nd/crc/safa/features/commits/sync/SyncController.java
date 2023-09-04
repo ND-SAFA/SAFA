@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
@@ -43,7 +44,9 @@ public class SyncController extends BaseController {
     public ProjectAppEntity getChanges(@PathVariable UUID versionId,
                                        @RequestBody EntityChangeMessage message) {
         ProjectAppEntity projectAppEntity = new ProjectAppEntity();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         for (Change change : message.getChanges()) {
             projectAppEntity = updateProjectAppEntity(projectAppEntity, projectVersion, change);
         }

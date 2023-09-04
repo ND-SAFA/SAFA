@@ -82,8 +82,7 @@ public abstract class CommitJob extends AbstractJob {
      * @return A newly created project version.
      */
     protected ProjectVersion createProject(SafaUser owner, String name, String description) {
-        Project project = new Project(name, description);
-        projectService.saveProjectWithUserAsOwner(project, owner);
+        Project project = projectService.createProject(name, description, owner);
 
         this.createdProjectVersion = versionService.createInitialProjectVersion(project);
         projectCommit = new ProjectCommit(createdProjectVersion, false);

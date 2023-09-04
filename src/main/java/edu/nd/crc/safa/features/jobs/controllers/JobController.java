@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -177,10 +178,10 @@ public class JobController extends BaseController {
     public JobAppEntity generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) throws Exception {
         // Step - Check permissions and retrieve persistent properties
         UUID versionId = request.getProjectVersion().getVersionId();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
-        request.setProjectVersion(projectVersion);
-
         SafaUser user = safaUserService.getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
+        request.setProjectVersion(projectVersion);
 
         // Step - Create and start job.
         GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request, user);

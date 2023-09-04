@@ -12,6 +12,7 @@ import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -81,7 +82,9 @@ public class FlatFileController extends BaseController {
     public void downloadFlatFiles(@PathVariable UUID versionId,
                                   @PathVariable String fileType,
                                   HttpServletResponse response) throws Exception {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         String projectName = projectVersion.getProject().getName();
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);

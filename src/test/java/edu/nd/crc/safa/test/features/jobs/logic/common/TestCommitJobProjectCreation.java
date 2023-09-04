@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
+import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TestCommitJobProjectCreation extends ApplicationBaseTest {
 
     @Autowired
-    ProjectService projectService;
+    ProjectMembershipService projectMemberService;
 
     @Test
     public void testCommitIntoExistingProject() throws Exception {
@@ -34,7 +34,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         JobAppEntity result = jobBuilder.perform();
 
         // No new project should be created
-        assertEquals(1, projectService.getProjectsForUser(currentUser).size());
+        assertEquals(1, projectMemberService.getProjectsForUser(currentUser).size());
 
         // Job should be successful
         assertEquals(100, result.getCurrentProgress());
@@ -50,7 +50,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         JobAppEntity result = jobBuilder.perform();
 
         // No new project should be created
-        assertEquals(1, projectService.getProjectsForUser(currentUser).size());
+        assertEquals(1, projectMemberService.getProjectsForUser(currentUser).size());
 
         // Job should not be successful
         assertEquals(-1, result.getCurrentProgress());
@@ -63,7 +63,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         JobAppEntity result = jobBuilder.perform();
 
         // New project should be created
-        assertEquals(1, projectService.getProjectsForUser(currentUser).size());
+        assertEquals(1, projectMemberService.getProjectsForUser(currentUser).size());
 
         // Job should be successful
         assertEquals(100, result.getCurrentProgress());
@@ -76,7 +76,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         JobAppEntity result = jobBuilder.perform();
 
         // New project should be deleted
-        assertEquals(0, projectService.getProjectsForUser(currentUser).size());
+        assertEquals(0, projectMemberService.getProjectsForUser(currentUser).size());
 
         // Job should not be successful
         assertEquals(-1, result.getCurrentProgress());

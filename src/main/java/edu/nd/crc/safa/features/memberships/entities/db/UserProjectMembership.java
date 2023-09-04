@@ -14,8 +14,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.Data;
@@ -28,7 +28,7 @@ import org.hibernate.annotations.Type;
  * Joins each user to the project they are members in.
  */
 @Entity
-@Table(name = "project_membership",
+@Table(name = "user_project_membership",
     uniqueConstraints = {
         @UniqueConstraint(
             columnNames = {
@@ -38,7 +38,7 @@ import org.hibernate.annotations.Type;
     })
 @Data
 @NoArgsConstructor
-public class ProjectMembership implements Serializable {
+public class UserProjectMembership implements Serializable {
 
     @Id
     @GeneratedValue
@@ -64,7 +64,7 @@ public class ProjectMembership implements Serializable {
     @Enumerated(EnumType.STRING)
     ProjectRole role;
 
-    public ProjectMembership(Project project, SafaUser member, ProjectRole role) {
+    public UserProjectMembership(Project project, SafaUser member, ProjectRole role) {
         this.project = project;
         this.member = member;
         this.role = role;

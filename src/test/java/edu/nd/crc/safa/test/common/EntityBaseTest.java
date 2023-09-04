@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
@@ -61,7 +61,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected SafaUserRepository safaUserRepository;
 
     @Autowired
-    protected ProjectMembershipRepository projectMembershipRepository;
+    protected UserProjectMembershipRepository userProjectMembershipRepository;
 
     @Autowired
     protected DocumentRepository documentRepository;

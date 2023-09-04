@@ -117,6 +117,9 @@ public class GenerateLinksJob extends CommitJob {
 
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
             List<TraceAppEntity> tracePredictions = controller.generateLinks(generationDataset, this.getDbLogger());
+            tracePredictions =
+                tracePredictions.stream().filter(t -> t.getScore() >= LinkVisibilityService.MIN_THRESHOLD)
+                    .collect(Collectors.toList());
             LinkVisibilityService.setLinksVisibility(tracePredictions);
             this.generatedTraces = tracePredictions;
 

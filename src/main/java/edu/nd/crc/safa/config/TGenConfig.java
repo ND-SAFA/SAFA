@@ -21,17 +21,24 @@ public class TGenConfig {
     public static TGenConfig get() {
         return TGenConfig.staticConfig;
     }
-    
+
+    /**
+     * Returns TGEN endpoint path.
+     *
+     * @param endpointName The name of the endpoint.
+     * @return Endpoint path according to current environment.
+     */
+    public static String getEndpoint(String endpointName) {
+        TGenConfig config = get();
+        return buildTGenEndpoint(config.baseEndpoint, endpointName);
+    }
+
+    private static String buildTGenEndpoint(String... components) {
+        return FileUtilities.buildUrl(components) + FileUtilities.URL_SEP;
+    }
+
     @PostConstruct
     public void init() {
         TGenConfig.staticConfig = this;
-    }
-
-    public String getTGenEndpoint(String endpointName) {
-        return buildTGenEndpoint(baseEndpoint, endpointName);
-    }
-
-    public String buildTGenEndpoint(String... components) {
-        return FileUtilities.buildUrl(components) + FileUtilities.URL_SEP;
     }
 }

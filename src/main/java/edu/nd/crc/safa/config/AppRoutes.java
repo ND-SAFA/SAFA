@@ -271,7 +271,7 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Summarize {
-        public static final String SUMMARIZE_ARTIFACTS = "/summarize";
+        public static final String SUMMARIZE_ARTIFACTS = Projects.ROOT + "/versions/{versionId}/artifacts/summarize";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

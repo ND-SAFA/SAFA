@@ -74,25 +74,48 @@ public abstract class GenericVersionRepository<
         return this.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
     }
 
-    /**
-     * Calculates contents of each artifact at given version and returns bodies at version.
-     *
-     * @param projectVersion - The version of the artifact bodies that are returned
-     * @return list of artifact bodies in project at given version
-     */
     @Override
     public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
-        ProjectVersion projectVersion,
-        UUID entityId) {
-        List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject())
-            .stream()
-            .filter(versionEntity -> versionEntity.getBaseEntityId().equals(entityId))
-            .collect(Collectors.toList());
-        Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
-        entityHashTable.put(entityId, versionEntities);
+        ProjectVersion projectVersion, UUID entityId) {
+
+        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion);
+        return findVersionEntityByProjectVersionAndBaseEntityId(projectVersion, entityId, entityHashTable);
+    }
+
+    /**
+     * Returns the version of the entity specified by entity id in given project version.
+     *
+     * @param projectVersion  The version of the entity to retrieve.
+     * @param entityId        The id of the base entity whose version is being retrieved.
+     * @param entityHashTable The map of entity ids to version entities. Used to speed up retrieval.
+     *                        See {@link #createVersionEntityMap(ProjectVersion)}.
+     * @return Optional of entity version at given project version.
+     */
+    public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
+        ProjectVersion projectVersion, UUID entityId, Map<UUID, List<VersionEntity>> entityHashTable) {
+
+        Map<UUID, List<VersionEntity>> justThisEntityMap = new HashMap<>();
+        justThisEntityMap.put(entityId, entityHashTable.getOrDefault(entityId, List.of()));
+
         List<VersionEntity> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
-            entityHashTable);
+            justThisEntityMap);
         return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
+    }
+
+    @Override
+    public Map<UUID, List<VersionEntity>> createVersionEntityMap(ProjectVersion projectVersion) {
+        Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
+        this.retrieveVersionEntitiesByProject(projectVersion.getProject())
+            .forEach(versionEntity -> {
+                if (entityHashTable.containsKey(versionEntity.getBaseEntityId())) {
+                    entityHashTable.get(versionEntity.getBaseEntityId()).add(versionEntity);
+                } else {
+                    List<VersionEntity> versionEntities = new ArrayList<>();
+                    versionEntities.add(versionEntity);
+                    entityHashTable.put(versionEntity.getBaseEntityId(), versionEntities);
+                }
+            });
+        return entityHashTable;
     }
 
     /**
@@ -105,8 +128,10 @@ public abstract class GenericVersionRepository<
      * @return String representing parser error if one occurred.
      */
     @Override
-    public Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
-                                                                            AppEntity appEntity, SafaUser user) {
+    public Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(
+        ProjectVersion projectVersion, AppEntity appEntity, SafaUser user,
+        Map<UUID, List<VersionEntity>> entityHashTable) {
+
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
             BaseEntity baseEntity = this.createOrUpdateRelatedEntities(projectVersion, appEntity, user);
 
@@ -116,7 +141,7 @@ public abstract class GenericVersionRepository<
                 appEntity);
 
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
-                createOrUpdateVersionEntity(versionEntity, user);
+                createOrUpdateVersionEntity(versionEntity, user, entityHashTable);
                 UUID baseEntityId = baseEntity.getBaseEntityId();
                 appEntity.setId(baseEntityId);
             }
@@ -129,9 +154,8 @@ public abstract class GenericVersionRepository<
 
     @Override
     public Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
-        ProjectVersion projectVersion,
-        UUID baseEntityId,
-        SafaUser user) {
+        ProjectVersion projectVersion, UUID baseEntityId, SafaUser user,
+        Map<UUID, List<VersionEntity>> entityHashTable) {
 
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
             Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
@@ -142,7 +166,7 @@ public abstract class GenericVersionRepository<
                     projectVersion,
                     baseEntity,
                     null);
-                this.createOrUpdateVersionEntity(removedVersionEntity, user);
+                this.createOrUpdateVersionEntity(removedVersionEntity, user, entityHashTable);
                 return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
             } else {
                 return Optional.empty();
@@ -214,11 +238,12 @@ public abstract class GenericVersionRepository<
         SafaUser user) {
 
         List<UUID> processedAppEntities = new ArrayList<>();
+        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion);
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
             .map(appEntity -> {
                 Pair<VersionEntity, CommitError> commitResponse =
-                    this.commitAppEntityToProjectVersion(projectVersion, appEntity, user);
+                    this.commitAppEntityToProjectVersion(projectVersion, appEntity, user, entityHashTable);
                 if (commitResponse.getValue1() == null) {
                     UUID baseEntityId = commitResponse.getValue0().getBaseEntityId();
                     processedAppEntities.add(baseEntityId);
@@ -233,10 +258,8 @@ public abstract class GenericVersionRepository<
                     projectVersion.getProject())
                 .stream()
                 .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
-                .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(
-                    projectVersion,
-                    baseEntity.getBaseEntityId(),
-                    user))
+                .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(projectVersion, baseEntity.getBaseEntityId(),
+                    user, entityHashTable))
                 .collect(Collectors.toList());
             response.addAll(removedVersionEntities);
         }
@@ -244,14 +267,16 @@ public abstract class GenericVersionRepository<
         return response;
     }
 
-    private void createOrUpdateVersionEntity(VersionEntity versionEntity, SafaUser user) throws SafaError {
+    private void createOrUpdateVersionEntity(VersionEntity versionEntity, SafaUser user,
+                                             Map<UUID, List<VersionEntity>> entityHashTable) throws SafaError {
         try {
+
             this.findExistingVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
                 versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
 
             Optional<VersionEntity> previousEntity =
                 findVersionEntityByProjectVersionAndBaseEntityId(versionEntity.getProjectVersion(),
-                    versionEntity.getBaseEntityId());
+                    versionEntity.getBaseEntityId(), entityHashTable);
 
             this.save(versionEntity);
 

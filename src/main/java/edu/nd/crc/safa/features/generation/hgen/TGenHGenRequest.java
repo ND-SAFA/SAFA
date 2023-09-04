@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.generation.hgen;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifact;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +18,7 @@ public class TGenHGenRequest {
      * The artifacts used in clusters.
      */
     @NotNull
-    List<TGenSummaryArtifact> artifacts;
+    List<GenerationArtifact> artifacts;
     /**
      * The type of artifacts to generate.
      */

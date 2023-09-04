@@ -1,4 +1,5 @@
-ALTER TABLE project ADD COLUMN team_id BINARY(16) NOT NULL;
+ALTER TABLE project DROP COLUMN team_id;
+ALTER TABLE project ADD COLUMN team_id BINARY(16);
 
 CREATE TEMPORARY TABLE project_teams AS
     SELECT project.project_id, team.id, user_project_membership.membership_id
@@ -16,6 +17,9 @@ UPDATE project SET team_id =
             LIMIT 1
     );
 
+# If there is a project which still doesn't have a team, just give it to someone idk
+UPDATE project SET team_id = (SELECT team.id FROM team LIMIT 1) WHERE project.team_id IS NULL;
+
 DELETE FROM user_project_membership
     WHERE user_project_membership.membership_id IN
     (
@@ -27,4 +31,5 @@ DELETE FROM user_project_membership
 
 DROP TABLE project_teams;
 
+ALTER TABLE project MODIFY COLUMN team_id BINARY(16) NOT NULL;
 ALTER TABLE project ADD FOREIGN KEY (team_id) REFERENCES team (id) ON DELETE CASCADE;

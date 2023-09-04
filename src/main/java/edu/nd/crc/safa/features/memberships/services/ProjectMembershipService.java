@@ -131,6 +131,10 @@ public class ProjectMembershipService {
                             .stream()
                             .map(ProjectMemberAppEntity::new)
                             .collect(Collectors.toList());
+                    this.teamMembershipService.getTeamMemberships(project.getOwningTeam())
+                            .stream()
+                            .map(ProjectMemberAppEntity::new)
+                            .forEach(members::add);
                     return new ProjectIdAppEntity(project, members);
                 })
                 .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())

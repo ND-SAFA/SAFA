@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { MemberEntitySchema, MembershipSchema, ProjectSchema } from "@/types";
+import {
+  MemberEntitySchema,
+  MembershipSchema,
+  MembershipType,
+  ProjectSchema,
+} from "@/types";
 import { removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import projectStore from "./useProject";
@@ -17,6 +22,19 @@ export const useMembers = defineStore("members", {
   }),
   getters: {},
   actions: {
+    /**
+     * Returns members of a given type.
+     * @param type - The type of members to return.
+     * @return The given type of members.
+     */
+    getMembers(type?: MembershipType): MembershipSchema[] {
+      if (type === "PROJECT") {
+        return this.members;
+      } else {
+        // TODO: return members for orgs, teams
+        return this.members;
+      }
+    },
     /**
      * Initializes the current project.
      */

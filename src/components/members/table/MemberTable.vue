@@ -19,6 +19,7 @@
       addable
       :deletable="displayMemberActions"
       :loading="memberApiStore.loading"
+      :custom-cells="['role']"
       @row:add="handleAdd"
       @row:delete="handleDelete"
       @refresh="handleRefresh"
@@ -33,8 +34,14 @@
         />
       </template>
 
+      <template #body-cell-role="{ row }">
+        <q-td>
+          <member-role-button v-if="displayMemberActions" :member="row" />
+          <typography v-else :value="row.role" />
+        </q-td>
+      </template>
+
       <template #cell-actions="{ row }">
-        <member-role-button v-if="displayMemberActions" :member="row" />
         <icon-button
           v-if="row.email === userEmail"
           icon="leave"
@@ -73,7 +80,6 @@ import {
 } from "@/types";
 import { capitalizeSentence, membersColumns } from "@/util";
 import {
-  getProjectApiStore,
   memberApiStore,
   membersStore,
   permissionStore,
@@ -85,6 +91,7 @@ import {
   SelectorTable,
   IconButton,
   TextButton,
+  Typography,
 } from "@/components/common";
 import {
   InviteMemberInputs,
@@ -102,15 +109,6 @@ const title = computed(() => capitalizeSentence(itemName.value) + "s");
 
 const entityType = computed(() => props.entity.entityType || "PROJECT");
 
-// TODO: generalize to projects, teams, orgs
-const context = computed(() => {
-  if (entityType.value === "PROJECT") {
-    return getProjectApiStore.currentProject;
-  } else {
-    return undefined;
-  }
-});
-
 const memberPermission = computed(
   () =>
     ((
@@ -123,10 +121,13 @@ const memberPermission = computed(
 );
 
 const displayMemberActions = computed(() =>
-  permissionStore.isAllowed(memberPermission.value, context.value)
+  permissionStore.isAllowed(
+    memberPermission.value,
+    permissionStore.getCurrentContext(entityType.value)
+  )
 );
 
-const rows = computed(() => membersStore.members);
+const rows = computed(() => membersStore.getMembers(entityType.value));
 
 const userEmail = computed(() => sessionStore.user?.email);
 

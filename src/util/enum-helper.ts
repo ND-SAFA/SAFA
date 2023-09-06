@@ -18,6 +18,7 @@ import {
   SettingsTabTypes,
   TraceCountTypes,
   TracePredictionTabTypes,
+  MembershipType,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
 
@@ -125,18 +126,41 @@ export function traceModelOptions(): SelectOption[] {
 /**
  * @return display names for member role types.
  */
-export function memberRoleOptions(): SelectOption[] {
+export function memberRoleOptions(type?: MembershipType): SelectOption[] {
+  const isOrg = type === "ORGANIZATION";
+  const isTeam = type === "TEAM";
+  const isProject = !type || type === "PROJECT";
+
   return [
-    createEnumOption<MemberRole>("VIEWER", "View project data"),
+    ...(isProject || isTeam
+      ? [
+          createEnumOption<MemberRole>("VIEWER", "View project data"),
+          createEnumOption<MemberRole>(
+            "EDITOR",
+            "Edit data within a project version"
+          ),
+        ]
+      : []),
     createEnumOption<MemberRole>(
-      "EDITOR",
-      "Edit data within a project version"
+      "GENERATOR",
+      "Use generative features on project data"
     ),
-    createEnumOption<MemberRole>(
-      "ADMIN",
-      "Manage project versions and metadata"
-    ),
-    createEnumOption<MemberRole>("OWNER", "Full ownership of the project"),
+    createEnumOption<MemberRole>("ADMIN", "Manage projects and membership"),
+    ...(isProject
+      ? [createEnumOption<MemberRole>("OWNER", "Full ownership of the project")]
+      : []),
+    ...(isOrg
+      ? [
+          createEnumOption<MemberRole>(
+            "MEMBER",
+            "A member of the organization"
+          ),
+          createEnumOption<MemberRole>(
+            "BILLING_MANAGER",
+            "Manage billing for the organization"
+          ),
+        ]
+      : []),
   ];
 }
 

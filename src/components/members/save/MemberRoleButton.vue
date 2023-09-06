@@ -1,11 +1,12 @@
 <template>
-  <icon-button
+  <text-button
+    text
     icon="permission"
-    tooltip="Edit roles"
+    :label="props.member.role"
     :loading="loading"
     data-cy="button-member-roles"
   >
-    <icon variant="down" size="xs" style="width: 10px" />
+    <icon variant="down" size="xs" />
     <q-menu>
       <list>
         <list-item
@@ -18,7 +19,7 @@
         />
       </list>
     </q-menu>
-  </icon-button>
+  </text-button>
 </template>
 
 <script lang="ts">
@@ -31,15 +32,15 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { MemberRoleButtonProps, MemberRole } from "@/types";
 import { memberRoleOptions } from "@/util";
 import { memberApiStore } from "@/hooks";
-import { IconButton, ListItem, Icon, List } from "@/components/common";
+import { TextButton, ListItem, Icon, List } from "@/components/common";
 
 const props = defineProps<MemberRoleButtonProps>();
 
-const projectRoles = memberRoleOptions();
+const projectRoles = computed(() => memberRoleOptions(props.member.entityType));
 
 const loading = ref(false);
 

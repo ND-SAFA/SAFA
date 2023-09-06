@@ -94,8 +94,9 @@ export interface TableProps<Row = TableRow>
 export interface GroupableTableProps
   extends Pick<
       TableProps,
-      "columns" | "rows" | "rowKey" | "loading" | "expanded" | "customCells"
+      "columns" | "rows" | "rowKey" | "loading" | "expanded"
     >,
+    Partial<Pick<TableProps, "customCells">>,
     ExpandableProps {
   /**
    * The name of an item.
@@ -180,6 +181,7 @@ export interface GroupableTableRowProps extends ExpandableProps {
  */
 export interface SelectorTableProps
   extends Pick<TableProps, "columns" | "rows" | "rowKey" | "loading">,
+    Partial<Pick<TableProps, "customCells">>,
     MinimalProps {
   /**
    * The values of selected rows.

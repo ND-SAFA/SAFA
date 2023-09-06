@@ -10,7 +10,7 @@
     :loading="props.loading"
     selection="single"
     data-cy="generic-selector-table"
-    :custom-cells="['actions']"
+    :custom-cells="['actions', ...(props.customCells || [])]"
     :sort="(r) => r"
     @row-click="handleRowClick"
   >
@@ -39,6 +39,10 @@
           @click="emit('refresh')"
         />
       </flex-box>
+    </template>
+
+    <template v-for="name in customCellSlots" #[name]="scope">
+      <slot :name="name" v-bind="scope" />
     </template>
 
     <template #body-cell-actions="{ row }">
@@ -111,6 +115,10 @@ const selectedRows = useVModel(props, "selected");
 
 const { searchText, searchLabel, sortBy, sortDesc, filteredRows } =
   useTableFilter(props);
+
+const customCellSlots = computed(() =>
+  props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
+);
 
 const addLabel = computed(() => `Add ${props.itemName || ""}`);
 const editLabel = computed(() => `Edit ${props.itemName || ""}`);

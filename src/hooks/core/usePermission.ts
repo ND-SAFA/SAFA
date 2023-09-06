@@ -5,6 +5,7 @@ import {
   PermissionType,
   TeamSchema,
   OrganizationSchema,
+  MembershipType,
 } from "@/types";
 import { roleMap } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
@@ -24,6 +25,20 @@ export const usePermission = defineStore("permissionStore", {
   },
   actions: {
     /**
+     * Returns the current context, be it a project, team, or organization.
+     * @param type - The type of context to return.
+     */
+    getCurrentContext(
+      type?: MembershipType
+    ): IdentifierSchema | TeamSchema | OrganizationSchema {
+      if (type === "PROJECT") {
+        return projectStore.project;
+      } else {
+        // TODO: return team & org contexts.
+        return projectStore.project;
+      }
+    },
+    /**
      * Checks whether the current user has the given permission.
      *
      * @param permission - The permission to check.
@@ -39,6 +54,11 @@ export const usePermission = defineStore("permissionStore", {
     ): boolean {
       const member = sessionStore.getCurrentMember(context);
       const type = member?.entityType || "PROJECT";
+
+      // TODO: remove testing code.
+      if (permission.startsWith("team.") || permission.startsWith("org.")) {
+        return true;
+      }
 
       if (this.isDemo) {
         return false;

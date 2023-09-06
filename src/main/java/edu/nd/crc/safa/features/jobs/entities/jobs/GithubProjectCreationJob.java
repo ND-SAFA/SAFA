@@ -51,6 +51,15 @@ import com.fasterxml.jackson.databind.node.TextNode;
  */
 public class GithubProjectCreationJob extends CommitJob {
 
+    private final String[] DEFAULT_BRANCHES = {
+        "master",
+        "main",
+        "dev",
+        "development",
+        "prod",
+        "production"
+    };
+
     /**
      * Internal project identifier
      */
@@ -255,8 +264,42 @@ public class GithubProjectCreationJob extends CommitJob {
         if (importSettings.getBranch() != null) {
             ghProject.setBranch(importSettings.getBranch());
         } else {
-            ghProject.setBranch(this.githubRepository.getDefaultBranchRef().getName());
+            ghProject.setBranch(getDefaultBranch(this.githubRepository));
         }
+    }
+
+    /**
+     * Get the default branch for a repository
+     *
+     * @param githubRepository The repository
+     * @return The default branch if we could determine one, or null otherwise
+     */
+    private String getDefaultBranch(Repository githubRepository) {
+        // If there is a default branch use that
+        if (githubRepository.getDefaultBranchRef() != null) {
+            return githubRepository.getDefaultBranchRef().getName();
+        }
+
+        // If there is only one branch use that
+        if (githubRepository.getRefs().getEdges().size() == 1) {
+            return githubRepository.getRefs().getEdges().get(0).getNode().getName();
+        }
+
+        Map<String, String> branches = new HashMap<>(githubRepository.getRefs().getEdges().size());
+        githubRepository.getRefs().getEdges().stream()
+            .map(EdgeNode::getNode)
+            .map(Branch::getName)
+            .forEach(branchName -> branches.put(branchName.toLowerCase(), branchName));
+
+        // Check if they have any branches we recognize as possible defaults
+        for (String possibleBranchName : DEFAULT_BRANCHES) {
+            if (branches.containsKey(possibleBranchName)) {
+                return branches.get(possibleBranchName);
+            }
+        }
+
+        // Give up - if there are multiple branches still we don't have a good criteria to pick
+        return null;
     }
 
     /**
@@ -306,7 +349,10 @@ public class GithubProjectCreationJob extends CommitJob {
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 5)
     public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
         ProjectCommit commit = getProjectCommit();
+
+        logger.log("Attempting to find branch \"%s\".", this.githubProject.getBranch());
         Branch branch = getBranch(this.githubProject.getBranch());
+
         this.commitSha = branch.getTarget().getOid();
         commit.addArtifacts(ModificationType.ADDED, getArtifacts(logger));
         this.githubProject.setLastCommitSha(this.commitSha);
@@ -326,7 +372,8 @@ public class GithubProjectCreationJob extends CommitJob {
             .map(EdgeNode::getNode)
             .filter(branch -> branch.getName().equals(targetBranch))
             .findFirst()
-            .orElse(this.githubRepository.getDefaultBranchRef());
+            .orElseThrow(() -> new SafaError("Either no branch was supplied and no suitable default could be "
+                + "determined or the supplied branch could not be found."));
     }
 
     protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {

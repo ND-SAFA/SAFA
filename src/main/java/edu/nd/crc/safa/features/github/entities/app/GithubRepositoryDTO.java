@@ -96,8 +96,11 @@ public class GithubRepositoryDTO {
         ghDto.setUrl(repo.getUrl());
         ghDto.setDescription(repo.getDescription());
         ghDto.setVisibility(repo.getVisibility().name());
-        ghDto.setDefaultBranch(repo.getDefaultBranchRef().getName());
         ghDto.setCreationDate(repo.getCreatedAt());
+
+        if (repo.getDefaultBranchRef() != null) {
+            ghDto.setDefaultBranch(repo.getDefaultBranchRef().getName());
+        }
 
         if (repo.getPrimaryLanguage() != null) {
             ghDto.setLanguage(repo.getPrimaryLanguage().getName());

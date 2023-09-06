@@ -276,6 +276,9 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             .andReturn();
 
         if (requestResult.getRequest().isAsyncStarted()) {
+            if (requestResult.getRequest().getAsyncContext() != null) {
+                requestResult.getRequest().getAsyncContext().setTimeout(30000L);
+            }
             mockMvc.perform(asyncDispatch(requestResult))
                 .andExpect(test);
         }

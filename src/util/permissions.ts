@@ -93,6 +93,7 @@ export const roleMap: Record<
       "org.view_teams",
       "project.generate",
       "org.edit",
+      "org.edit_members",
       "org.delete_teams",
       "org.create_teams",
     ],

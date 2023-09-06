@@ -65,7 +65,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { MembershipSchema, MemberTableProps } from "@/types";
+import {
+  MembershipSchema,
+  MembershipType,
+  MemberTableProps,
+  PermissionType,
+} from "@/types";
 import { capitalizeSentence, membersColumns } from "@/util";
 import {
   getProjectApiStore,
@@ -95,17 +100,30 @@ const name = computed(() => props.entity.entityType?.toLowerCase() || "");
 const itemName = computed(() => `${name.value} member`);
 const title = computed(() => capitalizeSentence(itemName.value) + "s");
 
+const entityType = computed(() => props.entity.entityType || "PROJECT");
+
 // TODO: generalize to projects, teams, orgs
 const context = computed(() => {
-  if (props.entity.entityType === "PROJECT") {
+  if (entityType.value === "PROJECT") {
     return getProjectApiStore.currentProject;
   } else {
     return undefined;
   }
 });
 
+const memberPermission = computed(
+  () =>
+    ((
+      {
+        PROJECT: "project.edit_members",
+        TEAM: "team.edit_members",
+        ORGANIZATION: "org.edit_members",
+      } as Record<MembershipType, PermissionType>
+    )[entityType.value])
+);
+
 const displayMemberActions = computed(() =>
-  permissionStore.isAllowed("project.edit_members", context.value)
+  permissionStore.isAllowed(memberPermission.value, context.value)
 );
 
 const rows = computed(() => membersStore.members);

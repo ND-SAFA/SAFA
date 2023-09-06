@@ -40,6 +40,7 @@ export type PermissionType =
   | "org.edit"
   | "org.view_billing"
   | "org.view"
+  | "org.edit_members"
   | "team.delete_projects"
   | "team.create_projects"
   | "team.view_projects"

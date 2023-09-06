@@ -139,7 +139,9 @@ const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
 const groupBy = ref<string | undefined>("targetName");
 
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const rows = computed(() => approvalStore.traceLinks);
 

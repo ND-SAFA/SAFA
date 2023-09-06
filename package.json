@@ -83,7 +83,10 @@
   },
   "madge": {
     "baseDir": "./src",
-    "fileExtensions": ["ts", "vue"],
+    "fileExtensions": [
+      "ts",
+      "vue"
+    ],
     "tsConfig": "tsconfig.json"
   }
 }

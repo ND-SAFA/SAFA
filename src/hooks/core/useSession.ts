@@ -1,6 +1,12 @@
 import { defineStore } from "pinia";
 
-import { IdentifierSchema, MembershipSchema, SessionSchema } from "@/types";
+import {
+  IdentifierSchema,
+  MembershipSchema,
+  OrganizationSchema,
+  SessionSchema,
+  TeamSchema,
+} from "@/types";
 import { createSession, createUser } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -50,10 +56,12 @@ export const useSession = defineStore("session", {
       this.user = createUser();
     },
     /**
-     * @return This user's membership within a project.
+     * @return This user's membership within a project, team, or organization.
      */
-    getProjectMember(project: IdentifierSchema): MembershipSchema | undefined {
-      return project.members.find((member) => member.email === this.userEmail);
+    getCurrentMember(
+      context: IdentifierSchema | TeamSchema | OrganizationSchema
+    ): MembershipSchema | undefined {
+      return context.members.find((member) => member.email === this.userEmail);
     },
   },
 });

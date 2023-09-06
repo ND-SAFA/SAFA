@@ -1,6 +1,6 @@
 <template>
   <node-display
-    v-if="display"
+    v-if="displayActions"
     variant="menu"
     color="primary"
     @mousedown.stop
@@ -35,6 +35,7 @@
       />
       <separator vertical class="q-mx-xs" />
       <icon-button
+        v-if="displayGenerateActions"
         tooltip="Generate artifacts"
         icon="generate-artifacts"
         color="primary"
@@ -45,6 +46,7 @@
         "
       />
       <icon-button
+        v-if="displayGenerateActions"
         tooltip="Generate trace links"
         icon="generate-traces"
         color="primary"
@@ -78,5 +80,10 @@ const handleCloseMenu = inject<() => void>("menu-close");
 
 const drawMode = computed(() => appStore.isCreateLinkEnabled);
 
-const display = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
+const displayGenerateActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 </script>

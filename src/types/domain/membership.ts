@@ -14,15 +14,47 @@ export type ProjectPermissionType = "viewer" | "editor" | "admin" | "owner";
 export type MembershipType = "ORGANIZATION" | "TEAM" | "PROJECT";
 
 /**
- * Represents a role with certain authorization constraints
- * within a given project.
+ * The types of permissions allowed on an organization, team, or project.
  */
-export enum MemberRole {
-  VIEWER = "VIEWER",
-  EDITOR = "EDITOR",
-  ADMIN = "ADMIN",
-  OWNER = "OWNER",
-}
+export type MemberRole =
+  | "NONE" // project, team, org
+  | "VIEWER" // project, team
+  | "EDITOR" // project, team
+  | "GENERATOR" // project, team, org
+  | "ADMIN" // project, team, org
+  | "OWNER" // project
+  | "MEMBER" // org
+  | "BILLING_MANAGER"; // org
+
+/**
+ * The types of permissions allowed on an organization, team, or project.
+ */
+export type PermissionType =
+  | "safa.view"
+  | "safa.view_admin"
+  | "safa.create_orgs"
+  | "org.delete_teams"
+  | "org.create_teams"
+  | "org.view_teams"
+  | "org.delete"
+  | "org.edit"
+  | "org.view_billing"
+  | "org.view"
+  | "team.delete_projects"
+  | "team.create_projects"
+  | "team.view_projects"
+  | "team.delete"
+  | "team.edit_members"
+  | "team.edit"
+  | "team.view"
+  | "project.delete"
+  | "project.generate"
+  | "project.edit"
+  | "project.edit_members"
+  | "project.edit_data"
+  | "project.edit_versions"
+  | "project.edit_integrations"
+  | "project.view";
 
 /**
  * Represents the type of entity associated with a membership.

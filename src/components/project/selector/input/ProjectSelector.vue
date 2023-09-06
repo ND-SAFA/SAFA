@@ -17,7 +17,7 @@
         <template #actions>
           <flex-box justify="end">
             <icon-button
-              v-if="permissionStore.projectAllows('editor', opt)"
+              v-if="permissionStore.isAllowed('project.edit_members', opt)"
               small
               :tooltip="`Invite to ${opt.name}`"
               icon="invite"
@@ -25,7 +25,7 @@
               @click="projectInviteId = opt.projectId"
             />
             <icon-button
-              v-if="permissionStore.projectAllows('editor', opt)"
+              v-if="permissionStore.isAllowed('project.edit', opt)"
               small
               :tooltip="`Edit ${opt.name}`"
               icon="edit"
@@ -33,7 +33,7 @@
               @click="identifierSaveStore.selectIdentifier(opt, 'save')"
             />
             <icon-button
-              v-if="permissionStore.projectAllows('owner', opt)"
+              v-if="permissionStore.isAllowed('project.delete', opt)"
               small
               :tooltip="`Delete ${opt.name}`"
               icon="delete"
@@ -46,7 +46,7 @@
     </template>
     <template #after-options>
       <text-button
-        v-if="permissionStore.organizationAllows('navigation')"
+        v-if="permissionStore.isAllowed('safa.view')"
         text
         block
         label="Add Project"
@@ -55,7 +55,7 @@
       />
       <invite-member-modal
         :open="!!projectInviteId"
-        :project-id="projectInviteId"
+        :entity="entity"
         @close="projectInviteId = undefined"
         @submit="projectInviteId = undefined"
       />
@@ -74,6 +74,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { MemberEntitySchema } from "@/types";
 import {
   getProjectApiStore,
   identifierSaveStore,
@@ -87,6 +88,14 @@ import { InviteMemberModal } from "@/components/members";
 const { darkMode } = useTheme();
 
 const projectInviteId = ref<string>();
+
+const entity = computed(
+  () =>
+    ({
+      entityId: projectStore.projectId,
+      entityType: "PROJECT",
+    } as MemberEntitySchema)
+);
 
 const className = computed(() =>
   projectStore.isProjectDefined ? "nav-input nav-multi-input-left" : "nav-input"

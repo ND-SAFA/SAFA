@@ -1,8 +1,11 @@
 import { ComputedRef } from "vue";
 import {
+  IdentifierSchema,
   IOHandlerCallback,
   MemberEntitySchema,
   MembershipSchema,
+  OrganizationSchema,
+  TeamSchema,
 } from "@/types";
 
 /**
@@ -43,6 +46,10 @@ export interface MemberApiHook {
    * Opens a confirmation modal to delete the given member.
    *
    * @param member - The member to delete.
+   * @param context - The context to check, be it a project, team, or organization.
    */
-  handleDelete(member: MembershipSchema): void;
+  handleDelete(
+    member: MembershipSchema,
+    context?: IdentifierSchema | TeamSchema | OrganizationSchema
+  ): void;
 }

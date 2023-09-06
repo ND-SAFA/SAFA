@@ -29,9 +29,9 @@
           icon="view-tree"
           @click="documentStore.addDocumentOfTypes([props.artifactType])"
         />
-        <separator v-if="displayEditing" class="full-width q-my-xs" />
+        <separator v-if="displayActions" class="full-width q-my-xs" />
         <icon-button
-          v-if="displayEditing"
+          v-if="displayActions"
           tooltip="Generate parents"
           icon="generate-artifacts"
           color="primary"
@@ -76,7 +76,9 @@ const props = defineProps<TimNodeProps>();
 
 const { darkMode } = useTheme();
 
-const displayEditing = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const selected = computed(
   () => selectionStore.selectedArtifactLevelType === props.artifactType

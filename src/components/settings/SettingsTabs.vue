@@ -32,7 +32,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { SettingsTabTypes } from "@/types";
+import { SelectOption, SettingsTabTypes } from "@/types";
 import { settingsTabOptions } from "@/util";
 import { permissionStore } from "@/hooks";
 import { TabList, SidebarGrid } from "@/components/common";
@@ -47,9 +47,18 @@ import { ProjectMemberTable } from "@/components/members";
 
 const tab = ref(SettingsTabTypes.members);
 
-const tabs = computed(() =>
-  permissionStore.projectAllows("editor")
-    ? settingsTabOptions()
-    : [settingsTabOptions()[0]]
-);
+const tabs = computed(() => {
+  const options = settingsTabOptions();
+  const visibleOptions: SelectOption[] = [options[0]];
+
+  if (permissionStore.isAllowed("project.edit_versions")) {
+    visibleOptions.push(options[1]);
+  } else if (permissionStore.isAllowed("project.edit_integrations")) {
+    visibleOptions.push(options[2]);
+  } else if (permissionStore.isAllowed("project.edit")) {
+    visibleOptions.push(options[3]);
+  }
+
+  return visibleOptions;
+});
 </script>

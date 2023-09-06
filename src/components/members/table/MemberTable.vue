@@ -17,7 +17,7 @@
       row-key="email"
       :item-name="itemName"
       addable
-      :deletable="isAdmin"
+      :deletable="displayMemberActions"
       :loading="memberApiStore.loading"
       @row:add="handleAdd"
       @row:delete="handleDelete"
@@ -34,7 +34,7 @@
       </template>
 
       <template #cell-actions="{ row }">
-        <member-role-button v-if="isAdmin" :member="row" />
+        <member-role-button v-if="displayMemberActions" :member="row" />
         <icon-button
           v-if="row.email === userEmail"
           icon="leave"
@@ -65,10 +65,9 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { MembershipSchema, MemberTableProps, MemberRole } from "@/types";
+import { MembershipSchema, MemberTableProps } from "@/types";
 import { capitalizeSentence, membersColumns } from "@/util";
 import {
-  logStore,
   memberApiStore,
   membersStore,
   permissionStore,
@@ -95,17 +94,14 @@ const name = computed(() => props.entity.entityType?.toLowerCase() || "");
 const itemName = computed(() => `${name.value} member`);
 const title = computed(() => capitalizeSentence(itemName.value) + "s");
 
-const isAdmin = computed(() =>
-  permissionStore.projectAllows("admin", projectStore.project)
+// TODO: generalize to projects, teams, orgs
+const displayMemberActions = computed(() =>
+  permissionStore.isAllowed("project.edit_members")
 );
 
 const rows = computed(() => membersStore.members);
 
 const userEmail = computed(() => sessionStore.user?.email);
-
-const ownerCount = computed(
-  () => rows.value.filter((member) => member.role === MemberRole.OWNER).length
-);
 
 const subtitle = computed(() =>
   addMode.value
@@ -144,10 +140,6 @@ function handleAdd(email: string | null): void {
  * @param member - The member to delete.
  */
 function handleDelete(member: MembershipSchema): void {
-  if (member.role === MemberRole.OWNER && ownerCount.value === 1) {
-    logStore.onInfo("You cannot remove the only owner.");
-  } else {
-    memberApiStore.handleDelete(member);
-  }
+  memberApiStore.handleDelete(member);
 }
 </script>

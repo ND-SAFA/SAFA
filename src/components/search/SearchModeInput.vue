@@ -37,10 +37,12 @@ import { searchModeOptions } from "@/util";
 import { permissionStore, searchStore } from "@/hooks";
 import { ListItem, Separator } from "@/components/common";
 
-const displayEditing = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const modeOptions = computed(() =>
-  displayEditing.value ? searchModeOptions() : [searchModeOptions()[2]]
+  displayActions.value ? searchModeOptions() : [searchModeOptions()[2]]
 );
 
 /**

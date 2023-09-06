@@ -11,6 +11,7 @@
           @click="handleLinkParent"
         />
       </template>
+
       <list
         v-if="parents.length > 0"
         :scroll-height="300"
@@ -57,6 +58,7 @@
           @click="handleLinkChild"
         />
       </template>
+
       <list
         v-if="children.length > 0"
         :scroll-height="300"
@@ -124,7 +126,9 @@ import {
 } from "@/components/common";
 import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

@@ -70,7 +70,9 @@ import {
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
 
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.generate")
+);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

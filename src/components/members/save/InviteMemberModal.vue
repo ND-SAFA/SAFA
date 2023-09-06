@@ -7,7 +7,7 @@
   >
     <invite-member-inputs
       v-if="props.open"
-      :project-id="props.projectId"
+      :entity="props.entity"
       :email="props.email"
       @save="emit('submit')"
     />

@@ -5,7 +5,6 @@ import {
   CreateProjectByJsonSchema,
   CreatorFilePanel,
   MembershipSchema,
-  MemberRole,
 } from "@/types";
 import { createProject } from "@/util";
 import sessionStore from "@/hooks/core/useSession";
@@ -66,7 +65,7 @@ export const useSaveProject = defineStore("saveProject", {
       const user: MembershipSchema = {
         projectMembershipId: "",
         email: sessionStore.userEmail,
-        role: MemberRole.OWNER,
+        role: "OWNER",
       };
       const project = createProject({
         name: this.name,

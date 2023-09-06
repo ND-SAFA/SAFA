@@ -38,7 +38,7 @@
     </template>
     <template #after-options>
       <text-button
-        v-if="permissionStore.projectAllows('admin')"
+        v-if="displayActions"
         text
         label="Add Version"
         icon="add"
@@ -86,8 +86,12 @@ const { darkMode } = useTheme();
 const allVersions = computed(() => getVersionApiStore.allVersions);
 const project = computed(() => projectStore.project);
 const isProjectDefined = computed(() => projectStore.isProjectDefined);
+
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_versions")
+);
 const deletable = computed(
-  () => permissionStore.projectAllows("admin") && allVersions.value.length > 1
+  () => displayActions.value && allVersions.value.length > 1
 );
 
 /**

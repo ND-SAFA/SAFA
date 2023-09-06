@@ -38,7 +38,7 @@
 
   <invite-member-modal
     :open="!!projectInviteId"
-    :project-id="projectInviteId"
+    :entity="entity"
     @close="projectInviteId = undefined"
     @submit="projectInviteId = undefined"
   />
@@ -58,7 +58,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
-  MemberRole,
+  MemberEntitySchema,
   ProjectSelectorTableProps,
 } from "@/types";
 import {
@@ -69,9 +69,9 @@ import {
 import {
   getProjectApiStore,
   identifierSaveStore,
-  logStore,
   memberApiStore,
   permissionStore,
+  projectStore,
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
@@ -90,6 +90,14 @@ const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
 const projectInviteId = ref<string>();
+
+const entity = computed(
+  () =>
+    ({
+      entityId: projectStore.projectId,
+      entityType: "PROJECT",
+    } as MemberEntitySchema)
+);
 
 const selectedItems = computed({
   get() {
@@ -124,16 +132,11 @@ function handleReload() {
  * @param project - The project to leave.
  */
 function handleLeave(project: IdentifierSchema) {
-  const member = sessionStore.getProjectMember(project);
-  const ownerCount = project.members.filter(
-    (member) => member.role === MemberRole.OWNER
-  ).length;
+  const member = sessionStore.getCurrentMember(project);
 
-  if (!member || (member.role === MemberRole.OWNER && ownerCount === 1)) {
-    logStore.onInfo("You cannot remove the only owner of this project.");
-  } else {
-    memberApiStore.handleDelete(member);
-  }
+  if (!member) return;
+
+  memberApiStore.handleDelete(member, project);
 }
 
 /**
@@ -142,7 +145,7 @@ function handleLeave(project: IdentifierSchema) {
  * @returns Whether the current user can edit the project.
  */
 function isEditable(project: IdentifierSchema): boolean {
-  return permissionStore.projectAllows("editor", project);
+  return permissionStore.isAllowed("project.edit", project);
 }
 
 /**
@@ -151,7 +154,7 @@ function isEditable(project: IdentifierSchema): boolean {
  * @returns Whether the current user can delete the project.
  */
 function isDeletable(project: IdentifierSchema): boolean {
-  return permissionStore.projectAllows("owner", project);
+  return permissionStore.isAllowed("project.delete", project);
 }
 
 /**

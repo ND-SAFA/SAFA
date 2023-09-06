@@ -83,14 +83,9 @@ const rows = computed(() =>
 );
 
 const addable = computed(() =>
-  permissionStore.projectAllows("admin", props.project)
+  permissionStore.isAllowed("project.edit_versions", props.project)
 );
-
-const deletable = computed(
-  () =>
-    permissionStore.projectAllows("admin", props.project) &&
-    versions.value.length > 1
-);
+const deletable = computed(() => addable.value && versions.value.length > 1);
 
 /**
  * Loads project versions.

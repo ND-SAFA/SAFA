@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="display" justify="between" class="width-max">
+  <flex-box v-if="displayActions" justify="between" class="width-max">
     <flex-box align="center" justify="center">
       <text-button
         v-if="showUnreview"
@@ -74,7 +74,9 @@ const approveLoading = ref(false);
 const declineLoading = ref(false);
 const unreviewLoading = ref(false);
 
-const display = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const showApprove = computed(() => linkStatus(props.trace).canBeApproved());
 const showDecline = computed(() => linkStatus(props.trace).canBeDeclined());

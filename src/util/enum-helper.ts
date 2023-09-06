@@ -28,8 +28,8 @@ import { enumToDisplay } from "@/util/string-helper";
  * @param name - The name of the option, which will bne generated if not given.
  * @return The selectable option.
  */
-export function createEnumOption(
-  enumValue: string,
+export function createEnumOption<T extends string>(
+  enumValue: T,
   name?: string
 ): SelectOption {
   return { id: enumValue, name: name || enumToDisplay(enumValue) };
@@ -127,10 +127,16 @@ export function traceModelOptions(): SelectOption[] {
  */
 export function memberRoleOptions(): SelectOption[] {
   return [
-    createEnumOption(MemberRole.VIEWER, "View project data"),
-    createEnumOption(MemberRole.EDITOR, "Edit data within a project version"),
-    createEnumOption(MemberRole.ADMIN, "Manage project versions and metadata"),
-    createEnumOption(MemberRole.OWNER, "Full ownership of the project"),
+    createEnumOption<MemberRole>("VIEWER", "View project data"),
+    createEnumOption<MemberRole>(
+      "EDITOR",
+      "Edit data within a project version"
+    ),
+    createEnumOption<MemberRole>(
+      "ADMIN",
+      "Manage project versions and metadata"
+    ),
+    createEnumOption<MemberRole>("OWNER", "Full ownership of the project"),
   ];
 }
 

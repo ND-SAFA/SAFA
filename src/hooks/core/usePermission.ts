@@ -2,10 +2,11 @@ import { defineStore } from "pinia";
 
 import {
   IdentifierSchema,
-  OrganizationPermissionType,
-  ProjectPermissionType,
-  MemberRole,
+  PermissionType,
+  TeamSchema,
+  OrganizationSchema,
 } from "@/types";
+import { roleMap } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -19,50 +20,35 @@ export const usePermission = defineStore("permissionStore", {
        * Whether the app is in demo mode.
        */
       isDemo: false,
-      /**
-       * A mapping from project permission types to project roles.
-       */
-      projectRoleMap: {
-        viewer: [
-          MemberRole.VIEWER,
-          MemberRole.EDITOR,
-          MemberRole.ADMIN,
-          MemberRole.OWNER,
-        ],
-        editor: [MemberRole.EDITOR, MemberRole.ADMIN, MemberRole.OWNER],
-        admin: [MemberRole.ADMIN, MemberRole.OWNER],
-        owner: [MemberRole.OWNER],
-      } as Record<ProjectPermissionType, MemberRole[]>,
     };
   },
   actions: {
     /**
-     * Checks whether the current user has the given permission for their organization.
+     * Checks whether the current user has the given permission.
      *
      * @param permission - The permission to check.
+     * @param context - The context to check, be it a project, team, or organization.
      * @return Whether the current user has the requested permission.
      */
-    organizationAllows(permission: OrganizationPermissionType): boolean {
-      return permission !== "navigation" || !this.isDemo;
-    },
-    /**
-     * Checks whether the current user has the given permission on the given project.
-     *
-     * @param permission - The permission to check.
-     * @param project - The project to check.
-     * @return Whether the current user has the requested permission.
-     */
-    projectAllows(
-      permission: ProjectPermissionType,
-      project: IdentifierSchema = projectStore.project
+    isAllowed(
+      permission: PermissionType,
+      context:
+        | IdentifierSchema
+        | TeamSchema
+        | OrganizationSchema = projectStore.project
     ): boolean {
-      const member = sessionStore.getProjectMember(project);
+      const member = sessionStore.getCurrentMember(context);
+      const type = member?.entityType || "PROJECT";
 
-      return (
-        this.organizationAllows("navigation") &&
-        !!member &&
-        this.projectRoleMap[permission].includes(member.role)
-      );
+      if (this.isDemo) {
+        return false;
+      } else if (permission === "safa.view") {
+        return true;
+      } else if (permission.startsWith("safa.")) {
+        return !!sessionStore.user.superuser;
+      }
+
+      return !!member && roleMap[type][member.role].includes(permission);
     },
   },
 });

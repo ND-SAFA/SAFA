@@ -117,7 +117,7 @@ function canSave(doc = document.value): boolean {
   return (
     doc.name !== DEFAULT_VIEW_NAME &&
     !doc.documentId &&
-    permissionStore.projectAllows("editor")
+    permissionStore.isAllowed("project.edit_data")
   );
 }
 
@@ -127,7 +127,9 @@ function canSave(doc = document.value): boolean {
  * @return Whether editing is allowed.
  */
 function canEdit(name = ""): boolean {
-  return name !== DEFAULT_VIEW_NAME && permissionStore.projectAllows("editor");
+  return (
+    name !== DEFAULT_VIEW_NAME && permissionStore.isAllowed("project.edit_data")
+  );
 }
 
 /**

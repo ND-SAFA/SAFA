@@ -2,10 +2,13 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import {
+  IdentifierSchema,
   IOHandlerCallback,
   MemberApiHook,
   MemberEntitySchema,
   MembershipSchema,
+  OrganizationSchema,
+  TeamSchema,
 } from "@/types";
 import { removeMatches } from "@/util";
 import {
@@ -14,6 +17,7 @@ import {
   logStore,
   membersStore,
   sessionStore,
+  projectStore,
 } from "@/hooks";
 import {
   deleteProjectMember,
@@ -108,11 +112,25 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
     );
   }
 
-  function handleDelete(member: MembershipSchema): void {
+  function handleDelete(
+    member: MembershipSchema,
+    context:
+      | IdentifierSchema
+      | TeamSchema
+      | OrganizationSchema = projectStore.project
+  ): void {
+    const ownerCount = context.members.filter(
+      (member) => member.role === "OWNER"
+    ).length;
     const email =
       sessionStore.user?.email === member.email
         ? "yourself"
         : `"${member.email}"`;
+
+    if (member.role === "OWNER" && ownerCount === 1) {
+      logStore.onInfo("You cannot remove the only owner of this project.");
+      return;
+    }
 
     if (member.entityType === "PROJECT") {
       logStore.confirm(

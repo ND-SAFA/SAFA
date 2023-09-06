@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="display" wrap t="2" class="settings-buttons">
+  <flex-box wrap t="2" class="settings-buttons">
     <q-btn-group flat>
       <text-button
         text
@@ -13,16 +13,18 @@
         <text-button text label="JSON" @click="handleDownload('json')" />
       </q-btn-dropdown>
     </q-btn-group>
-    <separator vertical />
+    <separator v-if="displayEditing" vertical />
     <text-button
+      v-if="displayEditing"
       text
       label="Edit"
       icon="edit"
       data-cy="button-settings-edit"
       @click="handleEdit"
     />
-    <separator vertical />
+    <separator v-if="displayDeleting" vertical />
     <text-button
+      v-if="displayDeleting"
       text
       label="Delete"
       icon="delete"
@@ -51,7 +53,12 @@ import {
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
-const display = computed(() => permissionStore.projectAllows("editor"));
+const displayEditing = computed(() =>
+  permissionStore.isAllowed("project.edit")
+);
+const displayDeleting = computed(() =>
+  permissionStore.isAllowed("project.delete")
+);
 
 /**
  * Opens the edit modal.

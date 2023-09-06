@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="permissionStore.projectAllows('editor')" b="2">
+  <flex-box v-if="permissionStore.isAllowed('project.edit_data')" b="2">
     <text-button
       text
       label="Edit Type"

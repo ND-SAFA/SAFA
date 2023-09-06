@@ -1,6 +1,6 @@
 <template>
   <q-page-sticky
-    v-if="display"
+    v-if="displayActions"
     position="bottom-left"
     :offset="fabPos"
     class="artifact-fab"
@@ -17,6 +17,7 @@
       data-cy="button-fab-toggle"
     >
       <q-fab-action
+        v-if="displayGenerateActions"
         outline
         label="Generate Trace Links"
         icon="mdi-chart-timeline-variant-shimmer"
@@ -26,6 +27,7 @@
         @click="appStore.openDetailsPanel('generateTrace')"
       />
       <q-fab-action
+        v-if="displayGenerateActions"
         outline
         label="Generate Artifacts"
         icon="mdi-monitor-shimmer"
@@ -82,7 +84,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { appStore, layoutStore, permissionStore, projectStore } from "@/hooks";
+import { appStore, layoutStore, permissionStore } from "@/hooks";
 import { disableDrawMode, toggleDrawMode } from "@/cytoscape";
 import IconButton from "@/components/common/button/IconButton.vue";
 
@@ -94,8 +96,12 @@ const isTreeMode = computed(
   () => !appStore.isLoading && layoutStore.isTreeMode
 );
 const drawMode = computed(() => appStore.isCreateLinkEnabled);
-const display = computed(
-  () => projectStore.isProjectDefined && permissionStore.projectAllows("editor")
+
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
+const displayGenerateActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
 );
 
 /**

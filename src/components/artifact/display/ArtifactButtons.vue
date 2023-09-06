@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="display" b="2">
+  <flex-box b="2">
     <text-button
       text
       label="View Content"
@@ -8,6 +8,7 @@
       @click="handleViewBody"
     />
     <text-button
+      v-if="displayActions"
       text
       label="Edit"
       icon="edit"
@@ -16,6 +17,7 @@
     />
     <separator vertical />
     <text-button
+      v-if="displayActions"
       text
       :loading="artifactApiStore.deleteLoading"
       label="Delete"
@@ -45,7 +47,9 @@ import {
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
-const display = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

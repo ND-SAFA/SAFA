@@ -148,7 +148,9 @@ const visibleTypes = ref<string[] | null>([]);
 const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);

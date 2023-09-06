@@ -31,8 +31,7 @@ import Snackbar from "./Snackbar.vue";
 
 const displayNavigation = computed(() => sessionStore.doesSessionExist);
 const displaySidebar = computed(
-  () =>
-    displayNavigation.value && permissionStore.organizationAllows("navigation")
+  () => displayNavigation.value && permissionStore.isAllowed("safa.view")
 );
 
 const confirmationMessage = computed(() => logStore.confirmation);

@@ -137,7 +137,14 @@ export async function deleteAccount(password: string): Promise<void> {
 export async function deleteSession(): Promise<void> {
   await authHttpClient(fillEndpoint(Endpoint.logout), {
     method: "GET",
-  }).catch(() => {
-    // TODO: this should not be failing.
-  });
+  }).catch();
+}
+
+/**
+ * Updates the user's default organization.
+ *
+ * @param orgId - The organization to set as the default.
+ */
+export async function saveDefaultOrg(orgId: string): Promise<void> {
+  // TODO
 }

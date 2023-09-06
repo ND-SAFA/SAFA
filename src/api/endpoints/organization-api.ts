@@ -36,6 +36,7 @@ const exampleOrg = (id: string | number = 0): OrganizationSchema => ({
  * @return All organizations.
  */
 export async function getAllOrganizations(): Promise<OrganizationSchema[]> {
+  // TODO
   return [exampleOrg(), exampleOrg(1)];
 }
 
@@ -46,6 +47,7 @@ export async function getAllOrganizations(): Promise<OrganizationSchema[]> {
  * @return The organization.
  */
 export async function getOrganization(id: string): Promise<OrganizationSchema> {
+  // TODO
   return exampleOrg(id);
 }
 
@@ -58,6 +60,7 @@ export async function getOrganization(id: string): Promise<OrganizationSchema> {
 export async function createOrganization(
   org: Omit<OrganizationSchema, "id">
 ): Promise<OrganizationSchema> {
+  // TODO
   return {
     ...exampleOrg(),
     ...org,
@@ -73,6 +76,7 @@ export async function createOrganization(
 export async function editOrganization(
   org: OrganizationSchema
 ): Promise<OrganizationSchema> {
+  // TODO
   return org;
 }
 
@@ -84,6 +88,7 @@ export async function editOrganization(
 export async function deleteOrganization(
   org: OrganizationSchema
 ): Promise<void> {
+  // TODO
   return;
 }
 
@@ -98,6 +103,7 @@ export async function createTeam(
   orgId: string,
   team: Omit<TeamSchema, "id">
 ): Promise<TeamSchema> {
+  // TODO
   return {
     ...exampleTeam(),
     ...team,
@@ -115,6 +121,7 @@ export async function editTeam(
   orgId: string,
   team: TeamSchema
 ): Promise<TeamSchema> {
+  // TODO
   return team;
 }
 
@@ -128,6 +135,7 @@ export async function deleteTeam(
   orgId: string,
   team: TeamSchema
 ): Promise<void> {
+  // TODO
   return;
 }
 
@@ -140,6 +148,7 @@ export async function deleteTeam(
 export async function getMembers(
   entity: MemberEntitySchema
 ): Promise<MembershipSchema[]> {
+  // TODO
   return authHttpClient<MembershipSchema[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId: entity.entityId || "",
@@ -159,6 +168,7 @@ export async function getMembers(
 export async function createMember(
   member: Omit<MembershipSchema, "projectMembershipId">
 ): Promise<MembershipSchema> {
+  // TODO
   return authHttpClient<MembershipSchema>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId: member.entityId || "",
@@ -182,6 +192,7 @@ export async function createMember(
 export async function editMember(
   member: MembershipSchema
 ): Promise<MembershipSchema> {
+  // TODO
   return authHttpClient<MembershipSchema>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId: member.entityId || "",
@@ -205,6 +216,7 @@ export async function editMember(
 export async function deleteMember(
   member: MembershipSchema
 ): Promise<MembershipSchema> {
+  // TODO
   return authHttpClient<MembershipSchema>(
     fillEndpoint(Endpoint.deleteProjectMember, {
       projectMemberId: member.projectMembershipId,

@@ -52,7 +52,10 @@ export const useNotificationApi = defineStore(
           return setProjectApiStore.handleClear();
         case EntityType.MEMBERS:
           // (entityIds = projectMembershipsIds)
-          membersStore.deleteMembers(change.entityIds);
+          membersStore.deleteMembers(change.entityIds, {
+            entityType: "PROJECT",
+            entityId: projectStore.projectId,
+          });
           break;
         case EntityType.VERSION:
           // (entityIds = project version id)

@@ -49,17 +49,18 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
   ): Promise<void> {
     await memberApi.handleRequest(
       async () => {
-        if (member.entityType === "PROJECT") {
-          const invitedMember = await createMember({
-            ...member,
-            entityId: projectStore.projectId,
-          });
+        const entityId = member.entityId || projectStore.projectId;
+        const entityType = member.entityType || "PROJECT";
 
-          membersStore.updateMembers(
-            [...membersStore.members, invitedMember],
-            member
-          );
-        }
+        const invitedMember = await createMember({
+          ...member,
+          entityId,
+        });
+
+        membersStore.updateMembers(
+          [...membersStore.getMembers(entityType), invitedMember],
+          member
+        );
       },
       {
         ...callbacks,
@@ -75,22 +76,25 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
   ): Promise<void> {
     await memberApi.handleRequest(
       async () => {
-        if (member.entityType === "PROJECT") {
-          const updatedMember = await editMember({
-            ...member,
-            entityId: projectStore.projectId,
-          });
+        const entityId = member.entityId || projectStore.projectId;
+        const entityType = member.entityType || "PROJECT";
 
-          membersStore.updateMembers(
-            [
-              updatedMember,
-              ...removeMatches(membersStore.members, "projectMembershipId", [
-                updatedMember.projectMembershipId,
-              ]),
-            ],
-            member
-          );
-        }
+        const updatedMember = await editMember({
+          ...member,
+          entityId,
+        });
+
+        membersStore.updateMembers(
+          [
+            updatedMember,
+            ...removeMatches(
+              membersStore.getMembers(entityType),
+              "projectMembershipId",
+              [updatedMember.projectMembershipId]
+            ),
+          ],
+          member
+        );
       },
       {
         ...callbacks,
@@ -124,27 +128,25 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
       return;
     }
 
-    if (member.entityType === "PROJECT") {
-      logStore.confirm(
-        "Remove User from Project",
-        `Are you sure you want to remove ${email} from this project?`,
-        async (isConfirmed: boolean) => {
-          if (!isConfirmed) return;
+    logStore.confirm(
+      "Remove User",
+      `Are you sure you want to remove ${email}?`,
+      async (isConfirmed: boolean) => {
+        if (!isConfirmed) return;
 
-          await memberApi.handleRequest(
-            async () => {
-              await deleteMember(member);
-              membersStore.deleteMembers([member.projectMembershipId]);
-              await getProjectApiStore.handleReload();
-            },
-            {
-              success: `Deleted a member: ${member.email}`,
-              error: `Unable to delete member: ${member.email}`,
-            }
-          );
-        }
-      );
-    }
+        await memberApi.handleRequest(
+          async () => {
+            await deleteMember(member);
+            membersStore.deleteMembers([member.projectMembershipId], member);
+            await getProjectApiStore.handleReload();
+          },
+          {
+            success: `Deleted a member: ${member.email}`,
+            error: `Unable to delete member: ${member.email}`,
+          }
+        );
+      }
+    );
   }
 
   return {

@@ -73,13 +73,13 @@ const rows: TeamSchema[] = [
   {
     id: "1",
     name: "Team 1",
-    members: membersStore.members,
+    members: membersStore.getMembers("TEAM"),
     projects: [projectStore.projectIdentifier],
   },
   {
     id: "2",
     name: "Team 2",
-    members: membersStore.members,
+    members: membersStore.getMembers("TEAM"),
     projects: [projectStore.projectIdentifier],
   },
 ];

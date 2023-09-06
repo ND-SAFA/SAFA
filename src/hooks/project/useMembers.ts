@@ -19,8 +19,15 @@ export const useMembers = defineStore("members", {
      * List of members and their roles in the current project.
      */
     members: [] as MembershipSchema[],
+    /**
+     * List of members and their roles in the current organization.
+     */
+    orgMembers: [] as MembershipSchema[],
+    /**
+     * List of members and their roles in the current team.
+     */
+    teamMembers: [] as MembershipSchema[],
   }),
-  getters: {},
   actions: {
     /**
      * Returns members of a given type.
@@ -28,12 +35,13 @@ export const useMembers = defineStore("members", {
      * @return The given type of members.
      */
     getMembers(type?: MembershipType): MembershipSchema[] {
-      if (type === "PROJECT") {
-        return this.members;
-      } else {
-        // TODO: return members for orgs, teams
-        return this.members;
+      if (type === "TEAM") {
+        return this.teamMembers;
+      } else if (type === "ORGANIZATION") {
+        return this.orgMembers;
       }
+
+      return this.members;
     },
     /**
      * Initializes the current project.
@@ -60,21 +68,46 @@ export const useMembers = defineStore("members", {
         ];
 
         projectStore.project.members = this.members;
+      } else if (entity.entityType === "ORGANIZATION") {
+        this.orgMembers = [
+          ...removeMatches(this.orgMembers, "projectMembershipId", ids),
+          ...updatedMembers,
+        ];
+      } else if (entity.entityType === "TEAM") {
+        this.teamMembers = [
+          ...removeMatches(this.teamMembers, "projectMembershipId", ids),
+          ...updatedMembers,
+        ];
       }
     },
     /**
      * Deletes from the current project members.
      *
      * @param deletedMembers - The member ids to delete.
+     * @param entity - The entity to remove the members of.
      */
-    deleteMembers(deletedMembers: string[]): void {
-      this.members = removeMatches(
-        this.members,
-        "projectMembershipId",
-        deletedMembers
-      );
+    deleteMembers(deletedMembers: string[], entity: MemberEntitySchema): void {
+      if (entity.entityType === "PROJECT") {
+        this.members = removeMatches(
+          this.members,
+          "projectMembershipId",
+          deletedMembers
+        );
 
-      projectStore.project.members = this.members;
+        projectStore.project.members = this.members;
+      } else if (entity.entityType === "ORGANIZATION") {
+        this.orgMembers = removeMatches(
+          this.orgMembers,
+          "projectMembershipId",
+          deletedMembers
+        );
+      } else if (entity.entityType === "TEAM") {
+        this.teamMembers = removeMatches(
+          this.teamMembers,
+          "projectMembershipId",
+          deletedMembers
+        );
+      }
     },
   },
 });

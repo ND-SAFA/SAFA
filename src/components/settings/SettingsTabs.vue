@@ -53,9 +53,11 @@ const tabs = computed(() => {
 
   if (permissionStore.isAllowed("project.edit_versions")) {
     visibleOptions.push(options[1]);
-  } else if (permissionStore.isAllowed("project.edit_integrations")) {
+  }
+  if (permissionStore.isAllowed("project.edit_integrations")) {
     visibleOptions.push(options[2]);
-  } else if (permissionStore.isAllowed("project.edit")) {
+  }
+  if (permissionStore.isAllowed("project.edit")) {
     visibleOptions.push(options[3]);
   }
 

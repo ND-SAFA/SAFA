@@ -68,6 +68,7 @@ import { computed, ref } from "vue";
 import { MembershipSchema, MemberTableProps } from "@/types";
 import { capitalizeSentence, membersColumns } from "@/util";
 import {
+  getProjectApiStore,
   memberApiStore,
   membersStore,
   permissionStore,
@@ -95,8 +96,16 @@ const itemName = computed(() => `${name.value} member`);
 const title = computed(() => capitalizeSentence(itemName.value) + "s");
 
 // TODO: generalize to projects, teams, orgs
+const context = computed(() => {
+  if (props.entity.entityType === "PROJECT") {
+    return getProjectApiStore.currentProject;
+  } else {
+    return undefined;
+  }
+});
+
 const displayMemberActions = computed(() =>
-  permissionStore.isAllowed("project.edit_members")
+  permissionStore.isAllowed("project.edit_members", context.value)
 );
 
 const rows = computed(() => membersStore.members);

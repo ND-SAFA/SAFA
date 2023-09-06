@@ -34,7 +34,7 @@ import {
   OrganizationDisplay,
 } from "@/components/organization/save";
 import { OrgMemberTable } from "@/components/members";
-import { TeamTab } from "@/components/organization/team";
+import { TeamTab } from "@/components/organization/tabs";
 
 const tabs = organizationTabTypes();
 

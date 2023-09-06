@@ -10,46 +10,29 @@
       />
     </template>
 
-    <stepper
-      v-model="currentStep"
-      hide-actions
-      :steps="steps"
-      data-cy="team-stepper"
+    <selector-table
+      v-if="!addMode"
+      v-model:selected="selectedTeams"
+      addable
+      deletable
+      :columns="teamColumns"
+      :rows="rows"
+      :loading="loading"
+      row-key="id"
+      item-name="team"
+      @row:add="addMode = true"
     >
-      <template #1>
-        <selector-table
-          v-if="!addMode"
-          v-model:selected="selectedTeams"
-          addable
-          deletable
-          :columns="teamColumns"
-          :rows="rows"
-          :loading="loading"
-          row-key="id"
-          item-name="team"
-        >
-          <template #cell-actions="{ row }">
-            <icon-button
-              v-if="displayLeave(row)"
-              icon="leave"
-              tooltip="Leave team"
-              data-cy="button-selector-leave"
-              @click="handleLeave(row)"
-            />
-          </template>
-        </selector-table>
+      <template #cell-actions="{ row }">
+        <icon-button
+          v-if="displayLeave(row)"
+          icon="leave"
+          tooltip="Leave team"
+          data-cy="button-selector-leave"
+          @click="handleLeave(row)"
+        />
       </template>
-      <template #2>
-        <typography variant="subtitle" el="h3" :value="steps[1].title" />
-        <separator b="2" />
-        <expansion-item default-opened label="Members">
-          <team-member-table />
-        </expansion-item>
-        <expansion-item label="Projects">
-          <project-selector-table :open="currentStep === 2" />
-        </expansion-item>
-      </template>
-    </stepper>
+    </selector-table>
+    <save-team-inputs v-else />
   </panel-card>
 </template>
 
@@ -64,7 +47,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { StepperStep, TeamSchema } from "@/types";
+import { TeamSchema } from "@/types";
 import { teamColumns } from "@/util";
 import {
   memberApiStore,
@@ -72,31 +55,15 @@ import {
   projectStore,
   sessionStore,
 } from "@/hooks";
+import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   PanelCard,
   TextButton,
   IconButton,
-  Stepper,
   SelectorTable,
-  ExpansionItem,
-  Typography,
-  Separator,
 } from "@/components/common";
-import { TeamMemberTable } from "@/components/members";
-import { ProjectSelectorTable } from "@/components/project";
+import { SaveTeamInputs } from "@/components/organization/save";
 
-const defaultTeamListStep = (): StepperStep => ({
-  title: "Teams",
-  done: false,
-});
-
-const defaultTeamStep = (): StepperStep => ({
-  title: "Select a Team",
-  done: false,
-});
-
-const currentStep = ref(1);
-const steps = ref<StepperStep[]>([defaultTeamListStep(), defaultTeamStep()]);
 const selectedTeam = ref<TeamSchema>();
 
 const loading = ref(false);
@@ -125,14 +92,9 @@ const selectedTeams = computed({
     selectedTeam.value = teams[0];
 
     if (teams[0]) {
-      currentStep.value = 2;
-      steps.value[0].done = true;
-      steps.value[1] = {
-        title: teams[0].name,
-        done: false,
-      };
-    } else {
-      steps.value = [defaultTeamListStep(), defaultTeamStep()];
+      navigateTo(Routes.TEAM, {
+        [QueryParams.TEAM]: teams[0].id,
+      });
     }
   },
 });

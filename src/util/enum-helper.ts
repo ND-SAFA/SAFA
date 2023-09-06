@@ -19,6 +19,7 @@ import {
   TraceCountTypes,
   TracePredictionTabTypes,
   MembershipType,
+  TeamTabTypes,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
 
@@ -287,11 +288,21 @@ export function searchModeOptions(): SearchSelectOption[] {
 }
 
 /**
- * @return display names for organizations tabs.
+ * @return display names for organization tabs.
  */
 export function organizationTabTypes(): SelectOption[] {
   return [
     createEnumOption(OrganizationTabTypes.members, "Members"),
     createEnumOption(OrganizationTabTypes.teams, "Teams"),
+  ];
+}
+
+/**
+ * @return display names for team tabs.
+ */
+export function teamTabTypes(): SelectOption[] {
+  return [
+    createEnumOption(TeamTabTypes.members, "Members"),
+    createEnumOption(TeamTabTypes.projects, "Projects"),
   ];
 }

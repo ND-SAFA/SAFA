@@ -9,6 +9,7 @@ export enum PanelType {
   detailsPanel = "detailsPanel",
   projectSaver = "projectSaver",
   organizationEditor = "organizationEditor",
+  teamEditor = "teamEditor",
   projectEditor = "projectEditor",
   projectDeleter = "projectDeleter",
   artifactCreator = "artifactCreator",
@@ -59,6 +60,7 @@ export interface PanelStateMap {
   [PanelType.appPanel]: boolean;
   [PanelType.detailsPanel]: DetailsOpenState;
   [PanelType.organizationEditor]: boolean;
+  [PanelType.teamEditor]: boolean;
   [PanelType.projectSaver]: boolean;
   [PanelType.projectEditor]: boolean;
   [PanelType.projectDeleter]: boolean;

@@ -1,5 +1,5 @@
 <template>
-  <member-table minimal :entity="entity" />
+  <member-table :entity="entity" />
 </template>
 
 <script lang="ts">

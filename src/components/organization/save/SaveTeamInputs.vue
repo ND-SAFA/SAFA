@@ -1,15 +1,6 @@
 <template>
-  <div>
-    <text-input
-      label="Organization Name"
-      hint="Required"
-      data-cy="input-org-name"
-    />
-    <text-input
-      label="Organization Description"
-      type="textarea"
-      data-cy="input-org-description"
-    />
+  <div class="long-input q-mx-auto">
+    <text-input label="Team Name" hint="Required" data-cy="input-org-name" />
     <flex-box full-width justify="end">
       <text-button color="primary" label="Save" data-cy="button-org-save" />
     </flex-box>
@@ -18,10 +9,10 @@
 
 <script lang="ts">
 /**
- * Inputs for editing an organization.
+ * Inputs for creating a team.
  */
 export default {
-  name: "SaveOrganizationInputs",
+  name: "SaveTeamInputs",
 };
 </script>
 

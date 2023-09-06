@@ -1,18 +1,17 @@
 <template>
-  <panel-card title="My Organization">
+  <panel-card title="My Team">
     <template #title-actions>
       <text-button
         v-if="editMode"
         text
         label="Cancel"
         icon="cancel"
-        @click="appStore.closePanel(PanelType.organizationEditor)"
+        @click="appStore.closePanel(PanelType.teamEditor)"
       />
     </template>
 
     <div v-if="!editMode">
       <flex-box full-width>
-        <attribute-chip value="<#> Teams" />
         <attribute-chip value="<#> Members" />
         <attribute-chip value="<#> Projects" />
       </flex-box>
@@ -22,13 +21,13 @@
       <typography value="<Organization information>" />
     </div>
 
-    <save-organization-inputs v-else />
+    <save-team-inputs v-else />
   </panel-card>
 </template>
 
 <script lang="ts">
 /**
- * Displays an organization.
+ * Displays a team.
  */
 export default {
   name: "OrganizationDisplay",
@@ -46,7 +45,7 @@ import {
   TextButton,
   Typography,
 } from "@/components/common";
-import SaveOrganizationInputs from "./SaveOrganizationInputs.vue";
+import SaveTeamInputs from "./SaveTeamInputs.vue";
 
-const editMode = computed(() => appStore.isOrgEditorOpen);
+const editMode = computed(() => appStore.isTeamEditorOpen);
 </script>

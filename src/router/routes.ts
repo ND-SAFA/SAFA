@@ -15,6 +15,7 @@ import {
   SearchView,
   TracePredictionView,
   UploadStatusView,
+  MyTeamView,
 } from "@/views";
 
 /**
@@ -34,6 +35,7 @@ export enum Routes {
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
   ORG = "/organization",
+  TEAM = "/team",
   SEARCH = "/search",
 
   DEMO = "/demo",
@@ -47,6 +49,8 @@ export enum QueryParams {
   PW_RESET = "token",
   TAB = "tab",
   VERSION = "version",
+  ORG = "org",
+  TEAM = "team",
   JIRA_TOKEN = "code",
   GITHUB_TOKEN = "code",
 }
@@ -95,6 +99,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.ORG,
     name: "My Organization",
     component: MyOrganizationView,
+  },
+  {
+    path: Routes.TEAM,
+    name: "My Team",
+    component: MyTeamView,
   },
   {
     path: Routes.HOME,

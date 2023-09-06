@@ -18,12 +18,7 @@
               "primaryLanguage": {
                 "name": "TypeScript"
               },
-              "defaultBranchRef": {
-                "name": "development",
-                "target": {
-                  "oid": "8abec6b74c08236cc8972687e566957a00de7521"
-                }
-              },
+              "defaultBranchRef": null,
               "refs": {
                 "edges": [
                   {

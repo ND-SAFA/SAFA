@@ -40,8 +40,8 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { GenerationModelProps } from "@/types";
-import { trainingTabOptions } from "@/util";
+import { GenerationModelProps, SelectOption } from "@/types";
+import { createOption } from "@/util";
 import { TabList, TextButton, PanelCard } from "@/components/common";
 import {
   ModelProjectStep,
@@ -51,6 +51,18 @@ import {
 } from "./steps";
 
 const props = defineProps<GenerationModelProps>();
+
+/**
+ * @return display names for model training tabs.
+ */
+function trainingTabOptions(): SelectOption[] {
+  return [
+    createOption("documents", "Documents"),
+    createOption("repositories", "Repositories"),
+    createOption("keywords", "Keywords"),
+    createOption("project", "Project Data"),
+  ];
+}
 
 const tabs = trainingTabOptions();
 

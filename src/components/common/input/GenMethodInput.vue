@@ -26,8 +26,8 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GenMethodInputProps } from "@/types";
-import { traceModelOptions } from "@/util";
+import { GenMethodInputProps, ModelType, SelectOption } from "@/types";
+import { createOption } from "@/util";
 import { useVModel } from "@/hooks";
 import { ListItem } from "@/components/common/display";
 
@@ -38,6 +38,27 @@ defineEmits<{
 }>();
 
 const model = useVModel(props, "modelValue");
+
+/**
+ * @return display names for each trace model type.
+ */
+function traceModelOptions(): SelectOption[] {
+  return [
+    createOption(
+      ModelType.NLBert,
+      "Slower, higher quality links. Traces free-text artifacts to other free-text artifacts."
+    ),
+    createOption(
+      ModelType.PLBert,
+      "Slower, higher quality links. Traces free-text artifacts to source code."
+    ),
+    createOption(
+      ModelType.AutomotiveBert,
+      "Slower, high quality links for automotive projects."
+    ),
+    createOption(ModelType.VSM, "Faster, lower quality links."),
+  ];
+}
 
 const options = computed(() =>
   props.onlyTrainable ? traceModelOptions().slice(0, 3) : traceModelOptions()

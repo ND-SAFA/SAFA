@@ -6,8 +6,6 @@ import {
   DocumentType,
   FTANodeType,
   LoaderTabTypes,
-  ModelShareType,
-  ModelType,
   OrganizationTabTypes,
   MemberRole,
   ProjectTableTabTypes,
@@ -30,10 +28,10 @@ import { enumToDisplay } from "@/util/string-helper";
  * @param name - The name of the option, which will bne generated if not given.
  * @return The selectable option.
  */
-export function createEnumOption<T extends string>(
+export function createOption<T extends string>(
   enumValue: T,
   name?: string
-): SelectOption {
+): SelectOption<T> {
   return { id: enumValue, name: name || enumToDisplay(enumValue) };
 }
 
@@ -42,11 +40,11 @@ export function createEnumOption<T extends string>(
  */
 export function documentTypeOptions(): SelectOption[] {
   return [
-    createEnumOption(DocumentType.ARTIFACT_TREE, "Default"),
-    createEnumOption(DocumentType.FTA, "FTA"),
-    createEnumOption(DocumentType.SAFETY_CASE),
-    createEnumOption(DocumentType.FMEA, "FMEA"),
-    createEnumOption(DocumentType.FMECA, "FMECA"),
+    createOption(DocumentType.ARTIFACT_TREE, "Default"),
+    createOption(DocumentType.FTA, "FTA"),
+    createOption(DocumentType.SAFETY_CASE),
+    createOption(DocumentType.FMEA, "FMEA"),
+    createOption(DocumentType.FMECA, "FMECA"),
   ];
 }
 
@@ -55,10 +53,10 @@ export function documentTypeOptions(): SelectOption[] {
  */
 export function safetyCaseOptions(): SelectOption[] {
   return [
-    createEnumOption(SafetyCaseType.CONTEXT),
-    createEnumOption(SafetyCaseType.GOAL),
-    createEnumOption(SafetyCaseType.STRATEGY),
-    createEnumOption(SafetyCaseType.SOLUTION),
+    createOption(SafetyCaseType.CONTEXT),
+    createOption(SafetyCaseType.GOAL),
+    createOption(SafetyCaseType.STRATEGY),
+    createOption(SafetyCaseType.SOLUTION),
   ];
 }
 
@@ -66,7 +64,7 @@ export function safetyCaseOptions(): SelectOption[] {
  * @return display names for each logic type.
  */
 export function logicTypeOptions(): SelectOption[] {
-  return [createEnumOption(FTANodeType.AND), createEnumOption(FTANodeType.OR)];
+  return [createOption(FTANodeType.AND), createOption(FTANodeType.OR)];
 }
 
 /**
@@ -74,10 +72,10 @@ export function logicTypeOptions(): SelectOption[] {
  */
 export function deltaTypeOptions(): SelectOption[] {
   return [
-    createEnumOption(ArtifactDeltaState.NO_CHANGE),
-    createEnumOption(ArtifactDeltaState.ADDED),
-    createEnumOption(ArtifactDeltaState.MODIFIED),
-    createEnumOption(ArtifactDeltaState.REMOVED),
+    createOption(ArtifactDeltaState.NO_CHANGE),
+    createOption(ArtifactDeltaState.ADDED),
+    createOption(ArtifactDeltaState.MODIFIED),
+    createOption(ArtifactDeltaState.REMOVED),
   ];
 }
 
@@ -86,9 +84,9 @@ export function deltaTypeOptions(): SelectOption[] {
  */
 export function traceCountOptions(): SelectOption[] {
   return [
-    createEnumOption(TraceCountTypes.all, "All Artifacts"),
-    createEnumOption(TraceCountTypes.onlyTraced, "Only Traced Artifacts"),
-    createEnumOption(TraceCountTypes.notTraced, "Only Orphan Artifacts"),
+    createOption(TraceCountTypes.all, "All Artifacts"),
+    createOption(TraceCountTypes.onlyTraced, "Only Traced Artifacts"),
+    createOption(TraceCountTypes.notTraced, "Only Orphan Artifacts"),
   ];
 }
 
@@ -97,82 +95,45 @@ export function traceCountOptions(): SelectOption[] {
  */
 export function approvalTypeOptions(): SelectOption[] {
   return [
-    createEnumOption(ApprovalType.UNREVIEWED),
-    createEnumOption(ApprovalType.APPROVED),
-    createEnumOption(ApprovalType.DECLINED),
+    createOption(ApprovalType.UNREVIEWED),
+    createOption(ApprovalType.APPROVED),
+    createOption(ApprovalType.DECLINED),
   ];
 }
 
 /**
- * @return display names for each trace model type.
- */
-export function traceModelOptions(): SelectOption[] {
-  return [
-    createEnumOption(
-      ModelType.NLBert,
-      "Slower, higher quality links. Traces free-text artifacts to other free-text artifacts."
-    ),
-    createEnumOption(
-      ModelType.PLBert,
-      "Slower, higher quality links. Traces free-text artifacts to source code."
-    ),
-    createEnumOption(
-      ModelType.AutomotiveBert,
-      "Slower, high quality links for automotive projects."
-    ),
-    createEnumOption(ModelType.VSM, "Faster, lower quality links."),
-  ];
-}
-
-/**
+ * @param type - The type of member roles to include.
  * @return display names for member role types.
  */
 export function memberRoleOptions(type?: MembershipType): SelectOption[] {
-  const isOrg = type === "ORGANIZATION";
-  const isTeam = type === "TEAM";
-  const isProject = !type || type === "PROJECT";
+  const roles: SelectOption<MemberRole>[] = [];
 
-  return [
-    ...(isProject || isTeam
-      ? [
-          createEnumOption<MemberRole>("VIEWER", "View project data"),
-          createEnumOption<MemberRole>(
-            "EDITOR",
-            "Edit data within a project version"
-          ),
-        ]
-      : []),
-    createEnumOption<MemberRole>(
-      "GENERATOR",
-      "Use generative features on project data"
-    ),
-    createEnumOption<MemberRole>("ADMIN", "Manage projects and membership"),
-    ...(isProject
-      ? [createEnumOption<MemberRole>("OWNER", "Full ownership of the project")]
-      : []),
-    ...(isOrg
-      ? [
-          createEnumOption<MemberRole>(
-            "MEMBER",
-            "A member of the organization"
-          ),
-          createEnumOption<MemberRole>(
-            "BILLING_MANAGER",
-            "Manage billing for the organization"
-          ),
-        ]
-      : []),
-  ];
-}
+  // Include the given role if the type matches or if no type is given.
+  const addRoleFor = (
+    matchTypes: MembershipType[],
+    role: MemberRole,
+    description: string
+  ) =>
+    (matchTypes.length === 0 || matchTypes.includes(type || "PROJECT")) &&
+    roles.push(createOption(role, description));
 
-/**
- * @return display names for model share options.
- */
-export function modelShareOptions(): SelectOption[] {
-  return [
-    createEnumOption(ModelShareType.CLONE, "Clone the model"),
-    createEnumOption(ModelShareType.REUSE, "Reuse the same model"),
-  ];
+  addRoleFor(["PROJECT", "TEAM"], "VIEWER", "View project data");
+  addRoleFor(
+    ["PROJECT", "TEAM"],
+    "EDITOR",
+    "Edit data within a project version"
+  );
+  addRoleFor([], "GENERATOR", "Use generative features on project data");
+  addRoleFor([], "ADMIN", "Manage projects and membership");
+  addRoleFor(["PROJECT"], "OWNER", "Full ownership of the project");
+  addRoleFor(["ORGANIZATION"], "MEMBER", "A member of the organization");
+  addRoleFor(
+    ["ORGANIZATION"],
+    "BILLING_MANAGER",
+    "Manage billing for the organization"
+  );
+
+  return roles;
 }
 
 /**
@@ -180,9 +141,9 @@ export function modelShareOptions(): SelectOption[] {
  */
 export function creatorTabOptions(): SelectOption[] {
   return [
-    createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
-    createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
-    createEnumOption(CreatorTabTypes.import, "Integrations Import"),
+    createOption(CreatorTabTypes.standard, "Standard Upload"),
+    createOption(CreatorTabTypes.bulk, "Bulk Upload"),
+    createOption(CreatorTabTypes.import, "Integrations Import"),
   ];
 }
 
@@ -191,8 +152,8 @@ export function creatorTabOptions(): SelectOption[] {
  */
 export function loaderTabOptions(): SelectOption[] {
   return [
-    createEnumOption(LoaderTabTypes.load, "Open Project"),
-    createEnumOption(LoaderTabTypes.uploads, "Project Uploads"),
+    createOption(LoaderTabTypes.load, "Open Project"),
+    createOption(LoaderTabTypes.uploads, "Project Uploads"),
   ];
 }
 
@@ -201,9 +162,9 @@ export function loaderTabOptions(): SelectOption[] {
  */
 export function tracePredictionTabOptions(): SelectOption[] {
   return [
-    createEnumOption(TracePredictionTabTypes.models, "Models"),
-    createEnumOption(TracePredictionTabTypes.generation, "Trace Generation"),
-    createEnumOption(TracePredictionTabTypes.approval, "Trace Approval"),
+    createOption(TracePredictionTabTypes.models, "Models"),
+    createOption(TracePredictionTabTypes.generation, "Trace Generation"),
+    createOption(TracePredictionTabTypes.approval, "Trace Approval"),
   ];
 }
 
@@ -212,22 +173,10 @@ export function tracePredictionTabOptions(): SelectOption[] {
  */
 export function settingsTabOptions(): SelectOption[] {
   return [
-    createEnumOption(SettingsTabTypes.members, "Members"),
-    createEnumOption(SettingsTabTypes.upload, "Data Upload"),
-    createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
-    createEnumOption(SettingsTabTypes.attributes, "Custom Attributes"),
-  ];
-}
-
-/**
- * @return display names for model training tabs.
- */
-export function trainingTabOptions(): SelectOption[] {
-  return [
-    createEnumOption("documents", "Documents"),
-    createEnumOption("repositories", "Repositories"),
-    createEnumOption("keywords", "Keywords"),
-    createEnumOption("project", "Project Data"),
+    createOption(SettingsTabTypes.members, "Members"),
+    createOption(SettingsTabTypes.upload, "Data Upload"),
+    createOption(SettingsTabTypes.integrations, "Data Integrations"),
+    createOption(SettingsTabTypes.attributes, "Custom Attributes"),
   ];
 }
 
@@ -236,9 +185,9 @@ export function trainingTabOptions(): SelectOption[] {
  */
 export function tableViewTabOptions(): SelectOption[] {
   return [
-    createEnumOption(ProjectTableTabTypes.artifact, "Artifacts"),
-    createEnumOption(ProjectTableTabTypes.trace, "Trace Links"),
-    createEnumOption(ProjectTableTabTypes.approve, "Trace Approval"),
+    createOption(ProjectTableTabTypes.artifact, "Artifacts"),
+    createOption(ProjectTableTabTypes.trace, "Trace Links"),
+    createOption(ProjectTableTabTypes.approve, "Trace Approval"),
   ];
 }
 
@@ -247,15 +196,15 @@ export function tableViewTabOptions(): SelectOption[] {
  */
 export function attributeTypeOptions(): SelectOption[] {
   return [
-    createEnumOption(AttributeType.text, "Text"),
-    createEnumOption(AttributeType.paragraph, "Paragraph"),
-    createEnumOption(AttributeType.select, "Select"),
-    createEnumOption(AttributeType.multiselect, "Multiselect"),
-    createEnumOption(AttributeType.relation, "Relation"),
-    createEnumOption(AttributeType.date, "Date"),
-    createEnumOption(AttributeType.int, "Integer"),
-    createEnumOption(AttributeType.float, "Number"),
-    createEnumOption(AttributeType.boolean, "Yes/No"),
+    createOption(AttributeType.text, "Text"),
+    createOption(AttributeType.paragraph, "Paragraph"),
+    createOption(AttributeType.select, "Select"),
+    createOption(AttributeType.multiselect, "Multiselect"),
+    createOption(AttributeType.relation, "Relation"),
+    createOption(AttributeType.date, "Date"),
+    createOption(AttributeType.int, "Integer"),
+    createOption(AttributeType.float, "Number"),
+    createOption(AttributeType.boolean, "Yes/No"),
   ];
 }
 
@@ -292,8 +241,8 @@ export function searchModeOptions(): SearchSelectOption[] {
  */
 export function organizationTabTypes(): SelectOption[] {
   return [
-    createEnumOption(OrganizationTabTypes.members, "Members"),
-    createEnumOption(OrganizationTabTypes.teams, "Teams"),
+    createOption(OrganizationTabTypes.members, "Members"),
+    createOption(OrganizationTabTypes.teams, "Teams"),
   ];
 }
 
@@ -302,7 +251,7 @@ export function organizationTabTypes(): SelectOption[] {
  */
 export function teamTabTypes(): SelectOption[] {
   return [
-    createEnumOption(TeamTabTypes.members, "Members"),
-    createEnumOption(TeamTabTypes.projects, "Projects"),
+    createOption(TeamTabTypes.members, "Members"),
+    createOption(TeamTabTypes.projects, "Projects"),
   ];
 }

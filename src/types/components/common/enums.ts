@@ -3,11 +3,11 @@ import { SearchMode } from "@/types";
 /**
  * Represents an option for a select menu.
  */
-export interface SelectOption {
+export interface SelectOption<T extends string = string> {
   /**
    * The iud of the option to use as a stored.
    */
-  id: string;
+  id: T;
   /**
    * The name of the option to display.
    */

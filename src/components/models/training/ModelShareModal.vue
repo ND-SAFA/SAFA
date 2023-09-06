@@ -31,8 +31,8 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ModelShareType, OpenableProps } from "@/types";
-import { modelShareOptions } from "@/util";
+import { ModelShareType, OpenableProps, SelectOption } from "@/types";
+import { createOption } from "@/util";
 import { modelApiStore, modelSaveStore } from "@/hooks";
 import {
   Modal,
@@ -46,6 +46,16 @@ const props = defineProps<OpenableProps>();
 const emit = defineEmits<{
   (e: "close"): void;
 }>();
+
+/**
+ * @return display names for model share options.
+ */
+function modelShareOptions(): SelectOption[] {
+  return [
+    createOption(ModelShareType.CLONE, "Clone the model"),
+    createOption(ModelShareType.REUSE, "Reuse the same model"),
+  ];
+}
 
 const shareOptions = modelShareOptions();
 

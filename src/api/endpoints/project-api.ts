@@ -2,11 +2,8 @@ import {
   CreateProjectByJsonSchema,
   IdentifierSchema,
   JobSchema,
-  MemberRequestSchema,
-  MembershipSchema,
   VersionDeltaSchema,
   ProjectSchema,
-  MemberRole,
 } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
@@ -77,67 +74,6 @@ export async function getProjectDelta(
     }),
     {
       method: "GET",
-    }
-  );
-}
-
-/**
- * Returns the list of project members in given project.
- */
-export async function getProjectMembers(
-  projectId: string
-): Promise<MembershipSchema[]> {
-  return authHttpClient<MembershipSchema[]>(
-    fillEndpoint(Endpoint.getProjectMembers, {
-      projectId,
-    }),
-    {
-      method: "GET",
-    }
-  );
-}
-
-/**
- * Shares a project with a user.
- *
- * @param projectId - The project to add this user to.
- * @param memberEmail - The email of the given user.
- * @param projectRole - The role to set for the given user.
- */
-export async function saveProjectMember(
-  projectId: string,
-  memberEmail: string,
-  projectRole: MemberRole
-): Promise<MembershipSchema> {
-  return authHttpClient<MembershipSchema>(
-    fillEndpoint(Endpoint.getProjectMembers, {
-      projectId,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify({
-        memberEmail,
-        projectRole,
-      } as MemberRequestSchema),
-    }
-  );
-}
-
-/**
- * Deletes a user from a project.
- *
- * @param projectMember - The user to delete.
- * @return The remaining users.
- */
-export async function deleteProjectMember({
-  projectMembershipId,
-}: MembershipSchema): Promise<MembershipSchema[]> {
-  return authHttpClient<MembershipSchema[]>(
-    fillEndpoint(Endpoint.deleteProjectMember, {
-      projectMemberId: projectMembershipId,
-    }),
-    {
-      method: "DELETE",
     }
   );
 }

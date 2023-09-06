@@ -19,11 +19,7 @@ import {
   sessionStore,
   projectStore,
 } from "@/hooks";
-import {
-  deleteProjectMember,
-  getProjectMembers,
-  saveProjectMember,
-} from "@/api";
+import { deleteMember, editMember, createMember, getMembers } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -39,11 +35,9 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
 
     await memberApi.handleRequest(
       async () => {
-        if (entity.entityType === "PROJECT") {
-          const members = await getProjectMembers(entity.entityId || "");
+        const members = await getMembers(entity);
 
-          membersStore.updateMembers(members, entity);
-        }
+        membersStore.updateMembers(members, entity);
       },
       { error: `Unable to get members` }
     );
@@ -56,11 +50,10 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
     await memberApi.handleRequest(
       async () => {
         if (member.entityType === "PROJECT") {
-          const invitedMember = await saveProjectMember(
-            member.entityId || "",
-            member.email,
-            member.role
-          );
+          const invitedMember = await createMember({
+            ...member,
+            entityId: projectStore.projectId,
+          });
 
           membersStore.updateMembers(
             [...membersStore.members, invitedMember],
@@ -83,11 +76,10 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
     await memberApi.handleRequest(
       async () => {
         if (member.entityType === "PROJECT") {
-          const updatedMember = await saveProjectMember(
-            member.entityId || "",
-            member.email,
-            member.role
-          );
+          const updatedMember = await editMember({
+            ...member,
+            entityId: projectStore.projectId,
+          });
 
           membersStore.updateMembers(
             [
@@ -141,7 +133,7 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
 
           await memberApi.handleRequest(
             async () => {
-              await deleteProjectMember(member);
+              await deleteMember(member);
               membersStore.deleteMembers([member.projectMembershipId]);
               await getProjectApiStore.handleReload();
             },

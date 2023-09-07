@@ -1,5 +1,5 @@
 import { CommitSchema } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Sends commit to backend to be saved to the database.
@@ -10,13 +10,7 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
 export async function persistCommit(
   commit: CommitSchema
 ): Promise<CommitSchema> {
-  const { versionId } = commit.commitVersion;
-
-  return authHttpClient<CommitSchema>(
-    fillEndpoint(Endpoint.commit, { versionId }),
-    {
-      method: "POST",
-      body: JSON.stringify(commit),
-    }
-  );
+  return buildRequest<CommitSchema, "versionId", CommitSchema>("commit")
+    .withParam("versionId", commit.commitVersion.versionId)
+    .post(commit);
 }

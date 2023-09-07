@@ -1,5 +1,5 @@
 import { AttributeLayoutSchema, AttributeSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Creates a new artifact custom attribute.
@@ -12,15 +12,11 @@ export async function createAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
-  return authHttpClient<AttributeSchema>(
-    fillEndpoint(Endpoint.createAttribute, {
-      projectId,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify(attribute),
-    }
-  );
+  return buildRequest<AttributeSchema, "projectId", AttributeSchema>(
+    "createAttribute"
+  )
+    .withParam("projectId", projectId)
+    .post(attribute);
 }
 
 /**
@@ -34,16 +30,12 @@ export async function editAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
-  return authHttpClient<AttributeSchema>(
-    fillEndpoint(Endpoint.editAttribute, {
-      projectId,
-      key: attribute.key,
-    }),
-    {
-      method: "PUT",
-      body: JSON.stringify(attribute),
-    }
-  );
+  return buildRequest<AttributeSchema, "projectId" | "key", AttributeSchema>(
+    "editAttribute"
+  )
+    .withParam("projectId", projectId)
+    .withParam("key", attribute.key)
+    .put(attribute);
 }
 
 /**
@@ -56,15 +48,10 @@ export async function deleteAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.editAttribute, {
-      projectId,
-      key: attribute.key,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
+  return buildRequest<void, "projectId" | "key">("editAttribute")
+    .withParam("projectId", projectId)
+    .withParam("key", attribute.key)
+    .delete();
 }
 
 /**
@@ -78,15 +65,13 @@ export async function createAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<AttributeLayoutSchema> {
-  return authHttpClient<AttributeLayoutSchema>(
-    fillEndpoint(Endpoint.createAttributeLayout, {
-      projectId,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify(layout),
-    }
-  );
+  return buildRequest<
+    AttributeLayoutSchema,
+    "projectId",
+    AttributeLayoutSchema
+  >("createAttributeLayout")
+    .withParam("projectId", projectId)
+    .post(layout);
 }
 
 /**
@@ -100,16 +85,14 @@ export async function editAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<AttributeLayoutSchema> {
-  return authHttpClient<AttributeLayoutSchema>(
-    fillEndpoint(Endpoint.editAttributeLayout, {
-      projectId,
-      id: layout.id,
-    }),
-    {
-      method: "PUT",
-      body: JSON.stringify(layout),
-    }
-  );
+  return buildRequest<
+    AttributeLayoutSchema,
+    "id" | "projectId",
+    AttributeLayoutSchema
+  >("editAttributeLayout")
+    .withParam("projectId", projectId)
+    .withParam("id", layout.id)
+    .put(layout);
 }
 
 /**
@@ -122,13 +105,8 @@ export async function deleteAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.editAttributeLayout, {
-      projectId,
-      id: layout.id,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
+  return buildRequest<void, "id" | "projectId">("editAttributeLayout")
+    .withParam("projectId", projectId)
+    .withParam("id", layout.id)
+    .delete();
 }

@@ -1,5 +1,5 @@
 import { ChangeMessageSchema, ProjectSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Get changes in EntityChangeMessage.
@@ -12,11 +12,7 @@ export async function getChanges(
   versionId: string,
   message: ChangeMessageSchema
 ): Promise<ProjectSchema> {
-  return authHttpClient<ProjectSchema>(
-    fillEndpoint(Endpoint.sync, { versionId }),
-    {
-      method: "POST",
-      body: JSON.stringify(message),
-    }
-  );
+  return buildRequest<ProjectSchema, "versionId", ChangeMessageSchema>("sync")
+    .withParam("versionId", versionId)
+    .post(message);
 }

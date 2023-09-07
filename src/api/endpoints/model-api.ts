@@ -1,5 +1,5 @@
 import { ModelShareType, GenerationModelSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Returns the models for the given project.
@@ -10,14 +10,9 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 export async function getProjectModels(
   projectId: string
 ): Promise<GenerationModelSchema[]> {
-  return authHttpClient<GenerationModelSchema[]>(
-    fillEndpoint(Endpoint.getModels, {
-      projectId,
-    }),
-    {
-      method: "GET",
-    }
-  );
+  return buildRequest<GenerationModelSchema[], "projectId">("getModels")
+    .withParam("projectId", projectId)
+    .get();
 }
 
 /**
@@ -31,15 +26,13 @@ export async function createModel(
   projectId: string,
   model: GenerationModelSchema
 ): Promise<GenerationModelSchema> {
-  return authHttpClient<GenerationModelSchema>(
-    fillEndpoint(Endpoint.createModel, {
-      projectId,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify(model),
-    }
-  );
+  return buildRequest<
+    GenerationModelSchema,
+    "projectId",
+    GenerationModelSchema
+  >("createModel")
+    .withParam("projectId", projectId)
+    .post(model);
 }
 
 /**
@@ -53,16 +46,14 @@ export async function editModel(
   projectId: string,
   model: GenerationModelSchema
 ): Promise<GenerationModelSchema> {
-  return authHttpClient<GenerationModelSchema>(
-    fillEndpoint(Endpoint.editModel, {
-      projectId,
-      modelId: model.id,
-    }),
-    {
-      method: "PUT",
-      body: JSON.stringify(model),
-    }
-  );
+  return buildRequest<
+    GenerationModelSchema,
+    "projectId" | "modelId",
+    GenerationModelSchema
+  >("editModel")
+    .withParam("projectId", projectId)
+    .withParam("modelId", model.id)
+    .put(model);
 }
 
 /**
@@ -75,15 +66,10 @@ export async function deleteModel(
   projectId: string,
   modelId: string
 ): Promise<void> {
-  await authHttpClient<GenerationModelSchema>(
-    fillEndpoint(Endpoint.deleteModel, {
-      projectId,
-      modelId,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
+  return buildRequest<void, "projectId" | "modelId">("deleteModel")
+    .withParam("projectId", projectId)
+    .withParam("modelId", modelId)
+    .delete();
 }
 
 /**
@@ -98,12 +84,17 @@ export async function shareModel(
   model: GenerationModelSchema,
   shareMethod: ModelShareType
 ): Promise<void> {
-  await authHttpClient(fillEndpoint(Endpoint.shareModel), {
-    method: "POST",
-    body: JSON.stringify({
-      model,
-      targetProject,
-      shareMethod,
-    }),
+  await buildRequest<
+    void,
+    string,
+    {
+      model: GenerationModelSchema;
+      targetProject: string;
+      shareMethod: ModelShareType;
+    }
+  >("shareModel").post({
+    model,
+    targetProject,
+    shareMethod,
   });
 }

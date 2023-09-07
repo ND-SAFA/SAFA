@@ -8,13 +8,7 @@ import {
   JobSchema,
 } from "@/types";
 import { jobStore, useApi } from "@/hooks";
-import {
-  deleteJobById,
-  Endpoint,
-  fillEndpoint,
-  getJobLog,
-  getUserJobs,
-} from "@/api";
+import { deleteJobById, fillEndpoint, getJobLog, getUserJobs } from "@/api";
 import { pinia } from "@/plugins";
 import stompApiStore from "./useStompApi";
 
@@ -36,7 +30,7 @@ export const useJobApi = defineStore("jobApi", () => {
     if (!jobId) return;
 
     await stompApiStore.subscribeToStomp(
-      fillEndpoint(Endpoint.jobTopic, { jobId }),
+      fillEndpoint("jobTopic", { jobId }),
       async (frame) => {
         await jobApi.handleRequest(async () => {
           const job: JobSchema | ChangeMessageSchema = JSON.parse(frame.body);

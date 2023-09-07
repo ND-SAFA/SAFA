@@ -1,5 +1,5 @@
 import { JiraOrganizationSchema, JiraProjectSchema, JobSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * The formatted scopes of Jira permissions being requested.
@@ -47,12 +47,9 @@ export function authorizeJira(): void {
  * @param accessCode - The access code received from authorizing Jira.
  */
 export async function saveJiraCredentials(accessCode: string): Promise<void> {
-  await authHttpClient(
-    fillEndpoint(Endpoint.jiraCreateCredentials, { accessCode }),
-    {
-      method: "POST",
-    }
-  );
+  await buildRequest<void, "accessCode">("jiraCreateCredentials")
+    .withParam("accessCode", accessCode)
+    .post();
 }
 
 /**
@@ -63,12 +60,9 @@ export async function saveJiraCredentials(accessCode: string): Promise<void> {
 export async function getJiraCredentials(): Promise<boolean> {
   return (
     (
-      await authHttpClient<{ payload: boolean | null }>(
-        Endpoint.jiraValidateCredentials,
-        {
-          method: "GET",
-        }
-      )
+      await buildRequest<{ payload: boolean | null }>(
+        "jiraValidateCredentials"
+      ).get()
     ).payload === true
   );
 }
@@ -81,12 +75,9 @@ export async function getJiraCredentials(): Promise<boolean> {
 export async function refreshJiraCredentials(): Promise<boolean> {
   return (
     (
-      await authHttpClient<{ payload: boolean | null }>(
-        Endpoint.jiraEditCredentials,
-        {
-          method: "PUT",
-        }
-      )
+      await buildRequest<{ payload: boolean | null }>(
+        "jiraEditCredentials"
+      ).put()
     ).payload === true
   );
 }
@@ -95,9 +86,7 @@ export async function refreshJiraCredentials(): Promise<boolean> {
  * Deletes the stored Jira credentials.
  */
 export async function deleteJiraCredentials(): Promise<void> {
-  await authHttpClient(Endpoint.jiraEditCredentials, {
-    method: "DELETE",
-  });
+  await buildRequest("jiraEditCredentials").delete();
 }
 
 /**
@@ -110,12 +99,9 @@ export async function getJiraInstallations(): Promise<
 > {
   return (
     (
-      await authHttpClient<{ payload: JiraOrganizationSchema[] }>(
-        Endpoint.jiraGetInstallations,
-        {
-          method: "GET",
-        }
-      )
+      await buildRequest<{ payload: JiraOrganizationSchema[] }>(
+        "jiraGetInstallations"
+      ).get()
     ).payload || []
   );
 }
@@ -131,12 +117,11 @@ export async function getJiraProjects(
 ): Promise<JiraProjectSchema[]> {
   return (
     (
-      await authHttpClient<{ payload: JiraProjectSchema[] }>(
-        fillEndpoint(Endpoint.jiraGetProjects, { cloudId }),
-        {
-          method: "GET",
-        }
+      await buildRequest<{ payload: JiraProjectSchema[] }, "cloudId">(
+        "jiraGetInstallations"
       )
+        .withParam("cloudId", cloudId)
+        .get()
     ).payload || []
   );
 }
@@ -153,12 +138,12 @@ export async function createJiraProject(
   id: string
 ): Promise<JobSchema> {
   return (
-    await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.jiraCreateProject, { cloudId, id }),
-      {
-        method: "POST",
-      }
+    await buildRequest<{ payload: JobSchema }, "cloudId" | "id">(
+      "jiraCreateProject"
     )
+      .withParam("cloudId", cloudId)
+      .withParam("id", id)
+      .post()
   ).payload;
 }
 
@@ -175,11 +160,12 @@ export async function createJiraProjectSync(
   id: string
 ): Promise<JobSchema> {
   return (
-    await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.jiraSyncProject, { versionId, cloudId, id }),
-      {
-        method: "PUT",
-      }
+    await buildRequest<{ payload: JobSchema }, "versionId" | "cloudId" | "id">(
+      "jiraSyncProject"
     )
+      .withParam("versionId", versionId)
+      .withParam("cloudId", cloudId)
+      .withParam("id", id)
+      .put()
   ).payload;
 }

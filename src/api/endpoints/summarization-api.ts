@@ -1,24 +1,25 @@
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Generates a summary for an artifact.
  *
- * @param artifact - The artifact to summarize.
+ * @param versionId - The project version to update.
+ * @param artifactId - The artifact to summarize.
  * @return The artifact summary.
  */
 export async function createSummary(
   versionId: string,
   artifactId: string
 ): Promise<string> {
-  const summaries = await authHttpClient<string[]>(
-    fillEndpoint(Endpoint.summarize, { versionId }),
-    {
-      method: "POST",
-      body: JSON.stringify({
-        artifacts: [artifactId],
-      }),
-    }
-  );
+  const summaries = await buildRequest<
+    string[],
+    "versionId",
+    { artifacts: string[] }
+  >("summarize")
+    .withParam("versionId", versionId)
+    .post({
+      artifacts: [artifactId],
+    });
 
   return summaries[0] || "";
 }
@@ -30,13 +31,11 @@ export async function createSummary(
  * @return The response based on the prompt.
  */
 export async function createPrompt(prompt: string): Promise<string> {
-  const { completion } = await authHttpClient<{ completion: string }>(
-    fillEndpoint(Endpoint.prompt),
-    {
-      method: "POST",
-      body: JSON.stringify({ prompt }),
-    }
-  );
+  const { completion } = await buildRequest<
+    { completion: string },
+    string,
+    { prompt: string }
+  >("prompt").post({ prompt });
 
   return completion;
 }

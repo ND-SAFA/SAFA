@@ -1,5 +1,5 @@
 import { ArtifactSchema, ProjectSchema, TraceLinkSchema } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { buildRequest } from "@/api/util";
 
 /**
  * Gets a specific version of a project.
@@ -10,10 +10,9 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 export async function getProjectVersion(
   versionId: string
 ): Promise<ProjectSchema> {
-  return authHttpClient<ProjectSchema>(
-    fillEndpoint(Endpoint.projectVersion, { versionId }),
-    { method: "GET" }
-  );
+  return buildRequest<ProjectSchema, "versionId">("projectVersion")
+    .withParam("versionId", versionId)
+    .get();
 }
 
 /**
@@ -25,10 +24,9 @@ export async function getProjectVersion(
 export async function getArtifactsInVersion(
   versionId: string
 ): Promise<ArtifactSchema[]> {
-  return authHttpClient<ArtifactSchema[]>(
-    fillEndpoint(Endpoint.getArtifactsInVersion, { versionId }),
-    { method: "GET" }
-  );
+  return buildRequest<ArtifactSchema[], "versionId">("getArtifactsInVersion")
+    .withParam("versionId", versionId)
+    .get();
 }
 
 /**
@@ -40,8 +38,7 @@ export async function getArtifactsInVersion(
 export async function getTracesInVersion(
   versionId: string
 ): Promise<TraceLinkSchema[]> {
-  return authHttpClient<TraceLinkSchema[]>(
-    fillEndpoint(Endpoint.getTracesInVersion, { versionId }),
-    { method: "GET" }
-  );
+  return buildRequest<TraceLinkSchema[], "versionId">("getTracesInVersion")
+    .withParam("versionId", versionId)
+    .get();
 }

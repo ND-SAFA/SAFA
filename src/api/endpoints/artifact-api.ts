@@ -1,5 +1,5 @@
 import { NameValidationSchema } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Returns whether the given artifact name already exists.
@@ -12,10 +12,13 @@ export async function getDoesArtifactExist(
   versionId: string,
   artifactName: string
 ): Promise<boolean> {
-  const res = await authHttpClient<NameValidationSchema>(
-    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId }),
-    { method: "POST", body: JSON.stringify({ artifactName }) }
-  );
-
-  return res.artifactExists;
+  return (
+    await buildRequest<
+      NameValidationSchema,
+      "versionId",
+      { artifactName: string }
+    >("isArtifactNameTaken")
+      .withParam("versionId", versionId)
+      .post({ artifactName })
+  ).artifactExists;
 }

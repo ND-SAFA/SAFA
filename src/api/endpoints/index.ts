@@ -23,3 +23,4 @@ export * from "./search-api";
 export * from "./summarization-api";
 export * from "./hgen-api";
 export * from "./organization-api";
+export * from "./delta-api";

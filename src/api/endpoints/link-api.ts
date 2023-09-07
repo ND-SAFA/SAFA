@@ -3,7 +3,7 @@ import {
   TraceLinkSchema,
   TrainOrGenerateLinksSchema,
 } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
+import { buildRequest } from "@/api/util";
 
 /**
  * Returns all generated links for this project.
@@ -14,10 +14,9 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
 export async function getGeneratedLinks(
   versionId: string
 ): Promise<TraceLinkSchema[]> {
-  return authHttpClient<TraceLinkSchema[]>(
-    fillEndpoint(Endpoint.getGeneratedLinks, { versionId }),
-    { method: "GET" }
-  );
+  return buildRequest<TraceLinkSchema[], "versionId">("getGeneratedLinks")
+    .withParam("versionId", versionId)
+    .get();
 }
 
 /**
@@ -29,10 +28,9 @@ export async function getGeneratedLinks(
 export async function createGeneratedLinks(
   config: TrainOrGenerateLinksSchema
 ): Promise<JobSchema> {
-  return authHttpClient<JobSchema>(fillEndpoint(Endpoint.generateLinksJob), {
-    method: "POST",
-    body: JSON.stringify(config),
-  });
+  return buildRequest<JobSchema, string, TrainOrGenerateLinksSchema>(
+    "generateLinksJob"
+  ).post(config);
 }
 
 /**
@@ -46,11 +44,9 @@ export async function createModelTraining(
   projectId: string,
   config: TrainOrGenerateLinksSchema
 ): Promise<JobSchema> {
-  return authHttpClient<JobSchema>(
-    fillEndpoint(Endpoint.trainModelJob, { projectId }),
-    {
-      method: "POST",
-      body: JSON.stringify(config),
-    }
-  );
+  return buildRequest<JobSchema, "projectId", TrainOrGenerateLinksSchema>(
+    "trainModelJob"
+  )
+    .withParam("projectId", projectId)
+    .post(config);
 }

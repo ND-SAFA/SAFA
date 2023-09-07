@@ -1,5 +1,5 @@
 import { InstallationSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Returns the 3rd party data installations linked to a given project.
@@ -10,10 +10,7 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 export async function getProjectInstallations(
   projectId: string
 ): Promise<InstallationSchema[]> {
-  return authHttpClient<InstallationSchema[]>(
-    fillEndpoint(Endpoint.getInstallations, { projectId }),
-    {
-      method: "GET",
-    }
-  );
+  return buildRequest<InstallationSchema[], "projectId">("getInstallations")
+    .withParam("projectId", projectId)
+    .get();
 }

@@ -1,5 +1,5 @@
 import { ParseArtifactFileSchema, ParseTraceFileSchema } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Parses an artifact file into artifacts.
@@ -16,14 +16,12 @@ export async function parseArtifactFile(
 
   formData.append("file", file);
 
-  return authHttpClient<ParseArtifactFileSchema>(
-    fillEndpoint(Endpoint.parseArtifactFile, { artifactType }),
-    {
-      method: "POST",
-      body: formData,
-    },
-    { setJsonContentType: false }
-  );
+  return buildRequest<ParseArtifactFileSchema, "artifactType", FormData>(
+    "parseArtifactFile"
+  )
+    .withParam("artifactType", artifactType)
+    .withFormData()
+    .post(formData);
 }
 
 /**
@@ -39,12 +37,7 @@ export async function parseTraceFile(
 
   formData.append("file", file);
 
-  return authHttpClient<ParseTraceFileSchema>(
-    Endpoint.parseTraceFile,
-    {
-      method: "POST",
-      body: formData,
-    },
-    { setJsonContentType: false }
-  );
+  return buildRequest<ParseTraceFileSchema, string, FormData>("parseTraceFile")
+    .withFormData()
+    .post(formData);
 }

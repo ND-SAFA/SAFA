@@ -6,29 +6,7 @@ import {
   PasswordChangeSchema,
   UserSchema,
 } from "@/types";
-import { BASE_URL, Endpoint, fillEndpoint, authHttpClient } from "@/api";
-
-/**
- * Custom fetch call for session endpoints.
- *
- * @param args - Args to pass to fetch.
- * @throws Error - Response status was not 200.
- */
-async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
-  const response = await fetch(`${BASE_URL}/${args[0]}`, {
-    ...args[1],
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw Error("Unable to find a session.");
-  }
-
-  return response.json();
-}
+import { buildRequest } from "@/api";
 
 /**
  * Creates a new account.
@@ -40,7 +18,7 @@ async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
 export async function createUser(
   user: UserPasswordSchema
 ): Promise<SessionSchema> {
-  return sessionFetch<SessionSchema>(fillEndpoint(Endpoint.createAccount), {
+  return buildRequest<SessionSchema>("createAccount").sessionRequest({
     method: "POST",
     body: JSON.stringify(user),
   });
@@ -56,7 +34,7 @@ export async function createUser(
 export async function createLoginSession(
   user: UserPasswordSchema
 ): Promise<SessionSchema> {
-  return sessionFetch<SessionSchema>(fillEndpoint(Endpoint.login), {
+  return buildRequest<SessionSchema>("login").sessionRequest({
     method: "POST",
     body: JSON.stringify(user),
   });
@@ -69,9 +47,7 @@ export async function createLoginSession(
  * @throws If no user exists.
  */
 export async function getCurrentUser(): Promise<UserSchema> {
-  return authHttpClient<UserSchema>(fillEndpoint(Endpoint.getAccount), {
-    method: "GET",
-  });
+  return buildRequest<UserSchema>("getAccount").get();
 }
 
 /**
@@ -82,10 +58,7 @@ export async function getCurrentUser(): Promise<UserSchema> {
 export async function createPasswordReset(
   user: UserResetSchema
 ): Promise<void> {
-  await authHttpClient(fillEndpoint(Endpoint.forgotPassword), {
-    method: "PUT",
-    body: JSON.stringify(user),
-  });
+  await buildRequest<void, string, UserResetSchema>("forgotPassword").put(user);
 }
 
 /**
@@ -97,7 +70,7 @@ export async function createPasswordReset(
 export async function updatePassword(
   password: PasswordResetSchema
 ): Promise<void> {
-  await sessionFetch(fillEndpoint(Endpoint.resetPassword), {
+  return buildRequest("resetPassword").sessionRequest({
     method: "PUT",
     body: JSON.stringify(password),
   });
@@ -112,10 +85,9 @@ export async function updatePassword(
 export async function savePassword(
   password: PasswordChangeSchema
 ): Promise<void> {
-  await authHttpClient(fillEndpoint(Endpoint.updatePassword), {
-    method: "PUT",
-    body: JSON.stringify(password),
-  });
+  await buildRequest<void, string, PasswordChangeSchema>("updatePassword").put(
+    password
+  );
 }
 
 /**
@@ -125,9 +97,8 @@ export async function savePassword(
  * @throws The delete request was unsuccessful.
  */
 export async function deleteAccount(password: string): Promise<void> {
-  await authHttpClient(fillEndpoint(Endpoint.deleteAccount), {
-    method: "POST",
-    body: JSON.stringify({ password }),
+  await buildRequest<void, string, { password: string }>("deleteAccount").post({
+    password,
   });
 }
 
@@ -135,9 +106,7 @@ export async function deleteAccount(password: string): Promise<void> {
  * Logs out the current user.
  */
 export async function deleteSession(): Promise<void> {
-  await authHttpClient(fillEndpoint(Endpoint.logout), {
-    method: "GET",
-  }).catch();
+  await buildRequest("logout").get().catch();
 }
 
 /**

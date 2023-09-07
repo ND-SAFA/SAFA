@@ -1,2 +1,2 @@
 export * from "./endpoints";
-export { default as authHttpClient } from "./auth-http-client";
+export { default as buildRequest } from "./buildRequest";

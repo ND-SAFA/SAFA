@@ -5,7 +5,7 @@ import {
   OrganizationSchema,
   TeamSchema,
 } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 const exampleMember = (id: string | number = 0): MembershipSchema => ({
   projectMembershipId: id.toString(),
@@ -152,14 +152,9 @@ export async function getMembers(
   entity: MemberEntitySchema
 ): Promise<MembershipSchema[]> {
   // TODO
-  return authHttpClient<MembershipSchema[]>(
-    fillEndpoint(Endpoint.getProjectMembers, {
-      projectId: entity.entityId || "",
-    }),
-    {
-      method: "GET",
-    }
-  );
+  return buildRequest<MembershipSchema[], "projectId">("getProjectMembers")
+    .withParam("projectId", entity.entityId || "")
+    .get();
 }
 
 /**
@@ -172,18 +167,14 @@ export async function createMember(
   member: Omit<MembershipSchema, "projectMembershipId">
 ): Promise<MembershipSchema> {
   // TODO
-  return authHttpClient<MembershipSchema>(
-    fillEndpoint(Endpoint.getProjectMembers, {
-      projectId: member.entityId || "",
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify({
-        memberEmail: member.email,
-        projectRole: member.role,
-      } as MemberRequestSchema),
-    }
-  );
+  return buildRequest<MembershipSchema, "projectId", MemberRequestSchema>(
+    "updateProjectMember"
+  )
+    .withParam("projectId", member.entityId || "")
+    .post({
+      memberEmail: member.email,
+      projectRole: member.role,
+    });
 }
 
 /**
@@ -196,18 +187,14 @@ export async function editMember(
   member: MembershipSchema
 ): Promise<MembershipSchema> {
   // TODO
-  return authHttpClient<MembershipSchema>(
-    fillEndpoint(Endpoint.getProjectMembers, {
-      projectId: member.entityId || "",
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify({
-        memberEmail: member.email,
-        projectRole: member.role,
-      } as MemberRequestSchema),
-    }
-  );
+  return buildRequest<MembershipSchema, "projectId", MemberRequestSchema>(
+    "updateProjectMember"
+  )
+    .withParam("projectId", member.entityId || "")
+    .post({
+      memberEmail: member.email,
+      projectRole: member.role,
+    });
 }
 
 /**
@@ -220,12 +207,9 @@ export async function deleteMember(
   member: MembershipSchema
 ): Promise<MembershipSchema> {
   // TODO
-  return authHttpClient<MembershipSchema>(
-    fillEndpoint(Endpoint.deleteProjectMember, {
-      projectMemberId: member.projectMembershipId,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
+  return buildRequest<MembershipSchema, "projectMemberId">(
+    "deleteProjectMember"
+  )
+    .withParam("projectMemberId", member.projectMembershipId)
+    .delete();
 }

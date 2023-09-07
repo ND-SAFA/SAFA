@@ -1,5 +1,5 @@
-import { ArtifactSchema, DocumentSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { DocumentSchema } from "@/types";
+import { buildRequest } from "@/api";
 
 /**
  * Creates or updates given document under project specified.
@@ -12,15 +12,11 @@ export async function saveDocument(
   versionId: string,
   document: DocumentSchema
 ): Promise<DocumentSchema> {
-  return authHttpClient<DocumentSchema>(
-    fillEndpoint(Endpoint.createOrUpdateDocument, {
-      versionId,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify(document),
-    }
-  );
+  return buildRequest<DocumentSchema, "versionId", DocumentSchema>(
+    "createOrUpdateDocument"
+  )
+    .withParam("versionId", versionId)
+    .post(document);
 }
 
 /**
@@ -32,14 +28,9 @@ export async function saveDocument(
 export async function getDocuments(
   versionId: string
 ): Promise<DocumentSchema[]> {
-  return authHttpClient<DocumentSchema[]>(
-    fillEndpoint(Endpoint.getProjectDocuments, {
-      versionId,
-    }),
-    {
-      method: "GET",
-    }
-  );
+  return buildRequest<DocumentSchema[], "versionId">("getProjectDocuments")
+    .withParam("versionId", versionId)
+    .get();
 }
 
 /**
@@ -49,63 +40,9 @@ export async function getDocuments(
  * @param document - The document to be deleted.
  */
 export async function deleteDocument(document: DocumentSchema): Promise<void> {
-  await authHttpClient<void>(
-    fillEndpoint(Endpoint.deleteDocument, {
-      documentId: document.documentId,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
-}
-
-/**
- * Attaches artifacts to a document.
- *
- * @param versionId - The version to mark the addition to.
- * @param documentId - The document to which the artifacts are added to.
- * @param artifacts - The artifacts being added to the document.
- * @return The attached artifacts.
- */
-export async function saveDocumentArtifacts(
-  versionId: string,
-  documentId: string,
-  artifacts: ArtifactSchema[]
-): Promise<ArtifactSchema[]> {
-  return authHttpClient<ArtifactSchema[]>(
-    fillEndpoint(Endpoint.addArtifactsToDocument, {
-      versionId,
-      documentId,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify(artifacts),
-    }
-  );
-}
-
-/**
- * Removed artifacts from a document.
- *
- * @param versionId - The version to mark the removal at.
- * @param documentId - The document to remove the artifacts from.
- * @param artifactId - The artifact to remove from the document.
- */
-export async function deleteDocumentArtifact(
-  versionId: string,
-  documentId: string,
-  artifactId: string
-): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.removeArtifactFromDocument, {
-      versionId,
-      documentId,
-      artifactId,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
+  await buildRequest<void, "documentId">("deleteDocument")
+    .withParam("documentId", document.documentId)
+    .delete();
 }
 
 /**
@@ -113,21 +50,14 @@ export async function deleteDocumentArtifact(
  * @param documentId The document to save.
  */
 export async function setCurrentDocument(documentId: string): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.setCurrentDocument, {
-      documentId,
-    }),
-    {
-      method: "POST",
-    }
-  );
+  return buildRequest<void, "documentId">("setCurrentDocument")
+    .withParam("documentId", documentId)
+    .post();
 }
 
 /**
  * Removes the current document affiliated with current user.
  */
 export async function clearCurrentDocument(): Promise<void> {
-  return authHttpClient<void>(fillEndpoint(Endpoint.clearCurrentDocument, {}), {
-    method: "DELETE",
-  });
+  return buildRequest("clearCurrentDocument").delete();
 }

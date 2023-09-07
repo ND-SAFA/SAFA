@@ -1,5 +1,5 @@
 import { WarningCollectionSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Returns the project warnings in the given project version.
@@ -10,12 +10,9 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 export async function getWarningsInProjectVersion(
   versionId: string
 ): Promise<WarningCollectionSchema> {
-  return authHttpClient<WarningCollectionSchema>(
-    fillEndpoint(Endpoint.getWarningsInProjectVersion, {
-      versionId,
-    }),
-    {
-      method: "GET",
-    }
-  );
+  return buildRequest<WarningCollectionSchema, "versionId">(
+    "getWarningsInProjectVersion"
+  )
+    .withParam("versionId", versionId)
+    .get();
 }

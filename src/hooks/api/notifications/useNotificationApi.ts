@@ -28,7 +28,7 @@ import {
   timStore,
 } from "@/hooks";
 import { router } from "@/router";
-import { Endpoint, fillEndpoint, getChanges } from "@/api";
+import { fillEndpoint, getChanges } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -226,7 +226,7 @@ export const useNotificationApi = defineStore(
       stompApiStore.clearStompSubscriptions();
 
       await stompApiStore.subscribeToStomp(
-        fillEndpoint(Endpoint.projectTopic, { projectId }),
+        fillEndpoint("projectTopic", { projectId }),
         (frame) =>
           handleEntityChangeMessage(versionId, frame).catch((e) =>
             logStore.onError(e)
@@ -234,7 +234,7 @@ export const useNotificationApi = defineStore(
       );
 
       await stompApiStore.subscribeToStomp(
-        fillEndpoint(Endpoint.versionTopic, { versionId }),
+        fillEndpoint("versionTopic", { versionId }),
         (frame) =>
           handleEntityChangeMessage(versionId, frame).catch((e) =>
             logStore.onError(e)

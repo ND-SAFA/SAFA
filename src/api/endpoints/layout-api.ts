@@ -1,5 +1,5 @@
 import { GeneratedLayoutsSchema, LayoutRegenerationSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Regenerates layouts for a version & document.
@@ -16,11 +16,11 @@ export async function createLayout(
     ? { defaultDocument: false, documentIds: [documentId] }
     : { defaultDocument: true, documentIds: [] };
 
-  return authHttpClient<GeneratedLayoutsSchema>(
-    fillEndpoint(Endpoint.refreshLayout, { versionId }),
-    {
-      method: "POST",
-      body: JSON.stringify(body),
-    }
-  );
+  return buildRequest<
+    GeneratedLayoutsSchema,
+    "versionId",
+    LayoutRegenerationSchema
+  >("refreshLayout")
+    .withParam("versionId", versionId)
+    .post(body);
 }

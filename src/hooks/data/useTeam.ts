@@ -6,7 +6,7 @@ import { pinia } from "@/plugins";
 /**
  * A store for managing the state of the user's current team.
  */
-export const useTeam = defineStore("teamStore", {
+export const useTeam = defineStore("team", {
   state: () => ({
     /**
      * The currently loaded team.

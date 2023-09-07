@@ -6,7 +6,7 @@ import { pinia } from "@/plugins";
 /**
  * A store for managing the state of the user's current organization.
  */
-export const useOrg = defineStore("orgStore", {
+export const useOrg = defineStore("org", {
   state: () => ({
     /**
      * The currently loaded organization.

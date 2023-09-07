@@ -4,31 +4,12 @@ import { DocumentType } from "./document";
 /**
  * Enumerates the types of FTA nodes.
  */
-export enum FTANodeType {
-  OR = "OR",
-  AND = "AND",
-}
+export type FTANodeType = "AND" | "OR";
 
 /**
  * Enumerates the types of safety cases.
  */
-export enum SafetyCaseType {
-  GOAL = "GOAL",
-  SOLUTION = "SOLUTION",
-  CONTEXT = "CONTEXT",
-  STRATEGY = "STRATEGY",
-}
-
-/**
- * A map from each safety case types to what they can trace to.
- */
-export const allowedSafetyCaseTypes: Record<SafetyCaseType, SafetyCaseType[]> =
-  {
-    [SafetyCaseType.GOAL]: [SafetyCaseType.GOAL, SafetyCaseType.STRATEGY],
-    [SafetyCaseType.SOLUTION]: [SafetyCaseType.GOAL],
-    [SafetyCaseType.CONTEXT]: [SafetyCaseType.GOAL],
-    [SafetyCaseType.STRATEGY]: [SafetyCaseType.GOAL],
-  };
+export type SafetyCaseType = "GOAL" | "SOLUTION" | "CONTEXT" | "STRATEGY";
 
 /**
  * Defines an artifact of a project.

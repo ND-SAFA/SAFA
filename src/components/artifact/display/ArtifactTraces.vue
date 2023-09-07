@@ -107,7 +107,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
+import { ArtifactSchema } from "@/types";
 import {
   appStore,
   artifactStore,
@@ -179,13 +179,11 @@ function getTraceLinkClassName(artifactName: string): string {
   );
 
   const base =
-    traceLink?.traceType === TraceType.GENERATED
+    traceLink?.traceType === "GENERATED"
       ? "trace-chip-generated text-nodeGenerated "
       : "trace-chip text-nodeDefault ";
   const unreviewed =
-    traceLink?.approvalStatus === ApprovalType.UNREVIEWED
-      ? "trace-chip-unreviewed"
-      : "";
+    traceLink?.approvalStatus === "UNREVIEWED" ? "trace-chip-unreviewed" : "";
 
   return base + unreviewed;
 }

@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 
 import {
-  ApprovalType,
   ArtifactSchema,
   TraceLinkSchema,
   ArtifactCommitApiHook,
@@ -39,7 +38,7 @@ export const useArtifactCommitApi = defineStore(
     ): Promise<ArtifactSchema> {
       traceLinks = traceLinks.map((link) => ({
         ...link,
-        approvalStatus: ApprovalType.DECLINED,
+        approvalStatus: "DECLINED",
       }));
 
       return commitApiStore

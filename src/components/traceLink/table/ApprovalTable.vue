@@ -135,8 +135,8 @@ const customCells: (keyof FlatTraceLink | string)[] = [
 
 const currentRoute = useRoute();
 
-const countType = ref<TraceCountTypes>(TraceCountTypes.all);
-const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
+const countType = ref<TraceCountTypes>("all");
+const approvalTypes = ref<ApprovalType[]>(["UNREVIEWED"]);
 const groupBy = ref<string | undefined>("targetName");
 
 const displayActions = computed(() =>
@@ -201,9 +201,9 @@ function filterRow(row: FlatTraceLink): boolean {
 
   return (
     !traceApiStore.loadingTraceIds.includes(row.traceLinkId) &&
-    (countType.value === TraceCountTypes.all ||
-      (countType.value === TraceCountTypes.onlyTraced && bothTraced) ||
-      (countType.value === TraceCountTypes.notTraced && !bothTraced)) &&
+    (countType.value === "all" ||
+      (countType.value === "onlyTraced" && bothTraced) ||
+      (countType.value === "notTraced" && !bothTraced)) &&
     (approvalTypes.value.length === 0 ||
       approvalTypes.value.includes(row.approvalStatus))
   );

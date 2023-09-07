@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import {
-  ApprovalType,
   MatrixSchema,
   FlatTraceLink,
   IOHandlerCallback,
@@ -53,9 +52,9 @@ export const useTraceGenerationApi = defineStore(
             const source = artifactStore.getArtifactById(link.sourceId);
             const target = artifactStore.getArtifactById(link.targetId);
 
-            if (link.approvalStatus === ApprovalType.APPROVED) {
+            if (link.approvalStatus === "APPROVED") {
               approvedIds.push(link.traceLinkId);
-            } else if (link.approvalStatus === ApprovalType.DECLINED) {
+            } else if (link.approvalStatus === "DECLINED") {
               declinedIds.push(link.traceLinkId);
             }
 

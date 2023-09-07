@@ -1,13 +1,10 @@
 import {
   ArtifactSchema,
   CommitSchema,
-  ConfirmationType,
   ConfirmDialogueMessage,
   DocumentSchema,
-  DocumentType,
   FTANodeType,
   IdentifierSchema,
-  MessageType,
   ModelType,
   VersionDeltaSchema,
   ProjectSchema,
@@ -18,7 +15,6 @@ import {
   UserSchema,
   VersionSchema,
   AttributeSchema,
-  AttributeType,
   AttributeLayoutSchema,
   MatrixSchema,
   GeneratedMatrixSchema,
@@ -31,7 +27,7 @@ export function createSnackbarMessage(): SnackbarMessage {
   return {
     errors: [],
     message: "",
-    type: MessageType.clear,
+    type: "clear",
   };
 }
 
@@ -40,7 +36,7 @@ export function createSnackbarMessage(): SnackbarMessage {
  */
 export function createConfirmDialogueMessage(): ConfirmDialogueMessage {
   return {
-    type: ConfirmationType.CLEAR,
+    type: "clear",
     title: "",
     body: "",
     statusCallback: () => null,
@@ -135,10 +131,10 @@ export function createArtifact(
     body: artifact?.body || "",
     type: artifact?.type || "",
     isCode: artifact?.isCode || false,
-    documentType: artifact?.documentType || DocumentType.ARTIFACT_TREE,
+    documentType: artifact?.documentType || "ARTIFACT_TREE",
     documentIds: artifact?.documentIds || [],
-    safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
-    logicType: artifact?.logicType || FTANodeType.AND,
+    safetyCaseType: artifact?.safetyCaseType || "GOAL",
+    logicType: artifact?.logicType || "AND",
     attributes: artifact?.attributes || {},
   };
 }
@@ -158,30 +154,29 @@ export function createArtifactOfType(
   type?: true | string
 ): ArtifactSchema {
   if (typeof type === "string") {
-    const isFTA = type in FTANodeType;
-    const isSC = type in SafetyCaseType;
+    const isFTA = type in (["AND", "OR"] as FTANodeType[]);
+    const isSC =
+      type in (["GOAL", "SOLUTION", "STRATEGY", "CONTEXT"] as SafetyCaseType[]);
 
-    if (isFTA || type === DocumentType.FTA) {
+    if (isFTA || type === "FTA") {
       return createArtifact({
         ...artifact,
-        documentType: DocumentType.FTA,
-        logicType: isFTA ? (type as FTANodeType) : FTANodeType.AND,
-        type: DocumentType.FTA,
+        documentType: "FTA",
+        logicType: isFTA ? (type as FTANodeType) : "AND",
+        type: "FTA",
       });
     } else if (isSC) {
       return createArtifact({
         ...artifact,
-        documentType: DocumentType.SAFETY_CASE,
-        safetyCaseType: isSC
-          ? (type as SafetyCaseType)
-          : SafetyCaseType.CONTEXT,
-        type: DocumentType.SAFETY_CASE,
+        documentType: "SAFETY_CASE",
+        safetyCaseType: isSC ? (type as SafetyCaseType) : "CONTEXT",
+        type: "SAFETY_CASE",
       });
-    } else if (type === DocumentType.FMEA) {
+    } else if (type === "FMEA") {
       return createArtifact({
         ...artifact,
-        documentType: DocumentType.FMEA,
-        type: DocumentType.FMEA,
+        documentType: "FMEA",
+        type: "FMEA",
       });
     }
   }
@@ -224,7 +219,7 @@ export function createDocument(
       members: [],
     },
     name: document?.name || "",
-    type: document?.type || DocumentType.ARTIFACT_TREE,
+    type: document?.type || "ARTIFACT_TREE",
     artifactIds: document?.artifactIds || [],
     description: document?.description || "",
     layout: document?.layout || {},
@@ -240,7 +235,7 @@ export function createModel(
   return {
     id: model?.id || "",
     name: model?.name || "",
-    baseModel: model?.baseModel || ModelType.NLBert,
+    baseModel: model?.baseModel || "NLBert",
   };
 }
 
@@ -253,7 +248,7 @@ export function createAttribute(
   return {
     key: attribute?.key || "",
     label: attribute?.label || "",
-    type: attribute?.type || AttributeType.text,
+    type: attribute?.type || "text",
     options: attribute?.options,
     min: attribute?.min,
     max: attribute?.max,

@@ -4,12 +4,7 @@ import { ClassNameProps, CytoCoreGraph, StyleProps } from "@/types";
 /**
  * Enumerates the modes of the project graph.
  */
-export enum GraphMode {
-  tim = "tim",
-  tree = "tree",
-  table = "table",
-  delta = "delta",
-}
+export type GraphMode = "tim" | "tree" | "table" | "delta";
 
 /**
  * Enumerates the modes of the project graph.
@@ -54,7 +49,7 @@ export interface CytoElementData {
   /**
    * The type of graph for this node.
    */
-  graph: GraphMode.tree | GraphMode.tim;
+  graph: "tree" | "tim";
 
   /**
    * Whether the app is running in dark mode.

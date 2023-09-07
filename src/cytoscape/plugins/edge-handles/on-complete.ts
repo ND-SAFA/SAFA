@@ -3,7 +3,6 @@ import { CollectionReturnValue, EventObject, NodeSingular } from "cytoscape";
 import {
   ArtifactCytoElementData,
   CytoCore,
-  GraphMode,
   TimNodeCytoElementData,
 } from "@/types";
 import { traceApiStore, traceMatrixApiStore } from "@/hooks";
@@ -29,7 +28,7 @@ export function onArtifactTreeEdgeComplete(
 
   addedEdge.remove();
 
-  if (sourceNode.data()?.graph === GraphMode.tree) {
+  if (sourceNode.data()?.graph === "tree") {
     const sourceData: ArtifactCytoElementData = sourceNode.data();
     const targetData: ArtifactCytoElementData = targetNode.data();
 

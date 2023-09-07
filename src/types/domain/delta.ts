@@ -11,13 +11,12 @@ import {
 /**
  * Enumerates the types of delta state.
  */
-export enum ArtifactDeltaState {
-  NO_CHANGE = "NO_CHANGE",
-  MODIFIED = "MODIFIED",
-  ADDED = "ADDED",
-  REMOVED = "REMOVED",
-  IMPACTED = "IMPACTED",
-}
+export type ArtifactDeltaState =
+  | "NO_CHANGE"
+  | "MODIFIED"
+  | "ADDED"
+  | "REMOVED"
+  | "IMPACTED";
 
 /**
  * Defines a modification over some delta

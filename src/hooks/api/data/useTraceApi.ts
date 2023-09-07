@@ -4,9 +4,7 @@ import { computed, ref } from "vue";
 import {
   ArtifactSchema,
   ArtifactCytoElementData,
-  ApprovalType,
   TraceLinkSchema,
-  TraceType,
   IOHandlerCallback,
   TraceApiHook,
 } from "@/types";
@@ -56,8 +54,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
       sourceName,
       targetId: target.id,
       targetName,
-      traceType: TraceType.MANUAL,
-      approvalStatus: ApprovalType.APPROVED,
+      traceType: "MANUAL",
+      approvalStatus: "APPROVED",
       score: 1,
     };
 
@@ -155,9 +153,7 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
           },
           {
             onError: () =>
-              unreviewed.map(
-                (link) => (link.approvalStatus = ApprovalType.UNREVIEWED)
-              ),
+              unreviewed.map((link) => (link.approvalStatus = "UNREVIEWED")),
             useAppLoad: true,
             success: `Removed unreviewed trace links: ${unreviewed.length}`,
             error: `Unable to clear unreviewed trace links: ${unreviewed.length}`,

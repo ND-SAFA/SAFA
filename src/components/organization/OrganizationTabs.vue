@@ -26,7 +26,6 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { OrganizationTabTypes } from "@/types";
 import { organizationTabTypes } from "@/util";
 import { TabList, SidebarGrid } from "@/components/common";
 import {
@@ -38,5 +37,5 @@ import { TeamTab } from "@/components/organization/tabs";
 
 const tabs = organizationTabTypes();
 
-const tab = ref(OrganizationTabTypes.members);
+const tab = ref(tabs[0].id);
 </script>

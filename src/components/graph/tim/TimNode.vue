@@ -53,12 +53,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  GraphMode,
-  GraphElementType,
-  TimNodeCytoElement,
-  TimNodeProps,
-} from "@/types";
+import { GraphElementType, TimNodeCytoElement, TimNodeProps } from "@/types";
 import { sanitizeNodeId } from "@/util";
 import {
   timStore,
@@ -95,7 +90,7 @@ const countLabel = computed(() =>
 const definition = computed<TimNodeCytoElement>(() => ({
   data: {
     type: GraphElementType.node,
-    graph: GraphMode.tim,
+    graph: "tim",
     id: sanitizeNodeId(props.artifactType),
 
     artifactType: props.artifactType,

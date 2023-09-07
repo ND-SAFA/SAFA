@@ -32,7 +32,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { SelectOption, SettingsTabTypes } from "@/types";
+import { SelectOption } from "@/types";
 import { settingsTabOptions } from "@/util";
 import { permissionStore } from "@/hooks";
 import { TabList, SidebarGrid } from "@/components/common";
@@ -44,8 +44,6 @@ import {
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
 import { ProjectMemberTable } from "@/components/members";
-
-const tab = ref(SettingsTabTypes.members);
 
 const tabs = computed(() => {
   const options = settingsTabOptions();
@@ -63,4 +61,5 @@ const tabs = computed(() => {
 
   return visibleOptions;
 });
+const tab = ref(tabs.value[0].id);
 </script>

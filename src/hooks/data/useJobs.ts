@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { JobSchema, JobStatus } from "@/types";
+import { JobSchema } from "@/types";
 import { pinia } from "@/plugins";
 
 /**
@@ -26,7 +26,7 @@ export const useJobs = defineStore("jobs", {
      * Returns in progress jobs.
      */
     inProgressJobs(): JobSchema[] {
-      return this.jobs.filter(({ status }) => status === JobStatus.IN_PROGRESS);
+      return this.jobs.filter(({ status }) => status === "IN_PROGRESS");
     },
     /**
      * Returns in progress jobs, as well as any completed within this session.
@@ -34,7 +34,7 @@ export const useJobs = defineStore("jobs", {
     recentJobs(): JobSchema[] {
       return this.jobs.filter(
         ({ status, id }) =>
-          status === JobStatus.IN_PROGRESS || this.completedJobIds.includes(id)
+          status === "IN_PROGRESS" || this.completedJobIds.includes(id)
       );
     },
   },
@@ -53,7 +53,7 @@ export const useJobs = defineStore("jobs", {
      * @param job - The job to update.
      */
     updateJob(job: JobSchema): void {
-      if (job.status === JobStatus.COMPLETED) {
+      if (job.status === "COMPLETED") {
         this.completedJobIds.push(job.id);
       }
 

@@ -3,7 +3,6 @@ import { defineStore } from "pinia";
 import {
   ArtifactSchema,
   GenerationModelSchema,
-  SearchMode,
   SearchQuerySchema,
 } from "@/types";
 import { searchModeOptions } from "@/util";
@@ -54,13 +53,13 @@ export const useSearch = defineStore("search", {
      * Whether the search mode searches for artifact types.
      */
     artifactTypeMode(): boolean {
-      return this.mode.id === SearchMode.artifactTypes;
+      return this.mode.id === "artifactTypes";
     },
     /**
      * Whether the search mode is basic search.
      */
     basicSearchMode(): boolean {
-      return this.mode.id === SearchMode.search;
+      return this.mode.id === "search";
     },
     /**
      * The number of search items selected.
@@ -90,9 +89,9 @@ export const useSearch = defineStore("search", {
         model: this.searchModel?.id,
       };
 
-      if (this.mode.id === SearchMode.prompt) {
+      if (this.mode.id === "prompt") {
         searchQuery.prompt = this.searchText;
-      } else if (this.mode.id === SearchMode.artifacts) {
+      } else if (this.mode.id === "artifacts") {
         searchQuery.artifactIds = this.selectionIds;
       } else {
         searchQuery.artifactTypes = this.selectionIds;

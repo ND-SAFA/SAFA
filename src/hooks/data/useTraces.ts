@@ -1,12 +1,10 @@
 import { defineStore } from "pinia";
 
 import {
-  ApprovalType,
   ArtifactCytoElementData,
   ArtifactSchema,
   DocumentTraces,
   TraceLinkSchema,
-  TraceType,
 } from "@/types";
 import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
 import { timStore, documentStore, layoutStore, projectStore } from "@/hooks";
@@ -31,9 +29,7 @@ export const useTraces = defineStore("traces", {
      * @return All visible trace links.
      */
     visibleTraces(): TraceLinkSchema[] {
-      return this.currentTraces.filter(
-        (t) => t.approvalStatus != ApprovalType.DECLINED
-      );
+      return this.currentTraces.filter((t) => t.approvalStatus != "DECLINED");
     },
   },
   actions: {
@@ -138,17 +134,16 @@ export const useTraces = defineStore("traces", {
 
       if (filters.includes("manual") && filters.includes("approved")) {
         return linksBetweenSets.filter(
-          ({ approvalStatus }) => approvalStatus === ApprovalType.APPROVED
+          ({ approvalStatus }) => approvalStatus === "APPROVED"
         );
       } else if (filters.includes("manual")) {
         return linksBetweenSets.filter(
-          ({ traceType }) => traceType === TraceType.MANUAL
+          ({ traceType }) => traceType === "MANUAL"
         );
       } else if (filters.includes("approved")) {
         return linksBetweenSets.filter(
           ({ traceType, approvalStatus }) =>
-            traceType === TraceType.GENERATED &&
-            approvalStatus === ApprovalType.APPROVED
+            traceType === "GENERATED" && approvalStatus === "APPROVED"
         );
       } else {
         return linksBetweenSets;

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ApprovalType, TraceLinkSchema, TraceCommitApiHook } from "@/types";
+import { TraceLinkSchema, TraceCommitApiHook } from "@/types";
 import { commitApiStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -15,7 +15,7 @@ export const useTraceCommitApi = defineStore(
     ): Promise<TraceLinkSchema[]> {
       traceLink = {
         ...traceLink,
-        approvalStatus: ApprovalType.APPROVED,
+        approvalStatus: "APPROVED",
       };
 
       return commitApiStore
@@ -28,7 +28,7 @@ export const useTraceCommitApi = defineStore(
     ): Promise<TraceLinkSchema[]> {
       traceLink = {
         ...traceLink,
-        approvalStatus: ApprovalType.APPROVED,
+        approvalStatus: "APPROVED",
       };
 
       return commitApiStore
@@ -41,7 +41,7 @@ export const useTraceCommitApi = defineStore(
     ): Promise<TraceLinkSchema[]> {
       traceLink = {
         ...traceLink,
-        approvalStatus: ApprovalType.DECLINED,
+        approvalStatus: "DECLINED",
       };
 
       return commitApiStore
@@ -54,7 +54,7 @@ export const useTraceCommitApi = defineStore(
     ): Promise<TraceLinkSchema[]> {
       traceLinks = traceLinks.map((link) => ({
         ...link,
-        approvalStatus: ApprovalType.DECLINED,
+        approvalStatus: "DECLINED",
       }));
 
       return commitApiStore
@@ -67,7 +67,7 @@ export const useTraceCommitApi = defineStore(
     ): Promise<TraceLinkSchema[]> {
       traceLink = {
         ...traceLink,
-        approvalStatus: ApprovalType.UNREVIEWED,
+        approvalStatus: "UNREVIEWED",
       };
 
       return commitApiStore

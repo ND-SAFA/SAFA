@@ -1,14 +1,13 @@
 /**
  * Enumerates app store message types.
  */
-export enum MessageType {
-  info = "info",
-  update = "update",
-  success = "success",
-  error = "error",
-  warning = "warning",
-  clear = "clear",
-}
+export type MessageType =
+  | "info"
+  | "update"
+  | "success"
+  | "error"
+  | "warning"
+  | "clear";
 
 /**
  * Defines a snackbar message.

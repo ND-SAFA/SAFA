@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ArtifactSchema, DocumentType } from "@/types";
+import { ArtifactSchema } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
 import { selectionStore, artifactStore, documentStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -46,19 +46,19 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      * @return Whether the artifact type is for an FTA node.
      */
     isFTA(): boolean {
-      return this.editedArtifact.documentType === DocumentType.FTA;
+      return this.editedArtifact.documentType === "FTA";
     },
     /**
      * @return Whether the artifact type is for a safety case node.
      */
     isSafetyCase(): boolean {
-      return this.editedArtifact.documentType === DocumentType.SAFETY_CASE;
+      return this.editedArtifact.documentType === "SAFETY_CASE";
     },
     /**
      * @return Whether the artifact type is for an FMEA node.
      */
     isFMEA(): boolean {
-      return this.editedArtifact.documentType === DocumentType.FMEA;
+      return this.editedArtifact.documentType === "FMEA";
     },
     /**
      * @return The parent artifact of a logic node.

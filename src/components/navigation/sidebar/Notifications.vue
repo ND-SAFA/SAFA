@@ -36,18 +36,18 @@
           >
             <template #icon>
               <q-circular-progress
-                v-if="job.status === JobStatus.IN_PROGRESS"
+                v-if="job.status === 'IN_PROGRESS'"
                 color="secondary"
                 :value="job.currentProgress"
                 size="sm"
               />
               <icon
-                v-else-if="job.status === JobStatus.COMPLETED"
+                v-else-if="job.status === 'COMPLETED'"
                 variant="job-complete"
                 color="primary"
               />
               <icon
-                v-else-if="job.status === JobStatus.FAILED"
+                v-else-if="job.status === 'FAILED'"
                 variant="job-fail"
                 color="error"
               />
@@ -71,22 +71,22 @@
           >
             <template #icon>
               <icon
-                v-if="item.type === MessageType.success"
+                v-if="item.type === 'success'"
                 variant="save"
                 color="added"
               />
               <icon
-                v-if="item.type === MessageType.error"
+                v-if="item.type === 'error'"
                 variant="error"
                 color="removed"
               />
               <icon
-                v-if="item.type === MessageType.warning"
+                v-if="item.type === 'warning'"
                 variant="warning"
                 color="warning"
               />
               <icon
-                v-if="item.type === MessageType.info"
+                v-if="item.type === 'info'"
                 variant="logs"
                 color="modified"
               />
@@ -109,7 +109,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { JobSchema, JobStatus, MessageType } from "@/types";
+import { JobSchema } from "@/types";
 import { getVersionApiStore, jobStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { Typography, Icon, List, ListItem } from "@/components/common";

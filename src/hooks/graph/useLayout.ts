@@ -41,20 +41,20 @@ export const useLayout = defineStore("layout", {
     /**
      * The current view mode of the graph.
      */
-    mode: GraphMode.tim as GraphMode,
+    mode: "tim" as GraphMode,
   }),
   getters: {
     /**
      * @return Whether the graph is in tree mode.
      */
     isTreeMode(): boolean {
-      return this.mode === GraphMode.tree;
+      return this.mode === "tree";
     },
     /**
      * @return Whether the graph is in table mode.
      */
     isTableMode(): boolean {
-      return this.mode === GraphMode.table;
+      return this.mode === "table";
     },
     /**
      * @return Layout options for the graph.
@@ -124,8 +124,7 @@ export const useLayout = defineStore("layout", {
       const layout = GraphLayout.createArtifactLayout();
       const payload = { layout, cyPromise: artifactTreeCyPromise };
       const generateLayout =
-        this.mode === GraphMode.tim ||
-        Object.keys(this.artifactPositions).length === 0;
+        this.mode === "tim" || Object.keys(this.artifactPositions).length === 0;
 
       this.setGraphLayout(payload, generateLayout);
     },

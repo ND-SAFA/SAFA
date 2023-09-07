@@ -42,7 +42,7 @@ export const nodeStyles: CytoStyleSheet[] = [
   },
   // FTA Logic
   {
-    selector: `${ARTIFACT_NODE_SELECTOR}[logicType='${FTANodeType.AND}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[logicType='${"AND" as FTANodeType}']`,
     style: {
       "border-width": ARTIFACT_FTA_BORDER_WIDTH,
       shape: ARTIFACT_SHAPE.FTA,
@@ -50,7 +50,7 @@ export const nodeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_NODE_SELECTOR}[logicType='${FTANodeType.OR}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[logicType='${"OR" as FTANodeType}']`,
     style: {
       "border-width": ARTIFACT_FTA_BORDER_WIDTH,
       shape: ARTIFACT_SHAPE.FTA,
@@ -59,7 +59,9 @@ export const nodeStyles: CytoStyleSheet[] = [
   },
   // Safety Cases
   {
-    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.GOAL}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${
+      "GOAL" as SafetyCaseType
+    }']`,
     style: {
       shape: ARTIFACT_SHAPE.SC_GOAL,
       width: ARTIFACT_WIDTH,
@@ -67,7 +69,9 @@ export const nodeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.CONTEXT}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${
+      "CONTEXT" as SafetyCaseType
+    }']`,
     style: {
       shape: ARTIFACT_SHAPE.SC_CONTEXT,
       width: ARTIFACT_WIDTH,
@@ -75,7 +79,9 @@ export const nodeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.SOLUTION}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${
+      "SOLUTION" as SafetyCaseType
+    }']`,
     style: {
       shape: ARTIFACT_SHAPE.SC_SOLUTION,
       width: ARTIFACT_HEIGHT * 1.4,
@@ -83,7 +89,9 @@ export const nodeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${SafetyCaseType.STRATEGY}']`,
+    selector: `${ARTIFACT_NODE_SELECTOR}[safetyCaseType='${
+      "STRATEGY" as SafetyCaseType
+    }']`,
     style: {
       shape: ARTIFACT_SHAPE.SC_STRATEGY,
       width: ARTIFACT_WIDTH * 1.2,

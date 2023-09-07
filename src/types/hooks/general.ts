@@ -77,15 +77,10 @@ export type DetailsOpenState =
  * Defines a title and message for a confirmation dialog.
  */
 export interface ConfirmDialogueMessage {
-  type: ConfirmationType;
+  type: "info" | "clear";
   title: string;
   body: string;
   statusCallback: (status: boolean) => void;
-}
-
-export enum ConfirmationType {
-  INFO = "info",
-  CLEAR = "clear",
 }
 
 /**

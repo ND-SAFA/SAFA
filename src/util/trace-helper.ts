@@ -1,11 +1,9 @@
 import {
-  ApprovalType,
   ArtifactCytoElementData,
   ArtifactSchema,
   LinkSchema,
   TraceLinkSchema,
   TraceMatrixSchema,
-  TraceType,
 } from "@/types";
 
 /**
@@ -83,15 +81,15 @@ export function isLinkAllowedByType(
  */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function linkStatus(traceLink?: TraceLinkSchema) {
-  const canBeModified = () => traceLink?.traceType === TraceType.GENERATED;
+  const canBeModified = () => traceLink?.traceType === "GENERATED";
 
   return {
     canBeModified,
     canBeApproved: () =>
-      canBeModified() && traceLink?.approvalStatus !== ApprovalType.APPROVED,
+      canBeModified() && traceLink?.approvalStatus !== "APPROVED",
     canBeDeclined: () =>
-      canBeModified() && traceLink?.approvalStatus !== ApprovalType.DECLINED,
+      canBeModified() && traceLink?.approvalStatus !== "DECLINED",
     canBeReset: () =>
-      canBeModified() && traceLink?.approvalStatus !== ApprovalType.UNREVIEWED,
+      canBeModified() && traceLink?.approvalStatus !== "UNREVIEWED",
   };
 }

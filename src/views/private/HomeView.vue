@@ -66,11 +66,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { CreatorTabTypes } from "@/types";
+import { CreatorTab } from "@/types";
 import { useScreen } from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
-import ExternalLinks from "@/components/account/ExternalLinks.vue";
 import {
+  ExternalLinks,
   PrivatePage,
   FlexBox,
   Typography,
@@ -86,19 +86,19 @@ const parts = computed(() => (smallWindow.value ? "12" : "6"));
 
 function handleOpenStandard() {
   navigateTo(Routes.PROJECT_CREATOR, {
-    [QueryParams.TAB]: CreatorTabTypes.standard,
+    [QueryParams.TAB]: "standard" as CreatorTab,
   });
 }
 
 function handleOpenBulk() {
   navigateTo(Routes.PROJECT_CREATOR, {
-    [QueryParams.TAB]: CreatorTabTypes.bulk,
+    [QueryParams.TAB]: "bulk" as CreatorTab,
   });
 }
 
 function handleOpenImport() {
   navigateTo(Routes.PROJECT_CREATOR, {
-    [QueryParams.TAB]: CreatorTabTypes.import,
+    [QueryParams.TAB]: "import" as CreatorTab,
   });
 }
 </script>

@@ -13,12 +13,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  GraphElementType,
-  GraphMode,
-  TraceCytoElement,
-  TraceLinkProps,
-} from "@/types";
+import { GraphElementType, TraceCytoElement, TraceLinkProps } from "@/types";
 import { deltaStore, selectionStore, useTheme } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 
@@ -35,7 +30,7 @@ const faded = computed(
 const definition = computed<TraceCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
-    graph: GraphMode.tree,
+    graph: "tree",
     id: props.trace.traceLinkId,
 
     // Reversed to show arrow toward parent.

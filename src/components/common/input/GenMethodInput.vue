@@ -42,21 +42,21 @@ const model = useVModel(props, "modelValue");
 /**
  * @return display names for each trace model type.
  */
-function traceModelOptions(): SelectOption[] {
+function traceModelOptions(): SelectOption<ModelType>[] {
   return [
     createOption(
-      ModelType.NLBert,
+      "NLBert",
       "Slower, higher quality links. Traces free-text artifacts to other free-text artifacts."
     ),
     createOption(
-      ModelType.PLBert,
+      "PLBert",
       "Slower, higher quality links. Traces free-text artifacts to source code."
     ),
     createOption(
-      ModelType.AutomotiveBert,
+      "AutomotiveBert",
       "Slower, high quality links for automotive projects."
     ),
-    createOption(ModelType.VSM, "Faster, lower quality links."),
+    createOption("VSM", "Faster, lower quality links."),
   ];
 }
 

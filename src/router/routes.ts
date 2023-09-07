@@ -13,7 +13,6 @@ import {
   ProjectSettingsView,
   ResetPasswordView,
   SearchView,
-  TracePredictionView,
   UploadStatusView,
   MyTeamView,
 } from "@/views";
@@ -31,7 +30,6 @@ export enum Routes {
   MY_PROJECTS = "/open",
   ARTIFACT = "/project",
   PROJECT_SETTINGS = "/settings",
-  TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
   ORG = "/organization",
@@ -130,14 +128,6 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.ARTIFACT,
     name: "Artifact View",
     component: ArtifactView,
-    meta: {
-      requiresProject: true,
-    },
-  },
-  {
-    path: Routes.TRACE_LINK,
-    name: "Trace Prediction",
-    component: TracePredictionView,
     meta: {
       requiresProject: true,
     },

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { GraphMode, SearchApiHook } from "@/types";
+import { SearchApiHook } from "@/types";
 import { createDocument } from "@/util";
 import {
   useApi,
@@ -23,7 +23,7 @@ export const useSearchApi = defineStore("searchApi", (): SearchApiHook => {
       async () => {
         const searchQuery = searchStore.searchQuery;
 
-        layoutStore.mode = GraphMode.tree;
+        layoutStore.mode = "tree";
 
         const searchResults = await getProjectSearchQuery(
           projectStore.versionId,

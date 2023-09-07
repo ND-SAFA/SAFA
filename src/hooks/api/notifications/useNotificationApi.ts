@@ -5,7 +5,6 @@ import {
   ActionType,
   ChangeMessageSchema,
   ChangeSchema,
-  EntityType,
   NotificationApiHook,
   notifyUserEntities,
   ProjectSchema,
@@ -45,53 +44,53 @@ export const useNotificationApi = defineStore(
      */
     async function handleDeleteChange(change: ChangeSchema) {
       switch (change.entity) {
-        case EntityType.PROJECT:
+        case "PROJECT":
           // (entityIds.length should be 1 and equal to projectId)
           if (change.entityIds[0] !== projectStore.projectId) return;
 
           return setProjectApiStore.handleClear();
-        case EntityType.MEMBERS:
+        case "MEMBERS":
           // (entityIds = projectMembershipsIds)
           membersStore.deleteMembers(change.entityIds, {
             entityType: "PROJECT",
             entityId: projectStore.projectId,
           });
           break;
-        case EntityType.VERSION:
+        case "VERSION":
           // (entityIds = project version id)
           if (change.entityIds[0] !== projectStore.versionId) return;
 
           return setProjectApiStore.handleClear();
-        case EntityType.TYPES:
+        case "TYPES":
           // (entityIds = type id)
           timStore.deleteArtifactTypes(change.entityIds);
           break;
-        case EntityType.TRACE_MATRICES:
+        case "TRACE_MATRICES":
           timStore.deleteTraceMatrices(change.entityIds);
           break;
-        case EntityType.DOCUMENT:
+        case "DOCUMENT":
           // (entityIds = document id)
           change.entityIds.forEach((id) => documentStore.removeDocument(id));
           break;
-        case EntityType.ARTIFACTS:
+        case "ARTIFACTS":
           // (entityIds = artifact ids)
           artifactStore.deleteArtifacts(change.entityIds);
           break;
-        case EntityType.TRACES:
+        case "TRACES":
           // (entityIds = trace link ids)
           traceStore.deleteTraceLinks(change.entityIds);
           break;
-        case EntityType.WARNINGS:
+        case "WARNINGS":
           // Never called, case here for completion.
           break;
-        case EntityType.JOBS:
+        case "JOBS":
           // (entityIds = jobId)
           change.entityIds.forEach((id) => jobStore.deleteJob(id));
           break;
-        case EntityType.LAYOUT:
+        case "LAYOUT":
           // Never called, case here for completion.
           break;
-        case EntityType.MODELS:
+        case "MODELS":
           // (entityIds = modelIds)
           projectStore.updateProject({
             models: projectStore.models.filter(
@@ -99,11 +98,11 @@ export const useNotificationApi = defineStore(
             ),
           });
           break;
-        case EntityType.ATTRIBUTES:
+        case "ATTRIBUTES":
           // (entityIds = attribute keys)
           attributesStore.deleteAttributes(change.entityIds);
           break;
-        case EntityType.ATTRIBUTE_LAYOUTS:
+        case "ATTRIBUTE_LAYOUTS":
           // (entityIds = attribute layout ids)
           attributesStore.deleteAttributeLayouts(change.entityIds);
           break;
@@ -123,52 +122,52 @@ export const useNotificationApi = defineStore(
       const versionId = projectStore.versionId;
 
       switch (change.entity) {
-        case EntityType.PROJECT:
+        case "PROJECT":
           projectStore.updateProject({
             name: project.name,
             description: project.description,
           });
           break;
-        case EntityType.MEMBERS:
+        case "MEMBERS":
           membersStore.updateMembers(project.members, {
             entityType: "PROJECT",
             entityId: project.projectId,
           });
           break;
-        case EntityType.VERSION:
+        case "VERSION":
           return getVersionApiStore.handleLoad(versionId);
-        case EntityType.TYPES:
+        case "TYPES":
           timStore.addOrUpdateArtifactTypes(project.artifactTypes);
           break;
-        case EntityType.TRACE_MATRICES:
+        case "TRACE_MATRICES":
           timStore.addOrUpdateTraceMatrices(project.traceMatrices);
           break;
-        case EntityType.DOCUMENT:
+        case "DOCUMENT":
           await documentStore.updateDocuments(project.documents);
           break;
-        case EntityType.ARTIFACTS:
+        case "ARTIFACTS":
           artifactStore.addOrUpdateArtifacts(project.artifacts);
           break;
-        case EntityType.TRACES:
+        case "TRACES":
           traceStore.addOrUpdateTraceLinks(project.traces);
           break;
-        case EntityType.WARNINGS:
+        case "WARNINGS":
           return warningApiStore.handleReload(versionId);
-        case EntityType.JOBS:
+        case "JOBS":
           return jobApiStore.handleReload();
-        case EntityType.LAYOUT:
+        case "LAYOUT":
           documentStore.updateBaseLayout(project.layout);
           break;
-        case EntityType.SUBTREES:
+        case "SUBTREES":
           subtreeStore.initializeProject(project);
           break;
-        case EntityType.MODELS:
+        case "MODELS":
           projectStore.updateProject({ models: project.models });
           break;
-        case EntityType.ATTRIBUTES:
+        case "ATTRIBUTES":
           attributesStore.updateAttributes(project.attributes || []);
           break;
-        case EntityType.ATTRIBUTE_LAYOUTS:
+        case "ATTRIBUTE_LAYOUTS":
           attributesStore.updateAttributeLayouts(
             project.attributeLayouts || []
           );
@@ -202,7 +201,7 @@ export const useNotificationApi = defineStore(
         } else if (change.action === ActionType.UPDATE) {
           await handleUpdateChange(change, project);
 
-          if (change.entity === EntityType.ARTIFACTS) {
+          if (change.entity === "ARTIFACTS") {
             hasLayoutChange = true;
           }
         }

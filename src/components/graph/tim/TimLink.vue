@@ -13,12 +13,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  GraphElementType,
-  GraphMode,
-  TimEdgeCytoElement,
-  TimLinkProps,
-} from "@/types";
+import { GraphElementType, TimEdgeCytoElement, TimLinkProps } from "@/types";
 import { getTraceId, sanitizeNodeId } from "@/util";
 import { documentStore, selectionStore, useTheme } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
@@ -30,7 +25,7 @@ const { darkMode } = useTheme();
 const definition = computed<TimEdgeCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
-    graph: GraphMode.tim,
+    graph: "tim",
     id: sanitizeNodeId(getTraceId(props.sourceType, props.targetType)),
 
     // Reversed to show arrow toward parent.

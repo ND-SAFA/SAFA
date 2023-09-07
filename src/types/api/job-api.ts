@@ -47,24 +47,7 @@ export interface JobSchema {
 /**
  * The state a job can be in.
  */
-export enum JobStatus {
-  /**
-   * The job is being performed as expected.
-   */
-  IN_PROGRESS = "IN_PROGRESS",
-  /**
-   * The job has finished.
-   */
-  COMPLETED = "COMPLETED",
-  /**
-   * The job has been cancelled.
-   */
-  CANCELLED = "CANCELLED",
-  /**
-   * The job has failed.
-   */
-  FAILED = "FAILED",
-}
+export type JobStatus = "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "FAILED";
 
 /**
  * Describes an entry in the job log.

@@ -5,7 +5,6 @@ import {
   ArtifactSchema,
   ArtifactTypeSchema,
   ProjectSchema,
-  SafetyCaseType,
   TraceMatrixSchema,
 } from "@/types";
 import {
@@ -38,11 +37,7 @@ export const useTIM = defineStore("tim", {
      * @returns all type names of artifacts.
      */
     typeNames(): string[] {
-      const safetyCaseTypes = Object.values(SafetyCaseType) as string[];
-
-      return this.artifactTypes
-        .map(({ name }) => name)
-        .filter((name) => !safetyCaseTypes.includes(name));
+      return this.artifactTypes.map(({ name }) => name);
     },
   },
   actions: {

@@ -49,7 +49,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { TraceLinkDisplayProps, TraceType } from "@/types";
+import { TraceLinkDisplayProps } from "@/types";
 import { artifactStore } from "@/hooks";
 import { ArtifactBodyDisplay, Typography } from "@/components/common";
 import { ArtifactContentDisplay } from "@/components/artifact/display";
@@ -69,7 +69,7 @@ const showOnlyArtifact = computed(() =>
   props.showOnly === "source" ? sourceArtifact.value : targetArtifact.value
 );
 
-const generated = computed(() => props.trace.traceType === TraceType.GENERATED);
+const generated = computed(() => props.trace.traceType === "GENERATED");
 const explanation = computed(() =>
   generated.value ? props.trace.explanation : undefined
 );

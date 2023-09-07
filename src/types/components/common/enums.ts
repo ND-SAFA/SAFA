@@ -17,11 +17,7 @@ export interface SelectOption<T extends string = string> {
 /**
  * Represents an option for searching modes.
  */
-export interface SearchSelectOption extends SelectOption {
-  /**
-   * The iud of the option to use as a stored.
-   */
-  id: SearchMode;
+export interface SearchSelectOption extends SelectOption<SearchMode> {
   /**
    * Describes this search mode.
    */

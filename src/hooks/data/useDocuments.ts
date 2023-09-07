@@ -5,7 +5,6 @@ import {
   DocumentSchema,
   DocumentType,
   ProjectSchema,
-  GraphMode,
   ArtifactSchema,
 } from "@/types";
 import {
@@ -182,7 +181,7 @@ export const useDocuments = defineStore("documents", {
       layoutStore.updatePositions(document.layout);
 
       if (isTableDocument(document.type)) {
-        layoutStore.mode = GraphMode.table;
+        layoutStore.mode = "table";
       }
     },
     /**
@@ -214,7 +213,7 @@ export const useDocuments = defineStore("documents", {
 
       await this.removeDocument("");
       await this.addDocument(document);
-      layoutStore.mode = GraphMode.tree;
+      layoutStore.mode = "tree";
     },
     /**
      * Creates and adds a new document for multiple types of artifacts.
@@ -233,7 +232,7 @@ export const useDocuments = defineStore("documents", {
 
       await this.removeDocument("");
       await this.addDocument(document);
-      layoutStore.mode = GraphMode.tree;
+      layoutStore.mode = "tree";
     },
     /**
      * Adds artifacts to the current document.

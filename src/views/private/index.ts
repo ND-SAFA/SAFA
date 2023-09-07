@@ -1,4 +1,3 @@
-export { default as TracePredictionView } from "./TracePredictionView.vue";
 export { default as ArtifactView } from "./ArtifactView.vue";
 export { default as ProjectCreatorView } from "./ProjectCreatorView.vue";
 export { default as ProjectSettingsView } from "./ProjectSettingsView.vue";

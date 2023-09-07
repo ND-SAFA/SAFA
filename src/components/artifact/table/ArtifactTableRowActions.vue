@@ -45,7 +45,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ArtifactProps, GraphMode } from "@/types";
+import { ArtifactProps } from "@/types";
 import {
   appStore,
   artifactApiStore,
@@ -79,7 +79,7 @@ function handleDelete() {
  */
 function handleOpenTree(): void {
   documentStore.addDocumentOfNeighborhood(props.artifact);
-  layoutStore.mode = GraphMode.tree;
+  layoutStore.mode = "tree";
 }
 
 /**

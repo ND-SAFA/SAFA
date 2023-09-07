@@ -3,11 +3,7 @@ import { ArtifactSchema, MatrixSchema, TraceProps } from "@/types";
 /**
  * Enumerates the different methods of filtering artifacts by number of traces.
  */
-export enum TraceCountTypes {
-  all = "all",
-  onlyTraced = "onlyTraced",
-  notTraced = "notTraced",
-}
+export type TraceCountTypes = "all" | "onlyTraced" | "notTraced";
 
 /**
  * The props for displaying a trace link.

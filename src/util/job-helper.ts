@@ -1,4 +1,4 @@
-import { IconVariant, JobSchema, JobStatus } from "@/types";
+import { IconVariant, JobSchema } from "@/types";
 import { enumToDisplay, timestampToDisplay } from "@/util/string-helper";
 import { getEnumColor } from "@/util/theme";
 
@@ -10,19 +10,19 @@ import { getEnumColor } from "@/util/theme";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function jobStatus(job: JobSchema) {
   return {
-    isCompleted: () => job.status === JobStatus.COMPLETED,
-    isInProgress: () => job.status === JobStatus.IN_PROGRESS,
+    isCompleted: () => job.status === "COMPLETED",
+    isInProgress: () => job.status === "IN_PROGRESS",
     progress: () => {
       switch (job.status) {
-        case JobStatus.IN_PROGRESS:
+        case "IN_PROGRESS":
           return (
             `${job.currentProgress}% | ` +
             `${timestampToDisplay(job.lastUpdatedAt)}`
           );
-        case JobStatus.COMPLETED:
+        case "COMPLETED":
           return timestampToDisplay(job.completedAt);
-        case JobStatus.CANCELLED:
-        case JobStatus.FAILED:
+        case "CANCELLED":
+        case "FAILED":
           return timestampToDisplay(job.lastUpdatedAt);
         default:
           return "";
@@ -32,9 +32,9 @@ export function jobStatus(job: JobSchema) {
     color: () => getEnumColor(job.status || ""),
     icon: (): IconVariant => {
       switch (job.status) {
-        case JobStatus.CANCELLED:
+        case "CANCELLED":
           return "job-cancel";
-        case JobStatus.FAILED:
+        case "FAILED":
           return "job-fail";
         default:
           return "job-complete";

@@ -26,7 +26,6 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { TeamTabTypes } from "@/types";
 import { teamTabTypes } from "@/util";
 import { TabList, SidebarGrid } from "@/components/common";
 import { TeamButtons, TeamDisplay } from "@/components/organization/save";
@@ -35,5 +34,5 @@ import { ProjectVersionStepper } from "@/components/project";
 
 const tabs = teamTabTypes();
 
-const tab = ref(TeamTabTypes.members);
+const tab = ref(tabs[0].id);
 </script>

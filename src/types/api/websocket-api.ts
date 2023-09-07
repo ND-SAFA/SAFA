@@ -21,6 +21,26 @@ export interface ChangeMessageSchema {
 }
 
 /**
+ * Entity being changed.
+ */
+export type EntityType =
+  | "PROJECT"
+  | "MEMBERS"
+  | "VERSION"
+  | "TYPES"
+  | "TRACE_MATRICES"
+  | "DOCUMENT"
+  | "ARTIFACTS"
+  | "TRACES"
+  | "WARNINGS"
+  | "JOBS"
+  | "LAYOUT"
+  | "SUBTREES"
+  | "MODELS"
+  | "ATTRIBUTES"
+  | "ATTRIBUTE_LAYOUTS";
+
+/**
  * Represents list of changed entities.
  */
 export interface ChangeSchema {
@@ -30,34 +50,13 @@ export interface ChangeSchema {
 }
 
 /**
- * Entity being changed.
- */
-export enum EntityType {
-  PROJECT = "PROJECT",
-  MEMBERS = "MEMBERS",
-  VERSION = "VERSION",
-  TYPES = "TYPES",
-  TRACE_MATRICES = "TRACE_MATRICES",
-  DOCUMENT = "DOCUMENT",
-  ARTIFACTS = "ARTIFACTS",
-  TRACES = "TRACES",
-  WARNINGS = "WARNINGS",
-  JOBS = "JOBS",
-  LAYOUT = "LAYOUT",
-  SUBTREES = "SUBTREES",
-  MODELS = "MODELS",
-  ATTRIBUTES = "ATTRIBUTES",
-  ATTRIBUTE_LAYOUTS = "ATTRIBUTE_LAYOUTS",
-}
-
-/**
  * A list of all entities that can trigger updates
  * through notifications when made by the current user.
  */
-export const notifyUserEntities = [
-  EntityType.VERSION,
-  EntityType.WARNINGS,
-  EntityType.LAYOUT,
+export const notifyUserEntities: EntityType[] = [
+  "VERSION",
+  "WARNINGS",
+  "LAYOUT",
 ];
 
 /**

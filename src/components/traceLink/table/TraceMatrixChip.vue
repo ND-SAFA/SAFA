@@ -36,7 +36,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, TraceMatrixChipProps, TraceType } from "@/types";
+import { TraceMatrixChipProps } from "@/types";
 import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
 import { Typography, IconButton, Icon, Chip } from "@/components/common";
 
@@ -55,14 +55,10 @@ const traceLink = computed(() =>
     : traceStore.getTraceLinkByArtifacts(props.source.id, props.target.id)
 );
 
-const isGenerated = computed(
-  () => traceLink.value?.traceType === TraceType.GENERATED
-);
+const isGenerated = computed(() => traceLink.value?.traceType === "GENERATED");
 
 const isUnreviewed = computed(
-  () =>
-    isGenerated.value &&
-    traceLink.value?.approvalStatus === ApprovalType.UNREVIEWED
+  () => isGenerated.value && traceLink.value?.approvalStatus === "UNREVIEWED"
 );
 
 const className = computed(() => {

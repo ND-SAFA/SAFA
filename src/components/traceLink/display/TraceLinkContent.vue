@@ -51,7 +51,6 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
 import { AttributeChip, PanelCard, Typography } from "@/components/common";
 import { ArtifactBodyDisplay } from "@/components/artifact/display";
@@ -65,9 +64,7 @@ const targetArtifact = computed(() =>
   artifactStore.getArtifactById(traceLink.value?.targetId || "")
 );
 
-const generated = computed(
-  () => traceLink.value?.traceType === TraceType.GENERATED
-);
+const generated = computed(() => traceLink.value?.traceType === "GENERATED");
 
 const score = computed(() =>
   generated.value ? String(traceLink.value?.score) : ""

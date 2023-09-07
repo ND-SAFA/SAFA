@@ -3,12 +3,7 @@ import { GeneratedMatrixSchema, VersionSchema } from "@/types";
 /**
  * Enumerates the type of generated trace models.
  */
-export enum ModelType {
-  AutomotiveBert = "AutomotiveBert",
-  NLBert = "NLBert",
-  PLBert = "PLBert",
-  VSM = "VSM",
-}
+export type ModelType = "AutomotiveBert" | "NLBert" | "PLBert" | "VSM";
 
 /**
  * Represents a model trained to generate trace links.
@@ -35,10 +30,7 @@ export interface GenerationModelSchema {
 /**
  * Lists the methods by which a model can be shared.
  */
-export enum ModelShareType {
-  CLONE = "COPY_BY_VALUE",
-  REUSE = "COPY_BY_REFERENCE",
-}
+export type ModelShareType = "COPY_BY_VALUE" | "COPY_BY_REFERENCE";
 
 /**
  * Describes a matrix of artifacts.

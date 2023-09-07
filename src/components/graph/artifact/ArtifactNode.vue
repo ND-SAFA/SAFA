@@ -44,7 +44,6 @@ import {
   ArtifactNodeProps,
   CytoCore,
   GraphElementType,
-  GraphMode,
 } from "@/types";
 import { getEnumColor } from "@/util";
 import {
@@ -100,7 +99,7 @@ const definition = computed<ArtifactCytoElement>(() => {
   return {
     data: {
       type: GraphElementType.node,
-      graph: GraphMode.tree,
+      graph: "tree",
       id,
 
       artifactName: name,

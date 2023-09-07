@@ -1,11 +1,9 @@
 import { defineStore } from "pinia";
 
 import {
-  ApprovalType,
   ArtifactDeltaState,
   ArtifactSchema,
   EntityModificationSchema,
-  GraphMode,
   VersionDeltaSchema,
   TraceLinkSchema,
   VersionSchema,
@@ -80,7 +78,7 @@ export const useDelta = defineStore("delta", {
      */
     setIsDeltaViewEnabled(isDeltaViewEnabled: boolean): void {
       if (this.inDeltaView && !isDeltaViewEnabled) {
-        layoutStore.mode = GraphMode.tim;
+        layoutStore.mode = "tim";
         this.afterVersion = undefined;
       } else {
         appStore.closeSidePanels();
@@ -142,7 +140,7 @@ export const useDelta = defineStore("delta", {
 
       // Switch to tree view and generate the graph layout for the unique set of delta artifacts.
       await subtreeStore.restoreHiddenNodesAfter(async () => {
-        layoutStore.mode = GraphMode.tree;
+        layoutStore.mode = "tree";
         await layoutStore.updatePositions({});
         layoutStore.setArtifactTreeLayout();
       });
@@ -159,11 +157,11 @@ export const useDelta = defineStore("delta", {
 
       for (const id of artifactIds) {
         if (id in this.projectDelta.artifacts.added) {
-          deltaStates.add(ArtifactDeltaState.ADDED);
+          deltaStates.add("ADDED");
         } else if (id in this.projectDelta.artifacts.modified) {
-          deltaStates.add(ArtifactDeltaState.MODIFIED);
+          deltaStates.add("MODIFIED");
         } else if (id in this.projectDelta.artifacts.removed) {
-          deltaStates.add(ArtifactDeltaState.REMOVED);
+          deltaStates.add("REMOVED");
         }
       }
 
@@ -178,22 +176,22 @@ export const useDelta = defineStore("delta", {
      */
     getTraceDeltaType(id: string): ArtifactDeltaState {
       if (!this.inDeltaView) {
-        return ArtifactDeltaState.NO_CHANGE;
+        return "NO_CHANGE";
       } else if (id in this.projectDelta.traces.added) {
-        return ArtifactDeltaState.ADDED;
+        return "ADDED";
       } else if (id in this.projectDelta.traces.modified) {
         if (
           this.projectDelta.traces.modified[id].after.approvalStatus ===
-          ApprovalType.DECLINED
+          "DECLINED"
         ) {
-          return ArtifactDeltaState.REMOVED;
+          return "REMOVED";
         } else {
-          return ArtifactDeltaState.MODIFIED;
+          return "MODIFIED";
         }
       } else if (id in this.projectDelta.traces.removed) {
-        return ArtifactDeltaState.REMOVED;
+        return "REMOVED";
       } else {
-        return ArtifactDeltaState.NO_CHANGE;
+        return "NO_CHANGE";
       }
     },
     /**
@@ -204,15 +202,15 @@ export const useDelta = defineStore("delta", {
      */
     getArtifactDeltaType(id: string): ArtifactDeltaState {
       if (!this.inDeltaView) {
-        return ArtifactDeltaState.NO_CHANGE;
+        return "NO_CHANGE";
       } else if (id in this.projectDelta.artifacts.added) {
-        return ArtifactDeltaState.ADDED;
+        return "ADDED";
       } else if (id in this.projectDelta.artifacts.modified) {
-        return ArtifactDeltaState.MODIFIED;
+        return "MODIFIED";
       } else if (id in this.projectDelta.artifacts.removed) {
-        return ArtifactDeltaState.REMOVED;
+        return "REMOVED";
       } else {
-        return ArtifactDeltaState.NO_CHANGE;
+        return "NO_CHANGE";
       }
     },
   },

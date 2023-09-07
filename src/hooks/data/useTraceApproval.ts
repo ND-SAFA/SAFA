@@ -36,7 +36,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      */
     unreviewedLinks(): FlatTraceLink[] {
       return this.traceLinks.filter(
-        ({ approvalStatus }) => approvalStatus === ApprovalType.UNREVIEWED
+        ({ approvalStatus }) => approvalStatus === "UNREVIEWED"
       );
     },
   },
@@ -84,7 +84,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       );
       this.approvedIds = [...this.approvedIds, traceLink.traceLinkId];
       this.deselectLink(traceLink.traceLinkId);
-      this.updateLinkStatus(traceLink, ApprovalType.APPROVED);
+      this.updateLinkStatus(traceLink, "APPROVED");
     },
     /**
      * Updates the stored links with a new declined status.
@@ -97,7 +97,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       );
       this.declinedIds = [...this.declinedIds, traceLink.traceLinkId];
       this.deselectLink(traceLink.traceLinkId);
-      this.updateLinkStatus(traceLink, ApprovalType.DECLINED);
+      this.updateLinkStatus(traceLink, "DECLINED");
     },
     /**
      * Updates the stored links with a new un-reviewed status.
@@ -112,7 +112,7 @@ export const useTraceApproval = defineStore("traceApproval", {
         (declinedId) => declinedId != traceLink.traceLinkId
       );
       this.deselectLink(traceLink.traceLinkId);
-      this.updateLinkStatus(traceLink, ApprovalType.UNREVIEWED);
+      this.updateLinkStatus(traceLink, "UNREVIEWED");
     },
     /**
      * Expands all matching links.

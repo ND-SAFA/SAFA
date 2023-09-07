@@ -28,14 +28,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ConfirmationType } from "@/types";
 import { logStore } from "@/hooks";
 import { TextButton } from "@/components/common/button";
 import Modal from "./Modal.vue";
 
 const message = computed(() => logStore.confirmation);
 
-const isOpen = computed(() => message.value.type !== ConfirmationType.CLEAR);
+const isOpen = computed(() => message.value.type !== "clear");
 
 /**
  * Confirms the confirmation message.

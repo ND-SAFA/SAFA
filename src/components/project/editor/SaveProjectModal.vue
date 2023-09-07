@@ -22,12 +22,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { PanelType } from "@/types";
 import { projectApiStore, identifierSaveStore, appStore } from "@/hooks";
 import { Modal } from "@/components/common";
 import SaveProjectInputs from "./SaveProjectInputs.vue";
 
-const open = computed(() => appStore.isProjectCreatorOpen);
+const open = computed(() => appStore.popups.saveProject);
 const isUpdate = computed(() => identifierSaveStore.isUpdate);
 const modalTitle = computed(() =>
   isUpdate.value ? "Edit Project" : "Create Project"
@@ -37,6 +36,6 @@ const modalTitle = computed(() =>
  * Closes the save project panel.
  */
 function handleClose(): void {
-  appStore.closePanel(PanelType.projectSaver);
+  appStore.close("saveProject");
 }
 </script>

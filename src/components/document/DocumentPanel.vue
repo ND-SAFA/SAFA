@@ -91,7 +91,6 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { PanelType } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { appStore, documentApiStore, documentSaveStore } from "@/hooks";
 import {
@@ -126,7 +125,7 @@ function handleReset(): void {
  * Closes the document panel.
  */
 function handleClose() {
-  appStore.closePanel(PanelType.detailsPanel);
+  appStore.close("detailsPanel");
 }
 
 /**

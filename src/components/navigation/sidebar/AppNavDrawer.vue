@@ -68,10 +68,10 @@ const { smallWindow } = useScreen();
 
 const sidebarOpen = computed({
   get(): boolean {
-    return appStore.isAppPanelOpen;
+    return appStore.popups.navPanel;
   },
   set() {
-    appStore.toggleAppPanel();
+    appStore.toggle("navPanel");
   },
 });
 
@@ -85,6 +85,6 @@ function handleLogoClick(): void {
 onMounted(() => {
   if (!smallWindow) return;
 
-  appStore.toggleAppPanel();
+  appStore.close("navPanel");
 });
 </script>

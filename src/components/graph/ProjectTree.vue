@@ -112,7 +112,7 @@ const className = computed(() => {
 function handleClick(event: EventObject): void {
   if (event.target !== event.cy) return;
 
-  if (appStore.isCreateLinkEnabled) {
+  if (appStore.popups.drawTrace) {
     disableDrawMode();
   }
 
@@ -125,7 +125,7 @@ function handleClick(event: EventObject): void {
         "generateArtifact",
         "generateTrace",
       ] as DetailsOpenState[]
-    ).includes(appStore.isDetailsPanelOpen)
+    ).includes(appStore.popups.detailsPanel)
   )
     return;
 

@@ -145,6 +145,7 @@ export async function deleteSession(): Promise<void> {
  *
  * @param orgId - The organization to set as the default.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function saveDefaultOrg(orgId: string): Promise<void> {
   // TODO
 }

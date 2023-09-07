@@ -6,7 +6,7 @@
         text
         label="Cancel"
         icon="cancel"
-        @click="appStore.closePanel(PanelType.teamEditor)"
+        @click="appStore.close('saveTeam')"
       />
     </template>
 
@@ -36,7 +36,6 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { PanelType } from "@/types";
 import { appStore } from "@/hooks";
 import {
   AttributeChip,
@@ -47,5 +46,5 @@ import {
 } from "@/components/common";
 import SaveTeamInputs from "./SaveTeamInputs.vue";
 
-const editMode = computed(() => appStore.isTeamEditorOpen);
+const editMode = computed(() => appStore.popups.saveTeam);
 </script>

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { IdentifierSchema, PanelType } from "@/types";
+import { IdentifierSchema, PopupType } from "@/types";
 import { createProjectIdentifier } from "@/util";
 import { appStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -55,13 +55,13 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
 
       const panelName = (
         {
-          save: "projectSaver",
-          edit: "projectEditor",
-          delete: "projectDeleter",
-        } as Record<"save" | "edit" | "delete", PanelType>
+          save: "saveProject",
+          edit: "editProject",
+          delete: "deleteProject",
+        } as Record<"save" | "edit" | "delete", PopupType>
       )[mode];
 
-      appStore.isOpen[panelName] = true;
+      appStore.open(panelName);
     },
   },
 });

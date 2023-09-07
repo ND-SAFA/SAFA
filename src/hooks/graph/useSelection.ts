@@ -140,7 +140,7 @@ export const useSelection = defineStore("selection", {
       if (this.selectedTraceMatrixTypes[0]) {
         this.selectedTraceMatrixTypes = ["", ""];
       }
-      if (appStore.isDetailsPanelOpen) {
+      if (appStore.popups.detailsPanel) {
         appStore.closeSidePanels();
       }
     },

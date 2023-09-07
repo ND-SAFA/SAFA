@@ -185,7 +185,7 @@ export const useSaveTrace = defineStore("saveTrace", {
      * Resets the state of the trace based on selected artifacts.
      */
     resetTrace(): void {
-      const openState = appStore.isTraceCreatorOpen;
+      const openState = appStore.popups.saveTrace;
 
       this.sourceIds = [];
       this.targetIds = [];

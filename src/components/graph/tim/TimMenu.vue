@@ -60,7 +60,7 @@ import { NodeDisplay } from "../display";
 
 const handleCloseMenu = inject<() => void>("menu-close");
 
-const drawMode = computed(() => appStore.isCreateLinkEnabled);
+const drawMode = computed(() => appStore.popups.drawTrace);
 
 const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")

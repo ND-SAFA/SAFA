@@ -36,7 +36,6 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { PanelType } from "@/types";
 import {
   projectApiStore,
   identifierSaveStore,
@@ -47,7 +46,7 @@ import { Modal, TextInput, TextButton } from "@/components/common";
 
 const confirmText = ref("");
 
-const open = computed(() => appStore.isProjectDeleterOpen);
+const open = computed(() => appStore.popups.deleteProject);
 const projectName = computed(
   () => identifierSaveStore.baseIdentifier?.name || ""
 );
@@ -59,7 +58,7 @@ const canDelete = computed(() => confirmText.value === projectName.value);
  */
 function handleClose(): void {
   confirmText.value = "";
-  appStore.closePanel(PanelType.projectDeleter);
+  appStore.close("deleteProject");
 }
 
 /**

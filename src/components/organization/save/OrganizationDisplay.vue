@@ -6,7 +6,7 @@
         text
         label="Cancel"
         icon="cancel"
-        @click="appStore.closePanel(PanelType.organizationEditor)"
+        @click="appStore.close('saveOrg')"
       />
     </template>
 
@@ -37,7 +37,6 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { PanelType } from "@/types";
 import { appStore } from "@/hooks";
 import {
   AttributeChip,
@@ -48,5 +47,5 @@ import {
 } from "@/components/common";
 import SaveOrganizationInputs from "./SaveOrganizationInputs.vue";
 
-const editMode = computed(() => appStore.isOrgEditorOpen);
+const editMode = computed(() => appStore.popups.saveOrg);
 </script>

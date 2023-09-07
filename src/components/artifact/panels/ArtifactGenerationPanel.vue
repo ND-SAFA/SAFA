@@ -169,7 +169,7 @@ function handleGenerate(): void {
   });
 }
 watch(
-  () => appStore.isDetailsPanelOpen === "generateArtifact",
+  () => appStore.popups.detailsPanel === "generateArtifact",
   (openState) => {
     if (!openState) return;
 

@@ -1,20 +1,40 @@
 import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
 
+export type PopupType =
+  | "errorModal"
+  | "navPanel"
+  | "detailsPanel"
+  | "saveOrg"
+  | "saveTeam"
+  | "saveProject"
+  | "editProject"
+  | "deleteProject"
+  | "saveArtifact"
+  | "saveTrace"
+  | "drawTrace";
+
 /**
- * Enumerates types of panels.
+ * Represents the states of all popups.
  */
-export enum PanelType {
-  appPanel = "appPanel",
-  errorDisplay = "errorDisplay",
-  detailsPanel = "detailsPanel",
-  projectSaver = "projectSaver",
-  organizationEditor = "organizationEditor",
-  teamEditor = "teamEditor",
-  projectEditor = "projectEditor",
-  projectDeleter = "projectDeleter",
-  artifactCreator = "artifactCreator",
-  traceCreator = "traceCreator",
-  traceLinkDraw = "traceLinkDraw",
+export interface PopupStateMap
+  extends Record<
+    PopupType,
+    | boolean
+    | DetailsOpenState
+    | ArtifactCreatorOpenState
+    | TraceCreatorOpenState
+  > {
+  errorModal: boolean;
+  navPanel: boolean;
+  detailsPanel: DetailsOpenState;
+  saveOrg: boolean;
+  saveTeam: boolean;
+  saveProject: boolean;
+  editProject: boolean;
+  deleteProject: boolean;
+  saveArtifact: ArtifactCreatorOpenState;
+  saveTrace: TraceCreatorOpenState;
+  drawTrace: boolean;
 }
 
 /**
@@ -52,23 +72,6 @@ export type DetailsOpenState =
   | "displayArtifactLevel"
   | "saveArtifactLevel"
   | "displayTraceMatrix";
-
-/**
- * Represents the states of all openable panels.
- */
-export interface PanelStateMap {
-  [PanelType.appPanel]: boolean;
-  [PanelType.detailsPanel]: DetailsOpenState;
-  [PanelType.organizationEditor]: boolean;
-  [PanelType.teamEditor]: boolean;
-  [PanelType.projectSaver]: boolean;
-  [PanelType.projectEditor]: boolean;
-  [PanelType.projectDeleter]: boolean;
-  [PanelType.artifactCreator]: ArtifactCreatorOpenState;
-  [PanelType.traceCreator]: TraceCreatorOpenState;
-  [PanelType.errorDisplay]: boolean;
-  [PanelType.traceLinkDraw]: boolean;
-}
 
 /**
  * Defines a title and message for a confirmation dialog.

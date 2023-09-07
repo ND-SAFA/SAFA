@@ -13,7 +13,7 @@
       label="Edit"
       icon="edit"
       data-cy="button-org-edit"
-      @click="appStore.openPanel(PanelType.organizationEditor)"
+      @click="appStore.open('saveOrg')"
     />
     <separator vertical />
     <text-button
@@ -35,7 +35,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { PanelType } from "@/types";
 import { appStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 </script>

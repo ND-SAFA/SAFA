@@ -33,7 +33,7 @@ import { List, ListItem, Separator } from "@/components/common";
 
 const currentRoute = useRoute();
 
-const sidebarOpen = computed(() => appStore.isAppPanelOpen);
+const sidebarOpen = computed(() => appStore.popups.navPanel);
 const hideProjectOptions = computed(() => !projectStore.isProjectDefined);
 
 const options = computed(() => {

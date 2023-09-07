@@ -86,6 +86,7 @@ export async function editOrganization(
  * @param org - The organization to delete.
  */
 export async function deleteOrganization(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   org: OrganizationSchema
 ): Promise<void> {
   // TODO
@@ -132,7 +133,9 @@ export async function editTeam(
  * @param team - The team to delete.
  */
 export async function deleteTeam(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   orgId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   team: TeamSchema
 ): Promise<void> {
   // TODO

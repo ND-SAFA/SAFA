@@ -73,7 +73,7 @@ import { TraceMatrixPanel } from "@/components/traceMatrix";
 
 const { smallWindow } = useScreen();
 
-const openState = computed(() => appStore.isDetailsPanelOpen);
+const openState = computed(() => appStore.popups.detailsPanel);
 const drawerOpen = computed(() => typeof openState.value === "string");
 
 const className = computed(

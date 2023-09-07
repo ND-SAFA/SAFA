@@ -26,7 +26,7 @@ const errors = ref<string[]>([]);
 const $q = useQuasar();
 
 const hasErrors = computed(() => errors.value.length > 0);
-const isErrorOpen = computed(() => appStore.isErrorDisplayOpen);
+const isErrorOpen = computed(() => appStore.popups.errorModal);
 const showAction = computed(() => messageType.value === MessageType.update);
 
 const messageColor = computed(() => getEnumColor(messageType.value));
@@ -38,7 +38,7 @@ function buildNotification() {
     actions.push({
       label: "See Errors",
       color: "white",
-      handler: () => appStore.toggleErrorDisplay(),
+      handler: () => appStore.toggle("errorModal"),
     });
   }
 

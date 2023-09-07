@@ -13,7 +13,7 @@
       label="Edit"
       icon="edit"
       data-cy="button-team-edit"
-      @click="appStore.openPanel(PanelType.teamEditor)"
+      @click="appStore.open('saveTeam')"
     />
     <separator vertical />
     <text-button
@@ -35,7 +35,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { PanelType } from "@/types";
 import { appStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 </script>

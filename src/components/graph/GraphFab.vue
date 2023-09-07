@@ -95,7 +95,7 @@ const draggingFab = ref(false);
 const isTreeMode = computed(
   () => !appStore.isLoading && layoutStore.isTreeMode
 );
-const drawMode = computed(() => appStore.isCreateLinkEnabled);
+const drawMode = computed(() => appStore.popups.drawTrace);
 
 const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")

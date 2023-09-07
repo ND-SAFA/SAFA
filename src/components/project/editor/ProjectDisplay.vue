@@ -6,7 +6,7 @@
         text
         label="Cancel"
         icon="cancel"
-        @click="appStore.closePanel(PanelType.projectEditor)"
+        @click="appStore.close('editProject')"
       />
     </template>
 
@@ -56,10 +56,7 @@
       </expansion-item>
     </div>
 
-    <save-project-inputs
-      v-else
-      @save="appStore.closePanel(PanelType.projectEditor)"
-    />
+    <save-project-inputs v-else @click="appStore.close('editProject')" />
   </panel-card>
 </template>
 
@@ -74,7 +71,6 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { PanelType } from "@/types";
 import { versionToString } from "@/util";
 import { appStore, projectStore, timStore } from "@/hooks";
 import {
@@ -88,7 +84,7 @@ import {
 } from "@/components/common";
 import SaveProjectInputs from "./SaveProjectInputs.vue";
 
-const editMode = computed(() => appStore.isProjectEditorOpen);
+const editMode = computed(() => appStore.popups.editProject);
 
 const project = computed(() => projectStore.project);
 

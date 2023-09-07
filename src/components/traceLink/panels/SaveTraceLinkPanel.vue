@@ -132,7 +132,7 @@ async function handleSubmit(): Promise<void> {
 }
 
 watch(
-  () => appStore.isTraceCreatorOpen,
+  () => appStore.popups.saveTrace,
   (open) => {
     if (!open) return;
 

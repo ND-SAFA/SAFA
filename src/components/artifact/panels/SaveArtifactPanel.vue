@@ -36,7 +36,7 @@ onMounted(() => {
 });
 
 watch(
-  () => appStore.isDetailsPanelOpen && appStore.isArtifactCreatorOpen,
+  () => appStore.popups.detailsPanel && appStore.popups.saveArtifact,
   (openState) => {
     if (!openState) return;
 

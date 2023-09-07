@@ -6,7 +6,7 @@ import {
   CreatorFilePanel,
   MembershipSchema,
 } from "@/types";
-import { createProject } from "@/util";
+import { buildProject } from "@/util";
 import { sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -67,7 +67,7 @@ export const useSaveProject = defineStore("saveProject", {
         email: sessionStore.userEmail,
         role: "OWNER",
       };
-      const project = createProject({
+      const project = buildProject({
         name: this.name,
         description: this.description,
         owner: user.email,

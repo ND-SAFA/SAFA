@@ -9,7 +9,7 @@ import {
   GenerationModelSchema,
   TraceGenerationApiHook,
 } from "@/types";
-import { createGeneratedMatrix } from "@/util";
+import { buildGeneratedMatrix } from "@/util";
 import {
   useApi,
   approvalStore,
@@ -92,7 +92,7 @@ export const useTraceGenerationApi = defineStore(
       await traceGenerationApi.handleRequest(
         async () => {
           const job = await createGeneratedLinks({
-            requests: [createGeneratedMatrix(matrices, method)],
+            requests: [buildGeneratedMatrix(matrices, method)],
             projectVersion: projectStore.version,
           });
 
@@ -118,7 +118,7 @@ export const useTraceGenerationApi = defineStore(
       await traceGenerationApi.handleRequest(
         async () => {
           const job = await createModelTraining(projectStore.projectId, {
-            requests: [createGeneratedMatrix(matrices, model.baseModel, model)],
+            requests: [buildGeneratedMatrix(matrices, model.baseModel, model)],
           });
 
           await jobApiStore.handleCreate(job);

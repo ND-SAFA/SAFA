@@ -6,7 +6,7 @@ import {
   DocumentSchema,
   DocumentApiHook,
 } from "@/types";
-import { createDocument, preserveObjectKeys } from "@/util";
+import { buildDocument, preserveObjectKeys } from "@/util";
 import {
   useApi,
   logStore,
@@ -38,7 +38,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
       const versionId = projectStore.versionIdWithLog;
       const createdDocument = await saveDocument(
         versionId,
-        createDocument({
+        buildDocument({
           project: preserveObjectKeys(projectStore.project, [
             "name",
             "description",

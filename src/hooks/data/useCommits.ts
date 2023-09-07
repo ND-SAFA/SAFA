@@ -6,7 +6,7 @@ import {
   CommitHistory,
   TraceLinkSchema,
 } from "@/types";
-import { createCommit } from "@/util";
+import { buildCommit } from "@/util";
 import { pinia } from "@/plugins";
 import traceStore from "./useTraces";
 import artifactStore from "./useArtifacts";
@@ -51,7 +51,7 @@ export const useCommits = defineStore("commits", {
      */
     getRevert(commit: CommitSchema): CommitSchema {
       return {
-        ...createCommit(commit.commitVersion),
+        ...buildCommit(commit.commitVersion),
         artifacts: {
           added: commit.artifacts.removed,
           removed: commit.artifacts.added,

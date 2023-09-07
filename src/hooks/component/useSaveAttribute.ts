@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { AttributeSchema, AttributeType } from "@/types";
-import { createAttribute } from "@/util";
+import { buildAttribute } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -18,7 +18,7 @@ export const useSaveAttribute = (id: string) =>
       /**
        * The attribute being created or edited.
        */
-      editedAttribute: createAttribute(),
+      editedAttribute: buildAttribute(),
     }),
     getters: {
       /**
@@ -93,7 +93,7 @@ export const useSaveAttribute = (id: string) =>
        */
       resetAttribute(baseAttribute: AttributeSchema | undefined): void {
         this.baseAttribute = baseAttribute;
-        this.editedAttribute = createAttribute(this.baseAttribute);
+        this.editedAttribute = buildAttribute(this.baseAttribute);
       },
     },
   });

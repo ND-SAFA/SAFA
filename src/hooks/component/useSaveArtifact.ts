@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ArtifactSchema } from "@/types";
-import { createArtifact, createArtifactOfType } from "@/util";
+import { buildArtifact, buildArtifactOfType } from "@/util";
 import { selectionStore, artifactStore, documentStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -13,7 +13,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     /**
      * The artifact being created or edited.
      */
-    editedArtifact: createArtifact(selectionStore.selectedArtifact),
+    editedArtifact: buildArtifact(selectionStore.selectedArtifact),
     /**
      * The id of the parent artifact to connect to, if there is one.
      */
@@ -119,7 +119,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
       const { documentId } = documentStore.currentDocument;
       const { logicType, safetyCaseType } = this.editedArtifact;
 
-      return createArtifact({
+      return buildArtifact({
         ...this.editedArtifact,
         name: this.computedName,
         type: this.computedArtifactType,
@@ -138,7 +138,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     resetArtifact(type: true | string | undefined): void {
       const artifact = selectionStore.selectedArtifact;
 
-      this.editedArtifact = createArtifactOfType(artifact, type);
+      this.editedArtifact = buildArtifactOfType(artifact, type);
       this.isNameValid = !!artifact?.name;
       this.parentId = "";
     },
@@ -146,7 +146,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      * Updates the edited artifact to a new type.
      */
     updateArtifactType(): void {
-      this.editedArtifact = createArtifactOfType(
+      this.editedArtifact = buildArtifactOfType(
         this.editedArtifact,
         this.editedArtifact.type
       );

@@ -7,7 +7,7 @@ import {
   SessionSchema,
   TeamSchema,
 } from "@/types";
-import { createSession, createUser } from "@/util";
+import { buildSession, buildUser } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -19,11 +19,11 @@ export const useSession = defineStore("session", {
       /**
        * The current session.
        */
-      session: createSession(),
+      session: buildSession(),
       /**
        * The current user.
        */
-      user: createUser(),
+      user: buildUser(),
     };
   },
   getters: {
@@ -52,8 +52,8 @@ export const useSession = defineStore("session", {
      * Clears the current session.
      */
     clearSession() {
-      this.session = createSession();
-      this.user = createUser();
+      this.session = buildSession();
+      this.user = buildUser();
     },
     /**
      * @return This user's membership within a project, team, or organization.

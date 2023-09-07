@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { APIErrorBody, SnackbarMessage } from "@/types";
-import { createConfirmDialogueMessage, createSnackbarMessage } from "@/util";
+import { buildConfirmMessage, buildSnackbarMessage } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -12,11 +12,11 @@ export const useLog = defineStore("log", {
     /**
      * The current snackbar message.
      */
-    message: createSnackbarMessage(),
+    message: buildSnackbarMessage(),
     /**
      * The current confirmation message.
      */
-    confirmation: createConfirmDialogueMessage(),
+    confirmation: buildConfirmMessage(),
     /**
      * The timestamp of the last message displayed.
      */
@@ -32,13 +32,13 @@ export const useLog = defineStore("log", {
      * Clears the current snackbar message.
      */
     clearMessage(): void {
-      this.message = createSnackbarMessage();
+      this.message = buildSnackbarMessage();
     },
     /**
      * Clears the current snackbar message.
      */
     clearConfirmation(): void {
-      this.confirmation = createConfirmDialogueMessage();
+      this.confirmation = buildConfirmMessage();
     },
     setMessage(message: SnackbarMessage): void {
       if (Date.now() - this.lastMessageTimestamp < 1000) {

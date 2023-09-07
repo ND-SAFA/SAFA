@@ -8,7 +8,7 @@ import {
   TraceLinkSchema,
   VersionSchema,
 } from "@/types";
-import { createProjectDelta } from "@/util";
+import { buildProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
 import { pinia } from "@/plugins";
 import layoutStore from "../graph/useLayout";
@@ -33,7 +33,7 @@ export const useDelta = defineStore("delta", {
     /**
      * A collection of all added artifacts.
      */
-    projectDelta: createProjectDelta(),
+    projectDelta: buildProjectDelta(),
   }),
   getters: {
     /**

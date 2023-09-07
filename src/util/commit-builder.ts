@@ -4,7 +4,7 @@ import {
   VersionSchema,
   TraceLinkSchema,
 } from "@/types";
-import { createCommit } from "@/util";
+import { buildCommit } from "@/util";
 
 /**
  * Responsible for creating a commit of changes.
@@ -20,7 +20,7 @@ export class CommitBuilder {
    * @param version - The project version to commit to.
    */
   constructor(version: VersionSchema) {
-    this.commit = createCommit(version);
+    this.commit = buildCommit(version);
   }
 
   /**

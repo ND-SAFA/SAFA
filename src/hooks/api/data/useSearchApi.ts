@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { SearchApiHook } from "@/types";
-import { createDocument } from "@/util";
+import { buildDocument } from "@/util";
 import {
   useApi,
   documentStore,
@@ -30,7 +30,7 @@ export const useSearchApi = defineStore("searchApi", (): SearchApiHook => {
           searchQuery
         );
 
-        const document = createDocument({
+        const document = buildDocument({
           project: projectStore.projectIdentifier,
           name: searchQuery.prompt || "Search Query",
           artifactIds: searchResults.artifactIds,

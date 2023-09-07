@@ -8,7 +8,7 @@ import {
   ArtifactSchema,
 } from "@/types";
 import {
-  createDocument,
+  buildDocument,
   DEFAULT_VIEW_NAME,
   isTableDocument,
   removeMatches,
@@ -25,7 +25,7 @@ import artifactStore from "./useArtifacts";
  */
 export const useDocuments = defineStore("documents", {
   state() {
-    const baseDocument = createDocument();
+    const baseDocument = buildDocument();
 
     return {
       /**
@@ -93,7 +93,7 @@ export const useDocuments = defineStore("documents", {
         layout,
       } = project;
 
-      const defaultDocument = createDocument({
+      const defaultDocument = buildDocument({
         name: DEFAULT_VIEW_NAME,
         project,
         artifactIds: artifacts.map(({ id }) => id),
@@ -202,7 +202,7 @@ export const useDocuments = defineStore("documents", {
     async addDocumentOfNeighborhood(
       artifact: Pick<ArtifactSchema, "name" | "id">
     ): Promise<void> {
-      const document = createDocument({
+      const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,
         artifactIds: [
@@ -222,7 +222,7 @@ export const useDocuments = defineStore("documents", {
      */
     async addDocumentOfTypes(types: string[]): Promise<void> {
       const artifactsByType = artifactStore.allArtifactsByType;
-      const document = createDocument({
+      const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: types.join(", "),
         artifactIds: types

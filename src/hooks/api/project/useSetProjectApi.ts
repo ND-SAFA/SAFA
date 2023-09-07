@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ProjectSchema, SetProjectApiHook } from "@/types";
-import { createProject } from "@/util";
+import { buildProject } from "@/util";
 import {
   deltaStore,
   documentStore,
@@ -38,7 +38,7 @@ export const useSetProjectApi = defineStore(
     }
 
     async function handleClear(): Promise<void> {
-      const project = createProject();
+      const project = buildProject();
 
       projectStore.initializeProject(project);
       subtreeStore.$reset();

@@ -9,11 +9,8 @@ import {
   TraceType,
 } from "@/types";
 import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
-import { timStore } from "@/hooks";
+import { timStore, documentStore, layoutStore, projectStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import documentStore from "@/hooks/project/useDocuments";
-import layoutStore from "@/hooks/graph/useLayout";
-import projectStore from "@/hooks/project/useProject";
 
 /**
  * This module defines the state of the current project's trace links.

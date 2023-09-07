@@ -1,9 +1,14 @@
 import { defineStore } from "pinia";
 
 import { ArtifactSchema } from "@/types";
-import { appStore, subtreeStore, timStore, traceStore } from "@/hooks";
+import {
+  appStore,
+  subtreeStore,
+  timStore,
+  traceStore,
+  artifactStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
-import artifactStore from "../project/useArtifacts";
 
 /**
  * The save trace store assists in creating batches of trace links.

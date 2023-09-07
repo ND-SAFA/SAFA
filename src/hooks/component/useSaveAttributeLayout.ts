@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 
 import { AttributeLayoutSchema, AttributeSchema } from "@/types";
 import { createAttributeLayout, DEFAULT_LAYOUT_ID } from "@/util";
+import { attributesStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import attributesStore from "../project/useAttributes";
 
 /**
  * The save attribute store assists in creating and editing attribute layouts.

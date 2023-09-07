@@ -2,10 +2,8 @@ import { defineStore } from "pinia";
 
 import { DocumentSchema } from "@/types";
 import { createDocument } from "@/util";
+import { artifactStore, documentStore, subtreeStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import artifactStore from "../project/useArtifacts";
-import documentStore from "../project/useDocuments";
-import subtreeStore from "../project/useSubtree";
 
 /**
  * The save document store assists in creating and editing documents.

@@ -15,8 +15,8 @@ import {
   removeMatches,
   sanitizeNodeId,
 } from "@/util";
+import { projectStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import projectStore from "@/hooks/project/useProject";
 
 /**
  * This store manages the state of project TIM data,

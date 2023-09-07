@@ -2,10 +2,8 @@ import { defineStore } from "pinia";
 
 import { ArtifactSchema, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
+import { selectionStore, artifactStore, documentStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import selectionStore from "../graph/useSelection";
-import artifactStore from "../project/useArtifacts";
-import documentStore from "../project/useDocuments";
 
 /**
  * The save artifact store assists in creating and editing artifacts.

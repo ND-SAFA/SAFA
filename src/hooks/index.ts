@@ -1,5 +1,5 @@
 export * from "./core";
-export * from "./project";
+export * from "./data";
 export * from "./graph";
 export * from "./component";
 export * from "./composables";

@@ -7,7 +7,7 @@ import {
   MembershipSchema,
 } from "@/types";
 import { createProject } from "@/util";
-import sessionStore from "@/hooks/core/useSession";
+import { sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({

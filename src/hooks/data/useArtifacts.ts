@@ -8,12 +8,14 @@ import {
   removeMatches,
   collectByField,
 } from "@/util";
-import { timStore } from "@/hooks";
+import {
+  timStore,
+  documentStore,
+  projectStore,
+  layoutStore,
+  selectionStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
-import documentStore from "@/hooks/project/useDocuments";
-import projectStore from "@/hooks/project/useProject";
-import layoutStore from "@/hooks/graph/useLayout";
-import selectionStore from "@/hooks/graph/useSelection";
 
 /**
  * This module defines the state of the current project's artifacts.

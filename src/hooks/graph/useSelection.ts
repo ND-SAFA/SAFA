@@ -8,17 +8,19 @@ import {
   TraceMatrixSchema,
 } from "@/types";
 import { LARGE_NODE_COUNT, sanitizeNodeId } from "@/util";
-import { timStore } from "@/hooks";
+import {
+  timStore,
+  subtreeStore,
+  artifactStore,
+  traceStore,
+  appStore,
+} from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
   cyIfNotAnimated,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
-import subtreeStore from "../project/useSubtree";
-import artifactStore from "../project/useArtifacts";
-import traceStore from "../project/useTraces";
-import appStore from "../core/useApp";
 
 /**
  * Manages selection of parts of the project.

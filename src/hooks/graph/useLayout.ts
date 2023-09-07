@@ -8,6 +8,7 @@ import {
   PositionSchema,
   GraphMode,
 } from "@/types";
+import { appStore, selectionStore, subtreeStore } from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyApplyAutomove,
@@ -19,9 +20,6 @@ import {
   GraphLayout,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
-import { appStore } from "@/hooks/core";
-import selectionStore from "@/hooks/graph/useSelection";
-import subtreeStore from "@/hooks/project/useSubtree";
 
 /**
  * This module handles the layout positions of the graph.

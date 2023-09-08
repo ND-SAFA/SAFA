@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
-import { computed } from "vue/dist/vue";
-import { GetOrgApiHook, IOHandlerCallback, OrganizationSchema } from "@/types";
+import { GetOrgApiHook, OrganizationSchema } from "@/types";
 import { removeMatches } from "@/util";
 import { orgStore, sessionStore, useApi } from "@/hooks";
 import { getOrganization, getOrganizations, saveDefaultOrg } from "@/api";
@@ -41,25 +40,6 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
     allOrgs.value = allOrgs.value.filter(({ id }) => id !== org.id);
   }
 
-  async function handleReload(
-    callbacks: IOHandlerCallback = {}
-  ): Promise<void> {
-    if (!sessionStore.doesSessionExist) {
-      callbacks.onSuccess?.();
-      return;
-    }
-
-    await getOrgApi.handleRequest(
-      async () => {
-        allOrgs.value = await getOrganizations();
-      },
-      {
-        ...callbacks,
-        error: "Unable to load your organizations.",
-      }
-    );
-  }
-
   async function handleLoadCurrent(): Promise<void> {
     const orgId = sessionStore.user.defaultOrgId;
 
@@ -67,6 +47,7 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
     await getOrgApi.handleRequest(
       async () => {
+        allOrgs.value = await getOrganizations();
         orgStore.org = await getOrganization(orgId);
       },
       {
@@ -82,7 +63,6 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
     currentOrg,
     addOrg,
     removeOrg,
-    handleReload,
     handleLoadCurrent,
   };
 });

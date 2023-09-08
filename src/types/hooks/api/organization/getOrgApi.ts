@@ -1,5 +1,5 @@
 import { ComputedRef, Ref, WritableComputedRef } from "vue";
-import { IOHandlerCallback, OrganizationSchema } from "@/types";
+import { OrganizationSchema } from "@/types";
 
 /**
  * A hook for calling get organization API endpoints.
@@ -34,12 +34,6 @@ export interface GetOrgApiHook {
    * @param organization - The organization to remove.
    */
   removeOrg(organization: OrganizationSchema): void;
-  /**
-   * Stores all organizations for the current user.
-   *
-   * @param callbacks - The callbacks to call after the action.
-   */
-  handleReload(callbacks?: IOHandlerCallback): Promise<void>;
   /**
    * Loads the current organization.
    */

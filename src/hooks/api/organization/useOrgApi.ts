@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue/dist/vue";
+import { computed } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
 import { getOrgApiStore, orgStore, useApi } from "@/hooks";
 import {

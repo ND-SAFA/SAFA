@@ -14,6 +14,7 @@ import {
   sessionStore,
   logStore,
   permissionStore,
+  getOrgApiStore,
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -103,6 +104,8 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
 
       await getProjectApiStore.handleReload({
         onComplete: async () => {
+          await getOrgApiStore.handleLoadCurrent();
+
           if (goToPath === Routes.ARTIFACT) {
             await getProjectApiStore.handleLoadRecent();
           } else if (typeof goToPath === "string") {
@@ -147,6 +150,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
       permissionStore.isDemo = true;
     }
 
+    await getOrgApiStore.handleLoadCurrent();
     await getProjectApiStore.handleReload({});
   }
 

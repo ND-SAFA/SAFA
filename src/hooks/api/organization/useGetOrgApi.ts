@@ -21,17 +21,6 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
   const loading = computed(() => getOrgApi.loading);
 
-  const currentOrg = computed({
-    get: () => (orgStore.orgId ? orgStore.org : undefined),
-    set(org: OrganizationSchema | undefined) {
-      if (!org) return;
-
-      orgStore.org = org;
-
-      saveDefaultOrg(org.id);
-    },
-  });
-
   function addOrg(org: OrganizationSchema): void {
     allOrgs.value = [org, ...removeMatches(allOrgs.value, "id", [org.id])];
   }
@@ -40,14 +29,23 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
     allOrgs.value = allOrgs.value.filter(({ id }) => id !== org.id);
   }
 
-  async function handleLoadCurrent(): Promise<void> {
-    const orgId = sessionStore.user.defaultOrgId;
+  async function handleSwitch(org: OrganizationSchema): Promise<void> {
+    orgStore.org = org;
 
-    if (!sessionStore.doesSessionExist || !orgId) return;
+    await saveDefaultOrg(org.id);
+  }
+
+  async function handleLoadCurrent(): Promise<void> {
+    if (!sessionStore.doesSessionExist) return;
 
     await getOrgApi.handleRequest(
       async () => {
         allOrgs.value = await getOrganizations();
+
+        const orgId = sessionStore.user.defaultOrgId || allOrgs.value[0]?.id;
+
+        if (!orgId) return;
+
         orgStore.org = await getOrganization(orgId);
       },
       {
@@ -60,9 +58,9 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
     allOrgs,
     unloadedOrgs,
     loading,
-    currentOrg,
     addOrg,
     removeOrg,
+    handleSwitch,
     handleLoadCurrent,
   };
 });

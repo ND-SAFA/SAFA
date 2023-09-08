@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
-import { getOrgApiStore, orgStore, useApi } from "@/hooks";
+import { getOrgApiStore, logStore, orgStore, useApi } from "@/hooks";
 import {
   createOrganization,
   deleteOrganization,
@@ -23,7 +23,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
   const deleteOrgApiLoading = computed(() => deleteOrgApi.loading);
 
   async function handleCreate(
-    org: OrganizationSchema,
+    org: Pick<OrganizationSchema, "name" | "description">,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     await createOrgApi.handleRequest(
@@ -61,24 +61,33 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
   }
 
   async function handleDelete(
-    org: OrganizationSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
-    await deleteOrgApi.handleRequest(
-      async () => {
-        await deleteOrganization(org);
+    const org = orgStore.org;
 
-        getOrgApiStore.removeOrg(org);
+    logStore.confirm(
+      "Delete Organization",
+      `Are you sure you want to delete ${org.name}?`,
+      async (isConfirmed) => {
+        if (!isConfirmed) return;
 
-        if (orgStore.orgId !== org.id) return;
+        await deleteOrgApi.handleRequest(
+          async () => {
+            await deleteOrganization(org);
 
-        // Clear the current org if it was deleted.
-        orgStore.$reset();
-      },
-      {
-        ...callbacks,
-        success: `Organization has been deleted: ${org.name}`,
-        error: `Unable to delete organization: ${org.name}`,
+            getOrgApiStore.removeOrg(org);
+
+            if (orgStore.orgId !== org.id) return;
+
+            // Clear the current org if it was deleted.
+            orgStore.$reset();
+          },
+          {
+            ...callbacks,
+            success: `Organization has been deleted: ${org.name}`,
+            error: `Unable to delete organization: ${org.name}`,
+          }
+        );
       }
     );
   }

@@ -28,7 +28,7 @@ export interface OrgApiHook {
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**
-   * Edits an organization.
+   * Edits the given organization.
    *
    * @param org - The organization to edit.
    * @param callbacks - The callbacks to call after the action.
@@ -38,13 +38,9 @@ export interface OrgApiHook {
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**
-   * Deletes an organization.
+   * Deletes the current organization.
    *
-   * @param org - The organization to delete.
    * @param callbacks - The callbacks to call after the action.
    */
-  handleDelete(
-    org: OrganizationSchema,
-    callbacks?: IOHandlerCallback
-  ): Promise<void>;
+  handleDelete(callbacks?: IOHandlerCallback): Promise<void>;
 }

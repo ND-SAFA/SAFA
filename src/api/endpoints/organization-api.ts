@@ -58,7 +58,7 @@ export async function getOrganization(id: string): Promise<OrganizationSchema> {
  * @return The created organization.
  */
 export async function createOrganization(
-  org: Omit<OrganizationSchema, "id">
+  org: Pick<OrganizationSchema, "name" | "description">
 ): Promise<OrganizationSchema> {
   // TODO
   return {

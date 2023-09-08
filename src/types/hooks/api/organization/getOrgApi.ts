@@ -1,4 +1,4 @@
-import { ComputedRef, Ref, WritableComputedRef } from "vue";
+import { ComputedRef, Ref } from "vue";
 import { OrganizationSchema } from "@/types";
 
 /**
@@ -18,11 +18,6 @@ export interface GetOrgApiHook {
    */
   unloadedOrgs: ComputedRef<OrganizationSchema[]>;
   /**
-   * The current loaded organization.
-   * - Reactively loads the current organization when set.
-   */
-  currentOrg: WritableComputedRef<OrganizationSchema | undefined>;
-  /**
    * Adds or replaces an organization in the organization list.
    *
    * @param organization - The organization to add.
@@ -34,6 +29,12 @@ export interface GetOrgApiHook {
    * @param organization - The organization to remove.
    */
   removeOrg(organization: OrganizationSchema): void;
+  /**
+   * Switches to loading the given organization.
+   *
+   * @param organization - The organization to switch to.
+   */
+  handleSwitch(organization: OrganizationSchema): void;
   /**
    * Loads the current organization.
    */

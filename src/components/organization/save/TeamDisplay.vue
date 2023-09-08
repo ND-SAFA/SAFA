@@ -1,5 +1,5 @@
 <template>
-  <panel-card title="My Team">
+  <panel-card :title="team.name">
     <template #title-actions>
       <text-button
         v-if="editMode"
@@ -12,13 +12,9 @@
 
     <div v-if="!editMode">
       <flex-box full-width>
-        <attribute-chip value="<#> Members" />
-        <attribute-chip value="<#> Projects" />
+        <attribute-chip :value="memberCount" />
+        <attribute-chip :value="projectCount" />
       </flex-box>
-
-      <typography variant="caption" value="Description" />
-      <br />
-      <typography value="<Organization information>" />
     </div>
 
     <save-team-inputs v-else />
@@ -36,15 +32,19 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore } from "@/hooks";
+import { appStore, teamStore } from "@/hooks";
 import {
   AttributeChip,
   FlexBox,
   PanelCard,
   TextButton,
-  Typography,
 } from "@/components/common";
 import SaveTeamInputs from "./SaveTeamInputs.vue";
 
 const editMode = computed(() => appStore.popups.saveTeam);
+
+const team = computed(() => teamStore.team);
+
+const memberCount = computed(() => team.value.members.length + " Members");
+const projectCount = computed(() => team.value.projects.length + " Members");
 </script>

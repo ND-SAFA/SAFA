@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import { IOHandlerCallback, TeamApiHook, TeamSchema } from "@/types";
 import { removeMatches } from "@/util";
-import { orgStore, teamStore, useApi } from "@/hooks";
+import { logStore, orgStore, teamStore, useApi } from "@/hooks";
 import { createTeam, deleteTeam, editTeam } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -64,21 +64,31 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
     team: TeamSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
-    await deleteTeamApi.handleRequest(
-      async () => {
-        await deleteTeam(orgStore.orgId, team);
+    logStore.confirm(
+      "Delete Team",
+      `Are you sure you want to delete ${team.name}?`,
+      async (isConfirmed) => {
+        if (!isConfirmed) return;
 
-        orgStore.org.teams = removeMatches(orgStore.org.teams, "id", [team.id]);
+        await deleteTeamApi.handleRequest(
+          async () => {
+            await deleteTeam(orgStore.orgId, team);
 
-        if (teamStore.teamId !== team.id) return;
+            orgStore.org.teams = removeMatches(orgStore.org.teams, "id", [
+              team.id,
+            ]);
 
-        // Clear the current team if it was deleted.
-        teamStore.$reset();
-      },
-      {
-        ...callbacks,
-        success: `Team has been deleted: ${team.name}`,
-        error: `Unable to delete team: ${team.name}`,
+            if (teamStore.teamId !== team.id) return;
+
+            // Clear the current team if it was deleted.
+            teamStore.$reset();
+          },
+          {
+            ...callbacks,
+            success: `Team has been deleted: ${team.name}`,
+            error: `Unable to delete team: ${team.name}`,
+          }
+        );
       }
     );
   }

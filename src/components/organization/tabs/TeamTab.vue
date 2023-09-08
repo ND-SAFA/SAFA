@@ -21,6 +21,7 @@
       row-key="id"
       item-name="team"
       @row:add="addMode = true"
+      @row:delete="teamApiStore.handleDelete"
     >
       <template #cell-actions="{ row }">
         <icon-button
@@ -54,6 +55,8 @@ import {
   membersStore,
   projectStore,
   sessionStore,
+  teamApiStore,
+  teamStore,
 } from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -92,6 +95,8 @@ const selectedTeams = computed({
     selectedTeam.value = teams[0];
 
     if (teams[0]) {
+      teamStore.team = teams[0];
+
       navigateTo(Routes.TEAM, {
         [QueryParams.TEAM]: teams[0].id,
       });

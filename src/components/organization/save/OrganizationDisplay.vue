@@ -1,5 +1,5 @@
 <template>
-  <panel-card title="My Organization">
+  <panel-card :title="org.name">
     <template #title-actions>
       <text-button
         v-if="editMode"
@@ -12,14 +12,14 @@
 
     <div v-if="!editMode">
       <flex-box full-width>
-        <attribute-chip value="<#> Teams" />
-        <attribute-chip value="<#> Members" />
-        <attribute-chip value="<#> Projects" />
+        <attribute-chip :value="teamCount" />
+        <attribute-chip :value="memberCount" />
+        <attribute-chip :value="projectCount" />
       </flex-box>
 
       <typography variant="caption" value="Description" />
       <br />
-      <typography value="<Organization information>" />
+      <typography :value="org.description" />
     </div>
 
     <save-organization-inputs v-else />
@@ -37,7 +37,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore } from "@/hooks";
+import { appStore, orgStore } from "@/hooks";
 import {
   AttributeChip,
   FlexBox,
@@ -48,4 +48,15 @@ import {
 import SaveOrganizationInputs from "./SaveOrganizationInputs.vue";
 
 const editMode = computed(() => appStore.popups.saveOrg);
+
+const org = computed(() => orgStore.org);
+
+const teamCount = computed(() => orgStore.org.teams.length + " Teams");
+const memberCount = computed(() => orgStore.org.members.length + " Members");
+const projectCount = computed(
+  () =>
+    orgStore.org.teams
+      .map(({ projects }) => projects.length)
+      .reduce((a, b) => a + b, 0) + " Projects"
+);
 </script>

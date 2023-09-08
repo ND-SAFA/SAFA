@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
+import { buildOrg } from "@/util";
 import { getOrgApiStore, logStore, orgStore, useApi } from "@/hooks";
 import {
   createOrganization,
@@ -67,6 +68,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
 
             // Clear the current org if it was deleted.
             orgStore.$reset();
+            orgStore.org = getOrgApiStore.allOrgs[0] || buildOrg();
           },
           {
             ...callbacks,

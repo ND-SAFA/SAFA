@@ -33,7 +33,7 @@
         />
       </template>
     </selector-table>
-    <save-team-inputs v-else />
+    <save-team-inputs v-else @submit="addMode = false" />
   </panel-card>
 </template>
 

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, TeamApiHook, TeamSchema } from "@/types";
-import { removeMatches } from "@/util";
+import { buildTeam, removeMatches } from "@/util";
 import { logStore, orgStore, teamStore, useApi } from "@/hooks";
 import { createTeam, deleteTeam, editTeam } from "@/api";
 import { pinia } from "@/plugins";
@@ -68,6 +68,7 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
 
             // Clear the current team if it was deleted.
             teamStore.$reset();
+            teamStore.team = orgStore.org.teams[0] || buildTeam();
           },
           {
             ...callbacks,

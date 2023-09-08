@@ -32,6 +32,10 @@ import { computed } from "vue";
 import { appStore, saveTeamStore, teamApiStore } from "@/hooks";
 import { FlexBox, TextButton, TextInput } from "@/components/common";
 
+const emit = defineEmits<{
+  (e: "submit"): void;
+}>();
+
 const editedTeam = computed(() => saveTeamStore.editedTeam);
 
 const loading = computed(() => teamApiStore.saveTeamApiLoading);
@@ -41,7 +45,10 @@ const loading = computed(() => teamApiStore.saveTeamApiLoading);
  */
 function handleSave() {
   teamApiStore.handleSave(editedTeam.value, {
-    onSuccess: () => appStore.close("saveTeam"),
+    onSuccess: () => {
+      appStore.close("saveTeam");
+      emit("submit");
+    },
   });
 }
 </script>

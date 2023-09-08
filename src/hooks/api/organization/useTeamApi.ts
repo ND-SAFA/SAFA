@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, TeamApiHook, TeamSchema } from "@/types";
-import { buildTeam, removeMatches } from "@/util";
 import { logStore, orgStore, teamStore, useApi } from "@/hooks";
 import { createTeam, deleteTeam, editTeam } from "@/api";
 import { pinia } from "@/plugins";
@@ -26,15 +25,12 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
         if (!team.id) {
           const createdTeam = await createTeam(orgStore.orgId, team);
 
-          orgStore.org.teams.push(createdTeam);
+          teamStore.addTeam(createdTeam);
           teamStore.team = createdTeam;
         } else {
           const editedTeam = await editTeam(orgStore.orgId, team);
 
-          orgStore.org.teams = [
-            ...removeMatches(orgStore.org.teams, "id", [team.id]),
-            editedTeam,
-          ];
+          teamStore.addTeam(editedTeam);
           teamStore.team = editedTeam;
         }
       },
@@ -60,15 +56,7 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
           async () => {
             await deleteTeam(orgStore.orgId, team);
 
-            orgStore.org.teams = removeMatches(orgStore.org.teams, "id", [
-              team.id,
-            ]);
-
-            if (teamStore.teamId !== team.id) return;
-
-            // Clear the current team if it was deleted.
-            teamStore.$reset();
-            teamStore.team = orgStore.org.teams[0] || buildTeam();
+            teamStore.removeTeam(team);
           },
           {
             ...callbacks,

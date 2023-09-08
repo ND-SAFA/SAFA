@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 
-import { buildTeam } from "@/util";
+import { TeamSchema } from "@/types";
+import { buildTeam, removeMatches } from "@/util";
+import { orgStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -20,8 +22,36 @@ export const useTeam = defineStore("team", {
     teamId(): string {
       return this.team.id;
     },
+    /**
+     * @return The current organization's teams.
+     */
+    allTeams(): TeamSchema[] {
+      return orgStore.org.teams;
+    },
   },
-  actions: {},
+  actions: {
+    /**
+     * Adds a team to the list of all teams.
+     * @param team - The team to add.
+     */
+    addTeam(team: TeamSchema): void {
+      orgStore.org.teams = [
+        team,
+        ...removeMatches(this.allTeams, "id", [team.id]),
+      ];
+    },
+    /**
+     * Removes a team to the list of all teams.
+     * @param team - The team to remove.
+     */
+    removeTeam(team: TeamSchema): void {
+      orgStore.org.teams = removeMatches(this.allTeams, "id", [team.id]);
+
+      if (team.id === this.teamId) {
+        this.team = this.allTeams[0] || buildTeam();
+      }
+    },
+  },
 });
 
 export default useTeam(pinia);

@@ -3,7 +3,7 @@
     <q-btn-dropdown flat auto-close label="Switch Organizations">
       <flex-box column align="center">
         <text-button
-          v-for="org in getOrgApiStore.unloadedOrgs"
+          v-for="org in orgStore.unloadedOrgs"
           :key="org.id"
           text
           :label="org.name"

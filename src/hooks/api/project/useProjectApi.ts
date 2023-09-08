@@ -10,7 +10,6 @@ import {
 } from "@/types";
 import { versionToString } from "@/util";
 import {
-  getProjectApiStore,
   identifierSaveStore,
   logStore,
   projectStore,
@@ -46,9 +45,7 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
       async () => {
         const project = await saveProject(identifier);
 
-        getProjectApiStore.addProject(
-          identifier.projectId ? identifier : project
-        );
+        projectStore.addProject(identifier.projectId ? identifier : project);
 
         if (project.projectId === projectStore.projectId) {
           projectStore.project.name = project.name;
@@ -93,9 +90,7 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
       async () => {
         await deleteProject(project.projectId);
 
-        getProjectApiStore.allProjects = getProjectApiStore.allProjects.filter(
-          ({ projectId }) => projectId !== project.projectId
-        );
+        projectStore.removeProject(project);
 
         if (project.name !== projectStore.project.name) return;
 

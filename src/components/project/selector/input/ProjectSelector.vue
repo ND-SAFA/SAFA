@@ -5,7 +5,7 @@
     dark
     :options-dark="darkMode"
     label="Project"
-    :options="getProjectApiStore.allProjects"
+    :options="projectStore.allProjects"
     option-value="projectId"
     option-label="name"
     :class="className"

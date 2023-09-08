@@ -1,12 +1,11 @@
 import { defineStore } from "pinia";
 
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   GetProjectApiHook,
   IdentifierSchema,
   IOHandlerCallback,
 } from "@/types";
-import { removeMatches } from "@/util";
 import {
   getVersionApiStore,
   projectStore,
@@ -25,14 +24,6 @@ export const useGetProjectApi = defineStore(
   (): GetProjectApiHook => {
     const getProjectApi = useApi("getProjectApi");
 
-    const allProjects = ref<IdentifierSchema[]>([]);
-
-    const unloadedProjects = computed(() =>
-      allProjects.value.filter(
-        ({ projectId }) => projectId !== projectStore.projectId
-      )
-    );
-
     const loading = computed(() => getProjectApi.loading);
 
     const currentProject = computed({
@@ -44,13 +35,6 @@ export const useGetProjectApi = defineStore(
       },
     });
 
-    function addProject(project: IdentifierSchema): void {
-      allProjects.value = [
-        project,
-        ...removeMatches(allProjects.value, "projectId", [project.projectId]),
-      ];
-    }
-
     async function handleReload(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
@@ -61,7 +45,7 @@ export const useGetProjectApi = defineStore(
 
       await getProjectApi.handleRequest(
         async () => {
-          allProjects.value = await getProjects();
+          projectStore.allProjects = await getProjects();
         },
         {
           ...callbacks,
@@ -76,9 +60,10 @@ export const useGetProjectApi = defineStore(
       let versionId = getParam(QueryParams.VERSION);
 
       if (!versionId) {
-        if (allProjects.value.length > 0) {
-          versionId = (await getCurrentVersion(allProjects.value[0].projectId))
-            .versionId;
+        if (projectStore.allProjects.length > 0) {
+          versionId = (
+            await getCurrentVersion(projectStore.allProjects[0].projectId)
+          ).versionId;
         }
       }
       if (typeof versionId === "string") {
@@ -92,10 +77,7 @@ export const useGetProjectApi = defineStore(
 
     return {
       loading,
-      allProjects,
-      unloadedProjects,
       currentProject,
-      addProject,
       handleReload,
       handleLoadRecent,
     };

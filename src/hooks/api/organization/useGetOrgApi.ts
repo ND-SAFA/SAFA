@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { computed } from "vue";
 
 import { GetOrgApiHook, OrganizationSchema } from "@/types";
-import { removeMatches } from "@/util";
 import { orgStore, sessionStore, useApi } from "@/hooks";
 import { getOrganization, getOrganizations, saveDefaultOrg } from "@/api";
 import { pinia } from "@/plugins";
@@ -13,21 +12,7 @@ import { pinia } from "@/plugins";
 export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
   const getOrgApi = useApi("getOrgApi");
 
-  const allOrgs = ref<OrganizationSchema[]>([]);
-
-  const unloadedOrgs = computed(() =>
-    allOrgs.value.filter(({ id }) => id !== orgStore.orgId)
-  );
-
   const loading = computed(() => getOrgApi.loading);
-
-  function addOrg(org: OrganizationSchema): void {
-    allOrgs.value = [org, ...removeMatches(allOrgs.value, "id", [org.id])];
-  }
-
-  function removeOrg(org: OrganizationSchema): void {
-    allOrgs.value = allOrgs.value.filter(({ id }) => id !== org.id);
-  }
 
   async function handleSwitch(org: OrganizationSchema): Promise<void> {
     orgStore.org = org;
@@ -40,9 +25,9 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
     await getOrgApi.handleRequest(
       async () => {
-        allOrgs.value = await getOrganizations();
+        orgStore.allOrgs = await getOrganizations();
 
-        const orgId = sessionStore.user.defaultOrgId || allOrgs.value[0]?.id;
+        const orgId = sessionStore.user.defaultOrgId || orgStore.allOrgs[0]?.id;
 
         if (!orgId) return;
 
@@ -55,11 +40,7 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
   }
 
   return {
-    allOrgs,
-    unloadedOrgs,
     loading,
-    addOrg,
-    removeOrg,
     handleSwitch,
     handleLoadCurrent,
   };

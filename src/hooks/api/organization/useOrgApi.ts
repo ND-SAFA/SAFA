@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
 import { buildOrg } from "@/util";
-import { getOrgApiStore, logStore, orgStore, useApi } from "@/hooks";
+import { logStore, orgStore, useApi } from "@/hooks";
 import {
   createOrganization,
   deleteOrganization,
@@ -30,12 +30,12 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
         if (!org.id) {
           const createdOrg = await createOrganization(org);
 
-          getOrgApiStore.addOrg(createdOrg);
+          orgStore.addOrg(createdOrg);
           orgStore.org = createdOrg;
         } else {
           const editedOrg = await editOrganization(org);
 
-          getOrgApiStore.addOrg(editedOrg);
+          orgStore.addOrg(editedOrg);
           orgStore.org = editedOrg;
         }
       },
@@ -62,13 +62,13 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
           async () => {
             await deleteOrganization(org);
 
-            getOrgApiStore.removeOrg(org);
+            orgStore.removeOrg(org);
 
             if (orgStore.orgId !== org.id) return;
 
             // Clear the current org if it was deleted.
             orgStore.$reset();
-            orgStore.org = getOrgApiStore.allOrgs[0] || buildOrg();
+            orgStore.org = orgStore.allOrgs[0] || buildOrg();
           },
           {
             ...callbacks,

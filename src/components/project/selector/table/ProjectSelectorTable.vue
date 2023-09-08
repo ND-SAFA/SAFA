@@ -115,7 +115,7 @@ const columns = computed(() =>
     : [projectNameColumn, ...projectExpandedColumns]
 );
 
-const rows = computed(() => getProjectApiStore.allProjects);
+const rows = computed(() => projectStore.allProjects);
 
 /**
  * Loads all projects.

@@ -1,5 +1,6 @@
 export { default as artifactSaveStore } from "./useSaveArtifact";
 export { default as traceSaveStore } from "./useSaveTrace";
+export { default as editTraceStore } from "./useEditTrace";
 export { default as identifierSaveStore } from "./useSaveIdentifier";
 export { default as projectSaveStore } from "./useSaveProject";
 export { default as modelSaveStore } from "./useSaveModel";

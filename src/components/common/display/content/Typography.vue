@@ -8,16 +8,19 @@
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
-    <q-btn
-      flat
-      dense
-      size="sm"
-      color="textCaption"
-      :class="buttonClassName"
-      @click.stop="expanded = !expanded"
-    >
-      {{ expandLabel }}
-    </q-btn>
+    <div class="full-width flex justify-end">
+      <q-btn
+        flat
+        dense
+        align="right"
+        size="sm"
+        color="textCaption"
+        :class="buttonClassName"
+        @click.stop="expanded = !expanded"
+      >
+        {{ expandLabel }}
+      </q-btn>
+    </div>
   </div>
   <div v-else-if="variant === 'code'" class="width-100">
     <div class="flex nowrap overflow-auto">
@@ -28,9 +31,7 @@
       <pre v-if="expanded" v-highlightjs :class="className">
         <code>{{value}}</code>
       </pre>
-      <div v-else :class="className + ' text-textCaption'">
-        Code is hidden to save space.
-      </div>
+      <div v-else :class="className + ' text-textCaption'">Code hidden</div>
     </div>
     <q-btn
       flat

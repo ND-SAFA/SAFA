@@ -1,29 +1,26 @@
 <template>
   <flex-box v-if="displayActions" justify="between" class="width-max">
     <flex-box align="center" justify="center">
-      <text-button
+      <icon-button
         v-if="showUnreview"
-        text
-        label="Un-Review"
+        tooltip="Un-Review"
         :loading="unreviewLoading"
         data-cy="button-trace-unreview"
         icon="trace-unreview"
         @click="handleUnreview"
       />
-      <text-button
+      <icon-button
         v-if="showApprove"
-        text
-        label="Approve"
+        tooltip="Approve"
         :loading="approveLoading"
         data-cy="button-trace-approve"
         icon="trace-approve"
         color="primary"
         @click="handleApprove"
       />
-      <text-button
+      <icon-button
         v-if="showDecline"
-        text
-        label="Decline"
+        tooltip="Decline"
         :loading="declineLoading"
         data-cy="button-trace-decline"
         icon="trace-decline"
@@ -33,6 +30,14 @@
     </flex-box>
     <flex-box v-if="props.deletable">
       <separator v-if="showApprove || showDecline" vertical />
+      <text-button
+        text
+        label="Edit"
+        icon="edit"
+        data-cy="button-trace-edit"
+        @click="handleEdit"
+      />
+      <separator vertical />
       <text-button
         text
         label="Delete"
@@ -57,8 +62,18 @@ export default {
 import { computed, ref } from "vue";
 import { TraceLinkApprovalProps } from "@/types";
 import { linkStatus } from "@/util";
-import { permissionStore, traceApiStore } from "@/hooks";
-import { FlexBox, TextButton, Separator } from "@/components/common";
+import {
+  appStore,
+  editTraceStore,
+  permissionStore,
+  traceApiStore,
+} from "@/hooks";
+import {
+  FlexBox,
+  TextButton,
+  Separator,
+  IconButton,
+} from "@/components/common";
 
 const props = defineProps<TraceLinkApprovalProps>();
 
@@ -113,6 +128,14 @@ function handleUnreview() {
     onSuccess: () => emit("unreview"),
     onComplete: () => (unreviewLoading.value = false),
   });
+}
+
+/**
+ * Edits the given link.
+ */
+function handleEdit() {
+  editTraceStore.resetTrace(props.trace);
+  appStore.openDetailsPanel("editTrace");
 }
 
 /**

@@ -11,11 +11,12 @@ export const useTraceCommitApi = defineStore(
   "traceCommitApi",
   (): TraceCommitApiHook => {
     async function handleCreate(
-      traceLink: TraceLinkSchema
+      traceLink: TraceLinkSchema,
+      preserveApproval = false
     ): Promise<TraceLinkSchema[]> {
       traceLink = {
         ...traceLink,
-        approvalStatus: "APPROVED",
+        ...(preserveApproval ? {} : { approvalStatus: "APPROVED" }),
       };
 
       return commitApiStore

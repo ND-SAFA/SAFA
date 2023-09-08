@@ -1,15 +1,15 @@
 <template>
-  <q-splitter v-model="splitterModel" :horizontal="!isCode">
+  <q-splitter v-if="showSummary" v-model="splitterModel" :horizontal="!isCode">
     <template #before>
-      <typography
-        variant="caption"
-        :value="showSummary ? 'Summary' : 'Content'"
-      />
-      <artifact-body-display
-        :artifact="props.artifact"
-        default-expanded
-        full-width
-      />
+      <div>
+        <typography variant="caption" value="Summary" />
+        <typography
+          variant="expandable"
+          :value="props.artifact.summary"
+          default-expanded
+          :collapse-length="0"
+        />
+      </div>
     </template>
     <template #after>
       <div class="q-ml-md">
@@ -22,6 +22,14 @@
       </div>
     </template>
   </q-splitter>
+  <div v-else>
+    <typography variant="caption" value="Content" />
+    <typography
+      :variant="isCode ? 'code' : 'expandable'"
+      :value="props.artifact.body"
+      :default-expanded="!isCode"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -38,7 +46,6 @@ export default {
 import { computed, ref } from "vue";
 import { ArtifactProps } from "@/types";
 import { Typography } from "@/components/common";
-import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
 const props = defineProps<ArtifactProps>();
 

@@ -68,6 +68,7 @@ export type DetailsOpenState =
   | "saveArtifact"
   | "displayTrace"
   | "saveTrace"
+  | "editTrace"
   | "generateTrace"
   | "displayArtifactLevel"
   | "saveArtifactLevel"

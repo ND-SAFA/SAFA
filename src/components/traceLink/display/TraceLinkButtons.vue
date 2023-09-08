@@ -1,6 +1,7 @@
 <template>
   <flex-box b="2">
     <trace-link-approval
+      v-if="traceLink"
       :trace="traceLink"
       deletable
       @approve="handleClose"

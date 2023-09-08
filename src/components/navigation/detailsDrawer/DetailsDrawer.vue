@@ -25,6 +25,7 @@
       <save-artifact-panel />
       <trace-link-panel />
       <save-trace-link-panel />
+      <edit-trace-link-panel />
       <generate-trace-link-panel />
       <artifact-level-panel />
       <save-artifact-level-panel />
@@ -64,6 +65,7 @@ import {
   TraceLinkPanel,
   SaveTraceLinkPanel,
   GenerateTraceLinkPanel,
+  EditTraceLinkPanel,
 } from "@/components/traceLink/panels";
 import {
   ArtifactLevelPanel,
@@ -98,6 +100,8 @@ const title = computed(() => {
       return "Trace Link";
     case "saveTrace":
       return "Create Trace Link";
+    case "editTrace":
+      return "Edit Trace Link";
     case "generateTrace":
       return "Generate Trace Links";
     case "displayArtifactLevel":

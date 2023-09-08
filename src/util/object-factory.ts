@@ -20,6 +20,7 @@ import {
   GeneratedMatrixSchema,
   OrganizationSchema,
   TeamSchema,
+  TraceLinkSchema,
 } from "@/types";
 
 export function buildSnackbarMessage(): SnackbarMessage {
@@ -95,6 +96,22 @@ export function buildProjectDelta(): VersionDeltaSchema {
       modified: {},
       removed: {},
     },
+  };
+}
+
+export function buildTraceLink(
+  trace?: Partial<TraceLinkSchema>
+): TraceLinkSchema {
+  return {
+    traceLinkId: trace?.traceLinkId || "",
+    sourceId: trace?.sourceId || "",
+    sourceName: trace?.sourceName || "",
+    targetId: trace?.targetId || "",
+    targetName: trace?.targetName || "",
+    approvalStatus: trace?.approvalStatus || "UNREVIEWED",
+    score: trace?.score || 1,
+    traceType: trace?.traceType || "MANUAL",
+    explanation: trace?.explanation || "",
   };
 }
 

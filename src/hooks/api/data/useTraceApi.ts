@@ -21,11 +21,14 @@ import { pinia } from "@/plugins";
 
 export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
   const createTraceApi = useApi("traceApi");
+  const editTraceApi = useApi("editTraceApi");
+
   const approveTraceApi = useApi("approveTraceApi");
   const unreviewTraceApi = useApi("unreviewTraceApi");
   const declineTraceApi = useApi("declineTraceApi");
 
   const createLoading = computed(() => createTraceApi.loading);
+  const editLoading = computed(() => editTraceApi.loading);
   const approveLoading = computed(() => approveTraceApi.loading);
   const unreviewLoading = computed(() => unreviewTraceApi.loading);
   const declineLoading = computed(() => declineTraceApi.loading);
@@ -47,6 +50,7 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
       "artifactName" in source ? source.artifactName : source.name;
     const targetName =
       "artifactName" in target ? target.artifactName : target.name;
+    const traceName = `${sourceName} -> ${targetName}`;
 
     const traceLink: TraceLinkSchema = {
       traceLinkId: "",
@@ -68,8 +72,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
       },
       {
         ...callbacks,
-        success: `Created a new trace link: ${sourceName} -> ${targetName}`,
-        error: `Unable to create trace link: ${sourceName} -> ${targetName}`,
+        success: `Created a new trace link: ${traceName}`,
+        error: `Unable to create trace link: ${traceName}`,
       }
     );
   }
@@ -88,6 +92,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
     await approveTraceApi.handleRequest(
       async () => {
         loadTrace(traceLink.traceLinkId);
@@ -103,8 +109,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-        success: `Trace link approved: ${traceLink.sourceName} -> ${traceLink.targetName}`,
-        error: `Unable to approve trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
+        success: `Trace link approved: ${traceName}`,
+        error: `Unable to approve trace link: ${traceName}`,
       }
     );
   }
@@ -113,6 +119,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
     await declineTraceApi.handleRequest(
       async () => {
         loadTrace(traceLink.traceLinkId);
@@ -129,8 +137,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-        success: `Trace link declined: ${traceLink.sourceName} -> ${traceLink.targetName}`,
-        error: `Unable to decline trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
+        success: `Trace link declined: ${traceName}`,
+        error: `Unable to decline trace link: ${traceName}`,
       }
     );
   }
@@ -167,6 +175,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
     await unreviewTraceApi.handleRequest(
       async () => {
         loadTrace(traceLink.traceLinkId);
@@ -185,8 +195,31 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
           callbacks.onComplete?.();
         },
         useAppLoad: true,
-        success: `Trace link unreviewed: ${traceLink.sourceName} -> ${traceLink.targetName}`,
-        error: `Unable to unreview trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
+        success: `Trace link unreviewed: ${traceName}`,
+        error: `Unable to unreview trace link: ${traceName}`,
+      }
+    );
+  }
+
+  async function handleEdit(
+    traceLink: TraceLinkSchema,
+    callbacks: IOHandlerCallback
+  ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
+    await editTraceApi.handleRequest(
+      async () => {
+        const editedLinks = await traceCommitApiStore.handleCreate(
+          traceLink,
+          true
+        );
+
+        traceStore.addOrUpdateTraceLinks(editedLinks);
+      },
+      {
+        ...callbacks,
+        success: `Edited trace link: ${traceName}`,
+        error: `Unable to edit trace link: ${traceName}`,
       }
     );
   }
@@ -209,6 +242,7 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
   return {
     loadingTraceIds,
     createLoading,
+    editLoading,
     approveLoading,
     declineLoading,
     unreviewLoading,
@@ -218,6 +252,7 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
     handleDecline,
     handleDeclineAll,
     handleUnreview,
+    handleEdit,
     handleDelete,
   };
 });

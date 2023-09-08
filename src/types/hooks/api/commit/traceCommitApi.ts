@@ -8,9 +8,14 @@ export interface TraceCommitApiHook {
    * Creates new trace links.
    *
    * @param traceLink - The trace link to persist.
+   * @param preserveApproval - Whether to preserve the approval status.
+   *        @default to false.
    * @return The created trace links.
    */
-  handleCreate(traceLink: TraceLinkSchema): Promise<TraceLinkSchema[]>;
+  handleCreate(
+    traceLink: TraceLinkSchema,
+    preserveApproval?: boolean
+  ): Promise<TraceLinkSchema[]>;
   /**
    * Approves the given trace link ID.
    *

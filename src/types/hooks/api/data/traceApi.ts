@@ -11,13 +11,18 @@ import {
  */
 export interface TraceApiHook {
   /**
-   * The ids of any trace links currently loading changes.
+   * The ids of any trace links currently loading
+   * approval status changes.
    */
   loadingTraceIds: Ref<string[]>;
   /**
    * Whether the create request is loading.
    */
   createLoading: ComputedRef<boolean>;
+  /**
+   * Whether the edit request is loading.
+   */
+  editLoading: ComputedRef<boolean>;
   /**
    * Whether the approval request is loading.
    */
@@ -77,6 +82,16 @@ export interface TraceApiHook {
    * @param callbacks - The callbacks to call after the action.
    */
   handleUnreview(
+    traceLink: TraceLinkSchema,
+    callbacks: IOHandlerCallback
+  ): Promise<void>;
+  /**
+   * Edits an existing trace link.
+   *
+   * @param traceLink - The trace link to edit.
+   * @param callbacks - The callbacks to call after the action.
+   */
+  handleEdit(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void>;

@@ -13,7 +13,14 @@ export const useOrg = defineStore("org", {
      */
     org: buildOrg(),
   }),
-  getters: {},
+  getters: {
+    /**
+     * @return The current organization id.
+     */
+    orgId(): string {
+      return this.org.id;
+    },
+  },
   actions: {},
 });
 

@@ -35,7 +35,7 @@ const exampleOrg = (id: string | number = 0): OrganizationSchema => ({
  *
  * @return All organizations.
  */
-export async function getAllOrganizations(): Promise<OrganizationSchema[]> {
+export async function getOrganizations(): Promise<OrganizationSchema[]> {
   // TODO
   return [exampleOrg(), exampleOrg(1)];
 }

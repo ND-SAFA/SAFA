@@ -7,3 +7,4 @@ export * from "./notifications";
 export * from "./project";
 export * from "./settings";
 export * from "./version";
+export * from "./organization";

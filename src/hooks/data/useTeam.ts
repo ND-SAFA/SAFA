@@ -13,7 +13,14 @@ export const useTeam = defineStore("team", {
      */
     team: buildTeam(),
   }),
-  getters: {},
+  getters: {
+    /**
+     * @return The current team id.
+     */
+    teamId(): string {
+      return this.team.id;
+    },
+  },
   actions: {},
 });
 

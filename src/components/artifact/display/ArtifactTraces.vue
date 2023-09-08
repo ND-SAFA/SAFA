@@ -226,7 +226,7 @@ function handleTraceLinkClick(artifactName: string): void {
 function handleLinkParent(): void {
   if (!artifact.value) return;
 
-  traceSaveStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "source",
     artifactId: artifact.value.id,
   });
@@ -238,7 +238,7 @@ function handleLinkParent(): void {
 function handleLinkChild(): void {
   if (!artifact.value) return;
 
-  traceSaveStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "target",
     artifactId: artifact.value.id,
   });

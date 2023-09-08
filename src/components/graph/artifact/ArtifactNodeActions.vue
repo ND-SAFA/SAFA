@@ -37,7 +37,7 @@
         color="primary"
         :rotate="-90"
         @click="
-          traceSaveStore.openTraceCreatorTo({
+          traceSaveStore.openPanel({
             type: 'source',
             artifactId: id,
           })
@@ -50,7 +50,7 @@
         color="primary"
         :rotate="90"
         @click="
-          traceSaveStore.openTraceCreatorTo({
+          traceSaveStore.openPanel({
             type: 'target',
             artifactId: id,
           })

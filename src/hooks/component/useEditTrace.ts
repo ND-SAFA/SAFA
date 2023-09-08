@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { TraceLinkSchema } from "@/types";
 import { buildTraceLink } from "@/util";
+import { appStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -36,6 +37,14 @@ export const useEditTrace = defineStore("editTrace", {
       }
 
       this.editedTrace = buildTraceLink(this.baseTrace);
+    },
+    /**
+     * Opens the edit trace link panel.
+     * @param trace - The trace link to edit.
+     */
+    openPanel(trace?: TraceLinkSchema): void {
+      this.resetTrace(trace);
+      appStore.openDetailsPanel("editTrace");
     },
   },
 });

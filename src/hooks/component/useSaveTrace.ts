@@ -204,7 +204,7 @@ export const useSaveTrace = defineStore("saveTrace", {
      *
      * @param openTo - What to open to.
      */
-    openTraceCreatorTo(openTo?: TraceCreatorOpenState): void {
+    openPanel(openTo?: TraceCreatorOpenState): void {
       this.resetTrace(openTo);
       appStore.openDetailsPanel("saveTrace");
     },

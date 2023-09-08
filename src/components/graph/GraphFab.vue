@@ -60,9 +60,7 @@
         icon="mdi-folder-plus-outline"
         class="bg-neutral"
         data-cy="button-fab-create-artifact"
-        @click="
-          artifactSaveStore.openArtifactCreatorTo({ isNewArtifact: true })
-        "
+        @click="artifactSaveStore.openPanel({ isNewArtifact: true })"
       />
     </q-fab>
     <icon-button

@@ -69,7 +69,7 @@ function handleDelete(): void {
  * Opens the artifact creator.
  */
 function handleEdit(): void {
-  artifactSaveStore.openArtifactCreatorTo({});
+  artifactSaveStore.openPanel({});
 }
 
 /**

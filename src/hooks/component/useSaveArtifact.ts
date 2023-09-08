@@ -162,7 +162,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      *
      * @param openTo - What to open to.
      */
-    openArtifactCreatorTo(openTo: {
+    openPanel(openTo: {
       type?: ArtifactCreatorOpenState;
       isNewArtifact?: boolean;
     }): void {

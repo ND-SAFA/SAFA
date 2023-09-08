@@ -1,9 +1,5 @@
 <template>
-  <details-panel
-    panel="editTrace"
-    data-cy="panel-trace-edit"
-    @open="editTraceStore.resetTrace"
-  >
+  <details-panel panel="editTrace" data-cy="panel-trace-edit">
     <flex-box b="2">
       <text-button
         text

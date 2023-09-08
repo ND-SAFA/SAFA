@@ -12,7 +12,7 @@
         icon="create-artifact"
         data-cy="button-add-artifact"
         @click="
-          artifactSaveStore.openArtifactCreatorTo({ isNewArtifact: true });
+          artifactSaveStore.openPanel({ isNewArtifact: true });
           handleCloseMenu();
         "
       />
@@ -21,7 +21,7 @@
         icon="create-trace"
         data-cy="button-add-trace"
         @click="
-          traceSaveStore.openTraceCreatorTo();
+          traceSaveStore.openPanel();
           handleCloseMenu();
         "
       />

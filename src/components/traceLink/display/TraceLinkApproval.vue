@@ -62,12 +62,7 @@ export default {
 import { computed, ref } from "vue";
 import { TraceLinkApprovalProps } from "@/types";
 import { linkStatus } from "@/util";
-import {
-  appStore,
-  editTraceStore,
-  permissionStore,
-  traceApiStore,
-} from "@/hooks";
+import { editTraceStore, permissionStore, traceApiStore } from "@/hooks";
 import {
   FlexBox,
   TextButton,
@@ -134,8 +129,7 @@ function handleUnreview() {
  * Edits the given link.
  */
 function handleEdit() {
-  editTraceStore.resetTrace(props.trace);
-  appStore.openDetailsPanel("editTrace");
+  editTraceStore.openPanel(props.trace);
 }
 
 /**

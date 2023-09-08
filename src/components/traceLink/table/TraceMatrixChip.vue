@@ -88,7 +88,7 @@ function handleClick(): void {
  * Opens the trace creation panel to create a link between these artifacts.
  */
 function handleCreateLink(): void {
-  traceSaveStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "both",
     sourceId: props.source.id,
     targetId: props.target.id,

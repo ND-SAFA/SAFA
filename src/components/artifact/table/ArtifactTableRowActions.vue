@@ -63,7 +63,7 @@ const props = defineProps<ArtifactProps>();
  */
 function handleEdit() {
   selectionStore.selectArtifact(props.artifact.id);
-  artifactSaveStore.openArtifactCreatorTo({
+  artifactSaveStore.openPanel({
     isNewArtifact: false,
   });
 }
@@ -87,7 +87,7 @@ function handleOpenTree(): void {
  * Opens the create trace link panel with this artifact as the child.
  */
 function handleLinkParent(): void {
-  traceSaveStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "source",
     artifactId: props.artifact.id,
   });
@@ -97,7 +97,7 @@ function handleLinkParent(): void {
  * Opens the create trace link panel with this artifact as the parent.
  */
 function handleLinkChild(): void {
-  traceSaveStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "target",
     artifactId: props.artifact.id,
   });

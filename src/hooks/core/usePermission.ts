@@ -8,7 +8,7 @@ import {
   MembershipType,
 } from "@/types";
 import { roleMap } from "@/util";
-import { projectStore, sessionStore } from "@/hooks";
+import { projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -31,10 +31,11 @@ export const usePermission = defineStore("permissionStore", {
     getCurrentContext(
       type?: MembershipType
     ): IdentifierSchema | TeamSchema | OrganizationSchema {
-      if (type === "PROJECT") {
-        return projectStore.project;
+      if (type === "TEAM") {
+        return teamStore.team;
+      } else if (type === "ORGANIZATION") {
+        return teamStore.team;
       } else {
-        // TODO: return team & org contexts.
         return projectStore.project;
       }
     },
@@ -54,11 +55,6 @@ export const usePermission = defineStore("permissionStore", {
     ): boolean {
       const member = sessionStore.getCurrentMember(context);
       const type = member?.entityType || "PROJECT";
-
-      // TODO: remove testing code.
-      if (permission.startsWith("team.") || permission.startsWith("org.")) {
-        return true;
-      }
 
       if (this.isDemo) {
         return false;

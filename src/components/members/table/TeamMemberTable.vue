@@ -14,14 +14,14 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { MemberEntitySchema } from "@/types";
-import { projectStore } from "@/hooks";
+import { teamStore } from "@/hooks";
 import MemberTable from "./MemberTable.vue";
 
 const entity = computed(
   () =>
     ({
       entityType: "TEAM",
-      entityId: projectStore.projectId,
+      entityId: teamStore.teamId,
     } as MemberEntitySchema)
 );
 </script>

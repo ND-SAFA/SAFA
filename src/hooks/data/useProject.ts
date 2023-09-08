@@ -9,7 +9,6 @@ import { buildProject, buildProjectIdentifier, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 import logStore from "../core/useLog";
-import membersStore from "./useMembers";
 import warningStore from "./useWarnings";
 import documentStore from "./useDocuments";
 import subtreeStore from "./useSubtree";
@@ -130,7 +129,6 @@ export const useProject = defineStore("project", {
       this.project = project;
 
       selectionStore.clearSelections();
-      membersStore.initializeProject(project);
       timStore.initializeProject(project);
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);

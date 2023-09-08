@@ -1,12 +1,8 @@
 import { defineStore } from "pinia";
 
-import {
-  MemberEntitySchema,
-  MembershipSchema,
-  MembershipType,
-  ProjectSchema,
-} from "@/types";
+import { MemberEntitySchema, MembershipSchema, MembershipType } from "@/types";
 import { removeMatches } from "@/util";
+import { orgStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import projectStore from "./useProject";
 
@@ -14,20 +10,26 @@ import projectStore from "./useProject";
  * This module defines the state of the current project's members.
  */
 export const useMembers = defineStore("members", {
-  state: () => ({
+  getters: {
     /**
-     * List of members and their roles in the current project.
+     * @return The list of members and their roles in the current project.
      */
-    members: [] as MembershipSchema[],
+    members(): MembershipSchema[] {
+      return projectStore.project.members;
+    },
     /**
-     * List of members and their roles in the current organization.
+     * @return The list of members and their roles in the current organization.
      */
-    orgMembers: [] as MembershipSchema[],
+    orgMembers(): MembershipSchema[] {
+      return orgStore.org.members;
+    },
     /**
-     * List of members and their roles in the current team.
+     * @return The list of members and their roles in the current team.
      */
-    teamMembers: [] as MembershipSchema[],
-  }),
+    teamMembers(): MembershipSchema[] {
+      return teamStore.team.members;
+    },
+  },
   actions: {
     /**
      * Returns members of a given type.
@@ -44,12 +46,6 @@ export const useMembers = defineStore("members", {
       return this.members;
     },
     /**
-     * Initializes the current project.
-     */
-    initializeProject(project: ProjectSchema): void {
-      this.members = project.members;
-    },
-    /**
      * Updates the current project members.
      *
      * @param updatedMembers - The updated members.
@@ -62,19 +58,19 @@ export const useMembers = defineStore("members", {
       const ids = updatedMembers.map((member) => member.projectMembershipId);
 
       if (entity.entityType === "PROJECT") {
-        this.members = [
+        projectStore.project.members = [
           ...removeMatches(this.members, "projectMembershipId", ids),
           ...updatedMembers,
         ];
 
         projectStore.project.members = this.members;
       } else if (entity.entityType === "ORGANIZATION") {
-        this.orgMembers = [
+        orgStore.org.members = [
           ...removeMatches(this.orgMembers, "projectMembershipId", ids),
           ...updatedMembers,
         ];
       } else if (entity.entityType === "TEAM") {
-        this.teamMembers = [
+        teamStore.team.members = [
           ...removeMatches(this.teamMembers, "projectMembershipId", ids),
           ...updatedMembers,
         ];
@@ -88,7 +84,7 @@ export const useMembers = defineStore("members", {
      */
     deleteMembers(deletedMembers: string[], entity: MemberEntitySchema): void {
       if (entity.entityType === "PROJECT") {
-        this.members = removeMatches(
+        projectStore.project.members = removeMatches(
           this.members,
           "projectMembershipId",
           deletedMembers
@@ -96,13 +92,13 @@ export const useMembers = defineStore("members", {
 
         projectStore.project.members = this.members;
       } else if (entity.entityType === "ORGANIZATION") {
-        this.orgMembers = removeMatches(
+        orgStore.org.members = removeMatches(
           this.orgMembers,
           "projectMembershipId",
           deletedMembers
         );
       } else if (entity.entityType === "TEAM") {
-        this.teamMembers = removeMatches(
+        teamStore.team.members = removeMatches(
           this.teamMembers,
           "projectMembershipId",
           deletedMembers

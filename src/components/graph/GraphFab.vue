@@ -60,7 +60,9 @@
         icon="mdi-folder-plus-outline"
         class="bg-neutral"
         data-cy="button-fab-create-artifact"
-        @click="appStore.openArtifactCreatorTo({ isNewArtifact: true })"
+        @click="
+          artifactSaveStore.openArtifactCreatorTo({ isNewArtifact: true })
+        "
       />
     </q-fab>
     <icon-button
@@ -84,7 +86,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { appStore, layoutStore, permissionStore } from "@/hooks";
+import {
+  appStore,
+  artifactSaveStore,
+  layoutStore,
+  permissionStore,
+} from "@/hooks";
 import { disableDrawMode, toggleDrawMode } from "@/cytoscape";
 import IconButton from "@/components/common/button/IconButton.vue";
 

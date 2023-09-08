@@ -1,8 +1,13 @@
 import { defineStore } from "pinia";
 
-import { ArtifactSchema } from "@/types";
+import { ArtifactCreatorOpenState, ArtifactSchema } from "@/types";
 import { buildArtifact, buildArtifactOfType } from "@/util";
-import { selectionStore, artifactStore, documentStore } from "@/hooks";
+import {
+  selectionStore,
+  artifactStore,
+  documentStore,
+  appStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -150,6 +155,23 @@ export const useSaveArtifact = defineStore("saveArtifact", {
         this.editedArtifact,
         this.editedArtifact.type
       );
+    },
+
+    /**
+     * Opens the artifact creator to a specific node type.
+     *
+     * @param openTo - What to open to.
+     */
+    openArtifactCreatorTo(openTo: {
+      type?: ArtifactCreatorOpenState;
+      isNewArtifact?: boolean;
+    }): void {
+      const { type, isNewArtifact } = openTo;
+
+      if (isNewArtifact) selectionStore.clearSelections();
+
+      this.resetArtifact(type || true);
+      appStore.openDetailsPanel("saveArtifact");
     },
   },
 });

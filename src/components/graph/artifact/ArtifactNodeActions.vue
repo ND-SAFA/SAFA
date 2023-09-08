@@ -37,7 +37,7 @@
         color="primary"
         :rotate="-90"
         @click="
-          appStore.openTraceCreatorTo({
+          traceSaveStore.openTraceCreatorTo({
             type: 'source',
             artifactId: id,
           })
@@ -50,7 +50,7 @@
         color="primary"
         :rotate="90"
         @click="
-          appStore.openTraceCreatorTo({
+          traceSaveStore.openTraceCreatorTo({
             type: 'target',
             artifactId: id,
           })
@@ -75,8 +75,8 @@ import { ArtifactNodeDisplayProps } from "@/types";
 import {
   subtreeStore,
   documentStore,
-  appStore,
   permissionStore,
+  traceSaveStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, Separator, IconButton } from "@/components/common";

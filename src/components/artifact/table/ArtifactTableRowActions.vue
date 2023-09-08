@@ -47,11 +47,12 @@ export default {
 <script setup lang="ts">
 import { ArtifactProps } from "@/types";
 import {
-  appStore,
   artifactApiStore,
+  artifactSaveStore,
   documentStore,
   layoutStore,
   selectionStore,
+  traceSaveStore,
 } from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
@@ -62,7 +63,7 @@ const props = defineProps<ArtifactProps>();
  */
 function handleEdit() {
   selectionStore.selectArtifact(props.artifact.id);
-  appStore.openArtifactCreatorTo({
+  artifactSaveStore.openArtifactCreatorTo({
     isNewArtifact: false,
   });
 }
@@ -86,7 +87,7 @@ function handleOpenTree(): void {
  * Opens the create trace link panel with this artifact as the child.
  */
 function handleLinkParent(): void {
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openTraceCreatorTo({
     type: "source",
     artifactId: props.artifact.id,
   });
@@ -96,7 +97,7 @@ function handleLinkParent(): void {
  * Opens the create trace link panel with this artifact as the parent.
  */
 function handleLinkChild(): void {
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openTraceCreatorTo({
     type: "target",
     artifactId: props.artifact.id,
   });

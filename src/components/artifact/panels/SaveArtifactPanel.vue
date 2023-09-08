@@ -26,23 +26,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { watch } from "vue";
 import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
 import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
 import { SaveArtifactInputs, SaveArtifactButtons } from "../save";
-
-onMounted(() => {
-  artifactSaveStore.resetArtifact(true);
-});
-
-watch(
-  () => appStore.popups.detailsPanel && appStore.popups.saveArtifact,
-  (openState) => {
-    if (!openState) return;
-
-    artifactSaveStore.resetArtifact(openState);
-  }
-);
 
 watch(
   () => selectionStore.selectedArtifact,

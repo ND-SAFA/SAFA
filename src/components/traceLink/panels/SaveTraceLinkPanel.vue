@@ -1,9 +1,5 @@
 <template>
-  <details-panel
-    panel="saveTrace"
-    data-cy="panel-trace-save"
-    @open="traceSaveStore.resetTrace"
-  >
+  <details-panel panel="saveTrace" data-cy="panel-trace-save">
     <panel-card>
       <artifact-input
         v-model="traceSaveStore.targetIds"
@@ -83,7 +79,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import {
   timStore,
   appStore,
@@ -129,14 +125,6 @@ async function handleSubmit(): Promise<void> {
 
   loading.value = false;
   appStore.closeSidePanels();
+  traceSaveStore.resetTrace();
 }
-
-watch(
-  () => appStore.popups.saveTrace,
-  (open) => {
-    if (!open) return;
-
-    traceSaveStore.resetTrace();
-  }
-);
 </script>

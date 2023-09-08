@@ -109,11 +109,11 @@ export default {
 import { computed } from "vue";
 import { ArtifactSchema } from "@/types";
 import {
-  appStore,
   artifactStore,
   permissionStore,
   selectionStore,
   subtreeStore,
+  traceSaveStore,
   traceStore,
 } from "@/hooks";
 import {
@@ -226,7 +226,7 @@ function handleTraceLinkClick(artifactName: string): void {
 function handleLinkParent(): void {
   if (!artifact.value) return;
 
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openTraceCreatorTo({
     type: "source",
     artifactId: artifact.value.id,
   });
@@ -238,7 +238,7 @@ function handleLinkParent(): void {
 function handleLinkChild(): void {
   if (!artifact.value) return;
 
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openTraceCreatorTo({
     type: "target",
     artifactId: artifact.value.id,
   });

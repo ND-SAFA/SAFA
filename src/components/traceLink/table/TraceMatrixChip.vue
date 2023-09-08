@@ -37,7 +37,12 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { TraceMatrixChipProps } from "@/types";
-import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
+import {
+  selectionStore,
+  subtreeStore,
+  traceSaveStore,
+  traceStore,
+} from "@/hooks";
 import { Typography, IconButton, Icon, Chip } from "@/components/common";
 
 const props = defineProps<TraceMatrixChipProps>();
@@ -83,7 +88,7 @@ function handleClick(): void {
  * Opens the trace creation panel to create a link between these artifacts.
  */
 function handleCreateLink(): void {
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openTraceCreatorTo({
     type: "both",
     sourceId: props.source.id,
     targetId: props.target.id,

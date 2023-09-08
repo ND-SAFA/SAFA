@@ -1,14 +1,7 @@
 import { defineStore } from "pinia";
 
-import {
-  ArtifactCreatorOpenState,
-  DetailsOpenState,
-  PopupStateMap,
-  PopupType,
-  TraceCreatorOpenState,
-} from "@/types";
+import { DetailsOpenState, PopupStateMap, PopupType } from "@/types";
 import { pinia } from "@/plugins";
-import selectionStore from "../graph/useSelection";
 import logStore from "./useLog";
 
 /**
@@ -98,31 +91,6 @@ export const useApp = defineStore("app", {
     openDetailsPanel(state: DetailsOpenState): void {
       this.popups.detailsPanel = state;
       this.popups.navPanel = false;
-    },
-    /**
-     * Opens the artifact creator to a specific node type.
-     *
-     * @param openTo - What to open to.
-     */
-    openArtifactCreatorTo(openTo: {
-      type?: ArtifactCreatorOpenState;
-      isNewArtifact?: boolean;
-    }): void {
-      const { type, isNewArtifact } = openTo;
-
-      if (isNewArtifact) selectionStore.clearSelections();
-
-      this.popups.saveArtifact = type || true;
-      this.openDetailsPanel("saveArtifact");
-    },
-    /**
-     * Opens the artifact creator to a specific node type.
-     *
-     * @param openTo - What to open to.
-     */
-    openTraceCreatorTo(openTo?: TraceCreatorOpenState): void {
-      this.popups.saveTrace = openTo || true;
-      this.openDetailsPanel("saveTrace");
     },
 
     /**

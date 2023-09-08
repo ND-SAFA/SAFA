@@ -17,13 +17,7 @@ export type PopupType =
  * Represents the states of all popups.
  */
 export interface PopupStateMap
-  extends Record<
-    PopupType,
-    | boolean
-    | DetailsOpenState
-    | ArtifactCreatorOpenState
-    | TraceCreatorOpenState
-  > {
+  extends Record<PopupType, boolean | DetailsOpenState> {
   errorModal: boolean;
   navPanel: boolean;
   detailsPanel: DetailsOpenState;
@@ -32,8 +26,8 @@ export interface PopupStateMap
   saveProject: boolean;
   editProject: boolean;
   deleteProject: boolean;
-  saveArtifact: ArtifactCreatorOpenState;
-  saveTrace: TraceCreatorOpenState;
+  saveArtifact: boolean;
+  saveTrace: boolean;
   drawTrace: boolean;
 }
 

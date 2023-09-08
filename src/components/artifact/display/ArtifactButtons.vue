@@ -42,6 +42,7 @@ import { computed } from "vue";
 import {
   appStore,
   artifactApiStore,
+  artifactSaveStore,
   permissionStore,
   selectionStore,
 } from "@/hooks";
@@ -68,7 +69,7 @@ function handleDelete(): void {
  * Opens the artifact creator.
  */
 function handleEdit(): void {
-  appStore.openArtifactCreatorTo({});
+  artifactSaveStore.openArtifactCreatorTo({});
 }
 
 /**

@@ -14,48 +14,34 @@ import { pinia } from "@/plugins";
  * A hook for managing requests to the organizations API.
  */
 export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
-  const createOrgApi = useApi("createOrgApi");
-  const editOrgApi = useApi("editOrgApi");
+  const saveOrgApi = useApi("saveOrgApi");
   const deleteOrgApi = useApi("deleteOrgApi");
 
-  const createOrgApiLoading = computed(() => createOrgApi.loading);
-  const editOrgApiLoading = computed(() => editOrgApi.loading);
+  const saveOrgApiLoading = computed(() => saveOrgApi.loading);
   const deleteOrgApiLoading = computed(() => deleteOrgApi.loading);
 
-  async function handleCreate(
-    org: Pick<OrganizationSchema, "name" | "description">,
-    callbacks: IOHandlerCallback = {}
-  ): Promise<void> {
-    await createOrgApi.handleRequest(
-      async () => {
-        const createdOrg = await createOrganization(org);
-
-        getOrgApiStore.addOrg(createdOrg);
-        orgStore.org = createdOrg;
-      },
-      {
-        ...callbacks,
-        success: `Organization has been created: ${org.name}`,
-        error: `Unable to create organization: ${org.name}`,
-      }
-    );
-  }
-
-  async function handleEdit(
+  async function handleSave(
     org: OrganizationSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
-    await editOrgApi.handleRequest(
+    await saveOrgApi.handleRequest(
       async () => {
-        const editedOrg = await editOrganization(org);
+        if (!org.id) {
+          const createdOrg = await createOrganization(org);
 
-        getOrgApiStore.addOrg(editedOrg);
-        orgStore.org = editedOrg;
+          getOrgApiStore.addOrg(createdOrg);
+          orgStore.org = createdOrg;
+        } else {
+          const editedOrg = await editOrganization(org);
+
+          getOrgApiStore.addOrg(editedOrg);
+          orgStore.org = editedOrg;
+        }
       },
       {
         ...callbacks,
-        success: `Organization has been updated: ${org.name}`,
-        error: `Unable to update organization: ${org.name}`,
+        success: `Organization has been saved: ${org.name}`,
+        error: `Unable to save organization: ${org.name}`,
       }
     );
   }
@@ -93,11 +79,9 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
   }
 
   return {
-    createOrgApiLoading,
-    editOrgApiLoading,
+    saveOrgApiLoading,
     deleteOrgApiLoading,
-    handleCreate,
-    handleEdit,
+    handleSave,
     handleDelete,
   };
 });

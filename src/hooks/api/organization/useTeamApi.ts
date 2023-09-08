@@ -11,51 +11,37 @@ import { pinia } from "@/plugins";
  * A hook for managing requests to the teams API.
  */
 export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
-  const createTeamApi = useApi("createTeamApi");
-  const editTeamApi = useApi("editTeamApi");
+  const saveTeamApi = useApi("saveTeamApi");
   const deleteTeamApi = useApi("deleteTeamApi");
 
-  const createTeamApiLoading = computed(() => createTeamApi.loading);
-  const editTeamApiLoading = computed(() => editTeamApi.loading);
+  const saveTeamApiLoading = computed(() => saveTeamApi.loading);
   const deleteTeamApiLoading = computed(() => deleteTeamApi.loading);
 
-  async function handleCreate(
+  async function handleSave(
     team: TeamSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
-    await createTeamApi.handleRequest(
+    await saveTeamApi.handleRequest(
       async () => {
-        const createdTeam = await createTeam(orgStore.orgId, team);
+        if (!team.id) {
+          const createdTeam = await createTeam(orgStore.orgId, team);
 
-        orgStore.org.teams.push(createdTeam);
-        teamStore.team = createdTeam;
+          orgStore.org.teams.push(createdTeam);
+          teamStore.team = createdTeam;
+        } else {
+          const editedTeam = await editTeam(orgStore.orgId, team);
+
+          orgStore.org.teams = [
+            ...removeMatches(orgStore.org.teams, "id", [team.id]),
+            editedTeam,
+          ];
+          teamStore.team = editedTeam;
+        }
       },
       {
         ...callbacks,
-        success: `Team has been created: ${team.name}`,
-        error: `Unable to create team: ${team.name}`,
-      }
-    );
-  }
-
-  async function handleEdit(
-    team: TeamSchema,
-    callbacks: IOHandlerCallback = {}
-  ): Promise<void> {
-    await editTeamApi.handleRequest(
-      async () => {
-        const editedTeam = await editTeam(orgStore.orgId, team);
-
-        orgStore.org.teams = [
-          ...removeMatches(orgStore.org.teams, "id", [team.id]),
-          editedTeam,
-        ];
-        teamStore.team = editedTeam;
-      },
-      {
-        ...callbacks,
-        success: `Team has been updated: ${team.name}`,
-        error: `Unable to update team: ${team.name}`,
+        success: `Team has been saved: ${team.name}`,
+        error: `Unable to save team: ${team.name}`,
       }
     );
   }
@@ -94,11 +80,9 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
   }
 
   return {
-    createTeamApiLoading,
-    editTeamApiLoading,
+    saveTeamApiLoading,
     deleteTeamApiLoading,
-    handleCreate,
-    handleEdit,
+    handleSave,
     handleDelete,
   };
 });

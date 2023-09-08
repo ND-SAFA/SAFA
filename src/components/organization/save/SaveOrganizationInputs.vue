@@ -1,13 +1,13 @@
 <template>
   <div>
     <text-input
-      v-model="name"
+      v-model="editedOrg.name"
       label="Organization Name"
       hint="Required"
       data-cy="input-org-name"
     />
     <text-input
-      v-model="description"
+      v-model="editedOrg.description"
       label="Organization Description"
       type="textarea"
       data-cy="input-org-description"
@@ -17,6 +17,7 @@
         color="primary"
         label="Save"
         data-cy="button-org-save"
+        :loading="loading"
         @click="handleSave"
       />
     </flex-box>
@@ -33,23 +34,20 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { orgApiStore, orgStore } from "@/hooks";
+import { computed } from "vue";
+import { appStore, orgApiStore, saveOrgStore } from "@/hooks";
 import { FlexBox, TextButton, TextInput } from "@/components/common";
 
-const org = computed(() => orgStore.org);
+const editedOrg = computed(() => saveOrgStore.editedOrg);
 
-const name = ref(org.value.name);
-const description = ref(org.value.description);
+const loading = computed(() => orgApiStore.saveOrgApiLoading);
 
 /**
  * Saves the edited organization.
  */
 function handleSave() {
-  orgApiStore.handleEdit({
-    ...org.value,
-    name: name.value,
-    description: description.value,
+  orgApiStore.handleSave(editedOrg.value, {
+    onSuccess: () => appStore.close("saveOrg"),
   });
 }
 </script>

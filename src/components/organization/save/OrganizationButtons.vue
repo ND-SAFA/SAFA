@@ -25,7 +25,7 @@
       label="Edit"
       icon="edit"
       data-cy="button-org-edit"
-      @click="appStore.open('saveOrg')"
+      @click="handleEdit"
     />
     <separator v-if="displayDelete" vertical />
     <text-button
@@ -57,6 +57,7 @@ import {
   orgApiStore,
   orgStore,
   permissionStore,
+  saveOrgStore,
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
@@ -66,4 +67,12 @@ const displayEdit = computed(() =>
 const displayDelete = computed(() =>
   permissionStore.isAllowed("org.delete", orgStore.org)
 );
+
+/**
+ * Opens the organization editor.
+ */
+function handleEdit() {
+  saveOrgStore.resetOrg(orgStore.org);
+  appStore.open("saveOrg");
+}
 </script>

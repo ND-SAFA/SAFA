@@ -6,34 +6,20 @@ import { IOHandlerCallback, OrganizationSchema } from "@/types";
  */
 export interface OrgApiHook {
   /**
-   * Whether the create organization request is loading.
+   * Whether the save organization request is loading.
    */
-  createOrgApiLoading: ComputedRef<boolean>;
-  /**
-   * Whether the edit organization request is loading.
-   */
-  editOrgApiLoading: ComputedRef<boolean>;
+  saveOrgApiLoading: ComputedRef<boolean>;
   /**
    * Whether the delete organization request is loading.
    */
   deleteOrgApiLoading: ComputedRef<boolean>;
   /**
-   * Creates a new organization.
+   * Creates a new organization, or updates an existing one.
    *
-   * @param org - The organization to create.
+   * @param org - The organization to save.
    * @param callbacks - The callbacks to call after the action.
    */
-  handleCreate(
-    org: OrganizationSchema,
-    callbacks?: IOHandlerCallback
-  ): Promise<void>;
-  /**
-   * Edits the given organization.
-   *
-   * @param org - The organization to edit.
-   * @param callbacks - The callbacks to call after the action.
-   */
-  handleEdit(
+  handleSave(
     org: OrganizationSchema,
     callbacks?: IOHandlerCallback
   ): Promise<void>;

@@ -18,7 +18,7 @@
       label="Edit"
       icon="edit"
       data-cy="button-team-edit"
-      @click="appStore.open('saveTeam')"
+      @click="handleEdit"
     />
     <separator v-if="displayDelete" vertical />
     <text-button
@@ -47,6 +47,7 @@ import {
   appStore,
   orgStore,
   permissionStore,
+  saveTeamStore,
   teamApiStore,
   teamStore,
 } from "@/hooks";
@@ -60,4 +61,12 @@ const displayEdit = computed(() =>
 const displayDelete = computed(() =>
   permissionStore.isAllowed("team.delete", teamStore.team)
 );
+
+/**
+ * Opens the team editor.
+ */
+function handleEdit() {
+  saveTeamStore.resetTeam(team.value);
+  appStore.open("saveTeam");
+}
 </script>

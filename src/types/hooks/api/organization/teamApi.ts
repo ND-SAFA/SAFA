@@ -6,31 +6,20 @@ import { IOHandlerCallback, TeamSchema } from "@/types";
  */
 export interface TeamApiHook {
   /**
-   * Whether the create team request is loading.
+   * Whether the save team request is loading.
    */
-  createTeamApiLoading: ComputedRef<boolean>;
-  /**
-   * Whether the edit team request is loading.
-   */
-  editTeamApiLoading: ComputedRef<boolean>;
+  saveTeamApiLoading: ComputedRef<boolean>;
   /**
    * Whether the delete team request is loading.
    */
   deleteTeamApiLoading: ComputedRef<boolean>;
   /**
-   * Creates a new team.
+   * Creates a new team or updates an existing one.
    *
-   * @param team - The team to create.
+   * @param team - The team to save.
    * @param callbacks - The callbacks to call after the action.
    */
-  handleCreate(team: TeamSchema, callbacks?: IOHandlerCallback): Promise<void>;
-  /**
-   * Edits a team.
-   *
-   * @param team - The team to edit.
-   * @param callbacks - The callbacks to call after the action.
-   */
-  handleEdit(team: TeamSchema, callbacks?: IOHandlerCallback): Promise<void>;
+  handleSave(team: TeamSchema, callbacks?: IOHandlerCallback): Promise<void>;
   /**
    * Deletes a team.
    *

@@ -1,7 +1,7 @@
 <template>
   <div class="long-input q-mx-auto">
     <text-input
-      v-model="name"
+      v-model="editedTeam.name"
       label="Team Name"
       hint="Required"
       data-cy="input-org-name"
@@ -11,6 +11,7 @@
         color="primary"
         label="Save"
         data-cy="button-org-save"
+        :loading="loading"
         @click="handleSave"
       />
     </flex-box>
@@ -27,21 +28,20 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { teamApiStore, teamStore } from "@/hooks";
+import { computed } from "vue";
+import { appStore, saveTeamStore, teamApiStore } from "@/hooks";
 import { FlexBox, TextButton, TextInput } from "@/components/common";
 
-const team = computed(() => teamStore.team);
+const editedTeam = computed(() => saveTeamStore.editedTeam);
 
-const name = ref(team.value.name);
+const loading = computed(() => teamApiStore.saveTeamApiLoading);
 
 /**
- * Saves the edited organization.
+ * Saves the edited team.
  */
 function handleSave() {
-  teamApiStore.handleEdit({
-    ...team.value,
-    name: name.value,
+  teamApiStore.handleSave(editedTeam.value, {
+    onSuccess: () => appStore.close("saveTeam"),
   });
 }
 </script>

@@ -7,13 +7,14 @@ from tgen.jobs.summary_jobs.base_summarizer_job import BaseSummarizerJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
+from tgen.summarizer.summarizer import Summarizer
 
 
 class ProjectSummaryJob(BaseSummarizerJob):
 
     def __init__(self, artifacts: List[Dict] = None, artifact_reader: ArtifactProjectReader = None,
                  llm_manager: AbstractLLMManager = None, n_tokens: int = DEFAULT_SUMMARY_TOKENS,
-                 export_dir: str = None, job_args: JobArgs = None, **kwargs):
+                 export_dir: str = None, job_args: JobArgs = None, do_resummarize_project: bool = False, **kwargs):
         """
         Generates a system specification document for containing all artifacts.
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content
@@ -34,5 +35,6 @@ class ProjectSummaryJob(BaseSummarizerJob):
         :return: System summary.
         """
         args = self.create_summarizer_args()
+        summarizer = Summarizer(args)
         summary = ProjectSummarizer(args, self.n_tokens).summarize()
         return SummaryResponse(summary=summary, artifacts=[])

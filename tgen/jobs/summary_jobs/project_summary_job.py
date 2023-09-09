@@ -13,7 +13,7 @@ class ProjectSummaryJob(BaseSummarizerJob):
 
     def __init__(self, artifacts: List[Dict] = None, artifact_reader: ArtifactProjectReader = None,
                  llm_manager: AbstractLLMManager = None, n_tokens: int = DEFAULT_SUMMARY_TOKENS,
-                 export_dir: str = None, job_args: JobArgs = None, **kwargs):
+                 export_dir: str = None, job_args: JobArgs = None, do_resummarize_project: bool = False, **kwargs):
         """
         Generates a system specification document for containing all artifacts.
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content

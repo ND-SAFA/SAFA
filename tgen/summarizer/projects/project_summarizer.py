@@ -39,7 +39,7 @@ class ProjectSummarizer(BaseObject):
         """
         logger.log_title("Creating project specification.")
 
-        if self.args.summarize_artifacts:
+        if self.args.summarize_artifacts or not self.artifact_df.is_summarized():
             self.artifact_df.summarize_content(ArtifactsSummarizer())
 
         project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True)

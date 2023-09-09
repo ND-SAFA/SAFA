@@ -5,6 +5,7 @@ from typing import Any, Callable, List, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.core.trainers.trainer_task import TrainerTask
@@ -237,14 +238,19 @@ class PromptDataset(iDataset):
         """
         from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
         if self.trace_dataset is not None:
-            return PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path, dataset_dirname))
+            creator = self.trace_dataset.as_creator(project_path, dataset_dirname)
+            project_path = creator.project_reader.project_path
+            prompt_creator = PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path, dataset_dirname))
         elif self.artifact_df is not None:
             from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
             creator = TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame()).as_creator(project_path, dataset_dirname)
             project_path = creator.project_reader.project_path
-            return PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
-        elif self.prompt_df is not None:
-            raise NotImplementedError("Cannot get creator for prompt dataset with only prompt df")
+            prompt_creator = PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
+        else:
+            raise NotImplementedError("Cannot get creator for prompt dataset without an artifact df or trace dataset")
+        if self.project_summary:
+            FileUtil.write(self.project_summary, os.path.join(project_path, PROJECT_SUMMARY_FILENAME))
+        return prompt_creator
 
     def __getattr__(self, item: str) -> Any:
         """

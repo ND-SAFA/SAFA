@@ -1,3 +1,4 @@
+import os
 from typing import Any
 
 from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE, PS_ENTITIES_TITLE, PS_SUBSYSTEM_TITLE, \
@@ -26,8 +27,13 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         export_path = state.export_dir
         original_dataset_complete = args.dataset_for_sources
-        if not original_dataset_complete.project_summary or args.create_new_code_summaries:
-            original_dataset_complete = self._summarize(args, project_summary=original_dataset_complete.project_summary)
+        code_layers = original_dataset_complete.artifact_df.get_code_layers()
+        should_summarize_artifacts = args.create_new_code_summaries \
+                                     or not original_dataset_complete.artifact_df.is_summarized(code_layers)
+        if not original_dataset_complete.project_summary or should_summarize_artifacts:
+            original_dataset_complete = self._summarize(args, export_path=state.export_dir,
+                                                        project_summary=original_dataset_complete.project_summary,
+                                                        should_summarize_artifacts=should_summarize_artifacts)
         state.summary = original_dataset_complete.project_summary
         save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
 
@@ -36,10 +42,14 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.source_dataset = source_layer_only_dataset
         state.original_dataset = original_dataset_complete
 
-    def _summarize(self, args: HGenArgs, project_summary: str = None) -> PromptDataset:
+    def _summarize(self, args: HGenArgs, export_path: str, should_summarize_artifacts: bool,
+                   project_summary: str = None) -> PromptDataset:
         """
         Summarizes the project and artifacts
         :param args: The arguments to hgen
+        :param export_path: the path to save summaries to
+        :param should_summarize_artifacts: True if artifacts should be summarized
+        :param project_summary: Existing project summary if applicable
         :return: The summarized dataset
         """
         dataset = args.dataset_for_sources
@@ -47,14 +57,14 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         hgen_section_questionnaire.format_value(target_type=args.target_type)
         new_sections = {self.HGEN_SECTION_TITLE: hgen_section_questionnaire}
 
+        do_resummarize_project = not project_summary
         project_summary = project_summary if project_summary else args.system_summary
-        code_layers = dataset.artifact_df.get_code_layers()
-        summarizer_args = SummarizerArgs(dataset=dataset,
+        summarizer_args = SummarizerArgs(export_dir=os.path.join(export_path, "summarizer"),
+                                         dataset=dataset,
                                          project_summary=project_summary,
                                          summarize_code_only=True,
-                                         do_resummarize_project=True,
-                                         summarize_artifacts=args.create_new_code_summaries
-                                                             or not dataset.artifact_df.is_summarized(code_layers),
+                                         do_resummarize_project=do_resummarize_project,
+                                         summarize_artifacts=should_summarize_artifacts,
                                          project_summary_sections=[PS_ENTITIES_TITLE,
                                                                    PS_DATA_FLOW_TITLE,
                                                                    PS_OVERVIEW_TITLE,

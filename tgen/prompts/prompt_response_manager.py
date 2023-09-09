@@ -139,10 +139,9 @@ class PromptResponseManager:
         if isinstance(self.response_tag, dict):
             for parent, child_tags in self.response_tag.items():
                 values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
-                tags = child_tags
-                if True in [parent in v for v in values]:  # there is content in the parent tag as well
-                    tags.append(parent)
-                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in tags} for val in values]
+                tags = child_tags + [parent]
+                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in tags if c_tag in val or c_tag != parent}
+                          for val in values]
                 output[self._tag2id[parent]] = values
         else:
             tags, _ = self._convert2list(self.response_tag)

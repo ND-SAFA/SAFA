@@ -1,22 +1,5 @@
 _checkpoint_dir: state_checkpoints
-all_generated_content: null
-completed_steps:
-  GenerateArtifactContentStep: 1
-  GenerateInputsStep: 1
-  InitializeDatasetStep: 1
-description_of_artifact: A User story is a concise, informal description of a software
-  feature or functionality, written from the perspective of the end user. It is a
-  key artifact in Agile software development, used to capture and prioritize requirements.
-  User stories differ from other software artifacts, such as use cases or functional
-  specifications, in that they are intentionally brief, focusing on the user's needs
-  and goals, and are typically written in everyday language. They are meant to foster
-  collaboration and communication between the development team and stakeholders, rather
-  than serving as a detailed technical specification.
-export_dir: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230
-final_dataset: null
-format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
-  or benefit].
-generation_predictions:
+all_generated_content: &id001
   ? As a game developer, I want DebugOptions and FPSCounter classes to display debugging
     information like FPS, so that I can analyze performance and diagnose issues.
   : []
@@ -56,6 +39,24 @@ generation_predictions:
     loop for event handling, updating, and rendering, so that I have a reusable game
     engine framework.
   : - /Game.cpp
+completed_steps:
+  GenerateArtifactContentStep: 1
+  GenerateInputsStep: 1
+  InitializeDatasetStep: 1
+  RefineGenerationsStep: 1
+description_of_artifact: A User story is a concise, informal description of a software
+  feature or functionality, written from the perspective of the end user. It is a
+  key artifact in Agile software development, used to capture and prioritize requirements.
+  User stories differ from other software artifacts, such as use cases or functional
+  specifications, in that they are intentionally brief, focusing on the user's needs
+  and goals, and are typically written in everyday language. They are meant to foster
+  collaboration and communication between the development team and stakeholders, rather
+  than serving as a detailed technical specification.
+export_dir: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230
+final_dataset: null
+format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
+  or benefit].
+generation_predictions: *id001
 n_generations: 1
 original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
@@ -89,7 +90,7 @@ questions:
 - What external services, APIs, or libraries does the code use and why?
 - What algorithms or business logic can be inferred from the code?
 - What user needs might the code address based on its capabilities?
-refined_content: null
+refined_content: *id001
 source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []

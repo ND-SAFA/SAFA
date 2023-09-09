@@ -52,7 +52,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                  tags_for_response={generated_artifacts_tag},
                                                  return_first=False,
                                                  export_path=export_path)[0]
-        state.generation_predictions = {p[target_tag_id][0]: p[source_tag_id][0] for p in generation_predictions}
+        state.generation_predictions = {p[target_tag_id][0]: p[source_tag_id][0] for p in generation_predictions if target_tag_id in p}
         state.n_generations += 1
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:

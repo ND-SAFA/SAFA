@@ -27,7 +27,8 @@ class TestMultiLayerHGenJob(BaseJobTest):
     args = HGenArgs(source_layer_id="C++ Code",
                     target_type="Test User Story",
                     dataset_creator_for_sources=PromptDatasetCreator(
-                        trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))
+                        trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))),
+                    create_new_code_summaries=False,)
     higher_levels = ["requirement", "design document"]
     ranking_calls = 0
 

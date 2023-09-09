@@ -56,8 +56,9 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         Reads the project summary if it exists
         :return: The project summary
         """
-        project_reader = self.project_reader if self.project_reader else self.trace_dataset_creator.project_reader
-        project_summary_path = os.path.join(project_reader.project_path, PROJECT_SUMMARY_FILENAME)
+        project_reader = self.trace_dataset_creator.project_reader if self.trace_dataset_creator else self.project_reader
+        project_path = project_reader.project_path if project_reader else EMPTY_STRING
+        project_summary_path = os.path.join(project_path, PROJECT_SUMMARY_FILENAME)
         if not os.path.exists(project_summary_path):
             return None
         project_summary = FileUtil.read_file(project_summary_path, raise_exception=False)

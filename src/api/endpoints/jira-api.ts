@@ -137,6 +137,7 @@ export async function createJiraProject(
   cloudId: string,
   id: string
 ): Promise<JobSchema> {
+  // TODO: add org, team
   return (
     await buildRequest<{ payload: JobSchema }, "cloudId" | "id">(
       "jiraCreateProject"

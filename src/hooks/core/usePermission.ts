@@ -8,7 +8,7 @@ import {
   MembershipType,
 } from "@/types";
 import { roleMap } from "@/util";
-import { projectStore, sessionStore, teamStore } from "@/hooks";
+import { orgStore, projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -53,7 +53,10 @@ export const usePermission = defineStore("permissionStore", {
         | TeamSchema
         | OrganizationSchema = projectStore.project
     ): boolean {
+      // TODO: use a project's team and organization instead of the current team and organization.
       const member = sessionStore.getCurrentMember(context);
+      const teamMember = sessionStore.getCurrentMember(teamStore.team);
+      const orgMember = sessionStore.getCurrentMember(orgStore.org);
       const type = member?.entityType || "PROJECT";
 
       if (this.isDemo) {
@@ -64,7 +67,13 @@ export const usePermission = defineStore("permissionStore", {
         return !!sessionStore.user.superuser;
       }
 
-      return !!member && roleMap[type][member.role].includes(permission);
+      return (
+        (member && roleMap[type][member.role].includes(permission)) ||
+        (teamMember && roleMap.TEAM[teamMember.role].includes(permission)) ||
+        (orgMember &&
+          roleMap.ORGANIZATION[orgMember.role].includes(permission)) ||
+        false
+      );
     },
   },
 });

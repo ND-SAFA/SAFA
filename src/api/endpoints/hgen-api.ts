@@ -13,8 +13,7 @@ export function createGeneratedArtifacts(
   versionId: string
 ): Promise<JobSchema> {
   return buildRequest<JobSchema, "versionId", GenerateArtifactSchema>(
-    "generateArtifacts"
-  )
-    .withParam("versionId", versionId)
-    .post(config);
+    "generateArtifacts",
+    { versionId }
+  ).post(config);
 }

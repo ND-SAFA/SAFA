@@ -49,7 +49,7 @@ export async function getProjects(): Promise<IdentifierSchema[]> {
  */
 export async function deleteProject(projectId: string): Promise<void> {
   //TODO: include org, team
-  return buildRequest<void, "projectId">("updateProject")
-    .withParam("projectId", projectId)
-    .delete();
+  return buildRequest<void, "projectId">("updateProject", {
+    projectId,
+  }).delete();
 }

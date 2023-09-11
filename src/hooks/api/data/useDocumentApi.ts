@@ -98,7 +98,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
 
         await documentApi.handleRequest(
           async () => {
-            await deleteDocument(document);
+            await deleteDocument(document.documentId);
             await documentStore.removeDocument(document);
           },
           {

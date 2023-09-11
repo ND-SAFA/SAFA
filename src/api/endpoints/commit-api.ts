@@ -10,7 +10,7 @@ import { buildRequest } from "@/api";
 export async function persistCommit(
   commit: CommitSchema
 ): Promise<CommitSchema> {
-  return buildRequest<CommitSchema, "versionId", CommitSchema>("commit")
-    .withParam("versionId", commit.commitVersion.versionId)
-    .post(commit);
+  return buildRequest<CommitSchema, "versionId", CommitSchema>("commit", {
+    versionId: commit.commitVersion.versionId,
+  }).post(commit);
 }

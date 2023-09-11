@@ -12,8 +12,7 @@ export function getProjectSearchQuery(
   query: SearchQuerySchema
 ): Promise<SearchResultsSchema> {
   return buildRequest<SearchResultsSchema, "versionId", SearchQuerySchema>(
-    "search"
-  )
-    .withParam("versionId", versionId)
-    .post(query);
+    "search",
+    { versionId }
+  ).post(query);
 }

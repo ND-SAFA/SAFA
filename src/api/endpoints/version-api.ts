@@ -10,9 +10,9 @@ import { buildRequest } from "@/api";
 export async function getProjectVersions(
   projectId: string
 ): Promise<VersionSchema[]> {
-  return buildRequest<VersionSchema[], "projectId">("getProjectVersions")
-    .withParam("projectId", projectId)
-    .get();
+  return buildRequest<VersionSchema[], "projectId">("getProjectVersions", {
+    projectId,
+  }).get();
 }
 
 /**
@@ -24,9 +24,9 @@ export async function getProjectVersions(
 export async function getCurrentVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("getCurrentVersion")
-    .withParam("projectId", projectId)
-    .get();
+  return buildRequest<VersionSchema, "projectId">("getCurrentVersion", {
+    projectId,
+  }).get();
 }
 
 /**
@@ -38,9 +38,9 @@ export async function getCurrentVersion(
 export async function createMajorVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("createNewMajorVersion")
-    .withParam("projectId", projectId)
-    .post();
+  return buildRequest<VersionSchema, "projectId">("createNewMajorVersion", {
+    projectId,
+  }).post();
 }
 
 /**
@@ -52,9 +52,9 @@ export async function createMajorVersion(
 export async function createMinorVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("createNewMinorVersion")
-    .withParam("projectId", projectId)
-    .post();
+  return buildRequest<VersionSchema, "projectId">("createNewMinorVersion", {
+    projectId,
+  }).post();
 }
 
 /**
@@ -66,9 +66,9 @@ export async function createMinorVersion(
 export async function createRevisionVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("createNewRevisionVersion")
-    .withParam("projectId", projectId)
-    .post();
+  return buildRequest<VersionSchema, "projectId">("createNewRevisionVersion", {
+    projectId,
+  }).post();
 }
 
 /**
@@ -77,7 +77,7 @@ export async function createRevisionVersion(
  * @param versionId - The version ID to delete.
  */
 export async function deleteProjectVersion(versionId: string): Promise<void> {
-  return buildRequest<void, "versionId">("projectVersion")
-    .withParam("versionId", versionId)
-    .delete();
+  return buildRequest<void, "versionId">("projectVersion", {
+    versionId,
+  }).delete();
 }

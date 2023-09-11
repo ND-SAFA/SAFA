@@ -10,9 +10,9 @@ import { buildRequest } from "@/api/util";
 export async function getProjectVersion(
   versionId: string
 ): Promise<ProjectSchema> {
-  return buildRequest<ProjectSchema, "versionId">("projectVersion")
-    .withParam("versionId", versionId)
-    .get();
+  return buildRequest<ProjectSchema, "versionId">("projectVersion", {
+    versionId,
+  }).get();
 }
 
 /**
@@ -24,9 +24,9 @@ export async function getProjectVersion(
 export async function getArtifactsInVersion(
   versionId: string
 ): Promise<ArtifactSchema[]> {
-  return buildRequest<ArtifactSchema[], "versionId">("getArtifactsInVersion")
-    .withParam("versionId", versionId)
-    .get();
+  return buildRequest<ArtifactSchema[], "versionId">("getArtifactsInVersion", {
+    versionId,
+  }).get();
 }
 
 /**
@@ -38,7 +38,7 @@ export async function getArtifactsInVersion(
 export async function getTracesInVersion(
   versionId: string
 ): Promise<TraceLinkSchema[]> {
-  return buildRequest<TraceLinkSchema[], "versionId">("getTracesInVersion")
-    .withParam("versionId", versionId)
-    .get();
+  return buildRequest<TraceLinkSchema[], "versionId">("getTracesInVersion", {
+    versionId,
+  }).get();
 }

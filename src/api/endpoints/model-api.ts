@@ -10,9 +10,9 @@ import { buildRequest } from "@/api";
 export async function getProjectModels(
   projectId: string
 ): Promise<GenerationModelSchema[]> {
-  return buildRequest<GenerationModelSchema[], "projectId">("getModels")
-    .withParam("projectId", projectId)
-    .get();
+  return buildRequest<GenerationModelSchema[], "projectId">("getModels", {
+    projectId,
+  }).get();
 }
 
 /**
@@ -30,9 +30,7 @@ export async function createModel(
     GenerationModelSchema,
     "projectId",
     GenerationModelSchema
-  >("createModel")
-    .withParam("projectId", projectId)
-    .post(model);
+  >("createModel", { projectId }).post(model);
 }
 
 /**
@@ -50,10 +48,7 @@ export async function editModel(
     GenerationModelSchema,
     "projectId" | "modelId",
     GenerationModelSchema
-  >("editModel")
-    .withParam("projectId", projectId)
-    .withParam("modelId", model.id)
-    .put(model);
+  >("editModel", { projectId, modelId: model.id }).put(model);
 }
 
 /**
@@ -66,10 +61,10 @@ export async function deleteModel(
   projectId: string,
   modelId: string
 ): Promise<void> {
-  return buildRequest<void, "projectId" | "modelId">("deleteModel")
-    .withParam("projectId", projectId)
-    .withParam("modelId", modelId)
-    .delete();
+  return buildRequest<void, "projectId" | "modelId">("deleteModel", {
+    projectId,
+    modelId,
+  }).delete();
 }
 
 /**

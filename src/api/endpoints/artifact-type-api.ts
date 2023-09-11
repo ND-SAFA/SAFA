@@ -13,10 +13,9 @@ export async function createArtifactType(
   artifactType: ArtifactTypeSchema
 ): Promise<ArtifactTypeSchema> {
   return buildRequest<ArtifactTypeSchema, "projectId", ArtifactTypeSchema>(
-    "createArtifactType"
-  )
-    .withParam("projectId", projectId)
-    .post(artifactType);
+    "createArtifactType",
+    { projectId }
+  ).post(artifactType);
 }
 
 /**
@@ -34,10 +33,9 @@ export async function editArtifactType(
     ArtifactTypeSchema,
     "projectId" | "artifactTypeName",
     ArtifactTypeSchema
-  >("editArtifactType")
-    .withParam("projectId", projectId)
-    .withParam("artifactTypeName", artifactType.name)
-    .put(artifactType);
+  >("editArtifactType", { projectId, artifactTypeName: artifactType.name }).put(
+    artifactType
+  );
 }
 
 /**
@@ -51,9 +49,7 @@ export async function deleteArtifactType(
   artifactTypeName: string
 ): Promise<void> {
   return buildRequest<void, "projectId" | "artifactTypeName">(
-    "deleteArtifactType"
-  )
-    .withParam("projectId", projectId)
-    .withParam("artifactTypeName", artifactTypeName)
-    .delete();
+    "deleteArtifactType",
+    { projectId, artifactTypeName }
+  ).delete();
 }

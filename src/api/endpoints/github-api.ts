@@ -24,9 +24,9 @@ export function authorizeGitHub(): void {
  * @param accessCode - The access code received from authorizing GitHub.
  */
 export async function saveGitHubCredentials(accessCode: string): Promise<void> {
-  await buildRequest<void, "accessCode">("githubCreateCredentials")
-    .withParam("accessCode", accessCode)
-    .post();
+  await buildRequest<void, "accessCode">("githubCreateCredentials", {
+    accessCode,
+  }).post();
 }
 
 /**
@@ -88,10 +88,7 @@ export async function createGitHubProject(
     JobSchema,
     "owner" | "repositoryName",
     GitHubImportSchema | undefined
-  >("githubCreateProject")
-    .withParam("owner", owner)
-    .withParam("repositoryName", repositoryName)
-    .post(configuration);
+  >("githubCreateProject", { owner, repositoryName }).post(configuration);
 }
 
 /**
@@ -113,9 +110,7 @@ export async function createGitHubProjectSync(
     JobSchema,
     "versionId" | "owner" | "repositoryName",
     GitHubImportSchema | undefined
-  >("githubSyncProject")
-    .withParam("versionId", versionId)
-    .withParam("owner", owner)
-    .withParam("repositoryName", repositoryName)
-    .put(configuration);
+  >("githubSyncProject", { versionId, owner, repositoryName }).put(
+    configuration
+  );
 }

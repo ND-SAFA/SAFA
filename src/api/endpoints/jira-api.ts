@@ -47,9 +47,9 @@ export function authorizeJira(): void {
  * @param accessCode - The access code received from authorizing Jira.
  */
 export async function saveJiraCredentials(accessCode: string): Promise<void> {
-  await buildRequest<void, "accessCode">("jiraCreateCredentials")
-    .withParam("accessCode", accessCode)
-    .post();
+  await buildRequest<void, "accessCode">("jiraCreateCredentials", {
+    accessCode,
+  }).post();
 }
 
 /**
@@ -118,10 +118,9 @@ export async function getJiraProjects(
   return (
     (
       await buildRequest<{ payload: JiraProjectSchema[] }, "cloudId">(
-        "jiraGetInstallations"
-      )
-        .withParam("cloudId", cloudId)
-        .get()
+        "jiraGetInstallations",
+        { cloudId }
+      ).get()
     ).payload || []
   );
 }
@@ -140,11 +139,9 @@ export async function createJiraProject(
   // TODO: add org, team
   return (
     await buildRequest<{ payload: JobSchema }, "cloudId" | "id">(
-      "jiraCreateProject"
-    )
-      .withParam("cloudId", cloudId)
-      .withParam("id", id)
-      .post()
+      "jiraCreateProject",
+      { id, cloudId }
+    ).post()
   ).payload;
 }
 
@@ -162,11 +159,8 @@ export async function createJiraProjectSync(
 ): Promise<JobSchema> {
   return (
     await buildRequest<{ payload: JobSchema }, "versionId" | "cloudId" | "id">(
-      "jiraSyncProject"
-    )
-      .withParam("versionId", versionId)
-      .withParam("cloudId", cloudId)
-      .withParam("id", id)
-      .put()
+      "jiraSyncProject",
+      { versionId, id, cloudId }
+    ).put()
   ).payload;
 }

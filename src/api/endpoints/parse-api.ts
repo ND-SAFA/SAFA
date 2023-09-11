@@ -17,9 +17,9 @@ export async function parseArtifactFile(
   formData.append("file", file);
 
   return buildRequest<ParseArtifactFileSchema, "artifactType", FormData>(
-    "parseArtifactFile"
+    "parseArtifactFile",
+    { artifactType }
   )
-    .withParam("artifactType", artifactType)
     .withFormData()
     .post(formData);
 }

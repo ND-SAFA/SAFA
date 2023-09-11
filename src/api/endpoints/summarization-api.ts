@@ -15,11 +15,9 @@ export async function createSummary(
     string[],
     "versionId",
     { artifacts: string[] }
-  >("summarize")
-    .withParam("versionId", versionId)
-    .post({
-      artifacts: [artifactId],
-    });
+  >("summarize", { versionId }).post({
+    artifacts: [artifactId],
+  });
 
   return summaries[0] || "";
 }

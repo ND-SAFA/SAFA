@@ -11,8 +11,7 @@ export async function getWarningsInProjectVersion(
   versionId: string
 ): Promise<WarningCollectionSchema> {
   return buildRequest<WarningCollectionSchema, "versionId">(
-    "getWarningsInProjectVersion"
-  )
-    .withParam("versionId", versionId)
-    .get();
+    "getWarningsInProjectVersion",
+    { versionId }
+  ).get();
 }

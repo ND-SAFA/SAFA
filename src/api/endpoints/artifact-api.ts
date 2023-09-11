@@ -1,4 +1,7 @@
-import { NameValidationSchema } from "@/types";
+import {
+  NameValidationRequestSchema,
+  NameValidationResponseSchema,
+} from "@/types";
 import { buildRequest } from "@/api";
 
 /**
@@ -14,11 +17,9 @@ export async function getDoesArtifactExist(
 ): Promise<boolean> {
   return (
     await buildRequest<
-      NameValidationSchema,
+      NameValidationResponseSchema,
       "versionId",
-      { artifactName: string }
-    >("isArtifactNameTaken")
-      .withParam("versionId", versionId)
-      .post({ artifactName })
+      NameValidationRequestSchema
+    >("isArtifactNameTaken", { versionId }).post({ artifactName })
   ).artifactExists;
 }

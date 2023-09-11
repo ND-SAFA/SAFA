@@ -14,9 +14,9 @@ import { buildRequest } from "@/api/util";
 export async function getGeneratedLinks(
   versionId: string
 ): Promise<TraceLinkSchema[]> {
-  return buildRequest<TraceLinkSchema[], "versionId">("getGeneratedLinks")
-    .withParam("versionId", versionId)
-    .get();
+  return buildRequest<TraceLinkSchema[], "versionId">("getGeneratedLinks", {
+    versionId,
+  }).get();
 }
 
 /**
@@ -45,8 +45,7 @@ export async function createModelTraining(
   config: TrainOrGenerateLinksSchema
 ): Promise<JobSchema> {
   return buildRequest<JobSchema, "projectId", TrainOrGenerateLinksSchema>(
-    "trainModelJob"
-  )
-    .withParam("projectId", projectId)
-    .post(config);
+    "trainModelJob",
+    { projectId }
+  ).post(config);
 }

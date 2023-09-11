@@ -16,6 +16,10 @@ class RequestBuilder<
    */
   private relativeUrl: string;
   /**
+   * Any path variables to fill into the request URL.
+   */
+  private pathVariables: Record<string, string> = {};
+  /**
    * Format the request data as JSON.
    * @private
    */
@@ -31,8 +35,12 @@ class RequestBuilder<
    */
   private headers: Record<string, string> = {};
 
-  constructor(endpoint: keyof typeof Endpoint) {
+  constructor(
+    endpoint: keyof typeof Endpoint,
+    pathVariables?: Record<QueryParam, string>
+  ) {
     this.relativeUrl = Endpoint[endpoint];
+    this.pathVariables = pathVariables || {};
   }
 
   /**
@@ -53,16 +61,6 @@ class RequestBuilder<
   }
 
   /**
-   * Fills in a URL parameter
-   * @param param - The parameter to fill in.
-   * @param value - The value to fill with.
-   */
-  withParam(param: QueryParam, value: string): this {
-    this.relativeUrl = this.relativeUrl.replace(`:${param}`, value);
-    return this;
-  }
-
-  /**
    * Performs an API request.
    * @param method - The method to use for the request.
    * @param body - The body of the request.
@@ -72,7 +70,13 @@ class RequestBuilder<
     method: APIMethods,
     body?: BodyType
   ): Promise<ReturnType> {
-    const res = await fetch(`${BASE_URL}/${this.relativeUrl}`, {
+    let url = `${BASE_URL}/${this.relativeUrl}`;
+
+    Object.entries(this.pathVariables).forEach(([key, value]) => {
+      url = url.replace(`:${key}`, value);
+    });
+
+    const res = await fetch(url, {
       credentials: "include",
       headers: this.jsonBody
         ? {
@@ -166,11 +170,13 @@ class RequestBuilder<
   /**
    * Builds a new request for the given endpoint.
    * @param endpoint - The endpoint to build a request for.
+   * @param pathVariables - Any path variables to fill in.
    */
   static buildRequest<R = void, Q extends string = string, B = void>(
-    endpoint: keyof typeof Endpoint
+    endpoint: keyof typeof Endpoint,
+    pathVariables?: Record<Q, string>
   ): RequestBuilder<R, Q, B> {
-    return new RequestBuilder<R, Q, B>(endpoint);
+    return new RequestBuilder<R, Q, B>(endpoint, pathVariables);
   }
 }
 

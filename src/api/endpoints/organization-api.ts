@@ -152,9 +152,9 @@ export async function getMembers(
   entity: MemberEntitySchema
 ): Promise<MembershipSchema[]> {
   // TODO
-  return buildRequest<MembershipSchema[], "projectId">("getProjectMembers")
-    .withParam("projectId", entity.entityId || "")
-    .get();
+  return buildRequest<MembershipSchema[], "projectId">("getProjectMembers", {
+    projectId: entity.entityId || "",
+  }).get();
 }
 
 /**
@@ -168,13 +168,12 @@ export async function createMember(
 ): Promise<MembershipSchema> {
   // TODO
   return buildRequest<MembershipSchema, "projectId", MemberRequestSchema>(
-    "updateProjectMember"
-  )
-    .withParam("projectId", member.entityId || "")
-    .post({
-      memberEmail: member.email,
-      projectRole: member.role,
-    });
+    "updateProjectMember",
+    { projectId: member.entityId || "" }
+  ).post({
+    memberEmail: member.email,
+    projectRole: member.role,
+  });
 }
 
 /**
@@ -188,13 +187,12 @@ export async function editMember(
 ): Promise<MembershipSchema> {
   // TODO
   return buildRequest<MembershipSchema, "projectId", MemberRequestSchema>(
-    "updateProjectMember"
-  )
-    .withParam("projectId", member.entityId || "")
-    .post({
-      memberEmail: member.email,
-      projectRole: member.role,
-    });
+    "updateProjectMember",
+    { projectId: member.entityId || "" }
+  ).post({
+    memberEmail: member.email,
+    projectRole: member.role,
+  });
 }
 
 /**
@@ -208,8 +206,7 @@ export async function deleteMember(
 ): Promise<MembershipSchema> {
   // TODO
   return buildRequest<MembershipSchema, "projectMemberId">(
-    "deleteProjectMember"
-  )
-    .withParam("projectMemberId", member.projectMembershipId)
-    .delete();
+    "deleteProjectMember",
+    { projectMemberId: member.projectMembershipId }
+  ).delete();
 }

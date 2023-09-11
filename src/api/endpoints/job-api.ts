@@ -30,9 +30,9 @@ export async function createFlatFileUploadJob(
   formData: FormData
 ): Promise<JobSchema> {
   return buildRequest<JobSchema, "versionId", FormData>(
-    "updateProjectThroughFlatFiles"
+    "updateProjectThroughFlatFiles",
+    { versionId }
   )
-    .withParam("versionId", versionId)
     .withFormData()
     .post(formData);
 }
@@ -52,9 +52,7 @@ export async function getUserJobs(): Promise<JobSchema[]> {
  * @param jobId - The job to delete.
  */
 export async function deleteJobById(jobId: string): Promise<void> {
-  return buildRequest<void, "jobId">("deleteJobById")
-    .withParam("jobId", jobId)
-    .delete();
+  return buildRequest<void, "jobId">("deleteJobById", { jobId }).delete();
 }
 
 /**
@@ -63,7 +61,5 @@ export async function deleteJobById(jobId: string): Promise<void> {
  * @param jobId - The job to get logs for.
  */
 export async function getJobLog(jobId: string): Promise<JobLogSchema[][]> {
-  return buildRequest<JobLogSchema[][], "jobId">("getJobLog")
-    .withParam("jobId", jobId)
-    .get();
+  return buildRequest<JobLogSchema[][], "jobId">("getJobLog", { jobId }).get();
 }

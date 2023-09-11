@@ -13,10 +13,9 @@ export async function saveDocument(
   document: DocumentSchema
 ): Promise<DocumentSchema> {
   return buildRequest<DocumentSchema, "versionId", DocumentSchema>(
-    "createOrUpdateDocument"
-  )
-    .withParam("versionId", versionId)
-    .post(document);
+    "createOrUpdateDocument",
+    { versionId }
+  ).post(document);
 }
 
 /**
@@ -28,31 +27,31 @@ export async function saveDocument(
 export async function getDocuments(
   versionId: string
 ): Promise<DocumentSchema[]> {
-  return buildRequest<DocumentSchema[], "versionId">("getProjectDocuments")
-    .withParam("versionId", versionId)
-    .get();
+  return buildRequest<DocumentSchema[], "versionId">("getProjectDocuments", {
+    versionId,
+  }).get();
 }
 
 /**
  * Deletes the given document from the database.
  * User must have edit permissions on the project.
  *
- * @param document - The document to be deleted.
+ * @param documentId - The document to be deleted.
  */
-export async function deleteDocument(document: DocumentSchema): Promise<void> {
-  await buildRequest<void, "documentId">("deleteDocument")
-    .withParam("documentId", document.documentId)
-    .delete();
+export async function deleteDocument(documentId: string): Promise<void> {
+  await buildRequest<void, "documentId">("deleteDocument", {
+    documentId,
+  }).delete();
 }
 
 /**
  * Sets the document to be the user's current document.
- * @param documentId The document to save.
+ * @param documentId - The document to save.
  */
 export async function setCurrentDocument(documentId: string): Promise<void> {
-  return buildRequest<void, "documentId">("setCurrentDocument")
-    .withParam("documentId", documentId)
-    .post();
+  return buildRequest<void, "documentId">("setCurrentDocument", {
+    documentId,
+  }).post();
 }
 
 /**

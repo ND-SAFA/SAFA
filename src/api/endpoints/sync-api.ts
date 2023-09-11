@@ -12,7 +12,7 @@ export async function getChanges(
   versionId: string,
   message: ChangeMessageSchema
 ): Promise<ProjectSchema> {
-  return buildRequest<ProjectSchema, "versionId", ChangeMessageSchema>("sync")
-    .withParam("versionId", versionId)
-    .post(message);
+  return buildRequest<ProjectSchema, "versionId", ChangeMessageSchema>("sync", {
+    versionId,
+  }).post(message);
 }

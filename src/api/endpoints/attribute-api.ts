@@ -13,10 +13,9 @@ export async function createAttribute(
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
   return buildRequest<AttributeSchema, "projectId", AttributeSchema>(
-    "createAttribute"
-  )
-    .withParam("projectId", projectId)
-    .post(attribute);
+    "createAttribute",
+    { projectId }
+  ).post(attribute);
 }
 
 /**
@@ -31,11 +30,9 @@ export async function editAttribute(
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
   return buildRequest<AttributeSchema, "projectId" | "key", AttributeSchema>(
-    "editAttribute"
-  )
-    .withParam("projectId", projectId)
-    .withParam("key", attribute.key)
-    .put(attribute);
+    "editAttribute",
+    { projectId, key: attribute.key }
+  ).put(attribute);
 }
 
 /**
@@ -48,10 +45,10 @@ export async function deleteAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<void> {
-  return buildRequest<void, "projectId" | "key">("editAttribute")
-    .withParam("projectId", projectId)
-    .withParam("key", attribute.key)
-    .delete();
+  return buildRequest<void, "projectId" | "key">("editAttribute", {
+    projectId,
+    key: attribute.key,
+  }).delete();
 }
 
 /**
@@ -69,9 +66,7 @@ export async function createAttributeLayout(
     AttributeLayoutSchema,
     "projectId",
     AttributeLayoutSchema
-  >("createAttributeLayout")
-    .withParam("projectId", projectId)
-    .post(layout);
+  >("createAttributeLayout", { projectId }).post(layout);
 }
 
 /**
@@ -89,10 +84,7 @@ export async function editAttributeLayout(
     AttributeLayoutSchema,
     "id" | "projectId",
     AttributeLayoutSchema
-  >("editAttributeLayout")
-    .withParam("projectId", projectId)
-    .withParam("id", layout.id)
-    .put(layout);
+  >("editAttributeLayout", { projectId, id: layout.id }).put(layout);
 }
 
 /**
@@ -105,8 +97,8 @@ export async function deleteAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<void> {
-  return buildRequest<void, "id" | "projectId">("editAttributeLayout")
-    .withParam("projectId", projectId)
-    .withParam("id", layout.id)
-    .delete();
+  return buildRequest<void, "id" | "projectId">("editAttributeLayout", {
+    projectId,
+    id: layout.id,
+  }).delete();
 }

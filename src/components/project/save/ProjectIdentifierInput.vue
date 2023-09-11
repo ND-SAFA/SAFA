@@ -1,5 +1,17 @@
 <template>
   <div class="q-mx-auto long-input">
+    <flex-box b="4">
+      <select-input
+        label="Organization"
+        :options="orgStore.allOrgs"
+        class="q-mr-sm"
+      />
+      <select-input
+        label="Team"
+        :options="teamStore.allTeams"
+        class="full-width"
+      />
+    </flex-box>
     <text-input
       v-model="nameText"
       label="Project Name"
@@ -27,8 +39,8 @@ export default {
 <script setup lang="ts">
 import { withDefaults } from "vue";
 import { ProjectIdentifierProps } from "@/types";
-import { useVModel } from "@/hooks";
-import { TextInput } from "@/components/common";
+import { orgStore, teamStore, useVModel } from "@/hooks";
+import { FlexBox, SelectInput, TextInput } from "@/components/common";
 
 const props = withDefaults(defineProps<ProjectIdentifierProps>(), {
   dataCyName: "input-project-name",
@@ -42,4 +54,6 @@ defineEmits<{
 
 const nameText = useVModel(props, "name");
 const descriptionText = useVModel(props, "description");
+
+//TODO: track org, team when creating projects using these inputs
 </script>

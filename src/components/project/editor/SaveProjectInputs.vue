@@ -1,7 +1,7 @@
 <template>
   <div>
     <project-files-uploader
-      v-if="showUpload"
+      v-if="isUpdate"
       data-cy-name="input-project-name-modal"
       data-cy-description="input-project-description-modal"
       @submit="emit('save')"
@@ -15,7 +15,7 @@
     />
     <flex-box full-width justify="end">
       <text-button
-        v-if="!showUpload"
+        v-if="!isUpdate"
         color="primary"
         label="Save"
         :disabled="!canSave"
@@ -51,7 +51,7 @@ const emit = defineEmits<{
 }>();
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
-const showUpload = computed(() => !identifierSaveStore.isUpdate);
+const isUpdate = computed(() => !identifierSaveStore.isUpdate);
 const canSave = computed(() => identifierSaveStore.canSave);
 const loading = computed(() => projectApiStore.saveProjectLoading);
 

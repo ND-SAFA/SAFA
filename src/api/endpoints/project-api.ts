@@ -15,6 +15,7 @@ import { buildRequest } from "@/api";
 export async function saveProject(
   project: Pick<ProjectSchema, "projectId" | "name" | "description">
 ): Promise<ProjectSchema> {
+  //TODO: include org, team
   return buildRequest<
     ProjectSchema,
     string,
@@ -25,6 +26,7 @@ export async function saveProject(
 export async function createProjectCreationJob(
   payload: CreateProjectByJsonSchema
 ): Promise<JobSchema> {
+  //TODO: include org, team
   return buildRequest<JobSchema, string, CreateProjectByJsonSchema>(
     "createProjectJob"
   ).post(payload);
@@ -36,6 +38,7 @@ export async function createProjectCreationJob(
  * @return All project identifiers.
  */
 export async function getProjects(): Promise<IdentifierSchema[]> {
+  //TODO: include org, team?
   return buildRequest<IdentifierSchema[]>("project").get();
 }
 
@@ -45,6 +48,7 @@ export async function getProjects(): Promise<IdentifierSchema[]> {
  * @param projectId - The project ID to delete.
  */
 export async function deleteProject(projectId: string): Promise<void> {
+  //TODO: include org, team
   return buildRequest<void, "projectId">("updateProject")
     .withParam("projectId", projectId)
     .delete();

@@ -10,6 +10,7 @@ import { buildRequest } from "@/api";
 export async function createProjectUploadJob(
   formData: FormData
 ): Promise<JobSchema> {
+  //TODO: include org, team
   return buildRequest<JobSchema, string, FormData>(
     "createProjectThroughFlatFiles"
   )

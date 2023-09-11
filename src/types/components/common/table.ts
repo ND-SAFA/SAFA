@@ -77,7 +77,7 @@ export interface TableProps<Row = TableRow>
   /**
    * Any cells can be customized through the slot `body-cell-[name]`.
    */
-  customCells?: string[];
+  customCells?: (string | symbol | number)[];
   /**
    * Whether to display densely.
    */
@@ -131,7 +131,7 @@ export interface GroupableTableHeaderProps {
   /**
    * The search text to filter with.
    */
-  searchText: string;
+  searchText: string | null;
   /**
    * The label for the searchbar.
    */

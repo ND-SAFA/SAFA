@@ -35,13 +35,8 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { documentStore, selectionStore, artifactStore } from "@/hooks";
-import {
-  PanelCard,
-  TextButton,
-  List,
-  ListItem,
-  ArtifactBodyDisplay,
-} from "@/components/common";
+import { PanelCard, TextButton, List, ListItem } from "@/components/common";
+import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");

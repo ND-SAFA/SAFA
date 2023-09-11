@@ -34,14 +34,14 @@
         />
       </template>
 
-      <template #body-cell-role="{ row }">
+      <template #body-cell-role="{ row }: { row: MembershipSchema }">
         <q-td>
           <member-role-button v-if="displayMemberActions" :member="row" />
           <typography v-else :value="row.role" />
         </q-td>
       </template>
 
-      <template #cell-actions="{ row }">
+      <template #cell-actions="{ row }: { row: MembershipSchema }">
         <icon-button
           v-if="row.email === userEmail"
           icon="leave"

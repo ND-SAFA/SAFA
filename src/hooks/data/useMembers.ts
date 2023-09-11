@@ -2,9 +2,8 @@ import { defineStore } from "pinia";
 
 import { MemberEntitySchema, MembershipSchema, MembershipType } from "@/types";
 import { removeMatches } from "@/util";
-import { orgStore, teamStore } from "@/hooks";
+import { orgStore, teamStore, projectStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import projectStore from "./useProject";
 
 /**
  * This module defines the state of the current project's members.

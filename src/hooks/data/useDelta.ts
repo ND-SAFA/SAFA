@@ -9,13 +9,15 @@ import {
   VersionSchema,
 } from "@/types";
 import { buildProjectDelta } from "@/util";
+import {
+  layoutStore,
+  appStore,
+  subtreeStore,
+  artifactStore,
+  traceStore,
+} from "@/hooks";
 import { disableDrawMode } from "@/cytoscape";
 import { pinia } from "@/plugins";
-import layoutStore from "../graph/useLayout";
-import appStore from "../core/useApp";
-import subtreeStore from "./useSubtree";
-import artifactStore from "./useArtifacts";
-import traceStore from "./useTraces";
 
 /**
  * This module tracks the delta state of a project.

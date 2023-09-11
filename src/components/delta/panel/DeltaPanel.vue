@@ -17,7 +17,9 @@ export default {
 
 <script setup lang="ts">
 import { DetailsPanel } from "@/components/common";
-import DeltaPanelNav from "./DeltaPanelNav.vue";
-import ArtifactDeltas from "./ArtifactDeltas.vue";
-import TraceDeltas from "./TraceDeltas.vue";
+import {
+  DeltaPanelNav,
+  ArtifactDeltas,
+  TraceDeltas,
+} from "@/components/delta/display";
 </script>

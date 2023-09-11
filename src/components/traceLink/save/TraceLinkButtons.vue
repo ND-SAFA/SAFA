@@ -25,7 +25,7 @@ export default {
 import { computed } from "vue";
 import { appStore, selectionStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
-import { TraceLinkApproval } from "./index";
+import TraceLinkApproval from "./TraceLinkApproval.vue";
 
 const traceLink = computed(() => selectionStore.selectedTraceLink);
 

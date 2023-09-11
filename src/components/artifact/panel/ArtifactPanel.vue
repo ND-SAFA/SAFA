@@ -20,10 +20,10 @@ export default {
 <script setup lang="ts">
 import { DetailsPanel } from "@/components/common";
 import {
-  ArtifactButtons,
   ArtifactContent,
   ArtifactDocuments,
   ArtifactTraces,
   ArtifactErrors,
 } from "@/components/artifact/display";
+import { ArtifactButtons } from "@/components/artifact/save";
 </script>

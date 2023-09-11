@@ -9,7 +9,7 @@
     map-options
     emit-value
   >
-    <template #option="{ opt, itemProps }">
+    <template #option="{ opt, itemProps }: { opt: GenerationModelSchema }">
       <list-item v-bind="itemProps" :title="opt.id" :subtitle="opt.name" />
     </template>
   </q-select>
@@ -26,7 +26,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GenMethodInputProps, ModelType, SelectOption } from "@/types";
+import {
+  GenerationModelSchema,
+  GenMethodInputProps,
+  ModelType,
+  SelectOption,
+} from "@/types";
 import { createOption } from "@/util";
 import { useVModel } from "@/hooks";
 import { ListItem } from "@/components/common/display";

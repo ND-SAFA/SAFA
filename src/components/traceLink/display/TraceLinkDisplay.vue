@@ -51,8 +51,11 @@ export default {
 import { computed, ref } from "vue";
 import { TraceLinkDisplayProps } from "@/types";
 import { artifactStore } from "@/hooks";
-import { ArtifactBodyDisplay, Typography } from "@/components/common";
-import { ArtifactContentDisplay } from "@/components/artifact/display";
+import { Typography } from "@/components/common";
+import {
+  ArtifactContentDisplay,
+  ArtifactBodyDisplay,
+} from "@/components/artifact/display";
 
 const props = defineProps<TraceLinkDisplayProps>();
 

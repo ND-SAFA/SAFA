@@ -30,7 +30,9 @@
     <template #option="{ opt, itemProps }">
       <artifact-body-display v-bind="itemProps" display-title :artifact="opt" />
     </template>
-    <template #selected-item="{ opt, index, removeAtIndex }">
+    <template
+      #selected-item="{ opt, index, removeAtIndex }: { opt: ArtifactSchema }"
+    >
       <attribute-chip
         v-if="!!opt && opt.name && index < 3"
         removable
@@ -61,7 +63,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ArtifactInput, ArtifactTypeSchema } from "@/types";
+import { ArtifactInput, ArtifactSchema, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts, sortSelectedArtifactsToTop } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
 import { Typography, AttributeChip } from "@/components/common/display";

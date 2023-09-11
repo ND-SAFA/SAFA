@@ -7,10 +7,9 @@ import {
   JobLogSchema,
   JobSchema,
 } from "@/types";
-import { jobStore, useApi } from "@/hooks";
+import { jobStore, useApi, stompApiStore } from "@/hooks";
 import { deleteJobById, fillEndpoint, getJobLog, getUserJobs } from "@/api";
 import { pinia } from "@/plugins";
-import stompApiStore from "./useStompApi";
 
 /**
  * A hook for managing job API requests.

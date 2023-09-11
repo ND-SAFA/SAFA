@@ -117,7 +117,9 @@ const { searchText, searchLabel, sortBy, sortDesc, filteredRows } =
   useTableFilter(props);
 
 const customCellSlots = computed(() =>
-  props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
+  props.customCells
+    ? props.customCells.map((name) => `body-cell-${String(name)}`)
+    : []
 );
 
 const addLabel = computed(() => `Add ${props.itemName || ""}`);

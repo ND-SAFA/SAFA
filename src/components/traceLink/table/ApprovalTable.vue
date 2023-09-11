@@ -55,19 +55,19 @@
         />
       </template>
 
-      <template #body-cell-sourceType="{ row }">
+      <template #body-cell-sourceType="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.sourceType" artifact-type />
       </template>
 
-      <template #body-cell-targetType="{ row }">
+      <template #body-cell-targetType="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.targetType" artifact-type />
       </template>
 
-      <template #body-cell-approvalStatus="{ row }">
+      <template #body-cell-approvalStatus="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.approvalStatus" approval-type />
       </template>
 
-      <template #body-cell-score="{ row }">
+      <template #body-cell-score="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.score" confidence-score />
       </template>
 
@@ -214,7 +214,7 @@ onMounted(() => handleRefresh());
 watch(
   () => currentRoute.path,
   (path) => {
-    if (path !== Routes.TRACE_LINK) return;
+    if (path !== Routes.ARTIFACT) return;
 
     handleRefresh();
   }

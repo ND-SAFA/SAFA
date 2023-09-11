@@ -8,7 +8,7 @@
       <icon-button
         v-for="type of artifactTypes"
         v-show="visible"
-        :key="type.id"
+        :key="type.typeId"
         v-bind="buttonProps(type)"
         dense
         :tooltip-delay="0"

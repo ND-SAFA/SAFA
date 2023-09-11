@@ -7,9 +7,8 @@ import {
   TraceLinkSchema,
 } from "@/types";
 import { buildCommit } from "@/util";
+import { traceStore, artifactStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import traceStore from "./useTraces";
-import artifactStore from "./useArtifacts";
 
 /**
  * This module tracks commits and allows for undoing them.

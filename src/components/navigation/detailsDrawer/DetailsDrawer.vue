@@ -53,14 +53,14 @@ import {
   FlexBox,
   Separator,
 } from "@/components/common";
-import { DeltaPanel } from "@/components/delta";
+import { DeltaPanel } from "@/components/delta/panel";
 import { DocumentPanel } from "@/components/document";
 import {
   ArtifactPanel,
   ArtifactBodyPanel,
   SaveArtifactPanel,
   ArtifactGenerationPanel,
-} from "@/components/artifact/panels";
+} from "@/components/artifact/panel";
 import {
   TraceLinkPanel,
   SaveTraceLinkPanel,

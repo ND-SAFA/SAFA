@@ -29,7 +29,10 @@ export default {
 import { watch } from "vue";
 import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
 import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
-import { SaveArtifactInputs, SaveArtifactButtons } from "../save";
+import {
+  SaveArtifactInputs,
+  SaveArtifactButtons,
+} from "@/components/artifact/save";
 
 watch(
   () => selectionStore.selectedArtifact,

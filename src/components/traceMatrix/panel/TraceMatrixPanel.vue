@@ -22,6 +22,6 @@ import {
   TraceMatrixContent,
   TraceMatrixTraces,
   TraceMatrixArtifacts,
-  TraceMatrixButtons,
 } from "@/components/traceMatrix/display";
+import { TraceMatrixButtons } from "@/components/traceMatrix/save";
 </script>

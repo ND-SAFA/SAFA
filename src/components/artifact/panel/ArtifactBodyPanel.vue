@@ -15,5 +15,5 @@ export default {
 
 <script setup lang="ts">
 import { DetailsPanel } from "@/components/common";
-import { ArtifactBody } from "../display";
+import { ArtifactBody } from "@/components/artifact/display";
 </script>

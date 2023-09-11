@@ -7,9 +7,9 @@ import {
   TraceLinkSchema,
 } from "@/types";
 import { getMatchingChildren } from "@/util";
+import { artifactStore } from "@/hooks";
 import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
 import { pinia } from "@/plugins";
-import artifactStore from "./useArtifacts";
 
 /**
  * This module keeps track of the tree of artifacts.

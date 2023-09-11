@@ -6,14 +6,16 @@ import {
   VersionSchema,
 } from "@/types";
 import { buildProject, buildProjectIdentifier, removeMatches } from "@/util";
+import {
+  selectionStore,
+  logStore,
+  warningStore,
+  documentStore,
+  subtreeStore,
+  attributesStore,
+  timStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
-import selectionStore from "../graph/useSelection";
-import logStore from "../core/useLog";
-import warningStore from "./useWarnings";
-import documentStore from "./useDocuments";
-import subtreeStore from "./useSubtree";
-import attributesStore from "./useAttributes";
-import timStore from "./useTIM";
 
 /**
  * Manages the selected project.

@@ -39,7 +39,7 @@
         />
       </template>
 
-      <template #body-cell-type="{ row }">
+      <template #body-cell-type="{ row }: { row: ArtifactSchema }">
         <attribute-chip :value="row.type" artifact-type />
       </template>
 
@@ -65,7 +65,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { FlatArtifact, TableGroupRow } from "@/types";
+import { ArtifactSchema, FlatArtifact, TableGroupRow } from "@/types";
 import { artifactColumns, artifactMatrixColumns } from "@/util";
 import { appStore, artifactStore, selectionStore, timStore } from "@/hooks";
 import {

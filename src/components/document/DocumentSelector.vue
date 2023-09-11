@@ -24,7 +24,7 @@
         @click="handleSave"
       />
     </template>
-    <template #option="{ opt, itemProps }">
+    <template #option="{ opt, itemProps }: { opt: DocumentSchema }">
       <list-item
         v-bind="itemProps"
         :title="opt.name"

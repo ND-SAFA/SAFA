@@ -13,12 +13,14 @@ import {
   isTableDocument,
   removeMatches,
 } from "@/util";
-import { subtreeStore } from "@/hooks";
+import {
+  subtreeStore,
+  layoutStore,
+  projectStore,
+  traceStore,
+  artifactStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
-import layoutStore from "../graph/useLayout";
-import projectStore from "./useProject";
-import traceStore from "./useTraces";
-import artifactStore from "./useArtifacts";
 
 /**
  * This module keeps track of the different document views for a project.

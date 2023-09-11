@@ -23,7 +23,7 @@
     <template v-else>
       <tim-node
         v-for="type in artifactTypes"
-        :key="type.id"
+        :key="type.typeId"
         :count="type.count"
         :artifact-type="type.name"
         :icon="type.icon"

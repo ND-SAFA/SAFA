@@ -1,1 +1,1 @@
-export { default as DeltaPanel } from "./DeltaPanel.vue";
+export * from "./panel";

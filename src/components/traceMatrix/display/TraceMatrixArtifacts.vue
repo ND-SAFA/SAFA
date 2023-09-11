@@ -85,9 +85,9 @@ import {
   Typography,
   TextButton,
   ListItem,
-  ArtifactBodyDisplay,
   List,
 } from "@/components/common";
+import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 

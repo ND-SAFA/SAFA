@@ -44,7 +44,10 @@ import {
   getProjectApiStore,
 } from "@/hooks";
 import { TextButton, FlexBox } from "@/components/common";
-import { ProjectFilesUploader, ProjectIdentifierInput } from "../save";
+import {
+  ProjectFilesUploader,
+  ProjectIdentifierInput,
+} from "@/components/project/save";
 
 const emit = defineEmits<{
   (e: "save"): void;

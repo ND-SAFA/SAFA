@@ -26,7 +26,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
-import { ColorProps } from "@/types";
+import { ColorProps, IconVariant } from "@/types";
 import { commitApiStore, commitStore } from "@/hooks";
 import { FlexBox } from "@/components/common/display";
 import IconButton from "./IconButton.vue";
@@ -39,14 +39,14 @@ const buttons = computed(() => [
   {
     handler: () => commitApiStore.handleUndo(),
     label: "Undo",
-    icon: "undo",
+    icon: "undo" as IconVariant,
     isDisabled: !commitStore.canUndo,
     dataCy: "button-nav-undo",
   },
   {
     handler: () => commitApiStore.handleRedo(),
     label: "Redo",
-    icon: "redo",
+    icon: "redo" as IconVariant,
     isDisabled: !commitStore.canRedo,
     dataCy: "button-nav-redo",
   },

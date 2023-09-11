@@ -22,7 +22,8 @@ export default {
 import { computed } from "vue";
 import { ArtifactSchema, SearchOptionProps } from "@/types";
 import { searchStore } from "@/hooks";
-import { ListItem, ArtifactBodyDisplay } from "@/components/common";
+import { ListItem } from "@/components/common";
+import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
 const props = defineProps<SearchOptionProps>();
 

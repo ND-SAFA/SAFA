@@ -19,9 +19,9 @@ export default {
 <script setup lang="ts">
 import { DetailsPanel } from "@/components/common";
 import {
-  ArtifactLevelButtons,
   ArtifactLevelContent,
   ArtifactLevelTraces,
   ArtifactLevelArtifacts,
 } from "@/components/artifactType/display";
+import { ArtifactLevelButtons } from "@/components/artifactType/save";
 </script>

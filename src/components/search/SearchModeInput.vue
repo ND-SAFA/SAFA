@@ -9,7 +9,7 @@
     class="nav-input nav-search-mode nav-multi-input-left"
     data-cy="input-nav-search-mode"
   >
-    <template #option="{ opt, itemProps }">
+    <template #option="{ opt, itemProps }: { opt: SearchSelectOption }">
       <separator v-if="opt.id === 'search'" />
       <list-item
         clickable
@@ -32,6 +32,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
+import { SearchSelectOption } from "@/types";
 import { searchModeOptions } from "@/util";
 import { permissionStore, searchStore } from "@/hooks";
 import { ListItem, Separator } from "@/components/common";

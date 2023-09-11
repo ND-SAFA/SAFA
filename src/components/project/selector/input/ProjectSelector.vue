@@ -12,7 +12,7 @@
     color="primary"
     @popup-show="handleReload"
   >
-    <template #option="{ opt, itemProps }">
+    <template #option="{ opt, itemProps }: { opt: ProjectSchema }">
       <list-item v-bind="itemProps" :title="opt.name" :data-cy-name="opt.name">
         <template #actions>
           <flex-box justify="end">
@@ -74,7 +74,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { MemberEntitySchema } from "@/types";
+import { MemberEntitySchema, ProjectSchema } from "@/types";
 import {
   getProjectApiStore,
   identifierSaveStore,

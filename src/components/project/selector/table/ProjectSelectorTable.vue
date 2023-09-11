@@ -16,7 +16,7 @@
     @row:edit="identifierSaveStore.selectIdentifier($event, 'save')"
     @row:delete="identifierSaveStore.selectIdentifier($event, 'delete')"
   >
-    <template #cell-actions="{ row }">
+    <template #cell-actions="{ row }: { row: ProjectSchema }">
       <icon-button
         v-if="isEditable(row)"
         :small="props.minimal"
@@ -59,6 +59,7 @@ import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
   MemberEntitySchema,
+  ProjectSchema,
   ProjectSelectorTableProps,
 } from "@/types";
 import {

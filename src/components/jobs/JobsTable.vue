@@ -9,7 +9,7 @@
       :expanded="expanded"
       data-cy="job-table"
     >
-      <template #body="quasarProps">
+      <template #body="quasarProps: { row: JobSchema, expand: boolean }">
         <job-row
           v-model:expanded="quasarProps.expand"
           :quasar-props="quasarProps"
@@ -64,6 +64,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+import { JobSchema } from "@/types";
 import { jobColumns, timestampToDisplay } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";

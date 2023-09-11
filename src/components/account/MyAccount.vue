@@ -14,7 +14,7 @@
 
 <script lang="ts">
 /**
- * Displays information on the current user.
+ * Displays information about the current user.
  */
 export default {
   name: "MyAccount",
@@ -23,9 +23,11 @@ export default {
 
 <script setup lang="ts">
 import { FlexBox, FlexItem } from "@/components/common";
-import ExternalLinks from "./ExternalLinks.vue";
-import IntegrationsAccounts from "./IntegrationsAccounts.vue";
-import DeleteAccount from "./DeleteAccount.vue";
-import UpdatePassword from "./UpdatePassword.vue";
-import ThemeController from "./ThemeController.vue";
+import { ExternalLinks } from "@/components/account/display";
+import {
+  IntegrationsAccounts,
+  DeleteAccount,
+  UpdatePassword,
+  ThemeController,
+} from "@/components/account/save";
 </script>

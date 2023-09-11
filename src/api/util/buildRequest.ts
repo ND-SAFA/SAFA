@@ -14,11 +14,11 @@ class RequestBuilder<
    * The relative URL of the request.
    * @private
    */
-  private relativeUrl: string;
+  private readonly relativeUrl: string;
   /**
    * Any path variables to fill into the request URL.
    */
-  private pathVariables: Record<string, string> = {};
+  private readonly pathVariables: Record<string, string>;
   /**
    * Format the request data as JSON.
    * @private

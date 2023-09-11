@@ -79,7 +79,7 @@ import {
 } from "@/hooks";
 import { toggleDrawMode } from "@/cytoscape";
 import { FlexBox, IconButton, Separator } from "@/components/common";
-import { NodeDisplay } from "../display";
+import { NodeDisplay } from "@/components/graph/display";
 
 const handleCloseMenu = inject<() => void>("menu-close");
 

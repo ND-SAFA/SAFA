@@ -74,6 +74,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MemberEntitySchema, ProjectSchema } from "@/types";
 import {
   getProjectApiStore,

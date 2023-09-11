@@ -26,7 +26,6 @@ import { computed, onMounted, watch } from "vue";
 import { AttributeListInputProps } from "@/types";
 import { attributesStore } from "@/hooks";
 import { AttributeGrid } from "@/components/common/display";
-import AttributeDisplay from "@/components/common/display/attribute/AttributeDisplay.vue";
 import AttributeInput from "./AttributeInput.vue";
 
 const props = defineProps<AttributeListInputProps>();

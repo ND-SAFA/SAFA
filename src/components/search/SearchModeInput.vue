@@ -32,6 +32,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SearchSelectOption } from "@/types";
 import { searchModeOptions } from "@/util";
 import { permissionStore, searchStore } from "@/hooks";

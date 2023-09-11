@@ -27,6 +27,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   GenerationModelSchema,
   GenMethodInputProps,
   ModelType,

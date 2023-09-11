@@ -65,6 +65,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ArtifactSchema, FlatArtifact, TableGroupRow } from "@/types";
 import { artifactColumns, artifactMatrixColumns } from "@/util";
 import { appStore, artifactStore, selectionStore, timStore } from "@/hooks";

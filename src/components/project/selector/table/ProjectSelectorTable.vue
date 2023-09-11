@@ -59,6 +59,7 @@ import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
   MemberEntitySchema,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ProjectSchema,
   ProjectSelectorTableProps,
 } from "@/types";

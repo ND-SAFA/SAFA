@@ -64,6 +64,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JobSchema } from "@/types";
 import { jobColumns, timestampToDisplay } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";

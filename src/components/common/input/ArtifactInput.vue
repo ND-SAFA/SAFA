@@ -63,6 +63,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ArtifactInput, ArtifactSchema, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts, sortSelectedArtifactsToTop } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";

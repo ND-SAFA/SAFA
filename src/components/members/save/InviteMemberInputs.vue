@@ -16,7 +16,20 @@
       class="q-mb-lg"
       data-cy="input-member-role"
     />
-    <project-input v-model="entityIds" multiple />
+    <project-input
+      v-if="props.entity.entityType === 'PROJECT'"
+      v-model="entityIds"
+      multiple
+    />
+    <multiselect-input
+      v-else-if="props.entity.entityType === 'TEAM'"
+      v-model="entityIds"
+      label="Teams"
+      option-value="id"
+      option-label="name"
+      option-to-value
+      :options="teamStore.allTeams"
+    />
     <flex-box full-width justify="end" t="2">
       <text-button
         :disabled="!isValid"
@@ -39,10 +52,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { InviteMemberInputsProps, MemberRole } from "@/types";
 import { memberRoleOptions } from "@/util";
-import { memberApiStore } from "@/hooks";
+import { memberApiStore, teamStore } from "@/hooks";
 import {
   ProjectInput,
   TextInput,
@@ -50,6 +63,7 @@ import {
   TextButton,
   FlexBox,
 } from "@/components/common";
+import MultiselectInput from "@/components/common/input/MultiselectInput.vue";
 
 const props = defineProps<InviteMemberInputsProps>();
 
@@ -98,7 +112,7 @@ function handleSave() {
         projectMembershipId: "",
         email: userEmail.value,
         role: userRole.value,
-        entityType: "PROJECT",
+        entityType: props.entity.entityType,
         entityId,
       },
       {
@@ -108,8 +122,19 @@ function handleSave() {
   });
 }
 
-onMounted(() => {
+/**
+ * Resets the inputs to their default values.
+ */
+function handleReset() {
   entityIds.value = props.entity.entityId ? [props.entity.entityId] : [];
   userEmail.value = props.email || "";
-});
+  userRole.value = undefined;
+}
+
+onMounted(handleReset);
+
+watch(
+  () => [props.email, props.entity.entityId],
+  () => handleReset()
+);
 </script>

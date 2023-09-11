@@ -1,4 +1,4 @@
-import { ComputedRef } from "vue";
+import { ComputedRef, WritableComputedRef } from "vue";
 import { OrganizationSchema } from "@/types";
 
 /**
@@ -9,6 +9,11 @@ export interface GetOrgApiHook {
    * Whether the get organization request is loading.
    */
   loading: ComputedRef<boolean>;
+  /**
+   * The current organization.
+   * - Reactively loads organization and sets current organization and team.
+   */
+  currentOrg: WritableComputedRef<OrganizationSchema | undefined>;
   /**
    * Switches to loading the given organization.
    *

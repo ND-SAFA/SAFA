@@ -14,12 +14,25 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
   const loading = computed(() => getOrgApi.loading);
 
-  async function handleSwitch(org: OrganizationSchema): Promise<void> {
+  const currentOrg = computed({
+    get: () => orgStore.org,
+    set(org: OrganizationSchema | undefined) {
+      handleSwitch(org);
+    },
+  });
+
+  async function handleSwitch(
+    org: OrganizationSchema | undefined
+  ): Promise<void> {
+    if (!org) return;
+
+    saveDefaultOrg(org.id);
+
     orgStore.org = org;
-
-    await saveDefaultOrg(org.id);
-
-    // TODO: load org, set current team
+    teamStore.team =
+      orgStore.org.teams?.find(({ members = [] }) =>
+        members.find(({ email }) => email === sessionStore.userEmail)
+      ) || teamStore.team;
   }
 
   async function handleLoadCurrent(): Promise<void> {
@@ -33,11 +46,7 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
         if (!orgId) return;
 
-        orgStore.org = await getOrganization(orgId);
-        teamStore.team =
-          orgStore.org.teams.find(({ members }) =>
-            members.find(({ email }) => email === sessionStore.userEmail)
-          ) || teamStore.team;
+        currentOrg.value = await getOrganization(orgId);
       },
       {
         error: "Unable to load your current organization.",
@@ -47,6 +56,7 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
   return {
     loading,
+    currentOrg,
     handleSwitch,
     handleLoadCurrent,
   };

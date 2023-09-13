@@ -95,8 +95,6 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
       const goToPath = getParam(QueryParams.LOGIN_PATH);
       const query = { ...getParams() };
 
-      console.log({ goToPath, query });
-
       delete query[QueryParams.LOGIN_PATH];
 
       sessionStore.user = await getCurrentUser();

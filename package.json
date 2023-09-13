@@ -61,7 +61,7 @@
     "@vue/cli-service": "~5.0.8",
     "@vue/eslint-config-prettier": "^7.1.0",
     "@vue/eslint-config-typescript": "^11.0.2",
-    "cypress": "^12.9.0",
+    "cypress": "^13.2.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-wait-until": "^1.7.2",
     "electron": "^23.1.3",

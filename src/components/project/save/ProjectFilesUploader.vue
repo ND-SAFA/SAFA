@@ -3,6 +3,7 @@
     <project-identifier-input
       v-model:name="identifier.name"
       v-model:description="identifier.description"
+      :is-update="isUpdate"
       :data-cy-name="props.dataCyName"
       :data-cy-description="props.dataCyDescription"
     />
@@ -73,6 +74,7 @@ const emptyFiles = ref(false);
 const summarize = ref(false);
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
+const isUpdate = computed(() => identifierSaveStore.isUpdate);
 
 const disabled = computed(() => {
   const isNameInvalid = identifier.value.name.length === 0;

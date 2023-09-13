@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { TeamSchema } from "@/types";
 import { buildTeam, removeMatches } from "@/util";
-import { orgStore } from "@/hooks";
+import { orgStore, permissionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -27,6 +27,15 @@ export const useTeam = defineStore("team", {
      */
     allTeams(): TeamSchema[] {
       return orgStore.org.teams;
+    },
+    /**
+     * @return The current organization's teams that allow the current user
+     * to create a project.
+     */
+    teamsWithCreateProject(): TeamSchema[] {
+      return orgStore.org.teams.filter((team) =>
+        permissionStore.isAllowed("team.create_projects", team)
+      );
     },
   },
   actions: {

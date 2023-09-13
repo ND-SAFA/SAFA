@@ -11,7 +11,7 @@
       <select-input
         v-model="teamStore.team"
         label="Team"
-        :options="teamStore.allTeams"
+        :options="teamStore.teamsWithCreateProject"
         class="full-width"
         option-label="name"
       />

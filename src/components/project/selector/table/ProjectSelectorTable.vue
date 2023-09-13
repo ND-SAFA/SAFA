@@ -96,7 +96,7 @@ const projectInviteId = ref<string>();
 const entity = computed(
   () =>
     ({
-      entityId: projectStore.projectId,
+      entityId: projectInviteId.value,
       entityType: "PROJECT",
     } as MemberEntitySchema)
 );

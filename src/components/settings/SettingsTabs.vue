@@ -5,6 +5,9 @@
       <project-display />
     </template>
     <tab-list v-model="tab" :tabs="tabs">
+      <template #overview>
+        <project-overview-display />
+      </template>
       <template #members>
         <project-member-table />
       </template>
@@ -40,6 +43,7 @@ import {
   UploadNewVersion,
   ProjectButtons,
   ProjectDisplay,
+  ProjectOverviewDisplay,
 } from "@/components/project";
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
@@ -47,16 +51,16 @@ import { ProjectMemberTable } from "@/components/members";
 
 const tabs = computed(() => {
   const options = settingsTabOptions();
-  const visibleOptions: SelectOption[] = [options[0]];
+  const visibleOptions: SelectOption[] = [options[0], options[1]];
 
   if (permissionStore.isAllowed("project.edit_versions")) {
-    visibleOptions.push(options[1]);
-  }
-  if (permissionStore.isAllowed("project.edit_integrations")) {
     visibleOptions.push(options[2]);
   }
-  if (permissionStore.isAllowed("project.edit")) {
+  if (permissionStore.isAllowed("project.edit_integrations")) {
     visibleOptions.push(options[3]);
+  }
+  if (permissionStore.isAllowed("project.edit")) {
+    visibleOptions.push(options[4]);
   }
 
   return visibleOptions;

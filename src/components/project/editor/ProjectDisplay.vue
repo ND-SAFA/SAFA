@@ -8,55 +8,47 @@
         icon="cancel"
         @click="appStore.close('editProject')"
       />
+      <attribute-chip v-else :value="versionLabel" />
     </template>
 
     <div v-if="!editMode">
-      <flex-box full-width justify="between">
-        <attribute-chip :value="versionLabel" />
-        <div>
-          <attribute-chip :value="artifactLabel" icon="artifact" />
-          <attribute-chip :value="traceLabel" icon="trace" />
-        </div>
+      <flex-box column b="4">
+        <typography value="Project Data" variant="caption" />
+
+        <typography :value="artifactTypeLabel" />
+        <typography :value="artifactLabel" />
+        <typography :value="traceLabel" />
       </flex-box>
 
-      <typography variant="caption" value="Description" />
-      <typography
-        ep="p"
-        variant="expandable"
-        :value="description"
-        default-expanded
-      />
-
-      <expansion-item label="Artifact Types">
-        <flex-box
-          v-for="[parent, children] in artifactTypeMap"
-          :key="parent"
-          column
-          t="2"
-        >
-          <attribute-chip artifact-type :value="parent" />
-          <flex-box l="4">
-            <icon
-              class="q-mx-xs q-mt-xs"
-              size="sm"
-              color="text"
-              variant="trace"
-              :rotate="-90"
+      <typography value="Artifact Types" variant="caption" />
+      <flex-box
+        v-for="[parent, children] in artifactTypeMap"
+        :key="parent"
+        column
+        t="2"
+      >
+        <attribute-chip artifact-type :value="parent" />
+        <flex-box l="4">
+          <icon
+            class="q-mx-xs q-mt-xs"
+            size="sm"
+            color="text"
+            variant="trace"
+            :rotate="-90"
+          />
+          <flex-box column>
+            <attribute-chip
+              v-for="child in children"
+              :key="child"
+              artifact-type
+              :value="child"
             />
-            <flex-box column>
-              <attribute-chip
-                v-for="child in children"
-                :key="child"
-                artifact-type
-                :value="child"
-              />
-            </flex-box>
           </flex-box>
         </flex-box>
-      </expansion-item>
+      </flex-box>
     </div>
 
-    <save-project-inputs v-else @click="appStore.close('editProject')" />
+    <save-project-inputs v-else @save="appStore.close('editProject')" />
   </panel-card>
 </template>
 
@@ -76,11 +68,10 @@ import { appStore, projectStore, timStore } from "@/hooks";
 import {
   PanelCard,
   AttributeChip,
-  Typography,
   FlexBox,
   Icon,
   TextButton,
-  ExpansionItem,
+  Typography,
 } from "@/components/common";
 import SaveProjectInputs from "./SaveProjectInputs.vue";
 
@@ -92,15 +83,15 @@ const versionLabel = computed(
   () => `Version ${versionToString(project.value.projectVersion)}`
 );
 
+const artifactTypeLabel = computed(
+  () => `${project.value.artifactTypes.length} Artifact Types`
+);
+
 const artifactLabel = computed(
   () => `${project.value.artifacts.length} Artifacts`
 );
 
 const traceLabel = computed(() => `${project.value.traces.length} Trace Links`);
-
-const description = computed(
-  () => project.value.description || "No Description."
-);
 
 const artifactTypeMap = computed(() =>
   Object.entries(

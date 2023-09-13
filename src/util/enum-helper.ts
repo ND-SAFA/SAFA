@@ -207,6 +207,7 @@ export function loaderTabOptions(): SelectOption<LoaderTab>[] {
  */
 export function settingsTabOptions(): SelectOption<SettingsTab>[] {
   return [
+    createOption("overview", "Overview"),
     createOption("members", "Members"),
     createOption("upload", "Data Upload"),
     createOption("integrations", "Data Integrations"),

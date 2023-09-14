@@ -138,47 +138,32 @@
 .icon-safa {
   animation: fadeIn 1s;
 
-  .cls-2, .cls-3 {
-    fill: $color-background;
-    stroke: $color-primary;
+  .logo-wing-line, .logo-border-line, .logo-body-line {
+    fill: none;
+    stroke: url(#color-gradient);
     stroke-miterlimit: 10;
   }
 
-  .cls-2 {
-    stroke-width: 4px;
+  .logo-border-line {
+    fill: $color-background;
+    stroke-width: 16px;
   }
 
-  .cls-3 {
-    stroke-width: 10px;
+  .logo-body-line, .logo-wing-line {
+    stroke-width: 6px;
   }
 
-  circle {
-    r: 6px;
+  .logo-eye, .logo-border-point, .logo-wing-dot, .logo-name {
+    fill: url(#color-gradient);
   }
 
   &.logo {
     height: 60px;
     width: 60px;
-
-    //.cls-2, .cls-3 {
-    //  fill: $color-background;
-    //}
-    //
-    //.cls-2 {
-    //  stroke-width: 6px;
-    //}
-    //
-    //.cls-3, line, path {
-    //  stroke-width: 16px;
-    //}
   }
 
   &.clickable {
     height: 42pt;
-  }
-
-  & > * {
-    fill: $color-primary;
   }
 }
 

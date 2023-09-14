@@ -12,33 +12,26 @@
         />
       </template>
 
-      <list
+      <artifact-list-display
         v-if="parents.length > 0"
-        :scroll-height="300"
         data-cy="list-selected-parents"
+        :artifacts="parents"
+        :action-cols="1"
+        item-data-cy="list-selected-parent-item"
+        @click="handleArtifactClick($event.name)"
       >
-        <list-item
-          v-for="parent in parents"
-          :key="parent.id"
-          clickable
-          :action-cols="1"
-          data-cy="list-selected-parent-item"
-          @click="handleArtifactClick(parent.name)"
-        >
-          <artifact-body-display display-title :artifact="parent" />
-          <template #actions>
-            <icon-button
-              outline
-              :flat="false"
-              icon="trace"
-              tooltip="View Trace Link"
-              data-cy="button-selected-parent-link"
-              :class="getTraceLinkClassName(parent.name)"
-              @click="handleTraceLinkClick(parent.name)"
-            />
-          </template>
-        </list-item>
-      </list>
+        <template #actions="{ artifact: parent }">
+          <icon-button
+            outline
+            :flat="false"
+            icon="trace"
+            tooltip="View Trace Link"
+            data-cy="button-selected-parent-link"
+            :class="getTraceLinkClassName(parent.name)"
+            @click="handleTraceLinkClick(parent.name)"
+          />
+        </template>
+      </artifact-list-display>
       <typography
         v-else
         l="1"
@@ -59,33 +52,26 @@
         />
       </template>
 
-      <list
+      <artifact-list-display
         v-if="children.length > 0"
-        :scroll-height="300"
         data-cy="list-selected-children"
+        :artifacts="children"
+        :action-cols="1"
+        item-data-cy="list-selected-child-item"
+        @click="handleArtifactClick($event.name)"
       >
-        <list-item
-          v-for="child in children"
-          :key="child.id"
-          clickable
-          :action-cols="1"
-          data-cy="list-selected-child-item"
-          @click="handleArtifactClick(child.name)"
-        >
-          <artifact-body-display display-title :artifact="child" />
-          <template #actions>
-            <icon-button
-              outline
-              :flat="false"
-              icon="trace"
-              tooltip="View Trace Link"
-              data-cy="button-selected-child-link"
-              :class="getTraceLinkClassName(child.name)"
-              @click="handleTraceLinkClick(child.name)"
-            />
-          </template>
-        </list-item>
-      </list>
+        <template #actions="{ artifact: child }">
+          <icon-button
+            outline
+            :flat="false"
+            icon="trace"
+            tooltip="View Trace Link"
+            data-cy="button-selected-child-link"
+            :class="getTraceLinkClassName(child.name)"
+            @click="handleTraceLinkClick(child.name)"
+          />
+        </template>
+      </artifact-list-display>
       <typography
         v-else
         l="1"
@@ -121,10 +107,8 @@ import {
   IconButton,
   PanelCard,
   TextButton,
-  List,
-  ListItem,
 } from "@/components/common";
-import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
+import ArtifactListDisplay from "./ArtifactListDisplay.vue";
 
 const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")

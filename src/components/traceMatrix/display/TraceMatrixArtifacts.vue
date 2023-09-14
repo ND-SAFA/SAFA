@@ -9,22 +9,13 @@
           @click="documentStore.addDocumentOfTypes([targetType])"
         />
       </template>
-      <list
+      <artifact-list-display
         v-if="targetArtifacts.length > 0"
-        :scroll-height="300"
+        :artifacts="targetArtifacts"
         data-cy="list-selected-parent-artifacts"
-      >
-        <list-item
-          v-for="artifact in targetArtifacts"
-          :key="artifact.id"
-          clickable
-          :action-cols="1"
-          data-cy="list-selected--parent-artifact-item"
-          @click="documentStore.addDocumentOfNeighborhood(artifact)"
-        >
-          <artifact-body-display display-title :artifact="artifact" />
-        </list-item>
-      </list>
+        item-data-cy="list-selected-parent-artifact-item"
+        @click="documentStore.addDocumentOfNeighborhood($event)"
+      />
       <typography
         v-else
         l="1"
@@ -42,22 +33,13 @@
           @click="documentStore.addDocumentOfTypes([sourceType])"
         />
       </template>
-      <list
+      <artifact-list-display
         v-if="sourceArtifacts.length > 0"
-        :scroll-height="300"
+        :artifacts="sourceArtifacts"
         data-cy="list-selected-child-artifacts"
-      >
-        <list-item
-          v-for="artifact in sourceArtifacts"
-          :key="artifact.id"
-          clickable
-          :action-cols="1"
-          data-cy="list-selected--child-artifact-item"
-          @click="documentStore.addDocumentOfNeighborhood(artifact)"
-        >
-          <artifact-body-display display-title :artifact="artifact" />
-        </list-item>
-      </list>
+        item-data-cy="list-selected-child-artifact-item"
+        @click="documentStore.addDocumentOfNeighborhood($event)"
+      />
       <typography
         v-else
         l="1"
@@ -80,14 +62,8 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { artifactStore, documentStore, selectionStore } from "@/hooks";
-import {
-  PanelCard,
-  Typography,
-  TextButton,
-  ListItem,
-  List,
-} from "@/components/common";
-import { ArtifactBodyDisplay } from "@/components/artifact/display";
+import { PanelCard, Typography, TextButton } from "@/components/common";
+import { ArtifactListDisplay } from "@/components/artifact/display";
 
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 

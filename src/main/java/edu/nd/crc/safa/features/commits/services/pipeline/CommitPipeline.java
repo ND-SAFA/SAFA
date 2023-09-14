@@ -12,11 +12,11 @@ import edu.nd.crc.safa.features.commits.services.pipeline.steps.SendNotification
 import edu.nd.crc.safa.features.commits.services.pipeline.steps.SetLastUpdated;
 
 public class CommitPipeline {
-    ProjectCommit before;
+    ProjectCommit commit;
     List<ICommitStep> steps;
 
     public CommitPipeline(ProjectCommit projectCommit) {
-        this.before = projectCommit;
+        this.commit = projectCommit;
         this.steps = List.of(
             new AddRelatedTraces(),
             new MarkInvisibleLinks(),
@@ -29,9 +29,9 @@ public class CommitPipeline {
 
     public ProjectCommit commit(CommitService commitService) {
         ProjectCommit after = new ProjectCommit();
-        after.setCommitVersion(this.before.getCommitVersion());
+        after.setCommitVersion(this.commit.getCommitVersion());
         for (ICommitStep step : this.steps) {
-            step.performStep(commitService, this.before, after);
+            step.performStep(commitService, this.commit, after);
         }
         return after;
     }

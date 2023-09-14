@@ -1,10 +1,6 @@
 package edu.nd.crc.safa.features.versions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -14,21 +10,7 @@ import edu.nd.crc.safa.utilities.ProjectVersionFilter;
  * Calculates the most-up-to-date versions of items.
  */
 public class VersionCalculator {
-    public <A> Map<UUID, List<A>> groupEntityVersionsByEntityId(List<A> versionEntities,
-                                                                Function<A, UUID> idGetter) {
-        Map<UUID, List<A>> entityHashtable = new HashMap<>();
-        for (A versionEntity : versionEntities) {
-            UUID entityId = idGetter.apply(versionEntity);
-            if (entityHashtable.containsKey(entityId)) {
-                entityHashtable.get(entityId).add(versionEntity);
-            } else {
-                List<A> newList = new ArrayList<>();
-                newList.add(versionEntity);
-                entityHashtable.put(entityId, newList);
-            }
-        }
-        return entityHashtable;
-    }
+
 
     public <V> V getEntityAtVersion(List<V> bodies,
                                     ProjectVersion version,

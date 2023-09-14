@@ -24,6 +24,7 @@ import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.javatuples.Pair;
@@ -41,7 +42,7 @@ public abstract class GenericVersionRepository<
     AppEntity extends IAppEntity>
     implements IVersionRepository<VersionEntity, AppEntity> {
 
-    VersionCalculator versionCalculator = new VersionCalculator();
+    protected VersionCalculator versionCalculator = new VersionCalculator();
 
     protected abstract VersionEntity save(VersionEntity versionEntity);
 
@@ -374,7 +375,7 @@ public abstract class GenericVersionRepository<
      * @param nameToVersionEntityMap Contains artifact names as keys and their associated version entities as values.
      * @return List of version entities as showing up in given project version.
      */
-    private List<VersionEntity> calculateVersionEntitiesAtProjectVersion(
+    protected List<VersionEntity> calculateVersionEntitiesAtProjectVersion(
         ProjectVersion projectVersion,
         Map<UUID, List<VersionEntity>> nameToVersionEntityMap) {
         List<VersionEntity> entityVersionsAtProjectVersion = new ArrayList<>();
@@ -397,7 +398,7 @@ public abstract class GenericVersionRepository<
 
     private Map<UUID, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
         List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());
-        return versionCalculator.groupEntityVersionsByEntityId(versionEntities, IVersionEntity::getBaseEntityId);
+        return ProjectDataStructures.groupEntitiesByProperty(versionEntities, IVersionEntity::getBaseEntityId);
     }
 
     private VersionEntity instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,

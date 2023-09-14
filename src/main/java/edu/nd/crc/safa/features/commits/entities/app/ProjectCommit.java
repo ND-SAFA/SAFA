@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.StringUtil;
 
@@ -32,6 +33,7 @@ public class ProjectCommit {
     ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
     List<CommitError> errors = new ArrayList<>();
     boolean failOnError = true;
+    SafaUser user;
 
     public ProjectCommit(ProjectAppEntity projectAppEntity) {
         this.commitVersion = projectAppEntity.getProjectVersion();
@@ -148,5 +150,9 @@ public class ProjectCommit {
         logs.add(this.artifacts.getSummary("Artifacts"));
         logs.add(this.traces.getSummary("Trace Links"));
         return StringUtil.join(logs, "\n");
+    }
+
+    public void addErrors(List<CommitError> errors) {
+        this.errors.addAll(errors);
     }
 }

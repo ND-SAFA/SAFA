@@ -54,8 +54,12 @@ public class ProjectChanger {
         ProjectCommit committedChanges = serviceProvider
             .getCommitService()
             .performCommit(projectCommit, user);
-        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
-        layoutManager.generateLayoutUpdates(committedChanges);
+
+        if (projectCommit.shouldUpdateDefaultLayout()) {
+            LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
+            layoutManager.generateLayoutUpdates(committedChanges);
+        }
+
         return committedChanges;
     }
 

@@ -61,6 +61,13 @@
           icon="download"
           @click="jobApiStore.handleDownloadLogs"
         />
+        <text-button
+          color="negative"
+          text
+          icon="logs"
+          label="Report a Bug"
+          @click="handleFeedback"
+        />
       </template>
     </modal>
   </panel-card>
@@ -79,7 +86,7 @@ export default {
 import { computed, onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JobLogStepSchema, JobSchema } from "@/types";
-import { jobColumns } from "@/util";
+import { FEEDBACK_LINK, jobColumns } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import TextButton from "@/components/common/button/TextButton.vue";
@@ -90,6 +97,13 @@ const loading = computed(() => appStore.isLoading > 0);
 const expanded = computed(() =>
   jobStore.selectedJob ? [jobStore.selectedJob.id] : []
 );
+
+/**
+ * Routes the user to the feedback page.
+ */
+function handleFeedback(): void {
+  window.open(FEEDBACK_LINK);
+}
 
 onMounted(() => jobApiStore.handleReload());
 </script>

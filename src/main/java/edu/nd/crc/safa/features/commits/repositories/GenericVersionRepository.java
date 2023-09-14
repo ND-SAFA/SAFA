@@ -88,7 +88,7 @@ public abstract class GenericVersionRepository<
      * @param projectVersion  The version of the entity to retrieve.
      * @param entityId        The id of the base entity whose version is being retrieved.
      * @param entityHashTable The map of entity ids to version entities. Used to speed up retrieval.
-     *                        See {@link #createVersionEntityMap(ProjectVersion, List<UUID>)}.
+     *                        See {@link #createVersionEntityMap(ProjectVersion, List)}.
      * @return Optional of entity version at given project version.
      */
     public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
@@ -97,8 +97,8 @@ public abstract class GenericVersionRepository<
         Map<UUID, List<VersionEntity>> justThisEntityMap = new HashMap<>();
         justThisEntityMap.put(entityId, entityHashTable.getOrDefault(entityId, List.of()));
 
-        List<VersionEntity> currentVersionQuery = VersionCalculator.calculateVersionEntitiesAtProjectVersion(projectVersion,
-            justThisEntityMap);
+        List<VersionEntity> currentVersionQuery = VersionCalculator.calculateVersionEntitiesAtProjectVersion(
+            projectVersion, justThisEntityMap);
         return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
 
@@ -367,7 +367,6 @@ public abstract class GenericVersionRepository<
             }
         }
     }
-
 
     private Map<UUID, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
         List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());

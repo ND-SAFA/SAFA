@@ -16,12 +16,12 @@ import edu.nd.crc.safa.utilities.ProjectVersionFilter;
  */
 public class VersionCalculator {
 
-
     /**
      * Calculates the current version of artifact noted by the entries in the given map.
      *
      * @param projectVersion         The version returns for each entity in map.
      * @param nameToVersionEntityMap Contains artifact names as keys and their associated version entities as values.
+     * @param <V>                    The version entity to return.
      * @return List of version entities as showing up in given project version.
      */
     public static <V extends IVersionEntity> List<V> calculateVersionEntitiesAtProjectVersion(

@@ -90,7 +90,7 @@ public interface IVersionRepository<
      * @param a               The app entity whose state is saved.
      * @param user            The user doing the update
      * @param entityHashTable A hash table of entities used to speed up retrieval.
-     *                        See {@link #createVersionEntityMap(ProjectVersion, List<UUID>)}
+     *                        See {@link #createVersionEntityMap(ProjectVersion, List)}
      * @return String representing error message if one occurred.
      * @throws SafaError Throws error if saving changes fails.
      */
@@ -122,7 +122,7 @@ public interface IVersionRepository<
      * @param baseEntityName  The name of the base entity whose removal is committed to given version.
      * @param user            The user making the change
      * @param entityHashTable A hash table of entities used to speed up retrieval.
-     *                        See {@link #createVersionEntityMap(ProjectVersion, List<UUID>)}
+     *                        See {@link #createVersionEntityMap(ProjectVersion, List)}
      * @return CommitError if error occurred while deleting entity, null otherwise.
      */
     Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
@@ -157,6 +157,7 @@ public interface IVersionRepository<
      * Precalculating this information speeds up retrieval of entities, which in turn speeds up commits.
      *
      * @param projectVersion The version to retrieve entities from.
+     * @param baseEntityIds  The ids of the base entities who have changed.
      * @return A map between entity ID and entity versions for all entities in the given project version.
      */
     Map<UUID, List<V>> createVersionEntityMap(ProjectVersion projectVersion, List<UUID> baseEntityIds);

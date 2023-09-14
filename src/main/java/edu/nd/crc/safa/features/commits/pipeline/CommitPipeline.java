@@ -1,15 +1,15 @@
-package edu.nd.crc.safa.features.commits.services.pipeline;
+package edu.nd.crc.safa.features.commits.pipeline;
 
 import java.util.List;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.pipeline.steps.AddRelatedTraces;
+import edu.nd.crc.safa.features.commits.pipeline.steps.CommitArtifacts;
+import edu.nd.crc.safa.features.commits.pipeline.steps.CommitTraces;
+import edu.nd.crc.safa.features.commits.pipeline.steps.MarkInvisibleLinks;
+import edu.nd.crc.safa.features.commits.pipeline.steps.SendNotifications;
+import edu.nd.crc.safa.features.commits.pipeline.steps.SetLastUpdated;
 import edu.nd.crc.safa.features.commits.services.CommitService;
-import edu.nd.crc.safa.features.commits.services.pipeline.steps.AddRelatedTraces;
-import edu.nd.crc.safa.features.commits.services.pipeline.steps.CommitArtifacts;
-import edu.nd.crc.safa.features.commits.services.pipeline.steps.CommitTraces;
-import edu.nd.crc.safa.features.commits.services.pipeline.steps.MarkInvisibleLinks;
-import edu.nd.crc.safa.features.commits.services.pipeline.steps.SendNotifications;
-import edu.nd.crc.safa.features.commits.services.pipeline.steps.SetLastUpdated;
 
 public class CommitPipeline {
     ProjectCommit commit;

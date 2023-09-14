@@ -58,6 +58,7 @@ public class ProjectDataStructures {
      * @param versionEntities The list of entities to group.
      * @param idGetter        The function to determine the property for each entity.
      * @param <A>             The type of entity being grouped.
+     * @param <P>             The type of property to group by.
      * @return Map of
      */
     public static <A, P> Map<P, List<A>> groupEntitiesByProperty(List<A> versionEntities,

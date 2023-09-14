@@ -1,8 +1,8 @@
-package edu.nd.crc.safa.features.commits.services.pipeline.steps;
+package edu.nd.crc.safa.features.commits.pipeline.steps;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.commits.services.CommitService;
-import edu.nd.crc.safa.features.commits.services.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 public class SetLastUpdated implements ICommitStep {

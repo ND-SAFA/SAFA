@@ -1,12 +1,12 @@
-package edu.nd.crc.safa.features.commits.services.pipeline.steps;
+package edu.nd.crc.safa.features.commits.pipeline.steps;
 
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.commits.services.CommitService;
-import edu.nd.crc.safa.features.commits.services.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;

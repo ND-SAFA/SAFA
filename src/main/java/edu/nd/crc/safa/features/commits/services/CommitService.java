@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository
 import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.app.CommitAction;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
-import edu.nd.crc.safa.features.commits.services.pipeline.CommitPipeline;
+import edu.nd.crc.safa.features.commits.pipeline.CommitPipeline;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
@@ -64,6 +64,7 @@ public class CommitService {
      * @param versionEntityRepository The IVersionRepository used for this entity.
      * @param iAppEntityCreator       The constructor for creating app entities from version entities.
      * @param user                    The user making the change
+     * @param failOnError             Whether error should be thrown if encountered.
      * @param <A>                     The entity used on the application side.
      * @param <V>                     The entity used for version control.
      * @return ProjectChange containing processed entities.

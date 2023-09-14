@@ -1,9 +1,9 @@
-package edu.nd.crc.safa.features.commits.services.pipeline.steps;
+package edu.nd.crc.safa.features.commits.pipeline.steps;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.commits.services.CommitService;
-import edu.nd.crc.safa.features.commits.services.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;

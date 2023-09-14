@@ -10,6 +10,13 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class SendNotifications implements ICommitStep {
+    /**
+     * Sends notification for all the entities changed.
+     *
+     * @param service The commit service to access database and other services.
+     * @param commit  The commit being performed.
+     * @param after   The commit final state.
+     */
     @Override
     public void performStep(CommitService service, ProjectCommit commit, ProjectCommit after) {
         // Step - Broadcast change

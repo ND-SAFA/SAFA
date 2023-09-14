@@ -14,6 +14,13 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import org.javatuples.Pair;
 
 public class CommitTraces implements ICommitStep {
+    /**
+     * Commits trace changes to project version.
+     *
+     * @param service The commit service to access database and other services.
+     * @param commit  The commit being performed.
+     * @param after   The commit final state.
+     */
     @Override
     public void performStep(CommitService service, ProjectCommit commit, ProjectCommit after) {
         Pair<ProjectChange<TraceAppEntity>, List<CommitError>> traceResponse = commitTraceChanges(

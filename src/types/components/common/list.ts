@@ -35,6 +35,24 @@ export interface ArtifactListItemProps extends ClickableProps {
 }
 
 /**
+ * Defines props for a component that displays an artifact list.
+ */
+export interface ArtifactListProps extends TestableProps {
+  /**
+   * The artifacts to display.
+   */
+  artifacts: ArtifactSchema[];
+  /**
+   * A selector for each list item.
+   */
+  itemDataCy?: string;
+  /**
+   * How many action columns to display.
+   */
+  actionCols?: number;
+}
+
+/**
  * Defines props for a component that displays a expansion item.
  */
 export interface ExpansionItemProps {

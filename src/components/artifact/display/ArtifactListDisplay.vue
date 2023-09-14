@@ -32,15 +32,10 @@ export default {
 
 <script setup lang="ts">
 import { useSlots } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactListProps, ArtifactSchema } from "@/types";
 import { ArtifactBodyDisplay, List, ListItem } from "@/components";
 
-const props = defineProps<{
-  artifacts: ArtifactSchema[];
-  dataCy?: string;
-  itemDataCy?: string;
-  actionCols?: number;
-}>();
+const props = defineProps<ArtifactListProps>();
 
 const emit = defineEmits<{
   (e: "click", artifact: ArtifactSchema): void;

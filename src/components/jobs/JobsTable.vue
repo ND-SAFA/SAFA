@@ -28,7 +28,7 @@
       <q-timeline data-cy="text-job-log">
         <q-virtual-scroll
           v-slot="{ item, index }: { item: JobLogStepSchema }"
-          style="max-height: 80vh"
+          style="max-height: 70vh"
           :items="jobApiStore.jobLog"
           separator
         >
@@ -55,6 +55,13 @@
           </q-timeline-entry>
         </q-virtual-scroll>
       </q-timeline>
+      <template #actions>
+        <text-button
+          label="Download Logs"
+          icon="download"
+          @click="jobApiStore.handleDownloadLogs"
+        />
+      </template>
     </modal>
   </panel-card>
 </template>
@@ -75,6 +82,7 @@ import { JobLogStepSchema, JobSchema } from "@/types";
 import { jobColumns } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
+import TextButton from "@/components/common/button/TextButton.vue";
 import JobRow from "./JobRow.vue";
 
 const rows = computed(() => jobStore.jobs);

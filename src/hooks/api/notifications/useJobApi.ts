@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ref } from "vue";
+import { saveAs } from "file-saver";
 import {
   ChangeMessageSchema,
   IOHandlerCallback,
@@ -20,7 +21,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
   const jobApi = useApi("jobApi");
 
   const jobLog = ref<JobLogStepSchema[]>([]);
-  const jobSteps = ref<string[]>([]);
+  const viewedJob = ref<JobSchema | undefined>();
 
   /**
    * Subscribes to updates for job with given id.
@@ -45,10 +46,11 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
   }
 
   async function handleViewLogs(job: JobSchema): Promise<void> {
+    viewedJob.value = job;
+
     await jobApi.handleRequest(async () => {
       const logs = await getJobLog(job.id);
 
-      jobSteps.value = job.steps;
       jobLog.value = logs.map((logItems, index) => {
         const entry = logItems.map(({ entry }) => entry).join("\n\n");
 
@@ -66,7 +68,21 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
 
   function handleCloseLogs(): void {
     jobLog.value = [];
-    jobSteps.value = [];
+    viewedJob.value = undefined;
+  }
+
+  function handleDownloadLogs(): void {
+    if (!viewedJob.value) return;
+
+    const fileName = `${viewedJob.value.name}-${viewedJob.value.lastUpdatedAt}.md`;
+    const blob = new Blob(
+      jobLog.value.map(
+        (step) => `# ${step.stepName}\n\n${step.timestamp}\n\n${step.entry}`
+      ),
+      { type: "text/plain;charset=utf-8" }
+    );
+
+    saveAs(blob, fileName);
   }
 
   async function handleCreate(job: JobSchema): Promise<void> {
@@ -109,9 +125,9 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
 
   return {
     jobLog,
-    jobSteps,
     handleViewLogs,
     handleCloseLogs,
+    handleDownloadLogs,
     handleCreate,
     handleDelete,
     handleReload,

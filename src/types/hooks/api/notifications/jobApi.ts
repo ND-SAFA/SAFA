@@ -10,10 +10,6 @@ export interface JobApiHook {
    */
   jobLog: Ref<JobLogStepSchema[]>;
   /**
-   * Steps for the current job.
-   */
-  jobSteps: Ref<string[]>;
-  /**
    * Gets the log for a job.
    *
    * @param job - The job to view.
@@ -23,6 +19,10 @@ export interface JobApiHook {
    * Closes the job log.
    */
   handleCloseLogs(): void;
+  /**
+   * Downloads the viewed job logs as a markdown file.
+   */
+  handleDownloadLogs(): void;
   /**
    * Subscribes to job updates via websocket messages, updates the
    * store, and selects the job.

@@ -59,3 +59,13 @@ export interface JobLogSchema {
   timestamp: string;
   entry: string;
 }
+
+/**
+ * Describes the display of a log step, which is a collection of log `JobLogSchema`.
+ */
+export interface JobLogStepSchema {
+  stepName: string;
+  timestamp: string;
+  entry: string;
+  error: boolean;
+}

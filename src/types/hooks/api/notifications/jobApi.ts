@@ -1,5 +1,5 @@
 import { Ref } from "vue";
-import { IOHandlerCallback, JobLogSchema, JobSchema } from "@/types";
+import { IOHandlerCallback, JobLogStepSchema, JobSchema } from "@/types";
 
 /**
  * A hook for calling job API endpoints.
@@ -8,7 +8,7 @@ export interface JobApiHook {
   /**
    * Logs for the current job.
    */
-  jobLog: Ref<JobLogSchema[][]>;
+  jobLog: Ref<JobLogStepSchema[]>;
   /**
    * Steps for the current job.
    */

@@ -26,28 +26,34 @@
       @close="jobApiStore.handleCloseLogs"
     >
       <q-timeline data-cy="text-job-log">
-        <template v-for="(items, idx) in jobApiStore.jobLog" :key="idx">
+        <q-virtual-scroll
+          v-slot="{ item, index }: { item: JobLogStepSchema }"
+          style="max-height: 80vh"
+          :items="jobApiStore.jobLog"
+          separator
+        >
           <q-timeline-entry
-            v-for="item in items"
-            :key="item.entry"
-            :subtitle="timestampToDisplay(item.timestamp)"
+            v-if="!!item.entry"
+            :key="index"
+            :subtitle="item.timestamp"
+            :color="item.error ? 'negative' : 'positive'"
           >
             <q-expansion-item
               default-opened
               switch-toggle-side
-              :label="jobApiStore.jobSteps[idx]"
+              :label="item.stepName"
               class="text-h5"
             >
               <typography
-                v-for="line in item.entry.split('\n')"
-                :key="line"
-                el="p"
+                variant="expandable"
                 l="3"
-                :value="line"
+                :value="item.entry"
+                default-expanded
+                :collapse-length="0"
               />
             </q-expansion-item>
           </q-timeline-entry>
-        </template>
+        </q-virtual-scroll>
       </q-timeline>
     </modal>
   </panel-card>
@@ -65,8 +71,8 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { JobSchema } from "@/types";
-import { jobColumns, timestampToDisplay } from "@/util";
+import { JobLogStepSchema, JobSchema } from "@/types";
+import { jobColumns } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import JobRow from "./JobRow.vue";

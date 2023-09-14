@@ -4,9 +4,11 @@ import { ref } from "vue";
 import {
   ChangeMessageSchema,
   IOHandlerCallback,
-  JobLogSchema,
+  JobApiHook,
+  JobLogStepSchema,
   JobSchema,
 } from "@/types";
+import { timestampToDisplay } from "@/util";
 import { jobStore, useApi, stompApiStore } from "@/hooks";
 import { deleteJobById, fillEndpoint, getJobLog, getUserJobs } from "@/api";
 import { pinia } from "@/plugins";
@@ -14,10 +16,10 @@ import { pinia } from "@/plugins";
 /**
  * A hook for managing job API requests.
  */
-export const useJobApi = defineStore("jobApi", () => {
+export const useJobApi = defineStore("jobApi", (): JobApiHook => {
   const jobApi = useApi("jobApi");
 
-  const jobLog = ref<JobLogSchema[][]>([]);
+  const jobLog = ref<JobLogStepSchema[]>([]);
   const jobSteps = ref<string[]>([]);
 
   /**
@@ -44,8 +46,21 @@ export const useJobApi = defineStore("jobApi", () => {
 
   async function handleViewLogs(job: JobSchema): Promise<void> {
     await jobApi.handleRequest(async () => {
-      jobLog.value = await getJobLog(job.id);
+      const logs = await getJobLog(job.id);
+
       jobSteps.value = job.steps;
+      jobLog.value = logs.map((logItems, index) => {
+        const entry = logItems.map(({ entry }) => entry).join("\n\n");
+
+        return {
+          stepName: job.steps[index],
+          timestamp: timestampToDisplay(
+            logItems[logItems.length - 1]?.timestamp || ""
+          ),
+          entry,
+          error: entry.includes("rror"),
+        };
+      });
     });
   }
 

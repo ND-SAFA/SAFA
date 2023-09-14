@@ -82,7 +82,9 @@ public class CommitService {
         ProjectChange<A> processedChange = new ProjectChange<>();
         List<CommitError> commitErrors;
 
-        Map<UUID, List<V>> entityHashTable = versionEntityRepository.createVersionEntityMap(projectVersion);
+        List<UUID> baseEntityIds = projectChange.getEntityIds();
+        Map<UUID, List<V>> entityHashTable = versionEntityRepository.createVersionEntityMap(projectVersion,
+            baseEntityIds);
         // Define actions
         CommitAction<A, V> saveOrModifyAction = a ->
             versionEntityRepository.commitAppEntityToProjectVersion(projectVersion, a, user, entityHashTable);

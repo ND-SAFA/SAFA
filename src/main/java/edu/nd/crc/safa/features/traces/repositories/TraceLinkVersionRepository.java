@@ -35,6 +35,8 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
 
     List<TraceLinkVersion> findByTraceLink(TraceLink traceLink);
 
+    List<TraceLinkVersion> findByTraceLinkTraceLinkIdIn(List<UUID> traceLinkIds);
+
     List<TraceLinkVersion> findByTraceLinkTraceLinkId(UUID traceLinkId);
 
     List<TraceLinkVersion> findByProjectVersionProjectAndApprovalStatus(Project project,

@@ -110,6 +110,11 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
+    public List<TraceLinkVersion> retrieveVersionEntitiesByBaseIds(List<UUID> baseIds) {
+        return traceLinkVersionRepository.findByTraceLinkTraceLinkIdIn(baseIds);
+    }
+
+    @Override
     public List<TraceLinkVersion> retrieveVersionEntitiesByBaseEntity(TraceLink traceLink) {
         return traceLinkVersionRepository.findByTraceLink(traceLink);
     }
@@ -183,7 +188,7 @@ public class TraceLinkVersionRepositoryImpl
 
     private void notifyTraceMatrixUpdate(TraceMatrixEntry entry, SafaUser user) {
         EntityChangeBuilder builder = EntityChangeBuilder.create(entry.getProjectVersion().getVersionId())
-                .withTraceMatrixUpdate(entry.getId());
+            .withTraceMatrixUpdate(entry.getId());
         notificationService.broadcastChangeToUser(builder, user);
     }
 

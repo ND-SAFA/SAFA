@@ -80,7 +80,7 @@ public class ProjectCommit {
 
     @JsonIgnore
     public boolean shouldUpdateDefaultLayout() {
-        return this.getArtifacts().getAdded().size() + this.getArtifacts().getRemoved().size() > 1;
+        return this.getArtifacts().getAdded().size() + this.getArtifacts().getRemoved().size() > 0;
     }
 
     @JsonIgnore

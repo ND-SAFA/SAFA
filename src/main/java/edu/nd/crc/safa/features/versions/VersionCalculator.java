@@ -1,8 +1,13 @@
 package edu.nd.crc.safa.features.versions;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
+import edu.nd.crc.safa.features.common.IVersionEntity;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
@@ -11,6 +16,34 @@ import edu.nd.crc.safa.utilities.ProjectVersionFilter;
  */
 public class VersionCalculator {
 
+
+    /**
+     * Calculates the current version of artifact noted by the entries in the given map.
+     *
+     * @param projectVersion         The version returns for each entity in map.
+     * @param nameToVersionEntityMap Contains artifact names as keys and their associated version entities as values.
+     * @return List of version entities as showing up in given project version.
+     */
+    public static <V extends IVersionEntity> List<V> calculateVersionEntitiesAtProjectVersion(
+        ProjectVersion projectVersion,
+        Map<UUID, List<V>> nameToVersionEntityMap) {
+        List<V> entityVersionsAtProjectVersion = new ArrayList<>();
+
+        for (Map.Entry<UUID, List<V>> entry : nameToVersionEntityMap.entrySet()) {
+            V latest = null;
+            for (V body : entry.getValue()) {
+                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)
+                    && (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion()))) {
+                    latest = body;
+                }
+            }
+
+            if (latest != null && latest.getModificationType() != ModificationType.REMOVED) {
+                entityVersionsAtProjectVersion.add(latest);
+            }
+        }
+        return entityVersionsAtProjectVersion;
+    }
 
     public <V> V getEntityAtVersion(List<V> bodies,
                                     ProjectVersion version,

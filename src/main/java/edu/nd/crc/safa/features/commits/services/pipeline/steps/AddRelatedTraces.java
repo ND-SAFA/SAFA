@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.commits.services.pipeline.steps;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -16,11 +18,10 @@ public class AddRelatedTraces implements ICommitStep {
     public void performStep(CommitService service, ProjectCommit commit, ProjectCommit after) {
         ProjectVersion projectVersion = commit.getCommitVersion();
         TraceService traceService = service.getTraceService();
-        // Step - Add related trace links to be removed.
-        for (ArtifactAppEntity artifact : commit.getArtifacts().getRemoved()) {
-            List<TraceAppEntity> linksToArtifact = traceService
-                .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifact.getName());
-            commit.addTraces(ModificationType.REMOVED, linksToArtifact);
-        }
+        List<UUID> artifactIds = commit.getArtifacts().getRemoved()
+            .stream().map(ArtifactAppEntity::getId).collect(Collectors.toList());
+        List<TraceAppEntity> linksToArtifact = traceService
+            .getTracesRelatedToArtifacts(projectVersion, artifactIds);
+        commit.addTraces(ModificationType.REMOVED, linksToArtifact);
     }
 }

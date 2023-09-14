@@ -72,7 +72,7 @@ public abstract class GenericVersionRepository<
     public List<VersionEntity> retrieveVersionEntitiesByProjectVersion(ProjectVersion projectVersion) {
         Map<UUID, List<VersionEntity>> entityHashTable =
             this.groupEntityVersionsByEntityId(projectVersion);
-        return this.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
+        return VersionCalculator.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
     }
 
     @Override
@@ -97,7 +97,7 @@ public abstract class GenericVersionRepository<
         Map<UUID, List<VersionEntity>> justThisEntityMap = new HashMap<>();
         justThisEntityMap.put(entityId, entityHashTable.getOrDefault(entityId, List.of()));
 
-        List<VersionEntity> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
+        List<VersionEntity> currentVersionQuery = VersionCalculator.calculateVersionEntitiesAtProjectVersion(projectVersion,
             justThisEntityMap);
         return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
@@ -368,33 +368,6 @@ public abstract class GenericVersionRepository<
         }
     }
 
-    /**
-     * Calculates the current version of artifact noted by the entries in the given map.
-     *
-     * @param projectVersion         The version returns for each entity in map.
-     * @param nameToVersionEntityMap Contains artifact names as keys and their associated version entities as values.
-     * @return List of version entities as showing up in given project version.
-     */
-    protected List<VersionEntity> calculateVersionEntitiesAtProjectVersion(
-        ProjectVersion projectVersion,
-        Map<UUID, List<VersionEntity>> nameToVersionEntityMap) {
-        List<VersionEntity> entityVersionsAtProjectVersion = new ArrayList<>();
-
-        for (Map.Entry<UUID, List<VersionEntity>> entry : nameToVersionEntityMap.entrySet()) {
-            VersionEntity latest = null;
-            for (VersionEntity body : entry.getValue()) {
-                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)
-                    && (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion()))) {
-                    latest = body;
-                }
-            }
-
-            if (latest != null && latest.getModificationType() != ModificationType.REMOVED) {
-                entityVersionsAtProjectVersion.add(latest);
-            }
-        }
-        return entityVersionsAtProjectVersion;
-    }
 
     private Map<UUID, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
         List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());

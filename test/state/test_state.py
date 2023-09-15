@@ -6,7 +6,6 @@ from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
@@ -34,11 +33,12 @@ class TestState(BaseTest):
         self.assertEqual(state.description_of_artifact, HGenTestConstants.description)
         self.assertEqual(state.summary, HGenTestConstants.summary)
         self.assertListEqual(state.questions, HGenTestConstants.questions.splitlines())
-        self.assertListEqual(state.generated_artifact_content, HGenTestConstants.user_stories)
+        self.assertSetEqual(set(state.generation_predictions.keys()), set(HGenTestConstants.user_stories))
+        self.assertListEqual(list(state.generation_predictions.values()), HGenTestConstants.code_files)
         self.assertEqual(state.format_of_artifacts, HGenTestConstants.format_)
         self.assertIsInstance(state.original_dataset, PromptDataset)
         self.assertIsInstance(state.source_dataset, PromptDataset)
-        self.assertIsInstance(state.final_dataset, TraceDataset)
+        self.assertIsInstance(state.final_dataset, PromptDataset)
 
         # failed to find a state so initialize empty
         file_not_found_state = HGenState.load_latest(TEST_STATE_PATH, ["UnknownStep"])
@@ -65,14 +65,25 @@ class TestState(BaseTest):
         orig_state.save(state_name)
         reloaded_attrs = YamlUtil.read(State._get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name))
 
-        self.assertSetEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])
+        self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])
         self.assertEqual(orig_state.description_of_artifact, reloaded_attrs["description_of_artifact"])
         self.assertEqual(orig_state.summary, reloaded_attrs["summary"])
         self.assertListEqual(orig_state.questions, reloaded_attrs["questions"])
-        self.assertListEqual(orig_state.generated_artifact_content, reloaded_attrs["generated_artifact_content"])
+        self.assertDictEqual(orig_state.generation_predictions, reloaded_attrs["generation_predictions"])
         self.assertEqual(orig_state.format_of_artifacts, reloaded_attrs["format_of_artifacts"])
         reloaded_dataset_original = assert_check_type("original_dataset", reloaded_attrs["original_dataset"],)
         self.assertSetEqual(set(orig_state.original_dataset.artifact_df.index), set(reloaded_dataset_original.artifact_df.index))
         reloaded_dataset_source = assert_check_type("source_dataset", reloaded_attrs["source_dataset"])
         self.assertSetEqual(set(orig_state.source_dataset.artifact_df.index), set(reloaded_dataset_source.artifact_df.index))
-        self.assertEqual(orig_state.final_dataset, reloaded_attrs["dataset"])
+        self.assertEqual(orig_state.final_dataset, reloaded_attrs["final_dataset"])
+
+    def test_mark_as_complete(self):
+        state = HGenState()
+        step_name = GenerateArtifactContentStep.get_step_name()
+        self.assertFalse(state.step_is_complete(step_name))
+        state.mark_step_as_complete(step_name)
+        self.assertTrue(state.step_is_complete(step_name))
+        state.mark_step_as_complete(step_name)
+        self.assertEqual(state.completed_steps[step_name], 2)
+        state.mark_step_as_incomplete(step_name)
+        self.assertFalse(state.step_is_complete(step_name))

@@ -27,9 +27,15 @@ class HGenTestConstants:
                          f'{PromptUtil.create_xml("format", format_)}']
     summary = "Here is a summary of the key technical details and design aspects of the system based on the provided code"
 
-    user_stories = ["As a player, I want to move around in a 3D world so that I can explore the environment.",
-                    "As a player, I want to place and remove blocks in the world so that I can modify the environment.",
-                    "As a player, I want to copy the color of blocks so that I can reuse colors while building."]
+    user_stories = ["As a game developer, I want a Player class to store player state, apply movement, "
+                    "handle collisions, perform raycasting for block selection, and render the player, " 
+                    "so that I can implement a controllable character that interacts with the 3D world.",
+                    "As a game developer, I want a RenderEngine class to handle window creation, OpenGL " 
+                    "context, camera view, and scene rendering, so that I have a reusable graphics " 
+                    "engine for displaying 3D scenes.",
+                    "As a game developer, I want an Image class to load image files as textures using "
+                    "STB Image, so that I can apply detailed textures to 3D models."]
+    code_files = [["/Player.cpp"], ["/Rendering/RenderEngine.cpp"], ["/Rendering/Image.cpp", "/Rendering/stb_image.cpp"]]
 
 
 def get_generated_artifacts_response(contents=None, type_="user-story"):

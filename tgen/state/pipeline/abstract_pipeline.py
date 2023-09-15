@@ -58,7 +58,7 @@ class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
     INTERACTIVE_MODE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP, InteractiveModeOptions.NEXT_STEP,
                                 InteractiveModeOptions.LOAD_NEW_STATE, InteractiveModeOptions.QUIT]
-    NEW_STATE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.NEXT_STEP, InteractiveModeOptions.SKIP_STEP]
+    NEW_STATE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP, InteractiveModeOptions.NEXT_STEP]
 
     def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]]):
         """
@@ -93,7 +93,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :param re_run: If True, runs step even if it complete
         :return: None
         """
-        step_ran = step.run(self.args, self.state, re_run=re_run)
+        step.run(self.args, self.state, re_run=re_run)
         if self.args.interactive_mode:
             self._run_interactive_mode(step)
 

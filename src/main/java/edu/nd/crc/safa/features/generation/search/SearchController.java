@@ -8,7 +8,9 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -34,8 +36,9 @@ public class SearchController extends BaseController {
     @PostMapping(AppRoutes.Search.SEARCH)
     public SearchResponse search(@PathVariable UUID versionId, @RequestBody @Valid SearchRequest request)
         throws InvalidAttributeValueException {
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion =
-            this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+            this.resourceBuilder.fetchVersion(versionId).withPermission(ProjectPermission.EDIT, user).get();
         ProjectAppEntity projectAppEntity = this.serviceProvider
             .getProjectRetrievalService()
             .getProjectAppEntity(projectVersion);

@@ -7,8 +7,10 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.services.VersionService;
 
@@ -45,7 +47,9 @@ public class VersionController extends BaseController {
      */
     @GetMapping(AppRoutes.Versions.GET_VERSIONS)
     public List<ProjectVersion> getVersions(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.versionService.getProjectVersions(project);
     }
 
@@ -58,7 +62,9 @@ public class VersionController extends BaseController {
      */
     @GetMapping(AppRoutes.Versions.GET_CURRENT_VERSION)
     public ProjectVersion getCurrentVersion(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.versionService.getCurrentVersion(project);
     }
 
@@ -72,7 +78,9 @@ public class VersionController extends BaseController {
     @PostMapping(AppRoutes.Versions.CREATE_NEW_MAJOR_VERSION)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectVersion createNewMajorVersion(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         return versionService.createNewMajorVersion(project);
     }
 
@@ -86,7 +94,9 @@ public class VersionController extends BaseController {
     @PostMapping(AppRoutes.Versions.CREATE_NEW_MINOR_VERSION)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectVersion createNewMinorVersion(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         return versionService.createNewMinorVersion(project);
     }
 
@@ -100,7 +110,9 @@ public class VersionController extends BaseController {
     @PostMapping(AppRoutes.Versions.CREATE_NEW_REVISION_VERSION)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectVersion createNewRevisionVersion(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         return versionService.createNextRevision(project);
     }
 
@@ -112,7 +124,9 @@ public class VersionController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Versions.DELETE_VERSION_BY_ID)
     public void deleteVersion(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         this.serviceProvider.getProjectVersionRepository().delete(projectVersion);
     }
 }

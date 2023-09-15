@@ -7,7 +7,7 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
@@ -82,7 +82,7 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
-    public T withProjectMembership(ProjectMembership projectMembership) {
+    public T withProjectMembership(UserProjectMembership projectMembership) {
         this.path = this.path.replace("{projectMembershipId}", projectMembership.getMembershipId().toString());
         return (T) this;
     }

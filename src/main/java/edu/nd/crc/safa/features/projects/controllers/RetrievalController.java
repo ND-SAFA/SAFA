@@ -8,6 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -42,7 +43,9 @@ public class RetrievalController extends BaseController {
      */
     @GetMapping(AppRoutes.Retrieval.GET_PROJECT_IN_VERSION)
     public ProjectAppEntity getProjectInVersion(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider
             .getProjectRetrievalService()
             .getProjectAppEntity(projectVersion);
@@ -57,8 +60,9 @@ public class RetrievalController extends BaseController {
      */
     @GetMapping(AppRoutes.Retrieval.GET_ARTIFACTS_IN_VERSION)
     public List<ArtifactAppEntity> getArtifactsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider.getArtifactService().getAppEntities(projectVersion, user);
     }
 
@@ -73,8 +77,9 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Retrieval.GET_ARTIFACT_IDS_IN_VERSION)
     public List<ArtifactAppEntity> queryArtifactInVersion(@PathVariable UUID versionId,
                                                           @RequestBody List<UUID> artifactIds) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider.getArtifactService().getAppEntitiesByIds(projectVersion, user, artifactIds);
     }
 
@@ -87,8 +92,9 @@ public class RetrievalController extends BaseController {
      */
     @GetMapping(AppRoutes.Retrieval.GET_TRACES_IN_VERSION)
     public List<TraceAppEntity> getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider.getTraceService().getAppEntities(projectVersion, user);
     }
 }

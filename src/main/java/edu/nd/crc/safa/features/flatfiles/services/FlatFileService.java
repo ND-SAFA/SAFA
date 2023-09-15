@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -110,7 +111,8 @@ public class FlatFileService {
                                                        boolean asCompleteSet)
         throws SafaError, IOException {
 
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(projectVersionId).withEditVersionAs(user);
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(projectVersionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         return updateProjectFromFlatFiles(projectVersion, files, user, asCompleteSet);
     }
 

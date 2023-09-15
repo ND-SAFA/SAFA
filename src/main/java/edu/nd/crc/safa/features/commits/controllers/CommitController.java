@@ -7,7 +7,9 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -41,7 +43,9 @@ public class CommitController extends BaseController {
     @PostMapping(AppRoutes.Commits.COMMIT_CHANGE)
     public ProjectCommit commitChange(@PathVariable UUID versionId,
                                       @RequestBody ProjectCommit projectCommit) {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, user).get();
         projectCommit.setCommitVersion(projectVersion);
         ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
         return projectChanger.commit(projectCommit);

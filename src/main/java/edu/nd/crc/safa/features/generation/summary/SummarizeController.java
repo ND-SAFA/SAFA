@@ -8,6 +8,8 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +36,11 @@ public class SummarizeController extends BaseController {
     @PostMapping(AppRoutes.Summarize.SUMMARIZE_ARTIFACTS)
     public List<String> summarizeArtifacts(@PathVariable UUID versionId,
                                            @RequestBody @Valid SummarizeArtifactRequestDTO request) {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder
+                .fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT, user)
+                .get();
         request.setProjectVersion(projectVersion);
         request.setProjectSummary(projectVersion.getProject().getSpecification());
         return serviceProvider.getSummaryService().generateArtifactSummaries(request);

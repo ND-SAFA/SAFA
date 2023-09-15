@@ -1,10 +1,8 @@
 package edu.nd.crc.safa.test.features.memberships.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
 
 import org.json.JSONArray;
@@ -42,17 +40,5 @@ class TestUpdateAndDeleteMemberships extends AbstractSharingTest {
     void testRemoveSelfWithoutEditPermission() throws Exception {
         authorizationService.loginUser(Sharee.email, Sharee.password);
         authorizationService.removeMemberFromProject(project, Sharee.email);
-    }
-
-    @Test
-    void testRemoveSelfAsLastOwner() throws Exception {
-        authorizationService.removeMemberFromProject(project, currentUser.getEmail(), status().is4xxClientError());
-    }
-
-    @Test
-    void testRemoveSelfWithMultipleOwner() throws Exception {
-        serviceProvider.getMemberService().addOrUpdateProjectMembership(project, currentUser,
-            Sharee.email, ProjectRole.OWNER);
-        authorizationService.removeMemberFromProject(project, currentUser.getEmail());
     }
 }

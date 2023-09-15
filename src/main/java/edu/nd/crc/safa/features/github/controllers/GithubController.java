@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.builders.ImportIntoProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -89,7 +90,8 @@ public class GithubController extends BaseController {
 
         return makeDeferredRequest(user -> {
             checkCredentials(user);
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(user);
+            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                    .withPermission(ProjectPermission.EDIT, user).get();
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             UpdateProjectViaGithubBuilder builder
                 = new UpdateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);
@@ -120,7 +122,8 @@ public class GithubController extends BaseController {
 
         return makeDeferredRequest(user -> {
             checkCredentials(user);
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(user);
+            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                    .withPermission(ProjectPermission.EDIT, user).get();
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             ImportIntoProjectViaGithubBuilder builder
                 = new ImportIntoProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);

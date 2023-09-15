@@ -8,12 +8,14 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
 import edu.nd.crc.safa.features.rules.entities.db.Rule;
 import edu.nd.crc.safa.features.rules.parser.ParserRule;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +46,18 @@ public class RuleController extends BaseController {
      */
     @GetMapping(AppRoutes.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
     public Map<UUID, List<RuleName>> getWarningsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider.getWarningService().retrieveWarningsInProjectVersion(projectVersion);
     }
 
     @PostMapping(AppRoutes.Rules.CREATE_WARNING_IN_PROJECT)
     public RuleAppEntity createWarningInProject(@PathVariable UUID projectId,
                                                 @RequestBody RuleAppEntity ruleAppEntity) {
-        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.resourceBuilder.fetchProject(projectId)
+                .withPermission(ProjectPermission.EDIT, user).get();
 
         // Step - Parse rule
         ParserRule parserRule = new ParserRule(

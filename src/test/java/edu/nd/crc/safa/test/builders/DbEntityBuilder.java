@@ -25,8 +25,7 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
-import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -38,7 +37,6 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.services.TypeService;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
@@ -67,7 +65,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final ProjectMembershipRepository projectMembershipRepository;
+    private final UserProjectMembershipRepository userProjectMembershipRepository;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     private final ProjectService projectService;
     private final CustomAttributeRepository customAttributeRepository;
@@ -97,7 +95,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactVersionRepository = serviceProvider.getArtifactVersionRepository();
         this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
-        this.projectMembershipRepository = serviceProvider.getProjectMembershipRepository();
+        this.userProjectMembershipRepository = serviceProvider.getUserProjectMembershipRepository();
         this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
         this.customAttributeRepository = customAttributeRepository;
         this.attributeSystemServiceProvider = attributeSystemServiceProvider;
@@ -151,9 +149,8 @@ public class DbEntityBuilder extends AbstractBuilder {
     }
 
     public DbEntityBuilder newProject(String name, SafaUser owner) {
-        Project project = new Project(name, "");
-        this.projectRepository.save(project);
-        this.projectMembershipRepository.save(new ProjectMembership(project, owner, ProjectRole.OWNER));
+        Project project = this.projectService.createProject(name, "", owner);
+
         this.projects.put(name, project);
         this.versions.put(name, new Hashtable<>());
         this.artifactTypes.put(name, new Hashtable<>());

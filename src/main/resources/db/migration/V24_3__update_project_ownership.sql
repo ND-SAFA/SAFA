@@ -1,4 +1,3 @@
-ALTER TABLE project DROP COLUMN team_id;
 ALTER TABLE project ADD COLUMN team_id BINARY(16);
 
 CREATE TEMPORARY TABLE project_teams AS

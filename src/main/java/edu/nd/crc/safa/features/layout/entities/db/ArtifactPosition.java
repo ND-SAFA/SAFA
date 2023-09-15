@@ -29,36 +29,36 @@ public class ArtifactPosition {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "id")
-    UUID id;
+    private UUID id;
     /**
      * The version in which artifact with this position exist in.
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
-    Artifact artifact;
+    private Artifact artifact;
     /**
      * The version in which artifact with this position exist in.
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "version_id", nullable = false)
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
     /**
      * The document this layout is setting this artifact at.
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "documentId")
-    Document document;
+    private Document document;
     /**
      * How many pixels right from the top left corner of the graph.
      */
     @Column(nullable = false)
-    double x;
+    private double x;
     /**
      * How many pixels down from the top left corner of the graph.
      */
     @Column(nullable = false)
-    double y;
+    private double y;
 }

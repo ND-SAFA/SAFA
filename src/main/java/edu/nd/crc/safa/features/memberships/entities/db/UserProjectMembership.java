@@ -44,25 +44,25 @@ public class UserProjectMembership implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "membership_id")
-    UUID membershipId;
+    private UUID membershipId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "project_id",
         nullable = false)
-    Project project;
+    private Project project;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "user_id",
         nullable = false)
-    SafaUser member;
+    private SafaUser member;
 
     @Column(name = "project_role")
     @Enumerated(EnumType.STRING)
-    ProjectRole role;
+    private ProjectRole role;
 
     public UserProjectMembership(Project project, SafaUser member, ProjectRole role) {
         this.project = project;

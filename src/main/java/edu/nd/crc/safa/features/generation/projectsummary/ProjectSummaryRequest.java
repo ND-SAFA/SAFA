@@ -13,5 +13,5 @@ public class ProjectSummaryRequest {
     /**
      * The artifacts in the project to summarize project with.
      */
-    List<GenerationArtifact> artifacts;
+    private List<GenerationArtifact> artifacts;
 }

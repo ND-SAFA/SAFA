@@ -42,9 +42,9 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
     /**
      * The artifact type to be associated with all artifacts.
      */
-    String artifactType;
+    private String artifactType;
 
-    DocumentType documentType;
+    private DocumentType documentType;
 
     public CsvArtifactFile(String artifactType,
                            DocumentType documentType,
@@ -75,7 +75,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
     @Override
     protected void exportAsFileContent(File file) throws IOException {
         String[] headers = getHeaders();
-        CsvFileUtilities.writeEntitiesAsCsvFile(file, headers, this.entities,
+        CsvFileUtilities.writeEntitiesAsCsvFile(file, headers, this.getEntities(),
             artifact -> this.getArtifactRow(artifact, headers));
     }
 
@@ -87,7 +87,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
      */
     private String[] getHeaders() {
         Set<String> headers = Constants.ALL_COLUMNS_SET;
-        for (ArtifactAppEntity entity : entities) {
+        for (ArtifactAppEntity entity : getEntities()) {
             headers.addAll(entity.getAttributes().keySet());
         }
         return headers.toArray(new String[0]);
@@ -188,7 +188,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
             return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {
-            return new Pair<>(null, String.format("%s: %s", filename, e.getMessage()));
+            return new Pair<>(null, String.format("%s: %s", getFilename(), e.getMessage()));
         }
     }
 

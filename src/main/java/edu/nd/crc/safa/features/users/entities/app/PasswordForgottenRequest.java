@@ -17,5 +17,5 @@ public class PasswordForgottenRequest {
      */
     @NotNull
     @NotEmpty
-    String email;
+    private String email;
 }

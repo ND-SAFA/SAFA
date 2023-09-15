@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -80,7 +81,8 @@ public class ResourceBuilder {
      */
     public abstract static class ObjectHolder<T> {
 
-        protected T value;
+        @Getter
+        private T value;
 
         public ObjectHolder(T value) {
             this.value = value;
@@ -124,7 +126,7 @@ public class ResourceBuilder {
 
         @Override
         protected void requirePermission(Permission permission, SafaUser user) {
-            permissionService.requirePermission(permission, value, user);
+            permissionService.requirePermission(permission, getValue(), user);
         }
     }
 
@@ -135,7 +137,7 @@ public class ResourceBuilder {
 
         @Override
         protected void requirePermission(Permission permission, SafaUser user) {
-            permissionService.requirePermission(permission, value.getProject(), user);
+            permissionService.requirePermission(permission, getValue().getProject(), user);
         }
     }
 }

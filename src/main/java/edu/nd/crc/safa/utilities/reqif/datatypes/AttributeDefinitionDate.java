@@ -27,10 +27,10 @@ import lombok.Setter;
 public class AttributeDefinitionDate extends AttributeDefinition {
 
     @XmlElement(name = "DEFAULT-VALUE")
-    protected DefaultValue defaultValue;
+    private DefaultValue defaultValue;
 
     @XmlElement(name = "TYPE", required = true)
-    protected Type type;
+    private Type type;
 
     /**
      * Java class for anonymous complex type.
@@ -43,7 +43,7 @@ public class AttributeDefinitionDate extends AttributeDefinition {
     @Setter
     public static class DefaultValue {
         @XmlElement(name = "ATTRIBUTE-VALUE-DATE", namespace = "")
-        protected AttributeValueDate attributeValue;
+        private AttributeValueDate attributeValue;
     }
 
 
@@ -60,7 +60,7 @@ public class AttributeDefinitionDate extends AttributeDefinition {
         @XmlElement(name = "DATATYPE-DEFINITION-DATE-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected DatatypeDefinitionDate datatypeDefinition;
+        private DatatypeDefinitionDate datatypeDefinition;
     }
 
 }

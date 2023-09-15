@@ -28,11 +28,11 @@ public class ProjectChanger {
     /**
      * The version being changed.
      */
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
     /**
      * Provides artifact and trace version repositories
      */
-    ServiceProvider serviceProvider;
+    private ServiceProvider serviceProvider;
 
     /**
      * Performs modifications specified in project commit and updates the layout accordingly.

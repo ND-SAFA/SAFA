@@ -19,14 +19,14 @@ public class UserIdentifierDTO {
      * Unique identifier for user.
      */
     @NotNull
-    UUID userId;
+    private UUID userId;
 
     /**
      * User's email.
      */
     @NotNull
     @NotEmpty
-    String email;
+    private String email;
 
     public UserIdentifierDTO(SafaUser safaUser) {
         this.userId = safaUser.getUserId();

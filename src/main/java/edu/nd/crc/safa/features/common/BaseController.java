@@ -16,7 +16,9 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -37,8 +39,10 @@ public abstract class BaseController {
 
     private static final long DEFAULT_REQUEST_TIMEOUT = 5000L;
 
-    protected final ResourceBuilder resourceBuilder;
-    protected final ServiceProvider serviceProvider;
+    @Getter(AccessLevel.PROTECTED)
+    private final ResourceBuilder resourceBuilder;
+    @Getter(AccessLevel.PROTECTED)
+    private final ServiceProvider serviceProvider;
 
     protected Document getDocumentById(DocumentRepository documentRepository,
                                        UUID documentId) throws SafaError {

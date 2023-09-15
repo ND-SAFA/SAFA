@@ -27,8 +27,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ArtifactPositionService {
     private final VersionCalculator versionCalculator = new VersionCalculator();
-    ArtifactPositionRepository artifactPositionRepository;
-    ArtifactRepository artifactRepository;
+    private ArtifactPositionRepository artifactPositionRepository;
+    private ArtifactRepository artifactRepository;
 
     /**
      * Creates or updates artifact position within document using artifact version id and given document.

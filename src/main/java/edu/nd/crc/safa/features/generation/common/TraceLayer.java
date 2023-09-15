@@ -12,9 +12,9 @@ public class TraceLayer {
     /**
      * The child type in tracing.
      */
-    String child;
+    private String child;
     /**
      * The parent type in tracing.
      */
-    String parent;
+    private String parent;
 }

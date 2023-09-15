@@ -63,15 +63,15 @@ public class DocumentController extends BaseDocumentController {
     public DocumentAppEntity createOrUpdateDocument(@PathVariable UUID versionId,
                                                     @RequestBody @Valid DocumentAppEntity documentAppEntity)
         throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.EDIT, user).get();
         Project project = projectVersion.getProject();
 
         // Create or update: document base entity
         Document document = documentAppEntity.toDocument();
         document.setProject(project);
-        this.documentRepository.save(document);
+        getDocumentRepository().save(document);
 
         if (documentAppEntity.getDocumentId() == null) {
             documentAppEntity.setDocumentId(document.getDocumentId());
@@ -104,8 +104,8 @@ public class DocumentController extends BaseDocumentController {
 
     public Map<UUID, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
                                                           DocumentAppEntity documentAppEntity) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        LayoutManager projectLayout = new LayoutManager(serviceProvider, projectVersion, user);
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        LayoutManager projectLayout = new LayoutManager(getServiceProvider(), projectVersion, user);
         return projectLayout.generateDocumentLayout(documentAppEntity.toDocument());
     }
 
@@ -118,8 +118,8 @@ public class DocumentController extends BaseDocumentController {
      */
     @GetMapping(AppRoutes.Documents.GET_PROJECT_DOCUMENTS)
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID versionId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         return this.documentService.getAppEntities(projectVersion, user);
     }
@@ -127,8 +127,8 @@ public class DocumentController extends BaseDocumentController {
     @GetMapping(AppRoutes.Documents.GET_DOCUMENT_BY_ID)
     public DocumentAppEntity getDocumentById(@PathVariable UUID versionId,
                                              @PathVariable UUID documentId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         Document document = this.documentService.getDocumentById(documentId);
         return this.documentService.createDocumentAppEntity(document, projectVersion);
@@ -146,15 +146,15 @@ public class DocumentController extends BaseDocumentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
         // Step - Retrieve document and associated project.
-        Document document = getDocumentById(this.documentRepository, documentId);
+        Document document = getDocumentById(getDocumentRepository(), documentId);
         Project project = document.getProject();
 
         // Step - Verify authorized user has permission to delete.
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        resourceBuilder.setProject(project).withPermission(ProjectPermission.EDIT, user);
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        getResourceBuilder().setProject(project).withPermission(ProjectPermission.EDIT, user);
 
         // Step - Delete document.
-        this.documentRepository.delete(document);
+        getDocumentRepository().delete(document);
 
         // Step - Notify project users that document has been deleted.
         this.notificationService.broadcastChange(

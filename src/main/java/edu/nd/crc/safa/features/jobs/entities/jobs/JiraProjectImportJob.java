@@ -17,7 +17,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Job to import a JIRA project into an existing SAFA project
  */
 public class JiraProjectImportJob extends CreateProjectViaJiraJob {
-    JiraConnectionService jiraConnectionService;
+    private JiraConnectionService jiraConnectionService;
 
     public JiraProjectImportJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
@@ -31,7 +31,7 @@ public class JiraProjectImportJob extends CreateProjectViaJiraJob {
 
     @Override
     protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId) {
-        Optional<JiraProject> optional = this.serviceProvider
+        Optional<JiraProject> optional = this.getServiceProvider()
             .getJiraProjectRepository()
             .findByProjectAndJiraProjectId(project, jiraProjectId);
 

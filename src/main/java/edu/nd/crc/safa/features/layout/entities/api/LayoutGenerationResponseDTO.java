@@ -17,11 +17,11 @@ public class LayoutGenerationResponseDTO {
     /**
      * Layout of default document if asked to be regenerated.
      */
-    Map<UUID, LayoutPosition> defaultDocumentLayout;
+    private Map<UUID, LayoutPosition> defaultDocumentLayout;
     /**
      * Map of document to its layout (map of artifact id to position).
      */
-    Map<UUID, Map<UUID, LayoutPosition>> documentLayoutMap;
+    private Map<UUID, Map<UUID, LayoutPosition>> documentLayoutMap;
 
     public void addDocumentLayout(UUID documentId, Map<UUID, LayoutPosition> layout) {
         if (this.documentLayoutMap == null) {

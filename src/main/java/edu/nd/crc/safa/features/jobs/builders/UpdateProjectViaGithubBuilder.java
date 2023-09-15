@@ -23,11 +23,11 @@ public class UpdateProjectViaGithubBuilder extends CreateProjectViaGithubBuilder
     @Override
     protected AbstractJob constructJobForWork() {
         return new GithubProjectUpdateJob(
-            jobDbEntity,
-            serviceProvider,
-            githubIdentifier,
-            githubImportDTO,
-            user
+            getJobDbEntity(),
+            getServiceProvider(),
+            getGithubIdentifier(),
+            getGithubImportDTO(),
+            getUser()
         );
     }
 }

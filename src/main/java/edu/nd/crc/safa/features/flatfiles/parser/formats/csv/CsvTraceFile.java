@@ -35,7 +35,7 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
     protected void exportAsFileContent(File file) throws IOException {
         CsvFileUtilities.writeEntitiesAsCsvFile(file,
             CsvTraceFile.Constants.REQUIRED_COLUMNS,
-            this.entities,
+            this.getEntities(),
             this::getTraceRow);
     }
 

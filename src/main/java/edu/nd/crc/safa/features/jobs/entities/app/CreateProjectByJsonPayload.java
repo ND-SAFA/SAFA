@@ -18,9 +18,9 @@ public class CreateProjectByJsonPayload {
     /**
      * The project entities to commit.
      */
-    ProjectAppEntity project;
+    private ProjectAppEntity project;
     /**
      * The traces to generate.
      */
-    List<TracingRequest> requests = new ArrayList<>();
+    private List<TracingRequest> requests = new ArrayList<>();
 }

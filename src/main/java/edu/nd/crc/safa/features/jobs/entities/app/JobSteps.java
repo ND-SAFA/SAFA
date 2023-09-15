@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.JobExecutionUtilities;
 
+import com.google.common.annotations.VisibleForTesting;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JobSteps {
 
+    @VisibleForTesting
     public static String[] jiraProjectCreationSteps = { // Not final because modified in some tests
         "Authenticate User Credentials",
         "Retrieve JIRA project",

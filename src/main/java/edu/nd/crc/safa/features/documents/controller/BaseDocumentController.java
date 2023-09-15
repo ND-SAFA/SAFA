@@ -5,6 +5,8 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BaseDocumentController extends BaseController {
 
-    protected final DocumentRepository documentRepository;
+    @Getter(AccessLevel.PROTECTED)
+    private final DocumentRepository documentRepository;
 
     @Autowired
     public BaseDocumentController(ResourceBuilder resourceBuilder,

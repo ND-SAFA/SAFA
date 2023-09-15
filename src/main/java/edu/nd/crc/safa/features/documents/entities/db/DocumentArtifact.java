@@ -38,7 +38,7 @@ public class DocumentArtifact implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "document_artifact_id")
-    UUID documentArtifactId;
+    private UUID documentArtifactId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -46,7 +46,7 @@ public class DocumentArtifact implements Serializable {
         name = "version_id",
         nullable = false
     )
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -54,14 +54,14 @@ public class DocumentArtifact implements Serializable {
         name = "document_id",
         nullable = false
     )
-    Document document;
+    private Document document;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "artifact_id",
         nullable = false)
-    Artifact artifact;
+    private Artifact artifact;
 
     public DocumentArtifact() {
     }

@@ -13,5 +13,5 @@ public class TracingRequest {
     /**
      * List of artifact levels to trace.
      */
-    List<ArtifactLevelRequest> artifactLevels;
+    private List<ArtifactLevelRequest> artifactLevels;
 }

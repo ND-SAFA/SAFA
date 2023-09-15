@@ -82,44 +82,44 @@ public class XhtmlObjectType extends XhtmlBasicStyleableType {
     })
     @XmlMixed
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicType> content = new ArrayList<>();
+    private List<XhtmlBasicType> content = new ArrayList<>();
 
     @XmlAttribute(name = "declare")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String declare;
+    private String declare;
 
     @XmlAttribute(name = "classid")
-    protected String classid;
+    private String classid;
 
     @XmlAttribute(name = "codebase")
-    protected String codebase;
+    private String codebase;
 
     @XmlAttribute(name = "data")
-    protected String data;
+    private String data;
 
     @XmlAttribute(name = "type")
-    protected String type;
+    private String type;
 
     @XmlAttribute(name = "codetype")
-    protected String codetype;
+    private String codetype;
 
     @XmlAttribute(name = "archive")
     @Setter(AccessLevel.NONE)
-    protected List<String> archive = new ArrayList<>();
+    private List<String> archive = new ArrayList<>();
 
     @XmlAttribute(name = "standby")
-    protected String standby;
+    private String standby;
 
     @XmlAttribute(name = "height")
-    protected String height;
+    private String height;
 
     @XmlAttribute(name = "width")
-    protected String width;
+    private String width;
 
     @XmlAttribute(name = "name")
-    protected String name;
+    private String name;
 
     @XmlAttribute(name = "tabindex")
-    protected BigInteger tabindex;
+    private BigInteger tabindex;
 
 }

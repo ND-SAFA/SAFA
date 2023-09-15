@@ -24,5 +24,5 @@ import lombok.Setter;
 @Setter
 public class AlternativeId {
     @XmlAttribute(name = "IDENTIFIER", required = true)
-    protected String identifier;
+    private String identifier;
 }

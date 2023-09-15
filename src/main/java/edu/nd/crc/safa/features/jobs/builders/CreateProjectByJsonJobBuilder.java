@@ -19,11 +19,11 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
     /**
      * The project requested to create.
      */
-    ProjectAppEntity projectAppEntity;
+    private ProjectAppEntity projectAppEntity;
     /**
      * Requests to generate trace links.
      */
-    TraceGenerationRequest traceGenerationRequest;
+    private TraceGenerationRequest traceGenerationRequest;
 
     public CreateProjectByJsonJobBuilder(ServiceProvider serviceProvider,
                                          ProjectAppEntity projectAppEntity,
@@ -40,9 +40,9 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
     protected AbstractJob constructJobForWork() {
         // Step - Create job
         return new CreateProjectViaJsonJob(
-            this.jobDbEntity,
+            this.getJobDbEntity(),
             this.projectAppEntity,
-            this.serviceProvider,
+            this.getServiceProvider(),
             this.traceGenerationRequest,
             this.projectOwner
         );

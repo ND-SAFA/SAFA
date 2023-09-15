@@ -62,7 +62,7 @@ public class GithubController extends BaseController {
             checkCredentials(user);
             GithubIdentifier identifier = new GithubIdentifier(null, owner, repositoryName);
             CreateProjectViaGithubBuilder builder
-                = new CreateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);
+                = new CreateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
 
             try {
                 return builder.perform();
@@ -90,11 +90,11 @@ public class GithubController extends BaseController {
 
         return makeDeferredRequest(user -> {
             checkCredentials(user);
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+            ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                     .withPermission(ProjectPermission.EDIT, user).get();
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             UpdateProjectViaGithubBuilder builder
-                = new UpdateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);
+                = new UpdateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
 
             try {
                 return builder.perform();
@@ -122,11 +122,11 @@ public class GithubController extends BaseController {
 
         return makeDeferredRequest(user -> {
             checkCredentials(user);
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+            ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                     .withPermission(ProjectPermission.EDIT, user).get();
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             ImportIntoProjectViaGithubBuilder builder
-                = new ImportIntoProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);
+                = new ImportIntoProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
 
             try {
                 return builder.perform();

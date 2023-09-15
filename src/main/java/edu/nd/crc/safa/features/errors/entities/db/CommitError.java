@@ -35,25 +35,25 @@ public class CommitError implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "id")
-    UUID id;
+    private UUID id;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "version_id", nullable = false)
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
 
     @Column(name = "activity")
     @Enumerated(EnumType.ORDINAL)
-    ProjectEntity applicationActivity;
+    private ProjectEntity applicationActivity;
 
     @Column(name = "file_name")
-    String fileName;
+    private String fileName;
 
     @Column(name = "line_number")
-    Long lineNumber;
+    private Long lineNumber;
 
     @Column(name = "description", length = 500)
-    String description;
+    private String description;
 
     public CommitError(ProjectVersion projectVersion,
                        String description,

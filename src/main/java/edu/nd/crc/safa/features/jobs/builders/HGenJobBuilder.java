@@ -14,17 +14,16 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
  * Creates a job for generating trace links.
  */
 public class HGenJobBuilder extends AbstractJobBuilder {
-    ProjectVersion projectVersion;
-    HGenRequest request;
+    private ProjectVersion projectVersion;
+    private HGenRequest request;
 
     public HGenJobBuilder(ServiceProvider serviceProvider,
                           ProjectVersion projectVersion,
                           HGenRequest request,
                           SafaUser user) {
-        super(serviceProvider);
+        super(serviceProvider, user);
         this.projectVersion = projectVersion;
         this.request = request;
-        this.user = user;
     }
 
     @Override

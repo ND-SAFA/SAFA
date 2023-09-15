@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Scope("singleton")
 public class TraceGenerationService {
     private static final String DELIMITER = "*";
-    ITraceGenerationController traceGenerationController;
+    private ITraceGenerationController traceGenerationController;
 
     /**
      * Retrieves artifacts associated with the source and target types defined in the tracing request.

@@ -16,13 +16,13 @@ public class JiraIdentifier {
     /**
      * The project version identified by this JIRA project.
      */
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
     /**
      * The JIRA id of the project.
      */
-    Long jiraProjectId;
+    private Long jiraProjectId;
     /**
      * The JIRA resource ID.
      */
-    UUID orgId;
+    private UUID orgId;
 }

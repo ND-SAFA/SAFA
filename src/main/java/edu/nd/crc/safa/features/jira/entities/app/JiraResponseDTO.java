@@ -10,9 +10,9 @@ import lombok.Getter;
 @Getter
 public class JiraResponseDTO<T> {
 
-    T payload;
+    private T payload;
 
-    JiraResponseMessage message;
+    private JiraResponseMessage message;
 
     @AllArgsConstructor
     public enum JiraResponseMessage {

@@ -15,6 +15,6 @@ public class TGenTraceGenerationResponse implements ITGenResponse {
     /**
      * List of links with their predicted similarity score.
      */
-    List<GenerationLink> predictions;
-    List<String> logs;
+    private List<GenerationLink> predictions;
+    private List<String> logs;
 }

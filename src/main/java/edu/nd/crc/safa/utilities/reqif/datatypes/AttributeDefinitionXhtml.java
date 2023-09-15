@@ -28,10 +28,10 @@ import lombok.Setter;
 public class AttributeDefinitionXhtml extends AttributeDefinition {
 
     @XmlElement(name = "DEFAULT-VALUE")
-    protected DefaultValue defaultValue;
+    private DefaultValue defaultValue;
 
     @XmlElement(name = "TYPE", required = true)
-    protected Type type;
+    private Type type;
 
     /**
      * Java class for anonymous complex type.
@@ -44,7 +44,7 @@ public class AttributeDefinitionXhtml extends AttributeDefinition {
     @Setter
     public static class DefaultValue {
         @XmlElement(name = "ATTRIBUTE-VALUE-XHTML", namespace = "")
-        protected AttributeValueXhtml attributeValue;
+        private AttributeValueXhtml attributeValue;
     }
 
     /**
@@ -60,7 +60,7 @@ public class AttributeDefinitionXhtml extends AttributeDefinition {
         @XmlElement(name = "DATATYPE-DEFINITION-XHTML-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected DatatypeDefinitionXhtml datatypeDefinition;
+        private DatatypeDefinitionXhtml datatypeDefinition;
     }
 
 }

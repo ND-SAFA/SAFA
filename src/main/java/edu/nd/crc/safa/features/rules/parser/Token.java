@@ -1,12 +1,15 @@
 package edu.nd.crc.safa.features.rules.parser;
 
+import lombok.Getter;
+
 /**
  * A word in a rule definition. Serves as the base entity defines in rule definitions.
  */
+@Getter
 public class Token {
 
-    public final TokenType tokenType;
-    public final String value;
+    private final TokenType tokenType;
+    private final String value;
 
     public Token(TokenType tokenType, String value) {
         this.tokenType = tokenType;

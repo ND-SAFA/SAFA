@@ -43,33 +43,33 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
 
     @Override
     protected GithubProject getGithubProjectMapping(Project project) {
-        GithubProjectRepository repository = this.serviceProvider.getGithubProjectRepository();
+        GithubProjectRepository repository = this.getServiceProvider().getGithubProjectRepository();
 
-        this.githubProject = repository.findByProjectAndOwnerAndRepositoryName(
+        this.setGithubProject(repository.findByProjectAndOwnerAndRepositoryName(
             project,
-            this.githubIdentifier.getRepositoryOwner(),
-            this.githubIdentifier.getRepositoryName()
-        ).orElseThrow(() -> new SafaError("Linked project not found"));
+            this.getGithubIdentifier().getRepositoryOwner(),
+            this.getGithubIdentifier().getRepositoryName()
+        ).orElseThrow(() -> new SafaError("Linked project not found")));
 
-        applyImportSettings(project, this.githubProject);
+        applyImportSettings(project, this.getGithubProject());
 
-        return this.githubProject;
+        return this.getGithubProject();
     }
 
     @Override
     protected String getDefaultTypeName() {
-        return this.githubProject.getArtifactType().getName();
+        return this.getGithubProject().getArtifactType().getName();
     }
 
     @Override
     protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
+        GithubConnectionService connectionService = getServiceProvider().getGithubConnectionService();
         GithubCommitDiffResponseDTO diffResponseDTO = connectionService.getDiffBetweenOldCommitAndHead(
-            credentials,
-            githubProject.getRepositoryName(),
-            githubProject.getLastCommitSha(),
-            githubProject.getBranch()
+            getCredentials(),
+            getGithubProject().getRepositoryName(),
+            getGithubProject().getLastCommitSha(),
+            getGithubProject().getBranch()
         );
 
         log.info("Retrieving diff");

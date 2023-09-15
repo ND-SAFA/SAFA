@@ -16,41 +16,41 @@ public class RuleAppEntity {
     /**
      * UUID uniquely identifying rule.
      */
-    String id;
+    private String id;
     /**
      * The name of the rule.
      */
-    String name;
+    private String name;
     /**
      * Description of what the rule is doing.
      */
-    String description;
+    private String description;
     /**
      * The condition which to match the source
      * and target types.
      */
-    RuleCondition condition;
+    private RuleCondition condition;
     /**
      * The number expected for the condition to be true.
      */
-    int value = 1;
+    private int value = 1;
     /**
      * The source artifact type to apply the condition to.
      */
-    String sourceType;
+    private String sourceType;
     /**
      * How the source and target types should be related.
      */
-    RuleRelation relation;
+    private RuleRelation relation;
     /**
      * The target artifact type being applied in condition.
      */
-    String targetType;
+    private String targetType;
     /**
      * The list of sub-rules joined by condition
      * (e.g. AND or OR)
      */
-    List<RuleAppEntity> subRules;
+    private List<RuleAppEntity> subRules;
 
     public String toString() {
         if (!subRules.isEmpty()) {

@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.google.errorprone.annotations.ForOverride;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -58,21 +59,23 @@ public abstract class AbstractJob implements Job {
      * The job identifying information that is being performed.
      */
     private static final Logger log = LoggerFactory.getLogger(AbstractJob.class);
-    protected JobDbEntity jobDbEntity;
+    @Getter(AccessLevel.PROTECTED)
+    private JobDbEntity jobDbEntity;
     /**
      * Service used to send job updates.
      */
-    protected ServiceProvider serviceProvider;
-    protected JobService jobService;
-    protected NotificationService notificationService;
+    @Getter(AccessLevel.PROTECTED)
+    private ServiceProvider serviceProvider;
+    private JobService jobService;
+    private NotificationService notificationService;
     /**
      * List of step indices to skip.
      */
-    List<Integer> skipSteps = new ArrayList<>();
+    private List<Integer> skipSteps = new ArrayList<>();
     /**
      * The authentication to execute job with.
      */
-    Authentication authentication;
+    private Authentication authentication;
     private JobLogger dbLogger;
 
     protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {

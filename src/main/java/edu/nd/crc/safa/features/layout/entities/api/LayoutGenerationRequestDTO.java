@@ -14,9 +14,9 @@ public class LayoutGenerationRequestDTO {
     /**
      * The id of the document to create.
      */
-    boolean defaultDocument = true;
+    private boolean defaultDocument = true;
     /**
      * Ids of document whose layouts are regenerated.
      */
-    List<UUID> documentIds = new ArrayList<>();
+    private List<UUID> documentIds = new ArrayList<>();
 }

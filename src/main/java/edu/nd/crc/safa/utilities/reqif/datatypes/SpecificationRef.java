@@ -23,5 +23,5 @@ public class SpecificationRef {
     @XmlElement(name = "SPECIFICATION-REF", namespace = "")
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
-    protected Specification specification;
+    private Specification specification;
 }

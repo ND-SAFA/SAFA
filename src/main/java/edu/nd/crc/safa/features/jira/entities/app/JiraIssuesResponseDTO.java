@@ -11,5 +11,5 @@ import lombok.Data;
 @Data
 public class JiraIssuesResponseDTO {
 
-    List<JiraIssueDTO> issues;
+    private List<JiraIssueDTO> issues;
 }

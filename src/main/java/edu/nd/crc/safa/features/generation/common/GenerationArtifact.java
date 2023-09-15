@@ -22,20 +22,20 @@ public class GenerationArtifact {
      * The identifier of the artifact.
      */
     @Nullable
-    String id;
+    private String id;
     /**
      * The content to summarize.
      */
-    String content;
+    private String content;
     /**
      * The artifact summary.
      */
-    String summary;
+    private String summary;
     /**
      * The layer this artifact belongs to
      */
     @JsonProperty("layer_id")
-    String layerId;
+    private String layerId;
 
     public GenerationArtifact(ArtifactAppEntity artifact) {
         this.id = artifact.getName();

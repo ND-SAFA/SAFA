@@ -26,5 +26,5 @@ import lombok.Getter;
 @Getter
 public class ReqIfToolExtension {
     @XmlAnyElement(lax = true)
-    protected List<Object> extensions = new ArrayList<>();
+    private List<Object> extensions = new ArrayList<>();
 }

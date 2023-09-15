@@ -46,17 +46,17 @@ public class RuleController extends BaseController {
      */
     @GetMapping(AppRoutes.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
     public Map<UUID, List<RuleName>> getWarningsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
-        return this.serviceProvider.getWarningService().retrieveWarningsInProjectVersion(projectVersion);
+        return getServiceProvider().getWarningService().retrieveWarningsInProjectVersion(projectVersion);
     }
 
     @PostMapping(AppRoutes.Rules.CREATE_WARNING_IN_PROJECT)
     public RuleAppEntity createWarningInProject(@PathVariable UUID projectId,
                                                 @RequestBody RuleAppEntity ruleAppEntity) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.EDIT, user).get();
 
         // Step - Parse rule
@@ -68,7 +68,7 @@ public class RuleController extends BaseController {
 
         // Step - Create and save persistent rule
         Rule rule = new Rule(project, ruleAppEntity);
-        this.serviceProvider.getRuleRepository().save(rule);
+        getServiceProvider().getRuleRepository().save(rule);
         ruleAppEntity.setId(rule.getId().toString());
 
         return ruleAppEntity;

@@ -31,26 +31,26 @@ import lombok.Setter;
 public class EnumValue {
 
     @XmlElement(name = "ALTERNATIVE-ID")
-    protected AlternativeIdWrapper alternativeId;
+    private AlternativeIdWrapper alternativeId;
 
     @XmlElement(name = "PROPERTIES", required = true)
-    protected Properties properties;
+    private Properties properties;
 
     @XmlAttribute(name = "DESC")
-    protected String desc;
+    private String desc;
 
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String identifier;
+    private String identifier;
 
     @XmlAttribute(name = "LAST-CHANGE", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar lastChange;
+    private XMLGregorianCalendar lastChange;
 
     @XmlAttribute(name = "LONG-NAME")
-    protected String longName;
+    private String longName;
 
     /**
      * Java class for anonymous complex type.
@@ -63,7 +63,7 @@ public class EnumValue {
     @Setter
     public static class Properties {
         @XmlElement(name = "EMBEDDED-VALUE", namespace = "")
-        protected EmbeddedValue embeddedValue;
+        private EmbeddedValue embeddedValue;
     }
 
 }

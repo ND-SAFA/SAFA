@@ -17,9 +17,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProjectParsingErrors {
-    List<ErrorApplicationEntity> tim;
-    List<ErrorApplicationEntity> artifacts;
-    List<ErrorApplicationEntity> traces;
+    private List<ErrorApplicationEntity> tim;
+    private List<ErrorApplicationEntity> artifacts;
+    private List<ErrorApplicationEntity> traces;
 
     public ProjectParsingErrors() {
         this.tim = new ArrayList<>();

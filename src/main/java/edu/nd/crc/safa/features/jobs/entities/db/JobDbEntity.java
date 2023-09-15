@@ -43,13 +43,13 @@ public class JobDbEntity {
     @JsonIgnore
     @NotNull
     @Column(name = "job_type", nullable = false)
-    protected Class<? extends AbstractJob> jobType;
+    private Class<? extends AbstractJob> jobType;
     /**
      * The name of the job used for as a human readable description / id.
      */
     @Lob
     @Column(name = "name", nullable = false, columnDefinition = "mediumtext")
-    String name;
+    private String name;
     /**
      * The unique identifier for job.
      */
@@ -58,44 +58,44 @@ public class JobDbEntity {
     @Type(type = "uuid-char")
     @Column(name = "id")
     @NotNull
-    UUID id;
+    private UUID id;
     /**
      * The status of the job.
      */
     @NotNull
     @Column(name = "status", nullable = false)
-    JobStatus status;
+    private JobStatus status;
     /**
      * The datetime that a job was started at.
      */
     @NotNull
     @Column(name = "started_at", nullable = false)
-    Timestamp startedAt;
+    private Timestamp startedAt;
     /**
      * The datetime that the last update was received.
      */
     @NotNull
     @Column(name = "last_updated_at", nullable = false)
     @UpdateTimestamp
-    Timestamp lastUpdatedAt;
+    private Timestamp lastUpdatedAt;
     /**
      * The datetime that the job was completed at, null otherwise.
      */
     @Nullable
     @Column(name = "completed_at")
-    Timestamp completedAt;
+    private Timestamp completedAt;
     /**
      * The current integer percentage of the job that has been completed.
      */
     @NotNull
     @Column(name = "current_progress", nullable = false)
-    int currentProgress;
+    private int currentProgress;
     /**
      * The current step the job is on.
      */
     @NotNull
     @Column(name = "current_step", nullable = false)
-    int currentStep;
+    private int currentStep;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -103,17 +103,17 @@ public class JobDbEntity {
     @JoinColumn(
         name = "user_id",
         nullable = false)
-    SafaUser user;
+    private SafaUser user;
 
     /**
      * The id of the entity that been created or modified with this job.
      */
     @Column(name = "completed_entity_id")
     @Type(type = "uuid-char")
-    UUID completedEntityId;
+    private UUID completedEntityId;
 
     @Column(name = "task_id", nullable = true)
-    UUID taskId;
+    private UUID taskId;
 
     public JobDbEntity(SafaUser user,
                        String name,

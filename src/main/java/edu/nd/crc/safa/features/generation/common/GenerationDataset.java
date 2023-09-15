@@ -22,25 +22,25 @@ public class GenerationDataset {
     /**
      * Map of artifact type to artifact maps.
      */
-    List<GenerationArtifact> artifacts; // snake_case to match TGEN
+    private List<GenerationArtifact> artifacts; // snake_case to match TGEN
     /**
      * List of layers being traced (child -> parent).
      */
     @JsonProperty()
-    List<TraceLayer> layers;
+    private List<TraceLayer> layers;
     /**
      * The trace links between artifacts in all artifact layers.
      */
     @Nullable
-    List<GenerationLink> links;
+    private List<GenerationLink> links;
     /**
      * Optional. Project summary.
      */
     @Nullable
-    String summary;
+    private String summary;
 
     @JsonIgnore
-    Map<String, List<String>> layerIds = new HashMap<>();
+    private Map<String, List<String>> layerIds = new HashMap<>();
 
     public GenerationDataset(List<GenerationArtifact> artifacts, List<TraceLayer> layers) {
         this.artifacts = artifacts;

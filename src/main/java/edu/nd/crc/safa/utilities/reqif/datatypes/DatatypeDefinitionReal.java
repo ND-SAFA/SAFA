@@ -26,11 +26,11 @@ import lombok.Setter;
 public class DatatypeDefinitionReal extends DatatypeDefinition {
 
     @XmlAttribute(name = "ACCURACY", required = true)
-    protected BigInteger accuracy;
+    private BigInteger accuracy;
 
     @XmlAttribute(name = "MAX", required = true)
-    protected double max;
+    private double max;
 
     @XmlAttribute(name = "MIN", required = true)
-    protected double min;
+    private double min;
 }

@@ -86,7 +86,7 @@ public class JobController extends BaseController {
             UUID taskId = jobDbEntity.getTaskId();
             this.genApi.cancelJob(taskId);
         }
-        this.serviceProvider.getNotificationService().broadcastChange(
+        getServiceProvider().getNotificationService().broadcastChange(
             EntityChangeBuilder
                 .create(jobId)
                 .withJobDelete(jobId)
@@ -112,7 +112,7 @@ public class JobController extends BaseController {
 
         UpdateProjectByFlatFileJobBuilder jobBuilder =
             new UpdateProjectByFlatFileJobBuilder(
-                serviceProvider,
+                getServiceProvider(),
                 versionId,
                 files.orElseGet(this::defaultFileListSupplier),
                 summarize);
@@ -141,7 +141,7 @@ public class JobController extends BaseController {
 
         CreateProjectByFlatFileJobBuilder jobBuilder =
             new CreateProjectByFlatFileJobBuilder(
-                serviceProvider,
+                getServiceProvider(),
                 files.orElseGet(this::defaultFileListSupplier),
                 safaUserService.getCurrentUser(),
                 name,
@@ -163,7 +163,7 @@ public class JobController extends BaseController {
         // Step - Create and start job.
         SafaUser requester = safaUserService.getCurrentUser();
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
-            serviceProvider, payload.getProject(), payload.getRequests(), requester);
+            getServiceProvider(), payload.getProject(), payload.getRequests(), requester);
         return createProjectByJsonJobBuilder.perform();
     }
 
@@ -179,12 +179,12 @@ public class JobController extends BaseController {
         // Step - Check permissions and retrieve persistent properties
         UUID versionId = request.getProjectVersion().getVersionId();
         SafaUser user = safaUserService.getCurrentUser();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.EDIT, user).get();
         request.setProjectVersion(projectVersion);
 
         // Step - Create and start job.
-        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request, user);
+        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(getServiceProvider(), request, user);
         return jobBuilder.perform();
     }
 

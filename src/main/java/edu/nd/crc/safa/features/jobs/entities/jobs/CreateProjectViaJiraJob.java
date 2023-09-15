@@ -24,6 +24,8 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -37,25 +39,28 @@ public class CreateProjectViaJiraJob extends CommitJob {
     /**
      * The project version to upload entities to.
      */
-    protected JiraIdentifier jiraIdentifier;
+    @Getter(AccessLevel.PROTECTED)
+    private JiraIdentifier jiraIdentifier;
     /**
      * The credentials used to access the project.
      */
-    protected JiraAccessCredentials credentials;
+    @Getter(AccessLevel.PROTECTED)
+    private JiraAccessCredentials credentials;
     /**
      * List of issues in project;
      */
     @Setter
-    protected List<JiraIssueDTO> issues;
+    private List<JiraIssueDTO> issues;
     /**
      * JIRA's response for downloading project
      */
     @Setter
-    protected JiraProjectResponseDTO jiraProjectResponse;
+    private JiraProjectResponseDTO jiraProjectResponse;
     /**
      * The jira project created.
      */
-    JiraProject jiraProject;
+    @Getter(AccessLevel.PROTECTED)
+    private JiraProject jiraProject;
 
     private final SafaUser user;
 
@@ -80,7 +85,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
     @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
         // Step - Get services needed
-        JiraAccessCredentialsRepository jiraAccessCredentialsRepository = this.serviceProvider
+        JiraAccessCredentialsRepository jiraAccessCredentialsRepository = this.getServiceProvider()
             .getJiraAccessCredentialsRepository();
 
         this.credentials = jiraAccessCredentialsRepository
@@ -91,7 +96,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
     @IJobStep(value = "Retrieving Jira Project", position = 2)
     public void retrieveJiraProject(JobLogger logger) {
         // Step - Get required services
-        JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
+        JiraConnectionService jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
 
         // Step - Retrieve project information including issues
         Long jiraProjectId = this.jiraIdentifier.getJiraProjectId();
@@ -116,7 +121,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());
 
         // Step - Update job name
-        this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
+        this.getServiceProvider().getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
     }
 
     @IJobStep(value = "Creating SAFA Project to Jira Project Mapping", position = 4)
@@ -136,7 +141,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
     protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId) {
         JiraProject jiraProject = new JiraProject(project, orgId, jiraProjectId);
 
-        return this.serviceProvider.getJiraProjectRepository().save(jiraProject);
+        return this.getServiceProvider().getJiraProjectRepository().save(jiraProject);
     }
 
     @IJobStep(value = "Importing Issues and Links", position = 5)
@@ -146,11 +151,11 @@ public class CreateProjectViaJiraJob extends CommitJob {
         getProjectCommitDefinition().addTraces(ModificationType.ADDED, projectEntities.getTraces());
 
         jiraProject.setLastUpdate(new Date());
-        this.serviceProvider.getJiraProjectRepository().save(jiraProject);
+        this.getServiceProvider().getJiraProjectRepository().save(jiraProject);
     }
 
     protected ProjectEntities retrieveJiraEntities() {
-        return this.serviceProvider
+        return this.getServiceProvider()
             .getJiraParsingService()
             .parseProjectEntitiesFromIssues(this.issues);
     }

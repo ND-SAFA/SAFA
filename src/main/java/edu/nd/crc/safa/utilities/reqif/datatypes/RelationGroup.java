@@ -38,35 +38,35 @@ import lombok.Setter;
 public class RelationGroup {
 
     @XmlElement(name = "ALTERNATIVE-ID")
-    protected AlternativeIdWrapper alternativeId;
+    private AlternativeIdWrapper alternativeId;
 
     @XmlElement(name = "SOURCE-SPECIFICATION", required = true)
-    protected SpecificationRef sourceSpecification;
+    private SpecificationRef sourceSpecification;
 
     @XmlElement(name = "SPEC-RELATIONS")
-    protected SpecRelations specRelations;
+    private SpecRelations specRelations;
 
     @XmlElement(name = "TARGET-SPECIFICATION", required = true)
-    protected SpecificationRef targetSpecification;
+    private SpecificationRef targetSpecification;
 
     @XmlElement(name = "TYPE", required = true)
-    protected Type type;
+    private Type type;
 
     @XmlAttribute(name = "DESC")
-    protected String desc;
+    private String desc;
 
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String identifier;
+    private String identifier;
 
     @XmlAttribute(name = "LAST-CHANGE", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar lastChange;
+    private XMLGregorianCalendar lastChange;
 
     @XmlAttribute(name = "LONG-NAME")
-    protected String longName;
+    private String longName;
 
     /**
      * Java class for anonymous complex type.
@@ -78,7 +78,7 @@ public class RelationGroup {
     @Getter
     public static class SpecRelations {
         @XmlElementRef(type = SpecRelationRef.class, required = false)
-        protected List<SpecRelationRef> specRelations = new ArrayList<>();
+        private List<SpecRelationRef> specRelations = new ArrayList<>();
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -89,7 +89,7 @@ public class RelationGroup {
         @XmlValue
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected SpecRelation specRelation;
+        private SpecRelation specRelation;
     }
 
     /**
@@ -105,7 +105,7 @@ public class RelationGroup {
         @XmlElement(name = "RELATION-GROUP-TYPE-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected RelationGroupType type;
+        private RelationGroupType type;
     }
 
 }

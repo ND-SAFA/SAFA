@@ -25,5 +25,5 @@ import lombok.Setter;
 @Setter
 public class DatatypeDefinitionString extends DatatypeDefinition {
     @XmlAttribute(name = "MAX-LENGTH", required = true)
-    protected BigInteger maxLength;
+    private BigInteger maxLength;
 }

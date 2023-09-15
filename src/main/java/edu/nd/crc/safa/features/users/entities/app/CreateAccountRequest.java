@@ -11,5 +11,5 @@ public class CreateAccountRequest extends UserIdentifierDTO {
     /**
      * User password to create account with.
      */
-    String password;
+    private String password;
 }

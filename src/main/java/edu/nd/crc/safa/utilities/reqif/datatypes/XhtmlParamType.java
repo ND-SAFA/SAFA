@@ -29,16 +29,16 @@ import lombok.Setter;
 public class XhtmlParamType extends XhtmlBasicType {
 
     @XmlAttribute(name = "name", required = true)
-    protected String name;
+    private String name;
 
     @XmlAttribute(name = "value")
-    protected String value;
+    private String value;
 
     @XmlAttribute(name = "valuetype")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String valuetype = "data";
+    private String valuetype = "data";
 
     @XmlAttribute(name = "type")
-    protected String type;
+    private String type;
 
 }

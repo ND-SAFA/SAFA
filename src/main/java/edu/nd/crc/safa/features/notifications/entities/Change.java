@@ -20,15 +20,15 @@ public class Change {
     /**
      * The entity that was changed.
      */
-    Entity entity;
+    private Entity entity;
     /**
      * The type of change applied to entity.
      */
-    Action action;
+    private Action action;
     /**
      * ID of entity changed.
      */
-    List<UUID> entityIds = new ArrayList<>();
+    private List<UUID> entityIds = new ArrayList<>();
 
     public List<UUID> getEntityIds() {
         return this.entityIds.stream().collect(Collectors.toList());

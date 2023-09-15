@@ -16,16 +16,16 @@ public class EntityChangeMessage {
     /**
      * The user initiating the change.
      */
-    String user;
+    private String user;
     /**
      * The change that should be resolved by client.
      */
-    List<Change> changes = new ArrayList<>();
+    private List<Change> changes = new ArrayList<>();
     /**
      * Whether the changes included in the message invalidate
      * the default document layout.
      */
-    boolean updateLayout = false;
+    private boolean updateLayout = false;
 
     @JsonIgnore
     public Change getChangeForEntity(Change.Entity entity) {

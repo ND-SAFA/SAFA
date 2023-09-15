@@ -31,13 +31,13 @@ public class SafetyCaseArtifact implements IArtifact {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "safety_case_artifact_id")
-    UUID safetyCaseArtifactId;
+    private UUID safetyCaseArtifactId;
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false, unique = true)
-    Artifact artifact;
+    private Artifact artifact;
     @Column(name = "safety_case_type")
-    SafetyCaseType safetyCaseType;
+    private SafetyCaseType safetyCaseType;
 
     public SafetyCaseArtifact(Artifact artifact, SafetyCaseType safetyCaseType) {
         this.artifact = artifact;

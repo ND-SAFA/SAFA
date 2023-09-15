@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AccountLookupService implements UserDetailsService {
 
-    protected final SafaUserRepository safaUserRepository;
+    private final SafaUserRepository safaUserRepository;
 
     /**
      * The implementation for UserDetailService that bridges Spring's default authentication and our

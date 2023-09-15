@@ -19,7 +19,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Job to update an already imported JIRA project
  */
 public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
-    JiraConnectionService jiraConnectionService;
+    private JiraConnectionService jiraConnectionService;
 
     public JiraProjectUpdateJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
@@ -34,12 +34,12 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
     @Override
     public ProjectEntities retrieveJiraEntities() {
         JiraIssuesResponseDTO dto = jiraConnectionService.retrieveUpdatedJIRAIssues(
-            credentials,
-            jiraIdentifier.getOrgId(),
-            this.jiraIdentifier.getJiraProjectId(),
-            jiraProject.getLastUpdate());
+            getCredentials(),
+            getJiraIdentifier().getOrgId(),
+            this.getJiraIdentifier().getJiraProjectId(),
+            getJiraProject().getLastUpdate());
 
-        return this.serviceProvider
+        return this.getServiceProvider()
             .getJiraParsingService()
             .parseProjectEntitiesFromIssues(dto.getIssues());
     }

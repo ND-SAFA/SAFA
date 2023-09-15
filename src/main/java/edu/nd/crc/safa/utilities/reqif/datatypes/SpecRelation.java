@@ -32,35 +32,35 @@ import lombok.Setter;
 public class SpecRelation {
 
     @XmlElement(name = "ALTERNATIVE-ID")
-    protected AlternativeIdWrapper alternativeId;
+    private AlternativeIdWrapper alternativeId;
 
     @XmlElement(name = "VALUES")
-    protected Values values;
+    private Values values;
 
     @XmlElement(name = "SOURCE", required = true)
-    protected SpecObjectRef source;
+    private SpecObjectRef source;
 
     @XmlElement(name = "TARGET", required = true)
-    protected SpecObjectRef target;
+    private SpecObjectRef target;
 
     @XmlElement(name = "TYPE", required = true)
-    protected Type type;
+    private Type type;
 
     @XmlAttribute(name = "DESC")
-    protected String desc;
+    private String desc;
 
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String identifier;
+    private String identifier;
 
     @XmlAttribute(name = "LAST-CHANGE", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar lastChange;
+    private XMLGregorianCalendar lastChange;
 
     @XmlAttribute(name = "LONG-NAME")
-    protected String longName;
+    private String longName;
 
     /**
      * Java class for anonymous complex type.
@@ -75,7 +75,7 @@ public class SpecRelation {
         @XmlElement(name = "SPEC-RELATION-TYPE-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected SpecRelationType specRelationType;
+        private SpecRelationType specRelationType;
     }
 
 }

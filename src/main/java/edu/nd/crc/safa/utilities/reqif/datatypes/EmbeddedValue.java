@@ -26,8 +26,8 @@ import lombok.Setter;
 public class EmbeddedValue {
 
     @XmlAttribute(name = "KEY", required = true)
-    protected BigInteger key;
+    private BigInteger key;
 
     @XmlAttribute(name = "OTHER-CONTENT", required = true)
-    protected String otherContent;
+    private String otherContent;
 }

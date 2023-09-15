@@ -20,12 +20,12 @@ public class GenArtifactSummaryRequest {
      * The artifacts to summarize.
      */
     @NotEmpty
-    List<@NotNull GenerationArtifact> artifacts;
+    private List<@NotNull GenerationArtifact> artifacts;
     /**
      * The project summary.
      */
     @Nullable
-    String projectSummary = null;
+    private String projectSummary = null;
 
     public GenArtifactSummaryRequest(List<GenerationArtifact> artifacts) {
         this.artifacts = artifacts;

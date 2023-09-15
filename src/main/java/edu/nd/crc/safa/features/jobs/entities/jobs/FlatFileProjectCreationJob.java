@@ -166,7 +166,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     private List<CommitError> createErrors(List<String> errorMessages,
                                            ProjectEntity projectEntity) {
-        CommitErrorRepository commitErrorRepository = this.serviceProvider.getCommitErrorRepository();
+        CommitErrorRepository commitErrorRepository = this.getServiceProvider().getCommitErrorRepository();
         return
             errorMessages
                 .stream()

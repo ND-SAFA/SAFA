@@ -28,9 +28,9 @@ import lombok.Setter;
 public class XhtmlContent {
 
     @XmlElement(namespace = "")
-    protected XhtmlPType p;
+    private XhtmlPType p;
 
     @XmlElement(namespace = "")
-    protected XhtmlDivType div;
+    private XhtmlDivType div;
 
 }

@@ -13,9 +13,9 @@ public class ProjectSummaryResponse implements ITGenResponse {
     /**
      * The project summary / specification.
      */
-    String summary;
+    private String summary;
     /**
      * The logs associated with job.
      */
-    List<String> logs;
+    private List<String> logs;
 }

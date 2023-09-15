@@ -13,7 +13,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Creates a job for generating trace links.
  */
 public class GenerateLinksJobBuilder extends AbstractJobBuilder {
-    TraceGenerationRequest request;
+    private TraceGenerationRequest request;
     private final SafaUser user;
 
     public GenerateLinksJobBuilder(ServiceProvider serviceProvider,

@@ -40,45 +40,45 @@ import lombok.Setter;
 @Setter
 public class XhtmlTableType extends XhtmlBasicStyleableType {
 
-    protected XhtmlCaptionType caption;
+    private XhtmlCaptionType caption;
 
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlColType> col = new ArrayList<>();
+    private List<XhtmlColType> col = new ArrayList<>();
 
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlColgroupType> colgroup = new ArrayList<>();
+    private List<XhtmlColgroupType> colgroup = new ArrayList<>();
 
-    protected XhtmlTheadType thead;
+    private XhtmlTheadType thead;
 
-    protected XhtmlTfootType tfoot;
-
-    @Setter(AccessLevel.NONE)
-    protected List<XhtmlTbodyType> tbody = new ArrayList<>();
+    private XhtmlTfootType tfoot;
 
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlTrType> tr = new ArrayList<>();
+    private List<XhtmlTbodyType> tbody = new ArrayList<>();
+
+    @Setter(AccessLevel.NONE)
+    private List<XhtmlTrType> tr = new ArrayList<>();
 
     @XmlAttribute(name = "summary")
-    protected String summary;
+    private String summary;
 
     @XmlAttribute(name = "width")
-    protected String width;
+    private String width;
 
     @XmlAttribute(name = "border")
-    protected BigInteger border;
+    private BigInteger border;
 
     @XmlAttribute(name = "cellspacing")
-    protected String cellspacing;
+    private String cellspacing;
 
     @XmlAttribute(name = "cellpadding")
-    protected String cellpadding;
+    private String cellpadding;
 
     @XmlAttribute(name = "frame")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String frame;
+    private String frame;
 
     @XmlAttribute(name = "rules")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String rules;
+    private String rules;
 
 }

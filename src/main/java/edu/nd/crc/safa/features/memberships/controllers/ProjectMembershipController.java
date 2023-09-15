@@ -62,16 +62,16 @@ public class ProjectMembershipController extends BaseController {
                                                                @RequestBody ProjectMembershipRequest request)
         throws SafaError {
 
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        SafaUser userToUpdate = serviceProvider.getSafaUserService().getUserByEmail(request.getMemberEmail());
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        SafaUser userToUpdate = getServiceProvider().getSafaUserService().getUserByEmail(request.getMemberEmail());
 
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.SHARE, user).get();
 
         UserProjectMembership updatedProjectMembership =
                 projectMembershipService.addUserRole(userToUpdate, project, request.getProjectRole());
 
-        this.serviceProvider
+        getServiceProvider()
             .getNotificationService()
             .broadcastChange(EntityChangeBuilder
                 .create(projectId)
@@ -87,8 +87,8 @@ public class ProjectMembershipController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
     public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         return projectMembershipService
             .getAllProjectMembers(project)
@@ -106,23 +106,23 @@ public class ProjectMembershipController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.Membership.DELETE_PROJECT_MEMBERSHIP)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
-        MemberService memberService = serviceProvider.getMemberService();
+        MemberService memberService = getServiceProvider().getMemberService();
 
         UserProjectMembership projectMembership = memberService.getMembershipById(projectMembershipId);
 
         // Step - Verify user has sufficient permissions
         // You can always remove yourself, and you can remove others if you have admin permissions
         Project project = projectMembership.getProject();
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         if (!projectMembership.getMember().equals(user)) {
             permissionService.requirePermission(ProjectPermission.SHARE, project, user);
         }
 
         // Step - Delete membership
-        this.serviceProvider.getUserProjectMembershipRepository().delete(projectMembership);
+        getServiceProvider().getUserProjectMembershipRepository().delete(projectMembership);
 
         // Step - Broadcast change
-        this.serviceProvider
+        getServiceProvider()
             .getNotificationService()
             .broadcastChange(
                 EntityChangeBuilder

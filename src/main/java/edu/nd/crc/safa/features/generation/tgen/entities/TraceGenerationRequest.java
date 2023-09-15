@@ -20,12 +20,12 @@ public class TraceGenerationRequest {
      * The artifact levels being traced against.
      */
     @NotEmpty
-    List<TracingRequest> requests = new ArrayList<>();
+    private List<TracingRequest> requests = new ArrayList<>();
 
     /**
      * The project version to commit them too.
      */
-    ProjectVersion projectVersion = new ProjectVersion();
+    private ProjectVersion projectVersion = new ProjectVersion();
 
     @JsonIgnore
     public int size() {

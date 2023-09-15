@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Service
 public class RequestService {
-    protected final ObjectMapper objectMapper = ObjectMapperConfig.create();
+    private final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private final WebClient webClient;
     private final int DEFAULT_TIMEOUT = 60 * 60; // 1 Hour
 
@@ -143,11 +143,11 @@ public class RequestService {
     @AllArgsConstructor
     @Data
     protected class RequestMeta<T> {
-        String endpoint;
-        HttpMethod httpMethod;
-        Map<String, Object> headers;
-        Object payload; // can be JavaType, TypeReference, or Class<T>
-        Object responseClass;
-        Duration timeout = Duration.of(DEFAULT_TIMEOUT, ChronoUnit.SECONDS);
+        private String endpoint;
+        private HttpMethod httpMethod;
+        private Map<String, Object> headers;
+        private Object payload; // can be JavaType, TypeReference, or Class<T>
+        private Object responseClass;
+        private Duration timeout = Duration.of(DEFAULT_TIMEOUT, ChronoUnit.SECONDS);
     }
 }

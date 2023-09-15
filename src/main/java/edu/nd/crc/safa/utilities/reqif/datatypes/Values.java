@@ -28,5 +28,5 @@ public class Values {
         @XmlElement(name = "ATTRIBUTE-VALUE-STRING", namespace = "", type = AttributeValueString.class),
         @XmlElement(name = "ATTRIBUTE-VALUE-XHTML", namespace = "", type = AttributeValueXhtml.class)
     })
-    protected List<AttributeValue> attributeValues = new ArrayList<>();
+    private List<AttributeValue> attributeValues = new ArrayList<>();
 }

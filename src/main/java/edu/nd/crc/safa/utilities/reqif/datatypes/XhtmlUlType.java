@@ -33,6 +33,6 @@ public class XhtmlUlType extends XhtmlBasicStyleableType {
 
     @XmlElement(required = true)
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlLiType> content = new ArrayList<>();
+    private List<XhtmlLiType> content = new ArrayList<>();
 
 }

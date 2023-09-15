@@ -37,6 +37,6 @@ public class XhtmlDlType extends XhtmlBasicStyleableType {
         @XmlElement(name = "dd", type = XhtmlDdType.class)
     })
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicStyleableType> content = new ArrayList<>();
+    private List<XhtmlBasicStyleableType> content = new ArrayList<>();
 
 }

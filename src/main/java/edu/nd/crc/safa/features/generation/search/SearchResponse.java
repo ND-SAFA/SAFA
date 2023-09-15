@@ -18,5 +18,5 @@ public class SearchResponse {
     /**
      * The matched artifact ids.
      */
-    List<UUID> artifactIds = new ArrayList<>();
+    private List<UUID> artifactIds = new ArrayList<>();
 }

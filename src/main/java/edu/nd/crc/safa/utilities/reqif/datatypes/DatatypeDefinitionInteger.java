@@ -26,9 +26,9 @@ import lombok.Setter;
 public class DatatypeDefinitionInteger extends DatatypeDefinition {
 
     @XmlAttribute(name = "MAX", required = true)
-    protected BigInteger max;
+    private BigInteger max;
 
     @XmlAttribute(name = "MIN", required = true)
-    protected BigInteger min;
+    private BigInteger min;
 
 }

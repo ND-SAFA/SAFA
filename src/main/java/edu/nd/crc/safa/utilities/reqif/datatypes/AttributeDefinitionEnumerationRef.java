@@ -18,5 +18,5 @@ public class AttributeDefinitionEnumerationRef extends AttributeDefinitionRef {
     @XmlValue
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
-    protected AttributeDefinitionEnumeration attributeDefinition;
+    private AttributeDefinitionEnumeration attributeDefinition;
 }

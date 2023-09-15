@@ -30,5 +30,5 @@ public class SpecObjectRef {
     @XmlElement(name = "SPEC-OBJECT-REF", namespace = "")
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
-    protected SpecObject specObject;
+    private SpecObject specObject;
 }

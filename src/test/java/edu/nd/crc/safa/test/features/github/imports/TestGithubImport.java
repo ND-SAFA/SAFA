@@ -30,13 +30,15 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
     protected String owner = "ND-SAFA";
 
     @BeforeEach
-    public void setup() throws IOException {
+    public void setup() {
         GithubAccessCredentials credentials = new GithubAccessCredentials();
         credentials.setUser(currentUser);
         String accessToken = "testAccessToken";
         credentials.setAccessToken(accessToken);
         serviceProvider.getGithubAccessCredentialsRepository().save(credentials);
+    }
 
+    private void enqueueDefaultResponses() throws IOException {
         enqueueResponse("repository_response.json");
         enqueueResponse("filetree_response.json");
         enqueueResponse("filetree_response_src.json");
@@ -45,6 +47,8 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
     @Test
     void intoNewProjectTest() throws Exception {
+        enqueueDefaultResponses();
+
         SafaRequest
             .withRoute(AppRoutes.Github.Import.BY_NAME)
             .withRepositoryName(repositoryName)
@@ -102,6 +106,8 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
     @Test
     void intoNewProjectWithImportSettingsTest() throws Exception {
+        enqueueDefaultResponses();
+
         String typeName = "test github artifact type";
         GithubImportDTO importSettings = new GithubImportDTO();
         importSettings.setInclude(List.of("**/*.cpp", "**/*.hpp"));
@@ -141,6 +147,8 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
     @Test
     void intoExistingProjectTest() throws Exception {
+        enqueueDefaultResponses();
+
         String projectName = "githubImport";
         int initialArtifactCount = 5;
 
@@ -189,6 +197,8 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
     @Test
     void intoExistingProjectWithImportSettingsTest() throws Exception {
+        enqueueDefaultResponses();
+
         String typeName = "test github artifact type";
         GithubImportDTO importSettings = new GithubImportDTO();
         importSettings.setInclude(List.of("**/*.cpp", "**/*.hpp"));
@@ -242,5 +252,32 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
             serviceProvider.getTraceLinkRepository().count());
 
         assertLayout(project, typeName);
+    }
+
+    @Test
+    public void testNoDefaultBranch() throws Exception {
+        enqueueResponse("repository_response_no_default_branch.json");
+        enqueueResponse("filetree_response.json");
+        enqueueResponse("filetree_response_src.json");
+        enqueueResponse("filetree_response_include.json");
+
+        SafaRequest
+                .withRoute(AppRoutes.Github.Import.BY_NAME)
+                .withRepositoryName(repositoryName)
+                .withOwner(owner)
+                .postWithJsonObject(new GithubImportDTO(), status().is2xxSuccessful());
+
+        // We should have one version created
+        Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
+
+        GithubProject githubProject = serviceProvider.getGithubProjectRepository().findAll().get(0);
+
+        List<ArtifactAppEntity> importedFiles =
+                serviceProvider.getArtifactService().getAppEntities(githubProject.getProject());
+
+        // We should have the corespondent project and user set
+        Assertions.assertNotNull(githubProject.getProject());
+        // We should have as many artifacts as the number of files produced by the mock service
+        Assertions.assertEquals(23, importedFiles.size());
     }
 }

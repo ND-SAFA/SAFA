@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.traces.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -8,10 +9,14 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,7 +48,8 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
             .stream()
             .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
-        return retrieveTracesContainingArtifacts(projectVersion, projectVersionArtifactIds, tracePredicate);
+        return getTracesRelatedToArtifacts(projectVersion, projectVersionArtifactIds)
+            .stream().filter(tracePredicate).collect(Collectors.toList());
     }
 
     /**
@@ -55,20 +61,10 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
      */
     public List<TraceAppEntity> retrieveActiveTraces(ProjectVersion projectVersion,
                                                      List<UUID> existingArtifactIds) {
-        return retrieveTracesContainingArtifacts(projectVersion, existingArtifactIds, t -> t.isVisible());
-    }
-
-    public List<TraceAppEntity> retrieveTracesContainingArtifacts(ProjectVersion projectVersion,
-                                                                  List<UUID> existingArtifactIds,
-                                                                  Predicate<TraceAppEntity> traceFilter) {
-        return this.traceLinkVersionRepository
-            .retrieveAppEntitiesByProjectVersion(projectVersion)
+        return this.getTracesRelatedToArtifacts(projectVersion, existingArtifactIds)
             .stream()
-            .filter(t -> existingArtifactIds.contains(t.getSourceId())
-                && existingArtifactIds.contains(t.getTargetId()))
-            .filter(traceFilter)
+            .filter(TraceAppEntity::isVisible)
             .collect(Collectors.toList());
-        //TODO: Look at absorbing filter method into the retrieval method by default.
     }
 
     /**
@@ -76,17 +72,26 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
      * source or target as given artifact.
      *
      * @param projectVersion The project version used to retrieve active links.
-     * @param artifactName   The artifact to be used to query links.
+     * @param artifactIds    The artifact ids referenced by trace links.
      * @return List of traces active in version and associated with artifact
      */
-    public List<TraceAppEntity> getTracesInProjectVersionRelatedToArtifact(
+    public List<TraceAppEntity> getTracesRelatedToArtifacts(
         ProjectVersion projectVersion,
-        String artifactName
+        List<UUID> artifactIds
     ) {
-        return this.traceLinkVersionRepository
-            .retrieveAppEntitiesByProjectVersion(projectVersion)
+        List<TraceLinkVersion> traceVersions = this.traceLinkVersionRepository.getTraceVersionsRelatedToArtifacts(
+            artifactIds);
+        Map<UUID, List<TraceLinkVersion>> baseEntityTable = ProjectDataStructures.groupEntitiesByProperty(
+            traceVersions,
+            TraceLinkVersion::getBaseEntityId
+        );
+        List<TraceLinkVersion> traceLinksAtVersion =
+            VersionCalculator.calculateVersionEntitiesAtProjectVersion(projectVersion,
+                baseEntityTable);
+        return traceLinksAtVersion
             .stream()
-            .filter(t -> artifactName.equals(t.getSourceName()) || artifactName.equals(t.getTargetName()))
+            .filter(t -> t.getModificationType() != ModificationType.REMOVED)
+            .map(this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity)
             .collect(Collectors.toList());
     }
 }

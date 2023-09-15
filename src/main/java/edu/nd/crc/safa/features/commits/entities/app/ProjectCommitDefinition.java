@@ -5,14 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.StringUtil;
@@ -26,62 +24,56 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class ProjectCommit {
-    private ProjectVersion commitVersion;
-    private ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();
-    private ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
-    private List<CommitError> errors = new ArrayList<>();
-    private boolean failOnError = true;
-
-    public ProjectCommit(ProjectAppEntity projectAppEntity) {
-        this.commitVersion = projectAppEntity.getProjectVersion();
-        this.addArtifacts(ModificationType.ADDED, projectAppEntity.getArtifacts());
-        this.addTraces(ModificationType.ADDED, projectAppEntity.getTraces());
+public class ProjectCommitDefinition extends AbstractProjectCommit {
+    public ProjectCommitDefinition(ProjectCommitAppEntity commitAppEntity) {
+        this.setCommitVersion(commitAppEntity.getCommitVersion());
+        this.setUser(commitAppEntity.getUser());
+        this.setArtifacts(commitAppEntity.getArtifacts());
+        this.setTraces(commitAppEntity.getTraces());
+        this.setErrors(commitAppEntity.getErrors());
+        this.setFailOnError(commitAppEntity.isFailOnError());
     }
 
-    public ProjectCommit(ProjectVersion commitVersion, boolean failOnError) {
-        this.commitVersion = commitVersion;
-        this.failOnError = failOnError;
+    public ProjectCommitDefinition(ProjectVersion commitVersion, boolean failOnError) {
+        this.setFailOnError(failOnError);
+        this.setCommitVersion(commitVersion);
     }
 
-    public ProjectCommit(ProjectVersion projectVersion,
-                         ProjectChange<ArtifactAppEntity> artifacts,
-                         ProjectChange<TraceAppEntity> traces,
-                         List<CommitError> errors,
-                         boolean failOnError) {
-        this.commitVersion = projectVersion;
-        this.artifacts = artifacts;
-        this.traces = traces;
-        this.errors = errors;
-        this.failOnError = failOnError;
+    public ProjectCommitDefinition(ProjectVersion projectVersion,
+                                   ProjectChange<ArtifactAppEntity> artifacts,
+                                   ProjectChange<TraceAppEntity> traces,
+                                   List<CommitError> errors,
+                                   boolean failOnError) {
+        this.setCommitVersion(projectVersion);
+        this.setArtifacts(artifacts);
+        this.setTraces(traces);
+        this.setErrors(errors);
+        this.setFailOnError(failOnError);
     }
 
     public void addArtifacts(ModificationType modificationType,
                              List<ArtifactAppEntity> artifacts) {
-        this.addEntities(modificationType, this.artifacts, artifacts);
+        this.addEntities(modificationType, this.getArtifacts(), artifacts);
     }
 
     public void addArtifact(ModificationType modificationType,
                             ArtifactAppEntity artifactAppEntity) {
-        this.addEntity(modificationType, this.artifacts, artifactAppEntity);
+        this.addEntity(modificationType, this.getArtifacts(), artifactAppEntity);
     }
 
     public void addTraces(ModificationType modificationType,
                           List<TraceAppEntity> traces) {
-        this.addEntities(modificationType, this.traces, traces);
+        this.addEntities(modificationType, this.getTraces(), traces);
     }
 
     public void addTrace(ModificationType modificationType,
                          TraceAppEntity trace) {
-        this.addEntity(modificationType, this.traces, trace);
+        this.addEntity(modificationType, this.getTraces(), trace);
     }
 
     @JsonIgnore
     public boolean shouldUpdateDefaultLayout() {
-        return this.getArtifacts().getAdded().size()
-            + this.getArtifacts().getRemoved().size()
-            + this.getTraces().getAdded().size()
-            + this.getTraces().getRemoved().size() > 0;
+        return this.getArtifacts().getAdded().size() + this.getArtifacts().getRemoved().size() > 0;
     }
 
     @JsonIgnore
@@ -108,7 +100,7 @@ public class ProjectCommit {
 
     @JsonIgnore
     public List<ArtifactAppEntity> getArtifactList(ModificationType modificationType) {
-        return this.generateMod2Entities(this.artifacts).get(modificationType);
+        return this.generateMod2Entities(this.getArtifacts()).get(modificationType);
     }
 
     private <T extends IAppEntity> void addEntities(ModificationType modificationType,
@@ -145,8 +137,8 @@ public class ProjectCommit {
     @JsonIgnore
     public String getSummary() {
         List<String> logs = new ArrayList<>();
-        logs.add(this.artifacts.getSummary("Artifacts"));
-        logs.add(this.traces.getSummary("Trace Links"));
+        logs.add(this.getArtifacts().getSummary("Artifacts"));
+        logs.add(this.getTraces().getSummary("Trace Links"));
         return StringUtil.join(logs, "\n");
     }
 }

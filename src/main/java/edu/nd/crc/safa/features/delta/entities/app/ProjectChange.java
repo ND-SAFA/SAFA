@@ -41,6 +41,14 @@ public class ProjectChange<T extends IAppEntity> {
     }
 
     @JsonIgnore
+    public List<UUID> getEntityIds() {
+        List<UUID> entityIds = new ArrayList<>();
+        entityIds.addAll(getUpdatedIds());
+        entityIds.addAll(getDeletedIds());
+        return entityIds;
+    }
+
+    @JsonIgnore
     public List<UUID> getUpdatedIds() {
         List<UUID> updatedArtifactIds = new ArrayList<>();
         updatedArtifactIds.addAll(getIds(this.getAdded()));

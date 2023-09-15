@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -34,7 +34,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
 
     protected ProjectVersion projectVersion;
 
-    public ProjectCommit createProject() throws Exception {
+    public ProjectCommitDefinition createProject() throws Exception {
         this.jsonBuilder.withProject(projectName, projectName, "");
         this.projectVersion = this.dbEntityBuilder
             .newProject(projectName)
@@ -106,31 +106,31 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
         return documentLayout.get(artifactId);
     }
 
-    protected List<UUID> getArtifactIds(ProjectCommit projectCommit) {
-        return new ArrayList<>(getArtifactNameToIdMap(projectCommit).values());
+    protected List<UUID> getArtifactIds(ProjectCommitDefinition projectCommitDefinition) {
+        return new ArrayList<>(getArtifactNameToIdMap(projectCommitDefinition).values());
     }
 
-    protected UUID getArtifactIdFromProjectCommit(ProjectCommit projectCommit, String artifactName) {
-        return getArtifactNameToIdMap(projectCommit).get(artifactName);
+    protected UUID getArtifactIdFromProjectCommit(ProjectCommitDefinition projectCommitDefinition, String artifactName) {
+        return getArtifactNameToIdMap(projectCommitDefinition).get(artifactName);
     }
 
     protected List<LayoutPosition> getArtifactPositionsInDocument(
-        ProjectCommit projectCommit,
+        ProjectCommitDefinition projectCommitDefinition,
         JSONObject documentJson,
         List<String> artifactNames) throws JsonProcessingException {
         DocumentAppEntity document = MappingTestService.toClass(documentJson.toString(), DocumentAppEntity.class);
         return artifactNames
             .stream()
             .map(artifactName -> {
-                UUID artifactId = getArtifactIdFromProjectCommit(projectCommit, artifactName);
+                UUID artifactId = getArtifactIdFromProjectCommit(projectCommitDefinition, artifactName);
                 return document.getLayout().get(artifactId);
             })
             .collect(Collectors.toList());
     }
 
-    private Map<String, UUID> getArtifactNameToIdMap(ProjectCommit projectCommit) {
+    private Map<String, UUID> getArtifactNameToIdMap(ProjectCommitDefinition projectCommitDefinition) {
         Map<String, UUID> name2id = new Hashtable<>();
-        projectCommit.getArtifacts().getAdded().forEach(artifact -> {
+        projectCommitDefinition.getArtifacts().getAdded().forEach(artifact -> {
             name2id.put(artifact.getName(), artifact.getId());
         });
         return name2id;

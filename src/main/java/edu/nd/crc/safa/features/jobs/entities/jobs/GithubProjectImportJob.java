@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.Optional;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
@@ -29,7 +29,7 @@ public class GithubProjectImportJob extends GithubProjectCreationJob {
                                   GithubImportDTO githubImportDTO,
                                   SafaUser projectOwner) {
         super(jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO, projectOwner);
-        setProjectCommit(new ProjectCommit(githubIdentifier.getProjectVersion(), false));
+        setProjectCommitDefinition(new ProjectCommitDefinition(githubIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }
 

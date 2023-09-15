@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
@@ -19,7 +19,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Job to update an already imported JIRA project
  */
 public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
-    private JiraConnectionService jiraConnectionService;
+    private final JiraConnectionService jiraConnectionService;
 
     public JiraProjectUpdateJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
@@ -27,7 +27,7 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
                                 SafaUser user) {
         super(jobDbEntity, serviceProvider, jiraIdentifier, user);
         this.jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
-        setProjectCommit(new ProjectCommit(jiraIdentifier.getProjectVersion(), false));
+        setProjectCommitDefinition(new ProjectCommitDefinition(jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);
     }
 
@@ -47,8 +47,8 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
     @Override
     protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId) {
         Optional<JiraProject> optional = this.getServiceProvider()
-                .getJiraProjectRepository()
-                .findByProjectAndJiraProjectId(project, jiraProjectId);
+            .getJiraProjectRepository()
+            .findByProjectAndJiraProjectId(project, jiraProjectId);
 
         if (optional.isEmpty()) {
             throw new SafaError("JIRA project is not mapped to this SAFA project");

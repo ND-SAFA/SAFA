@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
@@ -17,7 +17,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Job to import a JIRA project into an existing SAFA project
  */
 public class JiraProjectImportJob extends CreateProjectViaJiraJob {
-    private JiraConnectionService jiraConnectionService;
+    private final JiraConnectionService jiraConnectionService;
 
     public JiraProjectImportJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
@@ -25,7 +25,7 @@ public class JiraProjectImportJob extends CreateProjectViaJiraJob {
                                 SafaUser user) {
         super(jobDbEntity, serviceProvider, jiraIdentifier, user);
         this.jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
-        setProjectCommit(new ProjectCommit(jiraIdentifier.getProjectVersion(), false));
+        setProjectCommitDefinition(new ProjectCommitDefinition(jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);
     }
 

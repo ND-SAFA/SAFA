@@ -40,19 +40,19 @@ public class CreateProjectViaJsonJob extends CommitJob {
         this.projectAppEntity.setProjectVersion(projectVersion);
         this.traceGenerationRequest.setProjectVersion(projectVersion);
 
-        getProjectCommit().addArtifacts(ModificationType.ADDED, this.projectAppEntity.getArtifacts());
-        getProjectCommit().addTraces(ModificationType.ADDED, this.projectAppEntity.getTraces());
+        getProjectCommitDefinition().addArtifacts(ModificationType.ADDED, this.projectAppEntity.getArtifacts());
+        getProjectCommitDefinition().addTraces(ModificationType.ADDED, this.projectAppEntity.getTraces());
     }
 
     @IJobStep(value = "Generating Trace Links", position = 2)
     public void generateLinks(JobLogger logger) {
         TraceGenerationRequest request = this.traceGenerationRequest;
-        ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommit());
+        ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommitDefinition());
 
         List<TraceAppEntity> generatedTraces = this.getServiceProvider()
             .getTraceGenerationService()
             .generateTraceLinks(request, projectAppEntity);
-        getProjectCommit().addTraces(ModificationType.ADDED, generatedTraces);
+        getProjectCommitDefinition().addTraces(ModificationType.ADDED, generatedTraces);
         logger.log("Links generated: %s", generatedTraces.size());
     }
 }

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.notifications.entities.Change;
@@ -20,10 +20,10 @@ public class TestAddArtifactSync extends AbstractSyncTest {
 
     @Override
     void performAction() throws Exception {
-        ProjectCommit projectCommit = this.commitService.commit(CommitBuilder
+        ProjectCommitDefinition projectCommitDefinition = this.commitService.commit(CommitBuilder
             .withVersion(this.projectVersion)
             .withAddedArtifact(artifactConstants.artifact));
-        this.artifactId = projectCommit.getArtifact(ModificationType.ADDED, 0).getId();
+        this.artifactId = projectCommitDefinition.getArtifact(ModificationType.ADDED, 0).getId();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.test.features.github.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
         assertEquals("development", bendBranches.get(0));
         assertEquals("production", bendBranches.get(1));
         assertEquals("branch3", bendBranches.get(2));
+        assertEquals("development", bend.getDefaultBranch());
 
         GithubRepositoryDTO fend = response.get(1);
         assertEquals("ND-SAFA", fend.getOwner());
@@ -68,6 +70,7 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
         assertEquals("FEAT-aws-integration", fendBranches.get(0));
         assertEquals("development", fendBranches.get(1));
         assertEquals("production", fendBranches.get(2));
+        assertNull(fend.getDefaultBranch());
     }
 
     @Test

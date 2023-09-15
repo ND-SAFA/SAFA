@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
 import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,7 @@ public class ArtifactPositionService {
         Map<UUID, LayoutPosition> layout = new HashMap<>();
         List<ArtifactPosition> artifactPositionsAcrossVersions = this.artifactPositionRepository
             .getByProjectAndDocumentId(projectVersion.getProject(), documentId);
-        Map<UUID, List<ArtifactPosition>> id2pos = versionCalculator.groupEntityVersionsByEntityId(
+        Map<UUID, List<ArtifactPosition>> id2pos = ProjectDataStructures.groupEntitiesByProperty(
             artifactPositionsAcrossVersions,
             ap -> ap.getArtifact().getArtifactId());
         for (Map.Entry<UUID, List<ArtifactPosition>> entry : id2pos.entrySet()) {

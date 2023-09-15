@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.jobs.builders;
 
 import java.io.IOException;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
@@ -13,22 +13,22 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Creates a job for generating trace links.
  */
 public class GenerateLinksJobBuilder extends AbstractJobBuilder {
-    private TraceGenerationRequest request;
-    private final SafaUser user;
+    private final TraceGenerationRequest request;
 
     public GenerateLinksJobBuilder(ServiceProvider serviceProvider,
                                    TraceGenerationRequest request,
                                    SafaUser user) {
         super(serviceProvider);
         this.request = request;
-        this.user = user;
+        this.setUser(user);
     }
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        ProjectCommit projectCommit = new ProjectCommit(this.request.getProjectVersion(), false);
-        return new GenerateLinksJob(this.getJobDbEntity(), this.getServiceProvider(), projectCommit,
-            this.request, this.user);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.request.getProjectVersion(),
+            false);
+        return new GenerateLinksJob(this.getJobDbEntity(), this.getServiceProvider(),
+            projectCommitDefinition, this.request, this.getUser());
     }
 
     @Override

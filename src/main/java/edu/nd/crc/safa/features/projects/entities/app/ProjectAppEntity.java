@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
@@ -132,10 +132,10 @@ public class ProjectAppEntity implements IAppEntity {
         this.traceMatrices = traceMatrices;
     }
 
-    public ProjectAppEntity(ProjectCommit projectCommit) {
-        this.artifacts = projectCommit.getArtifacts().getAdded();
-        this.traces = projectCommit.getTraces().getAdded();
-        this.projectVersion = projectCommit.getCommitVersion();
+    public ProjectAppEntity(ProjectCommitDefinition projectCommitDefinition) {
+        this.artifacts = projectCommitDefinition.getArtifacts().getAdded();
+        this.traces = projectCommitDefinition.getTraces().getAdded();
+        this.projectVersion = projectCommitDefinition.getCommitVersion();
     }
 
     @JsonIgnore

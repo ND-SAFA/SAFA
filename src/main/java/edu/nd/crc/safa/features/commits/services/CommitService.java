@@ -5,37 +5,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.app.CommitAction;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
+import edu.nd.crc.safa.features.commits.pipeline.CommitPipeline;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
-import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntityCreator;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.javatuples.Pair;
 import org.springframework.stereotype.Service;
 
 /**
  * Responsible for performing commits.
  */
+@Getter
 @AllArgsConstructor
 @Service
 public class CommitService {
@@ -48,100 +46,16 @@ public class CommitService {
     /**
      * Saves entities in commit to specified project version.
      *
-     * @param projectCommit The commit containing changes to artifacts and traces.
-     * @param user          The user performing the commit
+     * @param projectCommitDefinition The commit containing changes to artifacts and traces.
+     * @param user                    The user performing the commit
      * @return ProjectCommit with updated entities.
      * @throws SafaError Throws error if any change fails to commit.
      */
-    public ProjectCommit performCommit(ProjectCommit projectCommit, SafaUser user) throws SafaError {
-        ProjectVersion projectVersion = projectCommit.getCommitVersion();
-        boolean failOnError = projectCommit.isFailOnError();
-        List<CommitError> errors;
-
-        // Step - Add related trace links to be removed.
-        for (ArtifactAppEntity artifact : projectCommit.getArtifacts().getRemoved()) {
-            List<TraceAppEntity> linksToArtifact = this.traceService
-                .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifact.getName());
-            projectCommit.addTraces(ModificationType.REMOVED, linksToArtifact);
-        }
-
-        // Step - Mark decline trace links as invisible
-        projectCommit
-            .getTraces()
-            .getModified()
-            .stream()
-            .filter(t -> t.getApprovalStatus() == ApprovalStatus.DECLINED)
-            .forEach(t -> t.setVisible(false));
-        // Step - Commit artifact
-        Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> artifactResponse = commitArtifactChanges(
-            projectVersion,
-            projectCommit.getArtifacts(),
-            failOnError,
-            user);
-        errors = new ArrayList<>(artifactResponse.getValue1()); // linter wants it like this for some reason
-        ProjectChange<ArtifactAppEntity> artifactChanges = artifactResponse.getValue0();
-
-        // Step - Commit traces
-        Pair<ProjectChange<TraceAppEntity>, List<CommitError>> traceResponse = commitTraceChanges(
-            projectVersion,
-            projectCommit.getTraces(),
-            failOnError,
-            user);
-        ProjectChange<TraceAppEntity> traceChanges = traceResponse.getValue0();
-
-        // Step - Update project last edited
-        Project project = projectVersion.getProject();
-        project.setLastEdited();
-        this.projectRepository.save(project);
-
-        // Step - Add errors
-        errors.addAll(traceResponse.getValue1());
-
-        // Step - Broadcast change
-        EntityChangeBuilder builder = new EntityChangeBuilder(projectVersion.getVersionId());
-        builder
-            .withArtifactsUpdate(artifactChanges.getUpdatedIds())
-            .withArtifactsDelete(artifactChanges.getDeletedIds())
-            .withTracesUpdate(traceChanges.getUpdatedIds())
-            .withTracesDelete(traceChanges.getDeletedIds())
-            .withWarningsUpdate();
-        if (projectCommit.shouldUpdateDefaultLayout()) {
-            builder.withUpdateLayout();
-        }
-
-        this.notificationService.broadcastChangeToUser(builder, user);
-
-        return new ProjectCommit(projectVersion, artifactChanges, traceChanges, errors, failOnError);
-    }
-
-    private Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> commitArtifactChanges(
-        ProjectVersion projectVersion,
-        ProjectChange<ArtifactAppEntity> artifacts,
-        boolean failOnError,
-        SafaUser user) throws SafaError {
-
-        return commitEntityChanges(
-            projectVersion,
-            artifacts,
-            this.artifactVersionRepository,
-            this.artifactVersionRepository::retrieveAppEntityFromVersionEntity,
-            failOnError,
-            user);
-    }
-
-    private Pair<ProjectChange<TraceAppEntity>, List<CommitError>> commitTraceChanges(
-        ProjectVersion projectVersion,
-        ProjectChange<TraceAppEntity> traces,
-        boolean failOnError,
-        SafaUser user) throws SafaError {
-
-        return commitEntityChanges(
-            projectVersion,
-            traces,
-            this.traceLinkVersionRepository,
-            this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity,
-            failOnError,
-            user);
+    public ProjectCommitAppEntity performCommit(ProjectCommitDefinition projectCommitDefinition,
+                                                SafaUser user) throws SafaError {
+        projectCommitDefinition.setUser(user);
+        CommitPipeline pipeline = new CommitPipeline(projectCommitDefinition);
+        return pipeline.commit(this);
     }
 
     /**
@@ -152,12 +66,13 @@ public class CommitService {
      * @param versionEntityRepository The IVersionRepository used for this entity.
      * @param iAppEntityCreator       The constructor for creating app entities from version entities.
      * @param user                    The user making the change
+     * @param failOnError             Whether error should be thrown if encountered.
      * @param <A>                     The entity used on the application side.
      * @param <V>                     The entity used for version control.
      * @return ProjectChange containing processed entities.
      * @throws SafaError Throws error if anything goes wrong during any commit.
      */
-    private <A extends IAppEntity,
+    public <A extends IAppEntity,
         V extends IVersionEntity<A>> Pair<ProjectChange<A>,
         List<CommitError>> commitEntityChanges(
         ProjectVersion projectVersion,
@@ -167,10 +82,12 @@ public class CommitService {
         boolean failOnError,
         SafaUser user
     ) throws SafaError {
-        ProjectChange<A> change = new ProjectChange<>();
+        ProjectChange<A> processedChange = new ProjectChange<>();
         List<CommitError> commitErrors;
 
-        Map<UUID, List<V>> entityHashTable = versionEntityRepository.createVersionEntityMap(projectVersion);
+        List<UUID> baseEntityIds = projectChange.getEntityIds();
+        Map<UUID, List<V>> entityHashTable = versionEntityRepository.createVersionEntityMap(projectVersion,
+            baseEntityIds);
         // Define actions
         CommitAction<A, V> saveOrModifyAction = a ->
             versionEntityRepository.commitAppEntityToProjectVersion(projectVersion, a, user, entityHashTable);
@@ -185,7 +102,7 @@ public class CommitService {
             failOnError
         );
         List<A> entitiesAdded = addedResponse.getEntities();
-        change.getAdded().addAll(entitiesAdded);
+        processedChange.getAdded().addAll(entitiesAdded);
         commitErrors = new ArrayList<>(addedResponse.getErrors());
 
         // Commit modified entities
@@ -196,9 +113,9 @@ public class CommitService {
             failOnError
         );
         List<A> entitiesModified = modifiedResponse.getEntities();
-        change.getModified().addAll(entitiesModified);
+        processedChange.getModified().addAll(entitiesModified);
 
-        // Commit removed entities
+        // Commit deleted entities
         EntityParsingResult<A, CommitError> removeResponse = commitActionOnAppEntities(
             projectChange.getRemoved(),
             deleteAction,
@@ -206,8 +123,8 @@ public class CommitService {
             failOnError
         );
         List<A> entitiesRemoved = removeResponse.getEntities();
-        change.getRemoved().addAll(entitiesRemoved);
-        return new Pair<>(change, commitErrors);
+        processedChange.getRemoved().addAll(entitiesRemoved);
+        return new Pair<>(processedChange, commitErrors);
     }
 
     /**

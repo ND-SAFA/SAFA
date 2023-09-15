@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArtifactVersionRepository extends CrudRepository<ArtifactVersion, UUID>,
-        IVersionRepository<ArtifactVersion, ArtifactAppEntity> {
+    IVersionRepository<ArtifactVersion, ArtifactAppEntity> {
 
     List<ArtifactVersion> findByArtifact(Artifact artifact);
 
@@ -24,6 +24,8 @@ public interface ArtifactVersionRepository extends CrudRepository<ArtifactVersio
     Optional<ArtifactVersion> findByProjectVersionAndArtifact(ProjectVersion projectVersion, Artifact artifact);
 
     Optional<ArtifactVersion> findByProjectVersionAndArtifactName(ProjectVersion projectVersion, String name);
+
+    List<ArtifactVersion> findByArtifactArtifactIdIn(List<UUID> baseEntityIds);
 
     default List<ArtifactVersion> getBodiesWithName(Project project, String name) {
         return findByProjectVersionProjectAndArtifactName(project, name);

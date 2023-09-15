@@ -24,6 +24,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -98,6 +100,8 @@ public abstract class AbstractJob implements Job {
         boolean success = true;
 
         try {
+            execution.setStatus(BatchStatus.STARTED);
+
             notifyBeforeJob();
             for (JobStepImplementation stepImplementation : jobSteps) {
                 executeJobStep(stepImplementation, nSteps);
@@ -108,6 +112,14 @@ public abstract class AbstractJob implements Job {
             notifyJobFailed(e);
         } finally {
             notifyAfterJob(success);
+
+            if (success) {
+                execution.setExitStatus(ExitStatus.COMPLETED);
+                execution.setStatus(BatchStatus.COMPLETED);
+            } else {
+                execution.setExitStatus(ExitStatus.FAILED);
+                execution.setStatus(BatchStatus.FAILED);
+            }
         }
     }
 

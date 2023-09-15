@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
@@ -37,7 +37,7 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
                                   GithubImportDTO githubImportDTO,
                                   SafaUser user) {
         super(jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO, user);
-        setProjectCommit(new ProjectCommit(githubIdentifier.getProjectVersion(), false));
+        setProjectCommitDefinition(new ProjectCommitDefinition(githubIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }
 

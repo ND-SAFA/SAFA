@@ -24,6 +24,7 @@ import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.javatuples.Pair;
@@ -41,7 +42,7 @@ public abstract class GenericVersionRepository<
     AppEntity extends IAppEntity>
     implements IVersionRepository<VersionEntity, AppEntity> {
 
-    private VersionCalculator versionCalculator = new VersionCalculator();
+    private final VersionCalculator versionCalculator = new VersionCalculator();
 
     protected abstract VersionEntity save(VersionEntity versionEntity);
 
@@ -71,14 +72,13 @@ public abstract class GenericVersionRepository<
     public List<VersionEntity> retrieveVersionEntitiesByProjectVersion(ProjectVersion projectVersion) {
         Map<UUID, List<VersionEntity>> entityHashTable =
             this.groupEntityVersionsByEntityId(projectVersion);
-        return this.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
+        return VersionCalculator.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
     }
 
     @Override
     public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
         ProjectVersion projectVersion, UUID entityId) {
-
-        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion);
+        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion, List.of(entityId));
         return findVersionEntityByProjectVersionAndBaseEntityId(projectVersion, entityId, entityHashTable);
     }
 
@@ -88,7 +88,7 @@ public abstract class GenericVersionRepository<
      * @param projectVersion  The version of the entity to retrieve.
      * @param entityId        The id of the base entity whose version is being retrieved.
      * @param entityHashTable The map of entity ids to version entities. Used to speed up retrieval.
-     *                        See {@link #createVersionEntityMap(ProjectVersion)}.
+     *                        See {@link #createVersionEntityMap(ProjectVersion, List)}.
      * @return Optional of entity version at given project version.
      */
     public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
@@ -97,15 +97,16 @@ public abstract class GenericVersionRepository<
         Map<UUID, List<VersionEntity>> justThisEntityMap = new HashMap<>();
         justThisEntityMap.put(entityId, entityHashTable.getOrDefault(entityId, List.of()));
 
-        List<VersionEntity> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
-            justThisEntityMap);
+        List<VersionEntity> currentVersionQuery = VersionCalculator.calculateVersionEntitiesAtProjectVersion(
+            projectVersion, justThisEntityMap);
         return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
 
     @Override
-    public Map<UUID, List<VersionEntity>> createVersionEntityMap(ProjectVersion projectVersion) {
+    public Map<UUID, List<VersionEntity>> createVersionEntityMap(ProjectVersion projectVersion,
+                                                                 List<UUID> baseEntityIds) {
         Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
-        this.retrieveVersionEntitiesByProject(projectVersion.getProject())
+        this.retrieveVersionEntitiesByBaseIds(baseEntityIds)
             .forEach(versionEntity -> {
                 if (entityHashTable.containsKey(versionEntity.getBaseEntityId())) {
                     entityHashTable.get(versionEntity.getBaseEntityId()).add(versionEntity);
@@ -238,7 +239,8 @@ public abstract class GenericVersionRepository<
         SafaUser user) {
 
         List<UUID> processedAppEntities = new ArrayList<>();
-        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion);
+        List<UUID> entityIds = appEntities.stream().map(IAppEntity::getId).collect(Collectors.toList());
+        Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion, entityIds);
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
             .map(appEntity -> {
@@ -366,37 +368,9 @@ public abstract class GenericVersionRepository<
         }
     }
 
-    /**
-     * Calculates the current version of artifact noted by the entries in the given map.
-     *
-     * @param projectVersion         The version returns for each entity in map.
-     * @param nameToVersionEntityMap Contains artifact names as keys and their associated version entities as values.
-     * @return List of version entities as showing up in given project version.
-     */
-    private List<VersionEntity> calculateVersionEntitiesAtProjectVersion(
-        ProjectVersion projectVersion,
-        Map<UUID, List<VersionEntity>> nameToVersionEntityMap) {
-        List<VersionEntity> entityVersionsAtProjectVersion = new ArrayList<>();
-
-        for (Map.Entry<UUID, List<VersionEntity>> entry : nameToVersionEntityMap.entrySet()) {
-            VersionEntity latest = null;
-            for (VersionEntity body : entry.getValue()) {
-                if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)
-                    && (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion()))) {
-                    latest = body;
-                }
-            }
-
-            if (latest != null && latest.getModificationType() != ModificationType.REMOVED) {
-                entityVersionsAtProjectVersion.add(latest);
-            }
-        }
-        return entityVersionsAtProjectVersion;
-    }
-
     private Map<UUID, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
         List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());
-        return versionCalculator.groupEntityVersionsByEntityId(versionEntities, IVersionEntity::getBaseEntityId);
+        return ProjectDataStructures.groupEntitiesByProperty(versionEntities, IVersionEntity::getBaseEntityId);
     }
 
     private VersionEntity instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,
@@ -436,12 +410,6 @@ public abstract class GenericVersionRepository<
     }
 
     /**
-     * @param project The project whose entities are retrieved.
-     * @return Returns all versions of the base entities in a project.
-     */
-    public abstract List<VersionEntity> retrieveVersionEntitiesByProject(Project project);
-
-    /**
      * @param entity The base entities whose versions are retrieved
      * @return List of versions associated with given base entities.
      */
@@ -464,7 +432,7 @@ public abstract class GenericVersionRepository<
      *
      * @param projectVersion    The project version associated with given app entity.
      * @param artifactAppEntity The application entity whose sub entities are being created.
-     * @param user The user doing the operation
+     * @param user              The user doing the operation
      * @return Returns the base entity associated with given app entity.
      */
     protected abstract BaseEntity createOrUpdateRelatedEntities(ProjectVersion projectVersion,

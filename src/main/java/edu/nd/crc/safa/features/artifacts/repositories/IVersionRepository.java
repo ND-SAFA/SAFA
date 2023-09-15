@@ -50,6 +50,14 @@ public interface IVersionRepository<
     List<V> retrieveVersionEntitiesByProject(Project project);
 
     /**
+     * Retrieves the version entities whose base ids are referenced in list.
+     *
+     * @param baseIds List of base entities to retrieve by.
+     * @return List of versioned entities.
+     */
+    List<V> retrieveVersionEntitiesByBaseIds(List<UUID> baseIds);
+
+    /**
      * Returns the list of all application entities existing in given project.
      *
      * @param project The project whose existing entities are retrieved.
@@ -82,7 +90,7 @@ public interface IVersionRepository<
      * @param a               The app entity whose state is saved.
      * @param user            The user doing the update
      * @param entityHashTable A hash table of entities used to speed up retrieval.
-     *                        See {@link #createVersionEntityMap(ProjectVersion)}
+     *                        See {@link #createVersionEntityMap(ProjectVersion, List)}
      * @return String representing error message if one occurred.
      * @throws SafaError Throws error if saving changes fails.
      */
@@ -97,7 +105,7 @@ public interface IVersionRepository<
      * @param projectVersion The project version whose changes are committed to.
      * @param appEntities    The app entities whose states are saved.
      * @param asCompleteSet  Whether entities create entire set of entities in project.
-     * @param user The user making the change
+     * @param user           The user making the change
      * @return List of parsing errors occurring while saving app entities.
      * @throws SafaError Throws error if a fatal constraint or condition is not met.
      */
@@ -110,11 +118,11 @@ public interface IVersionRepository<
     /**
      * Deletes entity version with given name and commits to given project version.
      *
-     * @param projectVersion The project version associated with committed removal.
-     * @param baseEntityName The name of the base entity whose removal is committed to given version.
-     * @param user The user making the change
+     * @param projectVersion  The project version associated with committed removal.
+     * @param baseEntityName  The name of the base entity whose removal is committed to given version.
+     * @param user            The user making the change
      * @param entityHashTable A hash table of entities used to speed up retrieval.
-     *                        See {@link #createVersionEntityMap(ProjectVersion)}
+     *                        See {@link #createVersionEntityMap(ProjectVersion, List)}
      * @return CommitError if error occurred while deleting entity, null otherwise.
      */
     Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
@@ -137,10 +145,10 @@ public interface IVersionRepository<
     /**
      * Update TIM related information as needed for a given entity update.
      *
-     * @param projectVersion The version the update is happening in
-     * @param versionEntity The newly updated entity
+     * @param projectVersion        The version the update is happening in
+     * @param versionEntity         The newly updated entity
      * @param originalVersionEntity The previous version of the entity, if it exists (for calculating differences)
-     * @param user The user doing the change
+     * @param user                  The user doing the change
      */
     void updateTimInfo(ProjectVersion projectVersion, V versionEntity, V originalVersionEntity, SafaUser user);
 
@@ -149,7 +157,8 @@ public interface IVersionRepository<
      * Precalculating this information speeds up retrieval of entities, which in turn speeds up commits.
      *
      * @param projectVersion The version to retrieve entities from.
+     * @param baseEntityIds  The ids of the base entities who have changed.
      * @return A map between entity ID and entity versions for all entities in the given project version.
      */
-    Map<UUID, List<V>> createVersionEntityMap(ProjectVersion projectVersion);
+    Map<UUID, List<V>> createVersionEntityMap(ProjectVersion projectVersion, List<UUID> baseEntityIds);
 }

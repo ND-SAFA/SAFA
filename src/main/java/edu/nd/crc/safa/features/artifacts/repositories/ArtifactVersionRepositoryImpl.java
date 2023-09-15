@@ -122,7 +122,7 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public Optional<ArtifactVersion> findExistingVersionEntity(ArtifactVersion artifactVersion) {
         Optional<ArtifactVersion> version = this.artifactVersionRepository
-                .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
+            .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
         version.ifPresent(attributeValueService::attachCustomAttributesToArtifact);
         return version;
     }
@@ -137,6 +137,11 @@ public class ArtifactVersionRepositoryImpl
         List<ArtifactVersion> versions = artifactVersionRepository.findByProjectVersionProject(project);
         attributeValueService.attachCustomAttributesToArtifacts(versions);
         return versions;
+    }
+
+    @Override
+    public List<ArtifactVersion> retrieveVersionEntitiesByBaseIds(List<UUID> baseIds) {
+        return artifactVersionRepository.findByArtifactArtifactIdIn(baseIds);
     }
 
     @Override

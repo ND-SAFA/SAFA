@@ -9,7 +9,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -58,7 +58,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         artifactJson.put("attributes", customFields);
 
         // Step - Save added artifact
-        ProjectCommit commit = commitService.commit(CommitBuilder
+        ProjectCommitDefinition commit = commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(artifactJson));
 

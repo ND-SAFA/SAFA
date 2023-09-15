@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
@@ -25,7 +25,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
         String documentName = "test-document";
 
         // Step - Create project
-        ProjectCommit commit = createProject();
+        ProjectCommitDefinition commit = createProject();
         Document document = this.dbEntityBuilder
             .newDocument(projectName, documentName, "", DocumentType.ARTIFACT_TREE)
             .getDocument(projectName, documentName);
@@ -53,8 +53,8 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
         String docDescription = "";
 
         // Step - Create project
-        ProjectCommit projectCommit = createProject();
-        List<UUID> artifactIds = projectCommit
+        ProjectCommitDefinition projectCommitDefinition = createProject();
+        List<UUID> artifactIds = projectCommitDefinition
             .getArtifacts()
             .getAdded()
             .stream()
@@ -73,7 +73,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
 
         // Step - Get list of artifact positions
         List<LayoutPosition> artifactPositions = getArtifactPositionsInDocument(
-            projectCommit,
+            projectCommitDefinition,
             docCreated,
             List.of(a1Name, a2Name, a3Name));
 

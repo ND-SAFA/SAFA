@@ -2,7 +2,7 @@ package edu.nd.crc.safa.test.features.jobs.logic.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.builders.AbstractJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
@@ -27,10 +27,10 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
     @Test
     public void testCommitIntoExistingProject() throws Exception {
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
-        ProjectCommit projectCommit = new ProjectCommit(projectVersion, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
 
         DummyCommitJobBuilder jobBuilder =
-            new DummyCommitJobBuilder(serviceProvider, projectCommit, currentUser, false, false);
+            new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, currentUser, false, false);
         JobAppEntity result = jobBuilder.perform();
 
         // No new project should be created
@@ -43,10 +43,10 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
     @Test
     public void testFailedCommitIntoExistingProject() throws Exception {
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
-        ProjectCommit projectCommit = new ProjectCommit(projectVersion, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
 
         DummyCommitJobBuilder jobBuilder =
-            new DummyCommitJobBuilder(serviceProvider, projectCommit, currentUser, false, true);
+            new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, currentUser, false, true);
         JobAppEntity result = jobBuilder.perform();
 
         // No new project should be created
@@ -93,15 +93,15 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         SafaUser newProjectOwner;
 
         protected DummyCommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
-                                 ProjectCommit projectCommit, SafaUser newProjectOwner) {
+                                 ProjectCommitDefinition projectCommitDefinition, SafaUser newProjectOwner) {
             super(jobDbEntity, serviceProvider);
             this.newProjectOwner = newProjectOwner;
-            setProjectCommit(projectCommit);
+            setProjectCommitDefinition(projectCommitDefinition);
         }
 
         @IJobStep(value = "", position = 1)
         public void makeProject() {
-            if (getProjectCommit() == null) {
+            if (getProjectCommitDefinition() == null) {
                 if (allowProjectCreation) {
                     createProject(newProjectOwner, "test project name", "test project desc");
                 } else {
@@ -120,12 +120,12 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
 
     private static class DummyCommitJobBuilder extends AbstractJobBuilder {
 
-        private final ProjectCommit commit;
+        private final ProjectCommitDefinition commit;
         private final boolean allowProjectCreation;
         private final boolean fail;
 
         public DummyCommitJobBuilder(ServiceProvider serviceProvider,
-                                     ProjectCommit commit,
+                                     ProjectCommitDefinition commit,
                                      SafaUser user,
                                      boolean allowProjectCreation,
                                      boolean fail) {

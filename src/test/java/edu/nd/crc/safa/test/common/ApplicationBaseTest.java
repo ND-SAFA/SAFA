@@ -23,9 +23,12 @@ import edu.nd.crc.safa.test.services.RetrievalTestService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Testing layer for encapsulating application logic.
@@ -57,6 +60,9 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      */
     protected DbEntityBuilder dbEntityBuilder;
     protected JsonBuilder jsonBuilder;
+    protected MockRestServiceServer mockServer;
+    @Autowired
+    protected RestTemplate restTemplate;
 
     @PostConstruct
     public void init() throws Exception {
@@ -71,6 +77,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         clearData();
         setAuthorization();
         ReflectionTestUtils.setField(ServiceProvider.class, "instance", this.serviceProvider);
+        mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
     /**

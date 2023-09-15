@@ -20,7 +20,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
     /**
      * Trace links to generate.
      */
-    TraceGenerationRequest traceGenerationRequest;
+    private TraceGenerationRequest traceGenerationRequest;
 
     public CreateProjectViaJsonJob(JobDbEntity jobDbEntity,
                                    ProjectAppEntity projectAppEntity,
@@ -49,7 +49,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
         TraceGenerationRequest request = this.traceGenerationRequest;
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommit());
 
-        List<TraceAppEntity> generatedTraces = this.serviceProvider
+        List<TraceAppEntity> generatedTraces = this.getServiceProvider()
             .getTraceGenerationService()
             .generateTraceLinks(request, projectAppEntity);
         getProjectCommit().addTraces(ModificationType.ADDED, generatedTraces);

@@ -25,19 +25,19 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileP
     /**
      * Rows in csv file representing artifacts.
      */
-    protected List<I> artifactRecords;
+    private List<I> artifactRecords;
     /**
      * Entities parsed from file.
      */
-    protected List<E> entities;
+    private List<E> entities;
     /**
      * List of errors created while parsing entities.
      */
-    protected List<String> errors;
+    private List<String> errors;
     /**
      * The name of the file being parsed - used to generate more helpful error messages
      */
-    protected String filename;
+    private String filename;
 
     protected AbstractDataFile() {
         this.artifactRecords = new ArrayList<>();

@@ -18,13 +18,13 @@ public class TGenHGenRequest {
      * The artifacts used in clusters.
      */
     @NotNull
-    List<GenerationArtifact> artifacts;
+    private List<GenerationArtifact> artifacts;
     /**
      * The type of artifacts to generate.
      */
-    List<String> targetTypes;
+    private List<String> targetTypes;
     /**
      * The project summary.
      */
-    String summary;
+    private String summary;
 }

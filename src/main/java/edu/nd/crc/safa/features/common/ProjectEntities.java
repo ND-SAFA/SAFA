@@ -20,12 +20,12 @@ import lombok.Getter;
  */
 public class ProjectEntities {
     @Getter
-    List<ArtifactAppEntity> artifacts;
+    private List<ArtifactAppEntity> artifacts;
     @Getter
-    List<TraceAppEntity> traces;
-    Map<String, ArtifactAppEntity> name2artifact;
-    Map<UUID, ArtifactAppEntity> id2artifact;
-    Map<String, List<ArtifactAppEntity>> type2artifacts;
+    private List<TraceAppEntity> traces;
+    private Map<String, ArtifactAppEntity> name2artifact;
+    private Map<UUID, ArtifactAppEntity> id2artifact;
+    private Map<String, List<ArtifactAppEntity>> type2artifacts;
 
     private ProjectEntities() {
         this.artifacts = new ArrayList<>();

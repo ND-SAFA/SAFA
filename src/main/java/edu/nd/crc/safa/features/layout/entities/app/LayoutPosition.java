@@ -15,9 +15,9 @@ public class LayoutPosition {
     /**
      * # of pixels right from the top left corner.
      */
-    double x;
+    private double x;
     /**
      * # of pixels down from the top left corner.
      */
-    double y;
+    private double y;
 }

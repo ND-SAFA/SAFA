@@ -36,7 +36,7 @@ public class Document implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "document_id")
-    UUID documentId;
+    private UUID documentId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -45,17 +45,17 @@ public class Document implements Serializable {
         nullable = false
     )
     @JsonIgnore
-    Project project;
+    private Project project;
 
     @Column(name = "document_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    DocumentType type;
+    private DocumentType type;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     @Column(name = "description")
-    String description;
+    private String description;
 
     public Document(Document document) {
         this(document.documentId,

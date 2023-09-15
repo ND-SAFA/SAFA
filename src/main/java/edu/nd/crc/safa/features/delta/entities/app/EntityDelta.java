@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EntityDelta<E> {
-    Map<UUID, E> added;
-    Map<UUID, ModifiedEntity<E>> modified;
-    Map<UUID, E> removed;
+    private Map<UUID, E> added;
+    private Map<UUID, ModifiedEntity<E>> modified;
+    private Map<UUID, E> removed;
 }

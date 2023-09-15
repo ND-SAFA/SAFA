@@ -54,9 +54,9 @@ public class XhtmlBlockquoteType extends XhtmlBasicStyleableType {
         @XmlElementRef(type = XhtmlDelType.class, required = false)
     })
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicType> content = new ArrayList<>();
+    private List<XhtmlBasicType> content = new ArrayList<>();
 
     @XmlAttribute(name = "cite")
-    protected String cite;
+    private String cite;
 
 }

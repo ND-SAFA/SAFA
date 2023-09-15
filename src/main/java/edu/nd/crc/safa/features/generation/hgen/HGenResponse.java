@@ -17,5 +17,5 @@ public class HGenResponse extends GenerationDataset implements ITGenResponse {
     /**
      * The logs occurring during job execution.
      */
-    List<String> logs;
+    private List<String> logs;
 }

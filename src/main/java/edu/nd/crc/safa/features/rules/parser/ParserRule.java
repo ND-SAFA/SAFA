@@ -46,20 +46,20 @@ public class ParserRule {
     }
 
     public boolean isRuleSatisfied() {
-        return mTokens.get(0).tokenType == TokenType.TRUE;
+        return mTokens.get(0).getTokenType() == TokenType.TRUE;
     }
 
     public boolean isValid() {
         // Handle unbalanced parenthesis
-        long lParenCount = mTokens.stream().filter(t -> t.tokenType == TokenType.LEFT_PAREN).count();
-        long rParenCount = mTokens.stream().filter(t -> t.tokenType == TokenType.RIGHT_PAREN).count();
+        long lParenCount = mTokens.stream().filter(t -> t.getTokenType() == TokenType.LEFT_PAREN).count();
+        long rParenCount = mTokens.stream().filter(t -> t.getTokenType() == TokenType.RIGHT_PAREN).count();
         if (lParenCount != rParenCount) {
             return false;
         }
 
         // Handle unbalanced function
-        long fStartCount = mTokens.stream().filter(t -> t.tokenType == TokenType.FUNC_START).count();
-        long fEndCount = mTokens.stream().filter(t -> t.tokenType == TokenType.FUNC_END).count();
+        long fStartCount = mTokens.stream().filter(t -> t.getTokenType() == TokenType.FUNC_START).count();
+        long fEndCount = mTokens.stream().filter(t -> t.getTokenType() == TokenType.FUNC_END).count();
         if (fStartCount != fEndCount) {
             return false;
         }
@@ -67,8 +67,8 @@ public class ParserRule {
         // Handle functions that are not implemented
         return mTokens
             .stream()
-            .filter(t -> t.tokenType == TokenType.FUNC_START)
-            .anyMatch(t -> IMPLEMENTED_FUNCTIONS.contains(t.value));
+            .filter(t -> t.getTokenType() == TokenType.FUNC_START)
+            .anyMatch(t -> IMPLEMENTED_FUNCTIONS.contains(t.getValue()));
     }
 
     public Optional<Function> parseFunction() {
@@ -77,15 +77,15 @@ public class ParserRule {
         String functionName = "";
         List<String> arguments = new ArrayList<>();
         for (final Token t : mTokens) {
-            if (t.tokenType == TokenType.FUNC_START) {
-                functionName = t.value;
+            if (t.getTokenType() == TokenType.FUNC_START) {
+                functionName = t.getValue();
             }
 
-            if (t.tokenType == TokenType.ARGUMENT) {
-                arguments.add(t.value);
+            if (t.getTokenType() == TokenType.ARGUMENT) {
+                arguments.add(t.getValue());
             }
 
-            if (t.tokenType == TokenType.FUNC_END) {
+            if (t.getTokenType() == TokenType.FUNC_END) {
                 break;
             }
         }
@@ -97,43 +97,43 @@ public class ParserRule {
         int argOffset = 0;
         switch (functionName) {
             case "at-least-one":
-                function.condition = Condition.AT_LEAST;
-                function.count = 1;
+                function.setCondition(Condition.AT_LEAST);
+                function.setCount(1);
                 break;
             case "at-least-n":
-                function.condition = Condition.AT_LEAST;
-                function.count = Integer.parseInt(arguments.get(0).trim());
+                function.setCondition(Condition.AT_LEAST);
+                function.setCount(Integer.parseInt(arguments.get(0).trim()));
                 argOffset++;
                 break;
             case "exactly-one":
-                function.condition = Condition.EXACTLY;
-                function.count = 1;
+                function.setCondition(Condition.EXACTLY);
+                function.setCount(1);
                 break;
             case "exactly-n":
-                function.condition = Condition.EXACTLY;
-                function.count = Integer.parseInt(arguments.get(0).trim());
+                function.setCondition(Condition.EXACTLY);
+                function.setCount(Integer.parseInt(arguments.get(0).trim()));
                 argOffset++;
                 break;
             case "less-than-n":
-                function.condition = Condition.LESS_THAN;
-                function.count = Integer.parseInt(arguments.get(0).trim());
+                function.setCondition(Condition.LESS_THAN);
+                function.setCount(Integer.parseInt(arguments.get(0).trim()));
                 argOffset++;
                 break;
             default:
         }
 
-        function.targetArtifactType = arguments.get(argOffset).trim().toLowerCase();
+        function.setTargetArtifactType(arguments.get(argOffset).trim().toLowerCase());
         String nextArgument = arguments.get(argOffset + 1).trim().toLowerCase();
         switch (nextArgument) {
             case "child":
-                function.artifactRelationship = ArtifactRelationship.CHILD;
+                function.setArtifactRelationship(ArtifactRelationship.CHILD);
                 break;
             case "sibling":
-                function.artifactRelationship = ArtifactRelationship.SIBLING;
+                function.setArtifactRelationship(ArtifactRelationship.SIBLING);
                 break;
             default:
         }
-        function.sourceArtifactType = arguments.get(argOffset + 2).trim().toLowerCase();
+        function.setSourceArtifactType(arguments.get(argOffset + 2).trim().toLowerCase());
 
         return Optional.of(function);
     }
@@ -143,11 +143,11 @@ public class ParserRule {
         int end = -1;
         for (int i = 0; i < mTokens.size(); i++) {
             final Token t = mTokens.get(i);
-            if (t.tokenType == TokenType.FUNC_START) {
+            if (t.getTokenType() == TokenType.FUNC_START) {
                 start = i;
             }
 
-            if (t.tokenType == TokenType.FUNC_END) {
+            if (t.getTokenType() == TokenType.FUNC_END) {
                 end = i;
                 break;
             }
@@ -174,10 +174,10 @@ public class ParserRule {
         int rightParen = -1;
         for (int i = 0; i < input.size(); i++) {
             final Token t = input.get(i);
-            if (t.tokenType == TokenType.LEFT_PAREN) {
+            if (t.getTokenType() == TokenType.LEFT_PAREN) {
                 leftParen = i;
             }
-            if (leftParen != -1 && t.tokenType == TokenType.RIGHT_PAREN) {
+            if (leftParen != -1 && t.getTokenType() == TokenType.RIGHT_PAREN) {
                 rightParen = i;
                 break;
             }
@@ -201,11 +201,11 @@ public class ParserRule {
         // Handle Not
         for (int i = 0; i < input.size(); i++) {
             final Token t = input.get(i);
-            if (t.tokenType == TokenType.NOT) {
+            if (t.getTokenType() == TokenType.NOT) {
                 final Token b = input.get(i + 1);
                 assert b.isBoolean();
 
-                if (b.tokenType == TokenType.TRUE) {
+                if (b.getTokenType() == TokenType.TRUE) {
                     input.set(i, new Token(TokenType.FALSE, FALSE));
                 } else {
                     input.set(i, new Token(TokenType.TRUE, TRUE));
@@ -218,14 +218,14 @@ public class ParserRule {
         // Handle AND
         for (int i = 0; i < input.size(); i++) {
             final Token t = input.get(i);
-            if (t.tokenType == TokenType.AND) {
+            if (t.getTokenType() == TokenType.AND) {
                 final Token left = input.get(i - 1);
                 assert left.isBoolean();
-                final boolean leftBool = left.tokenType == TokenType.TRUE;
+                final boolean leftBool = left.getTokenType() == TokenType.TRUE;
 
                 final Token right = input.get(i + 1);
                 assert right.isBoolean();
-                final boolean rightBool = right.tokenType == TokenType.TRUE;
+                final boolean rightBool = right.getTokenType() == TokenType.TRUE;
 
                 if (leftBool && rightBool) {
                     input.set(i - 1, new Token(TokenType.TRUE, TRUE));
@@ -241,14 +241,14 @@ public class ParserRule {
         // Handle OR
         for (int i = 0; i < input.size(); i++) {
             final Token t = input.get(i);
-            if (t.tokenType == TokenType.OR) {
+            if (t.getTokenType() == TokenType.OR) {
                 final Token left = input.get(i - 1);
                 assert left.isBoolean();
-                final boolean leftBool = left.tokenType == TokenType.TRUE;
+                final boolean leftBool = left.getTokenType() == TokenType.TRUE;
 
                 final Token right = input.get(i + 1);
                 assert right.isBoolean();
-                final boolean rightBool = right.tokenType == TokenType.TRUE;
+                final boolean rightBool = right.getTokenType() == TokenType.TRUE;
 
                 if (leftBool || rightBool) {
                     input.set(i - 1, new Token(TokenType.TRUE, TRUE));

@@ -48,16 +48,16 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column
-    UUID entityVersionId;
+    private UUID entityVersionId;
 
     @Column(name = "modification_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    ModificationType modificationType;
+    private ModificationType modificationType;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
-    Artifact artifact;
+    private Artifact artifact;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -65,16 +65,16 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         name = "version_id",
         nullable = false
     )
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
 
     @Column(name = "summary", nullable = false)
-    String summary;
+    private String summary;
 
     @Lob
     @Column(name = "content",
         nullable = false,
         columnDefinition = "mediumtext")
-    String content;
+    private String content;
 
     @Transient
     private Map<String, JsonNode> customAttributeValues;

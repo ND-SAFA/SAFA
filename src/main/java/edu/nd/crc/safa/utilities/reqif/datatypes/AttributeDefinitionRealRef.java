@@ -18,5 +18,5 @@ public class AttributeDefinitionRealRef extends AttributeDefinitionRef {
     @XmlValue
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
-    protected AttributeDefinitionReal attributeDefinition;
+    private AttributeDefinitionReal attributeDefinition;
 }

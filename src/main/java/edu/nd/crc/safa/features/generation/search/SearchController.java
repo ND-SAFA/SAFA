@@ -36,47 +36,47 @@ public class SearchController extends BaseController {
     @PostMapping(AppRoutes.Search.SEARCH)
     public SearchResponse search(@PathVariable UUID versionId, @RequestBody @Valid SearchRequest request)
         throws InvalidAttributeValueException {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion =
-            this.resourceBuilder.fetchVersion(versionId).withPermission(ProjectPermission.EDIT, user).get();
-        ProjectAppEntity projectAppEntity = this.serviceProvider
+            getResourceBuilder().fetchVersion(versionId).withPermission(ProjectPermission.EDIT, user).get();
+        ProjectAppEntity projectAppEntity = getServiceProvider()
             .getProjectRetrievalService()
             .getProjectAppEntity(projectVersion);
         SearchResponse response = null;
-        switch (request.mode) {
+        switch (request.getMode()) {
             case PROMPT:
-                if (request.prompt == null || request.prompt.equals("")) {
+                if (request.getPrompt() == null || request.getPrompt().equals("")) {
                     throw new InvalidAttributeValueException("Expected prompt to contain non-empty string.");
                 }
-                response = this.serviceProvider.getSearchService().performPromptSearch(projectAppEntity,
+                response = getServiceProvider().getSearchService().performPromptSearch(projectAppEntity,
                     request.getPrompt(), request.getSearchTypes(), request.getMaxResults());
-                this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
+                getServiceProvider().getSearchService().addRelatedTypes(projectAppEntity, response,
                     request.getRelatedTypes());
                 return response;
 
             case ARTIFACTS:
-                if (request.artifactIds == null) {
+                if (request.getArtifactIds() == null) {
                     throw new InvalidAttributeValueException("Expected artifactIds to be non-null.");
                 }
-                if (request.artifactIds.isEmpty()) {
+                if (request.getArtifactIds().isEmpty()) {
                     return new SearchResponse();
                 }
-                response = this.serviceProvider.getSearchService().performArtifactSearch(projectAppEntity,
+                response = getServiceProvider().getSearchService().performArtifactSearch(projectAppEntity,
                     request.getArtifactIds(), request.getSearchTypes(), request.getMaxResults());
-                this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
+                getServiceProvider().getSearchService().addRelatedTypes(projectAppEntity, response,
                     request.getRelatedTypes());
                 return response;
 
             case ARTIFACTTYPES:
-                if (request.artifactTypes == null) {
+                if (request.getArtifactTypes() == null) {
                     throw new InvalidAttributeValueException("Expected artifactTypes to be non-null.");
                 }
-                if (request.artifactTypes.isEmpty()) {
+                if (request.getArtifactTypes().isEmpty()) {
                     return new SearchResponse();
                 }
                 throw new NotImplementedException("Generating between artifact types in under construction");
             default:
-                throw new RuntimeException("Search mode is not implemented:" + request.mode.name());
+                throw new RuntimeException("Search mode is not implemented:" + request.getMode().name());
         }
     }
 }

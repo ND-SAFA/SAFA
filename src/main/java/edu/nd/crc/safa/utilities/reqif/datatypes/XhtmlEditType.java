@@ -77,12 +77,12 @@ public class XhtmlEditType extends XhtmlBasicStyleableType {
     })
     @XmlMixed
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicType> content = new ArrayList<>();
+    private List<XhtmlBasicType> content = new ArrayList<>();
 
     @XmlAttribute(name = "cite")
-    protected String cite;
+    private String cite;
 
     @XmlAttribute(name = "datetime")
-    protected XMLGregorianCalendar datetime;
+    private XMLGregorianCalendar datetime;
 
 }

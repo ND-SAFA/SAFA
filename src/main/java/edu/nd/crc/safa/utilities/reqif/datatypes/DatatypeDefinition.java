@@ -27,21 +27,21 @@ import lombok.Setter;
 @Setter
 public class DatatypeDefinition {
     @XmlElement(name = "ALTERNATIVE-ID")
-    protected AlternativeIdWrapper alternativeId;
+    private AlternativeIdWrapper alternativeId;
 
     @XmlAttribute(name = "DESC")
-    protected String desc;
+    private String desc;
 
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String identifier;
+    private String identifier;
 
     @XmlAttribute(name = "LAST-CHANGE", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar lastChange;
+    private XMLGregorianCalendar lastChange;
 
     @XmlAttribute(name = "LONG-NAME")
-    protected String longName;
+    private String longName;
 }

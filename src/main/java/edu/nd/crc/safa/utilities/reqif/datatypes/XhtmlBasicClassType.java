@@ -15,11 +15,11 @@ import lombok.Setter;
 public class XhtmlBasicClassType extends XhtmlBasicType {
     @XmlAttribute(name = "space", namespace = "http://www.w3.org/XML/1998/namespace")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String space = "preserve";
+    private String space = "preserve";
 
     @XmlAttribute(name = "class")
-    protected String clazz;
+    private String clazz;
 
     @XmlAttribute(name = "title")
-    protected String title;
+    private String title;
 }

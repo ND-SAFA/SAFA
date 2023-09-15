@@ -30,7 +30,7 @@ public class GithubGraphQlRepositoriesResponse extends GraphQlResponse<GithubGra
 
             @Override
             public void paginate(SafaUser user) {
-                ServiceProvider.instance.getGithubGraphQlService().paginateRepositories(user, repositories);
+                ServiceProvider.getInstance().getGithubGraphQlService().paginateRepositories(user, repositories);
                 repositories.getEdges().forEach(edge -> edge.paginate(user));
             }
         }

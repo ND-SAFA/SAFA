@@ -28,18 +28,18 @@ public class DocumentColumn {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column
-    UUID documentColumnId;
+    private UUID documentColumnId;
     /**
      * The name of the column to be displayed.
      */
     @Column(nullable = false)
-    String name;
+    private String name;
     /**
      * The type of data this columns contains.
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    DocumentColumnDataType dataType;
+    private DocumentColumnDataType dataType;
     /**
      * The document containing this columns
      */
@@ -49,17 +49,17 @@ public class DocumentColumn {
         name = "document_id",
         nullable = false
     )
-    Document document;
+    private Document document;
     /**
      * The index this column is in the associated document above.
      */
     @Column(nullable = false)
-    int tableColumnIndex;
+    private int tableColumnIndex;
     /**
      * Whether this column should be required on rows in table.
      */
     @Column(nullable = false)
-    boolean required;
+    private boolean required;
 
     public DocumentColumn() {
         this.required = false;

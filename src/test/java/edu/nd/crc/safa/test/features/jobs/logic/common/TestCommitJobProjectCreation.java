@@ -130,16 +130,16 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
                                      boolean allowProjectCreation,
                                      boolean fail) {
 
-            super(serviceProvider);
+            super(serviceProvider, user);
             this.commit = commit;
             this.allowProjectCreation = allowProjectCreation;
             this.fail = fail;
-            this.user = user;
         }
 
         @Override
         public AbstractJob constructJobForWork() {
-            DummyCommitJob job = new DummyCommitJob(this.jobDbEntity, this.serviceProvider, this.commit, this.user);
+            DummyCommitJob job = new DummyCommitJob(this.getJobDbEntity(), this.getServiceProvider(),
+                this.commit, this.getUser());
             job.setAllowProjectCreation(allowProjectCreation);
             job.setFailStep(fail);
             return job;

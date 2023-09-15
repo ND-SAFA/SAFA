@@ -59,23 +59,23 @@ public class ProjectController extends BaseController {
 
         if (projectAppEntity.getProjectId() == null) { // new projects expected to have no projectId or projectVersion
             // Step - Create project identifier
-            SafaUser user = this.serviceProvider.getSafaUserService().getCurrentUser();
-            Project projectEntity = this.serviceProvider.getProjectService().createProject(projectAppEntity, user);
+            SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+            Project projectEntity = getServiceProvider().getProjectService().createProject(projectAppEntity, user);
             projectAppEntity.setProjectId(projectEntity.getProjectId());
 
             // Step - Create version
-            ProjectVersion projectVersion = this.serviceProvider
+            ProjectVersion projectVersion = getServiceProvider()
                 .getVersionService()
                 .createInitialProjectVersion(projectEntity);
             projectAppEntity.setProjectVersion(projectVersion);
         } else {
             // Step - Finding project identifier
             UUID projectId = projectAppEntity.getProjectId();
-            Project project = this.serviceProvider.getProjectRepository().findByProjectId(projectId);
+            Project project = getServiceProvider().getProjectRepository().findByProjectId(projectId);
 
             // Step - Update meta information
             project.updateFromAppEntity(projectAppEntity);
-            this.serviceProvider.getProjectRepository().save(project);
+            getServiceProvider().getProjectRepository().save(project);
         }
 
         return projectAppEntity;
@@ -88,7 +88,7 @@ public class ProjectController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_USER_PROJECTS)
     public List<ProjectIdAppEntity> getUserProjects() {
-        SafaUser user = this.serviceProvider.getSafaUserService().getCurrentUser();
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         return projectMembershipService.getProjectIdAppEntitiesForUser(user);
     }
 
@@ -101,9 +101,9 @@ public class ProjectController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.DELETE_PROJECT_BY_ID)
     @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable UUID projectId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.DELETE, user).get();
-        this.serviceProvider.getProjectRepository().delete(project);
+        getServiceProvider().getProjectRepository().delete(project);
     }
 }

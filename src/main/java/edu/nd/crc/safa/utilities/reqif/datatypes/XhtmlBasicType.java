@@ -20,6 +20,6 @@ public class XhtmlBasicType {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String id;
+    private String id;
 
 }

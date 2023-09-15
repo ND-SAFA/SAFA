@@ -35,5 +35,5 @@ public class SpecAttributes {
         @XmlElement(name = "ATTRIBUTE-DEFINITION-XHTML", namespace = "",
             type = AttributeDefinitionXhtml.class)
     })
-    protected List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+    private List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
 }

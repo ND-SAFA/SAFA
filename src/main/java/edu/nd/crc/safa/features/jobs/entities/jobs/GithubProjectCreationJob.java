@@ -41,6 +41,9 @@ import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Responsible for providing step implementations for importing a GitHub project:
@@ -54,29 +57,33 @@ public class GithubProjectCreationJob extends CommitJob {
     /**
      * Internal project identifier
      */
-    protected final GithubIdentifier githubIdentifier;
+    @Getter(AccessLevel.PROTECTED)
+    private final GithubIdentifier githubIdentifier;
 
     /**
      * Last commit for the repository we're pulling
      */
-    protected String commitSha;
+    private String commitSha;
 
     /**
      * Credentials used to pull GitHub data
      */
-    protected GithubAccessCredentials credentials;
+    @Getter(AccessLevel.PROTECTED)
+    private GithubAccessCredentials credentials;
 
     /**
      * Repository pulled data
      */
-    protected Repository githubRepository;
+    private Repository githubRepository;
 
     /**
      * Internal project representation
      */
-    protected GithubProject githubProject;
+    @Getter(AccessLevel.PROTECTED)
+    @Setter(AccessLevel.PROTECTED)
+    private GithubProject githubProject;
 
-    protected GithubImportDTO importSettings;
+    private GithubImportDTO importSettings;
 
     private final SafaUser user;
 
@@ -143,7 +150,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
-        GithubAccessCredentialsRepository accessCredentialsRepository = this.serviceProvider
+        GithubAccessCredentialsRepository accessCredentialsRepository = this.getServiceProvider()
             .getGithubAccessCredentialsRepository();
         SafaUser principal = this.getJobDbEntity().getUser();
 
@@ -158,7 +165,7 @@ public class GithubProjectCreationJob extends CommitJob {
      */
     @IJobStep(value = "Retrieving Github Repository", position = 2)
     public void retrieveGitHubRepository(JobLogger logger) {
-        GithubGraphQlService ghService = serviceProvider.getGithubGraphQlService();
+        GithubGraphQlService ghService = getServiceProvider().getGithubGraphQlService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
         String owner = this.githubIdentifier.getRepositoryOwner();
 
@@ -190,7 +197,7 @@ public class GithubProjectCreationJob extends CommitJob {
         Project project = this.githubIdentifier.getProjectVersion().getProject();
 
         // Step - Update job name
-        this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
+        this.getServiceProvider().getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
         createCustomAttributes(project);
 
@@ -208,10 +215,10 @@ public class GithubProjectCreationJob extends CommitJob {
      */
     private void createCustomAttributes(Project project) {
         for (CustomAttributeAppEntity attribute : ReservedAttributes.Github.ALL_ATTRIBUTES) {
-            AttributeService attributeService = serviceProvider.getAttributeService();
+            AttributeService attributeService = getServiceProvider().getAttributeService();
 
             if (attributeService.getByProjectAndKeyname(project, attribute.getKey()).isEmpty()) {
-                serviceProvider.getAttributeService().saveEntity(attribute, project, true);
+                getServiceProvider().getAttributeService().saveEntity(attribute, project, true);
             }
         }
     }
@@ -231,7 +238,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
         applyImportSettings(project, githubProject);
 
-        return this.serviceProvider.getGithubProjectRepository().save(githubProject);
+        return this.getServiceProvider().getGithubProjectRepository().save(githubProject);
     }
 
     /**
@@ -268,7 +275,7 @@ public class GithubProjectCreationJob extends CommitJob {
      * @return The artifact type we should use for importing.
      */
     protected ArtifactType getArtifactTypeMapping(Project project) {
-        TypeService typeService = serviceProvider.getTypeService();
+        TypeService typeService = getServiceProvider().getTypeService();
         String artifactTypeName = this.importSettings.getArtifactType();
         artifactTypeName = artifactTypeName != null ? artifactTypeName : getDefaultTypeName();
 
@@ -283,14 +290,14 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     private ArtifactType createArtifactType(Project project, String artifactTypeName) {
-        ArtifactType artifactType = serviceProvider.getTypeService()
+        ArtifactType artifactType = getServiceProvider().getTypeService()
             .createArtifactType(project, artifactTypeName, user);
         List<AttributePositionAppEntity> attributePositions = List.of(
             new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 0, 1, 1)
         );
         AttributeLayoutAppEntity layoutEntity = new AttributeLayoutAppEntity(null, artifactTypeName + " Layout",
             List.of(artifactTypeName), attributePositions);
-        serviceProvider.getAttributeLayoutService().saveLayoutEntity(user, layoutEntity, project, true);
+        getServiceProvider().getAttributeLayoutService().saveLayoutEntity(user, layoutEntity, project, true);
         return artifactType;
     }
 
@@ -310,7 +317,7 @@ public class GithubProjectCreationJob extends CommitJob {
         this.commitSha = branch.getTarget().getOid();
         commit.addArtifacts(ModificationType.ADDED, getArtifacts(logger));
         this.githubProject.setLastCommitSha(this.commitSha);
-        this.serviceProvider.getGithubProjectRepository().save(githubProject);
+        this.getServiceProvider().getGithubProjectRepository().save(githubProject);
 
         logger.log("Retrieved %d artifacts from project.", commit.getArtifacts().getSize());
     }
@@ -331,7 +338,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
     protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        GithubGraphQlService githubService = serviceProvider.getGithubGraphQlService();
+        GithubGraphQlService githubService = getServiceProvider().getGithubGraphQlService();
         List<GithubRepositoryFileDTO> files = githubService.getFilesInRepo(this.user,
             this.githubIdentifier.getRepositoryOwner(),
             this.githubIdentifier.getRepositoryName(),

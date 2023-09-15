@@ -13,7 +13,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
  * Creates mapping between source type to target type to trace links between those two.
  */
 public class Type2TraceMap {
-    Map<String, Map<String, List<TraceAppEntity>>> type2traces;
+    private Map<String, Map<String, List<TraceAppEntity>>> type2traces;
 
     public Type2TraceMap(ProjectAppEntity projectAppEntity, ProjectEntities projectEntityMaps) {
         this.type2traces = new HashMap<>();

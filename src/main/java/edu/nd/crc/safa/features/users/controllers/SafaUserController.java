@@ -83,7 +83,7 @@ public class SafaUserController extends BaseController {
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
     public UserIdentifierDTO createNewUser(@RequestBody CreateAccountRequest newUser) {
         // Step - Create user
-        return new UserIdentifierDTO(this.serviceProvider
+        return new UserIdentifierDTO(getServiceProvider()
             .getSafaUserService()
             .createUser(newUser.getEmail(), newUser.getPassword()));
     }
@@ -100,7 +100,7 @@ public class SafaUserController extends BaseController {
         if (confirmationPassword == null) {
             throw new SafaError("Received empty confirmation password.");
         }
-        this.serviceProvider
+        getServiceProvider()
             .getSafaUserService()
             .deleteUser(confirmationPassword);
     }

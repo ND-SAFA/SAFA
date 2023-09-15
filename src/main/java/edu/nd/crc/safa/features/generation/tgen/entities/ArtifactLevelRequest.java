@@ -11,9 +11,9 @@ public class ArtifactLevelRequest {
     /**
      * The artifact type of the source artifacts.
      */
-    String source;
+    private String source;
     /**
      * The artifact type of target artifacts.
      */
-    String target;
+    private String target;
 }

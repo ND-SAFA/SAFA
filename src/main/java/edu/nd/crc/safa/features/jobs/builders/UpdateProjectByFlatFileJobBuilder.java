@@ -21,24 +21,24 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     /**
      * ProjectVersion being updated.
      */
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
 
     /**
      * The files to parse
      */
-    MultipartFile[] files;
+    private MultipartFile[] files;
 
     /**
      * Whether the code artifacts should be summarized if no summary exists
      */
-    boolean shouldSummarize;
+    private boolean shouldSummarize;
 
     public UpdateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider,
                                              UUID versionId,
                                              MultipartFile[] files,
                                              boolean shouldSummarize) {
         super(serviceProvider);
-        this.projectVersion = this.serviceProvider.getProjectVersionRepository().findByVersionId(versionId);
+        this.projectVersion = this.getServiceProvider().getProjectVersionRepository().findByVersionId(versionId);
         this.files = files;
         this.shouldSummarize = shouldSummarize;
     }
@@ -49,8 +49,8 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
-            this.jobDbEntity,
-            serviceProvider,
+            this.getJobDbEntity(),
+            getServiceProvider(),
             this.projectVersion,
             this.shouldSummarize);
     }
@@ -66,7 +66,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     }
 
     private void uploadFlatFiles(Project project) throws IOException {
-        FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
+        FileUploadService fileUploadService = this.getServiceProvider().getFileUploadService();
         fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
     }
 }

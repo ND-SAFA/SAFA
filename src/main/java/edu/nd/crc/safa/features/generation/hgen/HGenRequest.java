@@ -20,14 +20,15 @@ public class HGenRequest {
      * List of artifact ids to generate hierarchy for.
      */
     @NotNull
-    List<UUID> artifacts;
+    private List<UUID> artifacts;
     /**
      * The target type of artifact to create.
      */
     @NotNull
-    @Valid List<@Valid String> targetTypes;
+    @Valid
+    private List<@Valid String> targetTypes;
     /**
      * Optional. Project summary.
      */
-    String summary;
+    private String summary;
 }

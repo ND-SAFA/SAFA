@@ -23,9 +23,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ProjectChange<T extends IAppEntity> {
-    List<@Valid T> added = new ArrayList<>();
-    List<@Valid T> removed = new ArrayList<>();
-    List<@Valid T> modified = new ArrayList<>();
+    private List<@Valid T> added = new ArrayList<>();
+    private List<@Valid T> removed = new ArrayList<>();
+    private List<@Valid T> modified = new ArrayList<>();
 
     @JsonIgnore
     public int getSize() {

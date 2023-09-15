@@ -41,8 +41,8 @@ public class TraceMatrixController extends BaseController {
     public TraceMatrixAppEntity createNewTraceMatrixEntry(@PathVariable UUID projectVersionId,
                                                           @PathVariable String sourceTypeName,
                                                           @PathVariable String targetTypeName) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(projectVersionId)
                 .withPermission(ProjectPermission.EDIT, user).get();
         ArtifactType sourceType = typeService.getArtifactType(projectVersion.getProject(), sourceTypeName);
         ArtifactType targetType = typeService.getArtifactType(projectVersion.getProject(), targetTypeName);
@@ -54,8 +54,8 @@ public class TraceMatrixController extends BaseController {
     public void deleteTraceMatrixEntry(@PathVariable UUID projectVersionId,
                                                        @PathVariable String sourceTypeName,
                                                        @PathVariable String targetTypeName) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(projectVersionId)
                 .withPermission(ProjectPermission.EDIT, user).get();
         ArtifactType sourceType = typeService.getArtifactType(projectVersion.getProject(), sourceTypeName);
         ArtifactType targetType = typeService.getArtifactType(projectVersion.getProject(), targetTypeName);
@@ -66,8 +66,8 @@ public class TraceMatrixController extends BaseController {
 
     @DeleteMapping(AppRoutes.TraceMatrix.BY_ID)
     public void deleteTraceMatrixEntry(@PathVariable UUID projectVersionId, @PathVariable UUID traceMatrixId) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(projectVersionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(projectVersionId)
                 .withPermission(ProjectPermission.EDIT, user).get();
         Optional<TraceMatrixEntry> entryOptional = traceMatrixService.getEntry(traceMatrixId);
         TraceMatrixEntry entry = entryOptional.orElseThrow(this::createMissingEntryException);

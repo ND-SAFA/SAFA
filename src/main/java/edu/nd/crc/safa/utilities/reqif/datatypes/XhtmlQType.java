@@ -60,9 +60,9 @@ public class XhtmlQType extends XhtmlBasicStyleableType {
         @XmlElementRef(type = XhtmlDelType.class, required = false)
     })
     @XmlMixed
-    protected List<XhtmlBasicType> content = new ArrayList<>();
+    private List<XhtmlBasicType> content = new ArrayList<>();
 
     @XmlAttribute(name = "cite")
-    protected String cite;
+    private String cite;
 
 }

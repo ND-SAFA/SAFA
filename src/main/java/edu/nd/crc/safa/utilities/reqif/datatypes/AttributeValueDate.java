@@ -29,11 +29,11 @@ import lombok.Setter;
 public class AttributeValueDate extends AttributeValue {
 
     @XmlElement(name = "DEFINITION", required = true)
-    protected Definition definition;
+    private Definition definition;
 
     @XmlAttribute(name = "THE-VALUE", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar value;
+    private XMLGregorianCalendar value;
 
     /**
      * Java class for anonymous complex type.
@@ -48,7 +48,7 @@ public class AttributeValueDate extends AttributeValue {
         @XmlElement(name = "ATTRIBUTE-DEFINITION-DATE-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected AttributeDefinitionDate attributeDefinition;
+        private AttributeDefinitionDate attributeDefinition;
     }
 
 }

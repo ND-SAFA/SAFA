@@ -38,20 +38,20 @@ public class XhtmlTrType extends XhtmlBasicStyleableType {
         @XmlElement(name = "td", type = XhtmlTdType.class)
     })
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicStyleableType> content = new ArrayList<>();
+    private List<XhtmlBasicStyleableType> content = new ArrayList<>();
 
     @XmlAttribute(name = "align")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String align;
+    private String align;
 
     @XmlAttribute(name = "char")
-    protected String alignChar;
+    private String alignChar;
 
     @XmlAttribute(name = "charoff")
-    protected String charoff;
+    private String charoff;
 
     @XmlAttribute(name = "valign")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String valign;
+    private String valign;
 
 }

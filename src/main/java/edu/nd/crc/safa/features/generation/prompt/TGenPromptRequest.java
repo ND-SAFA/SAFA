@@ -10,5 +10,5 @@ public class TGenPromptRequest {
     /**
      * The prompt to complete.
      */
-    String prompt;
+    private String prompt;
 }

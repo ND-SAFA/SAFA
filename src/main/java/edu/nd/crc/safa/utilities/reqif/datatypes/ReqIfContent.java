@@ -35,22 +35,22 @@ import lombok.Setter;
 public class ReqIfContent {
 
     @XmlElement(name = "DATATYPES")
-    protected DataTypes dataTypes;
+    private DataTypes dataTypes;
 
     @XmlElement(name = "SPEC-TYPES")
-    protected SpecTypes specTypes;
+    private SpecTypes specTypes;
 
     @XmlElement(name = "SPEC-OBJECTS")
-    protected SpecObjects specObjects;
+    private SpecObjects specObjects;
 
     @XmlElement(name = "SPEC-RELATIONS")
-    protected SpecRelations specRelations;
+    private SpecRelations specRelations;
 
     @XmlElement(name = "SPECIFICATIONS")
-    protected Specifications specifications;
+    private Specifications specifications;
 
     @XmlElement(name = "SPEC-RELATION-GROUPS")
-    protected SpecRelationGroups specRelationGroups;
+    private SpecRelationGroups specRelationGroups;
 
     /**
      * Java class for anonymous complex type.
@@ -77,7 +77,7 @@ public class ReqIfContent {
             @XmlElement(name = "DATATYPE-DEFINITION-XHTML", namespace = "",
                 type = DatatypeDefinitionXhtml.class)
         })
-        protected List<DatatypeDefinition> datatypeDefinitions = new ArrayList<>();
+        private List<DatatypeDefinition> datatypeDefinitions = new ArrayList<>();
     }
 
     /**
@@ -90,7 +90,7 @@ public class ReqIfContent {
     @Getter
     public static class Specifications {
         @XmlElement(name = "SPECIFICATION", namespace = "")
-        protected List<Specification> specifications = new ArrayList<>();
+        private List<Specification> specifications = new ArrayList<>();
     }
 
     /**
@@ -103,7 +103,7 @@ public class ReqIfContent {
     @Getter
     public static class SpecObjects {
         @XmlElement(name = "SPEC-OBJECT", namespace = "")
-        protected List<SpecObject> specObjects = new ArrayList<>();
+        private List<SpecObject> specObjects = new ArrayList<>();
     }
 
     /**
@@ -116,7 +116,7 @@ public class ReqIfContent {
     @Getter
     public static class SpecRelationGroups {
         @XmlElement(name = "RELATION-GROUP", namespace = "")
-        protected List<RelationGroup> relationGroups = new ArrayList<>();
+        private List<RelationGroup> relationGroups = new ArrayList<>();
     }
 
     /**
@@ -129,7 +129,7 @@ public class ReqIfContent {
     @Getter
     public static class SpecRelations {
         @XmlElement(name = "SPEC-RELATION", namespace = "")
-        protected List<SpecRelation> specRelations = new ArrayList<>();
+        private List<SpecRelation> specRelations = new ArrayList<>();
     }
 
     /**
@@ -147,7 +147,7 @@ public class ReqIfContent {
             @XmlElement(name = "SPEC-RELATION-TYPE", namespace = "", type = SpecRelationType.class),
             @XmlElement(name = "SPECIFICATION-TYPE", namespace = "", type = SpecificationType.class)
         })
-        protected List<SpecType> specTypes = new ArrayList<>();
+        private List<SpecType> specTypes = new ArrayList<>();
     }
 
 }

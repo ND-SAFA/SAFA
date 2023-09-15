@@ -27,7 +27,7 @@ import org.javatuples.Pair;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ElkGraphCreator {
 
-    static ElkGraphFactory factory = ElkGraphFactory.eINSTANCE;
+    private static ElkGraphFactory factory = ElkGraphFactory.eINSTANCE;
 
     public static Pair<ElkNode, Map<UUID, ElkNode>> createGraphFromProject(
         List<ArtifactAppEntity> artifacts,

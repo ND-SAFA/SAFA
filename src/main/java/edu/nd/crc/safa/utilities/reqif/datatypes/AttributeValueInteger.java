@@ -29,10 +29,10 @@ import lombok.Setter;
 public class AttributeValueInteger extends AttributeValue {
 
     @XmlElement(name = "DEFINITION", required = true)
-    protected Definition definition;
+    private Definition definition;
 
     @XmlAttribute(name = "THE-VALUE", required = true)
-    protected BigInteger value;
+    private BigInteger value;
 
     /**
      * Java class for anonymous complex type.
@@ -47,7 +47,7 @@ public class AttributeValueInteger extends AttributeValue {
         @XmlElement(name = "ATTRIBUTE-DEFINITION-INTEGER-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected AttributeDefinitionInteger attributeDefinition;
+        private AttributeDefinitionInteger attributeDefinition;
 
     }
 

@@ -10,9 +10,9 @@ import lombok.Data;
  */
 @Data
 public class ErrorApplicationEntity {
-    String errorId;
-    String message;
-    ProjectEntity activity;
+    private String errorId;
+    private String message;
+    private ProjectEntity activity;
 
     public ErrorApplicationEntity(CommitError error) {
         this.message = error.getDescription();

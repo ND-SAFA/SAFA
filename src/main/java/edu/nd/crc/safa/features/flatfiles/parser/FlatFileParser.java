@@ -21,17 +21,17 @@ public class FlatFileParser {
     /**
      * List of artifact file definitions
      */
-    protected List<IDataFile<ArtifactAppEntity>> artifactFiles;
+    private List<IDataFile<ArtifactAppEntity>> artifactFiles;
     /**
      * List of trace link file definitions
      */
-    protected List<IDataFile<TraceAppEntity>> traceFiles;
+    private List<IDataFile<TraceAppEntity>> traceFiles;
     /**
      * List of trace generation requests.
      */
-    protected TraceGenerationRequest traceGenerationRequest;
+    private TraceGenerationRequest traceGenerationRequest;
 
-    protected IProjectDefinitionParser timParser;
+    private IProjectDefinitionParser timParser;
 
     public FlatFileParser(IProjectDefinitionParser projectDefinitionParser) throws IOException {
         this.artifactFiles = projectDefinitionParser.parseArtifactFiles();

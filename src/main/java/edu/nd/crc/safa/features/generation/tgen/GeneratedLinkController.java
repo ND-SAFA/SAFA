@@ -45,10 +45,10 @@ public class GeneratedLinkController extends BaseController {
      */
     @GetMapping(value = AppRoutes.Links.GET_GENERATED_LINKS_IN_PROJECT_VERSION)
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
-        return this.serviceProvider
+        return getServiceProvider()
             .getTraceService()
             .getAppEntities(projectVersion, user, (t) -> true)
             .stream()
@@ -63,10 +63,10 @@ public class GeneratedLinkController extends BaseController {
      */
     @PostMapping(AppRoutes.Links.ADD_BATCH)
     public void addBatchOfLinks(@PathVariable UUID versionId) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
-        List<TraceAppEntity> links = this.serviceProvider
+        List<TraceAppEntity> links = getServiceProvider()
             .getTraceService()
             .getAppEntities(projectVersion, user, t -> true)
             .stream()
@@ -76,6 +76,6 @@ public class GeneratedLinkController extends BaseController {
         ProjectCommit projectCommit = new ProjectCommit();
         projectCommit.setCommitVersion(projectVersion);
         projectCommit.getTraces().setModified(modifiedLinks);
-        this.serviceProvider.getCommitService().performCommit(projectCommit, user);
+        getServiceProvider().getCommitService().performCommit(projectCommit, user);
     }
 }

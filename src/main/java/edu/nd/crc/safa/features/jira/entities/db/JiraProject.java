@@ -34,22 +34,22 @@ public class JiraProject {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "mapping_id")
-    UUID id;
+    private UUID id;
     /**
      * ID of associated safa project
      */
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "safa_project_id", nullable = false)
-    Project project;
+    private Project project;
     /**
      * ID of associated jira project
      */
     @Column(name = "jira_project_id", nullable = false)
-    Long jiraProjectId;
+    private Long jiraProjectId;
 
     @Column(nullable = false)
-    UUID orgId;
+    private UUID orgId;
 
     /**
      * Timestamp of the last update

@@ -12,8 +12,8 @@ import lombok.Setter;
 @Setter
 public class XhtmlBasicStyleableType extends XhtmlBasicClassType {
     @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
+    private String lang;
 
     @XmlAttribute(name = "style")
-    protected String style;
+    private String style;
 }

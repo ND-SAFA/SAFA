@@ -47,8 +47,8 @@ public class AttributeLayoutController extends BaseController {
     @PostMapping(AppRoutes.AttributeLayout.ROOT)
     public AttributeLayoutAppEntity createLayout(@PathVariable UUID projectId,
                                                  @RequestBody AttributeLayoutAppEntity layout) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.EDIT, user).get();
         AttributeLayout savedLayout = attributeLayoutService.saveLayoutEntity(user, layout, project, true);
         return attributeLayoutService.appEntityFromAttributeLayout(savedLayout);
@@ -65,8 +65,8 @@ public class AttributeLayoutController extends BaseController {
     @PutMapping(AppRoutes.AttributeLayout.BY_ID)
     public AttributeLayoutAppEntity editLayout(@PathVariable UUID projectId, @PathVariable UUID id,
                                                @RequestBody AttributeLayoutAppEntity layout) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.EDIT, user).get();
 
         if (layout.getId() == null) {
@@ -89,8 +89,8 @@ public class AttributeLayoutController extends BaseController {
      */
     @DeleteMapping(AppRoutes.AttributeLayout.BY_ID)
     public void deleteLayout(@PathVariable UUID projectId, @PathVariable UUID id) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        this.resourceBuilder.fetchProject(projectId).withPermission(ProjectPermission.EDIT, user);
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        getResourceBuilder().fetchProject(projectId).withPermission(ProjectPermission.EDIT, user);
         attributeLayoutService.deleteLayoutById(user, id);
     }
 
@@ -103,8 +103,8 @@ public class AttributeLayoutController extends BaseController {
      */
     @GetMapping(AppRoutes.AttributeLayout.BY_ID)
     public AttributeLayoutAppEntity getLayout(@PathVariable UUID projectId, @PathVariable UUID id) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        this.resourceBuilder.fetchProject(projectId).withPermission(ProjectPermission.VIEW, user);
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        getResourceBuilder().fetchProject(projectId).withPermission(ProjectPermission.VIEW, user);
         return attributeLayoutService.getLayoutById(id)
                 .map(attributeLayoutService::appEntityFromAttributeLayout)
                 .orElseThrow(() -> new SafaError("No layout with ID %s found.", id));
@@ -118,8 +118,8 @@ public class AttributeLayoutController extends BaseController {
      */
     @GetMapping(AppRoutes.AttributeLayout.ROOT)
     public List<AttributeLayoutAppEntity> getProjectLayouts(@PathVariable UUID projectId) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         return attributeLayoutService.getLayoutsByProject(project)
                 .stream()

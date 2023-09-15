@@ -32,20 +32,20 @@ import lombok.Setter;
 public class XhtmlTfootType extends XhtmlBasicStyleableType {
 
     @XmlElement(required = true)
-    protected List<XhtmlTrType> content = new ArrayList<>();
+    private List<XhtmlTrType> content = new ArrayList<>();
 
     @XmlAttribute(name = "align")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String align;
+    private String align;
 
     @XmlAttribute(name = "char")
-    protected String alignChar;
+    private String alignChar;
 
     @XmlAttribute(name = "charoff")
-    protected String charoff;
+    private String charoff;
 
     @XmlAttribute(name = "valign")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String valign;
+    private String valign;
 
 }

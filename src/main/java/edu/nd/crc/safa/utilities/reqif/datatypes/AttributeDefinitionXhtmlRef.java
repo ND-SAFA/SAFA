@@ -18,5 +18,5 @@ public class AttributeDefinitionXhtmlRef extends AttributeDefinitionRef {
     @XmlValue
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
-    protected AttributeDefinitionXhtml attributeDefinition;
+    private AttributeDefinitionXhtml attributeDefinition;
 }

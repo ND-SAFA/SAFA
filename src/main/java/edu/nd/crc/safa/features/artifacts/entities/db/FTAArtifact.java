@@ -29,19 +29,19 @@ public class FTAArtifact implements IArtifact {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "fta_artifact_id")
-    UUID ftaArtifactId;
+    private UUID ftaArtifactId;
     /**
      * The associated base artifact.
      */
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false, unique = true)
-    Artifact artifact;
+    private Artifact artifact;
     /**
      * For FTA nodes, the logic type of the artifact (e.g. AND / OR)
      */
     @Column(name = "logic_type")
-    FTAType logicType;
+    private FTAType logicType;
 
     public FTAArtifact(Artifact artifact, FTAType ftaType) {
         this.artifact = artifact;

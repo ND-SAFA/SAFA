@@ -26,5 +26,5 @@ import lombok.Getter;
 @Getter
 public class Children {
     @XmlElement(name = "SPEC-HIERARCHY", namespace = "")
-    protected List<SpecHierarchy> specHierarchy = new ArrayList<>();
+    private List<SpecHierarchy> specHierarchy = new ArrayList<>();
 }

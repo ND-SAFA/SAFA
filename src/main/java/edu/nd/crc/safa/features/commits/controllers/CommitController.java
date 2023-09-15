@@ -43,11 +43,11 @@ public class CommitController extends BaseController {
     @PostMapping(AppRoutes.Commits.COMMIT_CHANGE)
     public ProjectCommit commitChange(@PathVariable UUID versionId,
                                       @RequestBody ProjectCommit projectCommit) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.EDIT, user).get();
         projectCommit.setCommitVersion(projectVersion);
-        ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
+        ProjectChanger projectChanger = new ProjectChanger(projectVersion, getServiceProvider());
         return projectChanger.commit(projectCommit);
     }
 }

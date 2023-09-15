@@ -43,7 +43,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "trace_link_version_id")
-    UUID traceLinkVersionId;
+    private UUID traceLinkVersionId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,7 +51,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         name = "version_id",
         nullable = false
     )
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -59,28 +59,28 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         name = "trace_link_id",
         nullable = false
     )
-    TraceLink traceLink;
+    private TraceLink traceLink;
 
     @Column(name = "modification_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    ModificationType modificationType;
+    private ModificationType modificationType;
 
     @Column(name = "trace_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    TraceType traceType;
+    private TraceType traceType;
 
     @Column(name = "approval_status")
-    ApprovalStatus approvalStatus;
+    private ApprovalStatus approvalStatus;
 
     @Column(name = "score")
-    double score;
+    private double score;
 
     @Column(name = "is_visible")
-    boolean isVisible = true;
+    private boolean isVisible = true;
 
     @Lob
     @Column(columnDefinition = "text")
-    String explanation;
+    private String explanation;
 
     public TraceLinkVersion() {
         this.traceType = TraceType.GENERATED;
@@ -187,8 +187,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         if (e instanceof TraceLinkVersion) {
             TraceLinkVersion other = (TraceLinkVersion) e;
             return hasSameContent(
-                other.traceLink.sourceArtifact.getName(),
-                other.traceLink.targetArtifact.getName(),
+                other.traceLink.getSourceArtifact().getName(),
+                other.traceLink.getTargetArtifact().getName(),
                 other.traceType,
                 other.approvalStatus,
                 other.score,
@@ -216,8 +216,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
                                    ApprovalStatus approvalStatus,
                                    double score,
                                    boolean isVisible) {
-        return this.traceLink.sourceArtifact.getName().equals(sourceName)
-            && this.traceLink.targetArtifact.getName().equals(targetName)
+        return this.traceLink.getSourceArtifact().getName().equals(sourceName)
+            && this.traceLink.getTargetArtifact().getName().equals(targetName)
             && this.traceType == traceType
             && this.approvalStatus == approvalStatus
             && areEqualWithDelta(this.score, score, 0.001)

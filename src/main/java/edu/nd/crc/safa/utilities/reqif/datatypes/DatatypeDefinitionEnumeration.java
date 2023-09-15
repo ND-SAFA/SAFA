@@ -27,7 +27,7 @@ import lombok.Setter;
 public class DatatypeDefinitionEnumeration extends DatatypeDefinition {
 
     @XmlElement(name = "SPECIFIED-VALUES")
-    protected SpecifiedValues specifiedValues;
+    private SpecifiedValues specifiedValues;
 
     /**
      * Java class for anonymous complex type.
@@ -39,7 +39,7 @@ public class DatatypeDefinitionEnumeration extends DatatypeDefinition {
     @Getter
     public static class SpecifiedValues {
         @XmlElement(name = "ENUM-VALUE", namespace = "")
-        protected List<EnumValue> values = new ArrayList<>();
+        private List<EnumValue> values = new ArrayList<>();
     }
 
 }

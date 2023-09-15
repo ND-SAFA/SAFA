@@ -44,7 +44,7 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "artifact_id")
-    UUID artifactId;
+    private UUID artifactId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -52,21 +52,21 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
         name = "project_id",
         nullable = false
     )
-    Project project;
+    private Project project;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
         name = "type_id",
         nullable = false)
-    ArtifactType type;
+    private ArtifactType type;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     @Column(name = "document_type")
     @Enumerated(EnumType.STRING)
-    DocumentType documentType;
+    private DocumentType documentType;
 
     public Artifact() {
         this.documentType = DocumentType.ARTIFACT_TREE;

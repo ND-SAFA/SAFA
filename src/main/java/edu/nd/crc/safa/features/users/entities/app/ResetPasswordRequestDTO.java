@@ -19,12 +19,12 @@ public class ResetPasswordRequestDTO {
      */
     @NotNull
     @NotEmpty
-    String resetToken;
+    private String resetToken;
 
     /**
      * The new password to set the account to.
      */
     @NotNull
     @NotEmpty
-    String newPassword;
+    private String newPassword;
 }

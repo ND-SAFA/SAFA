@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class CheckArtifactNameService {
-    ArtifactRepository artifactRepository;
-    ArtifactVersionRepository artifactVersionRepository;
+    private ArtifactRepository artifactRepository;
+    private ArtifactVersionRepository artifactVersionRepository;
 
     public boolean doesArtifactExist(
         ProjectVersion projectVersion,

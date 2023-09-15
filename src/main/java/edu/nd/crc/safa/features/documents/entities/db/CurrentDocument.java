@@ -37,15 +37,15 @@ public class CurrentDocument {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "id")
-    UUID id;
+    private UUID id;
 
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = SafaUser.ID_COLUMN, nullable = false)
-    SafaUser user;
+    private SafaUser user;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "document_id", nullable = false)
-    Document document;
+    private Document document;
 }

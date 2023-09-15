@@ -19,25 +19,25 @@ public class TGenStatus {
     /**
      * The status of the celery job.
      */
-    CeleryStatus status;
+    private CeleryStatus status;
     /**
      * Message corresponding with status, used for reading error message.
      */
-    String message;
+    private String message;
     /**
      * The current logs of the job.
      */
-    List<String> logs;
+    private List<String> logs;
     /**
      * The current index of the log to read next.
      */
     @Nullable
-    int currentLogIndex = 0;
+    private int currentLogIndex = 0;
     /**
      * The entry of the job.
      */
     @Nullable
-    JobLogEntry jobLogEntry;
+    private JobLogEntry jobLogEntry;
 
     public void update(TGenStatus status) {
         this.status = status.status;

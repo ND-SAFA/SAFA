@@ -44,28 +44,28 @@ public class ProjectVersion implements Serializable {
     @Type(type = "uuid-char")
     @Column(name = "version_id")
     @NotNull
-    UUID versionId;
+    private UUID versionId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "project_id", nullable = false)
     @JsonIgnore
-    Project project;
+    private Project project;
 
     @NotNull
     @Positive
     @Column(name = "major_version", nullable = false)
-    int majorVersion;
+    private int majorVersion;
 
     @NotNull
     @PositiveOrZero
     @Column(name = "minor_version", nullable = false)
-    int minorVersion;
+    private int minorVersion;
 
     @NotNull
     @PositiveOrZero
     @Column(name = "revision", nullable = false)
-    int revision;
+    private int revision;
 
     public ProjectVersion(Project project,
                           int majorVersion,

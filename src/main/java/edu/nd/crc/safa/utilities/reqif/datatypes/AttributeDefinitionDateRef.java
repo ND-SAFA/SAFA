@@ -18,5 +18,5 @@ public class AttributeDefinitionDateRef extends AttributeDefinitionRef {
     @XmlValue
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
-    protected AttributeDefinitionDate attributeDefinition;
+    private AttributeDefinitionDate attributeDefinition;
 }

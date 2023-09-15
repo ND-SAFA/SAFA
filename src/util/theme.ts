@@ -86,7 +86,7 @@ export const ThemeColors = {
 /**
  * The colors used in light mode.
  */
-export const lightPalette: Record<string, string> = {
+export const lightPalette = {
   primary: ThemeColors.primary,
   secondary: ThemeColors.secondary,
   accent: ThemeColors.accent,
@@ -117,7 +117,7 @@ export const lightPalette: Record<string, string> = {
 /**
  * The colors used in dark mode.
  */
-export const darkPalette: Record<string, string> = {
+export const darkPalette = {
   primary: ThemeColors.primaryDark,
   secondary: ThemeColors.secondary,
   accent: ThemeColors.accent,

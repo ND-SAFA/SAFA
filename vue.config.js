@@ -8,6 +8,9 @@ module.exports = {
         fs: false,
       },
     },
+    devServer: {
+      client: { overlay: false },
+    },
   },
   transpileDependencies: ["quasar"],
   pluginOptions: {

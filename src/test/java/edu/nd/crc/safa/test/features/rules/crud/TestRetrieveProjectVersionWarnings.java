@@ -6,7 +6,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -82,7 +82,7 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .withAddedArtifact(designJson)
             .withAddedTrace(traceJson);
-        ProjectCommit addDesignCommit = commitService.commit(commitBuilder);
+        ProjectCommitDefinition addDesignCommit = commitService.commit(commitBuilder);
 
         // VP - Receive expected messages
         // TODO - fails due to intercepting a notification that's not meant for it
@@ -113,7 +113,7 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
 
         // Step - Delete design artifact
         ArtifactAppEntity updatedDesign = addDesignCommit.getArtifact(ModificationType.ADDED, 0);
-        ProjectCommit deletionCommit = commitService
+        ProjectCommitDefinition deletionCommit = commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
                 .withRemovedArtifact(updatedDesign));

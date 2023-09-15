@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.notifications.entities.Change;
@@ -29,7 +29,7 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     protected UUID createEntity() throws Exception {
         dbEntityBuilder.newCustomAttribute(projectName, CustomAttributeType.TEXT, "key", "key");
 
-        ProjectCommit commit = commitService
+        ProjectCommitDefinition commit = commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
                 .withAddedArtifact(artifact));

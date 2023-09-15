@@ -4,7 +4,8 @@ import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
@@ -36,26 +37,26 @@ public class ProjectChanger {
     /**
      * Performs modifications specified in project commit and updates the layout accordingly.
      *
-     * @param projectCommit Commit containing addition, modifications, and deletions of entities.
-     * @return {@link ProjectCommit} Commit containing persisted entities and any errors.
+     * @param projectCommitDefinition Commit containing addition, modifications, and deletions of entities.
+     * @return {@link ProjectCommitDefinition} Commit containing persisted entities and any errors.
      */
-    public ProjectCommit commit(ProjectCommit projectCommit) {
-        return commitAsUser(projectCommit, serviceProvider.getSafaUserService().getCurrentUser());
+    public ProjectCommitAppEntity commit(ProjectCommitDefinition projectCommitDefinition) {
+        return commitAsUser(projectCommitDefinition, serviceProvider.getSafaUserService().getCurrentUser());
     }
 
     /**
      * Performs modifications specified in project commit and updates the layout accordingly.
      *
-     * @param projectCommit Commit containing addition, modifications, and deletions of entities.
-     * @param user          The user performing the commit
-     * @return {@link ProjectCommit} Commit containing persisted entities and any errors.
+     * @param projectCommitDefinition Commit containing addition, modifications, and deletions of entities.
+     * @param user                    The user performing the commit
+     * @return {@link ProjectCommitDefinition} Commit containing persisted entities and any errors.
      */
-    public ProjectCommit commitAsUser(ProjectCommit projectCommit, SafaUser user) {
-        ProjectCommit committedChanges = serviceProvider
+    public ProjectCommitAppEntity commitAsUser(ProjectCommitDefinition projectCommitDefinition, SafaUser user) {
+        ProjectCommitAppEntity committedChanges = serviceProvider
             .getCommitService()
-            .performCommit(projectCommit, user);
+            .performCommit(projectCommitDefinition, user);
 
-        if (projectCommit.shouldUpdateDefaultLayout()) {
+        if (projectCommitDefinition.shouldUpdateDefaultLayout()) {
             LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
             layoutManager.generateLayoutUpdates(committedChanges);
         }

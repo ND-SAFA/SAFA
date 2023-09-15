@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
@@ -47,7 +47,7 @@ public class GeneratedLinkController extends BaseController {
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         return this.serviceProvider
             .getTraceService()
             .getAppEntities(projectVersion, user, (t) -> true)
@@ -65,7 +65,7 @@ public class GeneratedLinkController extends BaseController {
     public void addBatchOfLinks(@PathVariable UUID versionId) {
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         List<TraceAppEntity> links = this.serviceProvider
             .getTraceService()
             .getAppEntities(projectVersion, user, t -> true)
@@ -73,9 +73,9 @@ public class GeneratedLinkController extends BaseController {
             .filter(t -> !t.isVisible())
             .collect(Collectors.toList());
         List<TraceAppEntity> modifiedLinks = LinkVisibilityService.setLinksVisibility(links);
-        ProjectCommit projectCommit = new ProjectCommit();
-        projectCommit.setCommitVersion(projectVersion);
-        projectCommit.getTraces().setModified(modifiedLinks);
-        this.serviceProvider.getCommitService().performCommit(projectCommit, user);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition();
+        projectCommitDefinition.setCommitVersion(projectVersion);
+        projectCommitDefinition.getTraces().setModified(modifiedLinks);
+        this.serviceProvider.getCommitService().performCommit(projectCommitDefinition, user);
     }
 }

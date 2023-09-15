@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
@@ -75,7 +75,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
                                       ServiceProvider serviceProvider,
                                       ProjectVersion projectVersion,
                                       boolean shouldSummarize) {
-        super(jobDbEntity, serviceProvider, new ProjectCommit(projectVersion, true));
+        super(jobDbEntity, serviceProvider, new ProjectCommitDefinition(projectVersion, true));
         this.projectVersion = projectVersion;
         this.shouldSummarize = shouldSummarize;
     }
@@ -139,29 +139,29 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     public void parsingArtifactFiles(JobLogger logger) throws SafaError {
-        ProjectCommit projectCommit = getProjectCommit();
+        ProjectCommitDefinition projectCommitDefinition = getProjectCommitDefinition();
 
         EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
-        projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
-        logger.log("%d artifacts created.", projectCommit.getArtifacts().getSize());
+        projectCommitDefinition.getArtifacts().setAdded(artifactCreationResponse.getEntities());
+        logger.log("%d artifacts created.", projectCommitDefinition.getArtifacts().getSize());
 
         List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(), ProjectEntity.ARTIFACTS);
-        projectCommit.getErrors().addAll(artifactErrors);
-        logger.log("%d errors found.", projectCommit.getErrors().size());
+        projectCommitDefinition.getErrors().addAll(artifactErrors);
+        logger.log("%d errors found.", projectCommitDefinition.getErrors().size());
     }
 
     public void parsingTraceFiles(JobLogger logger) throws SafaError {
-        ProjectCommit projectCommit = getProjectCommit();
+        ProjectCommitDefinition projectCommitDefinition = getProjectCommitDefinition();
 
-        List<ArtifactAppEntity> artifactsCreated = projectCommit.getArtifacts().getAdded();
+        List<ArtifactAppEntity> artifactsCreated = projectCommitDefinition.getArtifacts().getAdded();
         EntityParsingResult<TraceAppEntity, String> traceCreationResponse =
             flatFileParser.parseTraces(artifactsCreated);
-        projectCommit.getTraces().setAdded(traceCreationResponse.getEntities());
-        logger.log("%d traces created.", projectCommit.getTraces().getSize());
+        projectCommitDefinition.getTraces().setAdded(traceCreationResponse.getEntities());
+        logger.log("%d traces created.", projectCommitDefinition.getTraces().getSize());
 
         List<CommitError> traceErrors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
-        projectCommit.getErrors().addAll(traceErrors);
-        logger.log("%d errors found.", projectCommit.getErrors().size());
+        projectCommitDefinition.getErrors().addAll(traceErrors);
+        logger.log("%d errors found.", projectCommitDefinition.getErrors().size());
     }
 
     private List<CommitError> createErrors(List<String> errorMessages,
@@ -180,26 +180,26 @@ public class FlatFileProjectCreationJob extends CommitJob {
         if (!this.shouldSummarize) {
             return;
         }
-        ProjectCommit projectCommit = this.getProjectCommit();
-        List<ArtifactAppEntity> newArtifacts = projectCommit.getArtifacts().getAdded();
+        ProjectCommitDefinition projectCommitDefinition = this.getProjectCommitDefinition();
+        List<ArtifactAppEntity> newArtifacts = projectCommitDefinition.getArtifacts().getAdded();
         SummaryService summaryService = this.serviceProvider.getSummaryService();
         summaryService.addSummariesToCode(newArtifacts, this.getDbLogger());
-        projectCommit.getArtifacts().setAdded(newArtifacts);
+        projectCommitDefinition.getArtifacts().setAdded(newArtifacts);
     }
 
     @IJobStep(value = "Generating Trace Links", position = 4)
     public void generatingTraces(JobLogger logger) {
-        ProjectCommit projectCommit = getProjectCommit();
+        ProjectCommitDefinition projectCommitDefinition = getProjectCommitDefinition();
 
         TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();
-        ProjectAppEntity projectAppEntity = new ProjectAppEntity(projectCommit);
+        ProjectAppEntity projectAppEntity = new ProjectAppEntity(projectCommitDefinition);
         List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(
             flatFileParser.getTraceGenerationRequest(),
             projectAppEntity);
-        generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(projectCommit.getTraces().getAdded(),
+        generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(projectCommitDefinition.getTraces().getAdded(),
             generatedLinks);
         logger.log("%d traces generated.", generatedLinks.size());
 
-        projectCommit.getTraces().getAdded().addAll(generatedLinks);
+        projectCommitDefinition.getTraces().getAdded().addAll(generatedLinks);
     }
 }

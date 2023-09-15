@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
@@ -28,11 +28,11 @@ public class HGenJob extends CommitJob {
 
     public HGenJob(JobDbEntity jobDbEntity,
                    ServiceProvider serviceProvider,
-                   ProjectCommit projectCommit,
+                   ProjectCommitDefinition projectCommitDefinition,
                    HGenRequest hGenRequest) {
-        super(jobDbEntity, serviceProvider, projectCommit);
+        super(jobDbEntity, serviceProvider, projectCommitDefinition);
         this.hGenRequest = hGenRequest;
-        this.projectVersion = projectCommit.getCommitVersion();
+        this.projectVersion = projectCommitDefinition.getCommitVersion();
     }
 
     public static String getJobName(HGenRequest request) {
@@ -56,8 +56,8 @@ public class HGenJob extends CommitJob {
         HGenService hGenService = this.serviceProvider.getHGenService();
         String summary = this.projectVersion.getProject().getSpecification();
         this.hGenRequest.setSummary(summary);
-        ProjectCommit projectCommit = hGenService.generateHierarchy(this.projectVersion, this.hGenRequest,
+        ProjectCommitDefinition projectCommitDefinition = hGenService.generateHierarchy(this.projectVersion, this.hGenRequest,
             this.getDbLogger());
-        this.setProjectCommit(projectCommit);
+        this.setProjectCommitDefinition(projectCommitDefinition);
     }
 }

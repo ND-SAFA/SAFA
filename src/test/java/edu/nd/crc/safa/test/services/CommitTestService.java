@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
@@ -21,10 +21,10 @@ import org.springframework.test.web.servlet.ResultMatcher;
 public class CommitTestService {
     ObjectMapper objectMapper = ObjectMapperConfig.create();
 
-    public ProjectCommit commit(CommitBuilder commitBuilder) throws Exception {
-        ProjectCommit commitRequest = commitBuilder.get();
+    public ProjectCommitDefinition commit(CommitBuilder commitBuilder) throws Exception {
+        ProjectCommitDefinition commitRequest = commitBuilder.get();
         JSONObject commitJson = commitWithStatus(commitBuilder, status().is2xxSuccessful());
-        ProjectCommit commitResponse = objectMapper.readValue(commitJson.toString(), ProjectCommit.class);
+        ProjectCommitDefinition commitResponse = objectMapper.readValue(commitJson.toString(), ProjectCommitDefinition.class);
 
         for (ArtifactAppEntity artifact : commitResponse.getArtifactList(ModificationType.ADDED)) {
             commitRequest.getArtifact(ModificationType.ADDED, artifact.getName()).setId(artifact.getId());

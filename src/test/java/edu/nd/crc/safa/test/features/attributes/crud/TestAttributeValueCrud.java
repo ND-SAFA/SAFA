@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
@@ -61,18 +61,18 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
             attributeServiceProvider, currentType);
 
         ArtifactAppEntity artifact = new ArtifactAppEntity(null,
-                "Requirements",
-                "RE-20",
-                "summary",
-                "body",
-                DocumentType.ARTIFACT_TREE,
-                Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).value)
+            "Requirements",
+            "RE-20",
+            "summary",
+            "body",
+            DocumentType.ARTIFACT_TREE,
+            Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).value)
         );
 
-        ProjectCommit commit = commitService
-                .commit(CommitBuilder
-                        .withVersion(projectVersion)
-                        .withAddedArtifact(artifact));
+        ProjectCommitDefinition commit = commitService
+            .commit(CommitBuilder
+                .withVersion(projectVersion)
+                .withAddedArtifact(artifact));
 
         currentId = commit.getArtifact(ModificationType.ADDED, 0).getId();
         artifact.setId(currentId);
@@ -96,17 +96,17 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     @Override
     protected void updateEntity() throws Exception {
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
-                "Requirements",
-                "RE-20",
-                "summary",
-                "body",
-                DocumentType.ARTIFACT_TREE,
-                Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
+            "Requirements",
+            "RE-20",
+            "summary",
+            "body",
+            DocumentType.ARTIFACT_TREE,
+            Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
         );
 
         commitService.commit(CommitBuilder
-                        .withVersion(projectVersion)
-                        .withModifiedArtifact(artifact));
+            .withVersion(projectVersion)
+            .withModifiedArtifact(artifact));
     }
 
     @Override
@@ -126,17 +126,17 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     @Override
     protected void deleteEntity(ArtifactAppEntity entity) throws Exception {
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
-                "Requirements",
-                "RE-20",
-                "summary",
-                "body",
-                DocumentType.ARTIFACT_TREE,
-                Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
+            "Requirements",
+            "RE-20",
+            "summary",
+            "body",
+            DocumentType.ARTIFACT_TREE,
+            Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
         );
 
         commitService.commit(CommitBuilder
-                .withVersion(projectVersion)
-                .withRemovedArtifact(artifact));
+            .withVersion(projectVersion)
+            .withRemovedArtifact(artifact));
     }
 
     @Override

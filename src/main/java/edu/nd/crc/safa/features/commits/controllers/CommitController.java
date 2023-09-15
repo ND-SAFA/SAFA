@@ -4,7 +4,8 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
@@ -35,19 +36,21 @@ public class CommitController extends BaseController {
     /**
      * Saves given entities to specified project version.
      *
-     * @param versionId     The id of the version to commit to.
-     * @param projectCommit The entities to commit.
+     * @param versionId              The id of the version to commit to.
+     * @param projectCommitAppEntity The entities to commit.
      * @return ProjectCommit The commit containing the entities with any processing additions.
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
     @PostMapping(AppRoutes.Commits.COMMIT_CHANGE)
-    public ProjectCommit commitChange(@PathVariable UUID versionId,
-                                      @RequestBody ProjectCommit projectCommit) {
+    public ProjectCommitAppEntity commitChange(@PathVariable UUID versionId,
+                                               @RequestBody ProjectCommitAppEntity projectCommitAppEntity) {
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
-        projectCommit.setCommitVersion(projectVersion);
+            .withPermission(ProjectPermission.EDIT, user).get();
+
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectCommitAppEntity);
+        projectCommitDefinition.setCommitVersion(projectVersion);
         ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
-        return projectChanger.commit(projectCommit);
+        return projectChanger.commit(projectCommitDefinition);
     }
 }

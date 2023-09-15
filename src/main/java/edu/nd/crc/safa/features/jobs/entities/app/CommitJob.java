@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 import java.io.IOException;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -28,21 +28,21 @@ public abstract class CommitJob extends AbstractJob {
     private final VersionService versionService;
     @Setter
     @Getter
-    private ProjectCommit projectCommit;
+    private ProjectCommitDefinition projectCommitDefinition;
     private ProjectVersion createdProjectVersion;
 
     /**
      * Create a commit job for a project that already exists.
      *
-     * @param jobDbEntity     DB entity for this job.
-     * @param serviceProvider Service provider
-     * @param projectCommit   The project commit all changes from this job should go into
+     * @param jobDbEntity             DB entity for this job.
+     * @param serviceProvider         Service provider
+     * @param projectCommitDefinition The project commit all changes from this job should go into
      */
-    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider, ProjectCommit projectCommit) {
+    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider, ProjectCommitDefinition projectCommitDefinition) {
         super(jobDbEntity, serviceProvider);
         this.projectService = serviceProvider.getProjectService();
         this.versionService = serviceProvider.getVersionService();
-        this.projectCommit = projectCommit;
+        this.projectCommitDefinition = projectCommitDefinition;
     }
 
     protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
@@ -50,19 +50,19 @@ public abstract class CommitJob extends AbstractJob {
         this.projectService = serviceProvider.getProjectService();
         this.versionService = serviceProvider.getVersionService();
 
-        this.projectCommit = null;
+        this.projectCommitDefinition = null;
     }
 
     @IJobStep(value = "Committing Entities", position = -2)
     public void commitArtifactsAndTraceLinks() throws SafaError {
         assertProjectVersionIsSet();
-        this.getDbLogger().log(this.projectCommit.getSummary());
-        ProjectChanger projectChanger = new ProjectChanger(projectCommit.getCommitVersion(), serviceProvider);
-        projectChanger.commitAsUser(projectCommit, getJobDbEntity().getUser());
+        this.getDbLogger().log(this.projectCommitDefinition.getSummary());
+        ProjectChanger projectChanger = new ProjectChanger(projectCommitDefinition.getCommitVersion(), serviceProvider);
+        projectChanger.commitAsUser(projectCommitDefinition, getJobDbEntity().getUser());
     }
 
     private void assertProjectVersionIsSet() {
-        if (this.projectCommit == null || this.projectCommit.getCommitVersion() == null) {
+        if (this.projectCommitDefinition == null || this.projectCommitDefinition.getCommitVersion() == null) {
             throw new NullPointerException("Project version is not set.");
         }
     }
@@ -70,7 +70,7 @@ public abstract class CommitJob extends AbstractJob {
     @Override
     protected UUID getCompletedEntityId() {
         assertProjectVersionIsSet();
-        return projectCommit.getCommitVersion().getVersionId();
+        return projectCommitDefinition.getCommitVersion().getVersionId();
     }
 
     /**
@@ -85,7 +85,7 @@ public abstract class CommitJob extends AbstractJob {
         Project project = projectService.createProject(name, description, owner);
 
         this.createdProjectVersion = versionService.createInitialProjectVersion(project);
-        projectCommit = new ProjectCommit(createdProjectVersion, false);
+        projectCommitDefinition = new ProjectCommitDefinition(createdProjectVersion, false);
         return createdProjectVersion;
     }
 

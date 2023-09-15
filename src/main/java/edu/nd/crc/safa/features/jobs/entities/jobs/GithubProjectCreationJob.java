@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
@@ -247,7 +247,7 @@ public class GithubProjectCreationJob extends CommitJob {
      * Applies the import settings to the github project definition, updating values if they are present
      * in the import settings.
      *
-     * @param project The project we're importing into.
+     * @param project   The project we're importing into.
      * @param ghProject The github project mapping.
      */
     protected void applyImportSettings(Project project, GithubProject ghProject) {
@@ -348,7 +348,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 5)
     public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
-        ProjectCommit commit = getProjectCommit();
+        ProjectCommitDefinition commit = getProjectCommitDefinition();
 
         logger.log("Attempting to find branch \"%s\".", this.githubProject.getBranch());
         Branch branch = getBranch(this.githubProject.getBranch());

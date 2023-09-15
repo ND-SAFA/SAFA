@@ -100,7 +100,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, orgId, jiraProjectId).getIssues();
 
         logger.log("Jira project '%s' successfully retrieved. %d issues will be imported",
-                jiraProjectResponse.getName(), issues.size());
+            jiraProjectResponse.getName(), issues.size());
     }
 
     @IJobStep(value = "Creating SAFA Project", position = CREATE_PROJECT_STEP_INDEX)
@@ -121,7 +121,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
     @IJobStep(value = "Creating SAFA Project to Jira Project Mapping", position = 4)
     public void mapSafaProject(JobLogger logger) {
-        Project project = getProjectCommit().getCommitVersion().getProject();
+        Project project = getProjectCommitDefinition().getCommitVersion().getProject();
 
         // Step - Map JIRA project to SAFA project
         this.jiraProject = this.getJiraProjectMapping(
@@ -133,7 +133,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
             jiraProject.getJiraProjectId(), jiraProject.getOrgId());
     }
 
-    protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId)  {
+    protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId) {
         JiraProject jiraProject = new JiraProject(project, orgId, jiraProjectId);
 
         return this.serviceProvider.getJiraProjectRepository().save(jiraProject);
@@ -142,8 +142,8 @@ public class CreateProjectViaJiraJob extends CommitJob {
     @IJobStep(value = "Importing Issues and Links", position = 5)
     public void convertIssuesToArtifactsAndTraceLinks() {
         ProjectEntities projectEntities = this.retrieveJiraEntities();
-        getProjectCommit().addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());
-        getProjectCommit().addTraces(ModificationType.ADDED, projectEntities.getTraces());
+        getProjectCommitDefinition().addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());
+        getProjectCommitDefinition().addTraces(ModificationType.ADDED, projectEntities.getTraces());
 
         jiraProject.setLastUpdate(new Date());
         this.serviceProvider.getJiraProjectRepository().save(jiraProject);

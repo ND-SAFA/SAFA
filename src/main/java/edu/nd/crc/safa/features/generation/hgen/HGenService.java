@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
@@ -39,7 +39,7 @@ public class HGenService {
      * @param jobLogger      The logger used to store logs under.
      * @return List of generated artifacts.
      */
-    public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequest request, JobLogger jobLogger) {
+    public ProjectCommitDefinition generateHierarchy(ProjectVersion projectVersion, HGenRequest request, JobLogger jobLogger) {
         List<String> targetTypes = request.getTargetTypes();
 
         List<ArtifactAppEntity> sourceArtifacts = this.artifactService.getAppEntities(projectVersion);
@@ -47,10 +47,10 @@ public class HGenService {
         TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes, request.getSummary());
 
         GenerationDataset dataset = genApi.generateHierarchy(tgenRequest, jobLogger);
-        ProjectCommit projectCommit = createHGenCommit(dataset, targetTypes);
-        projectCommit.setCommitVersion(projectVersion);
+        ProjectCommitDefinition projectCommitDefinition = createHGenCommit(dataset, targetTypes);
+        projectCommitDefinition.setCommitVersion(projectVersion);
 
-        return projectCommit;
+        return projectCommitDefinition;
     }
 
     /**
@@ -60,22 +60,22 @@ public class HGenService {
      * @param targetTypes The target type of artifacts.
      * @return The project commit containing generated entities
      */
-    private ProjectCommit createHGenCommit(GenerationDataset dataset,
-                                           List<String> targetTypes) {
-        ProjectCommit projectCommit = new ProjectCommit();
+    private ProjectCommitDefinition createHGenCommit(GenerationDataset dataset,
+                                                     List<String> targetTypes) {
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition();
 
         for (String targetType : targetTypes) {
             List<ArtifactAppEntity> artifactsGenerated = dataset.getArtifacts(targetType)
                 .stream().map(ArtifactAppEntity::new).collect(Collectors.toList());
-            projectCommit.addArtifacts(ModificationType.ADDED, artifactsGenerated);
+            projectCommitDefinition.addArtifacts(ModificationType.ADDED, artifactsGenerated);
         }
 
         if (dataset.getLinks() != null) {
             List<TraceAppEntity> generatedTraces = toTraces(dataset.getLinks());
-            projectCommit.addTraces(ModificationType.ADDED, generatedTraces);
+            projectCommitDefinition.addTraces(ModificationType.ADDED, generatedTraces);
         }
 
-        return projectCommit;
+        return projectCommitDefinition;
     }
 
     /**

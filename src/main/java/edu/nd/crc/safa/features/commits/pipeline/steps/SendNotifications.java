@@ -1,7 +1,8 @@
 package edu.nd.crc.safa.features.commits.pipeline.steps;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.commits.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
@@ -13,16 +14,16 @@ public class SendNotifications implements ICommitStep {
     /**
      * Sends notification for all the entities changed.
      *
-     * @param service The commit service to access database and other services.
-     * @param commit  The commit being performed.
-     * @param after   The commit final state.
+     * @param service          The commit service to access database and other services.
+     * @param commitDefinition The commit being performed.
+     * @param result           The commit final state.
      */
     @Override
-    public void performStep(CommitService service, ProjectCommit commit, ProjectCommit after) {
+    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition, ProjectCommitAppEntity result) {
         // Step - Broadcast change
-        ProjectVersion projectVersion = commit.getCommitVersion();
-        ProjectChange<ArtifactAppEntity> artifactChanges = after.getArtifacts();
-        ProjectChange<TraceAppEntity> traceChanges = after.getTraces();
+        ProjectVersion projectVersion = commitDefinition.getCommitVersion();
+        ProjectChange<ArtifactAppEntity> artifactChanges = result.getArtifacts();
+        ProjectChange<TraceAppEntity> traceChanges = result.getTraces();
 
         EntityChangeBuilder builder = new EntityChangeBuilder(projectVersion.getVersionId());
         builder
@@ -32,10 +33,10 @@ public class SendNotifications implements ICommitStep {
             .withTracesDelete(traceChanges.getDeletedIds())
             .withWarningsUpdate();
 
-        if (commit.shouldUpdateDefaultLayout()) {
+        if (commitDefinition.shouldUpdateDefaultLayout()) {
             builder.withUpdateLayout();
         }
 
-        service.getNotificationService().broadcastChangeToUser(builder, commit.getUser());
+        service.getNotificationService().broadcastChangeToUser(builder, commitDefinition.getUser());
     }
 }

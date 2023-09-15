@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.AbstractProjectCommit;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -78,13 +78,13 @@ public class LayoutManager {
      * - persist layout
      * - notify users of document that new layout exists
      *
-     * @param projectCommit The changes to the artifact tree to calculate layout changes.
+     * @param projectCommitDefinition The changes to the artifact tree to calculate layout changes.
      */
-    public void generateLayoutUpdates(ProjectCommit projectCommit) {
+    public void generateLayoutUpdates(AbstractProjectCommit projectCommitDefinition) {
         // Step - Extract artifact causing stale layouts
         List<ArtifactAppEntity> affectedArtifacts = new ArrayList<>();
-        affectedArtifacts.addAll(projectCommit.getArtifacts().getAdded());
-        affectedArtifacts.addAll(projectCommit.getArtifacts().getRemoved());
+        affectedArtifacts.addAll(projectCommitDefinition.getArtifacts().getAdded());
+        affectedArtifacts.addAll(projectCommitDefinition.getArtifacts().getRemoved());
 
         // Step - Generate affected documents
         List<Document> affectedDocuments = retrieveAffectedDocuments(affectedArtifacts);

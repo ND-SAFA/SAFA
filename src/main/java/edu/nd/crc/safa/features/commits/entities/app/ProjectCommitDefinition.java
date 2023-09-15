@@ -5,16 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.StringUtil;
 
@@ -27,30 +24,26 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class ProjectCommit {
-    ProjectVersion commitVersion;
-    ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();
-    ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
-    List<CommitError> errors = new ArrayList<>();
-    boolean failOnError = true;
-    SafaUser user;
-
-    public ProjectCommit(ProjectAppEntity projectAppEntity) {
-        this.commitVersion = projectAppEntity.getProjectVersion();
-        this.addArtifacts(ModificationType.ADDED, projectAppEntity.getArtifacts());
-        this.addTraces(ModificationType.ADDED, projectAppEntity.getTraces());
+public class ProjectCommitDefinition extends AbstractProjectCommit {
+    public ProjectCommitDefinition(ProjectCommitAppEntity commitAppEntity) {
+        this.commitVersion = commitAppEntity.commitVersion;
+        this.artifacts = commitAppEntity.artifacts;
+        this.traces = commitAppEntity.traces;
+        this.errors = commitAppEntity.errors;
+        this.failOnError = commitAppEntity.failOnError;
+        this.user = commitAppEntity.user;
     }
 
-    public ProjectCommit(ProjectVersion commitVersion, boolean failOnError) {
+    public ProjectCommitDefinition(ProjectVersion commitVersion, boolean failOnError) {
         this.commitVersion = commitVersion;
         this.failOnError = failOnError;
     }
 
-    public ProjectCommit(ProjectVersion projectVersion,
-                         ProjectChange<ArtifactAppEntity> artifacts,
-                         ProjectChange<TraceAppEntity> traces,
-                         List<CommitError> errors,
-                         boolean failOnError) {
+    public ProjectCommitDefinition(ProjectVersion projectVersion,
+                                   ProjectChange<ArtifactAppEntity> artifacts,
+                                   ProjectChange<TraceAppEntity> traces,
+                                   List<CommitError> errors,
+                                   boolean failOnError) {
         this.commitVersion = projectVersion;
         this.artifacts = artifacts;
         this.traces = traces;
@@ -149,7 +142,5 @@ public class ProjectCommit {
         return StringUtil.join(logs, "\n");
     }
 
-    public void addErrors(List<CommitError> errors) {
-        this.errors.addAll(errors);
-    }
+
 }

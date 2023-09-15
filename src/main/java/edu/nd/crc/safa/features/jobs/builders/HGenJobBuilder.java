@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.jobs.builders;
 
 import java.io.IOException;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
@@ -29,8 +29,8 @@ public class HGenJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        ProjectCommit projectCommit = new ProjectCommit(this.projectVersion, false);
-        return new HGenJob(this.jobDbEntity, this.serviceProvider, projectCommit, this.request);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.projectVersion, false);
+        return new HGenJob(this.jobDbEntity, this.serviceProvider, projectCommitDefinition, this.request);
     }
 
     @Override

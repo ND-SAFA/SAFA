@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.commits.pipeline.steps;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.commits.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -9,14 +10,14 @@ public class MarkInvisibleLinks implements ICommitStep {
     /**
      * Marks any declined links as invisible.
      *
-     * @param service The commit service to access database and other services.
-     * @param commit  The commit being performed.
-     * @param after   The commit final state.
+     * @param service          The commit service to access database and other services.
+     * @param commitDefinition The commit being performed.
+     * @param result           The commit final state.
      */
     @Override
-    public void performStep(CommitService service, ProjectCommit commit, ProjectCommit after) {
+    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition, ProjectCommitAppEntity result) {
         // Step - Mark decline trace links as invisible
-        commit
+        commitDefinition
             .getTraces()
             .getModified()
             .stream()

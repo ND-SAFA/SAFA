@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.test.features.notifications.documentartifact;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
@@ -21,13 +21,13 @@ public class DocumentArtifactNotificationTestService {
      * Creates project, version, document, and artifact not associated with a document.
      *
      * @param projectVersion The project version to put the artifact in
-     * @param test Contains the artifact and email
+     * @param test           Contains the artifact and email
      * @throws Exception If server error occurs while creating entities.
      */
     public void createArtifactAndVerifyMessage(ProjectVersion projectVersion,
                                                IDocumentArtifactTest test) throws Exception {
         // Step - Create artifact
-        ProjectCommit commit = this.commitService.commit(CommitBuilder
+        ProjectCommitDefinition commit = this.commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(test.getArtifact()));
         ArtifactAppEntity artifactAdded = commit.getArtifact(ModificationType.ADDED, 0);

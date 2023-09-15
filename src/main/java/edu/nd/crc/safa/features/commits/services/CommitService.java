@@ -8,7 +8,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.app.CommitAction;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.commits.pipeline.CommitPipeline;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.common.IVersionEntity;
@@ -45,14 +46,14 @@ public class CommitService {
     /**
      * Saves entities in commit to specified project version.
      *
-     * @param projectCommit The commit containing changes to artifacts and traces.
-     * @param user          The user performing the commit
+     * @param projectCommitDefinition The commit containing changes to artifacts and traces.
+     * @param user                    The user performing the commit
      * @return ProjectCommit with updated entities.
      * @throws SafaError Throws error if any change fails to commit.
      */
-    public ProjectCommit performCommit(ProjectCommit projectCommit, SafaUser user) throws SafaError {
-        projectCommit.setUser(user);
-        CommitPipeline pipeline = new CommitPipeline(projectCommit);
+    public ProjectCommitAppEntity performCommit(ProjectCommitDefinition projectCommitDefinition, SafaUser user) throws SafaError {
+        projectCommitDefinition.setUser(user);
+        CommitPipeline pipeline = new CommitPipeline(projectCommitDefinition);
         return pipeline.commit(this);
     }
 

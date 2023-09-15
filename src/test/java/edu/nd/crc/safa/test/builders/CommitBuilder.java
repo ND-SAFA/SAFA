@@ -2,7 +2,7 @@ package edu.nd.crc.safa.test.builders;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -16,10 +16,10 @@ import org.json.JSONObject;
  */
 public class CommitBuilder {
 
-    private final ProjectCommit projectCommit;
+    private final ProjectCommitDefinition projectCommitDefinition;
 
     public CommitBuilder(ProjectVersion projectVersion) {
-        projectCommit = new ProjectCommit(projectVersion, true);
+        projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
     }
 
     public static CommitBuilder withVersion(ProjectVersion projectVersion) {
@@ -31,7 +31,7 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withAddedArtifact(ArtifactAppEntity artifact) {
-        this.projectCommit.addArtifact(ModificationType.ADDED, artifact);
+        this.projectCommitDefinition.addArtifact(ModificationType.ADDED, artifact);
         return this;
     }
 
@@ -40,7 +40,7 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withRemovedArtifact(ArtifactAppEntity artifact) {
-        this.projectCommit.addArtifact(ModificationType.REMOVED, artifact);
+        this.projectCommitDefinition.addArtifact(ModificationType.REMOVED, artifact);
         return this;
     }
 
@@ -49,7 +49,7 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withModifiedArtifact(ArtifactAppEntity artifact) {
-        this.projectCommit.addArtifact(ModificationType.MODIFIED, artifact);
+        this.projectCommitDefinition.addArtifact(ModificationType.MODIFIED, artifact);
         return this;
     }
 
@@ -58,28 +58,28 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withAddedTrace(TraceAppEntity trace) {
-        this.projectCommit.addTrace(ModificationType.ADDED, trace);
+        this.projectCommitDefinition.addTrace(ModificationType.ADDED, trace);
         return this;
     }
 
     public CommitBuilder withModifiedTrace(TraceAppEntity traceAppEntity) {
-        this.projectCommit.addTrace(ModificationType.MODIFIED, traceAppEntity);
+        this.projectCommitDefinition.addTrace(ModificationType.MODIFIED, traceAppEntity);
         return this;
     }
 
     public CommitBuilder withRemovedTrace(TraceAppEntity traceAppEntity) {
-        this.projectCommit.addTrace(ModificationType.REMOVED, traceAppEntity);
+        this.projectCommitDefinition.addTrace(ModificationType.REMOVED, traceAppEntity);
         return this;
     }
 
     public JSONObject asJson() throws JsonProcessingException {
         ObjectMapper objectMapper = ObjectMapperConfig.create();
-        String commitString = objectMapper.writeValueAsString(this.projectCommit);
+        String commitString = objectMapper.writeValueAsString(this.projectCommitDefinition);
         return new JSONObject(commitString);
     }
 
-    public ProjectCommit get() {
-        return this.projectCommit;
+    public ProjectCommitDefinition get() {
+        return this.projectCommitDefinition;
     }
 
     private ArtifactAppEntity asArtifactAppEntity(JSONObject json) throws JsonProcessingException {

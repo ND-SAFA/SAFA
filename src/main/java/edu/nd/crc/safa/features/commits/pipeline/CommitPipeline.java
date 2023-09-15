@@ -2,7 +2,8 @@ package edu.nd.crc.safa.features.commits.pipeline;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.commits.pipeline.steps.AddTracesToDeletedArtifacts;
 import edu.nd.crc.safa.features.commits.pipeline.steps.CommitArtifacts;
 import edu.nd.crc.safa.features.commits.pipeline.steps.CommitTraces;
@@ -15,11 +16,11 @@ import edu.nd.crc.safa.features.commits.services.CommitService;
  * Contains the order of steps to be performed for each commit.
  */
 public class CommitPipeline {
-    ProjectCommit commit;
+    ProjectCommitDefinition commit;
     List<ICommitStep> steps;
 
-    public CommitPipeline(ProjectCommit projectCommit) {
-        this.commit = projectCommit;
+    public CommitPipeline(ProjectCommitDefinition projectCommitDefinition) {
+        this.commit = projectCommitDefinition;
         this.steps = List.of(
             new AddTracesToDeletedArtifacts(),
             new MarkInvisibleLinks(),
@@ -36,12 +37,12 @@ public class CommitPipeline {
      * @param commitService Provides access to services and other resources.
      * @return The processed commit.
      */
-    public ProjectCommit commit(CommitService commitService) {
-        ProjectCommit after = new ProjectCommit();
-        after.setCommitVersion(this.commit.getCommitVersion());
+    public ProjectCommitAppEntity commit(CommitService commitService) {
+        ProjectCommitAppEntity result = new ProjectCommitAppEntity();
+        result.setCommitVersion(this.commit.getCommitVersion());
         for (ICommitStep step : this.steps) {
-            step.performStep(commitService, this.commit, after);
+            step.performStep(commitService, this.commit, result);
         }
-        return after;
+        return result;
     }
 }

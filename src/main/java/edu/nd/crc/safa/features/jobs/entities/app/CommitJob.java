@@ -38,7 +38,8 @@ public abstract class CommitJob extends AbstractJob {
      * @param serviceProvider         Service provider
      * @param projectCommitDefinition The project commit all changes from this job should go into
      */
-    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider, ProjectCommitDefinition projectCommitDefinition) {
+    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
+                        ProjectCommitDefinition projectCommitDefinition) {
         super(jobDbEntity, serviceProvider);
         this.projectService = serviceProvider.getProjectService();
         this.versionService = serviceProvider.getVersionService();
@@ -57,7 +58,8 @@ public abstract class CommitJob extends AbstractJob {
     public void commitArtifactsAndTraceLinks() throws SafaError {
         assertProjectVersionIsSet();
         this.getDbLogger().log(this.projectCommitDefinition.getSummary());
-        ProjectChanger projectChanger = new ProjectChanger(projectCommitDefinition.getCommitVersion(), serviceProvider);
+        ProjectChanger projectChanger = new ProjectChanger(projectCommitDefinition.getCommitVersion(),
+            this.getServiceProvider());
         projectChanger.commitAsUser(projectCommitDefinition, getJobDbEntity().getUser());
     }
 

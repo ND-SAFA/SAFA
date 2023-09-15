@@ -44,8 +44,9 @@ public class CommitController extends BaseController {
     @PostMapping(AppRoutes.Commits.COMMIT_CHANGE)
     public ProjectCommitAppEntity commitChange(@PathVariable UUID versionId,
                                                @RequestBody ProjectCommitAppEntity projectCommitAppEntity) {
+        ServiceProvider serviceProvider = this.getServiceProvider();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        ProjectVersion projectVersion = this.getResourceBuilder().fetchVersion(versionId)
             .withPermission(ProjectPermission.EDIT, user).get();
 
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectCommitAppEntity);

@@ -17,14 +17,14 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Job to import a JIRA project into an existing SAFA project
  */
 public class JiraProjectImportJob extends CreateProjectViaJiraJob {
-    private JiraConnectionService jiraConnectionService;
+    private final JiraConnectionService jiraConnectionService;
 
     public JiraProjectImportJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
                                 JiraIdentifier jiraIdentifier,
                                 SafaUser user) {
         super(jobDbEntity, serviceProvider, jiraIdentifier, user);
-        this.jiraConnectionService = this.serviceProvider.getJiraConnectionService();
+        this.jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
         setProjectCommitDefinition(new ProjectCommitDefinition(jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);
     }

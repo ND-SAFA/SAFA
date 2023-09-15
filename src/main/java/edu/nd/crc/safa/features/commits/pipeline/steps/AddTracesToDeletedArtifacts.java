@@ -23,7 +23,8 @@ public class AddTracesToDeletedArtifacts implements ICommitStep {
      * @param result           The commit final state.
      */
     @Override
-    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition, ProjectCommitAppEntity result) {
+    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition,
+                            ProjectCommitAppEntity result) {
         ProjectVersion projectVersion = commitDefinition.getCommitVersion();
         TraceService traceService = service.getTraceService();
         List<UUID> artifactIds = commitDefinition.getArtifacts().getRemoved()

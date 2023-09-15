@@ -23,7 +23,8 @@ public class CommitTraces implements ICommitStep {
      * @param result           The commit final state.
      */
     @Override
-    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition, ProjectCommitAppEntity result) {
+    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition,
+                            ProjectCommitAppEntity result) {
         Pair<ProjectChange<TraceAppEntity>, List<CommitError>> traceResponse = commitTraceChanges(
             service, commitDefinition);
         ProjectChange<TraceAppEntity> traceChanges = traceResponse.getValue0();

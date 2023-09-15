@@ -42,7 +42,7 @@ public abstract class GenericVersionRepository<
     AppEntity extends IAppEntity>
     implements IVersionRepository<VersionEntity, AppEntity> {
 
-    protected VersionCalculator versionCalculator = new VersionCalculator();
+    private final VersionCalculator versionCalculator = new VersionCalculator();
 
     protected abstract VersionEntity save(VersionEntity versionEntity);
 

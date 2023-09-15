@@ -15,12 +15,12 @@ import lombok.Data;
 
 @Data
 public class AbstractProjectCommit {
-    protected ProjectVersion commitVersion;
-    protected ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();
-    protected ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
-    protected List<CommitError> errors = new ArrayList<>();
-    protected boolean failOnError = true;
-    protected SafaUser user;
+    private List<CommitError> errors = new ArrayList<>();
+    private boolean failOnError = true;
+    private SafaUser user;
+    private ProjectVersion commitVersion;
+    private ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();
+    private ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
 
     public void addErrors(List<CommitError> errors) {
         this.errors.addAll(errors);

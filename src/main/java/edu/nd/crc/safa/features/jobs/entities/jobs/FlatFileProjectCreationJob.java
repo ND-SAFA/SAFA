@@ -43,30 +43,25 @@ import org.json.JSONObject;
 public class FlatFileProjectCreationJob extends CommitJob {
 
     /**
+     * Whether code artifacts should be summarized if no summary exists.
+     */
+    private final boolean shouldSummarize;
+    /**
      * The initial project version
      */
     private ProjectVersion projectVersion;
-
     /**
      * Path to Tim file upload.
      */
     private String pathToTIMFile;
-
     /**
      * The parser used to parse time file.
      */
     private FlatFileParser flatFileParser;
-
     /**
      * Path to uploaded files.
      */
     private String pathToFiles;
-
-    /**
-     * Whether code artifacts should be summarized if no summary exists.
-     */
-    private final boolean shouldSummarize;
-
     private String projectName;
     private String projectDescription;
     private SafaUser user;
@@ -182,7 +177,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         }
         ProjectCommitDefinition projectCommitDefinition = this.getProjectCommitDefinition();
         List<ArtifactAppEntity> newArtifacts = projectCommitDefinition.getArtifacts().getAdded();
-        SummaryService summaryService = this.serviceProvider.getSummaryService();
+        SummaryService summaryService = this.getServiceProvider().getSummaryService();
         summaryService.addSummariesToCode(newArtifacts, this.getDbLogger());
         projectCommitDefinition.getArtifacts().setAdded(newArtifacts);
     }
@@ -196,8 +191,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
         List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(
             flatFileParser.getTraceGenerationRequest(),
             projectAppEntity);
-        generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(projectCommitDefinition.getTraces().getAdded(),
-            generatedLinks);
+        List<TraceAppEntity> addedTraceLinks = projectCommitDefinition.getTraces().getAdded();
+        generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(addedTraceLinks, generatedLinks);
         logger.log("%d traces generated.", generatedLinks.size());
 
         projectCommitDefinition.getTraces().getAdded().addAll(generatedLinks);

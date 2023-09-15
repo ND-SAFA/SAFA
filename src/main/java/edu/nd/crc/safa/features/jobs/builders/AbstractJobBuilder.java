@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Defines a job performing some actions on some identified entity.
@@ -21,7 +22,7 @@ public abstract class AbstractJobBuilder {
      * List of services.
      */
     @Getter(AccessLevel.PROTECTED)
-    private ServiceProvider serviceProvider;
+    private final ServiceProvider serviceProvider;
     /**
      * The database entity for this job.
      */
@@ -29,6 +30,7 @@ public abstract class AbstractJobBuilder {
     private JobDbEntity jobDbEntity;
 
     @Getter(AccessLevel.PROTECTED)
+    @Setter(AccessLevel.PROTECTED)
     private SafaUser user;
 
     protected AbstractJobBuilder(ServiceProvider serviceProvider) {

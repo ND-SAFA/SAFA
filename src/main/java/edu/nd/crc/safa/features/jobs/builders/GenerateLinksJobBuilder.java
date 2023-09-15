@@ -13,21 +13,22 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Creates a job for generating trace links.
  */
 public class GenerateLinksJobBuilder extends AbstractJobBuilder {
-    private TraceGenerationRequest request;
-    private final SafaUser user;
+    private final TraceGenerationRequest request;
 
     public GenerateLinksJobBuilder(ServiceProvider serviceProvider,
                                    TraceGenerationRequest request,
                                    SafaUser user) {
         super(serviceProvider);
         this.request = request;
-        this.user = user;
+        this.setUser(user);
     }
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.request.getProjectVersion(), false);
-        return new GenerateLinksJob(this.jobDbEntity, this.serviceProvider, projectCommitDefinition, this.request, this.user);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.request.getProjectVersion(),
+            false);
+        return new GenerateLinksJob(this.getJobDbEntity(), this.getServiceProvider(),
+            projectCommitDefinition, this.request, this.getUser());
     }
 
     @Override

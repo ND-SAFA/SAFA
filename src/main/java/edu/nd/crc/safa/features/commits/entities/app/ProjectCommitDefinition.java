@@ -26,17 +26,17 @@ import lombok.NoArgsConstructor;
 @Data
 public class ProjectCommitDefinition extends AbstractProjectCommit {
     public ProjectCommitDefinition(ProjectCommitAppEntity commitAppEntity) {
-        this.commitVersion = commitAppEntity.commitVersion;
-        this.artifacts = commitAppEntity.artifacts;
-        this.traces = commitAppEntity.traces;
-        this.errors = commitAppEntity.errors;
-        this.failOnError = commitAppEntity.failOnError;
-        this.user = commitAppEntity.user;
+        this.setCommitVersion(commitAppEntity.getCommitVersion());
+        this.setUser(commitAppEntity.getUser());
+        this.setArtifacts(commitAppEntity.getArtifacts());
+        this.setTraces(commitAppEntity.getTraces());
+        this.setErrors(commitAppEntity.getErrors());
+        this.setFailOnError(commitAppEntity.isFailOnError());
     }
 
     public ProjectCommitDefinition(ProjectVersion commitVersion, boolean failOnError) {
-        this.commitVersion = commitVersion;
-        this.failOnError = failOnError;
+        this.setFailOnError(failOnError);
+        this.setCommitVersion(commitVersion);
     }
 
     public ProjectCommitDefinition(ProjectVersion projectVersion,
@@ -44,31 +44,31 @@ public class ProjectCommitDefinition extends AbstractProjectCommit {
                                    ProjectChange<TraceAppEntity> traces,
                                    List<CommitError> errors,
                                    boolean failOnError) {
-        this.commitVersion = projectVersion;
-        this.artifacts = artifacts;
-        this.traces = traces;
-        this.errors = errors;
-        this.failOnError = failOnError;
+        this.setCommitVersion(projectVersion);
+        this.setArtifacts(artifacts);
+        this.setTraces(traces);
+        this.setErrors(errors);
+        this.setFailOnError(failOnError);
     }
 
     public void addArtifacts(ModificationType modificationType,
                              List<ArtifactAppEntity> artifacts) {
-        this.addEntities(modificationType, this.artifacts, artifacts);
+        this.addEntities(modificationType, this.getArtifacts(), artifacts);
     }
 
     public void addArtifact(ModificationType modificationType,
                             ArtifactAppEntity artifactAppEntity) {
-        this.addEntity(modificationType, this.artifacts, artifactAppEntity);
+        this.addEntity(modificationType, this.getArtifacts(), artifactAppEntity);
     }
 
     public void addTraces(ModificationType modificationType,
                           List<TraceAppEntity> traces) {
-        this.addEntities(modificationType, this.traces, traces);
+        this.addEntities(modificationType, this.getTraces(), traces);
     }
 
     public void addTrace(ModificationType modificationType,
                          TraceAppEntity trace) {
-        this.addEntity(modificationType, this.traces, trace);
+        this.addEntity(modificationType, this.getTraces(), trace);
     }
 
     @JsonIgnore
@@ -100,7 +100,7 @@ public class ProjectCommitDefinition extends AbstractProjectCommit {
 
     @JsonIgnore
     public List<ArtifactAppEntity> getArtifactList(ModificationType modificationType) {
-        return this.generateMod2Entities(this.artifacts).get(modificationType);
+        return this.generateMod2Entities(this.getArtifacts()).get(modificationType);
     }
 
     private <T extends IAppEntity> void addEntities(ModificationType modificationType,
@@ -137,10 +137,8 @@ public class ProjectCommitDefinition extends AbstractProjectCommit {
     @JsonIgnore
     public String getSummary() {
         List<String> logs = new ArrayList<>();
-        logs.add(this.artifacts.getSummary("Artifacts"));
-        logs.add(this.traces.getSummary("Trace Links"));
+        logs.add(this.getArtifacts().getSummary("Artifacts"));
+        logs.add(this.getTraces().getSummary("Trace Links"));
         return StringUtil.join(logs, "\n");
     }
-
-
 }

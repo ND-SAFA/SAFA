@@ -20,11 +20,11 @@ public class HGenJob extends CommitJob {
     /**
      * The request to generate trace links.
      */
-    private HGenRequest hGenRequest;
+    private final HGenRequest hGenRequest;
     /**
      * The project version to commit summaries and generated links to.
      */
-    private ProjectVersion projectVersion;
+    private final ProjectVersion projectVersion;
 
     public HGenJob(JobDbEntity jobDbEntity,
                    ServiceProvider serviceProvider,
@@ -56,8 +56,8 @@ public class HGenJob extends CommitJob {
         HGenService hGenService = this.getServiceProvider().getHGenService();
         String summary = this.projectVersion.getProject().getSpecification();
         this.hGenRequest.setSummary(summary);
-        ProjectCommitDefinition projectCommitDefinition = hGenService.generateHierarchy(this.projectVersion, this.hGenRequest,
-            this.getDbLogger());
+        ProjectCommitDefinition projectCommitDefinition = hGenService.generateHierarchy(this.projectVersion,
+            this.hGenRequest, this.getDbLogger());
         this.setProjectCommitDefinition(projectCommitDefinition);
     }
 }

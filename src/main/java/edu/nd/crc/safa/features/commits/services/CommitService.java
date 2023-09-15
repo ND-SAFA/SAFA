@@ -51,7 +51,8 @@ public class CommitService {
      * @return ProjectCommit with updated entities.
      * @throws SafaError Throws error if any change fails to commit.
      */
-    public ProjectCommitAppEntity performCommit(ProjectCommitDefinition projectCommitDefinition, SafaUser user) throws SafaError {
+    public ProjectCommitAppEntity performCommit(ProjectCommitDefinition projectCommitDefinition,
+                                                SafaUser user) throws SafaError {
         projectCommitDefinition.setUser(user);
         CommitPipeline pipeline = new CommitPipeline(projectCommitDefinition);
         return pipeline.commit(this);

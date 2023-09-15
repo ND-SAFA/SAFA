@@ -13,7 +13,6 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepositoryImpl;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -25,9 +24,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class TraceService implements IAppEntityService<TraceAppEntity> {
-    ArtifactService artifactService;
-    TraceLinkVersionRepository traceLinkVersionRepository;
-    TraceLinkVersionRepositoryImpl traceLinkVersionRepositoryImpl;
+    private ArtifactService artifactService;
+    private TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Override
     public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {

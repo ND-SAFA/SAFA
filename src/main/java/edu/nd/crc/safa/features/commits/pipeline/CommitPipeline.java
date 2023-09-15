@@ -16,8 +16,8 @@ import edu.nd.crc.safa.features.commits.services.CommitService;
  * Contains the order of steps to be performed for each commit.
  */
 public class CommitPipeline {
-    ProjectCommitDefinition commit;
-    List<ICommitStep> steps;
+    private final ProjectCommitDefinition commit;
+    private final List<ICommitStep> steps;
 
     public CommitPipeline(ProjectCommitDefinition projectCommitDefinition) {
         this.commit = projectCommitDefinition;

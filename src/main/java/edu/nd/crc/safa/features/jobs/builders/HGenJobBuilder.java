@@ -14,8 +14,8 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
  * Creates a job for generating trace links.
  */
 public class HGenJobBuilder extends AbstractJobBuilder {
-    private ProjectVersion projectVersion;
-    private HGenRequest request;
+    private final ProjectVersion projectVersion;
+    private final HGenRequest request;
 
     public HGenJobBuilder(ServiceProvider serviceProvider,
                           ProjectVersion projectVersion,
@@ -29,7 +29,7 @@ public class HGenJobBuilder extends AbstractJobBuilder {
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.projectVersion, false);
-        return new HGenJob(this.jobDbEntity, this.serviceProvider, projectCommitDefinition, this.request);
+        return new HGenJob(this.getJobDbEntity(), this.getServiceProvider(), projectCommitDefinition, this.request);
     }
 
     @Override

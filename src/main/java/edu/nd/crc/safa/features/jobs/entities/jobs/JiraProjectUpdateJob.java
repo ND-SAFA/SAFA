@@ -19,14 +19,14 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Job to update an already imported JIRA project
  */
 public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
-    private JiraConnectionService jiraConnectionService;
+    private final JiraConnectionService jiraConnectionService;
 
     public JiraProjectUpdateJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
                                 JiraIdentifier jiraIdentifier,
                                 SafaUser user) {
         super(jobDbEntity, serviceProvider, jiraIdentifier, user);
-        this.jiraConnectionService = this.serviceProvider.getJiraConnectionService();
+        this.jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
         setProjectCommitDefinition(new ProjectCommitDefinition(jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);
     }
@@ -46,7 +46,7 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
 
     @Override
     protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId) {
-        Optional<JiraProject> optional = this.serviceProvider
+        Optional<JiraProject> optional = this.getServiceProvider()
             .getJiraProjectRepository()
             .findByProjectAndJiraProjectId(project, jiraProjectId);
 

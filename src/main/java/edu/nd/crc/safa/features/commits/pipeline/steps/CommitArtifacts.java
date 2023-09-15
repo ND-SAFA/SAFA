@@ -24,7 +24,8 @@ public class CommitArtifacts implements ICommitStep {
      * @param result           The commit final state.
      */
     @Override
-    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition, ProjectCommitAppEntity result) {
+    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition,
+                            ProjectCommitAppEntity result) {
         ProjectVersion projectVersion = commitDefinition.getCommitVersion();
         Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> artifactResponse = commitArtifactChanges(
             projectVersion,

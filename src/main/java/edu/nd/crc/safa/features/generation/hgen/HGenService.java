@@ -39,7 +39,8 @@ public class HGenService {
      * @param jobLogger      The logger used to store logs under.
      * @return List of generated artifacts.
      */
-    public ProjectCommitDefinition generateHierarchy(ProjectVersion projectVersion, HGenRequest request, JobLogger jobLogger) {
+    public ProjectCommitDefinition generateHierarchy(ProjectVersion projectVersion, HGenRequest request,
+                                                     JobLogger jobLogger) {
         List<String> targetTypes = request.getTargetTypes();
 
         List<ArtifactAppEntity> sourceArtifacts = this.artifactService.getAppEntities(projectVersion);

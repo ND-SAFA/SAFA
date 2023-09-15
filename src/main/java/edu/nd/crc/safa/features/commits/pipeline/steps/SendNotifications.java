@@ -19,7 +19,8 @@ public class SendNotifications implements ICommitStep {
      * @param result           The commit final state.
      */
     @Override
-    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition, ProjectCommitAppEntity result) {
+    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition,
+                            ProjectCommitAppEntity result) {
         // Step - Broadcast change
         ProjectVersion projectVersion = commitDefinition.getCommitVersion();
         ProjectChange<ArtifactAppEntity> artifactChanges = result.getArtifacts();

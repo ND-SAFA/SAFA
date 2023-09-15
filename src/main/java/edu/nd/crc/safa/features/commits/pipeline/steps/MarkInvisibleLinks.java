@@ -15,7 +15,8 @@ public class MarkInvisibleLinks implements ICommitStep {
      * @param result           The commit final state.
      */
     @Override
-    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition, ProjectCommitAppEntity result) {
+    public void performStep(CommitService service, ProjectCommitDefinition commitDefinition,
+                            ProjectCommitAppEntity result) {
         // Step - Mark decline trace links as invisible
         commitDefinition
             .getTraces()

@@ -11,10 +11,10 @@ import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 public class ProjectMembershipRequest {
 
     @NotEmpty
-    String memberEmail;
+    private String memberEmail;
 
     @NotNull
-    ProjectRole projectRole;
+    private ProjectRole projectRole;
 
     public ProjectMembershipRequest() {
     }

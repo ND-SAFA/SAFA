@@ -11,6 +11,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ModifiedEntity<A> {
-    A before;
-    A after;
+    private A before;
+    private A after;
 }

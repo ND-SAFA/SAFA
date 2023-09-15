@@ -47,8 +47,8 @@ public class InstallationsController extends BaseController {
         )
     )
     public List<InstallationDTO> getInstallationsByProject(@PathVariable("id") UUID id) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        this.resourceBuilder.fetchProject(id).withPermission(ProjectPermission.VIEW, user);
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        getResourceBuilder().fetchProject(id).withPermission(ProjectPermission.VIEW, user);
         return this.projectRepository.findInstallationsByProjectId(id);
     }
 

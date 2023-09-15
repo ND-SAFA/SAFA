@@ -31,10 +31,10 @@ public class LayoutController extends BaseController {
     @PostMapping(AppRoutes.Layout.REGENERATE_LAYOUT)
     public LayoutGenerationResponseDTO resetLayout(@PathVariable UUID versionId,
                                                    @RequestBody LayoutGenerationRequestDTO layoutGeneration) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.EDIT, user).get();
-        LayoutManager layoutManager = new LayoutManager(this.serviceProvider, projectVersion, user);
+        LayoutManager layoutManager = new LayoutManager(getServiceProvider(), projectVersion, user);
         EntityChangeBuilder notificationBuilder = EntityChangeBuilder.create(versionId);
         LayoutGenerationResponseDTO response = new LayoutGenerationResponseDTO();
 
@@ -45,13 +45,13 @@ public class LayoutController extends BaseController {
         }
 
         for (UUID documentId : layoutGeneration.getDocumentIds()) {
-            Document document = this.serviceProvider.getDocumentService().getDocumentById(documentId);
+            Document document = getServiceProvider().getDocumentService().getDocumentById(documentId);
             Map<UUID, LayoutPosition> documentLayout = layoutManager.generateDocumentLayout(document);
             response.addDocumentLayout(documentId, documentLayout);
         }
         notificationBuilder.withDocumentUpdate(layoutGeneration.getDocumentIds());
 
-        this.serviceProvider.getNotificationService().broadcastChange(notificationBuilder);
+        getServiceProvider().getNotificationService().broadcastChange(notificationBuilder);
         return response;
     }
 }

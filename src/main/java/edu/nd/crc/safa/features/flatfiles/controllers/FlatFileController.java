@@ -65,12 +65,12 @@ public class FlatFileController extends BaseController {
             asCompleteSet = false;
         }
 
-        SafaUser user = this.serviceProvider.getSafaUserService().getCurrentUser();
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
 
-        ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().updateProjectFromFlatFiles(
+        ProjectAppEntity projectCreated = getServiceProvider().getFlatFileService().updateProjectFromFlatFiles(
             versionId, user, files, asCompleteSet);
 
-        this.serviceProvider.getNotificationService().broadcastChange(
+        getServiceProvider().getNotificationService().broadcastChange(
             EntityChangeBuilder
                 .create(versionId)
                 .withVersionUpdate(versionId)
@@ -82,17 +82,17 @@ public class FlatFileController extends BaseController {
     public void downloadFlatFiles(@PathVariable UUID versionId,
                                   @PathVariable String fileType,
                                   HttpServletResponse response) throws Exception {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         String projectName = projectVersion.getProject().getName();
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);
 
-        List<File> projectFiles = this.serviceProvider
+        List<File> projectFiles = getServiceProvider()
             .getFileDownloadService()
             .downloadProjectFiles(projectVersion,
                 fileType.toLowerCase());
-        this.serviceProvider.getZipFileService().sendFilesAsZipResponse(response, fileName, projectFiles);
+        getServiceProvider().getZipFileService().sendFilesAsZipResponse(response, fileName, projectFiles);
     }
 }

@@ -33,10 +33,10 @@ import lombok.Setter;
 public class AttributeValueEnumeration extends AttributeValue {
 
     @XmlElement(name = "DEFINITION", required = true)
-    protected Definition definition;
+    private Definition definition;
 
     @XmlElement(name = "VALUES")
-    protected Values values;
+    private Values values;
 
     /**
      * Java class for anonymous complex type.
@@ -51,7 +51,7 @@ public class AttributeValueEnumeration extends AttributeValue {
         @XmlElement(name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected AttributeDefinitionEnumeration attributeDefinition;
+        private AttributeDefinitionEnumeration attributeDefinition;
     }
 
 
@@ -65,7 +65,7 @@ public class AttributeValueEnumeration extends AttributeValue {
     @Getter
     public static class Values {
         @XmlElementRef(type = EnumValueRef.class, required = false)
-        protected List<EnumValueRef> values = new ArrayList<>();
+        private List<EnumValueRef> values = new ArrayList<>();
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -76,7 +76,7 @@ public class AttributeValueEnumeration extends AttributeValue {
         @XmlValue
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected EnumValue enumValue;
+        private EnumValue enumValue;
     }
 
 }

@@ -39,30 +39,30 @@ import lombok.Setter;
 public class ReqIfHeader {
 
     @XmlElement(name = "COMMENT")
-    protected String comment;
+    private String comment;
 
     @XmlElement(name = "CREATION-TIME", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar creationTime;
+    private XMLGregorianCalendar creationTime;
 
     @XmlElement(name = "REPOSITORY-ID")
-    protected String repositoryId;
+    private String repositoryId;
 
     @XmlElement(name = "REQ-IF-TOOL-ID", required = true)
-    protected String reqIfToolId;
+    private String reqIfToolId;
 
     @XmlElement(name = "REQ-IF-VERSION", required = true)
-    protected String reqIfVersion;
+    private String reqIfVersion;
 
     @XmlElement(name = "SOURCE-TOOL-ID", required = true)
-    protected String sourceToolId;
+    private String sourceToolId;
 
     @XmlElement(name = "TITLE", required = true)
-    protected String title;
+    private String title;
 
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String identifier;
+    private String identifier;
 }

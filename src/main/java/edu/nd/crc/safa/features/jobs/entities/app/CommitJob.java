@@ -57,7 +57,7 @@ public abstract class CommitJob extends AbstractJob {
     public void commitArtifactsAndTraceLinks() throws SafaError {
         assertProjectVersionIsSet();
         this.getDbLogger().log(this.projectCommit.getSummary());
-        ProjectChanger projectChanger = new ProjectChanger(projectCommit.getCommitVersion(), serviceProvider);
+        ProjectChanger projectChanger = new ProjectChanger(projectCommit.getCommitVersion(), getServiceProvider());
         projectChanger.commitAsUser(projectCommit, getJobDbEntity().getUser());
     }
 

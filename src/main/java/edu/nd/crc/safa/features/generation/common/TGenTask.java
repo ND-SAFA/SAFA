@@ -19,12 +19,12 @@ public class TGenTask<T> {
      * UUID for task subitted to TGEN.
      */
     @JsonProperty("task_id")
-    UUID taskId;
+    private UUID taskId;
     @Nullable
-    Class<T> responseClass;
+    private Class<T> responseClass;
 
     @Nullable
-    TGenStatus status;
+    private TGenStatus status;
 
     public void updateStatus(TGenStatus tGenStatus) {
         if (status == null) {

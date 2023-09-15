@@ -12,21 +12,21 @@ public class GenerationLink {
     /**
      * The child name;
      */
-    String source;
+    private String source;
     /**
      * The parent name.
      */
-    String target;
+    private String target;
     /**
      * The similarity score.
      */
-    double score;
+    private double score;
     /**
      * The true label between them.
      */
-    double label = -1;
+    private double label = -1;
     /**
      * The trace explanation.
      */
-    String explanation;
+    private String explanation;
 }

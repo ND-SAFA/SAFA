@@ -34,16 +34,16 @@ import lombok.Setter;
 public class ReqIf {
 
     @XmlElement(name = "THE-HEADER", required = true)
-    protected TheHeader theHeader;
+    private TheHeader theHeader;
 
     @XmlElement(name = "CORE-CONTENT", required = true)
-    protected CoreContent coreContent;
+    private CoreContent coreContent;
 
     @XmlElement(name = "TOOL-EXTENSIONS")
-    protected ToolExtensions toolExtensions;
+    private ToolExtensions toolExtensions;
 
     @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
+    private String lang;
 
     /**
      * Java class for anonymous complex type.
@@ -56,7 +56,7 @@ public class ReqIf {
     @Setter
     public static class CoreContent {
         @XmlElement(name = "REQ-IF-CONTENT", namespace = "")
-        protected ReqIfContent reqIfContent;
+        private ReqIfContent reqIfContent;
     }
 
     /**
@@ -70,7 +70,7 @@ public class ReqIf {
     @Setter
     public static class TheHeader {
         @XmlElement(name = "REQ-IF-HEADER", namespace = "")
-        protected ReqIfHeader reqIfHeader;
+        private ReqIfHeader reqIfHeader;
     }
 
     /**
@@ -83,7 +83,7 @@ public class ReqIf {
     @Getter
     public static class ToolExtensions {
         @XmlElement(name = "REQ-IF-TOOL-EXTENSION", namespace = "")
-        protected List<ReqIfToolExtension> reqIfToolExtensions = new ArrayList<>();
+        private List<ReqIfToolExtension> reqIfToolExtensions = new ArrayList<>();
     }
 
 }

@@ -16,6 +16,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ProjectDelta {
-    EntityDelta<ArtifactAppEntity> artifacts;
-    EntityDelta<TraceAppEntity> traces;
+    private EntityDelta<ArtifactAppEntity> artifacts;
+    private EntityDelta<TraceAppEntity> traces;
 }

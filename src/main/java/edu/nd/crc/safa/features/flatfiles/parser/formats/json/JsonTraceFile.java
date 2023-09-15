@@ -36,7 +36,7 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
-        JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.entities,
+        JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.getEntities(),
             Constants.JSON_TRACE_KEY);
         FileUtilities.writeToFile(file, fileContent.toString());
     }

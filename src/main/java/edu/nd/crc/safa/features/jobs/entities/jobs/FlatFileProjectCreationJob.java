@@ -166,7 +166,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     private List<CommitError> createErrors(List<String> errorMessages,
                                            ProjectEntity projectEntity) {
-        CommitErrorRepository commitErrorRepository = this.serviceProvider.getCommitErrorRepository();
+        CommitErrorRepository commitErrorRepository = this.getServiceProvider().getCommitErrorRepository();
         return
             errorMessages
                 .stream()
@@ -182,7 +182,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         }
         ProjectCommit projectCommit = this.getProjectCommit();
         List<ArtifactAppEntity> newArtifacts = projectCommit.getArtifacts().getAdded();
-        SummaryService summaryService = this.serviceProvider.getSummaryService();
+        SummaryService summaryService = this.getServiceProvider().getSummaryService();
         summaryService.addSummariesToCode(newArtifacts, this.getDbLogger());
         projectCommit.getArtifacts().setAdded(newArtifacts);
     }

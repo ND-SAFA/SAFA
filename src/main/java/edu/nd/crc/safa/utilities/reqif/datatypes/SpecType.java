@@ -27,24 +27,24 @@ import lombok.Setter;
 @Setter
 public class SpecType {
     @XmlElement(name = "ALTERNATIVE-ID")
-    protected AlternativeIdWrapper alternativeId;
+    private AlternativeIdWrapper alternativeId;
 
     @XmlElement(name = "SPEC-ATTRIBUTES")
-    protected SpecAttributes specAttributes;
+    private SpecAttributes specAttributes;
 
     @XmlAttribute(name = "DESC")
-    protected String desc;
+    private String desc;
 
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String identifier;
+    private String identifier;
 
     @XmlAttribute(name = "LAST-CHANGE", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar lastChange;
+    private XMLGregorianCalendar lastChange;
 
     @XmlAttribute(name = "LONG-NAME")
-    protected String longName;
+    private String longName;
 }

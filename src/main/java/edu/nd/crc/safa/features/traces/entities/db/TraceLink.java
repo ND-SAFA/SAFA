@@ -42,7 +42,7 @@ public class TraceLink implements Serializable, IBaseEntity {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "trace_link_id")
-    UUID traceLinkId;
+    private UUID traceLinkId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,7 +51,7 @@ public class TraceLink implements Serializable, IBaseEntity {
         referencedColumnName = "artifact_id",
         nullable = false
     )
-    Artifact sourceArtifact;
+    private Artifact sourceArtifact;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -60,7 +60,7 @@ public class TraceLink implements Serializable, IBaseEntity {
         referencedColumnName = "artifact_id",
         nullable = false
     )
-    Artifact targetArtifact;
+    private Artifact targetArtifact;
 
     public TraceLink(Artifact sourceArtifact,
                      Artifact targetArtifact) {

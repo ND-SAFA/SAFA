@@ -35,9 +35,9 @@ public class GithubProjectImportJob extends GithubProjectCreationJob {
 
     @Override
     protected GithubProject getGithubProjectMapping(Project project) {
-        GithubProjectRepository repository = this.serviceProvider.getGithubProjectRepository();
+        GithubProjectRepository repository = this.getServiceProvider().getGithubProjectRepository();
         Optional<GithubProject> githubProjectOptional = repository.findByProjectAndOwnerAndRepositoryName(
-            project, this.githubIdentifier.getRepositoryOwner(), this.githubIdentifier.getRepositoryName());
+            project, this.getGithubIdentifier().getRepositoryOwner(), this.getGithubIdentifier().getRepositoryName());
 
         if (githubProjectOptional.isPresent()) {
             throw new SafaError("Repository already imported");

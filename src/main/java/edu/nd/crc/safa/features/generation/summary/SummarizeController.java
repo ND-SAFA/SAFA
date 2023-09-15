@@ -36,13 +36,13 @@ public class SummarizeController extends BaseController {
     @PostMapping(AppRoutes.Summarize.SUMMARIZE_ARTIFACTS)
     public List<String> summarizeArtifacts(@PathVariable UUID versionId,
                                            @RequestBody @Valid SummarizeArtifactRequestDTO request) {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder()
                 .fetchVersion(versionId)
                 .withPermission(ProjectPermission.EDIT, user)
                 .get();
         request.setProjectVersion(projectVersion);
         request.setProjectSummary(projectVersion.getProject().getSpecification());
-        return serviceProvider.getSummaryService().generateArtifactSummaries(request);
+        return getServiceProvider().getSummaryService().generateArtifactSummaries(request);
     }
 }

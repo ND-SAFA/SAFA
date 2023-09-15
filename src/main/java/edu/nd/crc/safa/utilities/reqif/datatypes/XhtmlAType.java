@@ -64,33 +64,33 @@ public class XhtmlAType extends XhtmlBasicStyleableType {
     })
     @XmlMixed
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicType> content = new ArrayList<>();
+    private List<XhtmlBasicType> content = new ArrayList<>();
 
     @XmlAttribute(name = "href")
-    protected String href;
+    private String href;
 
     @XmlAttribute(name = "charset")
-    protected String charset;
+    private String charset;
 
     @XmlAttribute(name = "type")
-    protected String type;
+    private String type;
 
     @XmlAttribute(name = "hreflang")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String hreflang;
+    private String hreflang;
 
     @XmlAttribute(name = "rel")
     @Setter(AccessLevel.NONE)
-    protected List<String> rel = new ArrayList<>();
+    private List<String> rel = new ArrayList<>();
 
     @XmlAttribute(name = "rev")
     @Setter(AccessLevel.NONE)
-    protected List<String> rev = new ArrayList<>();
+    private List<String> rev = new ArrayList<>();
 
     @XmlAttribute(name = "accesskey")
-    protected String accesskey;
+    private String accesskey;
 
     @XmlAttribute(name = "tabindex")
-    protected BigInteger tabindex;
+    private BigInteger tabindex;
 
 }

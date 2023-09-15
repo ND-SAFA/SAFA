@@ -21,7 +21,7 @@ public class JobAppEntity extends JobDbEntity {
     /**
      * The list of steps that must be performed for this job.
      */
-    List<String> steps;
+    private List<String> steps;
 
     public JobAppEntity() {
         super();
@@ -34,7 +34,7 @@ public class JobAppEntity extends JobDbEntity {
                 f.setAccessible(true);
                 f.set(jobAppEntity, f.get(jobDbEntity));
             }
-            jobAppEntity.steps = JobSteps.getJobSteps(jobAppEntity.jobType);
+            jobAppEntity.steps = JobSteps.getJobSteps(jobAppEntity.getJobType());
             return jobAppEntity;
         } catch (IllegalAccessException e) {
             String errorMessage = "Illegally accessed field while creating job app entity. %s";

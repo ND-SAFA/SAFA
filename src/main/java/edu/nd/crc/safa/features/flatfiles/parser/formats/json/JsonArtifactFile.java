@@ -36,8 +36,8 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
-        this.entities.forEach(a -> a.setId(null));
-        JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.entities,
+        this.getEntities().forEach(a -> a.setId(null));
+        JSONObject fileContent = JsonFileUtilities.writeEntitiesAsJson(this.getEntities(),
             Constants.JSON_ARTIFACTS_KEY);
         FileUtilities.writeToFile(file, fileContent.toString());
     }
@@ -61,7 +61,7 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
             ArtifactAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), ArtifactAppEntity.class);
             return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {
-            return new Pair<>(null, String.format("%s: %s", filename, e.getMessage()));
+            return new Pair<>(null, String.format("%s: %s", getFilename(), e.getMessage()));
         }
     }
 

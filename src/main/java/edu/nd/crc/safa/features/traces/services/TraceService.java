@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class TraceService implements IAppEntityService<TraceAppEntity> {
-    ArtifactService artifactService;
-    TraceLinkVersionRepository traceLinkVersionRepository;
+    private ArtifactService artifactService;
+    private TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Override
     public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {

@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArtifactNameCheck {
-    String artifactName;
+    private String artifactName;
 }

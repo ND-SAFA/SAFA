@@ -46,7 +46,12 @@ function build {
   fi
 
   # shellcheck disable=SC2086
-  "$SCRIPT_DIR/gradlew" build --stacktrace $TEST_ARGS
+  "$SCRIPT_DIR/gradlew" build $TEST_ARGS
+  return $?
+}
+
+function clean {
+  "$SCRIPT_DIR/gradlew" clean
   return $?
 }
 
@@ -73,6 +78,7 @@ ENV_PROPERTIES=local
 ENV_FILE=""
 BUILD=false
 RUN=false
+CLEAN=false
 while [ $OPTIND -le "$#" ]; do
   if getopts ':hntef:' option; then
     case $option in
@@ -91,6 +97,7 @@ while [ $OPTIND -le "$#" ]; do
     case $command in
       build) BUILD=true;;
       run) RUN=true;;
+      clean) CLEAN=true;;
       *) echo -e "Unknown command $command"; help 1;;
     esac
   fi
@@ -105,9 +112,14 @@ case $ENV_PROPERTIES in
 esac
 
 # Check the user gave us something to do
-if [[ $BUILD = false && $RUN = false ]]; then
+if [[ $BUILD = false && $RUN = false && $CLEAN = false ]]; then
   echo -e "No command specified."
   help 1
+fi
+
+if $CLEAN; then
+  clean
+  checkReturn $?
 fi
 
 if $BUILD; then

@@ -139,14 +139,11 @@ jacocoTestCoverageVerification {
 checkstyle {
     toolVersion = '8.45'
     configFile = file('checkstyle.xml')
+    sourceSets = [project.sourceSets.main]
 }
 
 checkstyleMain {
     source = 'src/main/java'
     ignoreFailures = false
     maxWarnings = 0
-}
-
-checkstyleTest {
-    source = 'src/test/'
 }

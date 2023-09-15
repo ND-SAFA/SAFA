@@ -19,11 +19,11 @@ public class JiraProjectPermissionDTO {
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Permission {
-        String description;
-        Boolean havePermission;
-        Long id;
-        String key;
-        String name;
-        String type;
+        private String description;
+        private Boolean havePermission;
+        private Long id;
+        private String key;
+        private String name;
+        private String type;
     }
 }

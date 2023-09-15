@@ -6,13 +6,15 @@ import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 /**
  * Builds job for pulling issues from JIRA and updating project.
  */
 public class CreateProjectViaJiraBuilder extends AbstractJobBuilder {
-    JiraIdentifier jiraIdentifier;
-
-    SafaUser user;
+    @Getter(AccessLevel.PROTECTED)
+    private JiraIdentifier jiraIdentifier;
 
     public CreateProjectViaJiraBuilder(
         ServiceProvider serviceProvider,
@@ -21,17 +23,16 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder {
     ) {
         super(serviceProvider, user);
         this.jiraIdentifier = jiraIdentifier;
-        this.user = user;
     }
 
     @Override
     protected AbstractJob constructJobForWork() {
         // Step - Create jira project creation job
         return new CreateProjectViaJiraJob(
-            this.jobDbEntity,
-            serviceProvider,
+            this.getJobDbEntity(),
+            getServiceProvider(),
             this.jiraIdentifier,
-            this.user
+            this.getUser()
         );
     }
 

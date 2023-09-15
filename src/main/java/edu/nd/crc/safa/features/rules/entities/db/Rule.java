@@ -30,28 +30,28 @@ public class Rule {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "id")
-    UUID id;
+    private UUID id;
     /**
      * The project this rule is applied to.
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "project_id", nullable = false)
-    Project project;
+    private Project project;
     /**
      * The name of the rule.
      */
     @Column
-    String name;
+    private String name;
     /**
      * Description of what the rule does.
      */
-    String description;
+    private String description;
     /**
      * The rule in String format.
      */
     @Column
-    String rule;
+    private String rule;
 
     public Rule(Project project,
                 RuleAppEntity rule) {

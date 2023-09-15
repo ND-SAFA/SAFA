@@ -36,38 +36,38 @@ import lombok.Setter;
 public class SpecHierarchy {
 
     @XmlElement(name = "ALTERNATIVE-ID")
-    protected AlternativeIdWrapper alternativeId;
+    private AlternativeIdWrapper alternativeId;
 
     @XmlElement(name = "CHILDREN")
-    protected Children children;
+    private Children children;
 
     @XmlElement(name = "EDITABLE-ATTS")
-    protected EditableAttributes editableAttributes;
+    private EditableAttributes editableAttributes;
 
     @XmlElement(name = "OBJECT", required = true)
-    protected ObjectRef object;
+    private ObjectRef object;
 
     @XmlAttribute(name = "DESC")
-    protected String desc;
+    private String desc;
 
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    protected String identifier;
+    private String identifier;
 
     @XmlAttribute(name = "IS-EDITABLE")
-    protected Boolean editable;
+    private Boolean editable;
 
     @XmlAttribute(name = "IS-TABLE-INTERNAL")
-    protected Boolean tableInternal;
+    private Boolean tableInternal;
 
     @XmlAttribute(name = "LAST-CHANGE", required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar lastChange;
+    private XMLGregorianCalendar lastChange;
 
     @XmlAttribute(name = "LONG-NAME")
-    protected String longName;
+    private String longName;
 
     /**
      * Java class for anonymous complex type.
@@ -88,7 +88,7 @@ public class SpecHierarchy {
             @XmlElementRef(type = AttributeDefinitionStringRef.class, required = false),
             @XmlElementRef(type = AttributeDefinitionXhtmlRef.class, required = false)
         })
-        protected List<AttributeDefinitionRef> attributeDefinitions = new ArrayList<>();
+        private List<AttributeDefinitionRef> attributeDefinitions = new ArrayList<>();
     }
 
     /**
@@ -105,7 +105,7 @@ public class SpecHierarchy {
         @XmlElement(name = "SPEC-OBJECT-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected SpecObject specObject;
+        private SpecObject specObject;
     }
 
 }

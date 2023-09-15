@@ -40,11 +40,11 @@ public class DeltaController extends BaseController {
     @GetMapping(AppRoutes.Delta.CALCULATE_PROJECT_DELTA)
     public ProjectDelta calculateProjectDelta(@PathVariable UUID baselineVersionId,
                                               @PathVariable UUID targetVersionId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion baselineVersion = this.resourceBuilder.fetchVersion(baselineVersionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion baselineVersion = getResourceBuilder().fetchVersion(baselineVersionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
-        ProjectVersion targetVersion = this.resourceBuilder.fetchVersion(targetVersionId)
+        ProjectVersion targetVersion = getResourceBuilder().fetchVersion(targetVersionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
-        return this.serviceProvider.getDeltaService().calculateProjectDelta(baselineVersion, targetVersion);
+        return getServiceProvider().getDeltaService().calculateProjectDelta(baselineVersion, targetVersion);
     }
 }

@@ -76,6 +76,6 @@ public class XhtmlDivType extends XhtmlBasicStyleableType {
     })
     @XmlMixed
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicType> content;
+    private List<XhtmlBasicType> content;
 
 }

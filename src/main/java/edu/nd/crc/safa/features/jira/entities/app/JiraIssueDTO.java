@@ -19,123 +19,123 @@ public class JiraIssueDTO {
     /**
      * JIRA id for issue
      */
-    String id;
+    private String id;
     /**
      * The name of the issue within the project (e.g. RE-26)
      */
-    String key;
+    private String key;
     /**
      * Fields containing summary, description, and type.
      */
-    JiraIssueFields fields;
+    private JiraIssueFields fields;
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class JiraIssueFields {
-        Boolean subtask;
+        private Boolean subtask;
         /**
          * The title appearing for each issue.
          */
-        String summary;
+        private String summary;
 
         /**
          * Descriptions of the type of issue.
          */
         @JsonProperty("issuetype")
-        JiraIssueType issueType;
+        private JiraIssueType issueType;
         /**
          * List of ingoing and outgoing links to other issues.
          */
         @JsonProperty("issuelinks")
-        List<JiraIssueLink> issueLinks = new ArrayList<>();
+        private List<JiraIssueLink> issueLinks = new ArrayList<>();
         /**
          * The text defining this issue.
          */
         @Nullable
-        JiraDescription description;
-        Date updated;
-        Date created;
-        JiraProjectResponseDTO project;
-        JiraPriority priority;
-        JiraIssueStatus status;
-        JiraIssueAccount creator;
-        JiraIssueAccount reporter;
-        JiraIssueVotes votes;
+        private JiraDescription description;
+        private Date updated;
+        private Date created;
+        private JiraProjectResponseDTO project;
+        private JiraPriority priority;
+        private JiraIssueStatus status;
+        private JiraIssueAccount creator;
+        private JiraIssueAccount reporter;
+        private JiraIssueVotes votes;
 
         @Data
         public static class JiraDescription {
-            int version;
-            String type;
-            List<Content> content = new ArrayList<>();
+            private int version;
+            private String type;
+            private List<Content> content = new ArrayList<>();
 
             @Data
             public static class Content {
-                String type;
+                private String type;
                 // Cannot rename because this is the format defined by JIRA
-                List<ContentContent> content = new ArrayList<>();
+                private List<ContentContent> content = new ArrayList<>();
             }
 
             @Data
             public static class ContentContent {
-                String type;
-                String text;
+                private String type;
+                private String text;
             }
         }
 
         @Data
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class JiraIssueType {
-            String id;
-            String name;
-            String description;
+            private String id;
+            private String name;
+            private String description;
         }
 
         @Data
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class JiraPriority {
-            String id;
-            String name;
+            private String id;
+            private String name;
         }
 
         @Data
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class JiraIssueLink {
 
-            JiraIssueLinkType type;
-            JiraIssueDTO inwardIssue;
-            JiraIssueDTO outwardIssue;
+            private JiraIssueLinkType type;
+            private JiraIssueDTO inwardIssue;
+            private JiraIssueDTO outwardIssue;
 
             @Data
             @JsonIgnoreProperties(ignoreUnknown = true)
             public static class JiraIssueLinkType {
-                String id;
-                String name;
-                String inward;
-                String outward;
+                private String id;
+                private String name;
+                private String inward;
+                private String outward;
             }
         }
 
         @Data
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class JiraIssueStatus {
-            String id;
-            String name;
+            private String id;
+            private String name;
         }
 
         @Data
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class JiraIssueAccount {
-            String accountId;
-            String displayName;
-            String accountType;
-            String timezone;
-            Boolean active;
+            private String accountId;
+            private String displayName;
+            private String accountType;
+            private String timezone;
+            private Boolean active;
         }
 
         @Data
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class JiraIssueVotes {
-            Integer votes;
+            private Integer votes;
         }
 
     }

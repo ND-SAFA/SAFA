@@ -36,7 +36,7 @@ public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEnti
         List<String> projectArtifactNames = projectAppEntity.getArtifactNames();
         List<String> errors = new ArrayList<>();
         List<TraceAppEntity> validTraces = new ArrayList<>();
-        for (TraceAppEntity entity : this.entities) {
+        for (TraceAppEntity entity : this.getEntities()) {
             List<String> traceAppEntityErrors = assertTraceContainsPointers(entity, projectArtifactNames);
             if (traceAppEntityErrors.isEmpty()) {
                 validTraces.add(entity);
@@ -49,7 +49,7 @@ public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEnti
 
     @Override
     public Pair<List<TraceAppEntity>, List<String>> validateEntitiesCreated() {
-        return filterDuplicates(this.entities, new ArrayList<>());
+        return filterDuplicates(this.getEntities(), new ArrayList<>());
     }
 
     private Pair<List<TraceAppEntity>, List<String>> filterDuplicates(List<TraceAppEntity> traces,

@@ -9,7 +9,9 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Defines a job performing some actions on some identified entity.
@@ -18,13 +20,16 @@ public abstract class AbstractJobBuilder {
     /**
      * List of services.
      */
-    protected ServiceProvider serviceProvider;
+    @Getter(AccessLevel.PROTECTED)
+    private ServiceProvider serviceProvider;
     /**
      * The database entity for this job.
      */
-    protected JobDbEntity jobDbEntity;
+    @Getter(AccessLevel.PROTECTED)
+    private JobDbEntity jobDbEntity;
 
-    protected SafaUser user;
+    @Getter(AccessLevel.PROTECTED)
+    private SafaUser user;
 
     protected AbstractJobBuilder(ServiceProvider serviceProvider) {
         this(serviceProvider, null);
@@ -76,7 +81,7 @@ public abstract class AbstractJobBuilder {
 
     @AllArgsConstructor
     protected static class JobDefinition {
-        JobDbEntity jobDbEntity;
-        AbstractJob abstractJob;
+        private JobDbEntity jobDbEntity;
+        private AbstractJob abstractJob;
     }
 }

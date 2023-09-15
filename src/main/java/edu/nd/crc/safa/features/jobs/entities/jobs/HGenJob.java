@@ -20,11 +20,11 @@ public class HGenJob extends CommitJob {
     /**
      * The request to generate trace links.
      */
-    HGenRequest hGenRequest;
+    private HGenRequest hGenRequest;
     /**
      * The project version to commit summaries and generated links to.
      */
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
 
     public HGenJob(JobDbEntity jobDbEntity,
                    ServiceProvider serviceProvider,
@@ -43,17 +43,17 @@ public class HGenJob extends CommitJob {
     @IJobStep(value = "Summarizing Project", position = 1)
     public void summarizeProject() {
         Project project = this.projectVersion.getProject();
-        ProjectSummaryService service = this.serviceProvider.getProjectSummaryService();
+        ProjectSummaryService service = this.getServiceProvider().getProjectSummaryService();
         ProjectAppEntity projectAppEntity =
-            this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(
-                this.jobDbEntity.getUser(),
+            this.getServiceProvider().getProjectRetrievalService().getProjectAppEntity(
+                this.getJobDbEntity().getUser(),
                 this.projectVersion);
         service.generateProjectSummary(project, projectAppEntity.getArtifacts(), this.getDbLogger());
     }
 
     @IJobStep(value = "Generating Artifacts", position = 2)
     public void generatingArtifacts() {
-        HGenService hGenService = this.serviceProvider.getHGenService();
+        HGenService hGenService = this.getServiceProvider().getHGenService();
         String summary = this.projectVersion.getProject().getSpecification();
         this.hGenRequest.setSummary(summary);
         ProjectCommit projectCommit = hGenService.generateHierarchy(this.projectVersion, this.hGenRequest,

@@ -19,14 +19,14 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Job to update an already imported JIRA project
  */
 public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
-    JiraConnectionService jiraConnectionService;
+    private JiraConnectionService jiraConnectionService;
 
     public JiraProjectUpdateJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
                                 JiraIdentifier jiraIdentifier,
                                 SafaUser user) {
         super(jobDbEntity, serviceProvider, jiraIdentifier, user);
-        this.jiraConnectionService = this.serviceProvider.getJiraConnectionService();
+        this.jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
         setProjectCommit(new ProjectCommit(jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);
     }
@@ -34,19 +34,19 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
     @Override
     public ProjectEntities retrieveJiraEntities() {
         JiraIssuesResponseDTO dto = jiraConnectionService.retrieveUpdatedJIRAIssues(
-            credentials,
-            jiraIdentifier.getOrgId(),
-            this.jiraIdentifier.getJiraProjectId(),
-            jiraProject.getLastUpdate());
+            getCredentials(),
+            getJiraIdentifier().getOrgId(),
+            this.getJiraIdentifier().getJiraProjectId(),
+            getJiraProject().getLastUpdate());
 
-        return this.serviceProvider
+        return this.getServiceProvider()
             .getJiraParsingService()
             .parseProjectEntitiesFromIssues(dto.getIssues());
     }
 
     @Override
     protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId) {
-        Optional<JiraProject> optional = this.serviceProvider
+        Optional<JiraProject> optional = this.getServiceProvider()
                 .getJiraProjectRepository()
                 .findByProjectAndJiraProjectId(project, jiraProjectId);
 

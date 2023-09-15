@@ -81,42 +81,42 @@ public class XhtmlThType extends XhtmlBasicStyleableType {
     })
     @XmlMixed
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlBasicType> content = new ArrayList<>();
+    private List<XhtmlBasicType> content = new ArrayList<>();
 
     @XmlAttribute(name = "abbr")
-    protected String abbr;
+    private String abbr;
 
     @XmlAttribute(name = "axis")
-    protected String axis;
+    private String axis;
 
     @XmlAttribute(name = "headers")
     @XmlIDREF
     @XmlSchemaType(name = "IDREFS")
     @Setter(AccessLevel.NONE)
-    protected List<Object> headers = new ArrayList<>();
+    private List<Object> headers = new ArrayList<>();
 
     @XmlAttribute(name = "rowspan")
-    protected BigInteger rowspan = BigInteger.ONE;
+    private BigInteger rowspan = BigInteger.ONE;
 
     @XmlAttribute(name = "colspan")
-    protected BigInteger colspan = BigInteger.ONE;
+    private BigInteger colspan = BigInteger.ONE;
 
     @XmlAttribute(name = "align")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String align;
+    private String align;
 
     @XmlAttribute(name = "char")
-    protected String alignChar;
+    private String alignChar;
 
     @XmlAttribute(name = "charoff")
-    protected String charoff;
+    private String charoff;
 
     @XmlAttribute(name = "scope")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String scope;
+    private String scope;
 
     @XmlAttribute(name = "valign")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String valign;
+    private String valign;
 
 }

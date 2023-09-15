@@ -21,27 +21,27 @@ public class ProjectIdAppEntity {
     /**
      * The ID of the project.
      */
-    String projectId;
+    private String projectId;
     /**
      * The name of the project.
      */
-    String name;
+    private String name;
     /**
      * The description of the project.
      */
-    String description;
+    private String description;
     /**
      * The project owner email.
      */
-    String owner;
+    private String owner;
     /**
      * List of member on project.
      */
-    List<ProjectMemberAppEntity> members;
+    private List<ProjectMemberAppEntity> members;
     /**
      * Last edited.
      */
-    LocalDateTime lastEdited;
+    private LocalDateTime lastEdited;
 
     public ProjectIdAppEntity(Project project, List<ProjectMemberAppEntity> members) {
         this.projectId = project.getProjectId().toString();

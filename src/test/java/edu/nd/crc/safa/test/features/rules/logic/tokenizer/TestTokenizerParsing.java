@@ -22,22 +22,22 @@ class TestTokenizerParsing {
         List<Token> tokens = Tokenizer.lex(query);
 
         assertThat(tokens).hasSize(6);
-        assertThat(tokens.get(0).value).isEqualTo(functionName);
-        assertThat(tokens.get(0).tokenType).isEqualTo(TokenType.FUNC_START);
+        assertThat(tokens.get(0).getValue()).isEqualTo(functionName);
+        assertThat(tokens.get(0).getTokenType()).isEqualTo(TokenType.FUNC_START);
 
-        assertThat(tokens.get(1).value).isEqualTo("0");
-        assertThat(tokens.get(1).tokenType).isEqualTo(TokenType.ARGUMENT);
+        assertThat(tokens.get(1).getValue()).isEqualTo("0");
+        assertThat(tokens.get(1).getTokenType()).isEqualTo(TokenType.ARGUMENT);
 
-        assertThat(tokens.get(2).value).isEqualTo("Requirement");
-        assertThat(tokens.get(2).tokenType).isEqualTo(TokenType.ARGUMENT);
+        assertThat(tokens.get(2).getValue()).isEqualTo("Requirement");
+        assertThat(tokens.get(2).getTokenType()).isEqualTo(TokenType.ARGUMENT);
 
-        assertThat(tokens.get(3).value).isEqualTo("child");
-        assertThat(tokens.get(3).tokenType).isEqualTo(TokenType.ARGUMENT);
+        assertThat(tokens.get(3).getValue()).isEqualTo("child");
+        assertThat(tokens.get(3).getTokenType()).isEqualTo(TokenType.ARGUMENT);
 
-        assertThat(tokens.get(4).value).isEqualTo("Package");
-        assertThat(tokens.get(4).tokenType).isEqualTo(TokenType.ARGUMENT);
+        assertThat(tokens.get(4).getValue()).isEqualTo("Package");
+        assertThat(tokens.get(4).getTokenType()).isEqualTo(TokenType.ARGUMENT);
 
-        assertThat(tokens.get(5).value).isEqualTo(")");
-        assertThat(tokens.get(5).tokenType).isEqualTo(TokenType.FUNC_END);
+        assertThat(tokens.get(5).getValue()).isEqualTo(")");
+        assertThat(tokens.get(5).getTokenType()).isEqualTo(TokenType.FUNC_END);
     }
 }

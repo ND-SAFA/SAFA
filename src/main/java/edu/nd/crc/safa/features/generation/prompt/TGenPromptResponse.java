@@ -19,7 +19,7 @@ public class TGenPromptResponse implements ITGenResponse {
     /**
      * The completion to prompt.
      */
-    String completion;
+    private String completion;
 
     @Override
     public List<String> getLogs() {

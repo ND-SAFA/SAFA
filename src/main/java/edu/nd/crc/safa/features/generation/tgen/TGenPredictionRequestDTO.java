@@ -14,5 +14,5 @@ public class TGenPredictionRequestDTO {
     /**
      * Dataset containing artifacts to predict trace links against.
      */
-    GenerationDataset dataset;
+    private GenerationDataset dataset;
 }

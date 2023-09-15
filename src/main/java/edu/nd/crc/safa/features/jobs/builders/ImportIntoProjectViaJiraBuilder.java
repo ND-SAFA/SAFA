@@ -24,10 +24,10 @@ public class ImportIntoProjectViaJiraBuilder extends CreateProjectViaJiraBuilder
     @Override
     protected AbstractJob constructJobForWork() {
         return new JiraProjectImportJob(
-            jobDbEntity,
-            serviceProvider,
-            this.jiraIdentifier,
-            user
+            getJobDbEntity(),
+            getServiceProvider(),
+            this.getJiraIdentifier(),
+            getUser()
         );
     }
 }

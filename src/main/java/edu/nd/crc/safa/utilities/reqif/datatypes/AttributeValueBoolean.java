@@ -26,10 +26,10 @@ import lombok.Setter;
 public class AttributeValueBoolean extends AttributeValue {
 
     @XmlElement(name = "DEFINITION", required = true)
-    protected Definition definition;
+    private Definition definition;
 
     @XmlAttribute(name = "THE-VALUE", required = true)
-    protected boolean value;
+    private boolean value;
 
     /**
      * Java class for anonymous complex type.
@@ -44,7 +44,7 @@ public class AttributeValueBoolean extends AttributeValue {
         @XmlElement(name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected AttributeDefinitionBoolean attributeDefinition;
+        private AttributeDefinitionBoolean attributeDefinition;
     }
 
 }

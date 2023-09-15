@@ -18,14 +18,14 @@ public class JiraProjectResponseDTO {
 
     private static final String MEDIUM_AVATAR_KEY = "32x32";
 
-    String id;
-    String description;
-    String key;
-    String name;
-    Boolean isPrivate;
-    String style;
-    String smallAvatarUrl;
-    String mediumAvatarUrl;
+    private String id;
+    private String description;
+    private String key;
+    private String name;
+    private Boolean isPrivate;
+    private String style;
+    private String smallAvatarUrl;
+    private String mediumAvatarUrl;
 
     /**
      * Retrieve project avatar URLs

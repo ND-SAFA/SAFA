@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ProjectMemberAppEntity implements IAppEntity {
-    UUID projectMembershipId;
-    String email;
-    ProjectRole role;
+    private UUID projectMembershipId;
+    private String email;
+    private ProjectRole role;
 
     public ProjectMemberAppEntity(UserProjectMembership projectMembership) {
         this.projectMembershipId = projectMembership.getMembershipId();

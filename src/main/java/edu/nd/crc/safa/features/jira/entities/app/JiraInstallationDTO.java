@@ -13,8 +13,8 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JiraInstallationDTO {
 
-    String id;
-    String name;
-    String avatarUrl;
-    List<String> scopes = new ArrayList<>();
+    private String id;
+    private String name;
+    private String avatarUrl;
+    private List<String> scopes = new ArrayList<>();
 }

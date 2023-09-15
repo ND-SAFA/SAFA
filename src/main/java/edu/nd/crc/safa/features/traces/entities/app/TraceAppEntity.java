@@ -16,18 +16,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TraceAppEntity implements IAppEntity {
-    UUID traceLinkId;
+    private UUID traceLinkId;
     @NotEmpty
-    String sourceName;
-    UUID sourceId;
+    private String sourceName;
+    private UUID sourceId;
     @NotEmpty
-    String targetName;
-    UUID targetId;
-    ApprovalStatus approvalStatus;
-    double score;
-    TraceType traceType;
-    boolean isVisible = true;
-    String explanation;
+    private String targetName;
+    private UUID targetId;
+    private ApprovalStatus approvalStatus;
+    private double score;
+    private TraceType traceType;
+    private boolean isVisible = true;
+    private String explanation;
 
     public TraceAppEntity(String sourceName, String targetName) {
         this.sourceName = sourceName;

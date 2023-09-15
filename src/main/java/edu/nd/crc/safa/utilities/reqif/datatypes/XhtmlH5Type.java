@@ -59,6 +59,6 @@ public class XhtmlH5Type extends XhtmlBasicStyleableType {
         @XmlElementRef(type = XhtmlDelType.class, required = false)
     })
     @XmlMixed
-    protected List<XhtmlBasicType> content = new ArrayList<>();
+    private List<XhtmlBasicType> content = new ArrayList<>();
 
 }

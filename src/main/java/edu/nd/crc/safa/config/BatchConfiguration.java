@@ -17,7 +17,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 public class BatchConfiguration {
 
     @Autowired
-    JobRepository jobRepository;
+    private JobRepository jobRepository;
 
     /**
      * Sets the current task executor to run jobs asynchronously.

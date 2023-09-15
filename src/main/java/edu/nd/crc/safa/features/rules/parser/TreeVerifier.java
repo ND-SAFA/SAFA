@@ -93,7 +93,7 @@ public class TreeVerifier {
                         Function ruleFunction = ruleFunctionQuery.get();
                         String type = retrievers.typeRetriever.apply(artifactBody);
 
-                        if (type.equalsIgnoreCase(ruleFunction.targetArtifactType)) {
+                        if (type.equalsIgnoreCase(ruleFunction.getTargetArtifactType())) {
                             boolean isSatisfied = isRuleSatisfied(ruleFunction, artifactBody, traceLinks,
                                 idToArtifact, retrievers);
                             rule.setFunctionResult(isSatisfied);
@@ -124,7 +124,7 @@ public class TreeVerifier {
                                            final Map<UUID, A> idToArtifact, Retrievers<A, T> retrievers) {
         UUID artifactId = retrievers.idRetriever.apply(targetArtifact);
 
-        switch (ruleToApply.artifactRelationship) {
+        switch (ruleToApply.getArtifactRelationship()) {
             case BIDIRECTIONAL_LINK:
                 return satisfiesLinkCountRule(ruleToApply, artifactId, traceLinks, idToArtifact, retrievers);
             case CHILD:
@@ -154,8 +154,8 @@ public class TreeVerifier {
                     String sourceType = retrievers.typeRetriever.apply(sourceEntity);
                     String targetType = retrievers.typeRetriever.apply(targetEntity);
 
-                    return rule.sourceArtifactType.equalsIgnoreCase(sourceType)
-                        && rule.targetArtifactType.equalsIgnoreCase(targetType);
+                    return rule.getSourceArtifactType().equalsIgnoreCase(sourceType)
+                        && rule.getTargetArtifactType().equalsIgnoreCase(targetType);
                 } else {
                     return false;
                 }
@@ -175,7 +175,7 @@ public class TreeVerifier {
             .filter(link -> {
                 A artifact = idToArtifact.get(retrievers.sourceIdRetriever.apply(link));
                 String type = retrievers.typeRetriever.apply(artifact);
-                return type.equalsIgnoreCase(childCountRule.sourceArtifactType);
+                return type.equalsIgnoreCase(childCountRule.getSourceArtifactType());
             })
             .count();
         return matchesRuleCount(childCountRule, childCount);
@@ -191,7 +191,7 @@ public class TreeVerifier {
             .filter(t -> {
                 A artifact = idToArtifact.get(retrievers.sourceIdRetriever.apply(t));
                 String type = retrievers.typeRetriever.apply(artifact);
-                return type.equalsIgnoreCase(r.sourceArtifactType);
+                return type.equalsIgnoreCase(r.getSourceArtifactType());
             })
             .count();
 
@@ -202,7 +202,7 @@ public class TreeVerifier {
             .filter(t -> {
                 A artifact = idToArtifact.get(retrievers.targetIdRetriever.apply(t));
                 String type = retrievers.typeRetriever.apply(artifact);
-                return type.equalsIgnoreCase(r.sourceArtifactType);
+                return type.equalsIgnoreCase(r.getSourceArtifactType());
             })
             .count();
         long siblingCount = siblingCountAsTarget + siblingCountAsSource;
@@ -211,13 +211,13 @@ public class TreeVerifier {
     }
 
     private boolean matchesRuleCount(Function r, long childCount) {
-        switch (r.condition) {
+        switch (r.getCondition()) {
             case AT_LEAST:
-                return childCount >= r.count;
+                return childCount >= r.getCount();
             case EXACTLY:
-                return childCount == r.count;
+                return childCount == r.getCount();
             case LESS_THAN:
-                return childCount < r.count;
+                return childCount < r.getCount();
             default:
         }
         return true;
@@ -225,9 +225,9 @@ public class TreeVerifier {
 
     @AllArgsConstructor
     private static class Retrievers<A, T> {
-        public java.util.function.Function<A, UUID> idRetriever;
-        public java.util.function.Function<A, String> typeRetriever;
-        public java.util.function.Function<T, UUID> sourceIdRetriever;
-        public java.util.function.Function<T, UUID> targetIdRetriever;
+        private java.util.function.Function<A, UUID> idRetriever;
+        private java.util.function.Function<A, String> typeRetriever;
+        private java.util.function.Function<T, UUID> sourceIdRetriever;
+        private java.util.function.Function<T, UUID> targetIdRetriever;
     }
 }

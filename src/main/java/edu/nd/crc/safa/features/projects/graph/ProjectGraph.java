@@ -19,7 +19,7 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 public class ProjectGraph {
-    Map<UUID, ArtifactNode> artifactsMap = new HashMap<>();
+    private Map<UUID, ArtifactNode> artifactsMap = new HashMap<>();
 
     public ProjectGraph(ProjectAppEntity projectAppEntity) {
         this.addProjectRelationships(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());

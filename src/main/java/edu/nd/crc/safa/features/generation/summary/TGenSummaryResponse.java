@@ -19,7 +19,7 @@ public class TGenSummaryResponse implements ITGenResponse {
     /**
      * The content sent to summarize.
      */
-    List<GenerationArtifact> artifacts;
-    String summary;
-    List<String> logs;
+    private List<GenerationArtifact> artifacts;
+    private String summary;
+    private List<String> logs;
 }

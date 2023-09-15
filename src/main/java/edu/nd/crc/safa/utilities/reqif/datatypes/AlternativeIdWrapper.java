@@ -23,5 +23,5 @@ import lombok.Setter;
 @Setter
 public class AlternativeIdWrapper {
     @XmlElement(name = "ALTERNATIVE-ID", namespace = "")
-    protected AlternativeId alternativeId;
+    private AlternativeId alternativeId;
 }

@@ -33,27 +33,27 @@ import lombok.Setter;
 public class XhtmlColgroupType extends XhtmlBasicStyleableType {
 
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlColType> col = new ArrayList<>();
+    private List<XhtmlColType> col = new ArrayList<>();
 
     @XmlAttribute(name = "span")
-    protected BigInteger span = BigInteger.ONE;
+    private BigInteger span = BigInteger.ONE;
 
     @XmlAttribute(name = "width")
     @Setter(AccessLevel.NONE)
-    protected List<String> width = new ArrayList<>();
+    private List<String> width = new ArrayList<>();
 
     @XmlAttribute(name = "valign")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String valign;
+    private String valign;
 
     @XmlAttribute(name = "align")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String align;
+    private String align;
 
     @XmlAttribute(name = "char")
-    protected String alignChar;
+    private String alignChar;
 
     @XmlAttribute(name = "charoff")
-    protected String charoff;
+    private String charoff;
 
 }

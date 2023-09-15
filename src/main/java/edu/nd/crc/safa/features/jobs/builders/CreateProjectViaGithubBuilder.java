@@ -7,6 +7,9 @@ import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 /**
  * Creates a job responsible for pulling and parsing a GitHub repository
  */
@@ -15,23 +18,23 @@ public class CreateProjectViaGithubBuilder extends AbstractJobBuilder {
     /**
      * Identifier GitHub project to import.
      */
-    GithubIdentifier githubIdentifier;
+    @Getter(AccessLevel.PROTECTED)
+    private GithubIdentifier githubIdentifier;
 
-    SafaUser user;
-
-    GithubImportDTO githubImportDTO;
+    @Getter(AccessLevel.PROTECTED)
+    private GithubImportDTO githubImportDTO;
 
     public CreateProjectViaGithubBuilder(ServiceProvider serviceProvider, GithubIdentifier githubIdentifier,
                                          GithubImportDTO githubImportDTO, SafaUser user) {
         super(serviceProvider, user);
         this.githubIdentifier = githubIdentifier;
-        this.user = user;
         this.githubImportDTO = githubImportDTO;
     }
 
     @Override
     protected AbstractJob constructJobForWork() {
-        return new GithubProjectCreationJob(jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO, user);
+        return new GithubProjectCreationJob(getJobDbEntity(), getServiceProvider(), githubIdentifier,
+            githubImportDTO, getUser());
     }
 
     @Override

@@ -28,12 +28,12 @@ import lombok.Setter;
 public class AttributeDefinitionEnumeration extends AttributeDefinition {
 
     @XmlElement(name = "DEFAULT-VALUE")
-    protected DefaultValue defaultValue;
+    private DefaultValue defaultValue;
 
     @XmlElement(name = "TYPE", required = true)
-    protected Type type;
+    private Type type;
     @XmlAttribute(name = "MULTI-VALUED", required = true)
-    protected boolean multiValued;
+    private boolean multiValued;
 
     /**
      * Java class for anonymous complex type.
@@ -46,7 +46,7 @@ public class AttributeDefinitionEnumeration extends AttributeDefinition {
     @Setter
     public static class DefaultValue {
         @XmlElement(name = "ATTRIBUTE-VALUE-ENUMERATION", namespace = "")
-        protected AttributeValueEnumeration attributeValue;
+        private AttributeValueEnumeration attributeValue;
     }
 
     /**
@@ -60,7 +60,7 @@ public class AttributeDefinitionEnumeration extends AttributeDefinition {
         @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected DatatypeDefinitionEnumeration datatypeDefinition;
+        private DatatypeDefinitionEnumeration datatypeDefinition;
     }
 
 }

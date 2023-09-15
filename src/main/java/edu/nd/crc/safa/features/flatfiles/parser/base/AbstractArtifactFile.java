@@ -56,7 +56,7 @@ public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactA
         HashMap<String, ArtifactAppEntity> artifactsProcessed) {
         List<String> errors = new ArrayList<>();
         List<ArtifactAppEntity> validArtifacts = new ArrayList<>();
-        entities.forEach(artifact -> {
+        getEntities().forEach(artifact -> {
             if (artifactsProcessed.containsKey(artifact.getName())) {
                 String errorMessage = String.format("Duplicate artifact found: %s", artifact.getName());
                 errors.add(errorMessage);

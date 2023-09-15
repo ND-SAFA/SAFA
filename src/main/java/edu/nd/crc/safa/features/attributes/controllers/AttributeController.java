@@ -48,8 +48,8 @@ public class AttributeController extends BaseController  {
      */
     @GetMapping(AppRoutes.Attribute.ROOT)
     public List<CustomAttributeAppEntity> getProjectAttributes(@PathVariable UUID projectId) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         return attributeService.getAttributeEntitiesForProject(project);
     }
@@ -66,8 +66,8 @@ public class AttributeController extends BaseController  {
     public CustomAttributeAppEntity createNewProjectAttribute(@PathVariable UUID projectId,
                                                               @RequestBody CustomAttributeAppEntity appEntity) {
 
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.EDIT, user).get();
 
         if (appEntity.getKey() == null || appEntity.getKey().isBlank()) {
@@ -95,8 +95,8 @@ public class AttributeController extends BaseController  {
     public CustomAttributeAppEntity getProjectAttribute(@PathVariable UUID projectId, @PathVariable String key)
         throws SafaError {
 
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.VIEW, user).get();
 
         if (key.isBlank()) {
@@ -125,8 +125,8 @@ public class AttributeController extends BaseController  {
     public CustomAttributeAppEntity updateProjectAttribute(@PathVariable UUID projectId, @PathVariable String key,
                                                            @RequestBody CustomAttributeAppEntity appEntity) {
 
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.EDIT, user).get();
 
         if (key.isBlank()) {
@@ -157,8 +157,8 @@ public class AttributeController extends BaseController  {
     @Transactional
     public void deleteProjectAttribute(@PathVariable UUID projectId, @PathVariable String key) throws SafaError {
 
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        Project project = this.resourceBuilder.fetchProject(projectId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.EDIT, user).get();
 
         if (key.isBlank()) {

@@ -67,6 +67,7 @@ import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
@@ -85,7 +86,8 @@ import org.springframework.stereotype.Component;
 @Data
 @Scope("singleton")
 public class ServiceProvider {
-    public static ServiceProvider instance;
+    @Getter
+    private static ServiceProvider instance;
     // Project
     private final ProjectRepository projectRepository;
     private final ProjectService projectService;
@@ -167,7 +169,7 @@ public class ServiceProvider {
     private final JobService jobService;
     private final JobDbRepository jobRepository;
     // Jobs
-    JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
+    private JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     private JobLoggingService jobLoggingService;
     // Search
     private SearchService searchService;

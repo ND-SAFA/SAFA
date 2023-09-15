@@ -102,8 +102,8 @@ public class ParseDataFileController extends BaseController {
     @PostMapping(AppRoutes.Projects.Entities.CHECK_IF_ARTIFACT_EXISTS)
     public Map<String, Boolean> checkIfNameExists(@PathVariable UUID versionId,
                                                   @RequestBody ArtifactNameCheck artifactNameCheck) throws SafaError {
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         boolean artifactExists = checkArtifactNameService.doesArtifactExist(projectVersion, artifactNameCheck);
         Map<String, Boolean> response = new HashMap<>();

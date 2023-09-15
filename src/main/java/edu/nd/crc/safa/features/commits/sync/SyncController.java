@@ -44,15 +44,15 @@ public class SyncController extends BaseController {
     public ProjectAppEntity getChanges(@PathVariable UUID versionId,
                                        @RequestBody EntityChangeMessage message) {
         ProjectAppEntity projectAppEntity = new ProjectAppEntity();
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId)
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         for (Change change : message.getChanges()) {
             projectAppEntity = updateProjectAppEntity(projectAppEntity, projectVersion, change);
         }
 
         if (message.isUpdateLayout()) {
-            Map<UUID, LayoutPosition> defaultDocumentLayout = this.serviceProvider
+            Map<UUID, LayoutPosition> defaultDocumentLayout = getServiceProvider()
                 .getArtifactPositionService().retrieveDocumentLayout(projectVersion, null);
             projectAppEntity.setLayout(defaultDocumentLayout);
         }
@@ -64,7 +64,7 @@ public class SyncController extends BaseController {
                                                     Change change) {
         Project project = projectVersion.getProject();
         List<UUID> entityIds = change.getEntityIds();
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         switch (change.getEntity()) {
             case PROJECT:
                 projectAppEntity.setName(project.getName());
@@ -72,45 +72,45 @@ public class SyncController extends BaseController {
                 break;
             case MEMBERS:
                 List<ProjectMemberAppEntity> projectMemberAppEntities =
-                    this.serviceProvider.getMemberService().getAppEntitiesByIds(projectVersion, user, entityIds);
+                    getServiceProvider().getMemberService().getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setMembers(projectMemberAppEntities);
                 break;
             case TYPES:
-                List<TypeAppEntity> artifactTypes = this.serviceProvider
+                List<TypeAppEntity> artifactTypes = getServiceProvider()
                     .getTypeService()
                     .getAppEntities(projectVersion, user);
                 projectAppEntity.setArtifactTypes(artifactTypes);
                 break;
             case ARTIFACTS:
-                List<ArtifactAppEntity> artifacts = this.serviceProvider
+                List<ArtifactAppEntity> artifacts = getServiceProvider()
                     .getArtifactService()
                     .getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setArtifacts(artifacts);
                 break;
             case TRACES:
-                List<TraceAppEntity> traces = this.serviceProvider
+                List<TraceAppEntity> traces = getServiceProvider()
                     .getTraceService()
                     .getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
                 projectAppEntity.setTraces(traces);
                 break;
             case DOCUMENT:
-                List<DocumentAppEntity> documents = this.serviceProvider
+                List<DocumentAppEntity> documents = getServiceProvider()
                     .getDocumentService()
                     .getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setDocuments(documents);
                 break;
             case VERSION:
-                return this.serviceProvider
+                return getServiceProvider()
                     .getProjectRetrievalService()
                     .getProjectAppEntity(projectVersion);
             case WARNINGS:
-                Map<UUID, List<RuleName>> warnings = this.serviceProvider
+                Map<UUID, List<RuleName>> warnings = getServiceProvider()
                     .getWarningService()
                     .retrieveWarningsInProjectVersion(projectVersion);
                 projectAppEntity.setWarnings(warnings);
                 break;
             case TRACE_MATRICES:
-                List<TraceMatrixAppEntity> traceMatrixAppEntities = this.serviceProvider
+                List<TraceMatrixAppEntity> traceMatrixAppEntities = getServiceProvider()
                     .getTraceMatrixService()
                     .getAppEntities(projectVersion, null);
                 projectAppEntity.setTraceMatrices(traceMatrixAppEntities);

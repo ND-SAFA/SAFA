@@ -27,11 +27,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ProjectCommit {
-    ProjectVersion commitVersion;
-    ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();
-    ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
-    List<CommitError> errors = new ArrayList<>();
-    boolean failOnError = true;
+    private ProjectVersion commitVersion;
+    private ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();
+    private ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
+    private List<CommitError> errors = new ArrayList<>();
+    private boolean failOnError = true;
 
     public ProjectCommit(ProjectAppEntity projectAppEntity) {
         this.commitVersion = projectAppEntity.getProjectVersion();

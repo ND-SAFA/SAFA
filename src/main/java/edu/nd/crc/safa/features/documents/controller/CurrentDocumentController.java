@@ -39,7 +39,7 @@ public class CurrentDocumentController extends BaseDocumentController {
     @PostMapping(AppRoutes.Documents.SET_CURRENT_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setCurrentDocument(@PathVariable UUID documentId) {
-        Document document = getDocumentById(this.documentRepository, documentId);
+        Document document = getDocumentById(getDocumentRepository(), documentId);
         this.currentDocumentService.setCurrentDocumentForCurrentUser(document);
     }
 

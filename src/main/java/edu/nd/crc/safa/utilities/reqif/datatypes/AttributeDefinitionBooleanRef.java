@@ -18,5 +18,5 @@ public class AttributeDefinitionBooleanRef extends AttributeDefinitionRef {
     @XmlValue
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
-    protected AttributeDefinitionBoolean attributeDefinition;
+    private AttributeDefinitionBoolean attributeDefinition;
 }

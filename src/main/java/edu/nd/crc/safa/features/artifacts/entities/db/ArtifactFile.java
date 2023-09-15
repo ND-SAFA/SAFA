@@ -31,7 +31,7 @@ public class ArtifactFile {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "file_id")
-    UUID fileId;
+    private UUID fileId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -39,7 +39,7 @@ public class ArtifactFile {
         name = "project_id",
         nullable = false
     )
-    Project project;
+    private Project project;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -47,8 +47,8 @@ public class ArtifactFile {
         name = "type_id",
         nullable = false
     )
-    ArtifactType artifactType;
+    private ArtifactType artifactType;
 
     @Column(name = "file_name", nullable = false)
-    String fileName;
+    private String fileName;
 }

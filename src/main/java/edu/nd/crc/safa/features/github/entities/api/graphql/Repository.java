@@ -28,7 +28,8 @@ public class Repository implements Paginatable {
     @Override
     public void paginate(SafaUser user) {
         if (refs != null) {
-            ServiceProvider.instance.getGithubGraphQlService().paginateBranches(user, refs, name, owner.getLogin());
+            ServiceProvider.getInstance()
+                .getGithubGraphQlService().paginateBranches(user, refs, name, owner.getLogin());
         }
     }
 }

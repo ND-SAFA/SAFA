@@ -27,10 +27,10 @@ import lombok.Setter;
 public class AttributeDefinitionReal extends AttributeDefinition {
 
     @XmlElement(name = "DEFAULT-VALUE")
-    protected DefaultValue defaultValue;
+    private DefaultValue defaultValue;
 
     @XmlElement(name = "TYPE", required = true)
-    protected Type type;
+    private Type type;
 
     /**
      * Java class for anonymous complex type.
@@ -43,7 +43,7 @@ public class AttributeDefinitionReal extends AttributeDefinition {
     @Setter
     public static class DefaultValue {
         @XmlElement(name = "ATTRIBUTE-VALUE-REAL", namespace = "")
-        protected AttributeValueReal attributeValue;
+        private AttributeValueReal attributeValue;
     }
 
     /**
@@ -59,7 +59,7 @@ public class AttributeDefinitionReal extends AttributeDefinition {
         @XmlElement(name = "DATATYPE-DEFINITION-REAL-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        protected DatatypeDefinitionReal datatypeDefinition;
+        private DatatypeDefinitionReal datatypeDefinition;
     }
 
 }

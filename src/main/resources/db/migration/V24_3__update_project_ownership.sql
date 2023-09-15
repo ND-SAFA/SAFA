@@ -16,7 +16,7 @@ UPDATE project SET team_id =
             LIMIT 1
     );
 
-# If there is a project which still doesn't have a team, just give it to someone idk
+/* If there is a project which still doesn't have a team, just give it to someone idk */
 UPDATE project SET team_id = (SELECT team.id FROM team LIMIT 1) WHERE project.team_id IS NULL;
 
 DELETE FROM user_project_membership

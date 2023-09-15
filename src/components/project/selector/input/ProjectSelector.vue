@@ -95,7 +95,7 @@ const entity = computed(
     ({
       entityId: projectInviteId.value,
       entityType: "PROJECT",
-    } as MemberEntitySchema)
+    }) as MemberEntitySchema
 );
 
 const className = computed(() =>

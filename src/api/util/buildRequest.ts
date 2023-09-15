@@ -8,7 +8,7 @@ import { BASE_URL, Endpoint } from "@/api";
 class RequestBuilder<
   ReturnType = void,
   QueryParam extends string = string,
-  BodyType = void
+  BodyType = void,
 > {
   /**
    * The relative URL of the request.

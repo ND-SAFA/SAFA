@@ -7,7 +7,7 @@
  */
 export function standardizeValue<
   T extends string,
-  V extends string | number | boolean
+  V extends string | number | boolean,
 >(objOrValue: V | Record<T, V>, key: T): V {
   return typeof objOrValue === "object" ? objOrValue[key] : objOrValue;
 }

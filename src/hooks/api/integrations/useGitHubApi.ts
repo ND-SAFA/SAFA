@@ -46,7 +46,7 @@ export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
   ): Promise<void> {
     const accessCode =
       getParam(QueryParams.TAB) === "github"
-        ? getParam(QueryParams.GITHUB_TOKEN)
+        ? getParam(QueryParams.INTEGRATION_TOKEN)
         : "";
 
     const onSuccess = () => {

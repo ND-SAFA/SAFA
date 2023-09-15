@@ -9,7 +9,7 @@
       :expanded="expanded"
       data-cy="job-table"
     >
-      <template #body="quasarProps: { row: JobSchema, expand: boolean }">
+      <template #body="quasarProps: { row: JobSchema; expand: boolean }">
         <job-row
           v-model:expanded="quasarProps.expand"
           :quasar-props="quasarProps"

@@ -13,9 +13,8 @@ export const useWarningApi = defineStore("warningApi", (): WarningApiHook => {
 
   async function handleReload(versionId: string): Promise<void> {
     await warningApi.handleRequest(async () => {
-      warningStore.artifactWarnings = await getWarningsInProjectVersion(
-        versionId
-      );
+      warningStore.artifactWarnings =
+        await getWarningsInProjectVersion(versionId);
     });
   }
 

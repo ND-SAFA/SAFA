@@ -22,6 +22,6 @@ const entity = computed(
     ({
       entityType: "PROJECT",
       entityId: projectStore.projectId,
-    } as MemberEntitySchema)
+    }) as MemberEntitySchema
 );
 </script>

@@ -45,7 +45,7 @@ export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
   ): Promise<void> {
     const accessCode =
       getParam(QueryParams.TAB) === "jira"
-        ? getParam(QueryParams.JIRA_TOKEN)
+        ? getParam(QueryParams.INTEGRATION_TOKEN)
         : "";
 
     const onSuccess = () => {

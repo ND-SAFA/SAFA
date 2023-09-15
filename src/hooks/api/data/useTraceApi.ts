@@ -181,9 +181,8 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
       async () => {
         loadTrace(traceLink.traceLinkId);
 
-        const updatedLinks = await traceCommitApiStore.handleUnreview(
-          traceLink
-        );
+        const updatedLinks =
+          await traceCommitApiStore.handleUnreview(traceLink);
 
         traceStore.addOrUpdateTraceLinks(updatedLinks);
         approvalStore.resetLink(traceLink);

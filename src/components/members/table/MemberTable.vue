@@ -111,13 +111,13 @@ const entityType = computed(() => props.entity.entityType || "PROJECT");
 
 const memberPermission = computed(
   () =>
-    ((
-      {
+    (
+      ({
         PROJECT: "project.edit_members",
         TEAM: "team.edit_members",
         ORGANIZATION: "org.edit_members",
-      } as Record<MembershipType, PermissionType>
-    )[entityType.value])
+      }) as Record<MembershipType, PermissionType>
+    )[entityType.value]
 );
 
 const displayMemberActions = computed(() =>

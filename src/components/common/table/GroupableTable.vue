@@ -13,7 +13,7 @@
     separator="cell"
   >
     <template
-      #top="scope: { inFullscreen: boolean, toggleFullscreen: () => void }"
+      #top="scope: { inFullscreen: boolean; toggleFullscreen: () => void }"
     >
       <groupable-table-header
         v-model:search-text="searchText"
@@ -34,7 +34,7 @@
       </groupable-table-header>
     </template>
 
-    <template #body="quasarProps: { row: TableRow, expand: boolean }">
+    <template #body="quasarProps: { row: TableRow; expand: boolean }">
       <groupable-table-row
         v-model:expand="quasarProps.expand"
         :quasar-props="quasarProps"
@@ -114,17 +114,19 @@ const groupedRows = computed(() => {
 
   let sortIdx = 0;
 
-  return Object.entries(rowsByGroup).flatMap(([$groupValue, rows]) => [
-    {
-      id: `${groupBy.value}::${$groupValue}`,
-      [String(props.rowKey)]: `${groupBy.value}::${$groupValue}`,
-      $groupValue,
-      $groupBy: groupBy.value,
-      $groupRows: rows.length,
-      $sortIdx: sortIdx++,
-    },
-    ...rows.map((row) => ({ ...row, $sortIdx: sortIdx++ })),
-  ]);
+  return Object.entries<TableGroupRow[]>(rowsByGroup).flatMap(
+    ([$groupValue, groupRows]) => [
+      {
+        id: `${groupBy.value}::${$groupValue}`,
+        [String(props.rowKey)]: `${groupBy.value}::${$groupValue}`,
+        $groupValue,
+        $groupBy: groupBy.value,
+        $groupRows: groupRows.length,
+        $sortIdx: sortIdx++,
+      },
+      ...groupRows.map((row) => ({ ...row, $sortIdx: sortIdx++ })),
+    ]
+  );
 });
 
 /**

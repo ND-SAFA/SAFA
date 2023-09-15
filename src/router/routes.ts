@@ -49,8 +49,7 @@ export enum QueryParams {
   VERSION = "version",
   ORG = "org",
   TEAM = "team",
-  JIRA_TOKEN = "code",
-  GITHUB_TOKEN = "code",
+  INTEGRATION_TOKEN = "code",
 }
 
 export const routes: Array<RouteRecordRaw> = [

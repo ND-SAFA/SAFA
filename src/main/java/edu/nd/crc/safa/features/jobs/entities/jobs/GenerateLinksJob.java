@@ -5,24 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
-import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
-import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
-import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -33,7 +27,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 /**
  * Generates trace links between artifacts defined in request.
  */
-public class GenerateLinksJob extends CommitJob {
+public class GenerateLinksJob extends GenerationJob {
     private final SafaUser user;
     /**
      * The request to generate trace links.
@@ -78,33 +72,7 @@ public class GenerateLinksJob extends CommitJob {
         return String.format("Generating links between %s artifact levels.", nArtifactLevels);
     }
 
-    @IJobStep(value = "Retrieving project data", position = 1)
-    public void retrieveTrainingArtifacts() {
-        this.projectAppEntity = this.getServiceProvider()
-            .getProjectRetrievalService()
-            .getProjectAppEntity(user, this.projectVersion);
-    }
-
-    @IJobStep(value = "Summarizing Code Artifacts", position = 2)
-    public void createArtifactSummaries() {
-        SummaryService summaryService = this.getServiceProvider().getSummaryService();
-        List<ArtifactAppEntity> modifiedArtifacts =
-            summaryService.addSummariesToCode(this.projectAppEntity.getArtifacts());
-        CommitService commitService = this.getServiceProvider().getCommitService();
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition();
-        projectCommitDefinition.setCommitVersion(this.projectVersion);
-        projectCommitDefinition.addArtifacts(ModificationType.MODIFIED, modifiedArtifacts);
-        commitService.performCommit(projectCommitDefinition, this.user);
-    }
-
-    @IJobStep(value = "Summarizing Project", position = 3, requiredGeneration = true)
-    public void summarizeProject() {
-        Project project = this.projectVersion.getProject();
-        ProjectSummaryService service = this.getServiceProvider().getProjectSummaryService();
-        service.generateProjectSummary(project, this.projectAppEntity.getArtifacts(), this.getDbLogger());
-    }
-
-    @IJobStep(value = "Generating links", position = 4)
+    @IJobStep(value = "Generating links", position = 3)
     public void generateLinks(JobLogger logger) {
         ProjectCommitDefinition projectCommitDefinition = getProjectCommitDefinition();
 

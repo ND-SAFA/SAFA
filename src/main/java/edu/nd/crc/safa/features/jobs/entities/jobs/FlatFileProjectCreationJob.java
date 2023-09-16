@@ -178,7 +178,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         ProjectCommitDefinition projectCommitDefinition = this.getProjectCommitDefinition();
         List<ArtifactAppEntity> newArtifacts = projectCommitDefinition.getArtifacts().getAdded();
         SummaryService summaryService = this.getServiceProvider().getSummaryService();
-        summaryService.addSummariesToCode(newArtifacts, this.getDbLogger());
+        summaryService.addSummariesToCode(newArtifacts, null, this.getDbLogger());
         projectCommitDefinition.getArtifacts().setAdded(newArtifacts);
     }
 

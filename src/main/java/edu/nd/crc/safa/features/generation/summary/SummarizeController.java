@@ -2,12 +2,16 @@ package edu.nd.crc.safa.features.generation.summary;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
+import edu.nd.crc.safa.features.jobs.builders.ProjectSummaryJobBuilder;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -38,11 +42,23 @@ public class SummarizeController extends BaseController {
                                            @RequestBody @Valid SummarizeArtifactRequestDTO request) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
-                .fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user)
-                .get();
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT, user)
+            .get();
         request.setProjectVersion(projectVersion);
         request.setProjectSummary(projectVersion.getProject().getSpecification());
-        return getServiceProvider().getSummaryService().generateArtifactSummaries(request);
+        List<GenerationArtifact> summarizedArtifacts =
+            getServiceProvider().getSummaryService().generateArtifactSummaries(request);
+        return summarizedArtifacts.stream().map(GenerationArtifact::getSummary).collect(Collectors.toList());
+    }
+
+    @PostMapping(AppRoutes.Summarize.SUMMARIZE_PROJECT)
+    public JobAppEntity summarizeProject(@PathVariable UUID versionId) throws Exception {
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT, user)
+            .get();
+        return new ProjectSummaryJobBuilder(this.getServiceProvider(), projectVersion).perform();
     }
 }

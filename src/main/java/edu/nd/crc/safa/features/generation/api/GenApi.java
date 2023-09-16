@@ -43,11 +43,10 @@ public class GenApi implements ITraceGenerationController {
      * @param logger  The job logger.
      * @return The project summary.
      */
-    public String generateProjectSummary(ProjectSummaryRequest request, JobLogger logger) {
+    public ProjectSummaryResponse generateProjectSummary(ProjectSummaryRequest request, JobLogger logger) {
         String endpoint = TGenConfig.getEndpoint("project-summary");
-        ProjectSummaryResponse response = apiController.performJob(endpoint, request,
+        return apiController.performJob(endpoint, request,
             ProjectSummaryResponse.class, logger);
-        return response.getSummary();
     }
 
     /**

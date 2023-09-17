@@ -1,0 +1,20 @@
+{
+    "traces": [
+        {
+            "sourceName": "1 requirement",
+            "targetName": "0 DD",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8,
+            "explanation": "explanation"
+        },
+        {
+            "sourceName": "0 requirement",
+            "targetName": "0 DD",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8,
+            "explanation": "explanation"
+        }
+    ]
+}

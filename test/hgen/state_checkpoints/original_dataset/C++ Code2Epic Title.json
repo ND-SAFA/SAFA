@@ -1,0 +1,180 @@
+{
+    "traces": [
+        {
+            "sourceName": "/Graphics/Menu/EscapeMenu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.75,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Menu/ColorSelectorMenu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8055555555555556,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Utils/ICollidable.cpp",
+            "targetName": "Detect Block Collisions ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Render 3D Block World ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Texture Loading Utilities ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.75,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Components/VBox.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9444444444444444,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Improve Rendering Large Procedural Worlds ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Components/HBox.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9166666666666666,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Utils/AABB.cpp",
+            "targetName": "Detect Block Collisions ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9722222222222222,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Components/Text.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8611111111111112,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "First Person Player Movement ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Menu/SettingsMenu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.7777777777777778,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Rendering/BlockSelection.cpp",
+            "targetName": "First Person Player Movement ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.75,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Generate Voxel Cubic Chunk World ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Components/Rectangle.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8333333333333334,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Rendering/stb_image.cpp",
+            "targetName": "Texture Loading Utilities ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Components/Button.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8888888888888888,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Generate Voxel Cubic Chunk World ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Rendering/Image.cpp",
+            "targetName": "Texture Loading Utilities ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875,
+            "explanation": NaN
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "First Person Player Movement ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875,
+            "explanation": NaN
+        }
+    ]
+}

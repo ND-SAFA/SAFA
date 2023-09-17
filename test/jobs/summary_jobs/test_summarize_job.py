@@ -37,7 +37,7 @@ class TestSummarizeJob(BaseJobTest):
         responses = self.get_summarize_responses()[:self.N_ARTIFACTS]
 
         ai_manager.set_responses(responses)
-        job = SummarizeArtifactsJob(self.project.ARTIFACTS, is_subset=True)
+        job = SummarizeArtifactsJob(self.project.ARTIFACTS, is_subset=True, summarize_code_only=False)
         job.run()
         self.assert_output_on_success(job, job.result, resummarized=False)
 
@@ -76,4 +76,4 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertIn(f"{self.RESUMMARIZED} {ps_section_body}", job_result.body["summary"])
 
     def _get_job(self) -> AbstractJob:
-        return SummarizeArtifactsJob(self.project.ARTIFACTS)
+        return SummarizeArtifactsJob(self.project.ARTIFACTS, summarize_code_only=False)

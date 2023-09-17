@@ -25,7 +25,7 @@ class State(BaseObject):
 
     completed_steps: Union[set, list, dict] = field(default_factory=dict)
 
-    export_dir: str = None
+    export_dir: str = EMPTY_STRING
 
     _checkpoint_dir: str = "state_checkpoints"
 

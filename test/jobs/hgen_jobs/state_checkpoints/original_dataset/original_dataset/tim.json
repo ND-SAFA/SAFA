@@ -1,0 +1,37 @@
+{
+    "artifacts": [
+        {
+            "type": "Test User Story",
+            "fileName": "Test User Story.csv"
+        },
+        {
+            "type": "Epic Title",
+            "fileName": "Epic Title.csv"
+        },
+        {
+            "type": "requirement",
+            "fileName": "requirement.csv"
+        },
+        {
+            "type": "C++ Code",
+            "fileName": "C++ Code.csv"
+        }
+    ],
+    "traces": [
+        {
+            "fileName": "C++ Code2Epic Title.json",
+            "sourceType": "C++ Code",
+            "targetType": "Epic Title"
+        },
+        {
+            "fileName": "C++ Code2Test User Story.json",
+            "sourceType": "C++ Code",
+            "targetType": "Test User Story"
+        },
+        {
+            "fileName": "Test User Story2requirement.json",
+            "sourceType": "Test User Story",
+            "targetType": "requirement"
+        }
+    ]
+}

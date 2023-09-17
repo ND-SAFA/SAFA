@@ -1,5 +1,6 @@
 from typing import Callable, Dict, List, Union
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.llm_response_util import LLMResponseUtil
 
 
@@ -78,7 +79,12 @@ class TestAIManager:
         """
         start_body_tag = "</summary>"
         end_body_tag = "Assistant:"
-        artifact_body = LLMResponseUtil.parse(p, "artifact")
+        artifact_body = LLMResponseUtil.parse(p, "artifact", return_res_on_failure=False)
+        if not artifact_body:
+            artifact_body = EMPTY_STRING
+            split_prompt = p.split("# Code")
+            if len(split_prompt) > 1:
+                artifact_body = [v for v in split_prompt[1].split("\n") if v]
         if len(artifact_body) == 0:
             body_start = p.find(start_body_tag)
             body_end = p.find(end_body_tag)

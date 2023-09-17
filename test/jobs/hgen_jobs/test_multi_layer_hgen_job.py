@@ -53,11 +53,18 @@ class TestMultiLayerHGenJob(BaseJobTest):
 
         requirements = ["This is a requirement for a user story.", "This is another requirement for some user stories."]
         design_document = ["Here is the final, top level design document"]
-        expected_requirements_names, responses = get_all_responses(content=requirements, target_type=self.higher_levels[0])
+        expected_requirements_names, responses = get_all_responses(content=requirements, target_type=self.higher_levels[0],
+                                                                   source_type=self.args.target_type,
+                                                                   sources=[expected_user_story_names[:2],
+                                                                            [expected_user_story_names[-1]]])
         anthropic_responses.extend(responses)
-        expected_design_doc_name, responses = get_all_responses(content=design_document, target_type=self.higher_levels[1])
+        expected_design_doc_name, responses = get_all_responses(content=design_document, target_type=self.higher_levels[1],
+                                                                source_type=self.higher_levels[0],
+                                                                sources=[[expected_requirements_names[0]],
+                                                                         [expected_requirements_names[1]]])
         anthropic_responses.extend(responses)
 
+        anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses(anthropic_responses)
         open_ai_responses = HGenTestConstants.open_ai_responses * 3
         openai_ai_manager.set_responses(open_ai_responses)

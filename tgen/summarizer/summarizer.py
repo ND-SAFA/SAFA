@@ -2,6 +2,7 @@ import os
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
@@ -31,7 +32,12 @@ class Summarizer:
             artifact_df = self._resummarize_artifacts(project_summary)
             if self.args.do_resummarize_project:
                 project_summary = self._create_project_summary(artifact_df=artifact_df)
-        return PromptDataset(artifact_df=artifact_df, project_summary=project_summary)
+        trace_dataset = self.args.dataset.trace_dataset
+        if trace_dataset is not None:
+            trace_dataset = TraceDataset(artifact_df=artifact_df, trace_df=trace_dataset.trace_df, layer_df=trace_dataset.layer_df)
+        return PromptDataset(artifact_df=artifact_df,
+                             trace_dataset=trace_dataset,
+                             project_summary=project_summary)
 
     @staticmethod
     def create_summarizer(args: SummarizerArgs, project_summary: str = None) -> ArtifactsSummarizer:

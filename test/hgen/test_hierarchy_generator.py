@@ -22,6 +22,7 @@ from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
+from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -35,9 +36,11 @@ class TestHierarchyGenerator(BaseTest):
     HGEN_STATE = HGenState()
 
     def test_run(self):
+        self.HGEN_STATE.export_dir = self.HGEN_ARGS.export_dir
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
         self.assert_generate_artifact_content_step()
+        self.assert_refined_artifact_content_step()
         self.assert_create_dataset_step()
         self.assert_save_dataset_checkpoint()
 
@@ -50,7 +53,8 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df))
 
         export_path = TEST_OUTPUT_DIR
-        safa_save_path = save_dataset_checkpoint(self.HGEN_STATE.final_dataset, export_path, filename="dir", exporter_class=SafaExporter)
+        safa_save_path = save_dataset_checkpoint(self.HGEN_STATE.final_dataset, export_path, filename="dir",
+                                                 exporter_class=SafaExporter)
         saved_safa_dataset = TraceDatasetCreator(StructuredProjectReader(project_path=safa_save_path)).create()
         assert_dataset(saved_safa_dataset, self.HGEN_STATE.final_dataset)
         csv_save_path = save_dataset_checkpoint(self.HGEN_STATE.source_dataset, export_path, filename="artifacts")
@@ -64,7 +68,9 @@ class TestHierarchyGenerator(BaseTest):
         yaml_content = FileUtil.read_yaml(yaml_save_path)
         self.assertDictEqual(non_dataset, yaml_content)
 
-    def assert_initialize_dataset_step(self):
+    @mock_anthropic
+    def assert_initialize_dataset_step(self, anthropic_ai_manager: TestAIManager):
+        anthropic_ai_manager.mock_summarization()
         orig_dataset = self.HGEN_ARGS.dataset_creator_for_sources.create()
         InitializeDatasetStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assertSetEqual(set(self.HGEN_STATE.original_dataset.artifact_df.index), set(orig_dataset.artifact_df.index))
@@ -95,21 +101,27 @@ class TestHierarchyGenerator(BaseTest):
         anthropic_ai_manager.set_responses(response)
         step = GenerateArtifactContentStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
-        self.assertEqual(HGenTestConstants.summary, self.HGEN_STATE.summary)
-        for i, us in enumerate(HGenTestConstants.user_stories):
-            self.assertEqual(us, self.HGEN_STATE.generated_artifact_content[i])
+        for i, us in enumerate(self.HGEN_STATE.generation_predictions.keys()):
+            self.assertEqual(us, HGenTestConstants.user_stories[i])
+            self.assertEqual(self.HGEN_STATE.generation_predictions[us], HGenTestConstants.code_files[i])
+
+    @mock_anthropic
+    def assert_refined_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
+        # TODO
+        RefineGenerationsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
 
     @mock_anthropic
     @mock.patch.object(RankingJob, "run")
     def assert_create_dataset_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock):
-        names, expected_names, responses = get_name_responses(self.HGEN_STATE.generated_artifact_content)
+        names, expected_names, responses = get_name_responses(self.HGEN_STATE.generation_predictions)
         anthropic_ai_manager.set_responses(responses)
         job_result = get_ranking_job_result(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
         ranking_mock.return_value = job_result
         step = CreateHGenDatasetStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         for id_, link in self.HGEN_STATE.original_dataset.trace_dataset.trace_df.itertuples():
-            found_link = self.HGEN_STATE.final_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE], target_id=link[TraceKeys.TARGET])
+            found_link = self.HGEN_STATE.final_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
+                                                                         target_id=link[TraceKeys.TARGET])
             self.assertIsNotNone(found_link)
         for name in expected_names:
             self.assertIn(name, self.HGEN_STATE.final_dataset.artifact_df.index)
@@ -123,6 +135,7 @@ class TestHierarchyGenerator(BaseTest):
         for i, layer in self.HGEN_STATE.original_dataset.trace_dataset.layer_df.itertuples():
             q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df, layer)
             self.assertEqual(len(q), 1)
-        q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df, {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
-                                                                            LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
+        q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df,
+                                   {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
+                                    LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)

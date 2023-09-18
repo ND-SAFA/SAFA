@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE, PS_ENTITIES_TITLE, PS_SUBSYSTEM_TITLE, \
     PS_DATA_FLOW_TITLE
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -25,7 +26,6 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The state of HGEN.
         :return: The original dataset and a dataset with only the source layer
         """
-        export_path = state.export_dir
         original_dataset_complete = args.dataset_for_sources
         code_layers = original_dataset_complete.artifact_df.get_code_layers()
         should_summarize_artifacts = args.create_new_code_summaries \
@@ -35,7 +35,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                         project_summary=original_dataset_complete.project_summary,
                                                         should_summarize_artifacts=should_summarize_artifacts)
         state.summary = original_dataset_complete.project_summary
-        save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
+        save_dataset_checkpoint(original_dataset_complete, state.export_dir, filename="initial_dataset_with_sources")
 
         source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
                                                                            args.source_layer_id)
@@ -59,7 +59,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         do_resummarize_project = not project_summary
         project_summary = project_summary if project_summary else args.system_summary
-        summarizer_args = SummarizerArgs(export_dir=os.path.join(export_path, "summarizer"),
+        summarizer_args = SummarizerArgs(export_dir=os.path.join(export_path, "summaries") if export_path else EMPTY_STRING,
                                          dataset=dataset,
                                          project_summary=project_summary,
                                          summarize_code_only=True,

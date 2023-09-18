@@ -1,4 +1,0 @@
-id,content,layer_id,summary
-0 TUS,"As a game developer, I want a Player class to store player state, apply movement, handle collisions, perform raycasting for block selection, and render the player, so that I can implement a controllable character that interacts with the 3D world.",Test User Story,
-1 TUS,"As a game developer, I want a RenderEngine class to handle window creation, OpenGL context, camera view, and scene rendering, so that I have a reusable graphics engine for displaying 3D scenes.",Test User Story,
-2 TUS,"As a game developer, I want an Image class to load image files as textures using STB Image, so that I can apply detailed textures to 3D models.",Test User Story,

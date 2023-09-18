@@ -1,8 +1,0 @@
-id,content,layer_id,summary
-Generate Voxel Cubic Chunk World ET,Generate Procedural 3D Voxel World Composed of Cubic Chunks Containing Block Data,Epic Title,Generate Procedural 3D Voxel World Composed of Cubic Chunks Containing Block Data
-Render 3D Block World ET,Render World and Blocks Using Vertex Arrays and Textures with Custom Shaders,Epic Title,Render World and Blocks Using Vertex Arrays and Textures with Custom Shaders
-First Person Player Movement ET,Implement First-Person Controls for Player Movement and Interaction,Epic Title,Implement First-Person Controls for Player Movement and Interaction
-Modular Interface Development ET,"Develop Modular UI System for Menus, Settings, and In-Game Overlays",Epic Title,"Develop Modular UI System for Menus, Settings, and In-Game Overlays"
-Texture Loading Utilities ET,"Provide Utilities for Texture Loading, Text Rendering, and Debugging",Epic Title,"Provide Utilities for Texture Loading, Text Rendering, and Debugging"
-Detect Block Collisions ET,Implement Collision Detection Between Player and World Blocks,Epic Title,Implement Collision Detection Between Player and World Blocks
-Improve Rendering Large Procedural Worlds ET,Optimize Rendering and Memory Usage for Large Procedural Worlds,Epic Title,Optimize Rendering and Memory Usage for Large Procedural Worlds

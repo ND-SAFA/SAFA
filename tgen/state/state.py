@@ -81,7 +81,7 @@ class State(BaseObject):
         :param run_num: The number of times the step has been run
         :return: True if saved successfully else False
         """
-        if self.export_dir is None:
+        if not self.export_dir:
             return False
 
         try:

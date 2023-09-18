@@ -4,6 +4,8 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+
 
 class DataFrameUtil:
     """
@@ -131,3 +133,22 @@ class DataFrameUtil:
             return potential_value
         else:
             return None
+
+    @staticmethod
+    def contains_na(df: pd.DataFrame) -> bool:
+        """
+        Returns whether the dataframe contains any NAN values
+        :param df: The dataframe to evaluate
+        :return: True if the dataframe contains any NAN values
+        """
+        return df.isna().any()
+
+    @staticmethod
+    def contains_empty_string(df: pd.Series) -> bool:
+        """
+        Returns whether data frame or series contains any empty strings.
+        :param df: The data to check.
+        :return: True if empty strings is found, False otherwise.
+        """
+        query = np.where(df.apply(lambda x: x == EMPTY_STRING))
+        return len(query) > 0

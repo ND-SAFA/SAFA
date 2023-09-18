@@ -1,0 +1,48 @@
+description:
+- A Feature description is a concise and clear explanation of a specific functionality
+  or aspect of a software development project. It is an essential artifact that helps
+  stakeholders understand the purpose, scope, and requirements of a particular feature.
+  This artifact is different from other similar software artifacts, such as user stories
+  or use cases, as it focuses on the functionality itself rather than the user's interaction
+  with the system or the steps to achieve a specific goal. A Feature description typically
+  includes the problem it solves, the proposed solution, and any constraints or dependencies.
+example:
+- 'Feature: Export Data as CSV
+
+
+  Problem: Users need a way to export their data from the application in a format
+  that can be easily imported into other tools, such as spreadsheet applications.
+
+
+  Solution: Implement a feature that allows users to export their data as a CSV (Comma
+  Separated Values) file. This feature should be accessible from the main data view
+  and should generate a CSV file containing all the data currently displayed in the
+  application.
+
+
+  Constraints:
+
+  - The exported CSV file must be compatible with popular spreadsheet applications,
+  such as Microsoft Excel and Google Sheets.
+
+  - The export process should not significantly impact the application''s performance.
+
+  - The feature should be implemented in a way that allows for future expansion to
+  support additional export formats.'
+format:
+- 'Feature: [Feature Name]  Problem: [Brief description of the problem the feature
+  is intended to solve]  Solution: [Proposed solution or functionality to address
+  the problem]  Constraints: - [List of constraints or dependencies that may impact
+  the implementation or usage of the feature] - [Additional constraint or dependency]
+  - [Etc.]'
+questions:
+- - What is the overall purpose or goal of the system?
+  - Who are the primary users of the system?
+  - What are the main tasks the users need to perform with the system?
+  - Are there different types of users with different permissions/access levels?
+  - What are the key inputs and outputs of the system?
+  - Are there any constraints or regulatory requirements that impact the system?
+  - What are the most critical functions or features that enable the key workflows?
+  - What are the priority functions that need to be developed first?
+  - What types of data does the system need to process or store?
+  - What external systems does this system need to integrate with?

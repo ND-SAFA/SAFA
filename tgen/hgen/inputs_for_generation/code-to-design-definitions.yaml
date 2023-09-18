@@ -1,0 +1,72 @@
+description:
+- A Design Definitions is a software development artifact that provides a detailed
+  and structured description of a specific feature or functionality within a software
+  project. It outlines the requirements, constraints, and design decisions made during
+  the development process. This artifact is different from other software artifacts,
+  such as requirements documents or technical specifications, as it focuses on the
+  design rationale and the reasoning behind the chosen solution, rather than just
+  listing the requirements or describing the implementation details.
+example:
+- '
+
+  Design Definitions: User Authentication
+
+
+  1. Overview
+
+  The user authentication feature allows users to securely log in to the application
+  using their email address and password.
+
+
+  2. Requirements
+
+  - Users must provide a valid email address and password to log in.
+
+  - The system must verify the provided credentials against the user database.
+
+  - If the credentials are valid, the user is granted access to the application.
+
+  - If the credentials are invalid, the user is presented with an error message.
+
+
+  3. Design Decisions
+
+  - We have chosen to use the bcrypt hashing algorithm for storing and verifying passwords,
+  as it provides a good balance between security and performance.
+
+  - We will implement a rate-limiting mechanism to prevent brute-force attacks on
+  user accounts.
+
+
+  4. Constraints
+
+  - The user authentication feature must comply with the GDPR and other relevant data
+  protection regulations.
+
+  - The feature must be compatible with the existing user database schema.
+
+
+  5. Future Enhancements
+
+  - Support for two-factor authentication (2FA) can be added in a future release to
+  further enhance security.
+
+  '
+format:
+- Overview - Brief description of the feature or functionality.  Requirements - List
+  of requirements that the feature or functionality must fulfill.  Design Decisions
+  - Explanation of the design choices made and the rationale behind them.  Constraints
+  - List of constraints or limitations that the feature or functionality must adhere
+  to.  Future Enhancements - Optional section for potential improvements or additions
+  to the feature or functionality in future releases.
+questions:
+- - What are the main components/modules in the codebase?
+  - What are the key functions/methods in each component?
+  - What are the inputs and outputs of each key function?
+  - How do the components interact with each other?
+  - Is there a main control flow or architecture apparent in the code?
+  - Are there any major data structures that are used throughout?
+  - Does the code interface with any external systems/libraries?
+  - Are there any config files or resources that the code depends on?
+  - What are the main algorithms implemented in the code?
+  - What are the key abstractions in the codebase?

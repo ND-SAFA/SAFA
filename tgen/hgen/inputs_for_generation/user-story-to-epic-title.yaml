@@ -1,0 +1,22 @@
+description:
+- An Epic title in a software development project is a high-level, broad description
+  of a large feature or functionality that needs to be implemented. It is a collection
+  of smaller, related user stories or tasks that together deliver a significant value
+  to the end-user. An Epic title is different from other software artifacts, such
+  as user stories or tasks, as it represents a larger scope and usually takes multiple
+  sprints or iterations to complete.
+example:
+- Implement Advanced Search Functionality
+format:
+- '[Action Verb] [Feature or Functionality Description]'
+questions:
+- - What is the goal of the user story?
+  - Who is the user story intended for?
+  - What is the user trying to accomplish with this story?
+  - What is the high-level feature or capability this story supports?
+  - Does this story enable a new capability or improve an existing one?
+  - What part of the overall system or product does this story relate to?
+  - What is the user need driving this story?
+  - How does this story fit into the big picture of the product vision?
+  - What larger workflow or process does this story fit into?
+  - What is the main benefit or value delivered by this story?

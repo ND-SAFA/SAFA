@@ -36,6 +36,17 @@
       <separator vertical class="q-mx-xs" />
       <icon-button
         v-if="displayGenerateActions"
+        tooltip="Summarize artifacts"
+        icon="generate-summaries"
+        color="primary"
+        data-cy="button-summarize-artifact"
+        @click="
+          appStore.openDetailsPanel('summarizeArtifact');
+          handleCloseMenu();
+        "
+      />
+      <icon-button
+        v-if="displayGenerateActions"
         tooltip="Generate artifacts"
         icon="generate-artifacts"
         color="primary"

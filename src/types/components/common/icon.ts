@@ -34,6 +34,7 @@ export type IconVariant =
   | "create-trace"
   | "generate"
   | "generate-artifacts"
+  | "generate-summaries"
   | "generate-traces"
   | "notification"
   | "share"

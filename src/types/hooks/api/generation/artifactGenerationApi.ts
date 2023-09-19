@@ -43,11 +43,11 @@ export interface ArtifactGenerationApiHook {
   /**
    * Generates all summaries for an artifact type.
    *
-   * @param artifactTypeName - The artifact type to summarize.
+   * @param artifactIds - The artifacts to summarize.
    * @param callbacks - The callbacks to use for the action.
    */
   handleGenerateAllSummaries(
-    artifactTypeName: string,
+    artifactIds: string[],
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**

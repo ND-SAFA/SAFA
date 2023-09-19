@@ -77,12 +77,14 @@ export const useArtifactGenerationApi = defineStore(
     }
 
     async function handleGenerateAllSummaries(
-      artifactTypeName: string,
+      artifactIds: string[],
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       await summaryGenerationApi.handleRequest(
         async () => {
-          const artifacts = artifactStore.getArtifactsByType(artifactTypeName);
+          const artifacts = artifactStore.allArtifacts.filter(({ id }) =>
+            artifactIds.includes(id)
+          );
 
           const summaries = await createSummary(
             projectStore.versionId,
@@ -100,7 +102,8 @@ export const useArtifactGenerationApi = defineStore(
         },
         {
           ...callbacks,
-          error: `Failed to generate summaries: ${artifactTypeName}`,
+          success: "Successfully generated summaries.",
+          error: "Failed to generate summaries",
         }
       );
     }

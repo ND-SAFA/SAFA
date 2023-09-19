@@ -37,6 +37,16 @@
         @click="appStore.openDetailsPanel('generateArtifact')"
       />
       <q-fab-action
+        v-if="displayGenerateActions"
+        outline
+        label="Summarize Artifacts"
+        icon="mdi-shimmer"
+        class="bg-neutral"
+        color="primary"
+        data-cy="button-fab-summarize-artifact"
+        @click="appStore.openDetailsPanel('summarizeArtifact')"
+      />
+      <q-fab-action
         outline
         :label="drawMode ? 'Cancel Draw Mode' : 'Draw Links'"
         :icon="drawMode ? 'mdi-close' : 'mdi-ray-start-arrow'"

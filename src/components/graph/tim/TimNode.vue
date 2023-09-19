@@ -32,6 +32,14 @@
         <separator v-if="displayActions" class="full-width q-my-xs" />
         <icon-button
           v-if="displayActions"
+          tooltip="Summarize artifacts"
+          icon="generate-summaries"
+          color="primary"
+          data-cy="button-summarize-artifact"
+          @click="appStore.openDetailsPanel('summarizeArtifact')"
+        />
+        <icon-button
+          v-if="displayActions"
           tooltip="Generate parents"
           icon="generate-artifacts"
           color="primary"
@@ -53,7 +61,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GraphElementType, TimNodeCytoElement, TimNodeProps } from "@/types";
+import {
+  GraphElementType,
+  GraphMode,
+  TimNodeCytoElement,
+  TimNodeProps,
+} from "@/types";
 import { sanitizeNodeId } from "@/util";
 import {
   timStore,
@@ -90,7 +103,7 @@ const countLabel = computed(() =>
 const definition = computed<TimNodeCytoElement>(() => ({
   data: {
     type: GraphElementType.node,
-    graph: "tim",
+    graph: "tim" as GraphMode,
     id: sanitizeNodeId(props.artifactType),
 
     artifactType: props.artifactType,

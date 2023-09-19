@@ -84,6 +84,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-creation";
     case "generate-artifacts":
       return "mdi-monitor-shimmer";
+    case "generate-summaries":
+      return "mdi-shimmer";
     case "generate-traces":
       return "mdi-chart-timeline-variant-shimmer";
     case "notification":

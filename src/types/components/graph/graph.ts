@@ -49,7 +49,7 @@ export interface CytoElementData {
   /**
    * The type of graph for this node.
    */
-  graph: "tree" | "tim";
+  graph: GraphMode;
 
   /**
    * Whether the app is running in dark mode.

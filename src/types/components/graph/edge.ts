@@ -11,7 +11,7 @@ import {
  */
 export interface TraceCytoElementData
   extends CytoEdgeData,
-    Pick<TraceLinkSchema, "traceType" | "approvalStatus"> {
+    Pick<TraceLinkSchema, "traceType" | "approvalStatus" | "score"> {
   /**
    * The state of changes to the trace link.
    */

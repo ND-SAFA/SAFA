@@ -31,6 +31,7 @@
       <save-artifact-level-panel />
       <trace-matrix-panel />
       <artifact-generation-panel />
+      <artifact-summarization-panel />
     </div>
   </q-drawer>
 </template>
@@ -60,6 +61,7 @@ import {
   ArtifactBodyPanel,
   SaveArtifactPanel,
   ArtifactGenerationPanel,
+  ArtifactSummarizationPanel,
 } from "@/components/artifact/panel";
 import {
   TraceLinkPanel,
@@ -96,6 +98,8 @@ const title = computed(() => {
       return "Save Artifact";
     case "generateArtifact":
       return "Generate Artifacts";
+    case "summarizeArtifact":
+      return "Summarize Artifacts";
     case "displayTrace":
       return "Trace Link";
     case "saveTrace":

@@ -59,6 +59,7 @@ export type DetailsOpenState =
   | "displayArtifact"
   | "displayArtifactBody"
   | "generateArtifact"
+  | "summarizeArtifact"
   | "saveArtifact"
   | "displayTrace"
   | "saveTrace"

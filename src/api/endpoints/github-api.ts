@@ -8,14 +8,20 @@ const scopes = encodeURI(["repo"].join(","));
 
 /**
  * Opens an external link to authorize GitHub.
+ *
+ * @param validCredentials - Whether the current credentials are valid.
  */
-export function authorizeGitHub(): void {
-  window.open(
-    `https://github.com/login/oauth/authorize?` +
-      `client_id=${process.env.VUE_APP_GITHUB_CLIENT_ID}&` +
-      `redirect_uri=${process.env.VUE_APP_GITHUB_REDIRECT_LINK}&` +
-      `scope=${scopes}`
-  );
+export function authorizeGitHub(validCredentials: boolean): void {
+  if (validCredentials) {
+    window.open("https://github.com/apps/safa-ai-github");
+  } else {
+    window.open(
+      `https://github.com/login/oauth/authorize?` +
+        `client_id=${process.env.VUE_APP_GITHUB_CLIENT_ID}&` +
+        `redirect_uri=${process.env.VUE_APP_GITHUB_REDIRECT_LINK}&` +
+        `scope=${scopes}`
+    );
+  }
 }
 
 /**

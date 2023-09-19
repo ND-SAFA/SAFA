@@ -20,7 +20,7 @@
           icon="integrate"
           @click="emit('connect')"
         />
-        <flex-box v-else column align="end">
+        <flex-box v-else-if="!clickable" column align="end">
           <text-button
             outlined
             label="Installation"

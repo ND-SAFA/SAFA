@@ -31,7 +31,7 @@ export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
   const loading = computed(() => githubApi.loading);
 
   function handleAuthRedirect(): void {
-    authorizeGitHub();
+    authorizeGitHub(integrationsStore.validGitHubCredentials);
   }
 
   async function handleDeleteCredentials(): Promise<void> {

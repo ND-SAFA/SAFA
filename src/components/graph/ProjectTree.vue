@@ -151,12 +151,7 @@ watch(
   (inView) => {
     if (!inView) return;
 
-    appStore.onLoadStart();
-
-    setTimeout(() => {
-      layoutStore.resetLayout();
-      appStore.onLoadEnd();
-    }, 200);
+    layoutStore.resetLayout();
   }
 );
 

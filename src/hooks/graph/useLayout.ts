@@ -152,7 +152,7 @@ export const useLayout = defineStore("layout", {
       setTimeout(() => {
         this.setArtifactTreeLayout();
         appStore.onLoadEnd();
-      }, 200);
+      }, 100);
     },
     /**
      * Updates artifact positions and resets the layout.

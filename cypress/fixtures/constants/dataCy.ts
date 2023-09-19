@@ -213,10 +213,10 @@ export enum DataCy {
   projectSettingsEditButton = "button-settings-edit",
   projectSettingsDeleteButton = "button-settings-delete",
 
-  projectSettingsAddEmail = "input-settings-user-email",
-  projectSettingsAddRole = "input-settings-user-role",
-  projectSettingsAddToProject = "button-add-user-to-project",
-  projectSettingsEditUserButton = "button-selector-edit",
+  projectSettingsAddEmail = "input-member-email",
+  projectSettingsAddRole = "input-member-role",
+  projectSettingsSwitchRole = "button-member-role",
+  projectSettingsAddToProject = "button-invite-member",
   projectSettingsDeleteUserButton = "button-selector-delete",
   projectSettingsTable = "generic-selector-table",
 

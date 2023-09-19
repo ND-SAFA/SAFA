@@ -4,7 +4,7 @@
     icon="permission"
     :label="props.member.role"
     :loading="loading"
-    data-cy="button-member-roles"
+    data-cy="button-member-role"
   >
     <icon variant="down" size="xs" />
     <q-menu>

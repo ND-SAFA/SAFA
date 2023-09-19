@@ -14,6 +14,10 @@ export interface SessionApiHook {
    */
   loading: ComputedRef<boolean>;
   /**
+   * Whether the user's recently used account is being checked.
+   */
+  authLoading: ComputedRef<boolean>;
+  /**
    * Whether the most recent request had an error.
    */
   error: ComputedRef<boolean>;

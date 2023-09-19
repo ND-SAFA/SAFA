@@ -7,6 +7,15 @@
     <app-confirm-modal :message="confirmationMessage" />
     <save-project-modal />
     <delete-project-modal />
+    <flex-box
+      v-if="displayLoading"
+      full-width
+      justify="center"
+      align="center"
+      style="height: 100vh"
+    >
+      <q-spinner-ball color="primary" size="4em" />
+    </flex-box>
   </div>
 </template>
 
@@ -21,14 +30,21 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { logStore, permissionStore, sessionStore } from "@/hooks";
+import {
+  logStore,
+  permissionStore,
+  sessionApiStore,
+  sessionStore,
+} from "@/hooks";
 import { AppConfirmModal } from "@/components/common";
 import { SaveProjectModal, DeleteProjectModal } from "@/components/project";
+import FlexBox from "@/components/common/display/content/FlexBox.vue";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";
 import Snackbar from "./Snackbar.vue";
 
+const displayLoading = computed(() => sessionApiStore.authLoading);
 const displayNavigation = computed(() => sessionStore.doesSessionExist);
 const displaySidebar = computed(
   () => displayNavigation.value && permissionStore.isAllowed("safa.view")

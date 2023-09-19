@@ -37,8 +37,10 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   const createdAccount = ref(false);
   const passwordSubmitted = ref(false);
   const sessionApi = useApi("sessionApi")();
+  const authApi = useApi("authApi")();
 
   const loading = computed(() => sessionApi.loading);
+  const authLoading = computed(() => authApi.loading);
   const error = computed(() => sessionApi.error);
 
   const loginErrorMessage = sessionApi.errorMessage(
@@ -142,14 +144,16 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   }
 
   async function handleAuthentication(): Promise<void> {
-    sessionStore.user = await getCurrentUser();
+    await authApi.handleRequest(async () => {
+      sessionStore.user = await getCurrentUser();
 
-    if (sessionStore.user.email === DEMO_ACCOUNT.email) {
-      permissionStore.isDemo = true;
-    }
+      if (sessionStore.user.email === DEMO_ACCOUNT.email) {
+        permissionStore.isDemo = true;
+      }
 
-    await getOrgApiStore.handleLoadCurrent();
-    await getProjectApiStore.handleReload({});
+      await getOrgApiStore.handleLoadCurrent();
+      await getProjectApiStore.handleReload({});
+    });
   }
 
   async function handleChangePassword(
@@ -180,6 +184,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
 
   return {
     loading,
+    authLoading,
     error,
     createdAccount,
     passwordSubmitted,

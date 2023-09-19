@@ -143,7 +143,9 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     });
   }
 
-  async function handleAuthentication(): Promise<void> {
+  async function handleAuthentication(
+    callbacks: IOHandlerCallback
+  ): Promise<void> {
     await authApi.handleRequest(async () => {
       sessionStore.user = await getCurrentUser();
 
@@ -153,7 +155,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
 
       await getOrgApiStore.handleLoadCurrent();
       await getProjectApiStore.handleReload({});
-    });
+    }, callbacks);
   }
 
   async function handleChangePassword(

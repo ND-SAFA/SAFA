@@ -86,9 +86,9 @@ export interface SessionApiHook {
    * Verifies the stored authentication token,
    * and loads the last project if routing to the artifact tree.
    *
-   * @throws If the authentication token is invalid.
+   * @param callbacks - The callbacks to run on success or error.
    */
-  handleAuthentication(): Promise<void>;
+  handleAuthentication(callbacks: IOHandlerCallback): Promise<void>;
   /**
    * Updates a user's password.
    *

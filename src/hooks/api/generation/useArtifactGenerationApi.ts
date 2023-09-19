@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed, ref } from "vue";
 import {
+  ArtifactGenerationApiHook,
   ArtifactSchema,
   ArtifactSummaryConfirmation,
   GenerateArtifactSchema,
@@ -9,7 +10,9 @@ import {
 } from "@/types";
 import {
   artifactApiStore,
+  artifactCommitApiStore,
   artifactSaveStore,
+  artifactStore,
   jobStore,
   projectStore,
   useApi,
@@ -22,7 +25,7 @@ import { pinia } from "@/plugins";
  */
 export const useArtifactGenerationApi = defineStore(
   "artifactGenerationApi",
-  () => {
+  (): ArtifactGenerationApiHook => {
     const nameGenerationApi = useApi("nameGenerationApi");
     const bodyGenerationApi = useApi("bodyGenerationApi");
     const summaryGenerationApi = useApi("summaryGenerationApi");
@@ -43,7 +46,7 @@ export const useArtifactGenerationApi = defineStore(
     ): Promise<void> {
       await summaryGenerationApi.handleRequest(
         async () => {
-          const summary = await createSummary(
+          const summaries = await createSummary(
             projectStore.versionId,
             artifact.id
           );
@@ -60,11 +63,44 @@ export const useArtifactGenerationApi = defineStore(
               { onComplete: clear }
             );
 
-          summaryGenConfirm.value = { summary, confirm, clear };
+          summaryGenConfirm.value = {
+            summary: summaries[0] || "",
+            confirm,
+            clear,
+          };
         },
         {
           ...callbacks,
           error: `Failed to generate summary: ${artifact.name}`,
+        }
+      );
+    }
+
+    async function handleGenerateAllSummaries(
+      artifactTypeName: string,
+      callbacks: IOHandlerCallback = {}
+    ): Promise<void> {
+      await summaryGenerationApi.handleRequest(
+        async () => {
+          const artifacts = artifactStore.getArtifactsByType(artifactTypeName);
+
+          const summaries = await createSummary(
+            projectStore.versionId,
+            ...artifacts.map(({ id }) => id)
+          );
+
+          const updatedArtifacts = await artifactCommitApiStore.handleUpdate(
+            ...artifacts.map((artifact, index) => ({
+              ...artifact,
+              summary: summaries[index] || "",
+            }))
+          );
+
+          artifactStore.addOrUpdateArtifacts(updatedArtifacts);
+        },
+        {
+          ...callbacks,
+          error: `Failed to generate summaries: ${artifactTypeName}`,
         }
       );
     }
@@ -132,6 +168,7 @@ export const useArtifactGenerationApi = defineStore(
       summaryGenLoading,
       artifactGenLoading,
       handleGenerateSummary,
+      handleGenerateAllSummaries,
       handleGenerateName,
       handleGenerateBody,
       handleGenerateArtifacts,

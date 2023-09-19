@@ -15,20 +15,18 @@ export const useArtifactCommitApi = defineStore(
   "artifactCommitApi",
   (): ArtifactCommitApiHook => {
     async function handleCreate(
-      versionId: string,
-      artifact: ArtifactSchema
+      ...artifacts: ArtifactSchema[]
     ): Promise<ArtifactSchema[]> {
       return commitApiStore
-        .handleSave((builder) => builder.withNewArtifact(artifact))
+        .handleSave((builder) => builder.withNewArtifact(...artifacts))
         .then((commit) => commit?.artifacts.added || []);
     }
 
     async function handleUpdate(
-      versionId: string,
-      artifact: ArtifactSchema
+      ...artifacts: ArtifactSchema[]
     ): Promise<ArtifactSchema[]> {
       return commitApiStore
-        .handleSave((builder) => builder.withModifiedArtifact(artifact))
+        .handleSave((builder) => builder.withModifiedArtifact(...artifacts))
         .then((commit) => commit?.artifacts.modified || []);
     }
 

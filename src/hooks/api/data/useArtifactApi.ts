@@ -77,20 +77,14 @@ export const useArtifactApi = defineStore(
     ): Promise<void> {
       await artifactSaveApi.handleRequest(
         async () => {
-          const versionId = projectStore.versionIdWithLog;
-
           if (isUpdate) {
-            const updatedArtifacts = await artifactCommitApiStore.handleUpdate(
-              versionId,
-              artifact
-            );
+            const updatedArtifacts =
+              await artifactCommitApiStore.handleUpdate(artifact);
 
             artifactStore.addOrUpdateArtifacts(updatedArtifacts);
           } else {
-            const createdArtifacts = await artifactCommitApiStore.handleCreate(
-              versionId,
-              artifact
-            );
+            const createdArtifacts =
+              await artifactCommitApiStore.handleCreate(artifact);
 
             artifactStore.addCreatedArtifact(createdArtifacts[0]);
 

@@ -7,25 +7,17 @@ export interface ArtifactCommitApiHook {
   /**
    * Creates a new artifact in the given version.
    *
-   * @param versionId - The version that the artifact is stored within.
-   * @param artifact - The artifact to create.
+   * @param artifacts - The artifacts to create.
    * @return The created artifact.
    */
-  handleCreate(
-    versionId: string,
-    artifact: ArtifactSchema
-  ): Promise<ArtifactSchema[]>;
+  handleCreate(...artifacts: ArtifactSchema[]): Promise<ArtifactSchema[]>;
   /**
    * Updates the artifact in the given version.
    *
-   * @param versionId - The version that the artifact is stored within.
-   * @param artifact - The artifact to updated.
+   * @param artifacts - The artifacts to update.
    * @return The updated artifact.
    */
-  handleUpdate(
-    versionId: string,
-    artifact: ArtifactSchema
-  ): Promise<ArtifactSchema[]>;
+  handleUpdate(...artifacts: ArtifactSchema[]): Promise<ArtifactSchema[]>;
   /**
    * Deletes artifact in project version specified.
    *

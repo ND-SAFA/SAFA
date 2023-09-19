@@ -4,22 +4,19 @@ import { buildRequest } from "@/api";
  * Generates a summary for an artifact.
  *
  * @param versionId - The project version to update.
- * @param artifactId - The artifact to summarize.
- * @return The artifact summary.
+ * @param artifactIds - The artifacts to summarize.
+ * @return The artifact summaries.
  */
 export async function createSummary(
   versionId: string,
-  artifactId: string
-): Promise<string> {
-  const summaries = await buildRequest<
-    string[],
-    "versionId",
-    { artifacts: string[] }
-  >("summarize", { versionId }).post({
-    artifacts: [artifactId],
+  ...artifactIds: string[]
+): Promise<string[]> {
+  return buildRequest<string[], "versionId", { artifacts: string[] }>(
+    "summarize",
+    { versionId }
+  ).post({
+    artifacts: artifactIds,
   });
-
-  return summaries[0] || "";
 }
 
 /**

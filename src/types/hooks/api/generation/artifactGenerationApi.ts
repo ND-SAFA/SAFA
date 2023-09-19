@@ -41,6 +41,16 @@ export interface ArtifactGenerationApiHook {
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**
+   * Generates all summaries for an artifact type.
+   *
+   * @param artifactTypeName - The artifact type to summarize.
+   * @param callbacks - The callbacks to use for the action.
+   */
+  handleGenerateAllSummaries(
+    artifactTypeName: string,
+    callbacks?: IOHandlerCallback
+  ): Promise<void>;
+  /**
    * Generates the name of an artifact based on the body.
    * Uses the artifact currently being edited, and updates the edited artifact name to the response.
    *

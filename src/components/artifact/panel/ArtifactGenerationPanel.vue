@@ -26,9 +26,10 @@
       </div>
       <div v-else class="q-mb-md">
         <artifact-type-input
-          v-model="childArtifactType"
-          label="Child Artifact Type"
-          hint="Generate multiple parent artifacts by clustering these type of artifacts by functionality."
+          v-model="childArtifactTypes"
+          multiple
+          label="Child Artifact Types"
+          hint="Generate multiple parent artifacts by clustering these types of artifacts by functionality."
         />
       </div>
       <multiselect-input
@@ -92,7 +93,7 @@ const generateTypeOptions = [
 
 const mode = ref<"single" | "multiple">("single");
 const childArtifactIds = ref<string[]>([]);
-const childArtifactType = ref<string>("");
+const childArtifactTypes = ref<string[]>([]);
 const parentArtifactTypes = ref<string[]>([]);
 
 const canGenerate = computed(() => {
@@ -102,7 +103,8 @@ const canGenerate = computed(() => {
     );
   } else {
     return (
-      childArtifactType.value !== "" && parentArtifactTypes.value.length > 0
+      childArtifactTypes.value.length > 0 &&
+      parentArtifactTypes.value.length > 0
     );
   }
 });
@@ -129,15 +131,15 @@ function handleReset(): void {
   if (selectionStore.selectedGroupIds.length > 0) {
     mode.value = "single";
     childArtifactIds.value = selectionStore.selectedGroupIds;
-    childArtifactType.value = "";
+    childArtifactTypes.value = [];
   } else if (selectionStore.selectedArtifactLevel) {
     mode.value = "multiple";
-    childArtifactType.value = selectionStore.selectedArtifactLevel.name;
+    childArtifactTypes.value = [selectionStore.selectedArtifactLevel.name];
     childArtifactIds.value = [];
   } else {
     mode.value = "single";
     childArtifactIds.value = [];
-    childArtifactType.value = "";
+    childArtifactTypes.value = [];
   }
 
   parentArtifactTypes.value = [];
@@ -155,8 +157,8 @@ function handleGenerate(): void {
           clusters: [childArtifactIds.value],
         }
       : {
-          artifacts: artifactStore
-            .getArtifactsByType(childArtifactType.value)
+          artifacts: artifactStore.allArtifacts
+            .filter(({ type }) => childArtifactTypes.value.includes(type))
             .map(({ id }) => id),
           targetTypes: parentArtifactTypes.value,
         };

@@ -23,6 +23,15 @@ module.exports = {
     },
   },
   lintOnSave: true,
+  css: {
+    loaderOptions: {
+      sass: {
+        sassOptions: {
+          quietDeps: true,
+        },
+      },
+    },
+  },
   pwa: {
     iconPaths: {
       favicon16: "favicon.ico",

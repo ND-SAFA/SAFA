@@ -1,6 +1,6 @@
 <template>
   <div class="q-mx-auto long-input">
-    <flex-box v-if="!props.isUpdate" b="4">
+    <flex-box v-if="!props.isUpdate && ENABLED_FEATURES.ORGS" b="4">
       <select-input
         v-model="getOrgApiStore.currentOrg"
         label="Organization"
@@ -43,6 +43,7 @@ export default {
 <script setup lang="ts">
 import { withDefaults } from "vue";
 import { ProjectIdentifierProps } from "@/types";
+import { ENABLED_FEATURES } from "@/util";
 import { getOrgApiStore, orgStore, teamStore, useVModel } from "@/hooks";
 import { FlexBox, SelectInput, TextInput } from "@/components/common";
 

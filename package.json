@@ -7,8 +7,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test",
     "test:e2e": "npx cypress open",
-    "lint": "vue-cli-service lint",
-    "check:updates": "ncu",
+    "lint": "eslint ./src",
     "ci:run": "start-server-and-test start http://localhost:8080 ci:test",
     "ci:test": "cypress run --headed --browser chrome",
     "electron:build": "vue-cli-service electron:build",
@@ -21,6 +20,7 @@
     "serve:prod": "vue-cli-service serve --mode=production",
     "start": "npm run serve:local",
     "test": "npm run test:e2e && npm run test:unit",
+    "sec:updates": "ncu",
     "sec:outdated": "npm outdated"
   },
   "main": "background.js",

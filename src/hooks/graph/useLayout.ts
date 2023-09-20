@@ -8,15 +8,13 @@ import {
   PositionSchema,
   GraphMode,
 } from "@/types";
-import { appStore, selectionStore, subtreeStore } from "@/hooks";
+import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyApplyAutomove,
   cyCreateLayout,
-  cyResetTim,
   cyResetTree,
   disableDrawMode,
-  timTreeCyPromise,
   GraphLayout,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
@@ -110,7 +108,7 @@ export const useLayout = defineStore("layout", {
 
       // Wait for the graph to render.
       setTimeout(() => {
-        cyResetTim();
+        cyStore.resetWindow("creator");
         cyResetTree();
         appStore.onLoadEnd();
       }, 200);
@@ -132,7 +130,7 @@ export const useLayout = defineStore("layout", {
      */
     setTimTreeLayout(): void {
       const layout = GraphLayout.createTimLayout();
-      const payload = { layout, generate: true, cyPromise: timTreeCyPromise };
+      const payload = { layout, generate: true, cyPromise: cyStore.creatorCy };
 
       this.setGraphLayout(payload);
     },

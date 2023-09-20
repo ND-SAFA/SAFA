@@ -5,13 +5,13 @@
         text
         label="Center Graph"
         icon="graph-center"
-        @click="cyResetTim"
+        @click="cyStore.resetWindow('creator')"
       />
     </flex-box>
     <panel-card>
       <cytoscape
         id="cytoscape-tim"
-        :graph="timGraph"
+        :graph="cyStore.creatorGraph"
         :class="className"
         data-cy="view-tim-tree"
       >
@@ -40,17 +40,15 @@
  * and links between them as edges.
  */
 export default {
-  name: "TimTree",
+  name: "CreatorTree",
 };
 </script>
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
 import { TimTreeProps } from "@/types";
-import { appStore, layoutStore, projectSaveStore } from "@/hooks";
-import { timGraph, cyResetTim } from "@/cytoscape";
-import { FlexBox, TextButton } from "@/components/common";
-import PanelCard from "@/components/common/layout/PanelCard.vue";
+import { appStore, layoutStore, projectSaveStore, cyStore } from "@/hooks";
+import { FlexBox, TextButton, PanelCard } from "@/components/common";
 import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 
@@ -67,22 +65,24 @@ const className = computed(() => {
 });
 
 const artifacts = computed(() =>
-  projectSaveStore.artifactPanels.map(({ type, artifacts = [] }) => ({
-    type,
-    count: artifacts.length,
-  }))
+  projectSaveStore.artifactPanels
+    .filter(({ valid }) => valid)
+    .map(({ type, artifacts = [] }) => ({
+      type,
+      count: artifacts.length,
+    }))
 );
 
 const traces = computed(() =>
-  projectSaveStore.tracePanels.map(
-    ({ name, type, toType = "", traces = [], isGenerated }) => ({
+  projectSaveStore.tracePanels
+    .filter(({ valid }) => valid)
+    .map(({ name, type, toType = "", traces = [], isGenerated }) => ({
       name,
       sourceType: type,
       targetType: toType,
       count: traces.length,
       isGenerated,
-    })
-  )
+    }))
 );
 
 watch(

@@ -1,7 +1,7 @@
 import { CyPromise, CyLayout, CyLayoutPayload } from "@/types";
 import { selectionStore } from "@/hooks";
 import { applyAutoMoveEvents } from "@/cytoscape/hooks";
-import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
+import { artifactTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
@@ -215,15 +215,4 @@ export function cyResetTree(
   } else {
     cyCenterNodes(false, cyPromise);
   }
-}
-
-/**
- * Centers the viewport on all graph nodes.
- *
- * @param cyPromise - The cy instance.
- */
-export function cyResetTim(cyPromise: CyPromise = timTreeCyPromise): void {
-  cyPromise.then((cy) => {
-    cy.fit(cy.nodes(), 150);
-  });
 }

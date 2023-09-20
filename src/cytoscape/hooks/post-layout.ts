@@ -1,7 +1,6 @@
 import { EventObject, NodeSingular } from "cytoscape";
 import { LayoutHook, AutoMoveReposition, CytoCore, CyLayout } from "@/types";
-import { selectionStore } from "@/hooks";
-import { timTreeCyPromise } from "@/cytoscape/cy";
+import { cyStore, selectionStore } from "@/hooks";
 import { cyCenterNodes, cyZoomReset } from "@/cytoscape/operations";
 
 /**
@@ -99,6 +98,6 @@ export const DefaultPostLayoutHooks: LayoutHook[] = [
  * Post layout hooks for the TIM tree.
  */
 export const TIMPostLayoutHooks: LayoutHook[] = [
-  (): void => cyCenterNodes(false, timTreeCyPromise),
+  (): void => cyCenterNodes(false, cyStore.creatorCy),
   applyCytoEvents,
 ];

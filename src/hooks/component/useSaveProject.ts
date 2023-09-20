@@ -66,6 +66,8 @@ export const useSaveProject = defineStore("saveProject", {
         projectMembershipId: "",
         email: sessionStore.userEmail,
         role: "OWNER",
+        entityType: "PROJECT",
+        entityId: "",
       };
       const project = buildProject({
         name: this.name,

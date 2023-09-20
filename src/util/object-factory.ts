@@ -44,6 +44,9 @@ export function buildUser(): UserSchema {
   return {
     userId: "",
     email: "",
+    personalOrgId: "",
+    defaultOrgId: "",
+    superuser: false,
   };
 }
 

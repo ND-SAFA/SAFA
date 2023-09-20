@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { IdentifierSchema, PopupType } from "@/types";
 import { buildProjectIdentifier } from "@/util";
-import { appStore, orgStore, teamStore } from "@/hooks";
+import { appStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**

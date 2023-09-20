@@ -47,7 +47,7 @@ export function getIcon(variant?: IconVariant): string {
     case "error":
       return "mdi-alert-circle-outline";
     case "invite":
-      return "mdi-account-plus-outline";
+      return "mdi-account-plus";
     case "success":
       return "mdi-check-circle-outline";
     case "artifact":
@@ -178,6 +178,20 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-chevron-down";
     case "group-close-all":
       return "mdi-arrow-collapse-all";
+    case "member-add":
+      return "mdi-account-plus";
+    case "member-delete":
+      return "mdi-account-remove";
+    case "project-add":
+      return "mdi-briefcase-plus";
+    case "project-delete":
+      return "mdi-briefcase-remove";
+    case "project-edit":
+      return "mdi-briefcase-edit";
+    case "version-add":
+      return "mdi-folder-plus";
+    case "version-delete":
+      return "mdi-folder-remove";
     default:
       return "";
   }

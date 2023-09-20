@@ -52,7 +52,7 @@
           <icon-button
             v-if="isEditEnabled(row)"
             :small="props.minimal"
-            icon="edit"
+            :icon="editIcon"
             :tooltip="editLabel"
             data-cy="button-selector-edit"
             @click="emit('row:edit', row)"
@@ -60,7 +60,7 @@
           <icon-button
             v-if="isDeleteEnabled(row)"
             :small="props.minimal"
-            icon="delete"
+            :icon="deleteIcon"
             :tooltip="deleteLabel"
             data-cy="button-selector-delete"
             @click="emit('row:delete', row)"
@@ -73,7 +73,7 @@
       <icon-button
         fab
         color="primary"
-        icon="add"
+        :icon="addIcon"
         :tooltip="addLabel"
         data-cy="button-selector-add"
         @click="emit('row:add', null)"
@@ -125,6 +125,10 @@ const customCellSlots = computed(() =>
 const addLabel = computed(() => `Add ${props.itemName || ""}`);
 const editLabel = computed(() => `Edit ${props.itemName || ""}`);
 const deleteLabel = computed(() => `Delete ${props.itemName || ""}`);
+
+const addIcon = computed(() => props.icons?.add || "add");
+const editIcon = computed(() => props.icons?.edit || "edit");
+const deleteIcon = computed(() => props.icons?.delete || "delete");
 
 /**
  * Selects a clicked row, or deselects a selected row.

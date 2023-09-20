@@ -80,7 +80,14 @@ export type IconVariant =
   | "group-open"
   | "group-open-all"
   | "group-close"
-  | "group-close-all";
+  | "group-close-all"
+  | "member-add"
+  | "member-delete"
+  | "project-add"
+  | "project-edit"
+  | "project-delete"
+  | "version-add"
+  | "version-delete";
 
 /**
  * Defines props for an icon.

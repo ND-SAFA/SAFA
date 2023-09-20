@@ -20,6 +20,7 @@
       :deletable="displayMemberActions"
       :loading="memberApiStore.loading"
       :custom-cells="['role']"
+      :icons="{ add: 'member-add', delete: 'member-delete', edit: 'edit' }"
       @row:add="handleAdd"
       @row:delete="handleDelete"
       @refresh="handleRefresh"

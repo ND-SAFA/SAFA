@@ -10,6 +10,11 @@
     :rows="rows"
     row-key="projectId"
     item-name="project"
+    :icons="{
+      add: 'project-add',
+      edit: 'project-edit',
+      delete: 'project-delete',
+    }"
     data-cy="table-project"
     @refresh="handleReload"
     @row:add="identifierSaveStore.selectIdentifier(undefined, 'save')"

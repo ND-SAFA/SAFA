@@ -7,7 +7,7 @@
       flat
       style="flex-wrap: wrap"
       :options="iconOptions"
-      :disable="!allowEditing"
+      :disable="!permissionStore.isAllowed('project.edit_data')"
       :toggle-color="currentColor"
       data-cy="button-type-options-icon"
     />
@@ -48,8 +48,6 @@ const iconOptions = computed(() =>
     };
   })
 );
-
-const allowEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const icon = computed({
   get(): string {

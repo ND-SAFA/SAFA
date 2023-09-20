@@ -1,4 +1,4 @@
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Persists trace matrices between given source and target
@@ -13,16 +13,10 @@ export async function createTraceMatrix(
   sourceType: string,
   targetType: string
 ): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.createTraceMatrix, {
-      versionId,
-      sourceType,
-      targetType,
-    }),
-    {
-      method: "POST",
-    }
-  );
+  return buildRequest<void, "versionId" | "sourceType" | "targetType">(
+    "createTraceMatrix",
+    { versionId, sourceType, targetType }
+  ).post();
 }
 
 /**
@@ -37,14 +31,8 @@ export async function deleteTraceMatrix(
   sourceType: string,
   targetType: string
 ): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.deleteTraceMatrix, {
-      versionId,
-      sourceType,
-      targetType,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
+  return buildRequest<void, "versionId" | "sourceType" | "targetType">(
+    "deleteTraceMatrix",
+    { versionId, sourceType, targetType }
+  ).delete();
 }

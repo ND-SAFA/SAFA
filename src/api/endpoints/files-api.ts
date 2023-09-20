@@ -1,4 +1,4 @@
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Downloads project files for the given version.
@@ -9,11 +9,10 @@ export async function getProjectFiles(
   versionId: string,
   fileType: "csv" | "json" = "csv"
 ): Promise<string> {
-  return authHttpClient<string>(
-    fillEndpoint(Endpoint.getProjectFiles, { versionId, fileType }),
-    {
-      method: "GET",
-    },
-    { arrayBuffer: true }
-  );
+  return buildRequest<string, "versionId" | "fileType">("getProjectFiles", {
+    versionId,
+    fileType,
+  })
+    .withResponseType("arraybuffer")
+    .get();
 }

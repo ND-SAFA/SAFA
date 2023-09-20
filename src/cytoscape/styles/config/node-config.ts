@@ -15,10 +15,14 @@ export const NODE_BG_COLOR = {
 /**
  * Artifact node configuration.
  */
-export const ARTIFACT_NODE_SELECTOR = `node[graph='${GraphMode.tree}']`;
-export const ARTIFACT_EDGE_SELECTOR = `edge[graph='${GraphMode.tree}']`;
-export const GENERATED_LINK_SELECTOR = `${ARTIFACT_EDGE_SELECTOR}[traceType='${TraceType.GENERATED}']`;
-export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[approvalStatus='${ApprovalType.APPROVED}']`;
+export const ARTIFACT_NODE_SELECTOR = `node[graph='${"tree" as GraphMode}']`;
+export const ARTIFACT_EDGE_SELECTOR = `edge[graph='${"tree" as GraphMode}']`;
+export const GENERATED_LINK_SELECTOR = `${ARTIFACT_EDGE_SELECTOR}[traceType='${
+  "GENERATED" as TraceType
+}']`;
+export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[approvalStatus='${
+  "APPROVED" as ApprovalType
+}']`;
 
 export const ARTIFACT_WIDTH = 105;
 export const ARTIFACT_HEIGHT = (ARTIFACT_WIDTH * 9) / 16;
@@ -51,7 +55,7 @@ export const ARTIFACT_POLYGONS = {
 /**
  * TIM node configuration.
  */
-export const TIM_NODE_SELECTOR = `node[graph='${GraphMode.tim}']`;
+export const TIM_NODE_SELECTOR = `node[graph='${"tim" as GraphMode}']`;
 
 export const TIM_NODE_SHAPE = "round-rectangle";
 export const TIM_NODE_HEIGHT = 150;

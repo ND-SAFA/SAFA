@@ -1,5 +1,5 @@
 import { ArtifactTypeSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Creates a new artifact type.
@@ -12,15 +12,10 @@ export async function createArtifactType(
   projectId: string,
   artifactType: ArtifactTypeSchema
 ): Promise<ArtifactTypeSchema> {
-  return authHttpClient<ArtifactTypeSchema>(
-    fillEndpoint(Endpoint.createArtifactType, {
-      projectId,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify(artifactType),
-    }
-  );
+  return buildRequest<ArtifactTypeSchema, "projectId", ArtifactTypeSchema>(
+    "createArtifactType",
+    { projectId }
+  ).post(artifactType);
 }
 
 /**
@@ -34,32 +29,27 @@ export async function editArtifactType(
   projectId: string,
   artifactType: ArtifactTypeSchema
 ): Promise<ArtifactTypeSchema> {
-  return authHttpClient<ArtifactTypeSchema>(
-    fillEndpoint(Endpoint.editArtifactType, {
-      projectId,
-      artifactTypeName: artifactType.name,
-    }),
-    {
-      method: "PUT",
-      body: JSON.stringify(artifactType),
-    }
+  return buildRequest<
+    ArtifactTypeSchema,
+    "projectId" | "artifactTypeName",
+    ArtifactTypeSchema
+  >("editArtifactType", { projectId, artifactTypeName: artifactType.name }).put(
+    artifactType
   );
 }
 
 /**
  * Deletes the artifact type with given id.
  *
+ * @param projectId - The project who's the type will be deleted from.
  * @param artifactTypeName - The artifact type to delete.
  */
 export async function deleteArtifactType(
+  projectId: string,
   artifactTypeName: string
 ): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.deleteArtifactType, {
-      artifactTypeName,
-    }),
-    {
-      method: "DELETE",
-    }
-  );
+  return buildRequest<void, "projectId" | "artifactTypeName">(
+    "deleteArtifactType",
+    { projectId, artifactTypeName }
+  ).delete();
 }

@@ -1,20 +1,59 @@
 import { defineStore } from "pinia";
 
-import { ArtifactMap, CreatorFilePanel, TraceLinkSchema } from "@/types";
+import {
+  ArtifactMap,
+  CreatorFilePanel,
+  ParseApiHook,
+  TraceLinkSchema,
+} from "@/types";
 import { extractTraceId } from "@/util";
 import { useApi } from "@/hooks";
 import { parseArtifactFile, parseTraceFile } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useParseApi = defineStore("useParseApi", () => {
+/**
+ * A hook for managing file parsing API requests.
+ */
+export const useParseApi = defineStore("useParseApi", (): ParseApiHook => {
   const parseApi = useApi("parseApi");
 
   /**
-   * Parses a file for the project creator.
+   * Returns any errors for the given trace links.
    *
-   * @param panel - The panel to parse the file of.
-   * @param artifactMap - A collection of all parsed artifacts, keyed by name.
+   * @param panel - The panel for uploading trace links.
+   * @param artifactMap - A collection of all artifacts.
+   * @param traces - The traces to check for errors.
+   * @return The error message, if there is one.
    */
+  function getTraceErrors(
+    panel: CreatorFilePanel,
+    artifactMap: ArtifactMap,
+    traces: TraceLinkSchema[]
+  ): string[] {
+    const errors: string[] = [];
+
+    traces.forEach(({ sourceName, targetName }) => {
+      if (!(sourceName in artifactMap)) {
+        errors.push(`Artifact ${sourceName} does not exist`);
+      } else if (!(targetName in artifactMap)) {
+        errors.push(`Artifact ${targetName} does not exist`);
+      } else {
+        const sourceArtifact = artifactMap[sourceName];
+        const targetArtifact = artifactMap[targetName];
+
+        if (sourceArtifact.type !== panel.type) {
+          errors.push(`${sourceArtifact.name} is not of type ${panel.type}`);
+        }
+
+        if (targetArtifact.type !== panel.toType) {
+          errors.push(`${targetArtifact.name} is not of type ${panel.toType}`);
+        }
+      }
+    });
+
+    return errors;
+  }
+
   async function handleParseProjectFile(
     panel: CreatorFilePanel,
     artifactMap: ArtifactMap
@@ -61,43 +100,6 @@ export const useParseApi = defineStore("useParseApi", () => {
         onComplete: () => (panel.loading = false),
       }
     );
-  }
-
-  /**
-   * Returns any errors for the given trace links.
-   *
-   * @param panel - The panel for uploading trace links.
-   * @param artifactMap - A collection of all artifacts.
-   * @param traces - The traces to check for errors.
-   * @return The error message, if there is one.
-   */
-  function getTraceErrors(
-    panel: CreatorFilePanel,
-    artifactMap: ArtifactMap,
-    traces: TraceLinkSchema[]
-  ): string[] {
-    const errors: string[] = [];
-
-    traces.forEach(({ sourceName, targetName }) => {
-      if (!(sourceName in artifactMap)) {
-        errors.push(`Artifact ${sourceName} does not exist`);
-      } else if (!(targetName in artifactMap)) {
-        errors.push(`Artifact ${targetName} does not exist`);
-      } else {
-        const sourceArtifact = artifactMap[sourceName];
-        const targetArtifact = artifactMap[targetName];
-
-        if (sourceArtifact.type !== panel.type) {
-          errors.push(`${sourceArtifact.name} is not of type ${panel.type}`);
-        }
-
-        if (targetArtifact.type !== panel.toType) {
-          errors.push(`${targetArtifact.name} is not of type ${panel.toType}`);
-        }
-      }
-    });
-
-    return errors;
   }
 
   return { handleParseProjectFile };

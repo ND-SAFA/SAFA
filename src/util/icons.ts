@@ -52,7 +52,6 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-check-circle-outline";
     case "artifact":
       return "mdi-alpha-a-box-outline";
-    // return "mdi-application-array-outline";
     case "trace":
       return "mdi-ray-start-arrow";
     case "upload":
@@ -69,6 +68,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-arrow-left";
     case "account":
       return "mdi-account-circle";
+    case "organization":
+      return "mdi-domain";
+    case "permission":
+      return "mdi-account-cog";
     case "search":
       return "mdi-magnify";
     case "code":
@@ -81,6 +84,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-creation";
     case "generate-artifacts":
       return "mdi-monitor-shimmer";
+    case "generate-summaries":
+      return "mdi-shimmer";
     case "generate-traces":
       return "mdi-chart-timeline-variant-shimmer";
     case "notification":

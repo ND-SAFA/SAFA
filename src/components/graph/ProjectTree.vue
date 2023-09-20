@@ -23,7 +23,7 @@
     <template v-else>
       <tim-node
         v-for="type in artifactTypes"
-        :key="type.id"
+        :key="type.typeId"
         :count="type.count"
         :artifact-type="type.name"
         :icon="type.icon"
@@ -112,7 +112,7 @@ const className = computed(() => {
 function handleClick(event: EventObject): void {
   if (event.target !== event.cy) return;
 
-  if (appStore.isCreateLinkEnabled) {
+  if (appStore.popups.drawTrace) {
     disableDrawMode();
   }
 
@@ -125,7 +125,7 @@ function handleClick(event: EventObject): void {
         "generateArtifact",
         "generateTrace",
       ] as DetailsOpenState[]
-    ).includes(appStore.isDetailsPanelOpen)
+    ).includes(appStore.popups.detailsPanel)
   )
     return;
 
@@ -151,12 +151,7 @@ watch(
   (inView) => {
     if (!inView) return;
 
-    appStore.onLoadStart();
-
-    setTimeout(() => {
-      layoutStore.resetLayout();
-      appStore.onLoadEnd();
-    }, 200);
+    layoutStore.resetLayout();
   }
 );
 

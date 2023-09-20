@@ -36,8 +36,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, TraceMatrixChipProps, TraceType } from "@/types";
-import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
+import { TraceMatrixChipProps } from "@/types";
+import {
+  selectionStore,
+  subtreeStore,
+  traceSaveStore,
+  traceStore,
+} from "@/hooks";
 import { Typography, IconButton, Icon, Chip } from "@/components/common";
 
 const props = defineProps<TraceMatrixChipProps>();
@@ -55,14 +60,10 @@ const traceLink = computed(() =>
     : traceStore.getTraceLinkByArtifacts(props.source.id, props.target.id)
 );
 
-const isGenerated = computed(
-  () => traceLink.value?.traceType === TraceType.GENERATED
-);
+const isGenerated = computed(() => traceLink.value?.traceType === "GENERATED");
 
 const isUnreviewed = computed(
-  () =>
-    isGenerated.value &&
-    traceLink.value?.approvalStatus === ApprovalType.UNREVIEWED
+  () => isGenerated.value && traceLink.value?.approvalStatus === "UNREVIEWED"
 );
 
 const className = computed(() => {
@@ -87,7 +88,7 @@ function handleClick(): void {
  * Opens the trace creation panel to create a link between these artifacts.
  */
 function handleCreateLink(): void {
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "both",
     sourceId: props.source.id,
     targetId: props.target.id,

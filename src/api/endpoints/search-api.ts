@@ -1,5 +1,5 @@
 import { SearchQuerySchema, SearchResultsSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Returns the search results within a project version for the given query.
@@ -11,11 +11,8 @@ export function getProjectSearchQuery(
   versionId: string,
   query: SearchQuerySchema
 ): Promise<SearchResultsSchema> {
-  return authHttpClient<SearchResultsSchema>(
-    fillEndpoint(Endpoint.search, { versionId }),
-    {
-      method: "POST",
-      body: JSON.stringify(query),
-    }
-  );
+  return buildRequest<SearchResultsSchema, "versionId", SearchQuerySchema>(
+    "search",
+    { versionId }
+  ).post(query);
 }

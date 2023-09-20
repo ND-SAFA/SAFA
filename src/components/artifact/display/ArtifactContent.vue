@@ -44,8 +44,8 @@ import {
   AttributeListDisplay,
   Separator,
 } from "@/components/common";
+import { ArtifactSummary } from "@/components/artifact/save";
 import ArtifactNameDisplay from "./ArtifactNameDisplay.vue";
-import ArtifactSummary from "./ArtifactSummary.vue";
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 const body = computed(() => artifact.value?.body.trim() || "");

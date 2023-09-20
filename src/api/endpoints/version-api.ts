@@ -1,5 +1,5 @@
 import { VersionSchema } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Gets all versions of the given project.
@@ -10,10 +10,9 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
 export async function getProjectVersions(
   projectId: string
 ): Promise<VersionSchema[]> {
-  return authHttpClient<VersionSchema[]>(
-    fillEndpoint(Endpoint.getProjectVersions, { projectId }),
-    { method: "GET" }
-  );
+  return buildRequest<VersionSchema[], "projectId">("getProjectVersions", {
+    projectId,
+  }).get();
 }
 
 /**
@@ -25,10 +24,9 @@ export async function getProjectVersions(
 export async function getCurrentVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return authHttpClient<VersionSchema>(
-    fillEndpoint(Endpoint.getCurrentVersion, { projectId }),
-    { method: "GET" }
-  );
+  return buildRequest<VersionSchema, "projectId">("getCurrentVersion", {
+    projectId,
+  }).get();
 }
 
 /**
@@ -40,10 +38,9 @@ export async function getCurrentVersion(
 export async function createMajorVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return authHttpClient<VersionSchema>(
-    fillEndpoint(Endpoint.createNewMajorVersion, { projectId }),
-    { method: "POST" }
-  );
+  return buildRequest<VersionSchema, "projectId">("createNewMajorVersion", {
+    projectId,
+  }).post();
 }
 
 /**
@@ -55,10 +52,9 @@ export async function createMajorVersion(
 export async function createMinorVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return authHttpClient<VersionSchema>(
-    fillEndpoint(Endpoint.createNewMinorVersion, { projectId }),
-    { method: "POST" }
-  );
+  return buildRequest<VersionSchema, "projectId">("createNewMinorVersion", {
+    projectId,
+  }).post();
 }
 
 /**
@@ -70,12 +66,9 @@ export async function createMinorVersion(
 export async function createRevisionVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return authHttpClient<VersionSchema>(
-    fillEndpoint(Endpoint.createNewRevisionVersion, { projectId }),
-    {
-      method: "POST",
-    }
-  );
+  return buildRequest<VersionSchema, "projectId">("createNewRevisionVersion", {
+    projectId,
+  }).post();
 }
 
 /**
@@ -84,10 +77,7 @@ export async function createRevisionVersion(
  * @param versionId - The version ID to delete.
  */
 export async function deleteProjectVersion(versionId: string): Promise<void> {
-  return authHttpClient<void>(
-    fillEndpoint(Endpoint.projectVersion, { versionId }),
-    {
-      method: "DELETE",
-    }
-  );
+  return buildRequest<void, "versionId">("projectVersion", {
+    versionId,
+  }).delete();
 }

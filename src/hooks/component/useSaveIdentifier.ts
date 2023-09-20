@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
-import { IdentifierSchema } from "@/types";
-import { createProjectIdentifier } from "@/util";
+import { IdentifierSchema, PopupType } from "@/types";
+import { buildProjectIdentifier } from "@/util";
 import { appStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -17,7 +17,7 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
     /**
      * The identifier being created or edited.
      */
-    editedIdentifier: createProjectIdentifier(),
+    editedIdentifier: buildProjectIdentifier(),
   }),
   getters: {
     /**
@@ -38,7 +38,7 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
      * Resets the identifier value to the given base value.
      */
     resetIdentifier(): void {
-      this.editedIdentifier = createProjectIdentifier(this.baseIdentifier);
+      this.editedIdentifier = buildProjectIdentifier(this.baseIdentifier);
     },
     /**
      * Selects an identifier and opens the edit or delete modal.
@@ -48,13 +48,20 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
      */
     selectIdentifier(
       identifier: IdentifierSchema | undefined,
-      mode: "save" | "delete"
+      mode: "save" | "edit" | "delete"
     ): void {
       this.baseIdentifier = identifier;
       this.resetIdentifier();
 
-      appStore.isOpen[mode === "save" ? "projectSaver" : "projectDeleter"] =
-        true;
+      const panelName = (
+        {
+          save: "saveProject",
+          edit: "editProject",
+          delete: "deleteProject",
+        } as Record<"save" | "edit" | "delete", PopupType>
+      )[mode];
+
+      appStore.open(panelName);
     },
   },
 });

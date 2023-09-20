@@ -34,8 +34,8 @@ const artifact = computed(() => selectionStore.selectedArtifact);
 
 const documents = computed(() =>
   artifact.value
-    ? documentStore.projectDocuments.filter(({ documentId }) =>
-        artifact.value?.documentIds.includes(documentId)
+    ? documentStore.projectDocuments.filter(
+        ({ documentId }) => artifact.value?.documentIds.includes(documentId)
       )
     : []
 );

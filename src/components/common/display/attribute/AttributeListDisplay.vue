@@ -1,7 +1,8 @@
 <template>
-  <attribute-grid v-if="doDisplay" :layout="layout">
+  <attribute-grid v-if="doDisplay && !!layout" :layout="layout">
     <template #item="{ attribute }">
       <attribute-display
+        v-if="!!attribute"
         show-name
         :values="attributes"
         :attribute="attribute"

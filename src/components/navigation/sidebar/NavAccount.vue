@@ -6,20 +6,16 @@
       </template>
     </list-item>
 
-    <list-item to="" title="Notifications">
-      <template #icon>
-        <notifications />
-      </template>
-    </list-item>
-
-    <separator />
+    <notifications />
 
     <list-item
-      :to="Routes.ACCOUNT"
-      color="primary"
-      icon="account"
-      title="My Account"
-      class="q-py-sm"
+      v-for="option in options"
+      :key="option.label"
+      :to="option.path"
+      :icon="option.icon"
+      :title="option.label"
+      :subtitle="option.subtitle"
+      :color="option.color"
     />
   </div>
 </template>
@@ -34,8 +30,35 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { NavOption } from "@/types";
+import { ENABLED_FEATURES } from "@/util";
+import { sessionStore } from "@/hooks";
 import { Routes } from "@/router";
-import { ListItem, Separator } from "@/components/common";
+import { ListItem } from "@/components/common";
 import SavingIcon from "./SavingIcon.vue";
 import Notifications from "./Notifications.vue";
+
+const currentRoute = useRoute();
+
+const options = computed<NavOption[]>(() => [
+  ...(ENABLED_FEATURES.ORGS
+    ? [
+        {
+          label: "My Organization",
+          icon: "organization",
+          path: Routes.ORG,
+          color: Routes.ORG === currentRoute.path ? "primary" : "text",
+        },
+      ]
+    : []),
+  {
+    label: "My Account",
+    subtitle: sessionStore.user?.email,
+    icon: "account",
+    path: Routes.ACCOUNT,
+    color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",
+  },
+]);
 </script>

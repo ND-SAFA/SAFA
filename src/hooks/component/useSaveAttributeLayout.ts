@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 
 import { AttributeLayoutSchema, AttributeSchema } from "@/types";
-import { createAttributeLayout, DEFAULT_LAYOUT_ID } from "@/util";
+import { buildAttributeLayout, DEFAULT_LAYOUT_ID } from "@/util";
+import { attributesStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import attributesStore from "../project/useAttributes";
 
 /**
  * The save attribute store assists in creating and editing attribute layouts.
@@ -19,7 +19,7 @@ export const useSaveAttributeLayout = (id: string) =>
       /**
        * The attribute layout being created or edited.
        */
-      editedLayout: createAttributeLayout(),
+      editedLayout: buildAttributeLayout(),
     }),
     getters: {
       /**
@@ -68,7 +68,7 @@ export const useSaveAttributeLayout = (id: string) =>
        */
       resetLayout(baseLayout: AttributeLayoutSchema | undefined): void {
         this.baseLayout = baseLayout;
-        this.editedLayout = createAttributeLayout(this.baseLayout);
+        this.editedLayout = buildAttributeLayout(this.baseLayout);
       },
       /**
        * Adds an attribute to the bottom of the edited layout.

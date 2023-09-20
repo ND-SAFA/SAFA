@@ -30,7 +30,7 @@ const { darkMode } = useTheme();
 const definition = computed<TimEdgeCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
-    graph: GraphMode.tim,
+    graph: "tim" as GraphMode,
     id: sanitizeNodeId(getTraceId(props.sourceType, props.targetType)),
 
     // Reversed to show arrow toward parent.

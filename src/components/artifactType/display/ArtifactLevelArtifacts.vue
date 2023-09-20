@@ -8,18 +8,12 @@
         @click="documentStore.addDocumentOfTypes([name])"
       />
     </template>
-    <list :scroll-height="300" data-cy="list-selected-artifacts">
-      <list-item
-        v-for="artifact in artifacts"
-        :key="artifact.id"
-        clickable
-        :action-cols="1"
-        data-cy="list-selected-artifact-item"
-        @click="documentStore.addDocumentOfNeighborhood(artifact)"
-      >
-        <artifact-body-display display-title :artifact="artifact" />
-      </list-item>
-    </list>
+    <artifact-list-display
+      :artifacts="artifacts"
+      data-cy="list-selected-artifacts"
+      item-data-cy="list-selected-artifact-item"
+      @click="documentStore.addDocumentOfNeighborhood($event)"
+    />
   </panel-card>
 </template>
 
@@ -35,13 +29,8 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { documentStore, selectionStore, artifactStore } from "@/hooks";
-import {
-  PanelCard,
-  TextButton,
-  List,
-  ListItem,
-  ArtifactBodyDisplay,
-} from "@/components/common";
+import { PanelCard, TextButton } from "@/components/common";
+import { ArtifactListDisplay } from "@/components/artifact/display";
 
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");

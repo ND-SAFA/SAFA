@@ -86,7 +86,7 @@ export const ThemeColors = {
 /**
  * The colors used in light mode.
  */
-export const lightPalette: Record<string, string> = {
+export const lightPalette = {
   primary: ThemeColors.primary,
   secondary: ThemeColors.secondary,
   accent: ThemeColors.accent,
@@ -117,7 +117,7 @@ export const lightPalette: Record<string, string> = {
 /**
  * The colors used in dark mode.
  */
-export const darkPalette: Record<string, string> = {
+export const darkPalette = {
   primary: ThemeColors.primaryDark,
   secondary: ThemeColors.secondary,
   accent: ThemeColors.accent,
@@ -191,26 +191,26 @@ export function getEnumColor(
     | string
 ): ThemeColor {
   switch (state) {
-    case ArtifactDeltaState.ADDED:
-    case ApprovalType.APPROVED:
-    case JobStatus.COMPLETED:
-    case MessageType.success:
+    case "ADDED":
+    case "APPROVED":
+    case "COMPLETED":
+    case "success":
     case "added":
       return "added";
-    case ArtifactDeltaState.MODIFIED:
-    case ApprovalType.UNREVIEWED:
-    case JobStatus.IN_PROGRESS:
-    case MessageType.info:
-    case MessageType.update:
+    case "MODIFIED":
+    case "UNREVIEWED":
+    case "IN_PROGRESS":
+    case "info":
+    case "update":
     case "modified":
       return "modified";
-    case ArtifactDeltaState.REMOVED:
-    case ApprovalType.DECLINED:
-    case JobStatus.FAILED:
-    case MessageType.error:
+    case "REMOVED":
+    case "DECLINED":
+    case "FAILED":
+    case "error":
     case "removed":
       return "removed";
-    case MessageType.warning:
+    case "warning":
       return "warning";
     default:
       return "unchanged";

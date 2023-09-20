@@ -4,10 +4,9 @@ import { computed, ref } from "vue";
 import {
   ArtifactSchema,
   ArtifactCytoElementData,
-  ApprovalType,
   TraceLinkSchema,
-  TraceType,
   IOHandlerCallback,
+  TraceApiHook,
 } from "@/types";
 import {
   useApi,
@@ -20,13 +19,16 @@ import {
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
-export const useTraceApi = defineStore("traceApi", () => {
+export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
   const createTraceApi = useApi("traceApi");
+  const editTraceApi = useApi("editTraceApi");
+
   const approveTraceApi = useApi("approveTraceApi");
   const unreviewTraceApi = useApi("unreviewTraceApi");
   const declineTraceApi = useApi("declineTraceApi");
 
   const createLoading = computed(() => createTraceApi.loading);
+  const editLoading = computed(() => editTraceApi.loading);
   const approveLoading = computed(() => approveTraceApi.loading);
   const unreviewLoading = computed(() => unreviewTraceApi.loading);
   const declineLoading = computed(() => declineTraceApi.loading);
@@ -39,13 +41,6 @@ export const useTraceApi = defineStore("traceApi", () => {
       (id) => id !== traceId
     ));
 
-  /**
-   * Creates a new trace link.
-   *
-   * @param source - The artifact to link from.
-   * @param target - The artifact to link to.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleCreate(
     source: ArtifactSchema | ArtifactCytoElementData,
     target: ArtifactSchema | ArtifactCytoElementData,
@@ -55,6 +50,7 @@ export const useTraceApi = defineStore("traceApi", () => {
       "artifactName" in source ? source.artifactName : source.name;
     const targetName =
       "artifactName" in target ? target.artifactName : target.name;
+    const traceName = `${sourceName} -> ${targetName}`;
 
     const traceLink: TraceLinkSchema = {
       traceLinkId: "",
@@ -62,8 +58,8 @@ export const useTraceApi = defineStore("traceApi", () => {
       sourceName,
       targetId: target.id,
       targetName,
-      traceType: TraceType.MANUAL,
-      approvalStatus: ApprovalType.APPROVED,
+      traceType: "MANUAL",
+      approvalStatus: "APPROVED",
       score: 1,
     };
 
@@ -74,17 +70,14 @@ export const useTraceApi = defineStore("traceApi", () => {
         traceStore.addOrUpdateTraceLinks(createdLinks);
         subtreeStore.addTraceSubtree(traceLink);
       },
-      callbacks,
       {
-        success: `Created a new trace link: ${sourceName} -> ${targetName}`,
-        error: `Unable to create trace link: ${sourceName} -> ${targetName}`,
+        ...callbacks,
+        success: `Created a new trace link: ${traceName}`,
+        error: `Unable to create trace link: ${traceName}`,
       }
     );
   }
 
-  /**
-   * Creates a new trace link between all source to all target artifacts in the saved trace store.
-   */
   async function handleCreateAll(): Promise<void> {
     for (const target of traceSaveStore.targets) {
       for (const source of traceSaveStore.sources) {
@@ -95,16 +88,12 @@ export const useTraceApi = defineStore("traceApi", () => {
     }
   }
 
-  /**
-   * Processes link approvals, setting the app state to loading in between, and updating trace links afterwards.
-   *
-   * @param traceLink - The trace link to process.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleApprove(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
     await approveTraceApi.handleRequest(
       async () => {
         loadTrace(traceLink.traceLinkId);
@@ -120,24 +109,18 @@ export const useTraceApi = defineStore("traceApi", () => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-      },
-      {
-        success: `Trace link approved: ${traceLink.sourceName} -> ${traceLink.targetName}`,
-        error: `Unable to approve trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
+        success: `Trace link approved: ${traceName}`,
+        error: `Unable to approve trace link: ${traceName}`,
       }
     );
   }
 
-  /**
-   * Processes link declines, setting the app state to loading in between, and updating trace links afterwards.
-   *
-   * @param traceLink - The trace link to process.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleDecline(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
     await declineTraceApi.handleRequest(
       async () => {
         loadTrace(traceLink.traceLinkId);
@@ -154,17 +137,12 @@ export const useTraceApi = defineStore("traceApi", () => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-      },
-      {
-        success: `Trace link declined: ${traceLink.sourceName} -> ${traceLink.targetName}`,
-        error: `Unable to decline trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
+        success: `Trace link declined: ${traceName}`,
+        error: `Unable to decline trace link: ${traceName}`,
       }
     );
   }
 
-  /**
-   * Declines all unreviewed links, setting the app state to loading in between, and updating trace links.
-   */
   async function handleDeclineAll(): Promise<void> {
     await logStore.confirm(
       "Clear Unreviewed Links",
@@ -183,11 +161,7 @@ export const useTraceApi = defineStore("traceApi", () => {
           },
           {
             onError: () =>
-              unreviewed.map(
-                (link) => (link.approvalStatus = ApprovalType.UNREVIEWED)
-              ),
-          },
-          {
+              unreviewed.map((link) => (link.approvalStatus = "UNREVIEWED")),
             useAppLoad: true,
             success: `Removed unreviewed trace links: ${unreviewed.length}`,
             error: `Unable to clear unreviewed trace links: ${unreviewed.length}`,
@@ -197,23 +171,18 @@ export const useTraceApi = defineStore("traceApi", () => {
     );
   }
 
-  /**
-   * Processes link unreview, setting the app state to loading in between, and updating trace links afterwards.
-   *
-   * @param traceLink - The trace link to process.
-   * @param callbacks - The callbacks to call after the action.
-   */
   async function handleUnreview(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
     await unreviewTraceApi.handleRequest(
       async () => {
         loadTrace(traceLink.traceLinkId);
 
-        const updatedLinks = await traceCommitApiStore.handleUnreview(
-          traceLink
-        );
+        const updatedLinks =
+          await traceCommitApiStore.handleUnreview(traceLink);
 
         traceStore.addOrUpdateTraceLinks(updatedLinks);
         approvalStore.resetLink(traceLink);
@@ -224,21 +193,36 @@ export const useTraceApi = defineStore("traceApi", () => {
           unloadTrace(traceLink.traceLinkId);
           callbacks.onComplete?.();
         },
-      },
-      {
         useAppLoad: true,
-        success: `Trace link unreviewed: ${traceLink.sourceName} -> ${traceLink.targetName}`,
-        error: `Unable to unreview trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
+        success: `Trace link unreviewed: ${traceName}`,
+        error: `Unable to unreview trace link: ${traceName}`,
       }
     );
   }
 
-  /**
-   * Deletes a trace link after confirmation.
-   *
-   * @param traceLink - The trace link to delete.
-   * @param callbacks - The callbacks to call after the action.
-   */
+  async function handleEdit(
+    traceLink: TraceLinkSchema,
+    callbacks: IOHandlerCallback
+  ): Promise<void> {
+    const traceName = `${traceLink.sourceName} -> ${traceLink.targetName}`;
+
+    await editTraceApi.handleRequest(
+      async () => {
+        const editedLinks = await traceCommitApiStore.handleCreate(
+          traceLink,
+          true
+        );
+
+        traceStore.addOrUpdateTraceLinks(editedLinks);
+      },
+      {
+        ...callbacks,
+        success: `Edited trace link: ${traceName}`,
+        error: `Unable to edit trace link: ${traceName}`,
+      }
+    );
+  }
+
   async function handleDelete(
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
@@ -257,6 +241,7 @@ export const useTraceApi = defineStore("traceApi", () => {
   return {
     loadingTraceIds,
     createLoading,
+    editLoading,
     approveLoading,
     declineLoading,
     unreviewLoading,
@@ -266,6 +251,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     handleDecline,
     handleDeclineAll,
     handleUnreview,
+    handleEdit,
     handleDelete,
   };
 });

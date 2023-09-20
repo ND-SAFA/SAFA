@@ -1,6 +1,6 @@
 <template>
   <node-display
-    v-if="display"
+    v-if="displayActions"
     variant="menu"
     color="primary"
     @mousedown.stop
@@ -12,7 +12,7 @@
         icon="create-artifact"
         data-cy="button-add-artifact"
         @click="
-          appStore.openArtifactCreatorTo({ isNewArtifact: true });
+          artifactSaveStore.openPanel({ isNewArtifact: true });
           handleCloseMenu();
         "
       />
@@ -21,7 +21,7 @@
         icon="create-trace"
         data-cy="button-add-trace"
         @click="
-          appStore.openDetailsPanel('saveTrace');
+          traceSaveStore.openPanel();
           handleCloseMenu();
         "
       />
@@ -35,6 +35,18 @@
       />
       <separator vertical class="q-mx-xs" />
       <icon-button
+        v-if="displayGenerateActions"
+        tooltip="Summarize artifacts"
+        icon="generate-summaries"
+        color="primary"
+        data-cy="button-summarize-artifact"
+        @click="
+          appStore.openDetailsPanel('summarizeArtifact');
+          handleCloseMenu();
+        "
+      />
+      <icon-button
+        v-if="displayGenerateActions"
         tooltip="Generate artifacts"
         icon="generate-artifacts"
         color="primary"
@@ -45,6 +57,7 @@
         "
       />
       <icon-button
+        v-if="displayGenerateActions"
         tooltip="Generate trace links"
         icon="generate-traces"
         color="primary"
@@ -69,14 +82,24 @@ export default {
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { appStore, permissionStore } from "@/hooks";
+import {
+  appStore,
+  artifactSaveStore,
+  permissionStore,
+  traceSaveStore,
+} from "@/hooks";
 import { toggleDrawMode } from "@/cytoscape";
 import { FlexBox, IconButton, Separator } from "@/components/common";
-import { NodeDisplay } from "../display";
+import { NodeDisplay } from "@/components/graph/display";
 
 const handleCloseMenu = inject<() => void>("menu-close");
 
-const drawMode = computed(() => appStore.isCreateLinkEnabled);
+const drawMode = computed(() => appStore.popups.drawTrace);
 
-const display = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
+const displayGenerateActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 </script>

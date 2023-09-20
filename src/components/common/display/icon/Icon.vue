@@ -1,5 +1,7 @@
 <template>
+  <safa-icon v-if="props.variant === 'safa'" icon-only />
   <q-icon
+    v-else
     :color="iconColor"
     :size="props.size"
     :style="iconStyle"
@@ -21,6 +23,7 @@ export default {
 import { computed } from "vue";
 import { IconDisplayProps } from "@/types";
 import { getIcon } from "@/util";
+import SafaIcon from "@/components/common/display/icon/SafaIcon.vue";
 
 const props = defineProps<IconDisplayProps>();
 

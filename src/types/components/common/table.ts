@@ -77,7 +77,7 @@ export interface TableProps<Row = TableRow>
   /**
    * Any cells can be customized through the slot `body-cell-[name]`.
    */
-  customCells?: string[];
+  customCells?: (string | symbol | number)[];
   /**
    * Whether to display densely.
    */
@@ -94,8 +94,9 @@ export interface TableProps<Row = TableRow>
 export interface GroupableTableProps
   extends Pick<
       TableProps,
-      "columns" | "rows" | "rowKey" | "loading" | "expanded" | "customCells"
+      "columns" | "rows" | "rowKey" | "loading" | "expanded"
     >,
+    Partial<Pick<TableProps, "customCells">>,
     ExpandableProps {
   /**
    * The name of an item.
@@ -130,7 +131,7 @@ export interface GroupableTableHeaderProps {
   /**
    * The search text to filter with.
    */
-  searchText: string;
+  searchText: string | null;
   /**
    * The label for the searchbar.
    */
@@ -180,6 +181,7 @@ export interface GroupableTableRowProps extends ExpandableProps {
  */
 export interface SelectorTableProps
   extends Pick<TableProps, "columns" | "rows" | "rowKey" | "loading">,
+    Partial<Pick<TableProps, "customCells">>,
     MinimalProps {
   /**
    * The values of selected rows.

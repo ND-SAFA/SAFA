@@ -1,9 +1,14 @@
 import { defineStore } from "pinia";
 
-import { ArtifactSchema } from "@/types";
-import { appStore, subtreeStore, timStore, traceStore } from "@/hooks";
+import { ArtifactSchema, TraceCreatorOpenState } from "@/types";
+import {
+  subtreeStore,
+  timStore,
+  traceStore,
+  artifactStore,
+  appStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
-import artifactStore from "../project/useArtifacts";
 
 /**
  * The save trace store assists in creating batches of trace links.
@@ -179,22 +184,29 @@ export const useSaveTrace = defineStore("saveTrace", {
     /**
      * Resets the state of the trace based on selected artifacts.
      */
-    resetTrace(): void {
-      const openState = appStore.isTraceCreatorOpen;
-
+    resetTrace(openTo?: TraceCreatorOpenState): void {
       this.sourceIds = [];
       this.targetIds = [];
 
-      if (typeof openState !== "object") return;
+      if (typeof openTo !== "object") return;
 
-      if (openState.type === "source") {
-        this.sourceIds = [openState.artifactId];
-      } else if (openState.type === "target") {
-        this.targetIds = [openState.artifactId];
+      if (openTo.type === "source") {
+        this.sourceIds = [openTo.artifactId];
+      } else if (openTo.type === "target") {
+        this.targetIds = [openTo.artifactId];
       } else {
-        this.sourceIds = [openState.sourceId];
-        this.targetIds = [openState.targetId];
+        this.sourceIds = [openTo.sourceId];
+        this.targetIds = [openTo.targetId];
       }
+    },
+    /**
+     * Opens the trace creator to a specific source and target artifacts.
+     *
+     * @param openTo - What to open to.
+     */
+    openPanel(openTo?: TraceCreatorOpenState): void {
+      this.resetTrace(openTo);
+      appStore.openDetailsPanel("saveTrace");
     },
   },
 });

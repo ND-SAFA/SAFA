@@ -4,7 +4,10 @@ const inviteUser = Cypress.env("inviteUser");
 
 describe("Project Members Display", () => {
   before(() => {
-    cy.initEmptyProject().initProjectVersion(false).openProjectSettings();
+    cy.initEmptyProject()
+      .initProjectVersion(false)
+      .openProjectSettings()
+      .switchTab("Members");
 
     cy.projectAddNewMember(inviteUser.email, "Admin");
   });
@@ -12,7 +15,7 @@ describe("Project Members Display", () => {
   beforeEach(() => {
     cy.initProjectVersion(false);
     cy.getCy(DataCy.appLoading).should("not.exist");
-    cy.openProjectSettings();
+    cy.openProjectSettings().switchTab("Members");
   });
 
   describe("I can search through a project’s members", () => {

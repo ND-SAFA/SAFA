@@ -19,9 +19,9 @@ export default {
 import { computed } from "vue";
 import { appStore } from "@/hooks";
 import { DetailsPanel, PanelCard } from "@/components/common";
-import { TraceLinkGenerator } from "../save";
+import { TraceLinkGenerator } from "@/components/traceLink/save";
 
-const isOpen = computed(() => appStore.isDetailsPanelOpen === "generateTrace");
+const isOpen = computed(() => appStore.popups.detailsPanel === "generateTrace");
 
 /**
  * Closes all side panels.

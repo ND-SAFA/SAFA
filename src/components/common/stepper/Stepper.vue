@@ -74,11 +74,16 @@ const isStepDone = computed(() => props.steps[props.modelValue - 1].done);
 const continueText = computed(() =>
   currentStep.value === props.steps.length ? "Submit" : "Continue"
 );
-const className = computed(() =>
-  props.denseLabels
-    ? "full-width bg-transparent stepper-minimal"
-    : "full-width bg-transparent"
-);
+
+const className = computed(() => {
+  let classes = "full-width bg-transparent";
+
+  if (props.denseLabels) {
+    classes += " stepper-minimal";
+  }
+
+  return classes;
+});
 
 /**
  * Moves one step backward.

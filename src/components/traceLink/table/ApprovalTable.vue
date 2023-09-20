@@ -55,19 +55,19 @@
         />
       </template>
 
-      <template #body-cell-sourceType="{ row }">
+      <template #body-cell-sourceType="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.sourceType" artifact-type />
       </template>
 
-      <template #body-cell-targetType="{ row }">
+      <template #body-cell-targetType="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.targetType" artifact-type />
       </template>
 
-      <template #body-cell-approvalStatus="{ row }">
+      <template #body-cell-approvalStatus="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.approvalStatus" approval-type />
       </template>
 
-      <template #body-cell-score="{ row }">
+      <template #body-cell-score="{ row }: { row: FlatTraceLink }">
         <attribute-chip :value="row.score" confidence-score />
       </template>
 
@@ -135,11 +135,13 @@ const customCells: (keyof FlatTraceLink | string)[] = [
 
 const currentRoute = useRoute();
 
-const countType = ref<TraceCountTypes>(TraceCountTypes.all);
-const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
+const countType = ref<TraceCountTypes>("all");
+const approvalTypes = ref<ApprovalType[]>(["UNREVIEWED"]);
 const groupBy = ref<string | undefined>("targetName");
 
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const rows = computed(() => approvalStore.traceLinks);
 
@@ -199,9 +201,9 @@ function filterRow(row: FlatTraceLink): boolean {
 
   return (
     !traceApiStore.loadingTraceIds.includes(row.traceLinkId) &&
-    (countType.value === TraceCountTypes.all ||
-      (countType.value === TraceCountTypes.onlyTraced && bothTraced) ||
-      (countType.value === TraceCountTypes.notTraced && !bothTraced)) &&
+    (countType.value === "all" ||
+      (countType.value === "onlyTraced" && bothTraced) ||
+      (countType.value === "notTraced" && !bothTraced)) &&
     (approvalTypes.value.length === 0 ||
       approvalTypes.value.includes(row.approvalStatus))
   );
@@ -212,7 +214,7 @@ onMounted(() => handleRefresh());
 watch(
   () => currentRoute.path,
   (path) => {
-    if (path !== Routes.TRACE_LINK) return;
+    if (path !== Routes.ARTIFACT) return;
 
     handleRefresh();
   }

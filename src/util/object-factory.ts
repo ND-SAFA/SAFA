@@ -1,13 +1,10 @@
 import {
   ArtifactSchema,
   CommitSchema,
-  ConfirmationType,
   ConfirmDialogueMessage,
   DocumentSchema,
-  DocumentType,
   FTANodeType,
   IdentifierSchema,
-  MessageType,
   ModelType,
   VersionDeltaSchema,
   ProjectSchema,
@@ -18,59 +15,46 @@ import {
   UserSchema,
   VersionSchema,
   AttributeSchema,
-  AttributeType,
   AttributeLayoutSchema,
   MatrixSchema,
   GeneratedMatrixSchema,
+  OrganizationSchema,
+  TeamSchema,
+  TraceLinkSchema,
 } from "@/types";
 
-/**
- * @return An empty snackbar message.
- */
-export function createSnackbarMessage(): SnackbarMessage {
+export function buildSnackbarMessage(): SnackbarMessage {
   return {
     errors: [],
     message: "",
-    type: MessageType.clear,
+    type: "clear",
   };
 }
 
-/**
- * @return An empty confirm dialog message.
- */
-export function createConfirmDialogueMessage(): ConfirmDialogueMessage {
+export function buildConfirmMessage(): ConfirmDialogueMessage {
   return {
-    type: ConfirmationType.CLEAR,
+    type: "clear",
     title: "",
     body: "",
     statusCallback: () => null,
   };
 }
 
-/**
- * @return An empty user.
- */
-export function createUser(): UserSchema {
+export function buildUser(): UserSchema {
   return {
     userId: "",
     email: "",
   };
 }
 
-/**
- * @return An empty session.
- */
-export function createSession(): SessionSchema {
+export function buildSession(): SessionSchema {
   return {
     token: "",
     versionId: "",
   };
 }
 
-/**
- * @return A project identifier initialized to the given values.
- */
-export function createProjectIdentifier(
+export function buildProjectIdentifier(
   identifier?: Partial<IdentifierSchema>
 ): IdentifierSchema {
   return {
@@ -82,12 +66,9 @@ export function createProjectIdentifier(
   };
 }
 
-/**
- * @return A project initialized to the given values.
- */
-export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
+export function buildProject(project?: Partial<ProjectSchema>): ProjectSchema {
   return {
-    ...createProjectIdentifier(project),
+    ...buildProjectIdentifier(project),
     artifacts: project?.artifacts || [],
     traces: project?.traces || [],
     projectVersion: project?.projectVersion,
@@ -103,10 +84,7 @@ export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
   };
 }
 
-/**
- * @return An empty project delta.
- */
-export function createProjectDelta(): VersionDeltaSchema {
+export function buildProjectDelta(): VersionDeltaSchema {
   return {
     artifacts: {
       added: {},
@@ -121,10 +99,23 @@ export function createProjectDelta(): VersionDeltaSchema {
   };
 }
 
-/**
- * @return An artifact initialized to the given props.
- */
-export function createArtifact(
+export function buildTraceLink(
+  trace?: Partial<TraceLinkSchema>
+): TraceLinkSchema {
+  return {
+    traceLinkId: trace?.traceLinkId || "",
+    sourceId: trace?.sourceId || "",
+    sourceName: trace?.sourceName || "",
+    targetId: trace?.targetId || "",
+    targetName: trace?.targetName || "",
+    approvalStatus: trace?.approvalStatus || "UNREVIEWED",
+    score: trace?.score || 1,
+    traceType: trace?.traceType || "MANUAL",
+    explanation: trace?.explanation || "",
+  };
+}
+
+export function buildArtifact(
   artifact?: Partial<ArtifactSchema>
 ): ArtifactSchema {
   return {
@@ -135,10 +126,10 @@ export function createArtifact(
     body: artifact?.body || "",
     type: artifact?.type || "",
     isCode: artifact?.isCode || false,
-    documentType: artifact?.documentType || DocumentType.ARTIFACT_TREE,
+    documentType: artifact?.documentType || "ARTIFACT_TREE",
     documentIds: artifact?.documentIds || [],
-    safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
-    logicType: artifact?.logicType || FTANodeType.AND,
+    safetyCaseType: artifact?.safetyCaseType || "GOAL",
+    logicType: artifact?.logicType || "AND",
     attributes: artifact?.attributes || {},
   };
 }
@@ -153,46 +144,42 @@ export function createArtifact(
  *               If equal to a `DocumentType.FMEA`, an FMEA node will be created.
  * @return An artifact initialized to the given props.
  */
-export function createArtifactOfType(
+export function buildArtifactOfType(
   artifact: Partial<ArtifactSchema> | undefined,
   type?: true | string
 ): ArtifactSchema {
   if (typeof type === "string") {
-    const isFTA = type in FTANodeType;
-    const isSC = type in SafetyCaseType;
+    const isFTA = type in (["AND", "OR"] as FTANodeType[]);
+    const isSC =
+      type in (["GOAL", "SOLUTION", "STRATEGY", "CONTEXT"] as SafetyCaseType[]);
 
-    if (isFTA || type === DocumentType.FTA) {
-      return createArtifact({
+    if (isFTA || type === "FTA") {
+      return buildArtifact({
         ...artifact,
-        documentType: DocumentType.FTA,
-        logicType: isFTA ? (type as FTANodeType) : FTANodeType.AND,
-        type: DocumentType.FTA,
+        documentType: "FTA",
+        logicType: isFTA ? (type as FTANodeType) : "AND",
+        type: "FTA",
       });
     } else if (isSC) {
-      return createArtifact({
+      return buildArtifact({
         ...artifact,
-        documentType: DocumentType.SAFETY_CASE,
-        safetyCaseType: isSC
-          ? (type as SafetyCaseType)
-          : SafetyCaseType.CONTEXT,
-        type: DocumentType.SAFETY_CASE,
+        documentType: "SAFETY_CASE",
+        safetyCaseType: isSC ? (type as SafetyCaseType) : "CONTEXT",
+        type: "SAFETY_CASE",
       });
-    } else if (type === DocumentType.FMEA) {
-      return createArtifact({
+    } else if (type === "FMEA") {
+      return buildArtifact({
         ...artifact,
-        documentType: DocumentType.FMEA,
-        type: DocumentType.FMEA,
+        documentType: "FMEA",
+        type: "FMEA",
       });
     }
   }
 
-  return createArtifact(artifact);
+  return buildArtifact(artifact);
 }
 
-/**
- * @returns An empty commit.
- */
-export function createCommit(version: VersionSchema): CommitSchema {
+export function buildCommit(version: VersionSchema): CommitSchema {
   return {
     commitVersion: version,
     artifacts: {
@@ -208,10 +195,7 @@ export function createCommit(version: VersionSchema): CommitSchema {
   };
 }
 
-/**
- * @return An document initialized to the given props.
- */
-export function createDocument(
+export function buildDocument(
   document?: Partial<DocumentSchema>
 ): DocumentSchema {
   return {
@@ -224,46 +208,37 @@ export function createDocument(
       members: [],
     },
     name: document?.name || "",
-    type: document?.type || DocumentType.ARTIFACT_TREE,
+    type: document?.type || "ARTIFACT_TREE",
     artifactIds: document?.artifactIds || [],
     description: document?.description || "",
     layout: document?.layout || {},
   };
 }
 
-/**
- * @return A model initialized to the given props.
- */
-export function createModel(
+export function buildModel(
   model?: Partial<GenerationModelSchema>
 ): GenerationModelSchema {
   return {
     id: model?.id || "",
     name: model?.name || "",
-    baseModel: model?.baseModel || ModelType.NLBert,
+    baseModel: model?.baseModel || "NLBert",
   };
 }
 
-/**
- * @return An attribute initialized to the given props.
- */
-export function createAttribute(
+export function buildAttribute(
   attribute?: Partial<AttributeSchema>
 ): AttributeSchema {
   return {
     key: attribute?.key || "",
     label: attribute?.label || "",
-    type: attribute?.type || AttributeType.text,
+    type: attribute?.type || "text",
     options: attribute?.options,
     min: attribute?.min,
     max: attribute?.max,
   };
 }
 
-/**
- * @return An attribute layout initialized to the given props.
- */
-export function createAttributeLayout(
+export function buildAttributeLayout(
   layout?: Partial<AttributeLayoutSchema>
 ): AttributeLayoutSchema {
   return {
@@ -274,15 +249,7 @@ export function createAttributeLayout(
   };
 }
 
-/**
- * Creates a generated trace matrix defined over many artifact levels for
- * some tracing method or custom model.
- *
- * @param artifactLevels - The artifact levels to train on.
- * @param method - If a baseline method is used, this defines that method.
- * @param model - If a custom model is used,
- */
-export function createGeneratedMatrix(
+export function buildGeneratedMatrix(
   artifactLevels: MatrixSchema[],
   method?: ModelType,
   model?: GenerationModelSchema
@@ -291,5 +258,28 @@ export function createGeneratedMatrix(
     method: model?.baseModel || method || undefined,
     model,
     artifactLevels: artifactLevels,
+  };
+}
+
+export function buildOrg(
+  org: Partial<OrganizationSchema> = {}
+): OrganizationSchema {
+  return {
+    id: org.id || "",
+    name: org.name || "",
+    description: org.description || "",
+    personalOrg: org.personalOrg || false,
+    paymentTier: org.paymentTier || "",
+    members: org.members || [],
+    teams: org.teams || [],
+  };
+}
+
+export function buildTeam(team: Partial<TeamSchema> = {}): TeamSchema {
+  return {
+    id: team.id || "",
+    name: team.name || "",
+    members: team.members || [],
+    projects: team.projects || [],
   };
 }

@@ -1,14 +1,22 @@
 <template>
-  <panel-card
-    title="Data Integrations"
-    subtitle="View data integration sources and synchronize data between them."
-  >
+  <panel-card title="Data Integrations" :subtitle="subtitle">
+    <template #title-actions>
+      <text-button
+        v-if="addOpen"
+        text
+        icon="cancel"
+        label="Cancel import"
+        @click="addOpen = false"
+      />
+    </template>
+
     <selector-table
+      v-if="!addOpen"
       addable
       :columns="installationsColumns"
       :rows="rows"
       row-key="installationId"
-      @row:add="modalOpen = true"
+      @row:add="addOpen = true"
     >
       <template #cell-actions="{ row }">
         <text-button
@@ -20,14 +28,8 @@
         />
       </template>
     </selector-table>
-    <modal
-      :open="modalOpen"
-      size="lg"
-      title="Import Data"
-      @close="modalOpen = false"
-    >
-      <integrations-stepper type="connect" @submit="modalOpen = false" />
-    </modal>
+
+    <integrations-stepper v-else type="connect" @submit="addOpen = false" />
   </panel-card>
 </template>
 
@@ -45,17 +47,18 @@ import { computed, ref } from "vue";
 import { InstallationSchema } from "@/types";
 import { installationsColumns } from "@/util";
 import { integrationsApiStore } from "@/hooks";
-import {
-  Modal,
-  TextButton,
-  SelectorTable,
-  PanelCard,
-} from "@/components/common";
+import { TextButton, SelectorTable, PanelCard } from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
-const modalOpen = ref(false);
+const addOpen = ref(false);
 
 const rows = computed(() => integrationsApiStore.installations);
+
+const subtitle = computed(() =>
+  addOpen.value
+    ? "Configure a new integration source."
+    : "View data integration sources and synchronize data between them."
+);
 
 /**
  * Syncs the current project with the selected installation's data.

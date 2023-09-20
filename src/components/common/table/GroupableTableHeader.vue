@@ -74,7 +74,7 @@ import { FlexBox, Separator } from "@/components/common/display";
 const props = defineProps<GroupableTableHeaderProps>();
 
 const emit = defineEmits<{
-  (e: "update:searchText", text: string): void;
+  (e: "update:searchText", text: string | null): void;
   (e: "update:sortBy", values: string | undefined): void;
   (e: "update:sortDesc", descending: boolean): void;
   (e: "update:groupBy", value: string | undefined): void;

@@ -27,6 +27,10 @@ export interface ProjectIdentifierProps {
    */
   description: string;
   /**
+   * Whether a project is being updated, rather than created.
+   */
+  isUpdate?: boolean;
+  /**
    * The test selector for the name.
    */
   dataCyName?: string;

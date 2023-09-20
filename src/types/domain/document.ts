@@ -4,13 +4,12 @@ import { IdentifierSchema } from "@/types/domain/project";
 /**
  * Enumerates the type of documents supported by SAFA.
  */
-export enum DocumentType {
-  ARTIFACT_TREE = "ARTIFACT_TREE",
-  FTA = "FTA",
-  SAFETY_CASE = "SAFETY_CASE",
-  FMEA = "FMEA",
-  FMECA = "FMECA",
-}
+export type DocumentType =
+  | "ARTIFACT_TREE"
+  | "FTA"
+  | "SAFETY_CASE"
+  | "FMEA"
+  | "FMECA";
 
 /**
  * Defines a specific document.

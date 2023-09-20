@@ -17,6 +17,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ProjectFilesUploader } from "@/components/project/base";
+import { ProjectFilesUploader } from "@/components/project/save";
 import { PanelCard } from "@/components/common";
 </script>

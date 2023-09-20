@@ -1,6 +1,6 @@
 import { ComputedRef } from "vue";
 import { MarginProps, SizeType } from "@/types";
-import { useClasses } from "./useClasses";
+import { useClasses } from "@/hooks";
 
 const convertMargin = (value?: SizeType) => {
   switch (value) {

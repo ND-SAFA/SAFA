@@ -11,33 +11,27 @@
           @click="handleLinkParent"
         />
       </template>
-      <list
+
+      <artifact-list-display
         v-if="parents.length > 0"
-        :scroll-height="300"
         data-cy="list-selected-parents"
+        :artifacts="parents"
+        :action-cols="1"
+        item-data-cy="list-selected-parent-item"
+        @click="handleArtifactClick($event.name)"
       >
-        <list-item
-          v-for="parent in parents"
-          :key="parent.id"
-          clickable
-          :action-cols="1"
-          data-cy="list-selected-parent-item"
-          @click="handleArtifactClick(parent.name)"
-        >
-          <artifact-body-display display-title :artifact="parent" />
-          <template #actions>
-            <icon-button
-              outline
-              :flat="false"
-              icon="trace"
-              tooltip="View Trace Link"
-              data-cy="button-selected-parent-link"
-              :class="getTraceLinkClassName(parent.name)"
-              @click="handleTraceLinkClick(parent.name)"
-            />
-          </template>
-        </list-item>
-      </list>
+        <template #actions="{ artifact: parent }">
+          <icon-button
+            outline
+            :flat="false"
+            icon="trace"
+            tooltip="View Trace Link"
+            data-cy="button-selected-parent-link"
+            :class="getTraceLinkClassName(parent.name)"
+            @click="handleTraceLinkClick(parent.name)"
+          />
+        </template>
+      </artifact-list-display>
       <typography
         v-else
         l="1"
@@ -57,33 +51,27 @@
           @click="handleLinkChild"
         />
       </template>
-      <list
+
+      <artifact-list-display
         v-if="children.length > 0"
-        :scroll-height="300"
         data-cy="list-selected-children"
+        :artifacts="children"
+        :action-cols="1"
+        item-data-cy="list-selected-child-item"
+        @click="handleArtifactClick($event.name)"
       >
-        <list-item
-          v-for="child in children"
-          :key="child.id"
-          clickable
-          :action-cols="1"
-          data-cy="list-selected-child-item"
-          @click="handleArtifactClick(child.name)"
-        >
-          <artifact-body-display display-title :artifact="child" />
-          <template #actions>
-            <icon-button
-              outline
-              :flat="false"
-              icon="trace"
-              tooltip="View Trace Link"
-              data-cy="button-selected-child-link"
-              :class="getTraceLinkClassName(child.name)"
-              @click="handleTraceLinkClick(child.name)"
-            />
-          </template>
-        </list-item>
-      </list>
+        <template #actions="{ artifact: child }">
+          <icon-button
+            outline
+            :flat="false"
+            icon="trace"
+            tooltip="View Trace Link"
+            data-cy="button-selected-child-link"
+            :class="getTraceLinkClassName(child.name)"
+            @click="handleTraceLinkClick(child.name)"
+          />
+        </template>
+      </artifact-list-display>
       <typography
         v-else
         l="1"
@@ -105,13 +93,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
+import { ArtifactSchema } from "@/types";
 import {
-  appStore,
   artifactStore,
   permissionStore,
   selectionStore,
   subtreeStore,
+  traceSaveStore,
   traceStore,
 } from "@/hooks";
 import {
@@ -119,12 +107,12 @@ import {
   IconButton,
   PanelCard,
   TextButton,
-  List,
-  ListItem,
 } from "@/components/common";
-import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
+import ArtifactListDisplay from "./ArtifactListDisplay.vue";
 
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 
@@ -175,13 +163,11 @@ function getTraceLinkClassName(artifactName: string): string {
   );
 
   const base =
-    traceLink?.traceType === TraceType.GENERATED
+    traceLink?.traceType === "GENERATED"
       ? "trace-chip-generated text-nodeGenerated "
       : "trace-chip text-nodeDefault ";
   const unreviewed =
-    traceLink?.approvalStatus === ApprovalType.UNREVIEWED
-      ? "trace-chip-unreviewed"
-      : "";
+    traceLink?.approvalStatus === "UNREVIEWED" ? "trace-chip-unreviewed" : "";
 
   return base + unreviewed;
 }
@@ -224,7 +210,7 @@ function handleTraceLinkClick(artifactName: string): void {
 function handleLinkParent(): void {
   if (!artifact.value) return;
 
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "source",
     artifactId: artifact.value.id,
   });
@@ -236,7 +222,7 @@ function handleLinkParent(): void {
 function handleLinkChild(): void {
   if (!artifact.value) return;
 
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "target",
     artifactId: artifact.value.id,
   });

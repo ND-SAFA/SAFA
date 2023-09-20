@@ -1,5 +1,5 @@
 import { GenerateArtifactSchema, JobSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Generates parent artifacts from child artifacts.
@@ -12,11 +12,8 @@ export function createGeneratedArtifacts(
   config: GenerateArtifactSchema,
   versionId: string
 ): Promise<JobSchema> {
-  return authHttpClient<JobSchema>(
-    fillEndpoint(Endpoint.generateArtifacts, { versionId }),
-    {
-      method: "POST",
-      body: JSON.stringify(config),
-    }
-  );
+  return buildRequest<JobSchema, "versionId", GenerateArtifactSchema>(
+    "generateArtifacts",
+    { versionId }
+  ).post(config);
 }

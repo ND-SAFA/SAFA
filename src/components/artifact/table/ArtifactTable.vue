@@ -145,10 +145,12 @@ const countOptions = traceCountOptions();
 
 const groupBy = ref<string | undefined>("type");
 const visibleTypes = ref<string[] | null>([]);
-const countType = ref<TraceCountTypes>(TraceCountTypes.all);
+const countType = ref<TraceCountTypes>("all");
 const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
@@ -180,11 +182,9 @@ function filterRow(row: FlatArtifact): boolean {
     (!inDeltaView.value ||
       delta.length === 0 ||
       delta.includes(getDeltaType(row))) &&
-    (countType.value === TraceCountTypes.all ||
-      (countType.value === TraceCountTypes.onlyTraced &&
-        subtree.neighbors.length > 0) ||
-      (countType.value === TraceCountTypes.notTraced &&
-        subtree.neighbors.length === 0))
+    (countType.value === "all" ||
+      (countType.value === "onlyTraced" && subtree.neighbors.length > 0) ||
+      (countType.value === "notTraced" && subtree.neighbors.length === 0))
   );
 }
 

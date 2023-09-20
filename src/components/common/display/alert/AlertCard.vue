@@ -16,18 +16,18 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { AlertProps, MessageType } from "@/types";
+import { AlertProps } from "@/types";
 import { Typography } from "../content";
 
 const props = defineProps<AlertProps>();
 
 const className = computed(() => {
   switch (props.type) {
-    case MessageType.error:
+    case "error":
       return "bd-negative q-pa-sm nav-alert";
-    case MessageType.success:
+    case "success":
       return "bd-positive q-pa-sm nav-alert";
-    case MessageType.warning:
+    case "warning":
       return "bd-secondary q-pa-sm nav-alert";
     default:
       return "bd-primary q-pa-sm nav-alert";

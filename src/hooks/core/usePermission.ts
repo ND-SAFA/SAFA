@@ -2,11 +2,13 @@ import { defineStore } from "pinia";
 
 import {
   IdentifierSchema,
-  OrganizationPermissionType,
-  ProjectPermissionType,
-  ProjectRole,
+  PermissionType,
+  TeamSchema,
+  OrganizationSchema,
+  MembershipType,
 } from "@/types";
-import { projectStore, sessionStore } from "@/hooks";
+import { roleMap } from "@/util";
+import { orgStore, projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -19,49 +21,58 @@ export const usePermission = defineStore("permissionStore", {
        * Whether the app is in demo mode.
        */
       isDemo: false,
-      /**
-       * A mapping from project permission types to project roles.
-       */
-      projectRoleMap: {
-        viewer: [
-          ProjectRole.VIEWER,
-          ProjectRole.EDITOR,
-          ProjectRole.ADMIN,
-          ProjectRole.OWNER,
-        ],
-        editor: [ProjectRole.EDITOR, ProjectRole.ADMIN, ProjectRole.OWNER],
-        admin: [ProjectRole.ADMIN, ProjectRole.OWNER],
-        owner: [ProjectRole.OWNER],
-      } as Record<ProjectPermissionType, ProjectRole[]>,
     };
   },
   actions: {
     /**
-     * Checks whether the current user has the given permission for their organization.
-     *
-     * @param permission - The permission to check.
-     * @return Whether the current user has the requested permission.
+     * Returns the current context, be it a project, team, or organization.
+     * @param type - The type of context to return.
      */
-    organizationAllows(permission: OrganizationPermissionType): boolean {
-      return permission !== "navigation" || !this.isDemo;
+    getCurrentContext(
+      type?: MembershipType
+    ): IdentifierSchema | TeamSchema | OrganizationSchema {
+      if (type === "TEAM") {
+        return teamStore.team;
+      } else if (type === "ORGANIZATION") {
+        return teamStore.team;
+      } else {
+        return projectStore.project;
+      }
     },
     /**
-     * Checks whether the current user has the given permission on the given project.
+     * Checks whether the current user has the given permission.
      *
      * @param permission - The permission to check.
-     * @param project - The project to check.
+     * @param context - The context to check, be it a project, team, or organization.
      * @return Whether the current user has the requested permission.
      */
-    projectAllows(
-      permission: ProjectPermissionType,
-      project: IdentifierSchema = projectStore.project
+    isAllowed(
+      permission: PermissionType,
+      context:
+        | IdentifierSchema
+        | TeamSchema
+        | OrganizationSchema = projectStore.project
     ): boolean {
-      const member = sessionStore.getProjectMember(project);
+      // TODO: use a project's team and organization instead of the current team and organization.
+      const member = sessionStore.getCurrentMember(context);
+      const teamMember = sessionStore.getCurrentMember(teamStore.team);
+      const orgMember = sessionStore.getCurrentMember(orgStore.org);
+      const type = member?.entityType || "PROJECT";
+
+      if (this.isDemo) {
+        return false;
+      } else if (permission === "safa.view") {
+        return true;
+      } else if (permission.startsWith("safa.")) {
+        return !!sessionStore.user.superuser;
+      }
 
       return (
-        this.organizationAllows("navigation") &&
-        !!member &&
-        this.projectRoleMap[permission].includes(member.role)
+        (member && roleMap[type][member.role].includes(permission)) ||
+        (teamMember && roleMap.TEAM[teamMember.role].includes(permission)) ||
+        (orgMember &&
+          roleMap.ORGANIZATION[orgMember.role].includes(permission)) ||
+        false
       );
     },
   },

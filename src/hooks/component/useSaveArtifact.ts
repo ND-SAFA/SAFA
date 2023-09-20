@@ -1,11 +1,14 @@
 import { defineStore } from "pinia";
 
-import { ArtifactSchema, DocumentType } from "@/types";
-import { createArtifact, createArtifactOfType } from "@/util";
+import { ArtifactCreatorOpenState, ArtifactSchema } from "@/types";
+import { buildArtifact, buildArtifactOfType } from "@/util";
+import {
+  selectionStore,
+  artifactStore,
+  documentStore,
+  appStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
-import selectionStore from "../graph/useSelection";
-import artifactStore from "../project/useArtifacts";
-import documentStore from "../project/useDocuments";
 
 /**
  * The save artifact store assists in creating and editing artifacts.
@@ -15,7 +18,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     /**
      * The artifact being created or edited.
      */
-    editedArtifact: createArtifact(selectionStore.selectedArtifact),
+    editedArtifact: buildArtifact(selectionStore.selectedArtifact),
     /**
      * The id of the parent artifact to connect to, if there is one.
      */
@@ -48,19 +51,19 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      * @return Whether the artifact type is for an FTA node.
      */
     isFTA(): boolean {
-      return this.editedArtifact.documentType === DocumentType.FTA;
+      return this.editedArtifact.documentType === "FTA";
     },
     /**
      * @return Whether the artifact type is for a safety case node.
      */
     isSafetyCase(): boolean {
-      return this.editedArtifact.documentType === DocumentType.SAFETY_CASE;
+      return this.editedArtifact.documentType === "SAFETY_CASE";
     },
     /**
      * @return Whether the artifact type is for an FMEA node.
      */
     isFMEA(): boolean {
-      return this.editedArtifact.documentType === DocumentType.FMEA;
+      return this.editedArtifact.documentType === "FMEA";
     },
     /**
      * @return The parent artifact of a logic node.
@@ -121,7 +124,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
       const { documentId } = documentStore.currentDocument;
       const { logicType, safetyCaseType } = this.editedArtifact;
 
-      return createArtifact({
+      return buildArtifact({
         ...this.editedArtifact,
         name: this.computedName,
         type: this.computedArtifactType,
@@ -140,7 +143,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     resetArtifact(type: true | string | undefined): void {
       const artifact = selectionStore.selectedArtifact;
 
-      this.editedArtifact = createArtifactOfType(artifact, type);
+      this.editedArtifact = buildArtifactOfType(artifact, type);
       this.isNameValid = !!artifact?.name;
       this.parentId = "";
     },
@@ -148,10 +151,27 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      * Updates the edited artifact to a new type.
      */
     updateArtifactType(): void {
-      this.editedArtifact = createArtifactOfType(
+      this.editedArtifact = buildArtifactOfType(
         this.editedArtifact,
         this.editedArtifact.type
       );
+    },
+
+    /**
+     * Opens the artifact creator to a specific node type.
+     *
+     * @param openTo - What to open to.
+     */
+    openPanel(openTo: {
+      type?: ArtifactCreatorOpenState;
+      isNewArtifact?: boolean;
+    }): void {
+      const { type, isNewArtifact } = openTo;
+
+      if (isNewArtifact) selectionStore.clearSelections();
+
+      this.resetArtifact(type || true);
+      appStore.openDetailsPanel("saveArtifact");
     },
   },
 });

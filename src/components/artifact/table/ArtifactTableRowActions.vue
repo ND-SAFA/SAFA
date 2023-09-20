@@ -45,13 +45,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ArtifactProps, GraphMode } from "@/types";
+import { ArtifactProps } from "@/types";
 import {
-  appStore,
   artifactApiStore,
+  artifactSaveStore,
   documentStore,
   layoutStore,
   selectionStore,
+  traceSaveStore,
 } from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
@@ -62,7 +63,7 @@ const props = defineProps<ArtifactProps>();
  */
 function handleEdit() {
   selectionStore.selectArtifact(props.artifact.id);
-  appStore.openArtifactCreatorTo({
+  artifactSaveStore.openPanel({
     isNewArtifact: false,
   });
 }
@@ -79,14 +80,14 @@ function handleDelete() {
  */
 function handleOpenTree(): void {
   documentStore.addDocumentOfNeighborhood(props.artifact);
-  layoutStore.mode = GraphMode.tree;
+  layoutStore.mode = "tree";
 }
 
 /**
  * Opens the create trace link panel with this artifact as the child.
  */
 function handleLinkParent(): void {
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "source",
     artifactId: props.artifact.id,
   });
@@ -96,7 +97,7 @@ function handleLinkParent(): void {
  * Opens the create trace link panel with this artifact as the parent.
  */
 function handleLinkChild(): void {
-  appStore.openTraceCreatorTo({
+  traceSaveStore.openPanel({
     type: "target",
     artifactId: props.artifact.id,
   });

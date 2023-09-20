@@ -13,13 +13,23 @@
       v-if="!!props.icon || !!props.iconId || !!slots.icon"
       avatar
     >
-      <icon
-        v-if="!!props.icon || !!props.iconId"
-        :id="props.iconId"
-        :variant="props.icon"
-        :color="props.color"
-      />
-      <slot name="icon" />
+      <flex-box column align="center" justify="center">
+        <icon
+          v-if="!!props.icon || !!props.iconId"
+          :id="props.iconId"
+          :variant="props.icon"
+          :color="props.color"
+          size="sm"
+        />
+        <slot name="icon" />
+        <typography
+          v-if="!!props.iconTitle"
+          :value="props.iconTitle"
+          variant="small"
+          align="center"
+          :color="props.color"
+        />
+      </flex-box>
     </q-item-section>
     <q-item-section>
       <q-item-label class="text-ellipsis">
@@ -60,6 +70,7 @@ export default {
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
 import { ListItemProps } from "@/types";
+import FlexBox from "@/components/common/display/content/FlexBox.vue";
 import { Typography, Separator } from "../content";
 import { Icon } from "../icon";
 

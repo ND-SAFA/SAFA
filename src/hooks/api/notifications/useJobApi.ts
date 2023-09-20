@@ -1,47 +1,27 @@
 import { defineStore } from "pinia";
 
 import { ref } from "vue";
+import { saveAs } from "file-saver";
 import {
   ChangeMessageSchema,
   IOHandlerCallback,
-  JobLogSchema,
+  JobApiHook,
+  JobLogStepSchema,
   JobSchema,
 } from "@/types";
-import { jobStore, useApi } from "@/hooks";
-import {
-  deleteJobById,
-  Endpoint,
-  fillEndpoint,
-  getJobLog,
-  getUserJobs,
-} from "@/api";
+import { timestampToDisplay } from "@/util";
+import { jobStore, useApi, stompApiStore } from "@/hooks";
+import { deleteJobById, fillEndpoint, getJobLog, getUserJobs } from "@/api";
 import { pinia } from "@/plugins";
-import stompApiStore from "./useStompApi";
 
-export const useJobApi = defineStore("jobApi", () => {
+/**
+ * A hook for managing job API requests.
+ */
+export const useJobApi = defineStore("jobApi", (): JobApiHook => {
   const jobApi = useApi("jobApi");
 
-  const jobLog = ref<JobLogSchema[][]>([]);
-  const jobSteps = ref<string[]>([]);
-
-  /**
-   * Gets the log for a job.
-   * @param job - The job to view.
-   */
-  async function handleViewLogs(job: JobSchema): Promise<void> {
-    await jobApi.handleRequest(async () => {
-      jobLog.value = await getJobLog(job.id);
-      jobSteps.value = job.steps;
-    });
-  }
-
-  /**
-   * Closes the job log.
-   */
-  function handleCloseLogs(): void {
-    jobLog.value = [];
-    jobSteps.value = [];
-  }
+  const jobLog = ref<JobLogStepSchema[]>([]);
+  const viewedJob = ref<JobSchema | undefined>();
 
   /**
    * Subscribes to updates for job with given id.
@@ -52,7 +32,7 @@ export const useJobApi = defineStore("jobApi", () => {
     if (!jobId) return;
 
     await stompApiStore.subscribeToStomp(
-      fillEndpoint(Endpoint.jobTopic, { jobId }),
+      fillEndpoint("jobTopic", { jobId }),
       async (frame) => {
         await jobApi.handleRequest(async () => {
           const job: JobSchema | ChangeMessageSchema = JSON.parse(frame.body);
@@ -65,22 +45,52 @@ export const useJobApi = defineStore("jobApi", () => {
     );
   }
 
-  /**
-   * Subscribes to job updates via websocket messages, updates the
-   * store, and selects the job.
-   */
+  async function handleViewLogs(job: JobSchema): Promise<void> {
+    viewedJob.value = job;
+
+    await jobApi.handleRequest(async () => {
+      const logs = await getJobLog(job.id);
+
+      jobLog.value = logs.map((logItems, index) => {
+        const entry = logItems.map(({ entry }) => entry).join("\n\n");
+
+        return {
+          stepName: job.steps[index],
+          timestamp: timestampToDisplay(
+            logItems[logItems.length - 1]?.timestamp || ""
+          ),
+          entry,
+          error: entry.includes("rror"),
+        };
+      });
+    });
+  }
+
+  function handleCloseLogs(): void {
+    jobLog.value = [];
+    viewedJob.value = undefined;
+  }
+
+  function handleDownloadLogs(): void {
+    if (!viewedJob.value) return;
+
+    const fileName = `${viewedJob.value.name}-${viewedJob.value.lastUpdatedAt}.md`;
+    const blob = new Blob(
+      jobLog.value.map(
+        (step) => `# ${step.stepName}\n\n${step.timestamp}\n\n${step.entry}`
+      ),
+      { type: "text/plain;charset=utf-8" }
+    );
+
+    saveAs(blob, fileName);
+  }
+
   async function handleCreate(job: JobSchema): Promise<void> {
     await subscribeToJob(job.id);
     jobStore.updateJob(job);
     jobStore.selectedJob = job;
   }
 
-  /**
-   * Deletes a job.
-   *
-   * @param job - The job to delete.
-   * @param callbacks - The callbacks to run on success or error.
-   */
   async function handleDelete(
     job: JobSchema,
     callbacks: IOHandlerCallback
@@ -94,9 +104,6 @@ export const useJobApi = defineStore("jobApi", () => {
     });
   }
 
-  /**
-   * Reloads the current list of jobs.
-   */
   async function handleReload(): Promise<void> {
     await jobApi.handleRequest(
       async () => {
@@ -112,16 +119,15 @@ export const useJobApi = defineStore("jobApi", () => {
 
         jobStore.selectedJob = jobs[0];
       },
-      {},
       { useAppLoad: true }
     );
   }
 
   return {
     jobLog,
-    jobSteps,
     handleViewLogs,
     handleCloseLogs,
+    handleDownloadLogs,
     handleCreate,
     handleDelete,
     handleReload,

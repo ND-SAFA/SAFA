@@ -33,7 +33,7 @@ import { computed, ref, watch } from "vue";
 import { MatrixSchema, ModelType, OpenableProps } from "@/types";
 import { traceGenerationApiStore } from "@/hooks";
 import { Typography, TextButton } from "@/components/common";
-import { TraceMatrixCreator } from "../save";
+import { TraceMatrixCreator } from "@/components/traceLink/save";
 
 const props = defineProps<OpenableProps>();
 

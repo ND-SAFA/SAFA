@@ -19,6 +19,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2020,
   },
+  plugins: ["prettier"],
+  settings: {},
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
@@ -26,6 +28,15 @@ module.exports = {
     "vue/no-mutating-props": 0,
     "vue/script-setup-uses-vars": "error",
     "vue/multi-word-component-names": 0,
+    "@typescript-eslint/no-duplicate-enum-values": ["off"],
+    "prettier/prettier": [
+      "warn",
+      {
+        trailingComma: "es5",
+        endOfLine: "auto",
+        printWidth: 80,
+      },
+    ],
     "import/order": [
       "warn",
       {

@@ -33,8 +33,10 @@ export default {
 <script setup lang="ts">
 import { useScreen } from "@/hooks";
 import { PanelCard } from "@/components/common";
-import AttributeEditor from "./AttributeEditor.vue";
-import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
+import {
+  AttributeEditor,
+  AttributeLayoutEditor,
+} from "@/components/attributes/save";
 
 const { smallWindow } = useScreen();
 </script>

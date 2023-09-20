@@ -38,7 +38,7 @@ export function enableDrawMode(): void {
 
   edgeHandlesCore.enable();
   edgeHandlesCore.enableDrawMode();
-  appStore.enableDrawLink();
+  appStore.open("drawTrace");
 }
 
 /**
@@ -49,14 +49,14 @@ export function disableDrawMode(): void {
 
   edgeHandlesCore.disableDrawMode();
   edgeHandlesCore.disable();
-  appStore.disableDrawLink();
+  appStore.close("drawTrace");
 }
 
 /**
  * Toggles edge drawing mode.
  */
 export function toggleDrawMode(): void {
-  if (appStore.isCreateLinkEnabled) {
+  if (appStore.popups.drawTrace) {
     disableDrawMode();
   } else {
     enableDrawMode();

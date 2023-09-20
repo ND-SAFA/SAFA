@@ -21,6 +21,7 @@ export const actionsColumn: TableColumn<
   | InstallationSchema
   | GenerationModelSchema
   | MembershipSchema
+  | Record<string, string>
 > = {
   name: "actions",
   label: "Actions",
@@ -251,6 +252,28 @@ export const membersColumns: TableColumn<MembershipSchema>[] = [
     name: "role",
     align: "left",
     field: (row) => row.role,
+  },
+  actionsColumn,
+];
+
+export const teamColumns: TableColumn<Record<string, string>>[] = [
+  {
+    label: "Name",
+    name: "name",
+    align: "left",
+    field: (row) => row.name,
+  },
+  {
+    label: "Members",
+    name: "members",
+    align: "left",
+    field: (row) => row.members.length,
+  },
+  {
+    label: "Projects",
+    name: "projects",
+    align: "left",
+    field: (row) => row.projects.length,
   },
   actionsColumn,
 ];

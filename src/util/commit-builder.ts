@@ -4,7 +4,7 @@ import {
   VersionSchema,
   TraceLinkSchema,
 } from "@/types";
-import { createCommit } from "@/util";
+import { buildCommit } from "@/util";
 
 /**
  * Responsible for creating a commit of changes.
@@ -20,7 +20,7 @@ export class CommitBuilder {
    * @param version - The project version to commit to.
    */
   constructor(version: VersionSchema) {
-    this.commit = createCommit(version);
+    this.commit = buildCommit(version);
   }
 
   /**
@@ -32,57 +32,47 @@ export class CommitBuilder {
   }
 
   /**
-   * Adds a new artifact to this commit.
+   * Adds new artifacts to this commit.
    *
-   * @param artifact - The artifact to create.
+   * @param artifacts - The artifacts to create.
    */
-  withNewArtifact(artifact: ArtifactSchema): this {
-    this.commit.artifacts.added.push(artifact);
+  withNewArtifact(...artifacts: ArtifactSchema[]): this {
+    this.commit.artifacts.added.push(...artifacts);
     return this;
   }
 
   /**
-   * Adds a modified artifact to this commit.
+   * Adds modified artifacts to this commit.
    *
-   * @param artifact - The artifact to modify.
+   * @param artifacts - The artifacts to modify.
    */
-  withModifiedArtifact(artifact: ArtifactSchema): this {
-    this.commit.artifacts.modified.push(artifact);
+  withModifiedArtifact(...artifacts: ArtifactSchema[]): this {
+    this.commit.artifacts.modified.push(...artifacts);
     return this;
   }
 
   /**
-   * Adds a removed artifact to this commit.
+   * Adds removed artifacts to this commit.
    *
-   * @param artifact - The artifact to remove.
+   * @param artifacts - The artifacts to remove.
    */
-  withRemovedArtifact(artifact: ArtifactSchema): this {
-    this.commit.artifacts.removed.push(artifact);
+  withRemovedArtifact(...artifacts: ArtifactSchema[]): this {
+    this.commit.artifacts.removed.push(...artifacts);
     return this;
   }
 
   /**
-   * Adds a new trace link to this commit.
-   *
-   * @param traceLink - The link to add.
-   */
-  withNewTraceLink(traceLink: TraceLinkSchema): this {
-    this.commit.traces.added.push(traceLink);
-    return this;
-  }
-
-  /**
-   * Adds multiple new trace links to this commit.
+   * Adds new trace links to this commit.
    *
    * @param traceLinks - The links to add.
    */
-  withNewTraceLinks(traceLinks: TraceLinkSchema[]): this {
+  withNewTraceLink(...traceLinks: TraceLinkSchema[]): this {
     this.commit.traces.added.push(...traceLinks);
     return this;
   }
 
   /**
-   * Adds a modified trace link to this commit.
+   * Adds modified trace links to this commit.
    *
    * @param traceLinks - The links to modify.
    */

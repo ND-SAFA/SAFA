@@ -5,6 +5,9 @@
       <project-display />
     </template>
     <tab-list v-model="tab" :tabs="tabs">
+      <template #overview>
+        <project-overview-display />
+      </template>
       <template #members>
         <project-member-table />
       </template>
@@ -26,13 +29,13 @@
  * Tabs for changing project settings.
  */
 export default {
-  name: "TracePredictionTabs",
+  name: "SettingsTabs",
 };
 </script>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { SettingsTabTypes } from "@/types";
+import { SelectOption } from "@/types";
 import { settingsTabOptions } from "@/util";
 import { permissionStore } from "@/hooks";
 import { TabList, SidebarGrid } from "@/components/common";
@@ -40,16 +43,27 @@ import {
   UploadNewVersion,
   ProjectButtons,
   ProjectDisplay,
+  ProjectOverviewDisplay,
 } from "@/components/project";
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
-import { ProjectMemberTable } from "./members";
+import { ProjectMemberTable } from "@/components/members";
 
-const tab = ref(SettingsTabTypes.members);
+const tabs = computed(() => {
+  const options = settingsTabOptions();
+  const visibleOptions: SelectOption[] = [options[0], options[1]];
 
-const tabs = computed(() =>
-  permissionStore.projectAllows("editor")
-    ? settingsTabOptions()
-    : [settingsTabOptions()[0]]
-);
+  if (permissionStore.isAllowed("project.edit_versions")) {
+    visibleOptions.push(options[2]);
+  }
+  if (permissionStore.isAllowed("project.edit_integrations")) {
+    visibleOptions.push(options[3]);
+  }
+  if (permissionStore.isAllowed("project.edit")) {
+    visibleOptions.push(options[4]);
+  }
+
+  return visibleOptions;
+});
+const tab = ref(tabs.value[0].id);
 </script>

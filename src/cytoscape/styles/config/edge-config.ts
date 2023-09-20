@@ -39,7 +39,7 @@ export const TRACE_LINE_STYLE = {
 /**
  * TIM edge configuration.
  */
-export const TIM_EDGE_SELECTOR = `edge[graph='${GraphMode.tim}']`;
+export const TIM_EDGE_SELECTOR = `edge[graph='${"tim" as GraphMode}']`;
 
 export const TIM_EDGE_STYLE = "taxi";
 export const TIM_EDGE_ARROW_SHAPE = "chevron";

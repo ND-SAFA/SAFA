@@ -6,6 +6,7 @@ import {
   IdentifierSchema,
   IOHandlerCallback,
   VersionSchema,
+  GetVersionApiHook,
 } from "@/types";
 import {
   documentStore,
@@ -18,128 +19,114 @@ import { navigateTo, QueryParams, Routes, router } from "@/router";
 import { getProjectVersion, getProjectVersions } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useGetVersionApi = defineStore("getVersionApi", () => {
-  const getVersionApi = useApi("getVersionApi");
-  const loadVersionApi = useApi("loadVersionApi");
+/**
+ * A hook for managing get version API requests.
+ * - Watches for changes to the current project to load its versions.
+ */
+export const useGetVersionApi = defineStore(
+  "getVersionApi",
+  (): GetVersionApiHook => {
+    const getVersionApi = useApi("getVersionApi");
+    const loadVersionApi = useApi("loadVersionApi");
 
-  const allVersions = ref<VersionSchema[]>([]);
+    const allVersions = ref<VersionSchema[]>([]);
 
-  const getLoading = computed(() => getVersionApi.loading);
-  const loadLoading = computed(() => loadVersionApi.loading);
+    const getLoading = computed(() => getVersionApi.loading);
+    const loadLoading = computed(() => loadVersionApi.loading);
 
-  const currentProject = computed(() => projectStore.project);
-  const currentVersion = computed({
-    get: () => projectStore.version,
-    set(version: VersionSchema | undefined) {
-      if (!version) return;
+    const currentProject = computed(() => projectStore.project);
+    const currentVersion = computed({
+      get: () => projectStore.version,
+      set(version: VersionSchema | undefined) {
+        if (!version) return;
 
-      handleLoad(version.versionId);
-    },
-  });
-
-  /**
-   * Loads the versions of a project.
-   * If no project id is given, the current project is used, and all versions will be set.
-   *
-   * @param projectId - The id of the project to load the versions of.
-   * @param callbacks - Callbacks for the action.
-   */
-  async function handleReload(
-    projectId?: string,
-    callbacks: IOHandlerCallback<VersionSchema[]> = {}
-  ): Promise<void> {
-    const id = projectId || currentProject.value?.projectId;
-
-    await getVersionApi.handleRequest(async () => {
-      const versions = id ? await getProjectVersions(id) : [];
-
-      if (!projectId) {
-        allVersions.value = versions;
-      }
-
-      return versions;
-    }, callbacks);
-  }
-
-  /**
-   * Load the given project version.
-   * Navigates to the artifact view page to show the loaded project.
-   *
-   * @param versionId - The id of the version to retrieve and load.
-   * @param document - The document to start with viewing.
-   * @param doNavigate - Whether to navigate to the artifact tree if not already on an artifact page.
-   */
-  async function handleLoad(
-    versionId: string,
-    document?: DocumentSchema,
-    doNavigate = true
-  ): Promise<void> {
-    const routeRequiresProject = router.currentRoute.value.matched.some(
-      ({ meta }) => meta.requiresProject
-    );
-
-    await loadVersionApi.handleRequest(
-      async () => {
-        sessionStore.updateSession({ versionId });
-
-        const project = await getProjectVersion(versionId);
-
-        if (
-          project.projectVersion &&
-          !allVersions.value.find(
-            ({ versionId }) => versionId === project.projectVersion?.versionId
-          )
-        ) {
-          // Add the current version to the list of versions if it is not already there.
-          allVersions.value = [project.projectVersion, ...allVersions.value];
-        }
-
-        await setProjectApiStore.handleSet(project);
-
-        if (document) {
-          // If a document is given, switch to it.
-          await documentStore.switchDocuments(document);
-        }
-
-        if (!doNavigate || routeRequiresProject) return;
-
-        await navigateTo(Routes.ARTIFACT, {
-          [QueryParams.VERSION]: versionId,
-        });
+        handleLoad(version.versionId);
       },
-      {},
-      { useAppLoad: true }
+    });
+
+    async function handleReload(
+      projectId?: string,
+      callbacks: IOHandlerCallback<VersionSchema[]> = {}
+    ): Promise<void> {
+      const id = projectId || currentProject.value?.projectId;
+
+      await getVersionApi.handleRequest(async () => {
+        const versions = id ? await getProjectVersions(id) : [];
+
+        if (!projectId) {
+          allVersions.value = versions;
+        }
+
+        return versions;
+      }, callbacks);
+    }
+
+    async function handleLoad(
+      versionId: string,
+      document?: DocumentSchema,
+      doNavigate = true
+    ): Promise<void> {
+      const routeRequiresProject = router.currentRoute.value.matched.some(
+        ({ meta }) => meta.requiresProject
+      );
+
+      await loadVersionApi.handleRequest(
+        async () => {
+          sessionStore.updateSession({ versionId });
+
+          const project = await getProjectVersion(versionId);
+
+          if (
+            project.projectVersion &&
+            !allVersions.value.find(
+              ({ versionId }) => versionId === project.projectVersion?.versionId
+            )
+          ) {
+            // Add the current version to the list of versions if it is not already there.
+            allVersions.value = [project.projectVersion, ...allVersions.value];
+          }
+
+          await setProjectApiStore.handleSet(project);
+
+          if (document) {
+            // If a document is given, switch to it.
+            await documentStore.switchDocuments(document);
+          }
+
+          if (!doNavigate || routeRequiresProject) return;
+
+          await navigateTo(Routes.ARTIFACT, {
+            [QueryParams.VERSION]: versionId,
+          });
+        },
+        { useAppLoad: true }
+      );
+    }
+
+    async function handleLoadCurrent(
+      identifier: IdentifierSchema
+    ): Promise<void> {
+      const versions = await getProjectVersions(identifier.projectId);
+
+      await handleLoad(versions[0].versionId);
+    }
+
+    // Load the versions of the current project whenever the current project changes.
+    watch(
+      () => currentProject.value,
+      () => handleReload()
     );
+
+    return {
+      getLoading,
+      loadLoading,
+      allVersions,
+      currentVersion,
+      handleReload,
+      handleLoad,
+      handleLoadCurrent,
+    };
   }
-
-  /**
-   * Load the current version of the given project.
-   *
-   * @param identifier - The project to load the current version of.
-   */
-  async function handleLoadCurrent(
-    identifier: IdentifierSchema
-  ): Promise<void> {
-    const versions = await getProjectVersions(identifier.projectId);
-
-    await handleLoad(versions[0].versionId);
-  }
-
-  // Load the versions of the current project whenever the current project changes.
-  watch(
-    () => currentProject.value,
-    () => handleReload()
-  );
-
-  return {
-    getLoading,
-    loadLoading,
-    allVersions,
-    currentVersion,
-    handleReload,
-    handleLoad,
-    handleLoadCurrent,
-  };
-});
+);
 
 export default useGetVersionApi(pinia);

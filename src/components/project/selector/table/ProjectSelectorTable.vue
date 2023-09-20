@@ -9,14 +9,14 @@
     :columns="columns"
     :rows="rows"
     row-key="projectId"
-    item-name="Project"
+    item-name="project"
     data-cy="table-project"
     @refresh="handleReload"
     @row:add="identifierSaveStore.selectIdentifier(undefined, 'save')"
     @row:edit="identifierSaveStore.selectIdentifier($event, 'save')"
     @row:delete="identifierSaveStore.selectIdentifier($event, 'delete')"
   >
-    <template #cell-actions="{ row }">
+    <template #cell-actions="{ row }: { row: ProjectSchema }">
       <icon-button
         v-if="isEditable(row)"
         :small="props.minimal"
@@ -36,9 +36,9 @@
     </template>
   </selector-table>
 
-  <project-member-modal
+  <invite-member-modal
     :open="!!projectInviteId"
-    :project-id="projectInviteId"
+    :entity="entity"
     @close="projectInviteId = undefined"
     @submit="projectInviteId = undefined"
   />
@@ -58,7 +58,9 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
-  ProjectRole,
+  MemberEntitySchema,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ProjectSchema,
   ProjectSelectorTableProps,
 } from "@/types";
 import {
@@ -69,13 +71,13 @@ import {
 import {
   getProjectApiStore,
   identifierSaveStore,
-  logStore,
   memberApiStore,
   permissionStore,
+  projectStore,
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
-import { ProjectMemberModal } from "@/components/settings";
+import { InviteMemberModal } from "@/components/members";
 
 const props = defineProps<ProjectSelectorTableProps>();
 
@@ -90,6 +92,14 @@ const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
 const projectInviteId = ref<string>();
+
+const entity = computed(
+  () =>
+    ({
+      entityId: projectInviteId.value,
+      entityType: "PROJECT",
+    }) as MemberEntitySchema
+);
 
 const selectedItems = computed({
   get() {
@@ -107,7 +117,7 @@ const columns = computed(() =>
     : [projectNameColumn, ...projectExpandedColumns]
 );
 
-const rows = computed(() => getProjectApiStore.allProjects);
+const rows = computed(() => projectStore.allProjects);
 
 /**
  * Loads all projects.
@@ -124,16 +134,11 @@ function handleReload() {
  * @param project - The project to leave.
  */
 function handleLeave(project: IdentifierSchema) {
-  const member = sessionStore.getProjectMember(project);
-  const ownerCount = project.members.filter(
-    (member) => member.role === ProjectRole.OWNER
-  ).length;
+  const member = sessionStore.getCurrentMember(project);
 
-  if (!member || (member.role === ProjectRole.OWNER && ownerCount === 1)) {
-    logStore.onInfo("You cannot remove the only owner of this project.");
-  } else {
-    memberApiStore.handleDelete(member);
-  }
+  if (!member) return;
+
+  memberApiStore.handleDelete(member, project);
 }
 
 /**
@@ -142,7 +147,7 @@ function handleLeave(project: IdentifierSchema) {
  * @returns Whether the current user can edit the project.
  */
 function isEditable(project: IdentifierSchema): boolean {
-  return permissionStore.projectAllows("editor", project);
+  return permissionStore.isAllowed("project.edit", project);
 }
 
 /**
@@ -151,7 +156,7 @@ function isEditable(project: IdentifierSchema): boolean {
  * @returns Whether the current user can delete the project.
  */
 function isDeletable(project: IdentifierSchema): boolean {
-  return permissionStore.projectAllows("owner", project);
+  return permissionStore.isAllowed("project.delete", project);
 }
 
 /**

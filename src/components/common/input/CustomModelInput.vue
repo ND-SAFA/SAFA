@@ -9,7 +9,7 @@
     option-value="id"
     map-options
   >
-    <template #option="{ opt, itemProps }">
+    <template #option="{ opt, itemProps }: { opt: GenerationModelSchema }">
       <list-item
         v-bind="itemProps"
         :title="opt.name"

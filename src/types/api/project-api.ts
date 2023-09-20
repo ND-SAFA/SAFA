@@ -6,9 +6,19 @@ import {
 } from "@/types/domain";
 
 /**
+ * Defines the request for checking if an artifact exists.
+ */
+export interface NameValidationRequestSchema {
+  /**
+   * The artifact name to check.
+   */
+  artifactName: string;
+}
+
+/**
  * Defines the response from checking if an artifact exists.
  */
-export interface NameValidationSchema {
+export interface NameValidationResponseSchema {
   /**
    * Whether the artifact exists.
    */

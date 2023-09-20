@@ -6,15 +6,18 @@ import { documentTypeOptions } from "@/util/enum-helper";
  *
  * @return The select option names and ids.
  */
-export function documentTypeMap(): { [type in DocumentType]: SelectOption[] } {
+export function documentTypeMap(): Record<
+  DocumentType,
+  SelectOption<DocumentType>[]
+> {
   const options = documentTypeOptions();
 
   return {
-    [DocumentType.ARTIFACT_TREE]: [options[0]],
-    [DocumentType.FTA]: [options[0], options[1]],
-    [DocumentType.SAFETY_CASE]: [options[0], options[2]],
-    [DocumentType.FMEA]: [options[0], options[3]],
-    [DocumentType.FMECA]: [options[0], options[4]],
+    ARTIFACT_TREE: [options[0]],
+    FTA: [options[0], options[1]],
+    SAFETY_CASE: [options[0], options[2]],
+    FMEA: [options[0], options[3]],
+    FMECA: [options[0], options[4]],
   };
 }
 
@@ -25,7 +28,7 @@ export function documentTypeMap(): { [type in DocumentType]: SelectOption[] } {
  * @return Whether the type is for a table.
  */
 export function isTableDocument(type: DocumentType): boolean {
-  const tableDocuments = [DocumentType.FMEA, DocumentType.FMECA];
+  const tableDocuments: DocumentType[] = ["FMEA", "FMECA"];
 
   return tableDocuments.includes(type);
 }

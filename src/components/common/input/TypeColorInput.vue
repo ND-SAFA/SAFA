@@ -7,7 +7,7 @@
       flat
       style="flex-wrap: wrap"
       :options="colorOptions"
-      :disable="!allowEditing"
+      :disable="!permissionStore.isAllowed('project.edit_data')"
       :toggle-color="currentColor"
       data-cy="button-type-options-color"
     />
@@ -52,8 +52,6 @@ const colorOptions = computed(() =>
     };
   })
 );
-
-const allowEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const color = computed({
   get(): string {

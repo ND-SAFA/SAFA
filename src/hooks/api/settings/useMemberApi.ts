@@ -1,98 +1,145 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import { IOHandlerCallback, MembershipSchema, ProjectRole } from "@/types";
+import {
+  IdentifierSchema,
+  IOHandlerCallback,
+  MemberApiHook,
+  MemberEntitySchema,
+  MembershipSchema,
+  OrganizationSchema,
+  TeamSchema,
+} from "@/types";
+import { removeMatches } from "@/util";
 import {
   useApi,
   getProjectApiStore,
   logStore,
   membersStore,
-  projectStore,
   sessionStore,
+  projectStore,
 } from "@/hooks";
-import {
-  deleteProjectMember,
-  getProjectMembers,
-  saveProjectMember,
-} from "@/api";
+import { deleteMember, editMember, createMember, getMembers } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useMemberApi = defineStore("memberApi", () => {
+/**
+ * A hook for managing member API requests.
+ */
+export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
   const memberApi = useApi("memberApi");
 
   const loading = computed(() => memberApi.loading);
 
-  /**
-   * Returns the current project's members.
-   */
-  async function handleReload(): Promise<void> {
+  async function handleReload(entity: MemberEntitySchema): Promise<void> {
+    if (!entity.entityId) return;
+
     await memberApi.handleRequest(
       async () => {
-        const members = await getProjectMembers(projectStore.projectId);
+        const members = await getMembers(entity);
 
-        membersStore.updateMembers(members);
+        membersStore.updateMembers(members, entity);
       },
-      {},
       { error: `Unable to get members` }
     );
   }
 
-  /**
-   * Adds a user to a project and logs the status.
-   *
-   * @param projectId - The project to add this user to.
-   * @param memberEmail - The email of the given user.
-   * @param projectRole - The role to set for the given user.
-   * @param callbacks - Callbacks for the request.
-   */
   async function handleInvite(
-    projectId: string,
-    memberEmail: string,
-    projectRole: ProjectRole,
+    member: MembershipSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
     await memberApi.handleRequest(
       async () => {
-        const member = await saveProjectMember(
-          projectId,
-          memberEmail,
-          projectRole
-        );
+        const entityId = member.entityId || projectStore.projectId;
+        const entityType = member.entityType || "PROJECT";
 
-        membersStore.updateMembers([...membersStore.members, member]);
+        const invitedMember = await createMember({
+          ...member,
+          entityId,
+        });
+
+        membersStore.updateMembers(
+          [...membersStore.getMembers(entityType), invitedMember],
+          member
+        );
       },
-      callbacks,
       {
-        success: `Member has been added: ${memberEmail}`,
-        error: `Unable save member: ${memberEmail}`,
+        ...callbacks,
+        success: `Member has been added: ${member.email}`,
+        error: `Unable save member: ${member.email}`,
       }
     );
   }
 
-  /**
-   * Opens a confirmation modal to delete the given member.
-   *
-   * @param member - The member to delete.
-   */
-  function handleDelete(member: MembershipSchema): void {
+  async function handleSaveRole(
+    member: MembershipSchema,
+    callbacks: IOHandlerCallback
+  ): Promise<void> {
+    await memberApi.handleRequest(
+      async () => {
+        const entityId = member.entityId || projectStore.projectId;
+        const entityType = member.entityType || "PROJECT";
+
+        const updatedMember = await editMember({
+          ...member,
+          entityId,
+        });
+
+        membersStore.updateMembers(
+          [
+            updatedMember,
+            ...removeMatches(
+              membersStore.getMembers(entityType),
+              "projectMembershipId",
+              [updatedMember.projectMembershipId]
+            ),
+          ],
+          member
+        );
+      },
+      {
+        ...callbacks,
+        success: `Member is now an ${member.role.toLowerCase()}: ${
+          member.email
+        }`,
+        error: `Unable to change member to ${member.role.toLowerCase()}: ${
+          member.email
+        }`,
+      }
+    );
+  }
+
+  function handleDelete(
+    member: MembershipSchema,
+    context:
+      | IdentifierSchema
+      | TeamSchema
+      | OrganizationSchema = projectStore.project
+  ): void {
+    const ownerCount = context.members.filter(
+      (member) => member.role === "OWNER"
+    ).length;
     const email =
       sessionStore.user?.email === member.email
         ? "yourself"
         : `"${member.email}"`;
 
+    if (member.role === "OWNER" && ownerCount === 1) {
+      logStore.onInfo("You cannot remove the only owner of this project.");
+      return;
+    }
+
     logStore.confirm(
-      "Remove User from Project",
-      `Are you sure you want to remove ${email} from this project?`,
+      "Remove User",
+      `Are you sure you want to remove ${email}?`,
       async (isConfirmed: boolean) => {
         if (!isConfirmed) return;
 
         await memberApi.handleRequest(
           async () => {
-            await deleteProjectMember(member);
-            membersStore.deleteMembers([member.projectMembershipId]);
+            await deleteMember(member);
+            membersStore.deleteMembers([member.projectMembershipId], member);
             await getProjectApiStore.handleReload();
           },
-          {},
           {
             success: `Deleted a member: ${member.email}`,
             error: `Unable to delete member: ${member.email}`,
@@ -107,6 +154,7 @@ export const useMemberApi = defineStore("memberApi", () => {
     handleReload,
     handleInvite,
     handleDelete,
+    handleSaveRole,
   };
 });
 

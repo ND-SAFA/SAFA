@@ -1,5 +1,5 @@
 import { GitHubImportSchema, GitHubProjectSchema, JobSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * The formatted scopes of GitHub permissions being requested.
@@ -8,14 +8,20 @@ const scopes = encodeURI(["repo"].join(","));
 
 /**
  * Opens an external link to authorize GitHub.
+ *
+ * @param validCredentials - Whether the current credentials are valid.
  */
-export function authorizeGitHub(): void {
-  window.open(
-    `https://github.com/login/oauth/authorize?` +
-      `client_id=${process.env.VUE_APP_GITHUB_CLIENT_ID}&` +
-      `redirect_uri=${process.env.VUE_APP_GITHUB_REDIRECT_LINK}&` +
-      `scope=${scopes}`
-  );
+export function authorizeGitHub(validCredentials: boolean): void {
+  if (validCredentials) {
+    window.open("https://github.com/apps/safa-ai-github");
+  } else {
+    window.open(
+      `https://github.com/login/oauth/authorize?` +
+        `client_id=${process.env.VUE_APP_GITHUB_CLIENT_ID}&` +
+        `redirect_uri=${process.env.VUE_APP_GITHUB_REDIRECT_LINK}&` +
+        `scope=${scopes}`
+    );
+  }
 }
 
 /**
@@ -24,12 +30,9 @@ export function authorizeGitHub(): void {
  * @param accessCode - The access code received from authorizing GitHub.
  */
 export async function saveGitHubCredentials(accessCode: string): Promise<void> {
-  await authHttpClient(
-    fillEndpoint(Endpoint.githubCreateCredentials, { accessCode }),
-    {
-      method: "POST",
-    }
-  );
+  await buildRequest<void, "accessCode">("githubCreateCredentials", {
+    accessCode,
+  }).post();
 }
 
 /**
@@ -39,9 +42,8 @@ export async function saveGitHubCredentials(accessCode: string): Promise<void> {
  */
 export async function getGitHubCredentials(): Promise<boolean> {
   return (
-    (await authHttpClient<boolean | null>(Endpoint.githubValidateCredentials, {
-      method: "GET",
-    })) === true
+    (await buildRequest<boolean | null>("githubValidateCredentials").get()) ===
+    true
   );
 }
 
@@ -52,9 +54,7 @@ export async function getGitHubCredentials(): Promise<boolean> {
  */
 export async function refreshGitHubCredentials(): Promise<boolean> {
   return (
-    (await authHttpClient<boolean | null>(Endpoint.githubEditCredentials, {
-      method: "PUT",
-    })) === true
+    (await buildRequest<boolean | null>("githubEditCredentials").put()) === true
   );
 }
 
@@ -62,9 +62,7 @@ export async function refreshGitHubCredentials(): Promise<boolean> {
  * Deletes the stored GitHub credentials.
  */
 export async function deleteGitHubCredentials(): Promise<void> {
-  await authHttpClient(Endpoint.githubEditCredentials, {
-    method: "DELETE",
-  });
+  await buildRequest("githubEditCredentials").delete();
 }
 
 /**
@@ -74,9 +72,7 @@ export async function deleteGitHubCredentials(): Promise<void> {
  */
 export async function getGitHubProjects(): Promise<GitHubProjectSchema[]> {
   return (
-    (await authHttpClient<GitHubProjectSchema[]>(Endpoint.githubGetProjects, {
-      method: "GET",
-    })) || []
+    (await buildRequest<GitHubProjectSchema[]>("githubGetProjects").get()) || []
   );
 }
 
@@ -93,16 +89,12 @@ export async function createGitHubProject(
   repositoryName: string,
   configuration?: GitHubImportSchema
 ): Promise<JobSchema> {
-  return await authHttpClient<JobSchema>(
-    fillEndpoint(Endpoint.githubCreateProject, {
-      owner,
-      repositoryName,
-    }),
-    {
-      method: "POST",
-      body: JSON.stringify(configuration),
-    }
-  );
+  // TODO: add org, team
+  return buildRequest<
+    JobSchema,
+    "owner" | "repositoryName",
+    GitHubImportSchema | undefined
+  >("githubCreateProject", { owner, repositoryName }).post(configuration);
 }
 
 /**
@@ -120,15 +112,11 @@ export async function createGitHubProjectSync(
   repositoryName: string,
   configuration?: GitHubImportSchema
 ): Promise<JobSchema> {
-  return await authHttpClient<JobSchema>(
-    fillEndpoint(Endpoint.githubSyncProject, {
-      versionId,
-      owner,
-      repositoryName,
-    }),
-    {
-      method: "PUT",
-      body: JSON.stringify(configuration),
-    }
+  return buildRequest<
+    JobSchema,
+    "versionId" | "owner" | "repositoryName",
+    GitHubImportSchema | undefined
+  >("githubSyncProject", { versionId, owner, repositoryName }).put(
+    configuration
   );
 }

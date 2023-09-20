@@ -7,13 +7,14 @@ import {
   HomeView,
   LoginView,
   MyAccountView,
+  MyOrganizationView,
   ProjectCreatorView,
   ProjectSelectorView,
   ProjectSettingsView,
   ResetPasswordView,
   SearchView,
-  TracePredictionView,
   UploadStatusView,
+  MyTeamView,
 } from "@/views";
 
 /**
@@ -29,9 +30,10 @@ export enum Routes {
   MY_PROJECTS = "/open",
   ARTIFACT = "/project",
   PROJECT_SETTINGS = "/settings",
-  TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
+  ORG = "/organization",
+  TEAM = "/team",
   SEARCH = "/search",
 
   DEMO = "/demo",
@@ -45,8 +47,9 @@ export enum QueryParams {
   PW_RESET = "token",
   TAB = "tab",
   VERSION = "version",
-  JIRA_TOKEN = "code",
-  GITHUB_TOKEN = "code",
+  ORG = "org",
+  TEAM = "team",
+  INTEGRATION_TOKEN = "code",
 }
 
 export const routes: Array<RouteRecordRaw> = [
@@ -90,6 +93,16 @@ export const routes: Array<RouteRecordRaw> = [
     component: MyAccountView,
   },
   {
+    path: Routes.ORG,
+    name: "My Organization",
+    component: MyOrganizationView,
+  },
+  {
+    path: Routes.TEAM,
+    name: "My Team",
+    component: MyTeamView,
+  },
+  {
     path: Routes.HOME,
     name: "Home",
     component: HomeView,
@@ -114,14 +127,6 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.ARTIFACT,
     name: "Artifact View",
     component: ArtifactView,
-    meta: {
-      requiresProject: true,
-    },
-  },
-  {
-    path: Routes.TRACE_LINK,
-    name: "Trace Prediction",
-    component: TracePredictionView,
     meta: {
       requiresProject: true,
     },

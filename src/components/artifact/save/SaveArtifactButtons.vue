@@ -48,6 +48,7 @@ const isUpdate = computed(() => artifactSaveStore.isUpdate);
  */
 function handleDelete(): void {
   const artifact = selectionStore.selectedArtifact;
+
   if (!artifact) return;
 
   artifactApiStore.handleDelete(artifact, {

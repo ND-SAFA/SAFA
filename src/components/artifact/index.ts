@@ -1,4 +1,4 @@
 export * from "./display";
 export * from "./save";
 export * from "./table";
-export * from "./panels";
+export * from "./panel";

@@ -7,7 +7,7 @@ export interface APIOptions {
   body?: string | FormData;
 }
 
-type APIMethods = "GET" | "POST" | "PUT" | "DELETE";
+export type APIMethods = "GET" | "POST" | "PUT" | "DELETE";
 
 /**
  * Defines a error response from the API.

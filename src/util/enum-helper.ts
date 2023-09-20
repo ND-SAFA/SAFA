@@ -2,21 +2,20 @@ import {
   ApprovalType,
   ArtifactDeltaState,
   AttributeType,
-  CreatorTabTypes,
   DocumentType,
   FTANodeType,
-  LoaderTabTypes,
-  ModelShareType,
-  ModelType,
-  ProjectRole,
-  ProjectTableTabTypes,
+  OrganizationTabTypes,
+  MemberRole,
   SafetyCaseType,
-  SearchMode,
   SearchSelectOption,
   SelectOption,
-  SettingsTabTypes,
+  MembershipType,
+  TeamTabTypes,
   TraceCountTypes,
-  TracePredictionTabTypes,
+  CreatorTab,
+  LoaderTab,
+  SettingsTab,
+  ProjectTableTab,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
 
@@ -27,264 +26,219 @@ import { enumToDisplay } from "@/util/string-helper";
  * @param name - The name of the option, which will bne generated if not given.
  * @return The selectable option.
  */
-export function createEnumOption(
-  enumValue: string,
+export function createOption<T extends string>(
+  enumValue: T,
   name?: string
-): SelectOption {
+): SelectOption<T> {
   return { id: enumValue, name: name || enumToDisplay(enumValue) };
 }
 
 /**
- * Returns display names for each document type.
- *
- * @return The select option names and ids.
+ * @return display names for each document type.
  */
-export function documentTypeOptions(): SelectOption[] {
+export function documentTypeOptions(): SelectOption<DocumentType>[] {
   return [
-    createEnumOption(DocumentType.ARTIFACT_TREE, "Default"),
-    createEnumOption(DocumentType.FTA, "FTA"),
-    createEnumOption(DocumentType.SAFETY_CASE),
-    createEnumOption(DocumentType.FMEA, "FMEA"),
-    createEnumOption(DocumentType.FMECA, "FMECA"),
+    createOption("ARTIFACT_TREE", "Default"),
+    createOption("FTA", "FTA"),
+    createOption("SAFETY_CASE"),
+    createOption("FMEA", "FMEA"),
+    createOption("FMECA", "FMECA"),
   ];
 }
 
 /**
- * Returns display names for each safety case type.
- *
- * @return The select option names and ids.
+ * @return display names for each safety case type.
  */
-export function safetyCaseOptions(): SelectOption[] {
+export function safetyCaseOptions(): SelectOption<SafetyCaseType>[] {
   return [
-    createEnumOption(SafetyCaseType.CONTEXT),
-    createEnumOption(SafetyCaseType.GOAL),
-    createEnumOption(SafetyCaseType.STRATEGY),
-    createEnumOption(SafetyCaseType.SOLUTION),
+    createOption("CONTEXT"),
+    createOption("GOAL"),
+    createOption("STRATEGY"),
+    createOption("SOLUTION"),
   ];
 }
 
 /**
- * Returns display names for each logic type.
- *
- * @return The select option names and ids.
+ * @return display names for each logic type.
  */
-export function logicTypeOptions(): SelectOption[] {
-  return [createEnumOption(FTANodeType.AND), createEnumOption(FTANodeType.OR)];
+export function logicTypeOptions(): SelectOption<FTANodeType>[] {
+  return [createOption("AND"), createOption("OR")];
 }
 
 /**
- * Returns display names for each delta type.
- *
- * @return The select option names and ids.
+ * @return display names for each delta type.
  */
-export function deltaTypeOptions(): SelectOption[] {
+export function deltaTypeOptions(): SelectOption<ArtifactDeltaState>[] {
   return [
-    createEnumOption(ArtifactDeltaState.NO_CHANGE),
-    createEnumOption(ArtifactDeltaState.ADDED),
-    createEnumOption(ArtifactDeltaState.MODIFIED),
-    createEnumOption(ArtifactDeltaState.REMOVED),
+    createOption("NO_CHANGE"),
+    createOption("ADDED"),
+    createOption("MODIFIED"),
+    createOption("REMOVED"),
   ];
 }
 
 /**
- * Returns display names for each trace count type.
- *
- * @return The select option names and ids.
+ * @return display names for each trace count type.
  */
-export function traceCountOptions(): SelectOption[] {
+export function traceCountOptions(): SelectOption<TraceCountTypes>[] {
   return [
-    createEnumOption(TraceCountTypes.all, "All Artifacts"),
-    createEnumOption(TraceCountTypes.onlyTraced, "Only Traced Artifacts"),
-    createEnumOption(TraceCountTypes.notTraced, "Only Orphan Artifacts"),
+    createOption("all", "All Artifacts"),
+    createOption("onlyTraced", "Only Traced Artifacts"),
+    createOption("notTraced", "Only Orphan Artifacts"),
   ];
 }
 
 /**
- * Returns display names for each approval type.
- *
- * @return The select option names and ids.
+ * @return display names for each approval type.
  */
-export function approvalTypeOptions(): SelectOption[] {
+export function approvalTypeOptions(): SelectOption<ApprovalType>[] {
   return [
-    createEnumOption(ApprovalType.UNREVIEWED),
-    createEnumOption(ApprovalType.APPROVED),
-    createEnumOption(ApprovalType.DECLINED),
+    createOption("UNREVIEWED"),
+    createOption("APPROVED"),
+    createOption("DECLINED"),
   ];
 }
 
 /**
- * Returns display names for each trace model type.
- *
- * @return The select option names and ids.
+ * @param type - The type of member roles to include.
+ * @return display names for member role types.
  */
-export function traceModelOptions(): SelectOption[] {
+export function memberRoleOptions(
+  type?: MembershipType
+): SelectOption<MemberRole>[] {
+  const roles: SelectOption<MemberRole>[] = [];
+
+  // Include the given role if the type matches or if no type is given.
+  const addRoleFor = (
+    matchTypes: MembershipType[],
+    role: MemberRole,
+    description: string
+  ) =>
+    (matchTypes.length === 0 || matchTypes.includes(type || "PROJECT")) &&
+    roles.push(createOption(role, description));
+
+  addRoleFor(["PROJECT", "TEAM"], "VIEWER", "View project data");
+  addRoleFor(
+    ["PROJECT", "TEAM"],
+    "EDITOR",
+    "Edit data within a project version"
+  );
+  addRoleFor([], "GENERATOR", "Use generative features on project data");
+  addRoleFor([], "ADMIN", "Manage projects and membership");
+  addRoleFor(["PROJECT"], "OWNER", "Full ownership of the project");
+  addRoleFor(["ORGANIZATION"], "MEMBER", "A member of the organization");
+  addRoleFor(
+    ["ORGANIZATION"],
+    "BILLING_MANAGER",
+    "Manage billing for the organization"
+  );
+
+  return roles;
+}
+
+/**
+ * @return display names for attribute types.
+ */
+export function attributeTypeOptions(): SelectOption<AttributeType>[] {
   return [
-    createEnumOption(
-      ModelType.NLBert,
-      "Slower, higher quality links. Traces free-text artifacts to other free-text artifacts."
-    ),
-    createEnumOption(
-      ModelType.PLBert,
-      "Slower, higher quality links. Traces free-text artifacts to source code."
-    ),
-    createEnumOption(
-      ModelType.AutomotiveBert,
-      "Slower, high quality links for automotive projects."
-    ),
-    createEnumOption(ModelType.VSM, "Faster, lower quality links."),
+    createOption("text", "Text"),
+    createOption("paragraph", "Paragraph"),
+    createOption("select", "Select"),
+    createOption("multiselect", "Multiselect"),
+    createOption("relation", "Relation"),
+    createOption("date", "Date"),
+    createOption("int", "Integer"),
+    createOption("float", "Number"),
+    createOption("boolean", "Yes/No"),
   ];
 }
 
 /**
- * Returns display names for project role type.
- *
- * @return The select option names and ids.
- */
-export function projectRoleOptions(): SelectOption[] {
-  return [
-    createEnumOption(ProjectRole.OWNER),
-    createEnumOption(ProjectRole.ADMIN),
-    createEnumOption(ProjectRole.EDITOR),
-    createEnumOption(ProjectRole.VIEWER),
-  ];
-}
-
-/**
- * Returns display names for model share options.
- *
- * @return The select option names and ids.
- */
-export function modelShareOptions(): SelectOption[] {
-  return [
-    createEnumOption(ModelShareType.CLONE, "Clone the model"),
-    createEnumOption(ModelShareType.REUSE, "Reuse the same model"),
-  ];
-}
-
-/**
- * Returns display names for project creator tabs.
- *
- * @return The select option names and ids.
- */
-export function creatorTabOptions(): SelectOption[] {
-  return [
-    createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
-    createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
-    createEnumOption(CreatorTabTypes.import, "Integrations Import"),
-  ];
-}
-
-/**
- * Returns display names for project loader tabs.
- *
- * @return The select option names and ids.
- */
-export function loaderTabOptions(): SelectOption[] {
-  return [
-    createEnumOption(LoaderTabTypes.load, "Open Project"),
-    createEnumOption(LoaderTabTypes.uploads, "Project Uploads"),
-  ];
-}
-
-/**
- * Returns display names for trace prediction tabs.
- *
- * @return The select option names and ids.
- */
-export function tracePredictionTabOptions(): SelectOption[] {
-  return [
-    createEnumOption(TracePredictionTabTypes.models, "Models"),
-    createEnumOption(TracePredictionTabTypes.generation, "Trace Generation"),
-    createEnumOption(TracePredictionTabTypes.approval, "Trace Approval"),
-  ];
-}
-
-/**
- * Returns display names for project settings tabs.
- *
- * @return The select option names and ids.
- */
-export function settingsTabOptions(): SelectOption[] {
-  return [
-    createEnumOption(SettingsTabTypes.members, "Members"),
-    createEnumOption(SettingsTabTypes.upload, "Data Upload"),
-    createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
-    createEnumOption(SettingsTabTypes.attributes, "Custom Attributes"),
-  ];
-}
-
-/**
- * Returns display names for model training tabs.
- *
- * @return The select option names and ids.
- */
-export function trainingTabOptions(): SelectOption[] {
-  return [
-    createEnumOption("documents", "Documents"),
-    createEnumOption("repositories", "Repositories"),
-    createEnumOption("keywords", "Keywords"),
-    createEnumOption("project", "Project Data"),
-  ];
-}
-
-/**
- * Returns display names for table view tabs.
- *
- * @return The select option names and ids.
- */
-export function tableViewTabOptions(): SelectOption[] {
-  return [
-    createEnumOption(ProjectTableTabTypes.artifact, "Artifacts"),
-    createEnumOption(ProjectTableTabTypes.trace, "Trace Links"),
-    createEnumOption(ProjectTableTabTypes.approve, "Trace Approval"),
-  ];
-}
-
-/**
- * Returns display names for attribute types.
- *
- * @return The select option names and ids.
- */
-export function attributeTypeOptions(): SelectOption[] {
-  return [
-    createEnumOption(AttributeType.text, "Text"),
-    createEnumOption(AttributeType.paragraph, "Paragraph"),
-    createEnumOption(AttributeType.select, "Select"),
-    createEnumOption(AttributeType.multiselect, "Multiselect"),
-    createEnumOption(AttributeType.relation, "Relation"),
-    createEnumOption(AttributeType.date, "Date"),
-    createEnumOption(AttributeType.int, "Integer"),
-    createEnumOption(AttributeType.float, "Number"),
-    createEnumOption(AttributeType.boolean, "Yes/No"),
-  ];
-}
-
-/**
- * Returns display names for search modes.
- *
- * @return The select option names, descriptions, and ids.
+ * @return display names for search modes.
  */
 export function searchModeOptions(): SearchSelectOption[] {
   return [
     {
-      id: SearchMode.prompt,
+      id: "prompt",
       name: "Prompt",
       description: "Find artifacts that match a search prompt",
       placeholder: "Enter a prompt...",
     },
     {
-      id: SearchMode.artifacts,
+      id: "artifacts",
       name: "Artifact",
       description: "Find artifacts related to a specific artifact",
       placeholder: "Search artifacts...",
       artifactSearch: true,
     },
     {
-      id: SearchMode.search,
+      id: "search",
       name: "Basic",
       description: "Search through currently displayed artifacts",
       placeholder: "Search current artifacts...",
       artifactSearch: true,
     },
+  ];
+}
+
+/**
+ * @return display names for project creator tabs.
+ */
+export function creatorTabOptions(): SelectOption<CreatorTab>[] {
+  return [
+    createOption("standard", "Standard Upload"),
+    createOption("bulk", "Bulk Upload"),
+    createOption("import", "Integrations Import"),
+  ];
+}
+
+/**
+ * @return display names for project loader tabs.
+ */
+export function loaderTabOptions(): SelectOption<LoaderTab>[] {
+  return [
+    createOption("load", "Open Project"),
+    createOption("uploads", "Project Uploads"),
+  ];
+}
+
+/**
+ * @return display names for project settings tabs.
+ */
+export function settingsTabOptions(): SelectOption<SettingsTab>[] {
+  return [
+    createOption("overview", "Overview"),
+    createOption("members", "Members"),
+    createOption("upload", "Data Upload"),
+    createOption("integrations", "Data Integrations"),
+    createOption("attributes", "Custom Attributes"),
+  ];
+}
+
+/**
+ * @return display names for table view tabs.
+ */
+export function tableViewTabOptions(): SelectOption<ProjectTableTab>[] {
+  return [
+    createOption("artifact", "Artifacts"),
+    createOption("trace", "Trace Links"),
+    createOption("approve", "Trace Approval"),
+  ];
+}
+
+/**
+ * @return display names for organization tabs.
+ */
+export function organizationTabTypes(): SelectOption<OrganizationTabTypes>[] {
+  return [createOption("members", "Members"), createOption("teams", "Teams")];
+}
+
+/**
+ * @return display names for team tabs.
+ */
+export function teamTabTypes(): SelectOption<TeamTabTypes>[] {
+  return [
+    createOption("members", "Members"),
+    createOption("projects", "Projects"),
   ];
 }

@@ -40,7 +40,9 @@ import {
   ApprovalTable,
 } from "@/components";
 
-const displayEditing = computed(() => permissionStore.projectAllows("editor"));
+const displayEditing = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const tabs = computed(() =>
   displayEditing.value ? tableViewTabOptions() : [tableViewTabOptions()[0]]

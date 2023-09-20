@@ -1,0 +1,110 @@
+<template>
+  <panel-card :title="project.name">
+    <template #title-actions>
+      <text-button
+        v-if="editMode"
+        text
+        label="Cancel"
+        icon="cancel"
+        @click="appStore.close('editProject')"
+      />
+      <attribute-chip v-else :value="versionLabel" />
+    </template>
+
+    <div v-if="!editMode">
+      <flex-box column b="4">
+        <typography value="Project Data" variant="caption" />
+
+        <typography :value="artifactTypeLabel" />
+        <typography :value="artifactLabel" />
+        <typography :value="traceLabel" />
+      </flex-box>
+
+      <typography value="Artifact Types" variant="caption" />
+      <flex-box
+        v-for="[parent, children] in artifactTypeMap"
+        :key="parent"
+        column
+        t="2"
+      >
+        <attribute-chip artifact-type :value="parent" />
+        <flex-box l="4">
+          <icon
+            class="q-mx-xs q-mt-xs"
+            size="sm"
+            color="text"
+            variant="trace"
+            :rotate="-90"
+          />
+          <flex-box column>
+            <attribute-chip
+              v-for="child in children"
+              :key="child"
+              artifact-type
+              :value="child"
+            />
+          </flex-box>
+        </flex-box>
+      </flex-box>
+    </div>
+
+    <save-project-inputs v-else @save="appStore.close('editProject')" />
+  </panel-card>
+</template>
+
+<script lang="ts">
+/**
+ * Displays high level project information.
+ */
+export default {
+  name: "ProjectDisplay",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { versionToString } from "@/util";
+import { appStore, projectStore, timStore } from "@/hooks";
+import {
+  PanelCard,
+  AttributeChip,
+  FlexBox,
+  Icon,
+  TextButton,
+  Typography,
+} from "@/components/common";
+import SaveProjectInputs from "./SaveProjectInputs.vue";
+
+const editMode = computed(() => appStore.popups.editProject);
+
+const project = computed(() => projectStore.project);
+
+const versionLabel = computed(
+  () => `Version ${versionToString(project.value.projectVersion)}`
+);
+
+const artifactTypeLabel = computed(
+  () => `${project.value.artifactTypes.length} Artifact Types`
+);
+
+const artifactLabel = computed(
+  () => `${project.value.artifacts.length} Artifacts`
+);
+
+const traceLabel = computed(() => `${project.value.traces.length} Trace Links`);
+
+const artifactTypeMap = computed(() =>
+  Object.entries(
+    timStore.traceMatrices.reduce(
+      (acc, matrix) => ({
+        ...acc,
+        [matrix.targetType]: [
+          ...(acc[matrix.targetType] || []),
+          matrix.sourceType,
+        ],
+      }),
+      {} as Record<string, string[]>
+    )
+  )
+);
+</script>

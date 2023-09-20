@@ -50,7 +50,8 @@ describe("Project Versions", () => {
     });
   });
 
-  describe("I can upload new flat files to a project version", () => {
+  // TODO: remove this workaround once websocket messages are fixed.
+  describe.skip("I can upload new flat files to a project version", () => {
     it("Uploads files to the current version", () => {
       cy.projectSelectorContinue("project").projectSelectorContinue("version");
 

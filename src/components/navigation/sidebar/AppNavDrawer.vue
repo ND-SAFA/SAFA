@@ -5,6 +5,7 @@
     elevated
     :breakpoint="0"
     :width="260"
+    :mini-width="65"
     :mini="!sidebarOpen"
   >
     <flex-box
@@ -33,11 +34,9 @@
       class="nav-sidebar-header"
     >
       <icon-button
-        icon="nav-toggle"
+        icon="safa"
         tooltip="Open sidebar"
-        color="primary"
         data-cy="button-sidebar-open"
-        :rotate="180"
         @click="sidebarOpen = true"
       />
     </flex-box>
@@ -68,10 +67,10 @@ const { smallWindow } = useScreen();
 
 const sidebarOpen = computed({
   get(): boolean {
-    return appStore.isAppPanelOpen;
+    return appStore.popups.navPanel;
   },
   set() {
-    appStore.toggleAppPanel();
+    appStore.toggle("navPanel");
   },
 });
 
@@ -85,6 +84,6 @@ function handleLogoClick(): void {
 onMounted(() => {
   if (!smallWindow) return;
 
-  appStore.toggleAppPanel();
+  appStore.close("navPanel");
 });
 </script>

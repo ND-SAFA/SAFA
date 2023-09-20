@@ -25,7 +25,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ProjectInputProps } from "@/types";
-import { getProjectApiStore, useVModel } from "@/hooks";
+import { projectStore, useVModel } from "@/hooks";
 
 const props = defineProps<ProjectInputProps>();
 
@@ -33,7 +33,7 @@ const model = useVModel(props, "modelValue");
 
 const projects = computed(() =>
   props.excludeCurrentProject
-    ? getProjectApiStore.unloadedProjects
-    : getProjectApiStore.allProjects
+    ? projectStore.unloadedProjects
+    : projectStore.allProjects
 );
 </script>

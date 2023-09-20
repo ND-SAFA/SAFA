@@ -1,25 +1,24 @@
 /**
  * The search modes that are supported.
  */
-export enum SearchMode {
+export type SearchMode =
   /**
    * Search by tracing a prompt string to some type of artifacts.
    */
-  prompt = "prompt",
+  | "prompt"
   /**
    * Search by tracing artifacts to some type of artifacts.
    */
-  artifacts = "artifacts",
+  | "artifacts"
   /**
    * Search by tracing artifact types to other types of artifacts.
    */
-  artifactTypes = "artifactTypes",
+  | "artifactTypes"
   /**
    * Font-end only.
    * Search within the current view for artifacts.
    */
-  search = "search",
-}
+  | "search";
 
 /**
  * Represents a request to search for matching artifacts within a project.

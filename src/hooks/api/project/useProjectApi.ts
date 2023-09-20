@@ -2,10 +2,14 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import { saveAs } from "file-saver";
 
-import { IOHandlerCallback, ProjectSchema, VersionSchema } from "@/types";
+import {
+  IOHandlerCallback,
+  ProjectApiHook,
+  ProjectSchema,
+  VersionSchema,
+} from "@/types";
 import { versionToString } from "@/util";
 import {
-  getProjectApiStore,
   identifierSaveStore,
   logStore,
   projectStore,
@@ -20,7 +24,10 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useProjectApi = defineStore("projectApi", () => {
+/**
+ * A hook for managing project API requests.
+ */
+export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
   const saveProjectApi = useApi("saveProjectApi");
   const deleteProjectApi = useApi("deleteProjectApi");
   const deleteVersionApi = useApi("deleteVersionApi");
@@ -29,11 +36,6 @@ export const useProjectApi = defineStore("projectApi", () => {
   const deleteProjectLoading = computed(() => deleteProjectApi.loading);
   const deleteVersionLoading = computed(() => deleteVersionApi.loading);
 
-  /**
-   * Saves a project, updates app state, and logs the status.
-   *
-   * @param callbacks - Callbacks for the action.
-   */
   async function handleSave(
     callbacks: IOHandlerCallback<ProjectSchema> = {}
   ): Promise<void> {
@@ -43,25 +45,23 @@ export const useProjectApi = defineStore("projectApi", () => {
       async () => {
         const project = await saveProject(identifier);
 
-        getProjectApiStore.addProject(
-          identifier.projectId ? identifier : project
-        );
+        projectStore.addProject(identifier.projectId ? identifier : project);
+
+        if (project.projectId === projectStore.projectId) {
+          projectStore.project.name = project.name;
+          projectStore.project.description = project.description;
+        }
 
         return project;
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Project has been saved: ${identifier.name}`,
         error: `Unable to save project: ${identifier.name}`,
       }
     );
   }
 
-  /**
-   * Creates a file download for project files, either in csv for json format.
-   *
-   * @param fileType - The file format to download.
-   */
   async function handleDownload(
     fileType: "csv" | "json" = "csv"
   ): Promise<void> {
@@ -79,11 +79,6 @@ export const useProjectApi = defineStore("projectApi", () => {
     });
   }
 
-  /**
-   * Deletes a project, updates app state, and logs the status.
-   *
-   * @param callbacks - Callbacks for the action.
-   */
   async function handleDeleteProject(
     callbacks: IOHandlerCallback
   ): Promise<void> {
@@ -95,29 +90,21 @@ export const useProjectApi = defineStore("projectApi", () => {
       async () => {
         await deleteProject(project.projectId);
 
-        getProjectApiStore.allProjects = getProjectApiStore.allProjects.filter(
-          ({ projectId }) => projectId !== project.projectId
-        );
+        projectStore.removeProject(project);
 
         if (project.name !== projectStore.project.name) return;
 
         // Clear the current project if it has been deleted.
         await setProjectApiStore.handleClear();
       },
-      callbacks,
       {
+        ...callbacks,
         success: `Project has been deleted: ${project.name}`,
         error: `Unable to delete project: ${project.name}`,
       }
     );
   }
 
-  /**
-   * Deletes a version, updates app state, and logs the status.
-   *
-   * @param version - The version to delete.
-   * @param callbacks - Callbacks for the action.
-   */
   function handleDeleteVersion(
     version: VersionSchema,
     callbacks: IOHandlerCallback
@@ -132,8 +119,8 @@ export const useProjectApi = defineStore("projectApi", () => {
 
         await deleteVersionApi.handleRequest(
           async () => deleteProjectVersion(version.versionId),
-          callbacks,
           {
+            ...callbacks,
             success: `Version has been deleted: ${name}`,
             error: `Unable to delete version: ${name}`,
           }

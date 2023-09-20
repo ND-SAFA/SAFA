@@ -9,7 +9,7 @@
     map-options
     emit-value
   >
-    <template #option="{ opt, itemProps }">
+    <template #option="{ opt, itemProps }: { opt: GenerationModelSchema }">
       <list-item v-bind="itemProps" :title="opt.id" :subtitle="opt.name" />
     </template>
   </q-select>
@@ -26,8 +26,14 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GenMethodInputProps } from "@/types";
-import { traceModelOptions } from "@/util";
+import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  GenerationModelSchema,
+  GenMethodInputProps,
+  ModelType,
+  SelectOption,
+} from "@/types";
+import { createOption } from "@/util";
 import { useVModel } from "@/hooks";
 import { ListItem } from "@/components/common/display";
 
@@ -38,6 +44,27 @@ defineEmits<{
 }>();
 
 const model = useVModel(props, "modelValue");
+
+/**
+ * @return display names for each trace model type.
+ */
+function traceModelOptions(): SelectOption<ModelType>[] {
+  return [
+    createOption(
+      "NLBert",
+      "Slower, higher quality links. Traces free-text artifacts to other free-text artifacts."
+    ),
+    createOption(
+      "PLBert",
+      "Slower, higher quality links. Traces free-text artifacts to source code."
+    ),
+    createOption(
+      "AutomotiveBert",
+      "Slower, high quality links for automotive projects."
+    ),
+    createOption("VSM", "Faster, lower quality links."),
+  ];
+}
 
 const options = computed(() =>
   props.onlyTrainable ? traceModelOptions().slice(0, 3) : traceModelOptions()

@@ -35,12 +35,9 @@ describe("Projects", () => {
         DataCy.projectSettingsEditButton
       );
 
-      cy.getCy(DataCy.projectEditModal).within(() =>
-        cy
-          .getCy(DataCy.projectEditNameInput)
-          .type(editedName)
-          .clickButton(DataCy.projectEditSaveButton)
-      );
+      cy.getCy(DataCy.projectEditNameInput)
+        .type(editedName)
+        .clickButton(DataCy.projectEditSaveButton);
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.contains(editedName).should("be.visible");

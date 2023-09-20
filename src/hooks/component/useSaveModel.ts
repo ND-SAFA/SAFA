@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { GenerationModelSchema } from "@/types";
-import { createModel } from "@/util";
+import { buildModel } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -16,7 +16,7 @@ export const useSaveModel = defineStore("saveModel", {
     /**
      * The model being created or edited.
      */
-    editedModel: createModel(),
+    editedModel: buildModel(),
   }),
   getters: {
     /**
@@ -37,7 +37,7 @@ export const useSaveModel = defineStore("saveModel", {
      * Resets the model value to the given base value.
      */
     resetModel(): void {
-      this.editedModel = createModel(this.baseModel);
+      this.editedModel = buildModel(this.baseModel);
     },
   },
 });

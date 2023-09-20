@@ -7,7 +7,7 @@
       align="center"
       y="2"
     >
-      <flex-box align="center" :y="smallWindow ? '2' : ''">
+      <flex-box align="center" :b="smallWindow ? '1' : ''">
         <project-selector />
         <version-selector />
       </flex-box>

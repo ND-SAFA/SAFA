@@ -7,7 +7,7 @@
         :key="name"
         :value="getTypeLabel(name)"
         artifact-type
-        :removable="allowEditing"
+        :removable="permissionStore.isAllowed('project.edit_data')"
         data-cy="chip-type-direction"
         @remove="handleDelete(name)"
       />
@@ -32,8 +32,6 @@ import { permissionStore, timStore, traceMatrixApiStore } from "@/hooks";
 import { Typography, Chip, AttributeChip } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
-
-const allowEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const allowedTypes = computed(() =>
   timStore.traceMatrices

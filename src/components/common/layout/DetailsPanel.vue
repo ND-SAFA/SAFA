@@ -24,7 +24,7 @@ const emit = defineEmits<{
   (e: "open"): void;
 }>();
 
-const open = computed(() => appStore.isDetailsPanelOpen === props.panel);
+const open = computed(() => appStore.popups.detailsPanel === props.panel);
 
 watch(
   () => open.value,

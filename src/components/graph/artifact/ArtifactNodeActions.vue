@@ -28,29 +28,29 @@
         @click="subtreeStore.hideSubtree(id)"
       />
 
-      <separator v-if="displayEditing" class="full-width q-my-xs" />
+      <separator v-if="displayActions" class="full-width q-my-xs" />
 
       <icon-button
-        v-if="displayEditing"
+        v-if="displayActions"
         tooltip="Add parent"
         icon="trace"
         color="primary"
         :rotate="-90"
         @click="
-          appStore.openTraceCreatorTo({
+          traceSaveStore.openPanel({
             type: 'source',
             artifactId: id,
           })
         "
       />
       <icon-button
-        v-if="displayEditing"
+        v-if="displayActions"
         tooltip="Add child"
         icon="trace"
         color="primary"
         :rotate="90"
         @click="
-          appStore.openTraceCreatorTo({
+          traceSaveStore.openPanel({
             type: 'target',
             artifactId: id,
           })
@@ -75,15 +75,17 @@ import { ArtifactNodeDisplayProps } from "@/types";
 import {
   subtreeStore,
   documentStore,
-  appStore,
   permissionStore,
+  traceSaveStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, Separator, IconButton } from "@/components/common";
 
 const props = defineProps<Omit<ArtifactNodeDisplayProps, "deltaColor">>();
 
-const displayEditing = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const id = computed(() => props.artifact.id);
 

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
-import { ref, computed } from "vue";
-import { IOHandlerCallback } from "@/types";
+import { computed, ref } from "vue";
+import { ApiHook, RequestConfig } from "@/types";
 import { LOGOUT_ERROR } from "@/util";
 import { appStore, logStore, sessionApiStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -12,40 +12,22 @@ import { pinia } from "@/plugins";
  * @param id - The unique store id to use.
  */
 export const useApi = (id: string) =>
-  defineStore(`apiStore-${id}`, () => {
+  defineStore(`apiStore-${id}`, (): ApiHook => {
     const loading = ref(false);
     const error = ref(false);
 
-    /**
-     * Resets the API state.
-     */
     function handleReset(): void {
       loading.value = false;
       error.value = false;
     }
 
-    /**
-     * Creates a reactive error message for inputs.
-     * @param message - The message to display.
-     */
     function errorMessage(message: string) {
       return computed(() => (error.value ? message : false));
     }
 
-    /**
-     * Runs a request and handles the loading and error states,
-     * as well as optionally reporting success and error messages.
-     *
-     * @param cb - The callback to run.
-     * @param config - The success & error messages to display.
-     * @param onSuccess - The callback to run on success.
-     * @param onError - The callback to run on error.
-     * @param onComplete - The callback to run on completion.
-     */
     async function handleRequest<T = void>(
       cb: () => Promise<T>,
-      { onSuccess, onError, onComplete }: IOHandlerCallback<T> = {},
-      config: { success?: string; error?: string; useAppLoad?: boolean } = {}
+      config: RequestConfig<T> = {}
     ): Promise<T | undefined> {
       loading.value = true;
       error.value = false;
@@ -57,7 +39,7 @@ export const useApi = (id: string) =>
 
         const res = await cb();
 
-        onSuccess?.(res);
+        config.onSuccess?.(res);
 
         if (config.success) {
           logStore.onSuccess(config.success);
@@ -74,7 +56,7 @@ export const useApi = (id: string) =>
           return;
         }
 
-        onError?.(e as Error);
+        config.onError?.(e as Error);
         logStore.onDevError(String(e));
 
         if (config.error) {
@@ -87,11 +69,17 @@ export const useApi = (id: string) =>
           appStore.onLoadEnd();
         }
 
-        onComplete?.();
+        config.onComplete?.();
       }
     }
 
-    return { loading, error, errorMessage, handleRequest, handleReset };
+    return {
+      loading,
+      error,
+      errorMessage,
+      handleRequest,
+      handleReset,
+    };
   });
 
 export default (id: string) => useApi(id)(pinia);

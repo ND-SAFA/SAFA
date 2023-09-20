@@ -1,7 +1,8 @@
 <template>
-  <attribute-grid v-if="layout" :layout="layout">
+  <attribute-grid v-if="!!layout" :layout="layout">
     <template #item="{ attribute }">
       <attribute-input
+        v-if="!!attribute"
         class="q-mr-sm q-pb-md"
         :attributes="attributes"
         :attribute="attribute"

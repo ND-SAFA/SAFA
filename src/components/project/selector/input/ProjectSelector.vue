@@ -5,19 +5,19 @@
     dark
     :options-dark="darkMode"
     label="Project"
-    :options="getProjectApiStore.allProjects"
+    :options="projectStore.allProjects"
     option-value="projectId"
     option-label="name"
-    class="nav-input"
+    :class="className"
     color="primary"
     @popup-show="handleReload"
   >
-    <template #option="{ opt, itemProps }">
+    <template #option="{ opt, itemProps }: { opt: ProjectSchema }">
       <list-item v-bind="itemProps" :title="opt.name" :data-cy-name="opt.name">
         <template #actions>
           <flex-box justify="end">
             <icon-button
-              v-if="permissionStore.projectAllows('editor', opt)"
+              v-if="permissionStore.isAllowed('project.edit_members', opt)"
               small
               :tooltip="`Invite to ${opt.name}`"
               icon="invite"
@@ -25,7 +25,7 @@
               @click="projectInviteId = opt.projectId"
             />
             <icon-button
-              v-if="permissionStore.projectAllows('editor', opt)"
+              v-if="permissionStore.isAllowed('project.edit', opt)"
               small
               :tooltip="`Edit ${opt.name}`"
               icon="edit"
@@ -33,7 +33,7 @@
               @click="identifierSaveStore.selectIdentifier(opt, 'save')"
             />
             <icon-button
-              v-if="permissionStore.projectAllows('owner', opt)"
+              v-if="permissionStore.isAllowed('project.delete', opt)"
               small
               :tooltip="`Delete ${opt.name}`"
               icon="delete"
@@ -46,16 +46,16 @@
     </template>
     <template #after-options>
       <text-button
-        v-if="permissionStore.organizationAllows('navigation')"
+        v-if="permissionStore.isAllowed('safa.view')"
         text
         block
         label="Add Project"
         icon="add"
         @click="identifierSaveStore.selectIdentifier(undefined, 'save')"
       />
-      <project-member-modal
+      <invite-member-modal
         :open="!!projectInviteId"
-        :project-id="projectInviteId"
+        :entity="entity"
         @close="projectInviteId = undefined"
         @submit="projectInviteId = undefined"
       />
@@ -73,20 +73,34 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { MemberEntitySchema, ProjectSchema } from "@/types";
 import {
   getProjectApiStore,
   identifierSaveStore,
   permissionStore,
+  projectStore,
   useTheme,
 } from "@/hooks";
 import { FlexBox, IconButton, ListItem, TextButton } from "@/components/common";
-import { ProjectMemberModal } from "@/components/settings";
+import { InviteMemberModal } from "@/components/members";
 
 const { darkMode } = useTheme();
 
 const projectInviteId = ref<string>();
 
+const entity = computed(
+  () =>
+    ({
+      entityId: projectInviteId.value,
+      entityType: "PROJECT",
+    }) as MemberEntitySchema
+);
+
+const className = computed(() =>
+  projectStore.isProjectDefined ? "nav-input nav-multi-input-left" : "nav-input"
+);
 /**
  * Reloads the project list and resets any selected project.
  */

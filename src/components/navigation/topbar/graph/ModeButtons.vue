@@ -55,11 +55,11 @@ import {
 import { TextButton } from "@/components/common";
 import DeltaModeButton from "./DeltaModeButton.vue";
 
-const options = {
-  tim: GraphMode.tim,
-  tree: GraphMode.tree,
-  table: GraphMode.table,
-  delta: GraphMode.delta,
+const options: Record<GraphMode, GraphMode> = {
+  tim: "tim",
+  tree: "tree",
+  table: "table",
+  delta: "delta",
 };
 
 const { smallWindow } = useScreen();
@@ -92,7 +92,7 @@ function updateValue(): void {
   selected.push(layoutStore.mode);
 
   if (deltaStore.inDeltaView) {
-    selected.push(GraphMode.delta);
+    selected.push("delta");
   }
 
   value.value = selected;
@@ -102,7 +102,7 @@ function updateValue(): void {
  * Opens tree view.
  */
 function handleTimView(): void {
-  layoutStore.mode = GraphMode.tim;
+  layoutStore.mode = "tim";
   updateValue();
 }
 
@@ -110,7 +110,7 @@ function handleTimView(): void {
  * Opens tree view.
  */
 function handleTreeView(): void {
-  layoutStore.mode = GraphMode.tree;
+  layoutStore.mode = "tree";
   updateValue();
 }
 
@@ -118,7 +118,7 @@ function handleTreeView(): void {
  * Opens table view.
  */
 function handleTableView(): void {
-  layoutStore.mode = GraphMode.table;
+  layoutStore.mode = "table";
   updateValue();
 }
 /**

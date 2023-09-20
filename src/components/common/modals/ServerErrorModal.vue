@@ -28,12 +28,12 @@ import Modal from "./Modal.vue";
 
 const props = defineProps<ErrorModalProps>();
 
-const open = computed(() => appStore.isErrorDisplayOpen);
+const open = computed(() => appStore.popups.errorModal);
 
 /**
  * Closes the error display.
  */
 function handleClose() {
-  appStore.toggleErrorDisplay();
+  appStore.toggle("errorModal");
 }
 </script>

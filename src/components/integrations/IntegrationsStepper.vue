@@ -1,5 +1,5 @@
 <template>
-  <panel-card>
+  <panel-card :minimal="props.type === 'connect'">
     <stepper
       v-model="currentStep"
       :minimal="props.type === 'connect'"

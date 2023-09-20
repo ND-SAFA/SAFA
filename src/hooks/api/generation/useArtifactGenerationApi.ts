@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed, ref } from "vue";
 import {
+  ArtifactGenerationApiHook,
   ArtifactSchema,
   ArtifactSummaryConfirmation,
   GenerateArtifactSchema,
@@ -9,7 +10,9 @@ import {
 } from "@/types";
 import {
   artifactApiStore,
+  artifactCommitApiStore,
   artifactSaveStore,
+  artifactStore,
   jobStore,
   projectStore,
   useApi,
@@ -17,9 +20,12 @@ import {
 import { createGeneratedArtifacts, createPrompt, createSummary } from "@/api";
 import { pinia } from "@/plugins";
 
+/**
+ * A hook for managing artifact generation API requests.
+ */
 export const useArtifactGenerationApi = defineStore(
   "artifactGenerationApi",
-  () => {
+  (): ArtifactGenerationApiHook => {
     const nameGenerationApi = useApi("nameGenerationApi");
     const bodyGenerationApi = useApi("bodyGenerationApi");
     const summaryGenerationApi = useApi("summaryGenerationApi");
@@ -34,19 +40,13 @@ export const useArtifactGenerationApi = defineStore(
     const summaryGenLoading = computed(() => summaryGenerationApi.loading);
     const artifactGenLoading = computed(() => artifactGenerationApi.loading);
 
-    /**
-     * Generates a summary for an artifact, and updates the app state.
-     *
-     * @param artifact - The artifact to summarize.
-     * @param callbacks - The callbacks to use for the action.
-     */
     async function handleGenerateSummary(
       artifact: ArtifactSchema,
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       await summaryGenerationApi.handleRequest(
         async () => {
-          const summary = await createSummary(
+          const summaries = await createSummary(
             projectStore.versionId,
             artifact.id
           );
@@ -63,21 +63,51 @@ export const useArtifactGenerationApi = defineStore(
               { onComplete: clear }
             );
 
-          summaryGenConfirm.value = { summary, confirm, clear };
+          summaryGenConfirm.value = {
+            summary: summaries[0] || "",
+            confirm,
+            clear,
+          };
         },
-        callbacks,
         {
+          ...callbacks,
           error: `Failed to generate summary: ${artifact.name}`,
         }
       );
     }
 
-    /**
-     * Generates the name of an artifact based on the body.
-     * Uses the artifact currently being edited, and updates the edited artifact name to the response.
-     *
-     * @param callbacks - The callbacks to use for the action.
-     */
+    async function handleGenerateAllSummaries(
+      artifactIds: string[],
+      callbacks: IOHandlerCallback = {}
+    ): Promise<void> {
+      await summaryGenerationApi.handleRequest(
+        async () => {
+          const artifacts = artifactStore.allArtifacts.filter(({ id }) =>
+            artifactIds.includes(id)
+          );
+
+          const summaries = await createSummary(
+            projectStore.versionId,
+            ...artifacts.map(({ id }) => id)
+          );
+
+          const updatedArtifacts = await artifactCommitApiStore.handleUpdate(
+            ...artifacts.map((artifact, index) => ({
+              ...artifact,
+              summary: summaries[index] || "",
+            }))
+          );
+
+          artifactStore.addOrUpdateArtifacts(updatedArtifacts);
+        },
+        {
+          ...callbacks,
+          success: "Successfully generated summaries.",
+          error: "Failed to generate summaries",
+        }
+      );
+    }
+
     async function handleGenerateName(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
@@ -89,19 +119,13 @@ export const useArtifactGenerationApi = defineStore(
             `Generate a 3 word name for:\n\`\`\`\n${artifact.body}\n\`\`\``
           );
         },
-        callbacks,
         {
+          ...callbacks,
           error: `Failed to generate name based on the body: ${artifact.name}`,
         }
       );
     }
 
-    /**
-     * Generates the body of an artifact based on an artifact prompt.
-     * Uses the artifact currently being edited, and updates the edited artifact body to the response.
-     *
-     * @param callbacks - The callbacks to use for the action.
-     */
     async function handleGenerateBody(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
@@ -111,19 +135,13 @@ export const useArtifactGenerationApi = defineStore(
         async () => {
           artifact.body = await createPrompt(artifact.body);
         },
-        callbacks,
         {
+          ...callbacks,
           error: `Failed to generate body based on prompt: ${artifact.name}`,
         }
       );
     }
 
-    /**
-     * Generates parent artifacts based on child artifacts, and stores the generated artifacts.
-     *
-     * @param configuration - The configuration for generating the artifacts.
-     * @param callbacks - The callbacks for the action.
-     */
     async function handleGenerateArtifacts(
       configuration: GenerateArtifactSchema,
       callbacks: IOHandlerCallback
@@ -137,8 +155,8 @@ export const useArtifactGenerationApi = defineStore(
 
           jobStore.updateJob(job);
         },
-        callbacks,
         {
+          ...callbacks,
           success:
             "Artifacts are being generated. You'll receive an update when they have been created.",
           error: "Unable to generate artifacts.",
@@ -153,6 +171,7 @@ export const useArtifactGenerationApi = defineStore(
       summaryGenLoading,
       artifactGenLoading,
       handleGenerateSummary,
+      handleGenerateAllSummaries,
       handleGenerateName,
       handleGenerateBody,
       handleGenerateArtifacts,

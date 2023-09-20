@@ -4,6 +4,7 @@ import { ClickableProps, ColorProps, StyleProps, TestableProps } from "@/types";
  * Enumerates the types of icons.
  */
 export type IconVariant =
+  | "safa"
   | "add"
   | "edit"
   | "save"
@@ -25,12 +26,15 @@ export type IconVariant =
   | "warning"
   | "back"
   | "account"
+  | "organization"
+  | "permission"
   | "search"
   | "code"
   | "create-artifact"
   | "create-trace"
   | "generate"
   | "generate-artifacts"
+  | "generate-summaries"
   | "generate-traces"
   | "notification"
   | "share"
@@ -111,4 +115,8 @@ export interface SafaIconProps extends ClickableProps {
    * Whether to hide the icon.
    */
   hidden?: boolean;
+  /**
+   * Whether to show the icon only.
+   */
+  iconOnly?: boolean;
 }

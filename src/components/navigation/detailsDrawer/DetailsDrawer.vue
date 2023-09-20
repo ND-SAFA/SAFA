@@ -25,11 +25,13 @@
       <save-artifact-panel />
       <trace-link-panel />
       <save-trace-link-panel />
+      <edit-trace-link-panel />
       <generate-trace-link-panel />
       <artifact-level-panel />
       <save-artifact-level-panel />
       <trace-matrix-panel />
       <artifact-generation-panel />
+      <artifact-summarization-panel />
     </div>
   </q-drawer>
 </template>
@@ -52,18 +54,20 @@ import {
   FlexBox,
   Separator,
 } from "@/components/common";
-import { DeltaPanel } from "@/components/delta";
+import { DeltaPanel } from "@/components/delta/panel";
 import { DocumentPanel } from "@/components/document";
 import {
   ArtifactPanel,
   ArtifactBodyPanel,
   SaveArtifactPanel,
   ArtifactGenerationPanel,
-} from "@/components/artifact/panels";
+  ArtifactSummarizationPanel,
+} from "@/components/artifact/panel";
 import {
   TraceLinkPanel,
   SaveTraceLinkPanel,
   GenerateTraceLinkPanel,
+  EditTraceLinkPanel,
 } from "@/components/traceLink/panels";
 import {
   ArtifactLevelPanel,
@@ -73,7 +77,7 @@ import { TraceMatrixPanel } from "@/components/traceMatrix";
 
 const { smallWindow } = useScreen();
 
-const openState = computed(() => appStore.isDetailsPanelOpen);
+const openState = computed(() => appStore.popups.detailsPanel);
 const drawerOpen = computed(() => typeof openState.value === "string");
 
 const className = computed(
@@ -94,10 +98,14 @@ const title = computed(() => {
       return "Save Artifact";
     case "generateArtifact":
       return "Generate Artifacts";
+    case "summarizeArtifact":
+      return "Summarize Artifacts";
     case "displayTrace":
       return "Trace Link";
     case "saveTrace":
       return "Create Trace Link";
+    case "editTrace":
+      return "Edit Trace Link";
     case "generateTrace":
       return "Generate Trace Links";
     case "displayArtifactLevel":

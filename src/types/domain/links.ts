@@ -1,19 +1,12 @@
 /**
  * Enumerates the type of trace approvals.
  */
-export enum ApprovalType {
-  UNREVIEWED = "UNREVIEWED",
-  APPROVED = "APPROVED",
-  DECLINED = "DECLINED",
-}
+export type ApprovalType = "UNREVIEWED" | "APPROVED" | "DECLINED";
 
 /**
  * Enumerates the type of traces.
  */
-export enum TraceType {
-  GENERATED = "GENERATED",
-  MANUAL = "MANUAL",
-}
+export type TraceType = "GENERATED" | "MANUAL";
 
 /**
  * Defines a link.

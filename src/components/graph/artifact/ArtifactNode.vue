@@ -100,7 +100,7 @@ const definition = computed<ArtifactCytoElement>(() => {
   return {
     data: {
       type: GraphElementType.node,
-      graph: GraphMode.tree,
+      graph: "tree" as GraphMode,
       id,
 
       artifactName: name,

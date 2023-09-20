@@ -5,10 +5,9 @@ import {
   CreateProjectByJsonSchema,
   CreatorFilePanel,
   MembershipSchema,
-  ProjectRole,
 } from "@/types";
-import { createProject } from "@/util";
-import sessionStore from "@/hooks/core/useSession";
+import { buildProject } from "@/util";
+import { sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({
@@ -66,9 +65,9 @@ export const useSaveProject = defineStore("saveProject", {
       const user: MembershipSchema = {
         projectMembershipId: "",
         email: sessionStore.userEmail,
-        role: ProjectRole.OWNER,
+        role: "OWNER",
       };
-      const project = createProject({
+      const project = buildProject({
         name: this.name,
         description: this.description,
         owner: user.email,

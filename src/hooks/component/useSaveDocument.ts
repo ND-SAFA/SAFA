@@ -1,11 +1,9 @@
 import { defineStore } from "pinia";
 
 import { DocumentSchema } from "@/types";
-import { createDocument } from "@/util";
+import { buildDocument } from "@/util";
+import { artifactStore, documentStore, subtreeStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import artifactStore from "../project/useArtifacts";
-import documentStore from "../project/useDocuments";
-import subtreeStore from "../project/useSubtree";
 
 /**
  * The save document store assists in creating and editing documents.
@@ -19,7 +17,7 @@ export const useSaveDocument = defineStore("saveDocument", {
     /**
      * The document being created or edited.
      */
-    editedDocument: createDocument(),
+    editedDocument: buildDocument(),
     /**
      * The types of included artifacts.
      */
@@ -84,7 +82,7 @@ export const useSaveDocument = defineStore("saveDocument", {
      * Resets the document value to the given base value.
      */
     resetDocument(): void {
-      this.editedDocument = createDocument(this.baseDocument);
+      this.editedDocument = buildDocument(this.baseDocument);
       this.includedTypes = [];
       this.includeChildren = false;
       this.includedChildTypes = [];

@@ -35,7 +35,7 @@ const faded = computed(
 const definition = computed<TraceCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
-    graph: GraphMode.tree,
+    graph: "tree" as GraphMode,
     id: props.trace.traceLinkId,
 
     // Reversed to show arrow toward parent.

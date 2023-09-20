@@ -2,14 +2,14 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import {
-  ApprovalType,
   MatrixSchema,
   FlatTraceLink,
   IOHandlerCallback,
   ModelType,
   GenerationModelSchema,
+  TraceGenerationApiHook,
 } from "@/types";
-import { createGeneratedMatrix } from "@/util";
+import { buildGeneratedMatrix } from "@/util";
 import {
   useApi,
   approvalStore,
@@ -24,124 +24,115 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
-  const traceGenerationApi = useApi("traceGenerationApi");
+/**
+ * A hook for managing trace generation API requests.
+ */
+export const useTraceGenerationApi = defineStore(
+  "traceGenerationApi",
+  (): TraceGenerationApiHook => {
+    const traceGenerationApi = useApi("traceGenerationApi");
 
-  const loading = computed(() => traceGenerationApi.loading);
+    const loading = computed(() => traceGenerationApi.loading);
 
-  /**
-   * Updates the storage of generated links.
-   *
-   * @param callbacks - The callbacks to use for the action.
-   */
-  async function handleReload(
-    callbacks: IOHandlerCallback = {}
-  ): Promise<void> {
-    if (!projectStore.isProjectDefined) return;
+    async function handleReload(
+      callbacks: IOHandlerCallback = {}
+    ): Promise<void> {
+      if (!projectStore.isProjectDefined) return;
 
-    await traceGenerationApi.handleRequest(
-      async () => {
-        const traceLinks: FlatTraceLink[] = [];
-        const approvedIds: string[] = [];
-        const declinedIds: string[] = [];
-        const generatedLinks = await getGeneratedLinks(projectStore.versionId);
+      await traceGenerationApi.handleRequest(
+        async () => {
+          const traceLinks: FlatTraceLink[] = [];
+          const approvedIds: string[] = [];
+          const declinedIds: string[] = [];
+          const generatedLinks = await getGeneratedLinks(
+            projectStore.versionId
+          );
 
-        generatedLinks.forEach((link) => {
-          const source = artifactStore.getArtifactById(link.sourceId);
-          const target = artifactStore.getArtifactById(link.targetId);
+          generatedLinks.forEach((link) => {
+            const source = artifactStore.getArtifactById(link.sourceId);
+            const target = artifactStore.getArtifactById(link.targetId);
 
-          if (link.approvalStatus === ApprovalType.APPROVED) {
-            approvedIds.push(link.traceLinkId);
-          } else if (link.approvalStatus === ApprovalType.DECLINED) {
-            declinedIds.push(link.traceLinkId);
-          }
+            if (link.approvalStatus === "APPROVED") {
+              approvedIds.push(link.traceLinkId);
+            } else if (link.approvalStatus === "DECLINED") {
+              declinedIds.push(link.traceLinkId);
+            }
 
-          traceLinks.push({
-            ...link,
-            sourceType: source?.type || "",
-            sourceBody: source?.body || "",
-            targetType: target?.type || "",
-            targetBody: target?.body || "",
+            traceLinks.push({
+              ...link,
+              sourceType: source?.type || "",
+              sourceBody: source?.body || "",
+              targetType: target?.type || "",
+              targetBody: target?.body || "",
+            });
           });
-        });
 
-        approvalStore.initializeTraces({
-          traceLinks,
-          approvedIds,
-          declinedIds,
-        });
-      },
-      callbacks,
-      { useAppLoad: true }
-    );
+          approvalStore.initializeTraces({
+            traceLinks,
+            approvedIds,
+            declinedIds,
+          });
+        },
+        {
+          ...callbacks,
+          useAppLoad: true,
+        }
+      );
+    }
+
+    async function handleGenerate(
+      method: ModelType | undefined,
+      matrices: MatrixSchema[],
+      callbacks: IOHandlerCallback
+    ): Promise<void> {
+      const matricesName = matrices
+        .map(({ source, target }) => `${source} -> ${target}`)
+        .join(", ");
+
+      await traceGenerationApi.handleRequest(
+        async () => {
+          const job = await createGeneratedLinks({
+            requests: [buildGeneratedMatrix(matrices, method)],
+            projectVersion: projectStore.version,
+          });
+
+          await jobApiStore.handleCreate(job);
+        },
+        {
+          ...callbacks,
+          success: `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`,
+          error: `Unable to generate new trace links: ${matricesName}`,
+        }
+      );
+    }
+
+    async function handleTrain(
+      model: GenerationModelSchema,
+      matrices: MatrixSchema[],
+      callbacks: IOHandlerCallback
+    ): Promise<void> {
+      const matricesName = matrices
+        .map(({ source, target }) => `${source} -> ${target}`)
+        .join(", ");
+
+      await traceGenerationApi.handleRequest(
+        async () => {
+          const job = await createModelTraining(projectStore.projectId, {
+            requests: [buildGeneratedMatrix(matrices, model.baseModel, model)],
+          });
+
+          await jobApiStore.handleCreate(job);
+        },
+        {
+          ...callbacks,
+          success: `Started training model on: ${matricesName}. You'll receive a notification once complete.`,
+          error: `Unable to train model on: ${matricesName}`,
+        }
+      );
+    }
+
+    return { loading, handleReload, handleGenerate, handleTrain };
   }
-
-  /**
-   * Generates links between sets of artifact types and adds them to the project.
-   *
-   * @param method - The base model to generate with.
-   * @param matrices - An array of source and target artifact types to generate traces between.
-   * @param callbacks - The callbacks to use for the action.
-   */
-  async function handleGenerate(
-    method: ModelType | undefined,
-    matrices: MatrixSchema[],
-    callbacks: IOHandlerCallback
-  ): Promise<void> {
-    const matricesName = matrices
-      .map(({ source, target }) => `${source} -> ${target}`)
-      .join(", ");
-
-    await traceGenerationApi.handleRequest(
-      async () => {
-        const job = await createGeneratedLinks({
-          requests: [createGeneratedMatrix(matrices, method)],
-          projectVersion: projectStore.version,
-        });
-
-        await jobApiStore.handleCreate(job);
-      },
-      callbacks,
-      {
-        success: `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`,
-        error: `Unable to generate new trace links: ${matricesName}`,
-      }
-    );
-  }
-
-  /**
-   * Trains models on created trace links.
-   *
-   * @param model - The model to train.
-   * @param matrices - An array of source and target artifact types to train on traces between.
-   * @param callbacks - The callbacks to use for the action.
-   */
-  async function handleTrain(
-    model: GenerationModelSchema,
-    matrices: MatrixSchema[],
-    callbacks: IOHandlerCallback
-  ): Promise<void> {
-    const matricesName = matrices
-      .map(({ source, target }) => `${source} -> ${target}`)
-      .join(", ");
-
-    await traceGenerationApi.handleRequest(
-      async () => {
-        const job = await createModelTraining(projectStore.projectId, {
-          requests: [createGeneratedMatrix(matrices, model.baseModel, model)],
-        });
-
-        await jobApiStore.handleCreate(job);
-      },
-      callbacks,
-      {
-        success: `Started training model on: ${matricesName}. You'll receive a notification once complete.`,
-        error: `Unable to train model on: ${matricesName}`,
-      }
-    );
-  }
-
-  return { loading, handleReload, handleGenerate, handleTrain };
-});
+);
 
 export default useTraceGenerationApi(pinia);

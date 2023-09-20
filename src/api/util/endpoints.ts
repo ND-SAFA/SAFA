@@ -53,6 +53,7 @@ export enum Endpoint {
   project = "projects",
   updateProject = "projects/:projectId",
   getProjectMembers = "projects/:projectId/members",
+  updateProjectMember = "projects/:projectId/members",
   deleteProjectMember = "projects/members/:projectMemberId",
 
   // Integrations
@@ -163,7 +164,7 @@ export enum Endpoint {
  * @return The filled in endpoint path.
  */
 export function fillEndpoint(
-  endpoint: Endpoint,
+  endpoint: keyof typeof Endpoint,
   pathVariables: Record<string, string> = {}
 ): string {
   let filledPath: string = endpoint;

@@ -6,11 +6,11 @@
     :options="modeOptions"
     option-label="name"
     option-value="id"
-    class="nav-input nav-search-mode"
+    class="nav-input nav-search-mode nav-multi-input-left"
     data-cy="input-nav-search-mode"
   >
-    <template #option="{ opt, itemProps }">
-      <separator v-if="opt.id === SearchMode.search" />
+    <template #option="{ opt, itemProps }: { opt: SearchSelectOption }">
+      <separator v-if="opt.id === 'search'" />
       <list-item
         clickable
         :title="opt.name"
@@ -32,15 +32,18 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { SearchMode } from "@/types";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { SearchSelectOption } from "@/types";
 import { searchModeOptions } from "@/util";
 import { permissionStore, searchStore } from "@/hooks";
 import { ListItem, Separator } from "@/components/common";
 
-const displayEditing = computed(() => permissionStore.projectAllows("editor"));
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 const modeOptions = computed(() =>
-  displayEditing.value ? searchModeOptions() : [searchModeOptions()[2]]
+  displayActions.value ? searchModeOptions() : [searchModeOptions()[2]]
 );
 
 /**

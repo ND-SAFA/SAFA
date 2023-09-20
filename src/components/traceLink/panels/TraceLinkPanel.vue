@@ -16,5 +16,6 @@ export default {
 
 <script setup lang="ts">
 import { DetailsPanel } from "@/components/common";
-import { TraceLinkButtons, TraceLinkContent } from "../display";
+import { TraceLinkContent } from "@/components/traceLink/display";
+import { TraceLinkButtons } from "@/components/traceLink/save";
 </script>

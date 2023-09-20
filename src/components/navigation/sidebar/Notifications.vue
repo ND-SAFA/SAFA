@@ -1,20 +1,27 @@
 <template>
-  <div>
-    <div class="nav-job-icon">
-      <q-circular-progress
-        v-if="displayInProgressJobs"
-        :color="color"
-        indeterminate
-        size="md"
-      />
-    </div>
-    <q-btn round flat @click="handleClearNewMessages">
-      <icon variant="notification" />
-      <q-tooltip :delay="200">View notifications</q-tooltip>
-      <q-badge v-if="displayUpdates" :color="color" floating rounded>
-        {{ updates }}
-      </q-badge>
-      <q-menu>
+  <list-item to="" title="Notifications" clickable @click="handleOpen">
+    <template #icon>
+      <div class="nav-job-icon">
+        <q-circular-progress
+          v-if="displayInProgressJobs"
+          :color="color"
+          indeterminate
+          size="md"
+        />
+      </div>
+      <div>
+        <icon variant="notification" size="sm" color="text" />
+        <q-badge
+          v-if="displayUpdates"
+          :color="color"
+          rounded
+          floating
+          :label="updates"
+          class="nav-job-badge"
+        />
+      </div>
+
+      <q-menu v-model="open">
         <list v-if="displayRecentJobs" class="nav-notifications q-pa-sm">
           <typography variant="caption" value="Jobs" />
 
@@ -29,18 +36,18 @@
           >
             <template #icon>
               <q-circular-progress
-                v-if="job.status === JobStatus.IN_PROGRESS"
+                v-if="job.status === 'IN_PROGRESS'"
                 color="secondary"
                 :value="job.currentProgress"
                 size="sm"
               />
               <icon
-                v-else-if="job.status === JobStatus.COMPLETED"
+                v-else-if="job.status === 'COMPLETED'"
                 variant="job-complete"
                 color="primary"
               />
               <icon
-                v-else-if="job.status === JobStatus.FAILED"
+                v-else-if="job.status === 'FAILED'"
                 variant="job-fail"
                 color="error"
               />
@@ -53,7 +60,7 @@
             value="There are no notifications in the current session."
           />
         </div>
-        <list v-else class="nav-notifications q-pa-sm">
+        <list v-else class="nav-notifications q-pa-sm q-mb-sm">
           <typography variant="caption" value="Notifications" />
 
           <list-item
@@ -64,22 +71,22 @@
           >
             <template #icon>
               <icon
-                v-if="item.type === MessageType.success"
+                v-if="item.type === 'success'"
                 variant="save"
                 color="added"
               />
               <icon
-                v-if="item.type === MessageType.error"
+                v-if="item.type === 'error'"
                 variant="error"
                 color="removed"
               />
               <icon
-                v-if="item.type === MessageType.warning"
+                v-if="item.type === 'warning'"
                 variant="warning"
                 color="warning"
               />
               <icon
-                v-if="item.type === MessageType.info"
+                v-if="item.type === 'info'"
                 variant="logs"
                 color="modified"
               />
@@ -87,8 +94,8 @@
           </list-item>
         </list>
       </q-menu>
-    </q-btn>
-  </div>
+    </template>
+  </list-item>
 </template>
 
 <script lang="ts">
@@ -102,12 +109,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { JobSchema, JobStatus, MessageType } from "@/types";
+import { JobSchema } from "@/types";
 import { getVersionApiStore, jobStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { Typography, Icon, List, ListItem } from "@/components/common";
 
 const viewedMessages = ref(0);
+const open = ref(false);
 
 const notifications = computed(() => logStore.notifications);
 const newNotifications = computed(() =>
@@ -131,7 +139,8 @@ const color = computed(() => (inProgressJobs.value ? "primary" : "secondary"));
 /**
  * Sets all messages to viewed on open.
  */
-function handleClearNewMessages() {
+function handleOpen() {
+  open.value = true;
   viewedMessages.value = notifications.value.length;
 }
 

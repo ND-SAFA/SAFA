@@ -5,16 +5,15 @@ import { ArtifactSchema, ModelType, TraceLinkSchema } from "@/types/domain";
  */
 export type ArtifactMap = Record<string, ArtifactSchema>;
 
-export enum CreatorTabTypes {
-  standard = "standard",
-  bulk = "bulk",
-  import = "import",
-}
+/**
+ * The types of create project tabs.
+ */
+export type CreatorTab = "standard" | "bulk" | "import";
 
-export enum LoaderTabTypes {
-  load = "load",
-  uploads = "uploads",
-}
+/**
+ * The types of load project tabs.
+ */
+export type LoaderTab = "load" | "uploads";
 
 /**
  * Represents a panel for uploading files in the project creator.

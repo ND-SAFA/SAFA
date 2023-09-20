@@ -10,6 +10,21 @@ export interface UserSchema {
    * The user's email.
    */
   email: string;
+  /**
+   * TODO: required
+   * The id of this user's personal organization.
+   */
+  personalOrgId?: string;
+  /**
+   * TODO: required
+   * The id of this user's current default organization.
+   */
+  defaultOrgId?: string;
+  /**
+   * TODO: required
+   * Whether this user is a superuser.
+   */
+  superuser?: boolean;
 }
 
 /**

@@ -1,5 +1,5 @@
 import { JobLogSchema, JobSchema } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+import { buildRequest } from "@/api";
 
 /**
  * Creates a project from the given flat files.
@@ -10,14 +10,12 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 export async function createProjectUploadJob(
   formData: FormData
 ): Promise<JobSchema> {
-  return authHttpClient<JobSchema>(
-    Endpoint.createProjectThroughFlatFiles,
-    {
-      method: "POST",
-      body: formData,
-    },
-    { setJsonContentType: false }
-  );
+  //TODO: include org, team
+  return buildRequest<JobSchema, string, FormData>(
+    "createProjectThroughFlatFiles"
+  )
+    .withFormData()
+    .post(formData);
 }
 
 /**
@@ -31,14 +29,12 @@ export async function createFlatFileUploadJob(
   versionId: string,
   formData: FormData
 ): Promise<JobSchema> {
-  return authHttpClient<JobSchema>(
-    fillEndpoint(Endpoint.updateProjectThroughFlatFiles, { versionId }),
-    {
-      method: "POST",
-      body: formData,
-    },
-    { setJsonContentType: false }
-  );
+  return buildRequest<JobSchema, "versionId", FormData>(
+    "updateProjectThroughFlatFiles",
+    { versionId }
+  )
+    .withFormData()
+    .post(formData);
 }
 
 /**
@@ -47,9 +43,7 @@ export async function createFlatFileUploadJob(
  * @return Uses list.
  */
 export async function getUserJobs(): Promise<JobSchema[]> {
-  return authHttpClient<JobSchema[]>(fillEndpoint(Endpoint.getUserJobs, {}), {
-    method: "GET",
-  });
+  return buildRequest<JobSchema[]>("getUserJobs").get();
 }
 
 /**
@@ -58,9 +52,7 @@ export async function getUserJobs(): Promise<JobSchema[]> {
  * @param jobId - The job to delete.
  */
 export async function deleteJobById(jobId: string): Promise<void> {
-  return authHttpClient<void>(fillEndpoint(Endpoint.deleteJobById, { jobId }), {
-    method: "DELETE",
-  });
+  return buildRequest<void, "jobId">("deleteJobById", { jobId }).delete();
 }
 
 /**
@@ -69,10 +61,5 @@ export async function deleteJobById(jobId: string): Promise<void> {
  * @param jobId - The job to get logs for.
  */
 export async function getJobLog(jobId: string): Promise<JobLogSchema[][]> {
-  return authHttpClient<JobLogSchema[][]>(
-    fillEndpoint(Endpoint.getJobLog, { jobId }),
-    {
-      method: "GET",
-    }
-  );
+  return buildRequest<JobLogSchema[][], "jobId">("getJobLog", { jobId }).get();
 }

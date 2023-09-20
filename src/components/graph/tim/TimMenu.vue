@@ -1,6 +1,6 @@
 <template>
   <node-display
-    v-if="display"
+    v-if="displayActions"
     variant="menu"
     color="primary"
     @mousedown.stop
@@ -17,8 +17,20 @@
           handleCloseMenu();
         "
       />
-      <separator vertical class="q-mx-xs" />
+      <separator v-if="displayGenerateActions" vertical class="q-mx-xs" />
       <icon-button
+        v-if="displayGenerateActions"
+        tooltip="Summarize artifacts"
+        icon="generate-summaries"
+        color="primary"
+        data-cy="button-summarize-artifact"
+        @click="
+          appStore.openDetailsPanel('summarizeArtifact');
+          handleCloseMenu();
+        "
+      />
+      <icon-button
+        v-if="displayGenerateActions"
         tooltip="Generate artifacts"
         icon="generate-artifacts"
         color="primary"
@@ -28,6 +40,7 @@
         "
       />
       <icon-button
+        v-if="displayGenerateActions"
         tooltip="Generate trace links"
         icon="generate-traces"
         color="primary"
@@ -54,11 +67,16 @@ import { computed, inject } from "vue";
 import { appStore, permissionStore } from "@/hooks";
 import { toggleDrawMode } from "@/cytoscape";
 import { FlexBox, IconButton, Separator } from "@/components/common";
-import { NodeDisplay } from "../display";
+import { NodeDisplay } from "@/components/graph/display";
 
 const handleCloseMenu = inject<() => void>("menu-close");
 
-const display = computed(() => permissionStore.projectAllows("editor"));
+const drawMode = computed(() => appStore.popups.drawTrace);
 
-const drawMode = computed(() => appStore.isCreateLinkEnabled);
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
+const displayGenerateActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 </script>

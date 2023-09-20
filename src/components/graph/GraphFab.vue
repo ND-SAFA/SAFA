@@ -1,6 +1,6 @@
 <template>
   <q-page-sticky
-    v-if="display"
+    v-if="displayActions"
     position="bottom-left"
     :offset="fabPos"
     class="artifact-fab"
@@ -17,6 +17,7 @@
       data-cy="button-fab-toggle"
     >
       <q-fab-action
+        v-if="displayGenerateActions"
         outline
         label="Generate Trace Links"
         icon="mdi-chart-timeline-variant-shimmer"
@@ -26,6 +27,7 @@
         @click="appStore.openDetailsPanel('generateTrace')"
       />
       <q-fab-action
+        v-if="displayGenerateActions"
         outline
         label="Generate Artifacts"
         icon="mdi-monitor-shimmer"
@@ -33,6 +35,16 @@
         color="primary"
         data-cy="button-fab-generate-artifact"
         @click="appStore.openDetailsPanel('generateArtifact')"
+      />
+      <q-fab-action
+        v-if="displayGenerateActions"
+        outline
+        label="Summarize Artifacts"
+        icon="mdi-shimmer"
+        class="bg-neutral"
+        color="primary"
+        data-cy="button-fab-summarize-artifact"
+        @click="appStore.openDetailsPanel('summarizeArtifact')"
       />
       <q-fab-action
         outline
@@ -58,7 +70,7 @@
         icon="mdi-folder-plus-outline"
         class="bg-neutral"
         data-cy="button-fab-create-artifact"
-        @click="appStore.openArtifactCreatorTo({ isNewArtifact: true })"
+        @click="artifactSaveStore.openPanel({ isNewArtifact: true })"
       />
     </q-fab>
     <icon-button
@@ -82,7 +94,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { appStore, layoutStore, permissionStore, projectStore } from "@/hooks";
+import {
+  appStore,
+  artifactSaveStore,
+  layoutStore,
+  permissionStore,
+} from "@/hooks";
 import { disableDrawMode, toggleDrawMode } from "@/cytoscape";
 import IconButton from "@/components/common/button/IconButton.vue";
 
@@ -93,9 +110,13 @@ const draggingFab = ref(false);
 const isTreeMode = computed(
   () => !appStore.isLoading && layoutStore.isTreeMode
 );
-const drawMode = computed(() => appStore.isCreateLinkEnabled);
-const display = computed(
-  () => projectStore.isProjectDefined && permissionStore.projectAllows("editor")
+const drawMode = computed(() => appStore.popups.drawTrace);
+
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
+const displayGenerateActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
 );
 
 /**

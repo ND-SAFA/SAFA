@@ -48,7 +48,9 @@ export const edgeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_EDGE_SELECTOR}[approvalStatus='${ApprovalType.UNREVIEWED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[approvalStatus='${
+      "UNREVIEWED" as ApprovalType
+    }']`,
     style: {
       "line-style": TRACE_LINE_STYLE.UNREVIEWED,
       "line-dash-pattern": [6, 3],
@@ -62,7 +64,9 @@ export const edgeStyles: CytoStyleSheet[] = [
   },
   // Trace Link Delta
   {
-    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.NO_CHANGE}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${
+      "NO_CHANGE" as ArtifactDeltaState
+    }']`,
     style: {
       "target-arrow-color": EDGE_COLOR.NO_CHANGE,
       "source-arrow-color": EDGE_COLOR.NO_CHANGE,
@@ -70,7 +74,9 @@ export const edgeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.ADDED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${
+      "ADDED" as ArtifactDeltaState
+    }']`,
     style: {
       "target-arrow-color": EDGE_COLOR.ADDED,
       "source-arrow-color": EDGE_COLOR.ADDED,
@@ -78,7 +84,9 @@ export const edgeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.MODIFIED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${
+      "MODIFIED" as ArtifactDeltaState
+    }']`,
     style: {
       "target-arrow-color": EDGE_COLOR.MODIFIED,
       "source-arrow-color": EDGE_COLOR.MODIFIED,
@@ -86,7 +94,9 @@ export const edgeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${GENERATED_APPROVED_LINK_SELECTOR}[deltaType='${ArtifactDeltaState.MODIFIED}']`,
+    selector: `${GENERATED_APPROVED_LINK_SELECTOR}[deltaType='${
+      "MODIFIED" as ArtifactDeltaState
+    }']`,
     style: {
       "target-arrow-color": EDGE_COLOR.ADDED,
       "source-arrow-color": EDGE_COLOR.ADDED,
@@ -94,7 +104,9 @@ export const edgeStyles: CytoStyleSheet[] = [
     },
   },
   {
-    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.REMOVED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${
+      "REMOVED" as ArtifactDeltaState
+    }']`,
     style: {
       "target-arrow-color": EDGE_COLOR.REMOVED,
       "source-arrow-color": EDGE_COLOR.REMOVED,

@@ -88,7 +88,9 @@ const sortDesc = useVModel(props, "sortDesc");
 const sort = computed(() => props.sort || sortRows);
 
 const customCellSlots = computed(() =>
-  props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
+  props.customCells
+    ? props.customCells.map((name) => `body-cell-${String(name)}`)
+    : []
 );
 
 const pagination = ref({

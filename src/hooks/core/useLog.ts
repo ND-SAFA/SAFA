@@ -1,12 +1,7 @@
 import { defineStore } from "pinia";
 
-import {
-  APIErrorBody,
-  ConfirmationType,
-  MessageType,
-  SnackbarMessage,
-} from "@/types";
-import { createConfirmDialogueMessage, createSnackbarMessage } from "@/util";
+import { APIErrorBody, SnackbarMessage } from "@/types";
+import { buildConfirmMessage, buildSnackbarMessage } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -17,11 +12,11 @@ export const useLog = defineStore("log", {
     /**
      * The current snackbar message.
      */
-    message: createSnackbarMessage(),
+    message: buildSnackbarMessage(),
     /**
      * The current confirmation message.
      */
-    confirmation: createConfirmDialogueMessage(),
+    confirmation: buildConfirmMessage(),
     /**
      * The timestamp of the last message displayed.
      */
@@ -37,13 +32,13 @@ export const useLog = defineStore("log", {
      * Clears the current snackbar message.
      */
     clearMessage(): void {
-      this.message = createSnackbarMessage();
+      this.message = buildSnackbarMessage();
     },
     /**
      * Clears the current snackbar message.
      */
     clearConfirmation(): void {
-      this.confirmation = createConfirmDialogueMessage();
+      this.confirmation = buildConfirmMessage();
     },
     setMessage(message: SnackbarMessage): void {
       if (Date.now() - this.lastMessageTimestamp < 1000) {
@@ -63,7 +58,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onInfo(message: string): void {
-      this.setMessage({ message, type: MessageType.info, errors: [] });
+      this.setMessage({ message, type: "info", errors: [] });
     },
     /**
      * Creates a snackbar for updating with the given message.
@@ -71,7 +66,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onUpdate(message: string): void {
-      this.setMessage({ message, type: MessageType.update, errors: [] });
+      this.setMessage({ message, type: "update", errors: [] });
     },
     /**
      * Creates a snackbar success with the given message.
@@ -79,7 +74,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onSuccess(message: string): void {
-      this.setMessage({ message, type: MessageType.success, errors: [] });
+      this.setMessage({ message, type: "success", errors: [] });
     },
     /**
      * Creates a snackbar warning with the given message.
@@ -87,7 +82,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onWarning(message: string): void {
-      this.setMessage({ message, type: MessageType.warning, errors: [] });
+      this.setMessage({ message, type: "warning", errors: [] });
     },
     /**
      * Creates a snackbar error with the given message.
@@ -95,7 +90,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onError(message: string): void {
-      this.setMessage({ message, type: MessageType.error, errors: [] });
+      this.setMessage({ message, type: "error", errors: [] });
     },
     /**
      * Creates a snackbar error with the given server error.
@@ -105,7 +100,7 @@ export const useLog = defineStore("log", {
     onServerError(error: APIErrorBody | undefined): void {
       this.setMessage({
         message: error?.message || "An unexpected error occurred.",
-        type: MessageType.error,
+        type: "error",
         errors: error?.errors || [],
       });
     },
@@ -139,7 +134,7 @@ export const useLog = defineStore("log", {
     ): void {
       this.$patch({
         confirmation: {
-          type: ConfirmationType.INFO,
+          type: "info",
           title,
           body,
           statusCallback,

@@ -13,60 +13,6 @@
   100% { opacity: 1; }
 }
 
-.icon-safa {
-  animation: fadeIn 1s;
-
-  &.clickable {
-    height: 42pt;
-  }
-
-  & > * {
-    fill: $color-primary;
-  }
-}
-
-// Navigation - Searchbar
-
-.nav-search-mode {
-  min-width: 150px !important;
-
-  & > .q-field__inner > .q-field__control {
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-
-    &:before {
-      border-right: none;
-    }
-
-    &:hover:after {
-      border-color: $color-primary !important;
-    }
-  }
-
-  &.q-field--highlighted > .q-field__inner > .q-field__control:after {
-    border-color: $color-primary !important;
-  }
-}
-
-.nav-search-prompt {
-  width: 600px;
-  min-width: 130px !important;
-  max-width: 40vw;
-
-  & > .q-field__inner > .q-field__control {
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-
-    &:hover:after {
-      border-color: $color-primary !important;
-    }
-  }
-
-  &.q-field--highlighted > .q-field__inner > .q-field__control:after {
-    border-color: $color-primary !important;
-  }
-}
-
 // Navigation - Inputs
 
 .nav-mode-selected {
@@ -108,6 +54,36 @@
     width: 100px;
     min-width: 100px;
   }
+
+  &.nav-search-mode {
+    min-width: 150px !important;
+  }
+
+  &.nav-search-prompt {
+    width: 600px;
+    min-width: 130px !important;
+    max-width: 40vw;
+  }
+}
+
+.nav-multi-input {
+  &-left {
+    & > .q-field__inner > .q-field__control {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+
+      &:before {
+        border-right: none;
+      }
+    }
+  }
+
+  &-right {
+    & > .q-field__inner > .q-field__control {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+  }
 }
 
 // Navigation - Topbar
@@ -127,10 +103,14 @@
 
 .nav-job-icon {
   position: relative;
-  top: 5px;
-  left: 5px;
+  bottom: 4px;
+  right: 16px;
   width: 0;
   height: 0;
+}
+
+.nav-job-badge {
+  z-index: 1000;
 }
 
 .nav-mode-select {
@@ -155,23 +135,35 @@
   bottom: 0;
 }
 
-#logo-safa {
-  .cls-2, .cls-3 {
+.icon-safa {
+  animation: fadeIn 1s;
+
+  .logo-wing-line, .logo-border-line, .logo-body-line {
     fill: none;
-    stroke: $color-primary;
+    stroke: url(#color-gradient);
     stroke-miterlimit: 10;
   }
 
-  .cls-2 {
-    stroke-width: 4px;
+  .logo-border-line {
+    fill: $color-background;
+    stroke-width: 16px;
   }
 
-  .cls-3 {
-    stroke-width: 10px;
+  .logo-body-line, .logo-wing-line {
+    stroke-width: 6px;
   }
 
-  circle {
-    r: 6px;
+  .logo-eye, .logo-border-point, .logo-wing-dot, .logo-name {
+    fill: url(#color-gradient);
+  }
+
+  &.logo {
+    height: 60px;
+    width: 60px;
+  }
+
+  &.clickable {
+    height: 42pt;
   }
 }
 

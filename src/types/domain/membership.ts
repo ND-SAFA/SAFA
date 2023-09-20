@@ -9,23 +9,86 @@ export type OrganizationPermissionType = "navigation" | "viewer" | "editor";
 export type ProjectPermissionType = "viewer" | "editor" | "admin" | "owner";
 
 /**
- * Represents a member in a given project
+ * The types of entities that a user can be a member of.
  */
-export interface MembershipSchema {
-  projectMembershipId: string;
-  email: string;
-  role: ProjectRole;
+export type MembershipType = "ORGANIZATION" | "TEAM" | "PROJECT";
+
+/**
+ * The types of permissions allowed on an organization, team, or project.
+ */
+export type MemberRole =
+  | "NONE" // project, team, org
+  | "VIEWER" // project, team
+  | "EDITOR" // project, team
+  | "GENERATOR" // project, team, org
+  | "ADMIN" // project, team, org
+  | "OWNER" // project
+  | "MEMBER" // org
+  | "BILLING_MANAGER"; // org
+
+/**
+ * The types of permissions allowed on an organization, team, or project.
+ */
+export type PermissionType =
+  | "safa.view"
+  | "safa.view_admin"
+  | "safa.create_orgs"
+  | "org.delete_teams"
+  | "org.create_teams"
+  | "org.view_teams"
+  | "org.delete"
+  | "org.edit"
+  | "org.view_billing"
+  | "org.view"
+  | "org.edit_members"
+  | "team.delete_projects"
+  | "team.create_projects"
+  | "team.view_projects"
+  | "team.delete"
+  | "team.edit_members"
+  | "team.edit"
+  | "team.view"
+  | "project.delete"
+  | "project.generate"
+  | "project.edit"
+  | "project.edit_members"
+  | "project.edit_data"
+  | "project.edit_versions"
+  | "project.edit_integrations"
+  | "project.view";
+
+/**
+ * Represents the type of entity associated with a membership.
+ */
+export interface MemberEntitySchema {
+  /**
+   * TODO: required
+   * The type of entity that this member is a part of.
+   */
+  entityType?: MembershipType;
+  /**
+   * TODO: required
+   * The id of the entity that this member is a part of.
+   */
+  entityId?: string;
 }
 
 /**
- * Represents a role with certain authorization constraints
- * within a given project.
+ * Represents a member in a given project
  */
-export enum ProjectRole {
-  VIEWER = "VIEWER",
-  EDITOR = "EDITOR",
-  ADMIN = "ADMIN",
-  OWNER = "OWNER",
+export interface MembershipSchema extends MemberEntitySchema {
+  /**
+   * The id of this membership.
+   */
+  projectMembershipId: string;
+  /**
+   * The email of the member.
+   */
+  email: string;
+  /**
+   * The role(s) of the member.
+   */
+  role: MemberRole;
 }
 
 /**
@@ -33,5 +96,5 @@ export enum ProjectRole {
  */
 export interface MemberRequestSchema {
   memberEmail: string;
-  projectRole: ProjectRole;
+  projectRole: MemberRole;
 }

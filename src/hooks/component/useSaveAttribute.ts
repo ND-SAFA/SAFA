@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { AttributeSchema, AttributeType } from "@/types";
-import { createAttribute } from "@/util";
+import { buildAttribute } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -18,7 +18,7 @@ export const useSaveAttribute = (id: string) =>
       /**
        * The attribute being created or edited.
        */
-      editedAttribute: createAttribute(),
+      editedAttribute: buildAttribute(),
     }),
     getters: {
       /**
@@ -43,26 +43,19 @@ export const useSaveAttribute = (id: string) =>
        * @return Whether this attribute value has selectable options.
        */
       showOptions(): boolean {
-        return [AttributeType.select, AttributeType.multiselect].includes(
-          this.type
-        );
+        return ["select", "multiselect"].includes(this.type);
       },
       /**
        * @return Whether this attribute value has min and max bounds.
        */
       showBounds(): boolean {
-        return [
-          AttributeType.text,
-          AttributeType.paragraph,
-          AttributeType.int,
-          AttributeType.float,
-        ].includes(this.type);
+        return ["text", "paragraph", "int", "float"].includes(this.type);
       },
       /**
        * @return The hint for the min bound.
        */
       minBoundHint(): string {
-        return [AttributeType.int, AttributeType.float].includes(this.type)
+        return ["int", "float"].includes(this.type)
           ? "The minimum value of this number."
           : "The minimum length of this value.";
       },
@@ -70,7 +63,7 @@ export const useSaveAttribute = (id: string) =>
        * @return The hint for the max bound.
        */
       maxBoundHint(): string {
-        return [AttributeType.int, AttributeType.float].includes(this.type)
+        return ["int", "float"].includes(this.type)
           ? "The maximum value of this number."
           : "The maximum length of this value.";
       },
@@ -100,7 +93,7 @@ export const useSaveAttribute = (id: string) =>
        */
       resetAttribute(baseAttribute: AttributeSchema | undefined): void {
         this.baseAttribute = baseAttribute;
-        this.editedAttribute = createAttribute(this.baseAttribute);
+        this.editedAttribute = buildAttribute(this.baseAttribute);
       },
     },
   });

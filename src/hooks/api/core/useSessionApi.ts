@@ -4,6 +4,7 @@ import { computed, ref } from "vue";
 import {
   IOHandlerCallback,
   PasswordChangeSchema,
+  SessionApiHook,
   UserPasswordSchema,
 } from "@/types";
 import { DEMO_ACCOUNT } from "@/util";
@@ -13,6 +14,7 @@ import {
   sessionStore,
   logStore,
   permissionStore,
+  getOrgApiStore,
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -29,14 +31,16 @@ import { pinia } from "@/plugins";
 import { useApi } from "@/hooks/api/core/useApi";
 
 /**
- * Creates a store for handling session API requests.
+ * A store for handling session API requests.
  */
-export const useSessionApi = defineStore("sessionApi", () => {
+export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   const createdAccount = ref(false);
   const passwordSubmitted = ref(false);
   const sessionApi = useApi("sessionApi")();
+  const authApi = useApi("authApi")();
 
   const loading = computed(() => sessionApi.loading);
+  const authLoading = computed(() => authApi.loading);
   const error = computed(() => sessionApi.error);
 
   const loginErrorMessage = sessionApi.errorMessage(
@@ -51,20 +55,12 @@ export const useSessionApi = defineStore("sessionApi", () => {
     "Unable to update password."
   );
 
-  /**
-   * Resets the session API state.
-   */
   function handleReset(): void {
     createdAccount.value = false;
     passwordSubmitted.value = false;
     sessionApi.handleReset();
   }
 
-  /**
-   * Attempts to create a new account.
-   *
-   * @param user - The user to create.
-   */
   async function handleCreateAccount(user: UserPasswordSchema): Promise<void> {
     await sessionApi.handleRequest(async () => {
       await createUser(user);
@@ -73,11 +69,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Attempts to send a password reset email.
-   *
-   * @param email - The email to send the reset to.
-   */
   async function handlePasswordReset(email: string): Promise<void> {
     await sessionApi.handleRequest(async () => {
       await createPasswordReset({ email });
@@ -86,12 +77,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Attempts to reset a user's password.
-   *
-   * @param newPassword - The password and token to reset with.
-   * @param resetToken - The token to reset with.
-   */
   async function handlePasswordUpdate(
     newPassword: string,
     resetToken: string
@@ -106,18 +91,11 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Attempts to log a user in.
-   *
-   * @param user - The user to log in.
-   */
   async function handleLogin(user: UserPasswordSchema): Promise<void> {
     await sessionApi.handleRequest(async () => {
       const session = await createLoginSession(user);
       const goToPath = getParam(QueryParams.LOGIN_PATH);
       const query = { ...getParams() };
-
-      console.log({ goToPath, query });
 
       delete query[QueryParams.LOGIN_PATH];
 
@@ -126,6 +104,8 @@ export const useSessionApi = defineStore("sessionApi", () => {
 
       await getProjectApiStore.handleReload({
         onComplete: async () => {
+          await getOrgApiStore.handleLoadCurrent();
+
           if (goToPath === Routes.ARTIFACT) {
             await getProjectApiStore.handleLoadRecent();
           } else if (typeof goToPath === "string") {
@@ -138,9 +118,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Logs in to the demo account and opens the demo project.
-   */
   async function handleDemoLogin(): Promise<void> {
     permissionStore.isDemo = true;
 
@@ -151,11 +128,6 @@ export const useSessionApi = defineStore("sessionApi", () => {
     );
   }
 
-  /**
-   * Logs a user out to the login screen.
-   *
-   * @param sendLogoutRequest - Whether to send the API request to log out.
-   */
   async function handleLogout(sendLogoutRequest = false): Promise<void> {
     await sessionApi.handleRequest(async () => {
       document.cookie = "";
@@ -171,41 +143,32 @@ export const useSessionApi = defineStore("sessionApi", () => {
     });
   }
 
-  /**
-   * Verifies the stored authentication token, and loads the last project if routing to the artifact tree.
-   * @throws If the authentication token is invalid.
-   */
-  async function handleAuthentication(): Promise<void> {
-    sessionStore.user = await getCurrentUser();
+  async function handleAuthentication(
+    callbacks: IOHandlerCallback
+  ): Promise<void> {
+    await authApi.handleRequest(async () => {
+      sessionStore.user = await getCurrentUser();
 
-    if (sessionStore.user.email === DEMO_ACCOUNT.email) {
-      permissionStore.isDemo = true;
-    }
+      if (sessionStore.user.email === DEMO_ACCOUNT.email) {
+        permissionStore.isDemo = true;
+      }
 
-    await getProjectApiStore.handleReload({});
+      await getOrgApiStore.handleLoadCurrent();
+      await getProjectApiStore.handleReload({});
+    }, callbacks);
   }
 
-  /**
-   * Updates a user's password.
-   *
-   * @param password - The old and new password.
-   * @param callbacks - The callbacks to run on success or error.
-   */
   async function handleChangePassword(
     password: PasswordChangeSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await sessionApi.handleRequest(() => savePassword(password), callbacks, {
+    await sessionApi.handleRequest(() => savePassword(password), {
+      ...callbacks,
       success: "Your password has been updated.",
       error: "Unable to update your password.",
     });
   }
 
-  /**
-   * Confirms and deletes a user's account.
-   *
-   * @param password - The user's current password.
-   */
   function handleDeleteAccount(password: string): void {
     logStore.confirm(
       "Delete your account?",
@@ -213,19 +176,17 @@ export const useSessionApi = defineStore("sessionApi", () => {
       async (isConfirmed) => {
         if (!isConfirmed) return;
 
-        await sessionApi.handleRequest(
-          () => deleteAccount(password),
-          {
-            onSuccess: () => handleLogout(),
-          },
-          { error: "Unable to delete your account." }
-        );
+        await sessionApi.handleRequest(() => deleteAccount(password), {
+          onSuccess: () => handleLogout(),
+          error: "Unable to delete your account.",
+        });
       }
     );
   }
 
   return {
     loading,
+    authLoading,
     error,
     createdAccount,
     passwordSubmitted,

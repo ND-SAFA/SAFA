@@ -40,6 +40,10 @@ export interface StepperProps extends MinimalProps {
    * If true, the actions will be hidden.
    */
   hideActions?: boolean;
+  /**
+   * If true, the ability to click a previous step to go back will be hidden.
+   */
+  hideStepBack?: boolean;
 }
 
 /**

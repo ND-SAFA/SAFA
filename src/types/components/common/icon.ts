@@ -44,6 +44,7 @@ export type IconVariant =
   | "redo"
   | "logout"
   | "file"
+  | "calendar"
   | "down"
   | "up"
   | "arrow-down"
@@ -67,6 +68,7 @@ export type IconVariant =
   | "graph-zoom-out"
   | "graph-center"
   | "graph-refresh"
+  | "graph-add"
   | "nav-toggle"
   | "nav-home"
   | "nav-create"
@@ -80,7 +82,16 @@ export type IconVariant =
   | "group-open"
   | "group-open-all"
   | "group-close"
-  | "group-close-all";
+  | "group-close-all"
+  | "member-add"
+  | "member-delete"
+  | "project-add"
+  | "project-edit"
+  | "project-delete"
+  | "version-add"
+  | "version-delete"
+  | "pw-show"
+  | "pw-hide";
 
 /**
  * Defines props for an icon.

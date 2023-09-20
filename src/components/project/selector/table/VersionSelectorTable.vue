@@ -9,6 +9,7 @@
     :rows="rows"
     row-key="projectId"
     item-name="version"
+    :icons="{ add: 'version-add', edit: 'edit', delete: 'version-delete' }"
     data-cy="table-version"
     @refresh="handleReload"
     @row:add="addOpen = true"

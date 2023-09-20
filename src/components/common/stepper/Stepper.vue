@@ -14,7 +14,7 @@
       :title="step.title"
       :done="step.done"
       :caption="step.caption"
-      :header-nav="step.done"
+      :header-nav="step.done && !props.hideStepBack"
     >
       <slot :name="idx + 1" />
     </q-step>

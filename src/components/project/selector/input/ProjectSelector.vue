@@ -20,7 +20,7 @@
               v-if="permissionStore.isAllowed('project.edit_members', opt)"
               small
               :tooltip="`Invite to ${opt.name}`"
-              icon="invite"
+              icon="member-add"
               data-cy="button-project-invite"
               @click="projectInviteId = opt.projectId"
             />

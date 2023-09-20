@@ -2,10 +2,8 @@ package edu.nd.crc.safa.features.projects.entities.app;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import lombok.Data;
@@ -31,7 +29,7 @@ public class ProjectIdAppEntity {
      */
     private String description;
     /**
-     * The project owner email.
+     * The owning team ID.
      */
     private String owner;
     /**
@@ -48,20 +46,7 @@ public class ProjectIdAppEntity {
         this.name = project.getName();
         this.description = project.getDescription();
         this.members = members;
-        this.owner = getProjectOwner();
+        this.owner = project.getOwningTeam().getId().toString();
         this.lastEdited = project.getLastEdited();
-    }
-
-    private String getProjectOwner() {
-        List<ProjectMemberAppEntity> ownerQuery =
-            members
-                .stream()
-                .filter(m -> m.getRole() == ProjectRole.OWNER)
-                .collect(Collectors.toList());
-        if (ownerQuery.isEmpty()) {
-            return null;
-        } else {
-            return ownerQuery.get(0).getEmail();
-        }
     }
 }

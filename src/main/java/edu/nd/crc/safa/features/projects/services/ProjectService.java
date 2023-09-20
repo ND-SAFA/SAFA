@@ -1,33 +1,45 @@
 package edu.nd.crc.safa.features.projects.services;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import lombok.AllArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
  * Responsible for updating, deleting, and retrieving project identifiers.
  */
-@AllArgsConstructor
 @Service
 @Scope("singleton")
 public class ProjectService {
 
-    private final ProjectRepository projectRepository;
-    private final TeamService teamService;
+    @Setter(onMethod = @__({@Autowired}))
+    private ProjectRepository projectRepository;
+
+    @Setter(onMethod = @__({@Autowired}))
+    private TeamService teamService;
+
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
+    private ProjectMembershipService projectMembershipService;
 
     /**
      * Deletes given project and all related entities through cascade property.
@@ -121,5 +133,30 @@ public class ProjectService {
      */
     public List<Project> getProjectsOwnedByTeam(Team team) {
         return projectRepository.findByOwningTeam(team);
+    }
+
+    /**
+     * Converts a project to a project identifier front-end object
+     *
+     * @param project The project
+     * @return The project identifier
+     */
+    public ProjectIdAppEntity getIdAppEntity(Project project) {
+        List<ProjectMemberAppEntity> projectMemberships =
+            projectMembershipService.getAllProjectMembers(project)
+                .stream()
+                .map(ProjectMemberAppEntity::new)
+                .collect(Collectors.toUnmodifiableList());
+        return new ProjectIdAppEntity(project, projectMemberships);
+    }
+
+    /**
+     * Converts a collection of projects to project identifiers
+     *
+     * @param projects The projects
+     * @return A list of project identifier objects
+     */
+    public List<ProjectIdAppEntity> getIdAppEntities(Collection<Project> projects) {
+        return projects.stream().map(this::getIdAppEntity).collect(Collectors.toUnmodifiableList());
     }
 }

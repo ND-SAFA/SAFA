@@ -17,19 +17,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ProjectMemberAppEntity implements IAppEntity {
-    private UUID projectMembershipId;
+    private UUID id;
     private String email;
     private ProjectRole role;
 
     public ProjectMemberAppEntity(UserProjectMembership projectMembership) {
-        this.projectMembershipId = projectMembership.getMembershipId();
+        this.id = projectMembership.getMembershipId();
         this.email = projectMembership.getMember().getEmail();
         this.role = projectMembership.getRole();
     }
 
     // TODO update this all to new api once that's fleshed out and also fix the roles
     public ProjectMemberAppEntity(TeamMembership teamMembership) {
-        this.projectMembershipId = teamMembership.getId();
+        this.id = teamMembership.getId();
         this.email = teamMembership.getUser().getEmail();
         try {
             if (teamMembership.getRole() == TeamRole.ADMIN) {
@@ -41,15 +41,5 @@ public class ProjectMemberAppEntity implements IAppEntity {
             this.role = ProjectRole.NONE;
         }
 
-    }
-
-    @Override
-    public UUID getId() {
-        return this.projectMembershipId;
-    }
-
-    @Override
-    public void setId(UUID id) {
-        this.projectMembershipId = id;
     }
 }

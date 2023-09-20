@@ -64,4 +64,26 @@ public class OrganizationMembershipService {
                 .map(OrganizationMembership::getRole)
                 .collect(Collectors.toUnmodifiableList());
     }
+
+    /**
+     * Get all organization memberships for a given user.
+     *
+     * @param user The user
+     * @return A list of memberships for that user. Note that the same organization may appear
+     *         multiple times in this list if the user has multiple roles within that organization.
+     */
+    public List<OrganizationMembership> getAllMembershipsByUser(SafaUser user) {
+        return orgMembershipRepo.findByUser(user);
+    }
+
+    /**
+     * Get all user memberships for a given organization.
+     *
+     * @param organization The organization
+     * @return A list of memberships for that organization. Note that the same user may
+     *         appear multiple times in this list if they have multiple roles within this organization.
+     */
+    public List<OrganizationMembership> getAllMembershipsByOrganization(Organization organization) {
+        return orgMembershipRepo.findByOrganization(organization);
+    }
 }

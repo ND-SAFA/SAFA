@@ -15,4 +15,8 @@ public interface OrganizationMembershipRepository extends CrudRepository<Organiz
     List<OrganizationMembership> findByUserAndOrganization(SafaUser user, Organization organization);
 
     Optional<OrganizationMembership> findByUserAndOrganizationAndRole(SafaUser user, Organization organization, OrganizationRole role);
+
+    List<OrganizationMembership> findByUser(SafaUser user);
+
+    List<OrganizationMembership> findByOrganization(Organization organization);
 }

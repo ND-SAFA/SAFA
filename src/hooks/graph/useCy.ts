@@ -6,30 +6,28 @@ import { GRAPH_CONFIG, CREATOR_PLUGINS } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
- * Transferring the state of the cytoscape instances behaves weirdly asynchronously,
- * so this is a temporary solution to get the cytoscape instances.
- */
-
-/**
- * Wraps cytoscape instance in a promise.
- */
-let creatorResolveCy: ResolveCy = null;
-const creatorCy: CyPromise = new Promise((resolve) => {
-  creatorResolveCy = resolve;
-});
-
-/**
  * This hook manages the state of all cytoscape graphs.
  */
 export const useCy = defineStore("cy", {
-  state: () => ({}),
+  state() {
+    let creatorResolveCy: ResolveCy = null;
+
+    const creatorCy: CyPromise = new Promise((resolve) => {
+      creatorResolveCy = resolve;
+    });
+
+    return {
+      /**
+       * Wraps cytoscape instance in a promise.
+       */
+      creatorResolveCy,
+      /**
+       * A promise for using the project creator cy instance.
+       */
+      creatorCy,
+    };
+  },
   getters: {
-    /**
-     * @return A promise for using the project creator cy instance.
-     */
-    creatorCy(): CyPromise {
-      return creatorCy;
-    },
     /**
      * @return The configuration for the creator graph.
      */
@@ -37,7 +35,7 @@ export const useCy = defineStore("cy", {
       return {
         name: "tim-tree-graph",
         config: GRAPH_CONFIG,
-        saveCy: creatorResolveCy,
+        saveCy: this.creatorResolveCy,
         plugins: CREATOR_PLUGINS,
         afterInit() {
           // Wait for initialized nodes to be added.
@@ -55,7 +53,7 @@ export const useCy = defineStore("cy", {
      */
     resetWindow(type: "project" | "creator") {
       if (type === "creator") {
-        creatorCy.then((cy) => {
+        this.creatorCy.then((cy) => {
           cy.fit(cy.nodes(), 150);
         });
       }

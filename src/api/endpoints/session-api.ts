@@ -112,9 +112,12 @@ export async function deleteSession(): Promise<void> {
 /**
  * Updates the user's default organization.
  *
- * @param orgId - The organization to set as the default.
+ * @param defaultOrgId - The organization to set as the default.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function saveDefaultOrg(orgId: string): Promise<void> {
-  // TODO
+export async function saveDefaultOrg(defaultOrgId: string): Promise<void> {
+  await buildRequest<void, string, Pick<UserSchema, "defaultOrgId">>(
+    "editAccountOrg"
+  ).put({
+    defaultOrgId,
+  });
 }

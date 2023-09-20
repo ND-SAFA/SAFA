@@ -60,6 +60,8 @@ export function buildProjectIdentifier(
   return {
     name: identifier?.name || "",
     projectId: identifier?.projectId || "",
+    orgId: identifier?.orgId || "",
+    teamId: identifier?.teamId || "",
     description: identifier?.description || "",
     owner: identifier?.owner || "",
     members: identifier?.members || [],
@@ -200,13 +202,7 @@ export function buildDocument(
 ): DocumentSchema {
   return {
     documentId: document?.documentId || "",
-    project: document?.project || {
-      projectId: "",
-      name: "",
-      description: "",
-      owner: "",
-      members: [],
-    },
+    project: document?.project || buildProjectIdentifier(),
     name: document?.name || "",
     type: document?.type || "ARTIFACT_TREE",
     artifactIds: document?.artifactIds || [],

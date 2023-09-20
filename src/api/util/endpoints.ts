@@ -37,6 +37,7 @@ export enum Endpoint {
   updatePassword = "accounts/change",
   deleteAccount = "accounts/delete",
   getAccount = "accounts/self",
+  editAccountOrg = "accounts/organization",
 
   // Jobs
   createProjectJob = "jobs/projects",

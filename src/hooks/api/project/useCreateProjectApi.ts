@@ -9,7 +9,9 @@ import {
 import {
   integrationsStore,
   jobApiStore,
+  orgStore,
   projectSaveStore,
+  teamStore,
   useApi,
 } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
@@ -66,6 +68,8 @@ export const useCreateProjectApi = defineStore(
           const formData = new FormData();
 
           formData.append("name", project.name);
+          formData.append("orgId", orgStore.orgId);
+          formData.append("teamId", teamStore.teamId);
           formData.append("description", project.description);
           formData.append("summarize", summarize.toString());
 

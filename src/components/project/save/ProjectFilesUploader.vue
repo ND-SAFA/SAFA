@@ -50,7 +50,12 @@ export default {
 <script setup lang="ts">
 import { computed, ref, withDefaults } from "vue";
 import { ProjectIdentifierProps } from "@/types";
-import { createProjectApiStore, identifierSaveStore } from "@/hooks";
+import {
+  createProjectApiStore,
+  identifierSaveStore,
+  orgStore,
+  teamStore,
+} from "@/hooks";
 import { SwitchInput, TextButton } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";

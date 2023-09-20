@@ -1,7 +1,7 @@
 <template>
   <flex-box t="2" class="settings-buttons">
     <q-btn-dropdown flat auto-close label="Switch Teams">
-      <flex-box column align="center">
+      <flex-box column align="center" x="2" y="2">
         <text-button
           v-for="t in orgStore.org.teams"
           :key="t.id"

@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
+import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
@@ -13,6 +15,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.repositories.TeamRepository;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
@@ -31,6 +34,9 @@ public class TeamService {
 
     @Setter(onMethod = @__({@Autowired, @Lazy}))
     private OrganizationService orgService;
+
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
+    private OrganizationMembershipService orgMembershipService;
 
     @Setter(onMethod = @__({@Autowired}))
     private TeamMembershipService teamMembershipService;
@@ -92,6 +98,7 @@ public class TeamService {
      */
     public TeamAppEntity getAppEntity(Team team, SafaUser currentUser) {
         List<TeamMembership> teamMemberships = teamMembershipService.getTeamMemberships(team);
+
         List<MembershipAppEntity> teamMembershipAppEntities =
             teamMemberships
                 .stream()
@@ -101,7 +108,11 @@ public class TeamService {
         List<ProjectIdAppEntity> projects = projectService.getIdAppEntities(
             projectService.getProjectsOwnedByTeam(team), currentUser);
 
-        List<String> permissions = getUserPermissions(teamMemberships, currentUser);
+        List<String> permissions = getUserPermissions(team, currentUser)
+            .stream()
+            .filter(permission -> permission instanceof TeamPermission)
+            .map(Permission::getName)
+            .collect(Collectors.toUnmodifiableList());
 
         return new TeamAppEntity(team, teamMembershipAppEntities, projects, permissions);
     }
@@ -120,20 +131,22 @@ public class TeamService {
     }
 
     /**
-     * Get all permissions granted to a user based on a list of team memberships. This function
-     * just filters the list of memberships for ones that match the given user, extracts the corresponding roles,
-     * and then returns the permissions associated with those roles.
+     * Get all permissions granted to the user via their membership(s) within the given team.
      *
-     * @param memberships The list of all memberships within a team
+     * @param team The team the user is a part of. If the user is not actually a member of this team, the
+     *             function may still return some permissions based on if the user is a member of the organization
+     *             the team is a part of, but it will not grant the user any permissions they should not have.
      * @param currentUser The user in question
-     * @return All team-related permissions granted to the user
+     * @return A list of permissions the user has from the team
      */
-    private List<String> getUserPermissions(List<TeamMembership> memberships, SafaUser currentUser) {
-        return memberships.stream()
-            .filter(membership -> membership.getUser().getUserId().equals(currentUser.getUserId()))
-            .map(TeamMembership::getRole)
-            .flatMap(role -> role.getGrants().stream())
-            .map(Permission::getName)
-            .collect(Collectors.toUnmodifiableList());
+    public List<Permission> getUserPermissions(Team team, SafaUser currentUser) {
+
+        Stream<Permission> teamPermissions = teamMembershipService.getUserRoles(currentUser, team)
+            .stream()
+            .flatMap(role -> role.getGrants().stream());
+
+        Stream<Permission> orgPermissions = orgService.getUserPermissions(team.getOrganization(), currentUser).stream();
+
+        return Stream.concat(teamPermissions, orgPermissions).collect(Collectors.toUnmodifiableList());
     }
 }

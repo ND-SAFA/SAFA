@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.organizations.repositories.OrganizationRepository;
+import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -84,7 +85,11 @@ public class OrganizationService {
                 .map(MembershipAppEntity::new)
                 .collect(Collectors.toUnmodifiableList());
 
-        List<String> permissions = getUserPermissions(memberships, currentUser);
+        List<String> permissions = getUserPermissions(organization, currentUser)
+            .stream()
+            .filter(permission -> permission instanceof OrganizationPermission)
+            .map(Permission::getName)
+            .collect(Collectors.toUnmodifiableList());
 
         List<TeamAppEntity> teams =
             teamService.getAppEntities(teamService.getAllTeamsByOrganization(organization), currentUser);
@@ -106,20 +111,16 @@ public class OrganizationService {
     }
 
     /**
-     * Get all permissions granted to a user based on a list of organization memberships. This function
-     * just filters the list of memberships for ones that match the given user, extracts the corresponding roles,
-     * and then returns the permissions associated with those roles.
+     * Get all permissions granted to the user via their membership(s) within the given organization.
      *
-     * @param memberships The list of all memberships within an organization
+     * @param organization The organization the user is a part of.
      * @param currentUser The user in question
-     * @return All org-related permissions granted to the user
+     * @return A list of permissions the user has from the organization
      */
-    private List<String> getUserPermissions(List<OrganizationMembership> memberships, SafaUser currentUser) {
-        return memberships.stream()
-            .filter(membership -> membership.getUser().getUserId().equals(currentUser.getUserId()))
-            .map(OrganizationMembership::getRole)
+    public List<Permission> getUserPermissions(Organization organization, SafaUser currentUser) {
+        return organizationMembershipService.getUserRoles(currentUser, organization)
+            .stream()
             .flatMap(role -> role.getGrants().stream())
-            .map(Permission::getName)
             .collect(Collectors.toUnmodifiableList());
     }
 }

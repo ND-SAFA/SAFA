@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
@@ -13,6 +14,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -154,7 +156,11 @@ public class ProjectService {
                 .map(MembershipAppEntity::new)
                 .collect(Collectors.toUnmodifiableList());
 
-        List<String> permissions = getUserPermissions(projectMemberships, currentUser);
+        List<String> permissions = getUserPermissions(project, currentUser)
+            .stream()
+            .filter(permission -> permission instanceof ProjectPermission)
+            .map(Permission::getName)
+            .collect(Collectors.toUnmodifiableList());
 
         return new ProjectIdAppEntity(project, membershipAppEntities, permissions);
     }
@@ -173,20 +179,23 @@ public class ProjectService {
     }
 
     /**
-     * Get all permissions granted to a user based on a list of project memberships. This function
-     * just filters the list of memberships for ones that match the given user, extracts the corresponding roles,
-     * and then returns the permissions associated with those roles.
+     * Get all permissions granted to the user via their membership(s) within the given team.
      *
-     * @param memberships The list of all memberships within a project
+     * @param project The project the user is a part of. Note that the user can have permissions on a project even if
+     *                they do not have a direct project membership, as they could be a member of a team or an
+     *                organization that grants them project permissions.
      * @param currentUser The user in question
-     * @return All project-related permissions granted to the user
+     * @return A list of permissions the user has for the project
      */
-    private List<String> getUserPermissions(List<UserProjectMembership> memberships, SafaUser currentUser) {
-        return memberships.stream()
-            .filter(membership -> membership.getMember().getUserId().equals(currentUser.getUserId()))
-            .map(UserProjectMembership::getRole)
-            .flatMap(role -> role.getGrants().stream())
-            .map(Permission::getName)
-            .collect(Collectors.toUnmodifiableList());
+    public List<Permission> getUserPermissions(Project project, SafaUser currentUser) {
+
+        Stream<Permission> permissions = projectMembershipService.getUserRoles(currentUser, project)
+            .stream()
+            .flatMap(role -> role.getGrants().stream());
+
+        Stream<Permission> teamPermissions =
+            teamService.getUserPermissions(project.getOwningTeam(), currentUser).stream();
+
+        return Stream.concat(permissions, teamPermissions).collect(Collectors.toUnmodifiableList());
     }
 }

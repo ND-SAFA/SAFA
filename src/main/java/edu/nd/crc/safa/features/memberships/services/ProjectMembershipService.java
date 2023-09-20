@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.TeamProjectMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.TeamProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
@@ -127,13 +127,13 @@ public class ProjectMembershipService {
     public List<ProjectIdAppEntity> getProjectIdAppEntitiesForUser(SafaUser user) {
         return getProjectsForUser(user).stream()
                 .map(project -> {
-                    List<ProjectMemberAppEntity> members = this.userProjectMembershipRepo.findByProject(project)
+                    List<MembershipAppEntity> members = this.userProjectMembershipRepo.findByProject(project)
                             .stream()
-                            .map(ProjectMemberAppEntity::new)
+                            .map(MembershipAppEntity::new)
                             .collect(Collectors.toList());
                     this.teamMembershipService.getTeamMemberships(project.getOwningTeam())
                             .stream()
-                            .map(ProjectMemberAppEntity::new)
+                            .map(MembershipAppEntity::new)
                             .forEach(members::add);
                     return new ProjectIdAppEntity(project, members);
                 })
@@ -213,6 +213,7 @@ public class ProjectMembershipService {
      * @return List of project memberships relating members to projects.
      */
     public List<UserProjectMembership> getAllProjectMembers(Project project) {
+        //TODO don't convert to user memberships
         List<UserProjectMembership> users = getDirectProjectMembers(project);
         List<TeamProjectMembership> teams = getProjectTeams(project);
 

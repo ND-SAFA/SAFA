@@ -7,11 +7,12 @@ import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.TeamProjectMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
 import lombok.Data;
 
 @Data
-public class MembershipAppEntity {
+public class MembershipAppEntity implements IAppEntity {
     private UUID id;
     private String email;
     private String role;

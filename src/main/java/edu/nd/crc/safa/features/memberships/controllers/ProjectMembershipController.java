@@ -9,11 +9,11 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -58,8 +58,8 @@ public class ProjectMembershipController extends BaseController {
      * @return {@link UserProjectMembership} Updated project membership.
      */
     @PostMapping(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-    public ProjectMemberAppEntity addOrUpdateProjectMembership(@PathVariable UUID projectId,
-                                                               @RequestBody ProjectMembershipRequest request)
+    public MembershipAppEntity addOrUpdateProjectMembership(@PathVariable UUID projectId,
+                                                            @RequestBody ProjectMembershipRequest request)
         throws SafaError {
 
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
@@ -76,7 +76,7 @@ public class ProjectMembershipController extends BaseController {
             .broadcastChange(EntityChangeBuilder
                 .create(projectId)
                 .withMembersUpdate(updatedProjectMembership.getMembershipId()));
-        return new ProjectMemberAppEntity(updatedProjectMembership);
+        return new MembershipAppEntity(updatedProjectMembership);
     }
 
     /**
@@ -86,14 +86,14 @@ public class ProjectMembershipController extends BaseController {
      * @return ServerResponse containing list of project members ships
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
-    public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
+    public List<MembershipAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         return projectMembershipService
             .getAllProjectMembers(project)
             .stream()
-            .map(ProjectMemberAppEntity::new)
+            .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
     }
 

@@ -18,7 +18,7 @@ import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -55,7 +55,7 @@ public class ProjectAppEntity implements IAppEntity {
     private List<@Valid @NotNull TraceAppEntity> traces;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<ProjectMemberAppEntity> members;
+    private List<MembershipAppEntity> members;
 
     @Nullable
     private String currentDocumentId;
@@ -100,7 +100,7 @@ public class ProjectAppEntity implements IAppEntity {
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
                             List<TraceAppEntity> traces,
-                            List<ProjectMemberAppEntity> members,
+                            List<MembershipAppEntity> members,
                             List<DocumentAppEntity> documents,
                             @Nullable String currentDocumentId,
                             List<TypeAppEntity> artifactTypes,

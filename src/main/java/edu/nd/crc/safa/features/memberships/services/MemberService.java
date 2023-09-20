@@ -6,9 +6,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  */
 @Service
 @AllArgsConstructor
-public class MemberService implements IAppEntityService<ProjectMemberAppEntity> {
+public class MemberService implements IAppEntityService<MembershipAppEntity> {
 
     private UserProjectMembershipRepository userProjectMembershipRepository;
 
@@ -44,17 +44,17 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
     }
 
     @Override
-    public List<ProjectMemberAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
+    public List<MembershipAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         Project project = projectVersion.getProject();
 
-        List<ProjectMemberAppEntity> members = this.userProjectMembershipRepository.findByProject(project)
+        List<MembershipAppEntity> members = this.userProjectMembershipRepository.findByProject(project)
             .stream()
-            .map(ProjectMemberAppEntity::new)
+            .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
 
         // TODO pull members the right way
         SafaUser owner = projectVersion.getProject().getOwningTeam().getOrganization().getOwner();
-        members.add(new ProjectMemberAppEntity(
+        members.add(new MembershipAppEntity(
                 new UserProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
 
         return members;

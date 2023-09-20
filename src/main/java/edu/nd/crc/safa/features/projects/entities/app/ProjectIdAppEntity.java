@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.projects.entities.app;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import lombok.Data;
@@ -35,13 +35,13 @@ public class ProjectIdAppEntity {
     /**
      * List of member on project.
      */
-    private List<ProjectMemberAppEntity> members;
+    private List<MembershipAppEntity> members;
     /**
      * Last edited.
      */
     private LocalDateTime lastEdited;
 
-    public ProjectIdAppEntity(Project project, List<ProjectMemberAppEntity> members) {
+    public ProjectIdAppEntity(Project project, List<MembershipAppEntity> members) {
         this.projectId = project.getProjectId().toString();
         this.name = project.getName();
         this.description = project.getDescription();

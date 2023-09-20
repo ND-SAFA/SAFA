@@ -20,6 +20,8 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.projects.entities.app.SubtreeAppEntity;
@@ -36,7 +38,10 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -53,7 +58,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Scope("singleton")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProjectRetrievalService {
 
     private final ArtifactService artifactService;
@@ -69,6 +74,9 @@ public class ProjectRetrievalService {
     private final AttributeLayoutService attributeLayoutService;
     private final SafaUserService safaUserService;
     private final TraceMatrixService traceMatrixService;
+
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
+    private ProjectService projectService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
@@ -115,6 +123,12 @@ public class ProjectRetrievalService {
 
         List<TraceMatrixAppEntity> traceMatrices = traceMatrixService.getAppEntities(projectVersion, user);
 
+        List<String> permissions = projectService.getUserPermissions(projectVersion.getProject(), user)
+            .stream()
+            .filter(permission -> permission instanceof ProjectPermission)
+            .map(Permission::getName)
+            .collect(Collectors.toUnmodifiableList());
+
         return new ProjectAppEntity(
             projectVersion,
             entities.getArtifacts(),
@@ -129,7 +143,8 @@ public class ProjectRetrievalService {
             attributes,
             attributeLayouts,
             subtrees,
-            traceMatrices);
+            traceMatrices,
+            permissions);
     }
 
     /**

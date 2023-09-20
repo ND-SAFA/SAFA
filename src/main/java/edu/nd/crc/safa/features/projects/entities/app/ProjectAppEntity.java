@@ -79,6 +79,8 @@ public class ProjectAppEntity implements IAppEntity {
 
     private List<TraceMatrixAppEntity> traceMatrices;
 
+    private List<String> permissions;
+
     public ProjectAppEntity() {
         this.name = "";
         this.description = "";
@@ -95,6 +97,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.subtrees = new HashMap<>();
         this.traceMatrices = new ArrayList<>();
         this.lastEdited = LocalDateTime.now();
+        this.permissions = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -110,7 +113,8 @@ public class ProjectAppEntity implements IAppEntity {
                             List<CustomAttributeAppEntity> attributes,
                             List<AttributeLayoutAppEntity> attributeLayouts,
                             Map<UUID, SubtreeAppEntity> subtrees,
-                            List<TraceMatrixAppEntity> traceMatrices) {
+                            List<TraceMatrixAppEntity> traceMatrices,
+                            List<String> permissions) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
         this.lastEdited = project.getLastEdited();
@@ -130,6 +134,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.attributeLayouts = attributeLayouts;
         this.subtrees = subtrees;
         this.traceMatrices = traceMatrices;
+        this.permissions = permissions;
     }
 
     public ProjectAppEntity(ProjectCommitDefinition projectCommitDefinition) {

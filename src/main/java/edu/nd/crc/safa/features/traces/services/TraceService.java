@@ -32,6 +32,14 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
         return getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
     }
 
+    @Override
+    public List<TraceAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
+        return this.traceLinkVersionRepository.getByIds(entityIds)
+            .stream()
+            .map(this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity)
+            .collect(Collectors.toList());
+    }
+
     /**
      * Retrieves list of filtered trace links at given version.
      *

@@ -120,6 +120,7 @@ public class GenApi implements ITraceGenerationController {
         String cancelEndpoint = TGenConfig.getEndpoint("cancel");
         TGenTask task = new TGenTask();
         task.setTaskId(taskId);
-        this.requestService.sendPost(cancelEndpoint, task, TGenStatus.class);
+        TGenStatus status = this.requestService.sendPost(cancelEndpoint, task, TGenStatus.class);
+        System.out.println("hi");
     }
 }

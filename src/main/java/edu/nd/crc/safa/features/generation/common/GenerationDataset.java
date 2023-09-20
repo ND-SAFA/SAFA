@@ -54,13 +54,6 @@ public class GenerationDataset {
             .collect(Collectors.toList());
     }
 
-    public List<String> getArtifactBodies(String artifactType) {
-        return this.getArtifacts(artifactType)
-            .stream()
-            .map(GenerationArtifact::getContent)
-            .collect(Collectors.toList());
-    }
-
     /**
      * @return Returns the number of comparisons that are made for search or prediction.
      */

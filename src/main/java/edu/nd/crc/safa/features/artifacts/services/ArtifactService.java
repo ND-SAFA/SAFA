@@ -45,6 +45,11 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
         return versionToAppEntity(artifactVersions);
     }
 
+    @Override
+    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
+        return getAppEntitiesByIds(projectVersion, entityIds);
+    }
+
     /**
      * Returns all versions of all artifacts in the project.
      *
@@ -64,13 +69,13 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
      * @param artifactIds    The IDs of the artifacts to retrieve.
      * @return The constructed artifacts at given version.
      */
-    public List<ArtifactAppEntity> getAppEntitiesById(ProjectVersion projectVersion, List<UUID> artifactIds) {
+    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, List<UUID> artifactIds) {
         List<ArtifactVersion> artifactVersions = new ArrayList<>();
         for (UUID artifactId : artifactIds) {
             Optional<ArtifactVersion> artifactVersionOptional =
                 this.artifactVersionRepository.findVersionEntityByProjectVersionAndBaseEntityId(projectVersion,
                     artifactId);
-            artifactVersionOptional.ifPresent(a -> artifactVersions.add(a));
+            artifactVersionOptional.ifPresent(artifactVersions::add);
         }
         return versionToAppEntity(artifactVersions);
     }

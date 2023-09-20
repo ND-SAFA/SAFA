@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.entities.jobs.ProjectSummaryJob;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -19,8 +18,7 @@ public class ProjectSummaryJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        JobDbEntity jobDbEntity = new JobDbEntity();
-        return new ProjectSummaryJob(this.getServiceProvider(), jobDbEntity, this.projectVersion);
+        return new ProjectSummaryJob(this.getServiceProvider(), this.getJobDbEntity(), this.projectVersion);
     }
 
     @Override

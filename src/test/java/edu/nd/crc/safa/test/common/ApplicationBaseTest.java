@@ -28,6 +28,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.SimpleRequestExpectationManager;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -77,7 +78,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         clearData();
         setAuthorization();
         ReflectionTestUtils.setField(ServiceProvider.class, "instance", this.serviceProvider);
-        mockServer = MockRestServiceServer.createServer(restTemplate);
+        mockServer = MockRestServiceServer.bindTo(restTemplate).build(new SimpleRequestExpectationManager());
     }
 
     /**

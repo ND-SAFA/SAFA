@@ -43,7 +43,7 @@ public class SummaryService {
      */
     public List<GenerationArtifact> generateArtifactSummaries(SummarizeArtifactRequestDTO request,
                                                               JobLogger jobLogger) {
-        List<ArtifactAppEntity> artifactAppEntities = artifactService.getAppEntitiesById(request.getProjectVersion(),
+        List<ArtifactAppEntity> artifactAppEntities = artifactService.getAppEntitiesByIds(request.getProjectVersion(),
             request.getArtifacts());
         List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new)
             .collect(Collectors.toList());

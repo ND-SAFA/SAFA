@@ -15,7 +15,7 @@ public class ProjectSummaryJob extends GenerationJob {
     }
 
     @Override
-    @IJobStep(value = "Create Project Summary", position = 2, requiredGeneration = true)
+    @IJobStep(value = "Create Project Summary", position = 2)
     public void summarizeProjectEntities() {
         ProjectVersion projectVersion = this.getProjectVersion();
         projectVersion.getProject().setSpecification("");

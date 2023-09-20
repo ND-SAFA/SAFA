@@ -24,8 +24,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class RequestService {
     private final ObjectMapper objectMapper = ObjectMapperConfig.create();
-    private final WebClient webClient;
     private final int DEFAULT_TIMEOUT = 60 * 60; // 1 Hour
+    private final RestTemplate restTemplate;
 
     /**
      * Performs a POST request.

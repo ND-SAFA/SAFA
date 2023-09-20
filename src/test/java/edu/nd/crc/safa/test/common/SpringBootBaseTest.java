@@ -36,6 +36,4 @@ public abstract class SpringBootBaseTest {
 
     @Autowired
     DataSource dataSource;
-
-
 }

@@ -44,6 +44,14 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
         return types;
     }
 
+    @Override
+    public List<TypeAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
+        return artifactTypeRepository.getByIds(entityIds)
+            .stream()
+            .map(TypeAppEntity::new)
+            .collect(Collectors.toList());
+    }
+
     public List<TypeAppEntity> getAppEntities(Project project) {
         return getTypes(project)
             .stream()
@@ -85,7 +93,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
     /**
      * Get and artifact type for a given project by its name.
      *
-     * @param project the project the type belongs to
+     * @param project          the project the type belongs to
      * @param artifactTypeName the name of the artifact type
      * @return the artifact type, or null if it was not found
      */
@@ -107,8 +115,8 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * Create an artifact type for a given project.
      *
      * @param project the project the type belongs to
-     * @param name the name of the artifact type
-     * @param user The user doing the operation
+     * @param name    the name of the artifact type
+     * @param user    The user doing the operation
      * @return the created artifact type
      */
     public ArtifactType createArtifactType(Project project, String name, SafaUser user) {
@@ -120,9 +128,9 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * Create an artifact type for a given project.
      *
      * @param project the project the type belongs to
-     * @param name the name of the artifact type
-     * @param color the color associated with the type
-     * @param user The user doing the operation
+     * @param name    the name of the artifact type
+     * @param color   the color associated with the type
+     * @param user    The user doing the operation
      * @return the created artifact type
      */
     public ArtifactType createArtifactType(Project project, String name, String color, SafaUser user) {
@@ -133,7 +141,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * Save an artifact type to the database with some error checking and notifications.
      *
      * @param artifactType The type we are creating
-     * @param user The user doing the operation
+     * @param user         The user doing the operation
      * @return The type that got saved to the database
      */
     private ArtifactType createArtifactType(ArtifactType artifactType, SafaUser user) {
@@ -167,11 +175,11 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
     /**
      * Update values in an artifact type.
      *
-     * @param project Project containing the type
+     * @param project             Project containing the type
      * @param updatedArtifactType The updated type definition
-     * @param user The user doing the operation
+     * @param user                The user doing the operation
      * @return The type after the update (may not match the passed in type 100% as we do not allow editing
-     *         certain values)
+     * certain values)
      */
     public ArtifactType updateArtifactType(Project project, ArtifactType updatedArtifactType, SafaUser user) {
         ArtifactType originalType = getArtifactType(project, updatedArtifactType.getName());

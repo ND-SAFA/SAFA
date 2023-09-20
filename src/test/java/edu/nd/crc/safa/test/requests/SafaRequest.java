@@ -18,6 +18,7 @@ import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -35,6 +36,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 public class SafaRequest extends RouteBuilder<SafaRequest> {
     private static MockMvc mockMvc;
     private static Cookie authorizationToken = null;
+    private static final ObjectMapper objectMapper = ObjectMapperConfig.create();
 
     public SafaRequest(String path) {
         super(path);
@@ -101,6 +103,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject postWithJsonObject(Object body) throws Exception {
         return postWithResponseParser(body, ResponseParser::jsonCreator);
+    }
+
+    public <T> T postWithJsonObject(Object body, Class<T> responseClass) throws Exception {
+        JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
+        return objectMapper.readValue(responseJson.toString(), responseClass);
     }
 
     public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {

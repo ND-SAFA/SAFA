@@ -6,12 +6,12 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.utilities.GeneralRepository;
 
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, UUID> {
+public interface ArtifactTypeRepository extends GeneralRepository<ArtifactType, UUID> {
 
     Optional<ArtifactType> findByProjectAndNameIgnoreCase(Project project, String name);
 

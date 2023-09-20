@@ -193,7 +193,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         int versionIndex = getProjectVersions(projectName).size() - 1;
         return this.getProjectVersion(projectName, versionIndex);
     }
-
+    
     public DbEntityBuilder newVersion(String projectName) {
         Project project = getProject(projectName);
         ProjectVersion projectVersion = versionService.createNewVersion(project,

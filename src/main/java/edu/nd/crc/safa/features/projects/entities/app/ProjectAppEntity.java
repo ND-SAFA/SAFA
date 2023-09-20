@@ -45,6 +45,9 @@ public class ProjectAppEntity implements IAppEntity {
     @NotNull
     private String description;
 
+    @Nullable
+    private String specification;
+
     @Valid
     private ProjectVersion projectVersion;
 
@@ -116,6 +119,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.lastEdited = project.getLastEdited();
         this.name = project.getName();
         this.description = project.getDescription();
+        this.specification = project.getSpecification();
         this.projectVersion = projectVersion;
         this.artifacts = artifacts;
         this.traces = traces;

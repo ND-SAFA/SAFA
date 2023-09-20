@@ -13,7 +13,9 @@ const scopes = encodeURI(["repo"].join(","));
  */
 export function authorizeGitHub(validCredentials: boolean): void {
   if (validCredentials) {
-    window.open("https://github.com/apps/safa-ai-github");
+    window.open(
+      "https://github.com/settings/connections/applications/8ff9708f3644c2d5fbbe"
+    );
   } else {
     window.open(
       `https://github.com/login/oauth/authorize?` +

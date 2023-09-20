@@ -97,7 +97,7 @@ export const DefaultPostLayoutHooks: LayoutHook[] = [
 /**
  * Post layout hooks for the TIM tree.
  */
-export const TIMPostLayoutHooks: LayoutHook[] = [
+export const CreatorPostLayoutHooks: LayoutHook[] = [
   (): void => cyCenterNodes(false, cyStore.creatorCy),
   applyCytoEvents,
 ];

@@ -40,7 +40,7 @@ export const useCy = defineStore("cy", {
         afterInit() {
           // Wait for initialized nodes to be added.
           setTimeout(() => {
-            layoutStore.setTimTreeLayout();
+            layoutStore.setCreatorLayout();
           }, 100);
         },
       };

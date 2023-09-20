@@ -117,8 +117,8 @@ export const useLayout = defineStore("layout", {
      * Resets the graph layout of the artifact tree.
      * Generates a new layout if in TIM view, or if no positions are set.
      */
-    setArtifactTreeLayout(): void {
-      const layout = GraphLayout.createArtifactLayout();
+    setProjectLayout(): void {
+      const layout = GraphLayout.createProjectLayout();
       const generate =
         this.mode === "tim" || Object.keys(this.artifactPositions).length === 0;
       const payload = { layout, generate, cyPromise: artifactTreeCyPromise };
@@ -128,8 +128,8 @@ export const useLayout = defineStore("layout", {
     /**
      * Resets the graph layout of the TIM tree.
      */
-    setTimTreeLayout(): void {
-      const layout = GraphLayout.createTimLayout();
+    setCreatorLayout(): void {
+      const layout = GraphLayout.createCreatorLayout();
       const payload = { layout, generate: true, cyPromise: cyStore.creatorCy };
 
       this.setGraphLayout(payload);
@@ -147,7 +147,7 @@ export const useLayout = defineStore("layout", {
 
       // Wait for graph to render.
       setTimeout(() => {
-        this.setArtifactTreeLayout();
+        this.setProjectLayout();
         appStore.onLoadEnd();
       }, 100);
     },

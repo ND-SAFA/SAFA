@@ -11,8 +11,8 @@ import {
   ArtifactTreeAutoMoveHandlers,
   DefaultPostLayoutHooks,
   DefaultPreLayoutHooks,
-  TIMPostLayoutHooks,
-  TIMPreLayoutHooks,
+  CreatorPostLayoutHooks,
+  CreatorPreLayoutHooks,
 } from "@/cytoscape";
 import { DefaultEvents } from "@/cytoscape/events";
 import { KlaySettings } from "@/cytoscape/layout/klay-settings";
@@ -87,7 +87,7 @@ export default class GraphLayout implements CyLayout {
   /**
    * Creates the artifact graph layout.
    */
-  static createArtifactLayout(): GraphLayout {
+  static createProjectLayout(): GraphLayout {
     return new GraphLayout(
       ArtifactTreeAutoMoveHandlers,
       DefaultEvents,
@@ -98,15 +98,15 @@ export default class GraphLayout implements CyLayout {
   }
 
   /**
-   * Creates the TIM graph layout.
+   * Creates the project creator graph layout.
    */
-  static createTimLayout(): GraphLayout {
+  static createCreatorLayout(): GraphLayout {
     return new GraphLayout(
       {},
       DefaultEvents,
       KlaySettings,
-      TIMPreLayoutHooks,
-      TIMPostLayoutHooks
+      CreatorPreLayoutHooks,
+      CreatorPostLayoutHooks
     );
   }
 }

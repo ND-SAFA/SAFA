@@ -31,4 +31,4 @@ export const DefaultPreLayoutHooks: LayoutHook[] = [styleGeneratedLinks];
 /**
  * Pre-layout hooks for the TIM tree.
  */
-export const TIMPreLayoutHooks: LayoutHook[] = [];
+export const CreatorPreLayoutHooks: LayoutHook[] = [];

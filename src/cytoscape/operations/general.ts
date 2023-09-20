@@ -1,4 +1,4 @@
-import { CyPromise, CyLayout, LayoutPayload } from "@/types";
+import { CyPromise, CyLayout, CyLayoutPayload } from "@/types";
 import { selectionStore } from "@/hooks";
 import { applyAutoMoveEvents } from "@/cytoscape/hooks";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
@@ -95,14 +95,10 @@ export function cyCenterNodes(
  * Creates the given layout.
  *
  * @param layoutPayload - The cy instance and layout.
- * @param generate - Whether to generate the layout positions.
  */
-export function cyCreateLayout(
-  layoutPayload: LayoutPayload,
-  generate?: boolean
-): void {
+export function cyCreateLayout(layoutPayload: CyLayoutPayload): void {
   layoutPayload.cyPromise.then((cy) => {
-    layoutPayload.layout.createLayout(cy, generate);
+    layoutPayload.layout.createLayout(cy, layoutPayload.generate);
   });
 }
 

@@ -4,7 +4,7 @@ import { LayoutOptions, NodeSingular } from "cytoscape";
 import {
   LayoutPositionsSchema,
   CyLayout,
-  LayoutPayload,
+  CyLayoutPayload,
   PositionSchema,
   GraphMode,
 } from "@/types";
@@ -100,13 +100,12 @@ export const useLayout = defineStore("layout", {
      * Resets the graph layout.
      *
      * @param layoutPayload - The cy instance and layout.
-     * @param generate - Whether to generate the layout positions.
      */
-    setGraphLayout(layoutPayload: LayoutPayload, generate?: boolean): void {
+    setGraphLayout(layoutPayload: CyLayoutPayload): void {
       appStore.onLoadStart();
 
       this.layout = layoutPayload.layout;
-      cyCreateLayout(layoutPayload, generate);
+      cyCreateLayout(layoutPayload);
       this.applyAutomove();
 
       // Wait for the graph to render.
@@ -122,20 +121,20 @@ export const useLayout = defineStore("layout", {
      */
     setArtifactTreeLayout(): void {
       const layout = GraphLayout.createArtifactLayout();
-      const payload = { layout, cyPromise: artifactTreeCyPromise };
-      const generateLayout =
+      const generate =
         this.mode === "tim" || Object.keys(this.artifactPositions).length === 0;
+      const payload = { layout, generate, cyPromise: artifactTreeCyPromise };
 
-      this.setGraphLayout(payload, generateLayout);
+      this.setGraphLayout(payload);
     },
     /**
      * Resets the graph layout of the TIM tree.
      */
     setTimTreeLayout(): void {
       const layout = GraphLayout.createTimLayout();
-      const payload = { layout, cyPromise: timTreeCyPromise };
+      const payload = { layout, generate: true, cyPromise: timTreeCyPromise };
 
-      this.setGraphLayout(payload, true);
+      this.setGraphLayout(payload);
     },
     /**
      * Resets the layout of the graph.

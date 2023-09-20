@@ -1,34 +1,10 @@
 import {
   MemberEntitySchema,
-  MemberRequestSchema,
   MembershipSchema,
   OrganizationSchema,
   TeamSchema,
 } from "@/types";
 import { buildRequest } from "@/api";
-
-const exampleMember = (id: string | number = 0): MembershipSchema => ({
-  projectMembershipId: id.toString(),
-  email: `${id}@example.com`,
-  role: "VIEWER",
-});
-
-const exampleTeam = (id: string | number = 0): TeamSchema => ({
-  id: id.toString(),
-  name: `Team ${id}`,
-  members: [exampleMember(), exampleMember(1)],
-  projects: [],
-});
-
-const exampleOrg = (id: string | number = 0): OrganizationSchema => ({
-  id: id.toString(),
-  name: `Organization ${id}`,
-  description: "An example description",
-  members: [exampleMember(), exampleMember(1)],
-  personalOrg: id === 0,
-  paymentTier: "FREE",
-  teams: [exampleTeam(), exampleTeam(1)],
-});
 
 /**
  * Returns all organizations for the current user.
@@ -36,19 +12,19 @@ const exampleOrg = (id: string | number = 0): OrganizationSchema => ({
  * @return All organizations.
  */
 export async function getOrganizations(): Promise<OrganizationSchema[]> {
-  // TODO
-  return [exampleOrg(), exampleOrg(1)];
+  return buildRequest<OrganizationSchema[]>("getAllOrgs").get();
 }
 
 /**
  * Returns the organization with the given id.
  *
- * @param id - The id of the organization to return.
+ * @param orgId - The id of the organization to return.
  * @return The organization.
  */
-export async function getOrganization(id: string): Promise<OrganizationSchema> {
-  // TODO
-  return exampleOrg(id);
+export async function getOrganization(
+  orgId: string
+): Promise<OrganizationSchema> {
+  return buildRequest<OrganizationSchema, "orgId">("getOrg", { orgId }).get();
 }
 
 /**
@@ -60,11 +36,11 @@ export async function getOrganization(id: string): Promise<OrganizationSchema> {
 export async function createOrganization(
   org: Pick<OrganizationSchema, "name" | "description">
 ): Promise<OrganizationSchema> {
-  // TODO
-  return {
-    ...exampleOrg(),
-    ...org,
-  };
+  return buildRequest<
+    OrganizationSchema,
+    string,
+    Pick<OrganizationSchema, "name" | "description">
+  >("createOrg").post(org);
 }
 
 /**
@@ -76,8 +52,10 @@ export async function createOrganization(
 export async function editOrganization(
   org: OrganizationSchema
 ): Promise<OrganizationSchema> {
-  // TODO
-  return org;
+  return buildRequest<OrganizationSchema, "orgId", OrganizationSchema>(
+    "editOrg",
+    { orgId: org.id }
+  ).put(org);
 }
 
 /**
@@ -86,11 +64,11 @@ export async function editOrganization(
  * @param org - The organization to delete.
  */
 export async function deleteOrganization(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   org: OrganizationSchema
 ): Promise<void> {
-  // TODO
-  return;
+  await buildRequest<OrganizationSchema, "orgId">("deleteOrg", {
+    orgId: org.id,
+  }).delete();
 }
 
 /**
@@ -104,11 +82,10 @@ export async function createTeam(
   orgId: string,
   team: Omit<TeamSchema, "id">
 ): Promise<TeamSchema> {
-  // TODO
-  return {
-    ...exampleTeam(),
-    ...team,
-  };
+  return buildRequest<TeamSchema, "orgId", Omit<TeamSchema, "id">>(
+    "createTeam",
+    { orgId }
+  ).post(team);
 }
 
 /**
@@ -122,8 +99,10 @@ export async function editTeam(
   orgId: string,
   team: TeamSchema
 ): Promise<TeamSchema> {
-  // TODO
-  return team;
+  return buildRequest<TeamSchema, "orgId" | "teamId", TeamSchema>("editTeam", {
+    orgId,
+    teamId: team.id,
+  }).put(team);
 }
 
 /**
@@ -133,13 +112,13 @@ export async function editTeam(
  * @param team - The team to delete.
  */
 export async function deleteTeam(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   orgId: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   team: TeamSchema
 ): Promise<void> {
-  // TODO
-  return;
+  await buildRequest<TeamSchema, "orgId" | "teamId">("deleteTeam", {
+    orgId,
+    teamId: team.id,
+  }).delete();
 }
 
 /**
@@ -151,9 +130,8 @@ export async function deleteTeam(
 export async function getMembers(
   entity: MemberEntitySchema
 ): Promise<MembershipSchema[]> {
-  // TODO
-  return buildRequest<MembershipSchema[], "projectId">("getProjectMembers", {
-    projectId: entity.entityId || "",
+  return buildRequest<MembershipSchema[], "entityId">("getMembers", {
+    entityId: entity.entityId || "",
   }).get();
 }
 
@@ -166,13 +144,13 @@ export async function getMembers(
 export async function createMember(
   member: Omit<MembershipSchema, "projectMembershipId">
 ): Promise<MembershipSchema> {
-  // TODO
-  return buildRequest<MembershipSchema, "projectId", MemberRequestSchema>(
-    "updateProjectMember",
-    { projectId: member.entityId || "" }
-  ).post({
-    memberEmail: member.email,
-    projectRole: member.role,
+  return buildRequest<
+    MembershipSchema,
+    "entityId",
+    Pick<MembershipSchema, "email" | "role">
+  >("createMember", { entityId: member.entityId || "" }).post({
+    email: member.email,
+    role: member.role,
   });
 }
 
@@ -185,14 +163,10 @@ export async function createMember(
 export async function editMember(
   member: MembershipSchema
 ): Promise<MembershipSchema> {
-  // TODO
-  return buildRequest<MembershipSchema, "projectId", MemberRequestSchema>(
-    "updateProjectMember",
-    { projectId: member.entityId || "" }
-  ).post({
-    memberEmail: member.email,
-    projectRole: member.role,
-  });
+  return buildRequest<MembershipSchema, "entityId", MembershipSchema>(
+    "editMember",
+    { entityId: member.entityId || "" }
+  ).put(member);
 }
 
 /**
@@ -201,12 +175,8 @@ export async function editMember(
  * @param member - The member to delete.
  * @return The delete member.
  */
-export async function deleteMember(
-  member: MembershipSchema
-): Promise<MembershipSchema> {
-  // TODO
-  return buildRequest<MembershipSchema, "projectMemberId">(
-    "deleteProjectMember",
-    { projectMemberId: member.projectMembershipId }
-  ).delete();
+export async function deleteMember(member: MembershipSchema): Promise<void> {
+  await buildRequest<MembershipSchema, "entityId">("deleteMember", {
+    entityId: member.entityId || "",
+  }).delete();
 }

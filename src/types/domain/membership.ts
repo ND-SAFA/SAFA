@@ -90,11 +90,3 @@ export interface MembershipSchema extends MemberEntitySchema {
    */
   role: MemberRole;
 }
-
-/**
- * Represents a request for adding a member to a project.
- */
-export interface MemberRequestSchema {
-  memberEmail: string;
-  projectRole: MemberRole;
-}

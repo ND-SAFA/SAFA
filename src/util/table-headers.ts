@@ -26,7 +26,7 @@ export const actionsColumn: TableColumn<
   name: "actions",
   label: "Actions",
   sortable: false,
-  align: "left",
+  align: "right",
   field: () => "",
 };
 
@@ -43,7 +43,7 @@ export const artifactColumns: TableColumn<FlatArtifact>[] = [
     name: "type",
     label: "Type",
     sortable: true,
-    align: "left",
+    align: "right",
     classes: "data-table-cell-200",
     field: (row) => row.type,
   },
@@ -53,7 +53,7 @@ export const artifactDeltaColumn: TableColumn<FlatArtifact> = {
   name: "deltaType",
   label: "Delta State",
   sortable: true,
-  align: "left",
+  align: "right",
   classes: "data-table-cell-200",
   field: () => "",
 };
@@ -66,7 +66,7 @@ export const artifactAttributesColumns: (
     name: key,
     field: (row: FlatArtifact) => (row[key] === undefined ? "" : row[key]),
     sortable: true,
-    align: "left",
+    align: "right",
     classes: "data-table-cell-200",
   }));
 
@@ -78,7 +78,7 @@ export const artifactMatrixColumns: (
     name: id,
     field: () => "",
     sortable: true,
-    align: "left",
+    align: "right",
   }));
 
 export const jobColumns: TableColumn<JobSchema>[] = [
@@ -91,13 +91,13 @@ export const jobColumns: TableColumn<JobSchema>[] = [
   {
     name: "currentProgress",
     label: "Last Updated",
-    align: "left",
+    align: "right",
     field: (job) => job.currentProgress,
   },
   {
     name: "status",
     label: "Status",
-    align: "left",
+    align: "right",
     field: (job) => job.status,
   },
 ];
@@ -115,35 +115,35 @@ export const approvalColumns: TableColumn<FlatTraceLink>[] = [
     label: "Child Type",
     field: (row) => row.sourceType,
     sortable: true,
-    align: "left",
+    align: "right",
   },
   {
     name: "targetName",
     label: "Parent Name",
     field: (row) => row.targetName,
     sortable: true,
-    align: "left",
+    align: "right",
   },
   {
     name: "targetType",
     label: "Parent Type",
     field: (row) => row.targetType,
     sortable: true,
-    align: "left",
+    align: "right",
   },
   {
     name: "approvalStatus",
     label: "Approval Status",
     field: (row) => row.approvalStatus,
     sortable: true,
-    align: "left",
+    align: "right",
   },
   {
     name: "score",
     label: "Confidence Score",
     field: (row) => row.score,
     sortable: true,
-    align: "left",
+    align: "right",
   },
   actionsColumn,
 ];
@@ -158,31 +158,15 @@ export const installationsColumns: TableColumn<InstallationSchema>[] = [
   {
     label: "Project ID",
     name: "installationId",
-    align: "left",
+    align: "right",
     field: (row) => row.installationId,
   },
   {
     label: "Last Synced",
     name: "lastUpdate",
-    align: "left",
+    align: "right",
     field: (row) => row.lastUpdate,
     format: (lastUpdate: string) => timestampToDisplay(lastUpdate),
-  },
-  actionsColumn,
-];
-
-export const modelColumns: TableColumn<GenerationModelSchema>[] = [
-  {
-    name: "name",
-    label: "Name",
-    align: "left",
-    field: (row) => row.name,
-  },
-  {
-    name: "baseModel",
-    label: "Base Model",
-    align: "left",
-    field: (row) => row.baseModel,
   },
   actionsColumn,
 ];
@@ -201,7 +185,7 @@ export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
     name: "description",
     label: "Description",
     sortable: false,
-    align: "left",
+    align: "right",
     classes: "data-table-cell-200",
     field: (row) => row.description,
   },
@@ -209,7 +193,7 @@ export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
     name: "owner",
     label: "Owner",
     sortable: false,
-    align: "left",
+    align: "right",
     classes: "data-table-cell-200",
     field: (row) => row.owner,
   },
@@ -250,7 +234,7 @@ export const membersColumns: TableColumn<MembershipSchema>[] = [
   {
     label: "Role",
     name: "role",
-    align: "left",
+    align: "right",
     field: (row) => row.role,
   },
   actionsColumn,
@@ -266,13 +250,13 @@ export const teamColumns: TableColumn<Record<string, string>>[] = [
   {
     label: "Members",
     name: "members",
-    align: "left",
+    align: "right",
     field: (row) => row.members.length,
   },
   {
     label: "Projects",
     name: "projects",
-    align: "left",
+    align: "right",
     field: (row) => row.projects.length,
   },
   actionsColumn,

@@ -141,10 +141,21 @@ public abstract class BaseController {
      * @return A deferred result that will perform the request.
      */
     protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request) {
+        return makeDeferredRequest(request, BaseController.DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Perform a deferred request which will make the request in the background.
+     *
+     * @param request The request to make.
+     * @param timeout The timeout for the request.
+     * @return A deferred result that will perform the request.
+     */
+    protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request, long timeout) {
         return makeDeferredRequest((user) -> {
             request.accept(user);
             return null;
-        }, BaseController.DEFAULT_REQUEST_TIMEOUT);
+        }, timeout);
     }
 
     /**

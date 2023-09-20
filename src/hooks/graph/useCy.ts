@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { CyPromise, CytoCoreGraph, ResolveCy } from "@/types";
 import { layoutStore } from "@/hooks";
-import { GRAPH_CONFIG, CREATOR_PLUGINS } from "@/cytoscape";
+import { GRAPH_CONFIG, CREATOR_PLUGINS, PROJECT_PLUGINS } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -16,15 +16,29 @@ export const useCy = defineStore("cy", {
       creatorResolveCy = resolve;
     });
 
+    let projectResolveCy: ResolveCy = null;
+
+    const projectCy: CyPromise = new Promise((resolve) => {
+      projectResolveCy = resolve;
+    });
+
     return {
       /**
-       * Wraps cytoscape instance in a promise.
+       * Wraps creator cytoscape instance in a promise until it is created.
        */
       creatorResolveCy,
       /**
-       * A promise for using the project creator cy instance.
+       * A promise for using the creator cy instance.
        */
       creatorCy,
+      /**
+       * Wraps project cytoscape instance in a promise until it is created.
+       */
+      projectResolveCy,
+      /**
+       * A promise for using the project cy instance.
+       */
+      projectCy,
     };
   },
   getters: {
@@ -43,6 +57,18 @@ export const useCy = defineStore("cy", {
             layoutStore.setCreatorLayout();
           }, 100);
         },
+      };
+    },
+    /**
+     * @return The configuration for the project graph.
+     */
+    projectGraph(): CytoCoreGraph {
+      return {
+        name: "artifact-tree-graph",
+        config: GRAPH_CONFIG,
+        saveCy: this.projectResolveCy,
+        plugins: PROJECT_PLUGINS,
+        afterInit: () => undefined,
       };
     },
   },

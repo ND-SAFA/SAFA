@@ -1,7 +1,7 @@
 <template>
   <cytoscape
     id="cytoscape-artifact"
-    :graph="artifactTreeGraph"
+    :graph="cyStore.projectGraph"
     :class="className"
     data-cy="view-artifact-tree"
     @click="handleClick"
@@ -70,9 +70,10 @@ import {
   selectionStore,
   layoutStore,
   timStore,
+  cyStore,
 } from "@/hooks";
 import { Routes } from "@/router";
-import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
+import { disableDrawMode } from "@/cytoscape";
 import { Cytoscape } from "./base";
 import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
 import { TimNode, TimLink, TimMenu } from "./tim";

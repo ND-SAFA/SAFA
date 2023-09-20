@@ -10,7 +10,6 @@ import {
 } from "@/types";
 import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
 import {
-  artifactTreeCyPromise,
   cyApplyAutomove,
   cyCreateLayout,
   cyResetTree,
@@ -121,7 +120,7 @@ export const useLayout = defineStore("layout", {
       const layout = GraphLayout.createProjectLayout();
       const generate =
         this.mode === "tim" || Object.keys(this.artifactPositions).length === 0;
-      const payload = { layout, generate, cyPromise: artifactTreeCyPromise };
+      const payload = { layout, generate, cyPromise: cyStore.projectCy };
 
       this.setGraphLayout(payload);
     },

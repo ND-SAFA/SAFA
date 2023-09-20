@@ -15,11 +15,7 @@ import {
   traceStore,
   appStore,
 } from "@/hooks";
-import {
-  artifactTreeCyPromise,
-  cyCenterOnArtifacts,
-  cyIfNotAnimated,
-} from "@/cytoscape";
+import { cyCenterOnArtifacts, cyIfNotAnimated } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -149,17 +145,12 @@ export const useSelection = defineStore("selection", {
      * If no artifacts are given, the entire collection of nodes is centered.
      *
      * @param artifactIds - The artifacts whose average point will be centered.
-     * @param cyPromise - A promise returning an instance of cytoscape.
      */
-    centerOnArtifacts(
-      artifactIds: string[],
-      cyPromise = artifactTreeCyPromise
-    ): void {
+    centerOnArtifacts(artifactIds: string[]): void {
       cyCenterOnArtifacts(
         this.centeredArtifacts,
         artifactIds,
-        (ids) => (this.centeredArtifacts = ids || []),
-        cyPromise
+        (ids) => (this.centeredArtifacts = ids || [])
       );
     },
     /**

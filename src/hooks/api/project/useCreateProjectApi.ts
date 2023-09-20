@@ -103,7 +103,11 @@ export const useCreateProjectApi = defineStore(
       if (!installationId || !projectId) return;
 
       await createProjectApi.handleRequest(
-        () => createJiraProject(installationId, projectId),
+        () =>
+          createJiraProject(installationId, projectId, {
+            orgId: orgStore.orgId,
+            teamId: teamStore.teamId,
+          }),
         {
           ...callbacks,
           onSuccess: async (job) => {
@@ -131,11 +135,11 @@ export const useCreateProjectApi = defineStore(
 
       await createProjectApi.handleRequest(
         () =>
-          createGitHubProject(
-            owner,
-            repositoryName,
-            integrationsStore.gitHubConfig
-          ),
+          createGitHubProject(owner, repositoryName, {
+            ...integrationsStore.gitHubConfig,
+            orgId: orgStore.orgId,
+            teamId: teamStore.teamId,
+          }),
         {
           ...callbacks,
           onSuccess: async (job) => {

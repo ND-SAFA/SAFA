@@ -21,6 +21,16 @@ public class JobMessageController {
     @MessageMapping("/jobs/{jobId}")
     @SendToUser("/queue/job-updates")
     public JobAppEntity sendJobState(@DestinationVariable UUID jobId, SimpMessageHeaderAccessor headerAccessor) {
+        // TODO: How to send message back to user?
+        // User has to be subscribed to a topic to receive messages.
+        // Create user channels?
+        // User channels; receive any custom messages.
+
+        // What does custom mean?
+        // GenericMessage.
+        // EntityChangeNotification
+        // JobUpdate
+        // UserUpdate
         return JobAppEntity.createFromJob(jobService.getJobById(jobId));
     }
 }

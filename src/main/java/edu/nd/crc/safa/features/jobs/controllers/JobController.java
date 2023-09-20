@@ -23,6 +23,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -68,9 +69,36 @@ public class JobController extends BaseController {
      * @return The list of jobs created by user.
      * @throws SafaError If authentication error occurs.
      */
-    @GetMapping(AppRoutes.Jobs.Meta.GET_JOBS)
+    @GetMapping(AppRoutes.Jobs.Meta.GET_USER_JOBS)
     public List<JobAppEntity> getUserJobs() throws SafaError {
         return this.jobService.retrieveCurrentUserJobs();
+    }
+
+    /**
+     * Returns the list of jobs associated with project.
+     *
+     * @param projectId The ID of project.
+     * @return The list of jobs created by user.
+     * @throws SafaError If authentication error occurs.
+     */
+    @GetMapping(AppRoutes.Jobs.Meta.GET_PROJECT_JOBS)
+    public List<JobAppEntity> getProjectJobs(UUID projectId) throws SafaError {
+        ServiceProvider serviceProvider = this.getServiceProvider();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.getResourceBuilder().fetchProject(projectId)
+            .withPermission(ProjectPermission.EDIT, user).get();
+        return this.jobService.getProjectJobs(project);
+    }
+
+    /**
+     * Returns the list of jobs associated with all projects shared with user.
+     *
+     * @return The list of jobs created by user.
+     * @throws SafaError If authentication error occurs.
+     */
+    @GetMapping(AppRoutes.Jobs.Meta.GET_ALL_JOBS)
+    public List<JobAppEntity> getAllJobs() throws SafaError {
+        return this.jobService.getAllProjectJobs();
     }
 
     /**
@@ -180,7 +208,7 @@ public class JobController extends BaseController {
         UUID versionId = request.getProjectVersion().getVersionId();
         SafaUser user = safaUserService.getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         request.setProjectVersion(projectVersion);
 
         // Step - Create and start job.

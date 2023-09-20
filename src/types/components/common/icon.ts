@@ -67,6 +67,7 @@ export type IconVariant =
   | "graph-zoom-out"
   | "graph-center"
   | "graph-refresh"
+  | "graph-add"
   | "nav-toggle"
   | "nav-home"
   | "nav-create"

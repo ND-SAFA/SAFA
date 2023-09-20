@@ -150,6 +150,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-graphql";
     case "graph-refresh":
       return "mdi-refresh";
+    case "graph-add":
+      return "mdi-shape-plus";
     case "nav-toggle":
       return "mdi-menu-open";
     case "nav-home":

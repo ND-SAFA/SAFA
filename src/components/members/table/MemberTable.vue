@@ -20,6 +20,7 @@
       :deletable="displayMemberActions"
       :loading="memberApiStore.loading"
       :custom-cells="['role']"
+      :icons="{ add: 'member-add', delete: 'member-delete', edit: 'edit' }"
       @row:add="handleAdd"
       @row:delete="handleDelete"
       @refresh="handleRefresh"
@@ -35,7 +36,7 @@
       </template>
 
       <template #body-cell-role="{ row }: { row: MembershipSchema }">
-        <q-td>
+        <q-td align="end">
           <member-role-button v-if="displayMemberActions" :member="row" />
           <typography v-else :value="row.role" />
         </q-td>

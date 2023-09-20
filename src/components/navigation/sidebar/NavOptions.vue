@@ -45,7 +45,7 @@ const options = computed(() => {
     {
       label: "Create Project",
       iconTitle: !sidebarOpen.value ? "Create" : undefined,
-      icon: "nav-create",
+      icon: "project-add",
       path: Routes.PROJECT_CREATOR,
       color: Routes.PROJECT_CREATOR === currentRoute.path ? "primary" : "text",
     },

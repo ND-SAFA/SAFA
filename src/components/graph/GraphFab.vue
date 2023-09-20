@@ -11,8 +11,8 @@
       direction="up"
       vertical-actions-align="left"
       :color="drawMode ? 'secondary' : 'primary'"
-      active-icon="mdi-close"
-      :icon="drawMode ? 'mdi-ray-start-arrow' : 'mdi-plus'"
+      :active-icon="getIcon('cancel')"
+      :icon="drawMode ? getIcon('trace') : getIcon('graph-add')"
       :disable="draggingFab"
       data-cy="button-fab-toggle"
     >
@@ -20,7 +20,7 @@
         v-if="displayGenerateActions"
         outline
         label="Generate Trace Links"
-        icon="mdi-chart-timeline-variant-shimmer"
+        :icon="getIcon('generate-traces')"
         class="bg-neutral"
         color="primary"
         data-cy="button-fab-generate-trace"
@@ -30,7 +30,7 @@
         v-if="displayGenerateActions"
         outline
         label="Generate Artifacts"
-        icon="mdi-monitor-shimmer"
+        :icon="getIcon('generate-artifacts')"
         class="bg-neutral"
         color="primary"
         data-cy="button-fab-generate-artifact"
@@ -40,7 +40,7 @@
         v-if="displayGenerateActions"
         outline
         label="Summarize Artifacts"
-        icon="mdi-shimmer"
+        :icon="getIcon('generate-summaries')"
         class="bg-neutral"
         color="primary"
         data-cy="button-fab-summarize-artifact"
@@ -49,7 +49,7 @@
       <q-fab-action
         outline
         :label="drawMode ? 'Cancel Draw Mode' : 'Draw Links'"
-        :icon="drawMode ? 'mdi-close' : 'mdi-ray-start-arrow'"
+        :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
         class="bg-neutral"
         data-cy="button-fab-draw-trace"
         @click="toggleDrawMode"
@@ -58,7 +58,7 @@
         v-if="isTreeMode"
         outline
         label="Create Trace Link"
-        icon="mdi-ray-start-end"
+        :icon="getIcon('create-trace')"
         class="bg-neutral"
         data-cy="button-fab-create-trace"
         @click="appStore.openDetailsPanel('saveTrace')"
@@ -67,7 +67,7 @@
         v-if="isTreeMode"
         outline
         label="Create Artifact"
-        icon="mdi-folder-plus-outline"
+        :icon="getIcon('create-artifact')"
         class="bg-neutral"
         data-cy="button-fab-create-artifact"
         @click="artifactSaveStore.openPanel({ isNewArtifact: true })"
@@ -94,6 +94,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { getIcon } from "@/util";
 import {
   appStore,
   artifactSaveStore,

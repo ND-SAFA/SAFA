@@ -47,7 +47,7 @@ export function getIcon(variant?: IconVariant): string {
     case "error":
       return "mdi-alert-circle-outline";
     case "invite":
-      return "mdi-account-plus-outline";
+      return "mdi-account-plus";
     case "success":
       return "mdi-check-circle-outline";
     case "artifact":
@@ -104,6 +104,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-logout-variant";
     case "file":
       return "mdi-paperclip";
+    case "calendar":
+      return "mdi-calendar";
     case "down":
       return "mdi-chevron-down";
     case "up":
@@ -150,6 +152,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-graphql";
     case "graph-refresh":
       return "mdi-refresh";
+    case "graph-add":
+      return "mdi-shape-plus";
     case "nav-toggle":
       return "mdi-menu-open";
     case "nav-home":
@@ -178,6 +182,24 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-chevron-down";
     case "group-close-all":
       return "mdi-arrow-collapse-all";
+    case "member-add":
+      return "mdi-account-plus";
+    case "member-delete":
+      return "mdi-account-remove";
+    case "project-add":
+      return "mdi-briefcase-plus";
+    case "project-delete":
+      return "mdi-briefcase-remove";
+    case "project-edit":
+      return "mdi-briefcase-edit";
+    case "version-add":
+      return "mdi-folder-plus";
+    case "version-delete":
+      return "mdi-folder-remove";
+    case "pw-show":
+      return "mdi-eye";
+    case "pw-hide":
+      return "mdi-eye-off";
     default:
       return "";
   }

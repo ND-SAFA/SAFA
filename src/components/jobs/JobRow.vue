@@ -39,10 +39,11 @@
         minimal
         dense-labels
         hide-actions
+        hide-step-back
         :model-value="currentStep"
         :steps="steps"
       />
-      <flex-box full-width justify="end">
+      <flex-box full-width justify="end" b="2">
         <text-button
           outlined
           label="View Logs"

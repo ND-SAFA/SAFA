@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.features.organizations.services;
 
+import static edu.nd.crc.safa.utilities.AssertUtils.assertNotNull;
+import static edu.nd.crc.safa.utilities.AssertUtils.assertNull;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +22,7 @@ import edu.nd.crc.safa.features.organizations.repositories.OrganizationRepositor
 import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -40,9 +44,8 @@ public class OrganizationService {
      * @return The newly created organization
      */
     public Organization createNewOrganization(Organization organization) {
-        if (organization.getId() != null) {
-            throw new IllegalArgumentException("Cannot create a new organization with an ID");
-        }
+        assertNull(organization.getId(), "Cannot create a new organization with a specified ID");
+        assertRequiredFields(organization);
 
         organization = organizationRepo.save(organization);  // Save once so it gets an id
 
@@ -57,6 +60,31 @@ public class OrganizationService {
     }
 
     /**
+     * Update an organization entry in the database.
+     *
+     * @param organization The new entry
+     * @return The updated entry
+     */
+    public Organization updateOrganization(Organization organization) {
+        assertNotNull(organization.getId(), "Missing organization ID");
+        assertRequiredFields(organization);
+
+        return organizationRepo.save(organization);
+    }
+
+    /**
+     * Assert that all fields that are necessary for the database are included.
+     *
+     * @param organization The object to check
+     */
+    private void assertRequiredFields(Organization organization) {
+        assertNotNull(organization.getName(), "Missing organization name.");
+        assertNotNull(organization.getDescription(), "Missing organization description");
+        assertNotNull(organization.getOwner(), "Missing organization owner.");
+        assertNotNull(organization.getPaymentTier(), "Missing organization payment tier");
+    }
+
+    /**
      * Gets the personal organization representing a given user
      *
      * @param user The user
@@ -66,6 +94,17 @@ public class OrganizationService {
         UUID orgId = user.getPersonalOrgId();
         return organizationRepo.findById(orgId)
                 .orElseThrow(() -> new SafaError("User does not have a personal organization"));
+    }
+
+    /**
+     * Gets an organization by its ID.
+     *
+     * @param id Org ID
+     * @return The org
+     */
+    public Organization getOrganizationById(UUID id) {
+        return organizationRepo.findById(id)
+            .orElseThrow(() -> new SafaItemNotFoundError("No organization with the given ID found"));
     }
 
     /**
@@ -122,5 +161,14 @@ public class OrganizationService {
             .stream()
             .flatMap(role -> role.getGrants().stream())
             .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Delete an organization based on its id.
+     *
+     * @param id The id of the org to delete.
+     */
+    public void deleteOrganizationById(UUID id) {
+        organizationRepo.deleteById(id);
     }
 }

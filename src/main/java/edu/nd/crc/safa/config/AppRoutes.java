@@ -299,5 +299,6 @@ public class AppRoutes {
     public static class Organizations {
         public static final String ROOT = "/organizations";
         public static final String BY_ID = ROOT + "/{orgId}";
+        public static final String SELF = ROOT + "/self";
     }
 }

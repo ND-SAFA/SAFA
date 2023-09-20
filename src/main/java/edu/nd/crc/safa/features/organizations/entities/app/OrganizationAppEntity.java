@@ -6,8 +6,10 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class OrganizationAppEntity {
     private UUID id;
     private String name;

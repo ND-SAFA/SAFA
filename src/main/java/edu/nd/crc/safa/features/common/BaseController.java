@@ -23,6 +23,7 @@ import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededExceptio
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -105,6 +106,12 @@ public abstract class BaseController {
             .body(new SafaError(ex.getMessage()));
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public SafaError handleBadRequest(HttpMessageNotReadableException ex) {
+        return new SafaError(ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public SafaError handleGenericError(Exception ex) {
@@ -169,5 +176,9 @@ public abstract class BaseController {
         });
 
         return output;
+    }
+
+    protected SafaUser getCurrentUser() {
+        return getServiceProvider().getSafaUserService().getCurrentUser();
     }
 }

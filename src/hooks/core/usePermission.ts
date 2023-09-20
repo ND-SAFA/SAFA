@@ -7,7 +7,7 @@ import {
   OrganizationSchema,
   MembershipType,
 } from "@/types";
-import { roleMap } from "@/util";
+import { ENABLED_FEATURES, roleMap } from "@/util";
 import { orgStore, projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -64,7 +64,7 @@ export const usePermission = defineStore("permissionStore", {
       } else if (permission === "safa.view") {
         return true;
       } else if (permission.startsWith("safa.")) {
-        return !!sessionStore.user.superuser;
+        return !!sessionStore.user.superuser || ENABLED_FEATURES.ORGS_ADMIN;
       }
 
       return (

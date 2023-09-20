@@ -104,6 +104,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-logout-variant";
     case "file":
       return "mdi-paperclip";
+    case "calendar":
+      return "mdi-calendar";
     case "down":
       return "mdi-chevron-down";
     case "up":
@@ -194,6 +196,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-folder-plus";
     case "version-delete":
       return "mdi-folder-remove";
+    case "pw-show":
+      return "mdi-eye";
+    case "pw-hide":
+      return "mdi-eye-off";
     default:
       return "";
   }

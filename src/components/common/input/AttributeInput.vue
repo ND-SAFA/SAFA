@@ -3,7 +3,7 @@
     v-if="attribute.type === 'text'"
     :label="attribute.label"
     :rules="[lengthRules]"
-    :model-value="attributes[attribute.key]"
+    :model-value="attributes[attribute.key] as string"
     @update:model-value="handleInput"
   />
 
@@ -12,25 +12,25 @@
     type="textarea"
     :label="attribute.label"
     :rules="[lengthRules]"
-    :model-value="attributes[attribute.key]"
+    :model-value="attributes[attribute.key] as string"
     @update:model-value="handleInput"
   />
 
   <select-input
     v-else-if="attribute.type === 'select'"
     :label="attribute.label"
-    :options="attribute.options"
-    :model-value="attributes[attribute.key]"
+    :options="attribute.options || []"
+    :model-value="attributes[attribute.key] as string"
     @update:model-value="handleInput"
   />
 
   <multiselect-input
     v-else-if="attribute.type === 'multiselect'"
     :label="attribute.label"
-    :options="attribute.options"
+    :options="attribute.options || []"
     :rules="[lengthRules]"
-    :model-value="attributes[attribute.key]"
-    @update:model-value="handleInput"
+    :model-value="attributes[attribute.key] as string[]"
+    @update:model-value="handleInput as (value: string[]) => void"
   />
 
   <artifact-input
@@ -38,7 +38,7 @@
     multiple
     :label="attribute.label"
     :rules="[lengthRules]"
-    :model-value="attributes[attribute.key]"
+    :model-value="attributes[attribute.key] as string[]"
     @update:model-value="handleInput"
   />
 
@@ -47,7 +47,7 @@
     type="number"
     :label="attribute.label"
     :rules="[intRules, numRules]"
-    :model-value="attributes[attribute.key]"
+    :model-value="attributes[attribute.key] as number"
     @update:model-value="handleInput"
   />
 
@@ -56,7 +56,7 @@
     type="number"
     :label="attribute.label"
     :rules="[numRules]"
-    :model-value="attributes[attribute.key]"
+    :model-value="attributes[attribute.key] as number"
     @update:model-value="handleInput"
   />
 
@@ -72,11 +72,11 @@
     v-else-if="attribute.type === 'date'"
     filled
     :label="attribute.label"
-    :model-value="attributes[attribute.key]"
+    :model-value="attributes[attribute.key] as string"
     @update:model-value="handleInput"
   >
     <template #append>
-      <q-icon name="mdi-calendar" class="cursor-pointer">
+      <q-icon :name="getIcon('calendar')" class="cursor-pointer">
         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
           <q-date
             :model-value="attributes[attribute.key]"
@@ -105,6 +105,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { AttributeDataType, AttributeInputProps } from "@/types";
+import { getIcon } from "@/util";
 import TextInput from "./TextInput.vue";
 import SelectInput from "./SelectInput.vue";
 import ArtifactInput from "./ArtifactInput.vue";

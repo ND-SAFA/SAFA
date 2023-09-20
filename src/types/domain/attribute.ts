@@ -99,6 +99,7 @@ export type AttributeDataType =
   | string[]
   | number
   | boolean
+  | null
   | undefined;
 
 /**

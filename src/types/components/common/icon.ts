@@ -44,6 +44,7 @@ export type IconVariant =
   | "redo"
   | "logout"
   | "file"
+  | "calendar"
   | "down"
   | "up"
   | "arrow-down"
@@ -88,7 +89,9 @@ export type IconVariant =
   | "project-edit"
   | "project-delete"
   | "version-add"
-  | "version-delete";
+  | "version-delete"
+  | "pw-show"
+  | "pw-hide";
 
 /**
  * Defines props for an icon.

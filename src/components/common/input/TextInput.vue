@@ -48,7 +48,7 @@ const emit = defineEmits<{
   /**
    * Called when the model is updated.
    */
-  (e: "update:modelValue"): void;
+  (e: "update:modelValue", value: string | number | null): void;
   /**
    * Called when the enter button is pressed.
    */

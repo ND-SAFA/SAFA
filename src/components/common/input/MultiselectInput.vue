@@ -57,7 +57,7 @@ defineEmits<{
   /**
    * Called when the model is updated.
    */
-  (e: "update:modelValue"): void;
+  (e: "update:modelValue", value: unknown[]): void;
 }>();
 
 const model = useVModel(props, "modelValue");
@@ -65,7 +65,7 @@ const model = useVModel(props, "modelValue");
 const className = useMargins(props, () => [[!!props.class, props.class]]);
 
 const showError = computed(
-  () => (!!props.errorMessage && props.errorMessage.length > 0) || undefined
+  () => (props.errorMessage && props.errorMessage.length > 0) || undefined
 );
 
 const options = ref(props.options);

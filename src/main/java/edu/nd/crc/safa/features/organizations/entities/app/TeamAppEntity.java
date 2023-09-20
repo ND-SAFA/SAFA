@@ -14,11 +14,14 @@ public class TeamAppEntity {
     private String name;
     private List<MembershipAppEntity> members;
     private List<ProjectIdAppEntity> projects;
+    private List<String> permissions;
 
-    public TeamAppEntity(Team team, List<MembershipAppEntity> members, List<ProjectIdAppEntity> projects) {
+    public TeamAppEntity(Team team, List<MembershipAppEntity> members,
+                         List<ProjectIdAppEntity> projects,List<String> permissions) {
         this.id = team.getId();
         this.name = team.getName();
         this.members = members;
         this.projects = projects;
+        this.permissions = permissions;
     }
 }

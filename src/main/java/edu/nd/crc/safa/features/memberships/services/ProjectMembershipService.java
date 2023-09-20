@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.memberships.entities.db.TeamProjectMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.TeamProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
-import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
@@ -126,17 +125,7 @@ public class ProjectMembershipService {
      */
     public List<ProjectIdAppEntity> getProjectIdAppEntitiesForUser(SafaUser user) {
         return getProjectsForUser(user).stream()
-                .map(project -> {
-                    List<MembershipAppEntity> members = this.userProjectMembershipRepo.findByProject(project)
-                            .stream()
-                            .map(MembershipAppEntity::new)
-                            .collect(Collectors.toList());
-                    this.teamMembershipService.getTeamMemberships(project.getOwningTeam())
-                            .stream()
-                            .map(MembershipAppEntity::new)
-                            .forEach(members::add);
-                    return new ProjectIdAppEntity(project, members);
-                })
+                .map(project -> projectService.getIdAppEntity(project, user))
                 .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
                 .collect(Collectors.toList());
     }

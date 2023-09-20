@@ -16,9 +16,10 @@ public class OrganizationAppEntity {
     private String paymentTier;
     private List<MembershipAppEntity> members;
     private List<TeamAppEntity> teams;
+    private List<String> permissions;
 
     public OrganizationAppEntity(Organization organization, List<MembershipAppEntity> members,
-                                 List<TeamAppEntity> teams) {
+                                 List<TeamAppEntity> teams, List<String> permissions) {
         this.id = organization.getId();
         this.name = organization.getName();
         this.description = organization.getDescription();
@@ -26,5 +27,6 @@ public class OrganizationAppEntity {
         this.paymentTier = organization.getPaymentTier();
         this.members = members;
         this.teams = teams;
+        this.permissions = permissions;
     }
 }

@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
+import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -139,24 +141,52 @@ public class ProjectService {
      * Converts a project to a project identifier front-end object
      *
      * @param project The project
+     * @param currentUser The user making the request (so that we can properly show permissions)
      * @return The project identifier
      */
-    public ProjectIdAppEntity getIdAppEntity(Project project) {
-        List<MembershipAppEntity> projectMemberships =
-            projectMembershipService.getAllProjectMembers(project)
+    public ProjectIdAppEntity getIdAppEntity(Project project, SafaUser currentUser) {
+        List<UserProjectMembership> projectMemberships =
+            projectMembershipService.getAllProjectMembers(project);
+
+        List<MembershipAppEntity> membershipAppEntities =
+            projectMemberships
                 .stream()
                 .map(MembershipAppEntity::new)
                 .collect(Collectors.toUnmodifiableList());
-        return new ProjectIdAppEntity(project, projectMemberships);
+
+        List<String> permissions = getUserPermissions(projectMemberships, currentUser);
+
+        return new ProjectIdAppEntity(project, membershipAppEntities, permissions);
     }
 
     /**
      * Converts a collection of projects to project identifiers
      *
      * @param projects The projects
+     * @param currentUser The user making the request (so that we can properly show permissions)
      * @return A list of project identifier objects
      */
-    public List<ProjectIdAppEntity> getIdAppEntities(Collection<Project> projects) {
-        return projects.stream().map(this::getIdAppEntity).collect(Collectors.toUnmodifiableList());
+    public List<ProjectIdAppEntity> getIdAppEntities(Collection<Project> projects, SafaUser currentUser) {
+        return projects.stream()
+            .map(project -> getIdAppEntity(project, currentUser))
+            .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Get all permissions granted to a user based on a list of project memberships. This function
+     * just filters the list of memberships for ones that match the given user, extracts the corresponding roles,
+     * and then returns the permissions associated with those roles.
+     *
+     * @param memberships The list of all memberships within a project
+     * @param currentUser The user in question
+     * @return All project-related permissions granted to the user
+     */
+    private List<String> getUserPermissions(List<UserProjectMembership> memberships, SafaUser currentUser) {
+        return memberships.stream()
+            .filter(membership -> membership.getMember().getUserId().equals(currentUser.getUserId()))
+            .map(UserProjectMembership::getRole)
+            .flatMap(role -> role.getGrants().stream())
+            .map(Permission::getName)
+            .collect(Collectors.toUnmodifiableList());
     }
 }

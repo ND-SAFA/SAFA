@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.repositories.TeamRepository;
+import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
@@ -85,28 +87,53 @@ public class TeamService {
      * Convert a team to its front-end representation
      *
      * @param team The team
+     * @param currentUser The user making the request (so that we can properly show permissions)
      * @return The team front-end object
      */
-    public TeamAppEntity getAppEntity(Team team) {
-        List<MembershipAppEntity> teamMemberships =
-            teamMembershipService.getTeamMemberships(team)
+    public TeamAppEntity getAppEntity(Team team, SafaUser currentUser) {
+        List<TeamMembership> teamMemberships = teamMembershipService.getTeamMemberships(team);
+        List<MembershipAppEntity> teamMembershipAppEntities =
+            teamMemberships
                 .stream()
                 .map(MembershipAppEntity::new)
                 .collect(Collectors.toUnmodifiableList());
 
         List<ProjectIdAppEntity> projects = projectService.getIdAppEntities(
-            projectService.getProjectsOwnedByTeam(team));
+            projectService.getProjectsOwnedByTeam(team), currentUser);
 
-        return new TeamAppEntity(team, teamMemberships, projects);
+        List<String> permissions = getUserPermissions(teamMemberships, currentUser);
+
+        return new TeamAppEntity(team, teamMembershipAppEntities, projects, permissions);
     }
 
     /**
      * Converts a collection of teams to front-end objects
      *
      * @param teams The teams
+     * @param currentUser The user making the request (so that we can properly show permissions)
      * @return The front-end representations of the teams
      */
-    public List<TeamAppEntity> getAppEntities(Collection<Team> teams) {
-        return teams.stream().map(this::getAppEntity).collect(Collectors.toUnmodifiableList());
+    public List<TeamAppEntity> getAppEntities(Collection<Team> teams, SafaUser currentUser) {
+        return teams.stream()
+            .map(team -> getAppEntity(team, currentUser))
+            .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Get all permissions granted to a user based on a list of team memberships. This function
+     * just filters the list of memberships for ones that match the given user, extracts the corresponding roles,
+     * and then returns the permissions associated with those roles.
+     *
+     * @param memberships The list of all memberships within a team
+     * @param currentUser The user in question
+     * @return All team-related permissions granted to the user
+     */
+    private List<String> getUserPermissions(List<TeamMembership> memberships, SafaUser currentUser) {
+        return memberships.stream()
+            .filter(membership -> membership.getUser().getUserId().equals(currentUser.getUserId()))
+            .map(TeamMembership::getRole)
+            .flatMap(role -> role.getGrants().stream())
+            .map(Permission::getName)
+            .collect(Collectors.toUnmodifiableList());
     }
 }

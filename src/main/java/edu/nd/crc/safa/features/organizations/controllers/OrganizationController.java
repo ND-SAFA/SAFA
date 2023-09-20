@@ -44,7 +44,7 @@ public class OrganizationController extends BaseController {
 
         return orgMemberships.stream()
             .map(OrganizationMembership::getOrganization)
-            .map(organizationService::getAppEntity)
+            .map(org -> organizationService.getAppEntity(org, user))
             .collect(Collectors.toUnmodifiableList());
     }
 }

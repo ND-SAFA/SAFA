@@ -40,13 +40,15 @@ public class ProjectIdAppEntity {
      * Last edited.
      */
     private LocalDateTime lastEdited;
+    private List<String> permissions;
 
-    public ProjectIdAppEntity(Project project, List<MembershipAppEntity> members) {
+    public ProjectIdAppEntity(Project project, List<MembershipAppEntity> members, List<String> permissions) {
         this.projectId = project.getProjectId().toString();
         this.name = project.getName();
         this.description = project.getDescription();
         this.members = members;
         this.owner = project.getOwningTeam().getId().toString();
         this.lastEdited = project.getLastEdited();
+        this.permissions = permissions;
     }
 }

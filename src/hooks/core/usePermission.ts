@@ -59,12 +59,14 @@ export const usePermission = defineStore("permissionStore", {
       const orgMember = sessionStore.getCurrentMember(orgStore.org);
       const type = member?.entityType || "PROJECT";
 
-      if (this.isDemo) {
+      if (ENABLED_FEATURES.ORGS_ADMIN) {
+        return true;
+      } else if (this.isDemo) {
         return false;
       } else if (permission === "safa.view") {
         return true;
       } else if (permission.startsWith("safa.")) {
-        return !!sessionStore.user.superuser || ENABLED_FEATURES.ORGS_ADMIN;
+        return !!sessionStore.user.superuser;
       }
 
       return (

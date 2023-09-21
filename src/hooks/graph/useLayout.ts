@@ -8,10 +8,8 @@ import {
 } from "cytoscape";
 import {
   LayoutPositionsSchema,
-  CyLayout,
   PositionSchema,
   GraphMode,
-  CytoCore,
   AutoMoveReposition,
   CytoEvent,
   CSSCursor,
@@ -33,10 +31,6 @@ export const useLayout = defineStore("layout", {
      * A saved position for a node to be added.
      */
     savedPosition: undefined as PositionSchema | undefined,
-    /**
-     * The current graph layout.
-     */
-    layout: undefined as CyLayout | undefined,
     /**
      * The current view mode of the graph.
      */
@@ -72,29 +66,11 @@ export const useLayout = defineStore("layout", {
   },
   actions: {
     /**
-     * Creates a new graph layout.
-     * @param type - The type of graph to reset.
-     */
-    createLayout(type?: "project" | "creator"): CyLayout {
-      if (type === "creator") {
-        return {
-          preLayoutHooks: [],
-          postLayoutHooks: [],
-        };
-      } else {
-        return {
-          preLayoutHooks: [this.styleGeneratedLinks],
-          postLayoutHooks: [this.applyAutoMoveEvents],
-        };
-      }
-    },
-    /**
      * Resets the graph layout.
      * @param type - The type of graph to set the layout for.
      */
     setGraphLayout(type?: "project" | "creator"): void {
       const cyPromise = cyStore.getCy(type);
-      const layout = this.createLayout(type);
       const generate =
         type === "creator"
           ? true
@@ -103,11 +79,7 @@ export const useLayout = defineStore("layout", {
 
       appStore.onLoadStart();
 
-      this.layout = layout;
-
       cyPromise.then((cy) => {
-        layout.preLayoutHooks.forEach((hook) => hook(cy, layout));
-
         if (generate) {
           cy.layout({
             name: "klay",
@@ -117,8 +89,7 @@ export const useLayout = defineStore("layout", {
           cy.layout(this.layoutOptions).run();
         }
 
-        layout.postLayoutHooks.forEach((hook) => hook(cy, layout));
-
+        this.styleGeneratedLinks();
         this.applyAutomove();
       });
 
@@ -173,62 +144,51 @@ export const useLayout = defineStore("layout", {
       await this.resetLayout();
     },
     /**
-     * Resets all automove events.
+     * Adds auto-move handlers to all nodes, so that their children are dragged along with then.
      */
     applyAutomove(): void {
-      if (!this.layout) return;
-
       cyStore.getCy("project").then((cy) => {
-        this.applyAutoMoveEvents(cy);
+        cy.automove("destroy");
+
+        cy.nodes().forEach((node) => {
+          const children = node
+            .connectedEdges(`edge[source='${node.data().id}']`)
+            .targets();
+
+          cy.automove({
+            nodesMatching: children.union(children.successors()),
+            reposition: AutoMoveReposition.DRAG,
+            dragWith: node,
+          });
+
+          node.on(CytoEvent.CXT_TAP, (event: EventObject) => {
+            document.body.style.cursor = CSSCursor.GRAB;
+            const nodePosition = event.target.renderedPosition();
+            event.target.renderedPosition({
+              x: nodePosition.x + event.originalEvent.movementX / 2,
+              y: nodePosition.y + event.originalEvent.movementY / 2,
+            });
+          });
+        });
       });
     },
-
-    // Layout Hooks
-
     /**
      * Applies style changes to graph links.
-     * @param cy - The cy instance.
      */
-    styleGeneratedLinks(cy: CytoCore): void {
-      cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach(
-        (edge: EdgeSingular) => {
-          const score = edge.data().score;
+    styleGeneratedLinks(): void {
+      cyStore.getCy("project").then((cy) => {
+        cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach(
+          (edge: EdgeSingular) => {
+            const score = edge.data().score;
 
-          edge.style({
-            width: Math.min(
-              score * CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH,
-              CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
-            ),
-          });
-        }
-      );
-    },
-    /**
-     * Adds auto-move handlers to all nodes, so that their children are dragged along with then.
-     * @param cy - The cy instance.
-     */
-    applyAutoMoveEvents(cy: CytoCore) {
-      cy.automove("destroy");
-
-      cy.nodes().forEach((node) => {
-        const children = node
-          .connectedEdges(`edge[source='${node.data().id}']`)
-          .targets();
-
-        cy.automove({
-          nodesMatching: children.union(children.successors()),
-          reposition: AutoMoveReposition.DRAG,
-          dragWith: node,
-        });
-
-        node.on(CytoEvent.CXT_TAP, (event: EventObject) => {
-          document.body.style.cursor = CSSCursor.GRAB;
-          const nodePosition = event.target.renderedPosition();
-          event.target.renderedPosition({
-            x: nodePosition.x + event.originalEvent.movementX / 2,
-            y: nodePosition.y + event.originalEvent.movementY / 2,
-          });
-        });
+            edge.style({
+              width: Math.min(
+                score * CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH,
+                CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
+              ),
+            });
+          }
+        );
       });
     },
   },

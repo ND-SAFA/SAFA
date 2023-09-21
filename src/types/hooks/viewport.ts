@@ -1,4 +1,5 @@
-import { CyPromise, CyLayout } from "@/types";
+import { LayoutOptions } from "cytoscape";
+import { CyPromise } from "@/types";
 
 /**
  * Represents a payload for a cytoscape layout operation.
@@ -9,9 +10,9 @@ export interface CyLayoutPayload {
    */
   cyPromise: CyPromise;
   /**
-   * The layout options.
+   The layout options.
    */
-  layout: CyLayout;
+  options: LayoutOptions;
   /**
    * Whether to generate the layout.
    */

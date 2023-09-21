@@ -90,7 +90,7 @@ watch(
   () => {
     if (!props.visible) return;
 
-    layoutStore.setCreatorLayout();
+    layoutStore.setGraphLayout("creator");
   }
 );
 </script>

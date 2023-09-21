@@ -144,7 +144,7 @@ export const useDelta = defineStore("delta", {
       await subtreeStore.restoreHiddenNodesAfter(async () => {
         layoutStore.mode = "tree";
         await layoutStore.updatePositions({});
-        layoutStore.setProjectLayout();
+        layoutStore.setGraphLayout();
       });
       this.setIsDeltaViewEnabled(true);
     },

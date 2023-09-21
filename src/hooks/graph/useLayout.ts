@@ -1,15 +1,27 @@
 import { defineStore } from "pinia";
 
-import { LayoutOptions, NodeSingular } from "cytoscape";
+import {
+  EdgeSingular,
+  EventObject,
+  LayoutOptions,
+  NodeSingular,
+} from "cytoscape";
 import {
   LayoutPositionsSchema,
   CyLayout,
-  CyLayoutPayload,
   PositionSchema,
   GraphMode,
+  CytoCore,
+  AutoMoveReposition,
 } from "@/types";
 import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
-import { disableDrawMode } from "@/cytoscape";
+import {
+  ArtifactTreeAutoMoveHandlers,
+  disableDrawMode,
+  KlaySettings,
+  GENERATED_LINK_SELECTOR,
+  GENERATED_TRACE_MAX_WIDTH,
+} from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -64,6 +76,87 @@ export const useLayout = defineStore("layout", {
   },
   actions: {
     /**
+     * Creates a new graph layout.
+     * @param type - The type of graph to reset.
+     */
+    createLayout(type?: "project" | "creator"): CyLayout {
+      if (type === "creator") {
+        return {
+          klaySettings: KlaySettings,
+          preLayoutHooks: [],
+          postLayoutHooks: [this.applyCytoEvents],
+          cytoEventHandlers: {},
+          autoMoveHandlers: {},
+        };
+      } else {
+        return {
+          klaySettings: KlaySettings,
+          preLayoutHooks: [this.styleGeneratedLinks],
+          postLayoutHooks: [this.applyAutoMoveEvents, this.applyCytoEvents],
+          cytoEventHandlers: {},
+          autoMoveHandlers: ArtifactTreeAutoMoveHandlers,
+        };
+      }
+    },
+    /**
+     * Resets the graph layout.
+     * @param type - The type of graph to set the layout for.
+     */
+    setGraphLayout(type?: "project" | "creator"): void {
+      const cyPromise = cyStore.getCy(type);
+      const layout = this.createLayout(type);
+      const generate =
+        type === "creator"
+          ? true
+          : this.mode === "tim" ||
+            Object.keys(this.artifactPositions).length === 0;
+
+      appStore.onLoadStart();
+
+      this.layout = layout;
+
+      cyPromise.then((cy) => {
+        layout.preLayoutHooks.forEach((hook) => hook(cy, layout));
+
+        if (layout.klaySettings && generate) {
+          cy.layout({
+            name: "klay",
+            klay: layout.klaySettings,
+          }).run();
+        } else {
+          cy.layout(this.layoutOptions).run();
+        }
+
+        layout.postLayoutHooks.forEach((hook) => hook(cy, layout));
+
+        this.applyAutomove();
+      });
+
+      // Wait for the graph to render.
+      setTimeout(() => {
+        cyStore.resetWindow("both");
+        appStore.onLoadEnd();
+      }, 200);
+    },
+    /**
+     * Resets the layout of the graph.
+     */
+    async resetLayout(): Promise<void> {
+      appStore.onLoadStart();
+
+      disableDrawMode();
+      subtreeStore.resetHiddenNodes();
+      selectionStore.clearSelections();
+      appStore.closeSidePanels();
+
+      // Wait for graph to render.
+      setTimeout(() => {
+        this.setGraphLayout();
+        appStore.onLoadEnd();
+      }, 100);
+    },
+
+    /**
      * Sets the position of an artifact to the saved one, and clears the saved position.
      *
      * @param artifactId - The artifact id to set.
@@ -80,74 +173,6 @@ export const useLayout = defineStore("layout", {
       });
     },
     /**
-     * Resets all automove events.
-     */
-    applyAutomove(): void {
-      if (!this.layout) return;
-
-      cyStore.applyAutomove(this.layout);
-    },
-    /**
-     * Resets the graph layout.
-     *
-     * @param layoutPayload - The cy instance and layout.
-     */
-    setGraphLayout(layoutPayload: CyLayoutPayload): void {
-      appStore.onLoadStart();
-
-      this.layout = layoutPayload.layout;
-
-      layoutPayload.cyPromise.then((cy) => {
-        layoutPayload.layout.createLayout(cy, layoutPayload.generate);
-      });
-
-      this.applyAutomove();
-
-      // Wait for the graph to render.
-      setTimeout(() => {
-        cyStore.resetWindow("both");
-        appStore.onLoadEnd();
-      }, 200);
-    },
-    /**
-     * Resets the graph layout of the artifact tree.
-     * Generates a new layout if in TIM view, or if no positions are set.
-     */
-    setProjectLayout(): void {
-      const layout = cyStore.createLayout("project");
-      const generate =
-        this.mode === "tim" || Object.keys(this.artifactPositions).length === 0;
-      const payload = { layout, generate, cyPromise: cyStore.projectCy };
-
-      this.setGraphLayout(payload);
-    },
-    /**
-     * Resets the graph layout of the TIM tree.
-     */
-    setCreatorLayout(): void {
-      const layout = cyStore.createLayout("creator");
-      const payload = { layout, generate: true, cyPromise: cyStore.creatorCy };
-
-      this.setGraphLayout(payload);
-    },
-    /**
-     * Resets the layout of the graph.
-     */
-    async resetLayout(): Promise<void> {
-      appStore.onLoadStart();
-
-      disableDrawMode();
-      subtreeStore.resetHiddenNodes();
-      selectionStore.clearSelections();
-      appStore.closeSidePanels();
-
-      // Wait for graph to render.
-      setTimeout(() => {
-        this.setProjectLayout();
-        appStore.onLoadEnd();
-      }, 100);
-    },
-    /**
      * Updates artifact positions and resets the layout.
      *
      * @param positions - The new positions to set.
@@ -156,6 +181,80 @@ export const useLayout = defineStore("layout", {
       this.artifactPositions = positions;
 
       await this.resetLayout();
+    },
+    /**
+     * Resets all automove events.
+     */
+    applyAutomove(): void {
+      cyStore.getCy("project").then((cy) => {
+        if (!this.layout) return;
+        this.applyAutoMoveEvents(cy, this.layout);
+      });
+    },
+
+    // Layout Hooks
+
+    /**
+     * Applies style changes to graph links.
+     * @param cy - The cy instance.
+     */
+    styleGeneratedLinks(cy: CytoCore): void {
+      cy.edges(GENERATED_LINK_SELECTOR).forEach((edge: EdgeSingular) => {
+        const score = edge.data().score;
+
+        edge.style({
+          width: Math.min(
+            score * GENERATED_TRACE_MAX_WIDTH,
+            GENERATED_TRACE_MAX_WIDTH
+          ),
+        });
+      });
+    },
+    /**
+     * Applies cytoscape event handlers in the layout.
+     * @param cy - The cy instance.
+     * @param layout - The layout instance.
+     */
+    applyCytoEvents(cy: CytoCore, layout: CyLayout) {
+      Object.values(layout.cytoEventHandlers).forEach((cytoEvent) => {
+        const eventName = cytoEvent.events.join(" ");
+        const selector = cytoEvent.selector;
+        const handler = (event: EventObject) => cytoEvent.action(cy, event);
+
+        if (selector === undefined) {
+          cy.off(eventName);
+          cy.on(eventName, handler);
+        } else {
+          cy.off(eventName, selector);
+          cy.on(eventName, selector, handler);
+        }
+      });
+    },
+    /**
+     * Adds auto-move handlers to all nodes, so that their children are dragged along with then.
+     * @param cy - The cy instance.
+     * @param layout - The layout instance.
+     */
+    applyAutoMoveEvents(cy: CytoCore, layout: CyLayout) {
+      cy.automove("destroy");
+
+      cy.nodes().forEach((node) => {
+        const children = node
+          .connectedEdges(`edge[source='${node.data().id}']`)
+          .targets();
+
+        const rule = cy.automove({
+          nodesMatching: children.union(children.successors()),
+          reposition: AutoMoveReposition.DRAG,
+          dragWith: node,
+        });
+
+        for (const eventDefinition of Object.values(layout.autoMoveHandlers)) {
+          node.on(eventDefinition.triggers.join(" "), (event: EventObject) => {
+            eventDefinition.action(node, rule, event);
+          });
+        }
+      });
     },
   },
 });

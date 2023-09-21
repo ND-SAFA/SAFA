@@ -1,25 +1,17 @@
 import { defineStore } from "pinia";
 
-import { CyLayout, CyPromise, CytoCoreGraph, ResolveCy } from "@/types";
-import { layoutStore, selectionStore } from "@/hooks";
+import { CyPromise, CytoCoreGraph, ResolveCy } from "@/types";
+import { cyStore, selectionStore } from "@/hooks";
 import {
   GRAPH_CONFIG,
   CREATOR_PLUGINS,
   PROJECT_PLUGINS,
-  ArtifactTreeAutoMoveHandlers,
-  DefaultPreLayoutHooks,
-  DefaultPostLayoutHooks,
-  GraphLayout,
-  CreatorPreLayoutHooks,
-  CreatorPostLayoutHooks,
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
   CENTER_GRAPH_PADDING,
   ANIMATION_DURATION,
-  applyAutoMoveEvents,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
-import { KlaySettings } from "@/cytoscape/layout/klay-settings";
 
 /**
  * This hook manages the state of all cytoscape graphs.
@@ -67,12 +59,7 @@ export const useCy = defineStore("cy", {
         config: GRAPH_CONFIG,
         saveCy: this.creatorResolveCy,
         plugins: CREATOR_PLUGINS,
-        afterInit() {
-          // Wait for initialized nodes to be added.
-          setTimeout(() => {
-            layoutStore.setCreatorLayout();
-          }, 100);
-        },
+        afterInit: () => cyStore.centerNodes(false, "creator"),
       };
     },
     /**
@@ -84,34 +71,20 @@ export const useCy = defineStore("cy", {
         config: GRAPH_CONFIG,
         saveCy: this.projectResolveCy,
         plugins: PROJECT_PLUGINS,
-        afterInit: () => undefined,
+        afterInit() {
+          const selectedArtifacts = selectionStore.selectedArtifact?.id;
+
+          if (!selectedArtifacts) {
+            cyStore.zoomReset();
+            cyStore.centerNodes();
+          } else {
+            selectionStore.centerOnArtifacts([selectedArtifacts]);
+          }
+        },
       };
     },
   },
   actions: {
-    /**
-     * Creates a new graph layout.
-     * @param type - The type of graph to reset.
-     */
-    createLayout(type: "project" | "creator") {
-      if (type === "creator") {
-        return new GraphLayout(
-          ArtifactTreeAutoMoveHandlers,
-          {},
-          KlaySettings,
-          DefaultPreLayoutHooks,
-          DefaultPostLayoutHooks
-        );
-      } else {
-        return new GraphLayout(
-          {},
-          {},
-          KlaySettings,
-          CreatorPreLayoutHooks,
-          CreatorPostLayoutHooks
-        );
-      }
-    },
     /**
      * Returns the cytoscape instance for the given type.
      * @param type - The type of graph to use.
@@ -139,16 +112,6 @@ export const useCy = defineStore("cy", {
           cy.fit(cy.nodes(), 150);
         });
       }
-    },
-    /**
-     * Re-applies automove to all nodes.
-     * @param layout - The graph layout.
-     * @param type - The type of graph to use.
-     */
-    applyAutomove(layout: CyLayout, type?: "project" | "creator") {
-      this.getCy(type).then((cy) => {
-        applyAutoMoveEvents(cy, layout);
-      });
     },
     /**
      * Runs the given callback if cy is not animated.
@@ -218,7 +181,6 @@ export const useCy = defineStore("cy", {
     /**
      * Moves the viewport such that given set of artifacts is in the middle of the viewport.
      * If no artifacts are given, the entire collection of nodes is centered.
-     * Request is ignored if current animation is in progress to center the same collection of artifacts.
      * @param currentCenteringCollection - The current centered artifacts.
      * @param artifactIds - The artifacts whose average point will be centered.
      * @param setCenteredArtifacts - Sets the current centered artifacts.
@@ -253,9 +215,6 @@ export const useCy = defineStore("cy", {
 
     /**
      * Set the visibility of nodes and edges related to given list of artifact names.
-     * A node is related if it represents one of the target artifacts.
-     * An edge is related if either source or target is an artifact in target
-     * list.
      * @param artifactIds - The artifacts to display or hide.
      * @param visible - Whether to display or hide these artifacts.
      * @param type - The type of graph to use.

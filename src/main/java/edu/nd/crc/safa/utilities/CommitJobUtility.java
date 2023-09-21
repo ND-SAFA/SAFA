@@ -18,6 +18,7 @@ public class CommitJobUtility {
      * Creates a new project.
      *
      * @param serviceProvider Provides access to services.
+     * @param owner           The project owner.
      * @param name            The name of the project.
      * @param description     The description of the project.
      * @return A newly created project version.

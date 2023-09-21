@@ -62,7 +62,6 @@ public class FlatFileProjectCreationJob extends CommitJob {
      */
     private String pathToFiles;
 
-
     public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
                                       ServiceProvider serviceProvider,
                                       ProjectCommitDefinition commit,

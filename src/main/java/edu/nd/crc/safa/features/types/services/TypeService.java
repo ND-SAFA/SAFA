@@ -45,16 +45,17 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
         return types;
     }
 
-    @Override
-    public List<TypeAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
-        return GeneralRepositoryUtility.getByIds(appEntityIds, this.artifactTypeRepository)
+    public List<TypeAppEntity> getAppEntities(Project project) {
+        return getTypes(project)
             .stream()
             .map(TypeAppEntity::new)
             .collect(Collectors.toList());
     }
 
-    public List<TypeAppEntity> getAppEntities(Project project) {
-        return getTypes(project)
+    @Override
+    public List<TypeAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                   List<UUID> appEntityIds) {
+        return GeneralRepositoryUtility.getByIds(appEntityIds, this.artifactTypeRepository)
             .stream()
             .map(TypeAppEntity::new)
             .collect(Collectors.toList());
@@ -179,8 +180,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * @param project             Project containing the type
      * @param updatedArtifactType The updated type definition
      * @param user                The user doing the operation
-     * @return The type after the update (may not match the passed in type 100% as we do not allow editing
-     * certain values)
+     * @return The type after the update (may not 100% match given type as we do not allow editing certain values)
      */
     public ArtifactType updateArtifactType(Project project, ArtifactType updatedArtifactType, SafaUser user) {
         ArtifactType originalType = getArtifactType(project, updatedArtifactType.getName());

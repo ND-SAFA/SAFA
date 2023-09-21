@@ -58,7 +58,8 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
     }
 
     @Override
-    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion,
+                                                       SafaUser user, List<UUID> appEntityIds) {
         return getAppEntitiesByIds(projectVersion, appEntityIds);
     }
 

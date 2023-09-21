@@ -71,6 +71,7 @@ public class ProjectSummaryService {
      * Creates project summary.
      *
      * @param artifacts The artifacts in the project.
+     * @param kwargs    Additional keyword arguments for summarization process.
      * @param jobLogger Optional. Job logger to store logs under.
      * @return The project summary.
      */

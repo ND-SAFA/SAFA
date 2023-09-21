@@ -68,6 +68,4 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     protected Class<? extends AbstractJob> getJobType() {
         return FlatFileProjectCreationJob.class;
     }
-
-
 }

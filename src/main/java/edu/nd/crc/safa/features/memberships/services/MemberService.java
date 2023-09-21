@@ -65,7 +65,8 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
     }
 
     @Override
-    public List<ProjectMemberAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+    public List<ProjectMemberAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                            List<UUID> appEntityIds) {
         List<ProjectMemberAppEntity> members = this.userProjectMembershipRepository
             .findByProjectAndMembershipIdIn(projectVersion.getProject(), appEntityIds)
             .stream()

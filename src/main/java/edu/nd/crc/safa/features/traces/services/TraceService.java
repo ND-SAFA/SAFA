@@ -68,7 +68,8 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
      * @return List of trace links at version.
      */
     @Override
-    public List<TraceAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+    public List<TraceAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                    List<UUID> appEntityIds) {
         List<TraceLinkVersion> allVersions = this.traceLinkVersionRepository.findByTraceLinkTraceLinkIdIn(appEntityIds)
             .stream()
             .filter(TraceLinkVersion::isVisible)

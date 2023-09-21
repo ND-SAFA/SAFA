@@ -71,6 +71,20 @@ public class TeamController extends BaseController {
     }
 
     /**
+     * Get a team by its team ID.
+     *
+     * @param orgId The ID of the org the team is in
+     * @param teamId The ID of the team
+     * @return The team, if it is found
+     */
+    @GetMapping(AppRoutes.Organizations.Teams.BY_ID)
+    public TeamAppEntity getTeam(@PathVariable UUID orgId, @PathVariable UUID teamId) {
+        Team team = teamService.getTeamById(teamId);
+        assertEqual(team.getOrganization().getId(), orgId, "No team with the specified ID found under this org");
+        return teamService.getAppEntity(team, getCurrentUser());
+    }
+
+    /**
      * Create a new team within the organization with the given ID.
      *
      * @param orgId The ID of the organization that will contain the team.

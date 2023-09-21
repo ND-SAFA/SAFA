@@ -47,7 +47,7 @@ module.exports = {
             cert: fs.readFileSync("./certs/localhost.safa.ai.pem"),
           },
         },
-        host: "localhost",
+        host: "localhost.safa.ai",
         port: 8080,
       }
     : {},

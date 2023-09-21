@@ -13,7 +13,7 @@
         "
         :icon="drawMode ? 'cancel' : 'trace'"
         @click="
-          toggleDrawMode();
+          cyStore.drawMode('toggle');
           handleCloseMenu();
         "
       />
@@ -64,8 +64,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { appStore, permissionStore } from "@/hooks";
-import { toggleDrawMode } from "@/cytoscape";
+import { appStore, cyStore, permissionStore } from "@/hooks";
 import { FlexBox, IconButton, Separator } from "@/components/common";
 import { NodeDisplay } from "@/components/graph/display";
 

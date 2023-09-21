@@ -29,7 +29,7 @@
         />
       </template>
       <template #4>
-        <tim-tree :visible="currentStep === 4" />
+        <creator-tree :visible="currentStep === 4" />
       </template>
     </stepper>
   </panel-card>
@@ -47,7 +47,7 @@ import { useRoute } from "vue-router";
 import { StepperStep } from "@/types";
 import { createProjectApiStore, projectSaveStore } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
-import { TimTree } from "@/components/graph";
+import { CreatorTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/save";
 import { FilePanelList } from "@/components/project/creator/steps";
 
@@ -57,16 +57,16 @@ const steps = ref<StepperStep[]>([
   { title: "Name Project", done: false },
   { title: "Upload Artifacts", done: false },
   { title: "Upload Trace Links", done: false },
-  { title: "View TIM", done: true },
+  { title: "View TIM", done: false },
 ]);
 const currentStep = ref(1);
 
-const name = computed({
+const name = computed<string>({
   get: () => projectSaveStore.name,
   set: (value) => (projectSaveStore.name = value),
 });
 
-const description = computed({
+const description = computed<string>({
   get: () => projectSaveStore.description,
   set: (value) => (projectSaveStore.description = value),
 });
@@ -93,6 +93,7 @@ function handleValidateArtifacts(isValid: boolean): void {
  */
 function handleValidateTraces(isValid: boolean): void {
   steps.value[2].done = isValid;
+  steps.value[3].done = isValid;
 }
 
 /**

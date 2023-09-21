@@ -167,10 +167,12 @@ export const useTraces = defineStore("traces", {
      * @return Whether a link can be created, or a reason why it cant.
      */
     isLinkAllowed(
-      source: ArtifactSchema | ArtifactCytoElementData,
-      target: ArtifactSchema | ArtifactCytoElementData
+      source: ArtifactSchema | ArtifactCytoElementData | undefined,
+      target: ArtifactSchema | ArtifactCytoElementData | undefined
     ): string | boolean {
-      if (source.id === target.id) {
+      if (!source || !target) {
+        return false;
+      } else if (source.id === target.id) {
         return "An artifact cannot link to itself.";
       } else if (
         this.doesLinkExist(source.id, target.id) ||

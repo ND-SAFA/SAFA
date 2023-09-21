@@ -29,7 +29,7 @@
         :tooltip="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         :icon="drawMode ? 'cancel' : 'trace'"
         @click="
-          toggleDrawMode();
+          cyStore.drawMode('toggle');
           handleCloseMenu();
         "
       />
@@ -85,10 +85,10 @@ import { computed, inject } from "vue";
 import {
   appStore,
   artifactSaveStore,
+  cyStore,
   permissionStore,
   traceSaveStore,
 } from "@/hooks";
-import { toggleDrawMode } from "@/cytoscape";
 import { FlexBox, IconButton, Separator } from "@/components/common";
 import { NodeDisplay } from "@/components/graph/display";
 

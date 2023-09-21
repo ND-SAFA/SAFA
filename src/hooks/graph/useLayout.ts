@@ -92,7 +92,7 @@ export const useLayout = defineStore("layout", {
       setTimeout(() => {
         cyStore.resetWindow(type);
         appStore.onLoadEnd();
-      }, 200);
+      }, 300);
     },
     /**
      * Resets the layout of the graph.

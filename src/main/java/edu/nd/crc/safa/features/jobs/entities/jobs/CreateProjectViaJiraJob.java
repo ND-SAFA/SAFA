@@ -115,6 +115,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
         createProjectAndCommit(this.user, projectName, projectDescription);
         ProjectVersion projectVersion = getProjectVersion();
+        linkProjectToJob(projectVersion.getProject());
 
         Project project = projectVersion.getProject();
         this.jiraIdentifier.setProjectVersion(projectVersion);

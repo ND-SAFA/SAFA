@@ -8,12 +8,14 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.CreateProjectByJsonPayload;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.common.EntityConstants;
 import edu.nd.crc.safa.test.features.jobs.base.JobTestService;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.CommonRequestService;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * Responsible for testing that a project can be created via JSON
  * by submitting a job
  */
-class TestJsonCommitJob extends ApplicationBaseTest {
+class TestCreateProjectViaJsonJob extends ApplicationBaseTest {
     final String description = "description";
     final int N_STEPS = 4;
     EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();
@@ -68,5 +70,9 @@ class TestJsonCommitJob extends ApplicationBaseTest {
         assertThat(artifact.getSummary()).isEqualTo(artifactConstants.summary);
         assertThat(artifact.getBody()).isEqualTo(artifactConstants.body);
         assertThat(artifact.getDocumentType()).isEqualTo(artifactConstants.documentType);
+
+        // VP - Verify that job is associated with project
+        List<JobAppEntity> projectJobs = CommonRequestService.Project.getProjectJobs(projectVersion.getProject());
+        assertThat(projectJobs).hasSize(1);
     }
 }

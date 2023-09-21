@@ -186,6 +186,7 @@ public class GithubProjectCreationJob extends CommitJob {
         createProjectAndCommit(this.user, projectName, projectDescription);
         ProjectVersion projectVersion = getProjectVersion();
         this.githubIdentifier.setProjectVersion(projectVersion);
+        linkProjectToJob(projectVersion.getProject());
 
         Project project = projectVersion.getProject();
         logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());

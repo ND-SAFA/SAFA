@@ -38,6 +38,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
             projectAppEntity.getName(),
             projectAppEntity.getDescription());
         ProjectVersion projectVersion = getProjectVersion();
+        linkProjectToJob(projectVersion.getProject());
         this.projectAppEntity.setProjectVersion(projectVersion);
         this.TGenRequestAppEntity.setProjectVersion(projectVersion);
 

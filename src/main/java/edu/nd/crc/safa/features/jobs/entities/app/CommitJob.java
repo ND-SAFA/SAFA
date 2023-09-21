@@ -91,7 +91,7 @@ public abstract class CommitJob extends AbstractJob {
      *
      * @param project The project to associated with job.
      */
-    protected void setProject(Project project) {
+    protected void linkProjectToJob(Project project) {
         JobDbEntity job = this.getJobDbEntity();
         job.setProject(project);
         this.getServiceProvider().getJobRepository().save(job);
@@ -105,7 +105,7 @@ public abstract class CommitJob extends AbstractJob {
         ProjectVersion projectVersion = this.projectCommitDefinition.getCommitVersion();
         if (projectVersion != null) {
             Project project = projectVersion.getProject();
-            setProject(project);
+            linkProjectToJob(project);
         }
     }
 

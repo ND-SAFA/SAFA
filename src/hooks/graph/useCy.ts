@@ -93,15 +93,7 @@ export const useCy = defineStore("cy", {
         saveCy: this.projectResolveCy,
         plugins: CYTO_CONFIG.PROJECT_PLUGINS,
         afterInit: (cy) => {
-          const selectedArtifacts = selectionStore.selectedArtifact?.id;
-
-          if (!selectedArtifacts) {
-            this.zoom("reset");
-            this.centerNodes();
-          } else {
-            selectionStore.centerOnArtifacts([selectedArtifacts]);
-          }
-
+          this.resetWindow("project");
           this.configureDrawMode(cy);
         },
       };
@@ -110,8 +102,8 @@ export const useCy = defineStore("cy", {
      * Resets the graph window.
      * @param type - The type of graph to use.
      */
-    resetWindow(type?: "project" | "creator" | "both") {
-      if (type === "both" || type === "project") {
+    resetWindow(type?: "project" | "creator") {
+      if (type !== "creator") {
         const selectedId = selectionStore.selectedArtifact?.id;
 
         if (selectedId) {
@@ -119,8 +111,7 @@ export const useCy = defineStore("cy", {
         } else {
           this.centerNodes(false, "project");
         }
-      }
-      if (type === "both" || type === "creator") {
+      } else {
         this.creatorCy.then((cy) => {
           cy.fit(cy.nodes(), 150);
         });
@@ -163,6 +154,7 @@ export const useCy = defineStore("cy", {
         } else if (nodes.length > 10) {
           cy.fit(nodes, CYTO_CONFIG.CENTER_GRAPH_PADDING);
         } else {
+          this.zoom("reset", type);
           cy.center(nodes);
         }
       });

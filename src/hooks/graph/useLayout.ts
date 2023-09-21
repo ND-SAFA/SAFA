@@ -1,11 +1,6 @@
 import { defineStore } from "pinia";
 
-import {
-  EdgeSingular,
-  EventObject,
-  LayoutOptions,
-  NodeSingular,
-} from "cytoscape";
+import { EventObject, LayoutOptions, NodeSingular } from "cytoscape";
 import {
   LayoutPositionsSchema,
   PositionSchema,
@@ -95,7 +90,7 @@ export const useLayout = defineStore("layout", {
 
       // Wait for the graph to render.
       setTimeout(() => {
-        cyStore.resetWindow("both");
+        cyStore.resetWindow(type);
         appStore.onLoadEnd();
       }, 200);
     },
@@ -109,12 +104,9 @@ export const useLayout = defineStore("layout", {
       subtreeStore.resetHiddenNodes();
       selectionStore.clearSelections();
       appStore.closeSidePanels();
+      this.setGraphLayout();
 
-      // Wait for graph to render.
-      setTimeout(() => {
-        this.setGraphLayout();
-        appStore.onLoadEnd();
-      }, 100);
+      appStore.onLoadEnd();
     },
 
     /**
@@ -177,18 +169,14 @@ export const useLayout = defineStore("layout", {
      */
     styleGeneratedLinks(): void {
       cyStore.getCy("project").then((cy) => {
-        cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach(
-          (edge: EdgeSingular) => {
-            const score = edge.data().score;
-
-            edge.style({
-              width: Math.min(
-                score * CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH,
-                CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
-              ),
-            });
-          }
-        );
+        cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach((edge) => {
+          edge.style({
+            width: Math.min(
+              edge.data().score * CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH,
+              CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
+            ),
+          });
+        });
       });
     },
   },

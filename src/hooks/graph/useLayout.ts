@@ -78,17 +78,13 @@ export const useLayout = defineStore("layout", {
     createLayout(type?: "project" | "creator"): CyLayout {
       if (type === "creator") {
         return {
-          klaySettings: CYTO_CONFIG.KLAY_CONFIG,
           preLayoutHooks: [],
-          postLayoutHooks: [this.applyCytoEvents],
-          cytoEventHandlers: {},
+          postLayoutHooks: [],
         };
       } else {
         return {
-          klaySettings: CYTO_CONFIG.KLAY_CONFIG,
           preLayoutHooks: [this.styleGeneratedLinks],
-          postLayoutHooks: [this.applyAutoMoveEvents, this.applyCytoEvents],
-          cytoEventHandlers: {},
+          postLayoutHooks: [this.applyAutoMoveEvents],
         };
       }
     },
@@ -112,10 +108,10 @@ export const useLayout = defineStore("layout", {
       cyPromise.then((cy) => {
         layout.preLayoutHooks.forEach((hook) => hook(cy, layout));
 
-        if (layout.klaySettings && generate) {
+        if (generate) {
           cy.layout({
             name: "klay",
-            klay: layout.klaySettings,
+            klay: CYTO_CONFIG.KLAY_CONFIG,
           }).run();
         } else {
           cy.layout(this.layoutOptions).run();
@@ -206,26 +202,6 @@ export const useLayout = defineStore("layout", {
           });
         }
       );
-    },
-    /**
-     * Applies cytoscape event handlers in the layout.
-     * @param cy - The cy instance.
-     * @param layout - The layout instance.
-     */
-    applyCytoEvents(cy: CytoCore, layout: CyLayout) {
-      Object.values(layout.cytoEventHandlers).forEach((cytoEvent) => {
-        const eventName = cytoEvent.events.join(" ");
-        const selector = cytoEvent.selector;
-        const handler = (event: EventObject) => cytoEvent.action(cy, event);
-
-        if (selector === undefined) {
-          cy.off(eventName);
-          cy.on(eventName, handler);
-        } else {
-          cy.off(eventName, selector);
-          cy.on(eventName, selector, handler);
-        }
-      });
     },
     /**
      * Adds auto-move handlers to all nodes, so that their children are dragged along with then.

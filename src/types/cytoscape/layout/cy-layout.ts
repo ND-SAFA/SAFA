@@ -1,12 +1,9 @@
-import { KlayLayoutSettings, LayoutHook } from "@/types/cytoscape/plugins";
-import { CytoEventHandlers } from "@/types/cytoscape/core";
+import { LayoutHook } from "@/types/cytoscape/plugins";
 
 /**
  * Defines the layout and event handlers of a graph.
  */
 export interface CyLayout {
-  klaySettings: KlayLayoutSettings | undefined;
   preLayoutHooks: LayoutHook[];
   postLayoutHooks: LayoutHook[];
-  cytoEventHandlers: CytoEventHandlers;
 }

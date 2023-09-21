@@ -300,5 +300,12 @@ public class AppRoutes {
         public static final String ROOT = "/organizations";
         public static final String BY_ID = ROOT + "/{orgId}";
         public static final String SELF = ROOT + "/self";
+
+        @NoArgsConstructor(access = AccessLevel.NONE)
+        public static class Teams {
+            public static final String ROOT = Organizations.BY_ID + "/teams";
+            public static final String BY_ID = ROOT + "/{teamId}";
+            public static final String SELF = ROOT + "/self";
+        }
     }
 }

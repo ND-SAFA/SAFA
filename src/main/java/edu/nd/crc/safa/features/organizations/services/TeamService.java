@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.organizations.services;
 
+import static edu.nd.crc.safa.utilities.AssertUtils.assertNotNull;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +20,7 @@ import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -148,5 +151,40 @@ public class TeamService {
         Stream<Permission> orgPermissions = orgService.getUserPermissions(team.getOrganization(), currentUser).stream();
 
         return Stream.concat(teamPermissions, orgPermissions).collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Get a team by its team ID.
+     *
+     * @param teamId The ID of the team.
+     * @return The team with the given ID, if it exists.
+     * @throws SafaItemNotFoundError if the team is not found.
+     */
+    public Team getTeamById(UUID teamId) {
+        return teamRepo.findById(teamId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No team with the given ID found."));
+    }
+
+    /**
+     * Update a team entry in the database.
+     *
+     * @param team The new entry
+     * @return The updated entry
+     */
+    public Team updateTeam(Team team) {
+        assertNotNull(team.getId(), "Missing team ID");
+        assertNotNull(team.getName(), "Missing team name.");
+        assertNotNull(team.getOrganization(), "Missing team organization.");
+
+        return teamRepo.save(team);
+    }
+
+    /**
+     * Delete a team from the database.
+     *
+     * @param team The team to delete
+     */
+    public void deleteTeam(Team team) {
+        teamRepo.delete(team);
     }
 }

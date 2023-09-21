@@ -9,10 +9,12 @@ import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
 import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.services.GenTestService;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +37,7 @@ class TestTGen extends GenerationalTest {
         mockTGenResponse();
 
         TGenRequestAppEntity request = createTGenRequest();
-        CommonRequestService.Gen.performTGen(request);
+        JobAppEntity job = CommonRequestService.Gen.performTGen(request);
 
         refreshProject();
 
@@ -43,6 +45,7 @@ class TestTGen extends GenerationalTest {
         assertThat(generatedTraces).hasSize(1);
 
         verifyGeneratedLink(generatedTraces.get(0));
+        GenTestService.verifyJobAssociatedWithProject(this, job);
     }
 
     private TGenRequestAppEntity createTGenRequest() {

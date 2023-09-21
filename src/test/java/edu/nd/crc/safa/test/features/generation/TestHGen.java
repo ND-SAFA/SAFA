@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.TraceLayer;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenResponse;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.test.services.CommonRequestService;
 import edu.nd.crc.safa.test.services.GenTestService;
 
@@ -30,10 +31,11 @@ class TestHGen extends GenerationalTest {
         mockProjectSummaryResponse();
         mockHGenResponse();
 
-        CommonRequestService.Gen.performHGen(getProjectVersion(), createHGenRequest());
+        JobAppEntity job = CommonRequestService.Gen.performHGen(getProjectVersion(), createHGenRequest());
 
         refreshProject();
         verifyGeneratedArtifact();
+        GenTestService.verifyJobAssociatedWithProject(this, job);
     }
 
     private void mockHGenResponse() {

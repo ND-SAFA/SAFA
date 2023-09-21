@@ -2,8 +2,10 @@ package edu.nd.crc.safa.test.features.generation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.services.GenTestService;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +17,8 @@ class TestProjectSummary extends GenerationalTest {
     void testProjectDescriptionIsSet() throws Exception {
         createProject();
         mockProjectSummaryResponse();
-        runProjectSummaryJob();
+
+        JobAppEntity job = runProjectSummaryJob();
 
         refreshProject();
 
@@ -24,6 +27,7 @@ class TestProjectSummary extends GenerationalTest {
 
         assertEquals(getProjectSummary(), projectSummary);
         assertEquals(getProjectSummary(), specification);
+        GenTestService.verifyJobAssociatedWithProject(this, job);
     }
 
     /**
@@ -45,8 +49,8 @@ class TestProjectSummary extends GenerationalTest {
         assertEquals(newSummary, getProject().getSpecification());
     }
 
-    private void runProjectSummaryJob() throws Exception {
+    private JobAppEntity runProjectSummaryJob() throws Exception {
         ProjectVersion projectVersion = getProjectVersion();
-        CommonRequestService.Gen.performProjectSummary(projectVersion);
+        return CommonRequestService.Gen.performProjectSummary(projectVersion);
     }
 }

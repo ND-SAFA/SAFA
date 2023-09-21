@@ -31,7 +31,7 @@ public abstract class GenerationalTest extends AbstractRemoteApiTest<TGenMockSer
         this.projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
     }
 
-    protected ProjectVersion getProjectVersion() {
+    public ProjectVersion getProjectVersion() {
         assert this.projectAppEntity != null;
         return this.projectAppEntity.getProjectVersion();
     }

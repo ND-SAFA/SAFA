@@ -1,11 +1,15 @@
 package edu.nd.crc.safa.test.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryResponse;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
 
 public class GenTestService {
@@ -53,4 +57,11 @@ public class GenTestService {
         return String.format("artifact-summary: %s", name);
     }
 
+    public static void verifyJobAssociatedWithProject(GenerationalTest test, JobAppEntity serverJob) throws Exception {
+        Project project = test.getProjectVersion().getProject();
+        List<JobAppEntity> jobs = CommonRequestService.Project.getProjectJobs(project);
+        assertEquals(1, jobs.size());
+        JobAppEntity job = jobs.get(0);
+        assertEquals(serverJob.getId(), job.getId());
+    }
 }

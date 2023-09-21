@@ -1,8 +1,34 @@
-export * from "./plugins";
-export * from "./cy";
-export * from "./events";
-export * from "./graphs";
-export * from "./hooks";
-export * from "./layout";
-export * from "./operations";
-export * from "./styles";
+import {
+  CREATOR_PLUGINS,
+  PROJECT_PLUGINS,
+  EDGE_HANDLERS_OPTIONS,
+} from "./plugins";
+import {
+  GRAPH_CONFIG,
+  DEFAULT_ARTIFACT_TREE_ZOOM,
+  ZOOM_INCREMENT,
+  CENTER_GRAPH_PADDING,
+  ANIMATION_DURATION,
+  KLAY_CONFIG,
+  GENERATED_TRACE_MAX_WIDTH,
+  GENERATED_LINK_SELECTOR,
+} from "./styles";
+
+export const CYTO_CONFIG = {
+  GRAPH_CONFIG,
+
+  KLAY_CONFIG,
+  DEFAULT_ARTIFACT_TREE_ZOOM,
+  ZOOM_INCREMENT,
+  CENTER_GRAPH_PADDING,
+  ANIMATION_DURATION,
+
+  CREATOR_PLUGINS,
+  PROJECT_PLUGINS,
+  EDGE_HANDLERS_OPTIONS,
+
+  GENERATED_LINK_SELECTOR,
+  GENERATED_TRACE_MAX_WIDTH,
+};
+
+export default CYTO_CONFIG;

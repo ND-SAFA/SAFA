@@ -1,24 +1,16 @@
 import { defineStore } from "pinia";
 
-import { LayoutOptions, NodeSingular } from "cytoscape";
+import { EventObject, LayoutOptions, NodeSingular } from "cytoscape";
 import {
   LayoutPositionsSchema,
-  CyLayout,
-  LayoutPayload,
   PositionSchema,
   GraphMode,
+  AutoMoveReposition,
+  CytoEvent,
+  CSSCursor,
 } from "@/types";
-import { appStore, selectionStore, subtreeStore } from "@/hooks";
-import {
-  artifactTreeCyPromise,
-  cyApplyAutomove,
-  cyCreateLayout,
-  cyResetTim,
-  cyResetTree,
-  disableDrawMode,
-  timTreeCyPromise,
-  GraphLayout,
-} from "@/cytoscape";
+import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
+import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -34,10 +26,6 @@ export const useLayout = defineStore("layout", {
      * A saved position for a node to be added.
      */
     savedPosition: undefined as PositionSchema | undefined,
-    /**
-     * The current graph layout.
-     */
-    layout: undefined as CyLayout | undefined,
     /**
      * The current view mode of the graph.
      */
@@ -73,6 +61,55 @@ export const useLayout = defineStore("layout", {
   },
   actions: {
     /**
+     * Resets the graph layout.
+     * @param type - The type of graph to set the layout for.
+     */
+    setGraphLayout(type?: "project" | "creator"): void {
+      const cyPromise = cyStore.getCy(type);
+      const generate =
+        type === "creator"
+          ? true
+          : this.mode === "tim" ||
+            Object.keys(this.artifactPositions).length === 0;
+
+      appStore.onLoadStart();
+
+      cyPromise.then((cy) => {
+        if (generate) {
+          cy.layout({
+            name: "klay",
+            klay: CYTO_CONFIG.KLAY_CONFIG,
+          }).run();
+        } else {
+          cy.layout(this.layoutOptions).run();
+        }
+
+        this.styleGeneratedLinks();
+        this.applyAutomove();
+      });
+
+      // Wait for the graph to render.
+      setTimeout(() => {
+        cyStore.resetWindow(type);
+        appStore.onLoadEnd();
+      }, 300);
+    },
+    /**
+     * Resets the layout of the graph.
+     */
+    async resetLayout(): Promise<void> {
+      appStore.onLoadStart();
+
+      cyStore.drawMode("disable");
+      subtreeStore.resetHiddenNodes();
+      selectionStore.clearSelections();
+      appStore.closeSidePanels();
+      this.setGraphLayout();
+
+      appStore.onLoadEnd();
+    },
+
+    /**
      * Sets the position of an artifact to the saved one, and clears the saved position.
      *
      * @param artifactId - The artifact id to set.
@@ -89,72 +126,6 @@ export const useLayout = defineStore("layout", {
       });
     },
     /**
-     * Resets all automove events.
-     */
-    applyAutomove(): void {
-      if (!this.layout) return;
-
-      cyApplyAutomove(this.layout);
-    },
-    /**
-     * Resets the graph layout.
-     *
-     * @param layoutPayload - The cy instance and layout.
-     * @param generate - Whether to generate the layout positions.
-     */
-    setGraphLayout(layoutPayload: LayoutPayload, generate?: boolean): void {
-      appStore.onLoadStart();
-
-      this.layout = layoutPayload.layout;
-      cyCreateLayout(layoutPayload, generate);
-      this.applyAutomove();
-
-      // Wait for the graph to render.
-      setTimeout(() => {
-        cyResetTim();
-        cyResetTree();
-        appStore.onLoadEnd();
-      }, 200);
-    },
-    /**
-     * Resets the graph layout of the artifact tree.
-     * Generates a new layout if in TIM view, or if no positions are set.
-     */
-    setArtifactTreeLayout(): void {
-      const layout = GraphLayout.createArtifactLayout();
-      const payload = { layout, cyPromise: artifactTreeCyPromise };
-      const generateLayout =
-        this.mode === "tim" || Object.keys(this.artifactPositions).length === 0;
-
-      this.setGraphLayout(payload, generateLayout);
-    },
-    /**
-     * Resets the graph layout of the TIM tree.
-     */
-    setTimTreeLayout(): void {
-      const layout = GraphLayout.createTimLayout();
-      const payload = { layout, cyPromise: timTreeCyPromise };
-
-      this.setGraphLayout(payload, true);
-    },
-    /**
-     * Resets the layout of the graph.
-     */
-    async resetLayout(): Promise<void> {
-      appStore.onLoadStart();
-
-      disableDrawMode();
-      subtreeStore.resetHiddenNodes();
-      selectionStore.clearSelections();
-      appStore.closeSidePanels();
-
-      // Wait for graph to render.
-      setTimeout(() => {
-        this.setArtifactTreeLayout();
-        appStore.onLoadEnd();
-      }, 100);
-    },
-    /**
      * Updates artifact positions and resets the layout.
      *
      * @param positions - The new positions to set.
@@ -163,6 +134,50 @@ export const useLayout = defineStore("layout", {
       this.artifactPositions = positions;
 
       await this.resetLayout();
+    },
+    /**
+     * Adds auto-move handlers to all nodes, so that their children are dragged along with then.
+     */
+    applyAutomove(): void {
+      cyStore.getCy("project").then((cy) => {
+        cy.automove("destroy");
+
+        cy.nodes().forEach((node) => {
+          const children = node
+            .connectedEdges(`edge[source='${node.data().id}']`)
+            .targets();
+
+          cy.automove({
+            nodesMatching: children.union(children.successors()),
+            reposition: AutoMoveReposition.DRAG,
+            dragWith: node,
+          });
+
+          node.on(CytoEvent.CXT_TAP, (event: EventObject) => {
+            document.body.style.cursor = CSSCursor.GRAB;
+            const nodePosition = event.target.renderedPosition();
+            event.target.renderedPosition({
+              x: nodePosition.x + event.originalEvent.movementX / 2,
+              y: nodePosition.y + event.originalEvent.movementY / 2,
+            });
+          });
+        });
+      });
+    },
+    /**
+     * Applies style changes to graph links.
+     */
+    styleGeneratedLinks(): void {
+      cyStore.getCy("project").then((cy) => {
+        cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach((edge) => {
+          edge.style({
+            width: Math.min(
+              edge.data().score * CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH,
+              CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
+            ),
+          });
+        });
+      });
     },
   },
 });

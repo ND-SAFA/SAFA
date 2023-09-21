@@ -1,10 +1,4 @@
-import {
-  Core,
-  EventObject,
-  LayoutOptions,
-  Layouts,
-  Stylesheet,
-} from "cytoscape";
+import { Core, LayoutOptions, Layouts, Stylesheet } from "cytoscape";
 import {
   AutoMoveOptions,
   AutoMoveRule,
@@ -12,7 +6,6 @@ import {
   EdgeHandlersOptions,
   KlayLayoutOptions,
 } from "@/types/cytoscape";
-import { CytoEvent } from "@/types/cytoscape/core/events";
 
 /**
  * Defines CytoCore, an application specific definition of cytoscape defining
@@ -23,20 +16,6 @@ export interface CytoCore extends Core {
   layout(l: LayoutOptions | KlayLayoutOptions): Layouts;
   edgehandles(opts: EdgeHandlersOptions): EdgeHandleCore;
 }
-
-/**
- * Defines a cyto event handler.
- */
-export interface CytoEventDefinition {
-  events: CytoEvent[];
-  selector?: string;
-  action: (cy: CytoCore, event: EventObject) => void;
-}
-
-/**
- * Defines a collection of cyto event handlers.
- */
-export type CytoEventHandlers = Record<string, CytoEventDefinition>;
 
 /**
  * Defines a cyto style sheet.

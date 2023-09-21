@@ -94,7 +94,7 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public Optional<TraceLinkVersion> findExistingVersionEntity(TraceLinkVersion traceLinkVersion) {
+    public Optional<TraceLinkVersion> queryVersionEntity(TraceLinkVersion traceLinkVersion) {
         return this.traceLinkVersionRepository
             .findByProjectVersionAndTraceLink(traceLinkVersion.getProjectVersion(), traceLinkVersion.getTraceLink());
     }

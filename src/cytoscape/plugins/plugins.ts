@@ -1,9 +1,6 @@
 import klay from "cytoscape-klay";
 import automove from "cytoscape-automove";
 import edgehandles from "cytoscape-edgehandles";
-import { CytoCore } from "@/types";
-import { cyStore } from "@/hooks";
-import { artifactTreeEdgeHandleOptions, setEdgeHandlesCore } from "@/cytoscape";
 
 /**
  * Plugins used on the creator graph.
@@ -29,11 +26,6 @@ export const PROJECT_PLUGINS = [
   },
   {
     initialize: edgehandles,
-    afterInit(cy: CytoCore): Promise<void> {
-      return setEdgeHandlesCore(
-        cyStore.projectCy,
-        cy.edgehandles(artifactTreeEdgeHandleOptions)
-      );
-    },
+    afterInit: () => undefined,
   },
 ];

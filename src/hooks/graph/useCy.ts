@@ -1,7 +1,27 @@
 import { defineStore } from "pinia";
 
-import { CyPromise, CytoCoreGraph, ResolveCy } from "@/types";
-import { cyStore, selectionStore } from "@/hooks";
+import {
+  CollectionReturnValue,
+  EventHandler,
+  EventObject,
+  NodeSingular,
+} from "cytoscape";
+import {
+  CyPromise,
+  CytoCore,
+  CytoCoreGraph,
+  CytoEvent,
+  EdgeHandleCore,
+  ResolveCy,
+} from "@/types";
+import { getTraceId } from "@/util";
+import {
+  appStore,
+  selectionStore,
+  traceApiStore,
+  traceMatrixApiStore,
+  traceStore,
+} from "@/hooks";
 import {
   GRAPH_CONFIG,
   CREATOR_PLUGINS,
@@ -10,6 +30,7 @@ import {
   ZOOM_INCREMENT,
   CENTER_GRAPH_PADDING,
   ANIMATION_DURATION,
+  EDGE_HANDLERS_OPTIONS,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -19,13 +40,11 @@ import { pinia } from "@/plugins";
 export const useCy = defineStore("cy", {
   state() {
     let creatorResolveCy: ResolveCy = null;
+    let projectResolveCy: ResolveCy = null;
 
     const creatorCy: CyPromise = new Promise((resolve) => {
       creatorResolveCy = resolve;
     });
-
-    let projectResolveCy: ResolveCy = null;
-
     const projectCy: CyPromise = new Promise((resolve) => {
       projectResolveCy = resolve;
     });
@@ -47,42 +66,11 @@ export const useCy = defineStore("cy", {
        * A promise for using the project cy instance.
        */
       projectCy,
+      /**
+       * The edge handles link drawing plugin.
+       */
+      edgeHandles: undefined as EdgeHandleCore | undefined,
     };
-  },
-  getters: {
-    /**
-     * @return The configuration for the creator graph.
-     */
-    creatorGraph(): CytoCoreGraph {
-      return {
-        name: "tim-tree-graph",
-        config: GRAPH_CONFIG,
-        saveCy: this.creatorResolveCy,
-        plugins: CREATOR_PLUGINS,
-        afterInit: () => cyStore.centerNodes(false, "creator"),
-      };
-    },
-    /**
-     * @return The configuration for the project graph.
-     */
-    projectGraph(): CytoCoreGraph {
-      return {
-        name: "artifact-tree-graph",
-        config: GRAPH_CONFIG,
-        saveCy: this.projectResolveCy,
-        plugins: PROJECT_PLUGINS,
-        afterInit() {
-          const selectedArtifacts = selectionStore.selectedArtifact?.id;
-
-          if (!selectedArtifacts) {
-            cyStore.zoomReset();
-            cyStore.centerNodes();
-          } else {
-            selectionStore.centerOnArtifacts([selectedArtifacts]);
-          }
-        },
-      };
-    },
   },
   actions: {
     /**
@@ -91,6 +79,42 @@ export const useCy = defineStore("cy", {
      */
     getCy(type?: "project" | "creator"): CyPromise {
       return type === "creator" ? this.creatorCy : this.projectCy;
+    },
+
+    /**
+     * @return The configuration for the creator graph.
+     */
+    buildCreatorGraph(): CytoCoreGraph {
+      return {
+        name: "tim-tree-graph",
+        config: GRAPH_CONFIG,
+        saveCy: this.creatorResolveCy,
+        plugins: CREATOR_PLUGINS,
+        afterInit: () => this.centerNodes(false, "creator"),
+      };
+    },
+    /**
+     * @return The configuration for the project graph.
+     */
+    buildProjectGraph(): CytoCoreGraph {
+      return {
+        name: "artifact-tree-graph",
+        config: GRAPH_CONFIG,
+        saveCy: this.projectResolveCy,
+        plugins: PROJECT_PLUGINS,
+        afterInit: (cy) => {
+          const selectedArtifacts = selectionStore.selectedArtifact?.id;
+
+          if (!selectedArtifacts) {
+            this.zoomReset();
+            this.centerNodes();
+          } else {
+            selectionStore.centerOnArtifacts([selectedArtifacts]);
+          }
+
+          this.configureDrawMode(cy);
+        },
+      };
     },
 
     /**
@@ -108,7 +132,7 @@ export const useCy = defineStore("cy", {
         }
       }
       if (type === "both" || type === "creator") {
-        this.getCy("creator").then((cy) => {
+        this.creatorCy.then((cy) => {
           cy.fit(cy.nodes(), 150);
         });
       }
@@ -249,6 +273,65 @@ export const useCy = defineStore("cy", {
         cy.nodes().style({ display: "element" });
         cy.edges().style({ display: "element" });
       });
+    },
+
+    /**
+     *  Enables draw mode for the graph.
+     */
+    drawMode(action: "enable" | "disable" | "toggle"): void {
+      if (!this.edgeHandles) return;
+
+      if (
+        action === "disable" ||
+        (action === "toggle" && appStore.popups.drawTrace)
+      ) {
+        this.edgeHandles.disableDrawMode();
+        this.edgeHandles.disable();
+        appStore.close("drawTrace");
+      } else if (
+        action === "enable" ||
+        (action === "toggle" && !appStore.popups.drawTrace)
+      ) {
+        this.edgeHandles.enable();
+        this.edgeHandles.enableDrawMode();
+        appStore.open("drawTrace");
+      }
+    },
+    /**
+     * Initializes edge handles plugin for drawing links on the graph.
+     * @param cy - The cytoscape instance.
+     */
+    configureDrawMode(cy: CytoCore): void {
+      this.edgeHandles = cy.edgehandles({
+        ...EDGE_HANDLERS_OPTIONS,
+        canConnect: (source, target) =>
+          traceStore.isLinkAllowed(source.data(), target.data()) === true,
+        edgeParams: (source, target) => ({
+          id: getTraceId(source.data().id, target.data().id),
+          source: source.data().id,
+          target: target.data().id,
+        }),
+      });
+
+      cy.on(CytoEvent.EH_COMPLETE, ((
+        event: EventObject,
+        source: NodeSingular,
+        target: NodeSingular,
+        addedEdge: CollectionReturnValue
+      ) => {
+        this.drawMode("disable");
+
+        addedEdge.remove();
+
+        if (source.data()?.graph === "tree") {
+          traceApiStore.handleCreate(source.data(), target.data());
+        } else {
+          traceMatrixApiStore.handleCreate(
+            source.data().artifactType,
+            target.data().artifactType
+          );
+        }
+      }) as EventHandler);
     },
   },
 });

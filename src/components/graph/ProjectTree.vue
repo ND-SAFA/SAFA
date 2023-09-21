@@ -1,7 +1,7 @@
 <template>
   <cytoscape
     id="cytoscape-artifact"
-    :graph="cyStore.projectGraph"
+    :graph="graph"
     :class="className"
     data-cy="view-artifact-tree"
     @click="handleClick"
@@ -58,7 +58,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { watch, computed, onMounted } from "vue";
+import { watch, computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { EventObject } from "cytoscape";
 import { DetailsOpenState } from "@/types";
@@ -73,12 +73,13 @@ import {
   cyStore,
 } from "@/hooks";
 import { Routes } from "@/router";
-import { disableDrawMode } from "@/cytoscape";
 import { Cytoscape } from "./base";
 import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
 import { TimNode, TimLink, TimMenu } from "./tim";
 
 const currentRoute = useRoute();
+
+const graph = ref(cyStore.buildProjectGraph());
 
 const isInView = computed(() => !layoutStore.isTableMode);
 const isTreeMode = computed(() => layoutStore.isTreeMode);
@@ -114,7 +115,7 @@ function handleClick(event: EventObject): void {
   if (event.target !== event.cy) return;
 
   if (appStore.popups.drawTrace) {
-    disableDrawMode();
+    cyStore.drawMode("disable");
   }
 
   if (

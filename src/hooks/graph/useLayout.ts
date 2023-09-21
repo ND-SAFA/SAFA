@@ -18,7 +18,6 @@ import {
 } from "@/types";
 import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
 import {
-  disableDrawMode,
   KlaySettings,
   GENERATED_LINK_SELECTOR,
   GENERATED_TRACE_MAX_WIDTH,
@@ -143,7 +142,7 @@ export const useLayout = defineStore("layout", {
     async resetLayout(): Promise<void> {
       appStore.onLoadStart();
 
-      disableDrawMode();
+      cyStore.drawMode("disable");
       subtreeStore.resetHiddenNodes();
       selectionStore.clearSelections();
       appStore.closeSidePanels();

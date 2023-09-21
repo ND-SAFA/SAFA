@@ -11,7 +11,7 @@
     <panel-card>
       <cytoscape
         id="cytoscape-tim"
-        :graph="cyStore.creatorGraph"
+        :graph="graph"
         :class="className"
         data-cy="view-tim-tree"
       >
@@ -45,7 +45,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { TimTreeProps } from "@/types";
 import { appStore, layoutStore, projectSaveStore, cyStore } from "@/hooks";
 import { FlexBox, TextButton, PanelCard } from "@/components/common";
@@ -53,6 +53,8 @@ import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 
 const props = defineProps<TimTreeProps>();
+
+const graph = ref(cyStore.buildCreatorGraph());
 
 const className = computed(() => {
   if (!props.visible) {

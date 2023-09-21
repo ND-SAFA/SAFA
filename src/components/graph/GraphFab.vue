@@ -52,7 +52,7 @@
         :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
         class="bg-neutral"
         data-cy="button-fab-draw-trace"
-        @click="toggleDrawMode"
+        @click="cyStore.drawMode('toggle')"
       />
       <q-fab-action
         v-if="isTreeMode"
@@ -78,7 +78,7 @@
       icon="cancel"
       tooltip="Cancel draw mode"
       class="q-ml-sm"
-      @click="disableDrawMode"
+      @click="cyStore.drawMode('disable')"
     />
   </q-page-sticky>
 </template>
@@ -98,11 +98,11 @@ import { getIcon } from "@/util";
 import {
   appStore,
   artifactSaveStore,
+  cyStore,
   layoutStore,
   permissionStore,
 } from "@/hooks";
-import { disableDrawMode, toggleDrawMode } from "@/cytoscape";
-import IconButton from "@/components/common/button/IconButton.vue";
+import { IconButton } from "@/components/common";
 
 const open = ref(false);
 const fabPos = ref([18, 18]);

@@ -15,8 +15,8 @@ import {
   subtreeStore,
   artifactStore,
   traceStore,
+  cyStore,
 } from "@/hooks";
-import { disableDrawMode } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -88,7 +88,7 @@ export const useDelta = defineStore("delta", {
 
       this.inDeltaView = isDeltaViewEnabled;
 
-      disableDrawMode();
+      cyStore.drawMode("disable");
     },
     /**
      * Clears the current delta and resets the graph state.

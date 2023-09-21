@@ -42,7 +42,7 @@ public abstract class GenerationJob extends CommitJob {
     /**
      * Creates the project summary used across all generational jobs.
      */
-    @IJobStep(value = "Creating Project Summary", position = 2)
+    @IJobStep(value = "Summarizing Project Entities", position = 2)
     public void summarizeProjectEntities() {
         ProjectSummaryService service = this.getServiceProvider().getProjectSummaryService();
         Pair<String, List<ArtifactAppEntity>> summarizedEntities = service.summarizeProjectEntities(getProjectVersion(),

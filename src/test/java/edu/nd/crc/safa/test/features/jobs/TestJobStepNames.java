@@ -56,7 +56,7 @@ class TestJobStepNames extends ApplicationBaseTest {
         List<String> stepNames = JobSteps.getJobSteps(HGenJob.class);
         String[] expectedStepNames = new String[]{
             "Retrieving Project",
-            "Creating Project Summary",
+            "Summarizing Project Entities",
             "Generating Artifacts",
             "Committing Entities",
             "Done"

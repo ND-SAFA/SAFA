@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -13,10 +13,10 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Creates a job for generating trace links.
  */
 public class GenerateLinksJobBuilder extends AbstractJobBuilder {
-    private final TraceGenerationRequest request;
+    private final TGenRequestAppEntity request;
 
     public GenerateLinksJobBuilder(ServiceProvider serviceProvider,
-                                   TraceGenerationRequest request,
+                                   TGenRequestAppEntity request,
                                    SafaUser user) {
         super(serviceProvider);
         this.request = request;

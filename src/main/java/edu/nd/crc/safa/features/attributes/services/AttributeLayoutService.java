@@ -47,8 +47,8 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     }
 
     @Override
-    public List<AttributeLayoutAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-        return layoutRepo.findByProjectAndIdIn(projectVersion.getProject(), entityIds)
+    public List<AttributeLayoutAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+        return layoutRepo.findByProjectAndIdIn(projectVersion.getProject(), appEntityIds)
             .stream()
             .map(this::appEntityFromAttributeLayout)
             .collect(Collectors.toList());

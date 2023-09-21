@@ -69,7 +69,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
                                       String uploadedFilesPath,
                                       boolean shouldSummarize,
                                       boolean isNewProject) {
-        super(jobDbEntity, serviceProvider, commit);
+        super(jobDbEntity, serviceProvider, commit, isNewProject);
         this.pathToFiles = uploadedFilesPath;
         this.shouldSummarize = shouldSummarize;
         this.isNewProject = isNewProject;
@@ -165,10 +165,10 @@ public class FlatFileProjectCreationJob extends CommitJob {
         TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(projectCommitDefinition);
         List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(
-            flatFileParser.getTraceGenerationRequest(),
+            flatFileParser.getTGenRequestAppEntity(),
             projectAppEntity);
         List<TraceAppEntity> addedTraceLinks = projectCommitDefinition.getTraces().getAdded();
-        generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(addedTraceLinks, generatedLinks);
+        generatedLinks = traceGenerationService.removeOverlappingLinks(addedTraceLinks, generatedLinks);
         logger.log("%d traces generated.", generatedLinks.size());
 
         projectCommitDefinition.getTraces().getAdded().addAll(generatedLinks);

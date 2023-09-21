@@ -159,6 +159,7 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
+        attributeValueService.attachCustomAttributesToArtifact(artifactVersion);
 
         ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
             artifactVersion.getArtifact().getArtifactId(),

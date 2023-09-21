@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.CommitJobUtility;
@@ -21,16 +22,12 @@ import lombok.Setter;
  * the steps to create projects.
  */
 public abstract class CommitJob extends AbstractJob {
+    private final boolean deleteProjectOnFail;
     @Setter
     @Getter
     private ProjectCommitDefinition projectCommitDefinition;
     @Setter
     private ProjectVersion createdProjectVersion;
-
-    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
-        super(jobDbEntity, serviceProvider);
-        this.projectCommitDefinition = new ProjectCommitDefinition();
-    }
 
     /**
      * Create a commit job for a project that already exists.
@@ -39,19 +36,13 @@ public abstract class CommitJob extends AbstractJob {
      * @param serviceProvider         Service provider
      * @param projectCommitDefinition The project commit all changes from this job should go into
      */
-    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
-                        ProjectCommitDefinition projectCommitDefinition) {
-        this(jobDbEntity, serviceProvider);
+    protected CommitJob(JobDbEntity jobDbEntity,
+                        ServiceProvider serviceProvider,
+                        ProjectCommitDefinition projectCommitDefinition,
+                        boolean deleteProjectOnFail) {
+        super(jobDbEntity, serviceProvider);
         setProjectCommitDefinition(projectCommitDefinition);
-    }
-
-    @Override
-    public void beforeJob() {
-        ProjectVersion projectVersion = this.projectCommitDefinition.getCommitVersion();
-        Project project = projectVersion.getProject();
-        JobDbEntity job = this.getJobDbEntity();
-        job.setProject(project);
-        this.getServiceProvider().getJobRepository().save(job);
+        this.deleteProjectOnFail = deleteProjectOnFail;
     }
 
     @IJobStep(value = "Committing Entities", position = -2)
@@ -63,34 +54,80 @@ public abstract class CommitJob extends AbstractJob {
         projectChanger.commitAsUser(projectCommitDefinition, getJobDbEntity().getUser());
     }
 
-    private void assertProjectVersionIsSet() {
-        if (this.projectCommitDefinition == null || this.projectCommitDefinition.getCommitVersion() == null) {
-            throw new NullPointerException("Project version is not set.");
-        }
+    /**
+     * @return Returns the project version that this commit is being applied to.
+     */
+    public ProjectVersion getProjectVersion() {
+        return this.projectCommitDefinition.getCommitVersion();
     }
 
+    /**
+     * @return Returns the ID of project version commit was applied to.
+     */
     @Override
     protected UUID getCompletedEntityId() {
         assertProjectVersionIsSet();
-        return projectCommitDefinition.getCommitVersion().getVersionId();
+        return getProjectVersion().getVersionId();
     }
 
+    /**
+     * Deletes project on fail if flag is set.
+     *
+     * @param error The error that caused the job to fail.
+     * @throws RuntimeException If a problem occurs while saving.
+     * @throws IOException      If a problem occurs while logging.
+     */
     @Override
     protected void jobFailed(Exception error) throws RuntimeException, IOException {
-        if (createdProjectVersion != null) {
+        if (this.deleteProjectOnFail) {
             this.getDbLogger().log("Job failed, deleting job.");
-            getServiceProvider().getProjectService().deleteProject(createdProjectVersion.getProject());
+            Project project = createdProjectVersion.getProject();
+            getServiceProvider().getProjectService().deleteProject(project);
         }
     }
 
-    protected void createProjectAndCommit(String projectName, String description) {
-        ProjectCommitDefinition commit = CommitJobUtility.createProject(this.getServiceProvider(), projectName,
+    /**
+     * Links project with commit job.
+     *
+     * @param project The project to associated with job.
+     */
+    protected void setProject(Project project) {
+        JobDbEntity job = this.getJobDbEntity();
+        job.setProject(project);
+        this.getServiceProvider().getJobRepository().save(job);
+    }
+
+    /**
+     * Links the project referenced in commit to job.
+     */
+    @Override
+    protected void beforeJob() {
+        ProjectVersion projectVersion = this.projectCommitDefinition.getCommitVersion();
+        if (projectVersion != null) {
+            Project project = projectVersion.getProject();
+            setProject(project);
+        }
+    }
+
+    /**
+     * Creates new project and commit associated with project.
+     *
+     * @param name        The name of the project.
+     * @param description The description of project.
+     */
+    protected void createProjectAndCommit(SafaUser user, String name, String description) {
+        ProjectCommitDefinition commit = CommitJobUtility.createProject(this.getServiceProvider(), user, name,
             description);
         setProjectCommitDefinition(commit);
         setCreatedProjectVersion(commit.getCommitVersion());
     }
 
-    public ProjectVersion getProjectVersion() {
-        return this.projectCommitDefinition.getCommitVersion();
+    /**
+     * Asserts that project version has been set.
+     */
+    private void assertProjectVersionIsSet() {
+        if (this.projectCommitDefinition == null || this.projectCommitDefinition.getCommitVersion() == null) {
+            throw new NullPointerException("Project version is not set.");
+        }
     }
 }

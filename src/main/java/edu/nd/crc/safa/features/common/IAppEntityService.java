@@ -26,5 +26,13 @@ public interface IAppEntityService<T extends IAppEntity> {
      */
     List<T> getAppEntities(ProjectVersion projectVersion, SafaUser user);
 
-    List<T> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds);
+    /**
+     * Retrieves the app entities with given ids if present in project version.
+     *
+     * @param projectVersion The project version of the entities to calculate.
+     * @param user
+     * @param appEntityIds
+     * @return
+     */
+    List<T> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds);
 }

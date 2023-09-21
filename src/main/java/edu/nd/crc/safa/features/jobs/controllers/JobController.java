@@ -11,7 +11,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.api.GenApi;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
@@ -192,7 +192,7 @@ public class JobController extends BaseController {
      * @throws Exception If an error occurs while starting job.
      */
     @PostMapping(AppRoutes.Jobs.Traces.GENERATE)
-    public JobAppEntity generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) throws Exception {
+    public JobAppEntity generateTraceLinks(@RequestBody @Valid TGenRequestAppEntity request) throws Exception {
         // Step - Check permissions and retrieve persistent properties
         UUID versionId = request.getProjectVersion().getVersionId();
         SafaUser user = safaUserService.getCurrentUser();

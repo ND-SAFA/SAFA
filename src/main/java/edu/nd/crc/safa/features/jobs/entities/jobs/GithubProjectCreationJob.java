@@ -96,7 +96,7 @@ public class GithubProjectCreationJob extends CommitJob {
                                     GithubIdentifier githubIdentifier,
                                     GithubImportDTO githubImportDTO,
                                     SafaUser user) {
-        super(jobDbEntity, serviceProvider);
+        super(jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
         this.githubIdentifier = githubIdentifier;
         this.user = user;
         this.importSettings = githubImportDTO;
@@ -183,7 +183,7 @@ public class GithubProjectCreationJob extends CommitJob {
         if (projectDescription == null) {
             projectDescription = projectName;
         }
-        createProjectAndCommit(projectName, projectDescription);
+        createProjectAndCommit(this.user, projectName, projectDescription);
         ProjectVersion projectVersion = getProjectVersion();
         this.githubIdentifier.setProjectVersion(projectVersion);
 

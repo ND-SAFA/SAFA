@@ -22,13 +22,12 @@ public class CommitJobUtility {
      * @param description     The description of the project.
      * @return A newly created project version.
      */
-    public static ProjectCommitDefinition createProject(ServiceProvider serviceProvider, String name,
-                                                        String description) {
+    public static ProjectCommitDefinition createProject(ServiceProvider serviceProvider, SafaUser owner,
+                                                        String name, String description) {
         ProjectService projectService = serviceProvider.getProjectService();
         VersionService versionService = serviceProvider.getVersionService();
         SafaUserService userService = serviceProvider.getSafaUserService();
 
-        SafaUser owner = userService.getCurrentUser();
         Project project = projectService.createProject(name, description, owner);
         ProjectVersion projectVersion = versionService.createInitialProjectVersion(project);
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, false);

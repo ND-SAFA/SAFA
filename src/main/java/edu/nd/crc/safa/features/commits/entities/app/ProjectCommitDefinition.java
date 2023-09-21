@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.StringUtil;
 
@@ -49,6 +50,10 @@ public class ProjectCommitDefinition extends AbstractProjectCommit {
         this.setTraces(traces);
         this.setErrors(errors);
         this.setFailOnError(failOnError);
+    }
+
+    public ProjectCommitDefinition(SafaUser user) {
+        this.setUser(user);
     }
 
     public void addArtifacts(ModificationType modificationType,

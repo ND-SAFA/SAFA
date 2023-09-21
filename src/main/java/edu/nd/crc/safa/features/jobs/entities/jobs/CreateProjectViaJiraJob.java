@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -66,7 +67,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
     public CreateProjectViaJiraJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
                                    JiraIdentifier jiraIdentifier, SafaUser user) {
-        super(jobDbEntity, serviceProvider);
+        super(jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
         this.jiraIdentifier = jiraIdentifier;
         this.issues = new ArrayList<>();
         this.user = user;
@@ -112,7 +113,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
 
-        createProjectAndCommit(projectName, projectDescription);
+        createProjectAndCommit(this.user, projectName, projectDescription);
         ProjectVersion projectVersion = getProjectVersion();
 
         Project project = projectVersion.getProject();

@@ -39,7 +39,8 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), this.projectName,
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), user, this.projectName,
             this.projectDescription);
         Project project = commit.getCommitVersion().getProject();
         String uploadLocation = FlatFileUtility.uploadFlatFiles(this.getServiceProvider(), project, this.files);

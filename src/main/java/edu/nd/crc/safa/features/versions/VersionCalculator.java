@@ -9,12 +9,20 @@ import java.util.function.Function;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 /**
  * Calculates the most-up-to-date versions of items.
  */
 public class VersionCalculator {
+
+    public static <V extends IVersionEntity> List<V> getEntitiesAtVersion(ProjectVersion projectVersion,
+                                                                          List<V> versionEntities) {
+        Map<UUID, List<V>> entityMap = ProjectDataStructures.groupEntitiesByProperty(versionEntities,
+            IVersionEntity::getBaseEntityId);
+        return calculateVersionEntitiesAtProjectVersion(projectVersion, entityMap);
+    }
 
     /**
      * Calculates the current version of artifact noted by the entries in the given map.

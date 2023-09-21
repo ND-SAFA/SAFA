@@ -16,7 +16,6 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.GeneralRepositoryUtility;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
@@ -28,18 +27,16 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
     private ArtifactService artifactService;
     private TraceLinkVersionRepository traceLinkVersionRepository;
 
+    /**
+     * Retrieves traces visible in project version.
+     *
+     * @param projectVersion The version of the entities to construct.
+     * @param user           The user making the request
+     * @return Trace links in version.
+     */
     @Override
     public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         return getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
-    }
-
-    @Override
-    public List<TraceAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-
-        return GeneralRepositoryUtility.getByIds(entityIds, this.traceLinkVersionRepository)
-            .stream()
-            .map(this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity)
-            .collect(Collectors.toList());
     }
 
     /**
@@ -60,6 +57,26 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
             .collect(Collectors.toList());
         return getTracesRelatedToArtifacts(projectVersion, projectVersionArtifactIds)
             .stream().filter(tracePredicate).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves the trace links present in version with app entity ids.
+     *
+     * @param projectVersion The project version of the entities to calculate.
+     * @param user           Nullable, not used.
+     * @param appEntityIds   The trace link base entity ids.
+     * @return List of trace links at version.
+     */
+    @Override
+    public List<TraceAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+        List<TraceLinkVersion> allVersions = this.traceLinkVersionRepository.findByTraceLinkTraceLinkIdIn(appEntityIds)
+            .stream()
+            .filter(TraceLinkVersion::isVisible)
+            .collect(Collectors.toList());
+        return VersionCalculator.getEntitiesAtVersion(projectVersion, allVersions)
+            .stream()
+            .map(this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity)
+            .collect(Collectors.toList());
     }
 
     /**

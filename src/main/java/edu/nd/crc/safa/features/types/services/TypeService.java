@@ -46,8 +46,8 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
     }
 
     @Override
-    public List<TypeAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-        return GeneralRepositoryUtility.getByIds(entityIds, this.artifactTypeRepository)
+    public List<TypeAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+        return GeneralRepositoryUtility.getByIds(appEntityIds, this.artifactTypeRepository)
             .stream()
             .map(TypeAppEntity::new)
             .collect(Collectors.toList());

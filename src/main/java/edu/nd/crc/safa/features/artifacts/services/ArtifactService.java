@@ -2,7 +2,6 @@ package edu.nd.crc.safa.features.artifacts.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -11,6 +10,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -45,11 +45,6 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
         return versionToAppEntity(artifactVersions);
     }
 
-    @Override
-    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-        return getAppEntitiesByIds(projectVersion, entityIds);
-    }
-
     /**
      * Returns all versions of all artifacts in the project.
      *
@@ -62,6 +57,11 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
         return versionToAppEntity(artifactVersions);
     }
 
+    @Override
+    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+        return getAppEntitiesByIds(projectVersion, appEntityIds);
+    }
+
     /**
      * Retrieves the artifacts at the version specified.
      *
@@ -70,14 +70,11 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
      * @return The constructed artifacts at given version.
      */
     public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, List<UUID> artifactIds) {
-        List<ArtifactVersion> artifactVersions = new ArrayList<>();
-        for (UUID artifactId : artifactIds) {
-            Optional<ArtifactVersion> artifactVersionOptional =
-                this.artifactVersionRepository.findVersionEntityByProjectVersionAndBaseEntityId(projectVersion,
-                    artifactId);
-            artifactVersionOptional.ifPresent(artifactVersions::add);
-        }
-        return versionToAppEntity(artifactVersions);
+        List<ArtifactVersion> allArtifactVersions =
+            this.artifactVersionRepository.retrieveVersionEntitiesByBaseIds(artifactIds);
+        List<ArtifactVersion> artifactAtVersion = VersionCalculator.getEntitiesAtVersion(projectVersion,
+            allArtifactVersions);
+        return versionToAppEntity(artifactAtVersion);
     }
 
     private List<ArtifactAppEntity> versionToAppEntity(List<ArtifactVersion> artifactVersions) {

@@ -2,35 +2,28 @@ package edu.nd.crc.safa.test.features.generation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
-
-import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryResponse;
-import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.CommonRequestService;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-class TestProjectSummary extends AbstractGenerationTest {
-    private final String summary = "project-summary";
-
+class TestProjectSummary extends GenerationalTest {
     /**
      * Tests that project summary job sets the project description.
      */
     @Test
     void testProjectDescriptionIsSet() throws Exception {
-        ProjectVersion projectVersion = creationService.createProjectWithNewVersion(projectName);
-        setProjectSummaryResponse(summary);
+        createProject();
+        mockProjectSummaryResponse();
+        runProjectSummaryJob();
 
-        JSONObject project = runProjectSummaryJob(projectVersion);
+        refreshProject();
 
-        String projectSummary = project.getString("description");
-        String specification = project.getString("specification");
+        String projectSummary = getProject().getDescription();
+        String specification = getProject().getSpecification();
 
-        assertEquals(projectSummary, summary);
-        assertEquals(specification, summary);
+        assertEquals(getProjectSummary(), projectSummary);
+        assertEquals(getProjectSummary(), specification);
     }
 
     /**
@@ -38,40 +31,22 @@ class TestProjectSummary extends AbstractGenerationTest {
      */
     @Test
     void testProjectSummaryUpdate() throws Exception {
-        ProjectVersion projectVersion = creationService.createProjectWithNewVersion(projectName);
+        createProject();
+        mockProjectSummaryResponse();
+        runProjectSummaryJob();
+
         String newSummary = "new-summary";
+        mockProjectSummaryResponse(newSummary);
+        runProjectSummaryJob();
 
-        setProjectSummaryResponse(summary);
-        runProjectSummaryJob(projectVersion);
+        refreshProject();
 
-        mockServer.reset();
-
-        setProjectSummaryResponse(newSummary);
-        JSONObject project = runProjectSummaryJob(projectVersion);
-
-        assertEquals(summary, project.getString("description"));
-        assertEquals(newSummary, project.getString("specification"));
+        assertEquals(getProjectSummary(), getProject().getDescription());
+        assertEquals(newSummary, getProject().getSpecification());
     }
 
-    private JSONObject runProjectSummaryJob(ProjectVersion projectVersion) throws Exception {
-        JSONObject payload = new JSONObject();
-
-        SafaRequest
-            .withRoute(AppRoutes.Summarize.SUMMARIZE_PROJECT)
-            .withVersion(projectVersion)
-            .postWithJsonObject(payload, JobAppEntity.class);
-
-        JSONObject project = SafaRequest
-            .withRoute(AppRoutes.Retrieval.GET_PROJECT_IN_VERSION)
-            .withVersion(projectVersion)
-            .getWithJsonObject();
-        return project;
-    }
-
-    private void setProjectSummaryResponse(String summary) {
-        ProjectSummaryResponse mockResponse = new ProjectSummaryResponse();
-        mockResponse.setSummary(summary);
-        mockResponse.setArtifacts(new ArrayList<>());
-        setProjectSummaryResponse(mockResponse);
+    private void runProjectSummaryJob() throws Exception {
+        ProjectVersion projectVersion = getProjectVersion();
+        CommonRequestService.Gen.performProjectSummary(projectVersion);
     }
 }

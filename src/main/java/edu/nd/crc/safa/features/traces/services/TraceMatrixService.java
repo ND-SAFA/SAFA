@@ -107,8 +107,8 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
     }
 
     @Override
-    public List<TraceMatrixAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-        return repo.getByProjectVersionAndIdIn(projectVersion, entityIds)
+    public List<TraceMatrixAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+        return repo.getByProjectVersionAndIdIn(projectVersion, appEntityIds)
             .stream()
             .map(TraceMatrixAppEntity::new)
             .collect(Collectors.toList());

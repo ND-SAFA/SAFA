@@ -110,7 +110,7 @@ public class SummaryService {
      */
     private List<GenerationArtifact> performGenArtifactSummaryRequest(GenArtifactSummaryRequest request,
                                                                       JobLogger jobLogger) {
-        TGenSummaryResponse response = this.genApi.generateArtifactSummaries(request, jobLogger);
+        SummaryResponse response = this.genApi.generateArtifactSummaries(request, jobLogger);
         return response.getArtifacts();
     }
 }

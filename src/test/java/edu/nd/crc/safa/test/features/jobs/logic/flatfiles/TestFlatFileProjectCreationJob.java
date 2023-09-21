@@ -48,7 +48,7 @@ class TestFlatFileProjectCreationJob extends AbstractUpdateProjectViaFlatFileTes
         Project project = job.getProject();
 
         // VP - Verify that project job is logged.
-        List<JobAppEntity> projectJobs = CommonRequestService.getProjectJobs(project);
+        List<JobAppEntity> projectJobs = CommonRequestService.Project.getProjectJobs(project);
 
         // VP - Verify that all entities were created
         verifyDefaultProjectEntities(projectVersion.getProject());

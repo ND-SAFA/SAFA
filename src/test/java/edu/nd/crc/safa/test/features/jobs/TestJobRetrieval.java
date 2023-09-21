@@ -56,17 +56,17 @@ class TestJobRetrieval extends ApplicationBaseTest {
         JobDbEntity job = this.jobService.createNewJob(HGenJob.class, "hgen");
 
         if (linkJobToProject) {
-            job.setCompletedEntityId(project.getProjectId());
+            job.setProject(project);
             this.serviceProvider.getJobRepository().save(job);
         }
         return project;
     }
 
     private void assertJobs(Project project, int nUser, int nProject) throws Exception {
-        List<JobAppEntity> userJobs = CommonRequestService.getUserJobs();
-        List<JobAppEntity> projectJobs = CommonRequestService.getProjectJobs(project);
+        List<JobAppEntity> userJobs = CommonRequestService.Project.getUserJobs();
+        List<JobAppEntity> projectJobs = CommonRequestService.Project.getProjectJobs(project);
 
-        assertEquals(nUser, userJobs.size());
-        assertEquals(nProject, projectJobs.size());
+        assertEquals(nUser, userJobs.size(), "User Jobs");
+        assertEquals(nProject, projectJobs.size(), "Project Jobs");
     }
 }

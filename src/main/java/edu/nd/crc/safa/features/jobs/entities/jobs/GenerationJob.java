@@ -25,10 +25,13 @@ public abstract class GenerationJob extends CommitJob {
 
     protected GenerationJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
                             ProjectCommitDefinition projectCommitDefinition) {
-        super(jobDbEntity, serviceProvider, projectCommitDefinition);
+        super(jobDbEntity, serviceProvider, projectCommitDefinition, false);
     }
 
-    @IJobStep(value = "Retrieve Project", position = 1)
+    /**
+     * Retrieves project entities associated with project in commit.
+     */
+    @IJobStep(value = "Retrieving Project", position = 1)
     public void retrieveProject() {
         ProjectRetrievalService projectRetrievalService = this.getServiceProvider().getProjectRetrievalService();
         this.projectAppEntity = projectRetrievalService.getProjectAppEntity(
@@ -36,7 +39,10 @@ public abstract class GenerationJob extends CommitJob {
             getProjectVersion());
     }
 
-    @IJobStep(value = "Create Project Summary", position = 2)
+    /**
+     * Creates the project summary used across all generational jobs.
+     */
+    @IJobStep(value = "Creating Project Summary", position = 2)
     public void summarizeProjectEntities() {
         ProjectSummaryService service = this.getServiceProvider().getProjectSummaryService();
         Pair<String, List<ArtifactAppEntity>> summarizedEntities = service.summarizeProjectEntities(getProjectVersion(),

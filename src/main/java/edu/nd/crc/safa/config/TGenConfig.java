@@ -37,6 +37,10 @@ public class TGenConfig {
         return FileUtilities.buildUrl(components) + FileUtilities.URL_SEP;
     }
 
+    public static void setEndpoint(String endpoint) {
+        get().baseEndpoint = endpoint;
+    }
+
     @PostConstruct
     public void init() {
         TGenConfig.staticConfig = this;

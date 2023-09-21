@@ -59,8 +59,8 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
     }
 
     @Override
-    public List<DocumentAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-        return this.documentRepository.findByProjectAndDocumentIdIn(projectVersion.getProject(), entityIds)
+    public List<DocumentAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> appEntityIds) {
+        return this.documentRepository.findByProjectAndDocumentIdIn(projectVersion.getProject(), appEntityIds)
             .stream()
             .map(d -> createDocumentAppEntity(d, projectVersion))
             .collect(Collectors.toList());

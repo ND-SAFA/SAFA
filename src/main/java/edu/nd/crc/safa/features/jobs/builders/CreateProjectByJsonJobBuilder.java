@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.jobs.builders;
 import java.util.List;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
@@ -19,11 +19,11 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
     /**
      * The project requested to create.
      */
-    private ProjectAppEntity projectAppEntity;
+    private final ProjectAppEntity projectAppEntity;
     /**
      * Requests to generate trace links.
      */
-    private TraceGenerationRequest traceGenerationRequest;
+    private final TGenRequestAppEntity TGenRequestAppEntity;
 
     public CreateProjectByJsonJobBuilder(ServiceProvider serviceProvider,
                                          ProjectAppEntity projectAppEntity,
@@ -31,8 +31,8 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
                                          SafaUser projectOwner) {
         super(serviceProvider);
         this.projectAppEntity = projectAppEntity;
-        this.traceGenerationRequest = new TraceGenerationRequest();
-        this.traceGenerationRequest.setRequests(tracingRequests);
+        this.TGenRequestAppEntity = new TGenRequestAppEntity();
+        this.TGenRequestAppEntity.setRequests(tracingRequests);
         this.projectOwner = projectOwner;
     }
 
@@ -43,8 +43,8 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
             this.getJobDbEntity(),
             this.projectAppEntity,
             this.getServiceProvider(),
-            this.traceGenerationRequest,
-            this.projectOwner
+            this.projectOwner,
+            this.TGenRequestAppEntity
         );
     }
 

@@ -203,6 +203,7 @@ export const useCy = defineStore("cy", {
     },
     /**
      * Set the visibility of nodes and edges related to given list of artifact names.
+     * if no artifact ids are given, all nodes and edges are set.
      * @param artifactIds - The artifacts to display or hide.
      * @param visible - Whether to display or hide these artifacts.
      * @param type - The type of graph to use.
@@ -216,26 +217,19 @@ export const useCy = defineStore("cy", {
 
       this.getCy(type).then((cy) => {
         cy.nodes()
-          .filter((n) => artifactIds.includes(n.data().id))
+          .filter(
+            (n) => artifactIds.length === 0 || artifactIds.includes(n.data().id)
+          )
           .style({ display });
 
         cy.edges()
           .filter(
             (e) =>
-              artifactIds.includes(e.target().data().id) &&
-              artifactIds.includes(e.source().data().id)
+              artifactIds.length === 0 ||
+              (artifactIds.includes(e.target().data().id) &&
+                artifactIds.includes(e.source().data().id))
           )
           .style({ display });
-      });
-    },
-    /**
-     * Shows all nodes and edges.
-     * @param type - The type of graph to use.
-     */
-    displayAll(type?: "project" | "creator"): void {
-      this.getCy(type).then((cy) => {
-        cy.nodes().style({ display: "element" });
-        cy.edges().style({ display: "element" });
       });
     },
     /**

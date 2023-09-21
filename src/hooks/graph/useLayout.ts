@@ -9,13 +9,7 @@ import {
   GraphMode,
 } from "@/types";
 import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
-import {
-  cyApplyAutomove,
-  cyCreateLayout,
-  cyResetTree,
-  disableDrawMode,
-  GraphLayout,
-} from "@/cytoscape";
+import { disableDrawMode } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -91,7 +85,7 @@ export const useLayout = defineStore("layout", {
     applyAutomove(): void {
       if (!this.layout) return;
 
-      cyApplyAutomove(this.layout);
+      cyStore.applyAutomove(this.layout);
     },
     /**
      * Resets the graph layout.
@@ -102,13 +96,16 @@ export const useLayout = defineStore("layout", {
       appStore.onLoadStart();
 
       this.layout = layoutPayload.layout;
-      cyCreateLayout(layoutPayload);
+
+      layoutPayload.cyPromise.then((cy) => {
+        layoutPayload.layout.createLayout(cy, layoutPayload.generate);
+      });
+
       this.applyAutomove();
 
       // Wait for the graph to render.
       setTimeout(() => {
-        cyStore.resetWindow("creator");
-        cyResetTree();
+        cyStore.resetWindow("both");
         appStore.onLoadEnd();
       }, 200);
     },
@@ -117,7 +114,7 @@ export const useLayout = defineStore("layout", {
      * Generates a new layout if in TIM view, or if no positions are set.
      */
     setProjectLayout(): void {
-      const layout = GraphLayout.createProjectLayout();
+      const layout = cyStore.createLayout("project");
       const generate =
         this.mode === "tim" || Object.keys(this.artifactPositions).length === 0;
       const payload = { layout, generate, cyPromise: cyStore.projectCy };
@@ -128,7 +125,7 @@ export const useLayout = defineStore("layout", {
      * Resets the graph layout of the TIM tree.
      */
     setCreatorLayout(): void {
-      const layout = GraphLayout.createCreatorLayout();
+      const layout = cyStore.createLayout("creator");
       const payload = { layout, generate: true, cyPromise: cyStore.creatorCy };
 
       this.setGraphLayout(payload);

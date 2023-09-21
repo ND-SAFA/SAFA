@@ -7,8 +7,7 @@ import {
   TraceLinkSchema,
 } from "@/types";
 import { getMatchingChildren } from "@/util";
-import { artifactStore } from "@/hooks";
-import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
+import { artifactStore, cyStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -192,7 +191,7 @@ export const useSubtree = defineStore("subtrees", {
     resetHiddenNodes(): void {
       this.collapsedParentNodes = [];
       this.hiddenSubtreeNodes = [];
-      cyDisplayAll();
+      cyStore.displayAll();
     },
     /**
      * Hides the given artifact's subtree and add replaces child links with
@@ -213,7 +212,7 @@ export const useSubtree = defineStore("subtrees", {
         collapsedParentNodes: [...this.collapsedParentNodes, rootId],
       });
 
-      cySetDisplay(visibleChildren, false);
+      cyStore.setDisplay(visibleChildren, false);
     },
     /**
      * Un-hides the given artifact's subtree if hidden.
@@ -233,7 +232,7 @@ export const useSubtree = defineStore("subtrees", {
         ),
       });
 
-      cySetDisplay(subtreeNodes, true);
+      cyStore.setDisplay(subtreeNodes, true);
     },
     /**
      * Temporarily removes all hidden nodes, runs the callback, then restores the hidden nodes.

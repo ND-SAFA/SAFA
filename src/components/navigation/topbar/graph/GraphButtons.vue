@@ -28,12 +28,12 @@ export default {
 import { computed } from "vue";
 import { IconVariant } from "@/types";
 import {
+  cyStore,
   layoutApiStore,
   layoutStore,
   permissionStore,
   useScreen,
 } from "@/hooks";
-import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { IconButton, FlexBox, Separator } from "@/components/common";
 
 const { smallWindow } = useScreen();
@@ -43,14 +43,14 @@ const viewButtons = computed(() => [
     ? []
     : [
         {
-          handler: () => cyZoomIn(),
+          handler: () => cyStore.zoomIn(),
           label: "Zoom In",
           icon: "graph-zoom-in" as IconVariant,
           disabled: layoutStore.isTableMode,
           dataCy: "button-nav-graph-zoom-in",
         },
         {
-          handler: () => cyZoomOut(),
+          handler: () => cyStore.zoomOut(),
           label: "Zoom Out",
           icon: "graph-zoom-out" as IconVariant,
           disabled: layoutStore.isTableMode,
@@ -58,7 +58,7 @@ const viewButtons = computed(() => [
         },
       ]),
   {
-    handler: () => cyCenterNodes(true),
+    handler: () => cyStore.centerNodes(true),
     label: "Center Graph",
     icon: "graph-center" as IconVariant,
     disabled: layoutStore.isTableMode,

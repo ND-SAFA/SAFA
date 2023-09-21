@@ -1,9 +1,25 @@
 import { defineStore } from "pinia";
 
-import { CyPromise, CytoCoreGraph, ResolveCy } from "@/types";
-import { layoutStore } from "@/hooks";
-import { GRAPH_CONFIG, CREATOR_PLUGINS, PROJECT_PLUGINS } from "@/cytoscape";
+import { CyLayout, CyPromise, CytoCoreGraph, ResolveCy } from "@/types";
+import { layoutStore, selectionStore } from "@/hooks";
+import {
+  GRAPH_CONFIG,
+  CREATOR_PLUGINS,
+  PROJECT_PLUGINS,
+  ArtifactTreeAutoMoveHandlers,
+  DefaultPreLayoutHooks,
+  DefaultPostLayoutHooks,
+  GraphLayout,
+  CreatorPreLayoutHooks,
+  CreatorPostLayoutHooks,
+  DEFAULT_ARTIFACT_TREE_ZOOM,
+  ZOOM_INCREMENT,
+  CENTER_GRAPH_PADDING,
+  ANIMATION_DURATION,
+  applyAutoMoveEvents,
+} from "@/cytoscape";
 import { pinia } from "@/plugins";
+import { KlaySettings } from "@/cytoscape/layout/klay-settings";
 
 /**
  * This hook manages the state of all cytoscape graphs.
@@ -74,15 +90,206 @@ export const useCy = defineStore("cy", {
   },
   actions: {
     /**
-     * Resets the graph window.
+     * Creates a new graph layout.
      * @param type - The type of graph to reset.
      */
-    resetWindow(type: "project" | "creator") {
+    createLayout(type: "project" | "creator") {
       if (type === "creator") {
-        this.creatorCy.then((cy) => {
+        return new GraphLayout(
+          ArtifactTreeAutoMoveHandlers,
+          {},
+          KlaySettings,
+          DefaultPreLayoutHooks,
+          DefaultPostLayoutHooks
+        );
+      } else {
+        return new GraphLayout(
+          {},
+          {},
+          KlaySettings,
+          CreatorPreLayoutHooks,
+          CreatorPostLayoutHooks
+        );
+      }
+    },
+    /**
+     * Returns the cytoscape instance for the given type.
+     * @param type - The type of graph to use.
+     */
+    getCy(type?: "project" | "creator"): CyPromise {
+      return type === "creator" ? this.creatorCy : this.projectCy;
+    },
+
+    /**
+     * Resets the graph window.
+     * @param type - The type of graph to use.
+     */
+    resetWindow(type?: "project" | "creator" | "both") {
+      if (type === "both" || type === "project") {
+        const selectedId = selectionStore.selectedArtifact?.id;
+
+        if (selectedId) {
+          selectionStore.selectArtifact(selectedId);
+        } else {
+          this.centerNodes(false, "project");
+        }
+      }
+      if (type === "both" || type === "creator") {
+        this.getCy("creator").then((cy) => {
           cy.fit(cy.nodes(), 150);
         });
       }
+    },
+    /**
+     * Re-applies automove to all nodes.
+     * @param layout - The graph layout.
+     * @param type - The type of graph to use.
+     */
+    applyAutomove(layout: CyLayout, type?: "project" | "creator") {
+      this.getCy(type).then((cy) => {
+        applyAutoMoveEvents(cy, layout);
+      });
+    },
+    /**
+     * Runs the given callback if cy is not animated.
+     * @param callback - The callback to run.
+     * @param type - The type of graph to use.
+     */
+    ifNotAnimated(callback: () => void, type?: "project" | "creator") {
+      this.getCy(type).then((cy) => {
+        if (!cy.animated()) {
+          callback();
+        }
+      });
+    },
+
+    /**
+     * Zooms the graph to the default zoom level.
+     * @param type - The type of graph to use.
+     */
+    zoomReset(type?: "project" | "creator") {
+      this.getCy(type).then((cy) => {
+        cy.zoom(DEFAULT_ARTIFACT_TREE_ZOOM);
+      });
+    },
+    /**
+     * Zooms the graph in.
+     * @param type - The type of graph to use.
+     */
+    zoomIn(type?: "project" | "creator") {
+      this.getCy(type).then((cy) => {
+        cy.zoom(cy.zoom() + ZOOM_INCREMENT);
+      });
+    },
+    /**
+     * Zooms the graph out.
+     * @param type - The type of graph to use.
+     */
+    zoomOut(type?: "project" | "creator") {
+      this.getCy(type).then((cy) => {
+        cy.zoom(cy.zoom() - ZOOM_INCREMENT);
+      });
+    },
+    /**
+     * Centers the viewport on all graph nodes.
+     * @param animate - Whether to animate the centering.
+     * @param type - The type of graph to use.
+     */
+    centerNodes(animate = false, type?: "project" | "creator"): void {
+      this.getCy(type).then((cy) => {
+        const nodes = cy.nodes();
+
+        if (animate) {
+          if (cy.animated()) {
+            cy.stop(false, false);
+          }
+
+          cy.animate({
+            fit: { eles: nodes, padding: CENTER_GRAPH_PADDING },
+            duration: ANIMATION_DURATION,
+          });
+        } else if (nodes.length > 10) {
+          cy.fit(nodes, CENTER_GRAPH_PADDING);
+        } else {
+          cy.center(nodes);
+        }
+      });
+    },
+    /**
+     * Moves the viewport such that given set of artifacts is in the middle of the viewport.
+     * If no artifacts are given, the entire collection of nodes is centered.
+     * Request is ignored if current animation is in progress to center the same collection of artifacts.
+     * @param currentCenteringCollection - The current centered artifacts.
+     * @param artifactIds - The artifacts whose average point will be centered.
+     * @param setCenteredArtifacts - Sets the current centered artifacts.
+     * @param type - The type of graph to use.
+     */
+    centerOnArtifacts(
+      currentCenteringCollection: string[] | undefined,
+      artifactIds: string[],
+      setCenteredArtifacts: (ids: string[] | undefined) => void,
+      type?: "project" | "creator"
+    ): void {
+      this.getCy(type).then((cy) => {
+        if (cy.animated()) {
+          cy.stop(false, false);
+        }
+
+        setCenteredArtifacts(artifactIds);
+
+        const collection =
+          artifactIds.length === 0
+            ? cy.nodes()
+            : cy.nodes().filter((n) => artifactIds.includes(n.data().id));
+
+        cy.animate({
+          zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
+          center: { eles: collection },
+          duration: ANIMATION_DURATION,
+          complete: () => setCenteredArtifacts(undefined),
+        });
+      });
+    },
+
+    /**
+     * Set the visibility of nodes and edges related to given list of artifact names.
+     * A node is related if it represents one of the target artifacts.
+     * An edge is related if either source or target is an artifact in target
+     * list.
+     * @param artifactIds - The artifacts to display or hide.
+     * @param visible - Whether to display or hide these artifacts.
+     * @param type - The type of graph to use.
+     */
+    setDisplay(
+      artifactIds: string[],
+      visible: boolean,
+      type?: "project" | "creator"
+    ): void {
+      const display = visible ? "element" : "none";
+
+      this.getCy(type).then((cy) => {
+        cy.nodes()
+          .filter((n) => artifactIds.includes(n.data().id))
+          .style({ display });
+
+        cy.edges()
+          .filter(
+            (e) =>
+              artifactIds.includes(e.target().data().id) &&
+              artifactIds.includes(e.source().data().id)
+          )
+          .style({ display });
+      });
+    },
+    /**
+     * Shows all nodes and edges.
+     * @param type - The type of graph to use.
+     */
+    displayAll(type?: "project" | "creator"): void {
+      this.getCy(type).then((cy) => {
+        cy.nodes().style({ display: "element" });
+        cy.edges().style({ display: "element" });
+      });
     },
   },
 });

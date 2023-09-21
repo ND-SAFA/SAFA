@@ -7,15 +7,6 @@ import {
   CytoEventHandlers,
 } from "@/types";
 import { layoutStore } from "@/hooks";
-import {
-  ArtifactTreeAutoMoveHandlers,
-  DefaultPostLayoutHooks,
-  DefaultPreLayoutHooks,
-  CreatorPostLayoutHooks,
-  CreatorPreLayoutHooks,
-} from "@/cytoscape";
-import { DefaultEvents } from "@/cytoscape/events";
-import { KlaySettings } from "@/cytoscape/layout/klay-settings";
 
 /**
  * Defines a graph layout.
@@ -82,31 +73,5 @@ export default class GraphLayout implements CyLayout {
     for (const postHook of this.postLayoutHooks) {
       postHook(cy, this);
     }
-  }
-
-  /**
-   * Creates the artifact graph layout.
-   */
-  static createProjectLayout(): GraphLayout {
-    return new GraphLayout(
-      ArtifactTreeAutoMoveHandlers,
-      DefaultEvents,
-      KlaySettings,
-      DefaultPreLayoutHooks,
-      DefaultPostLayoutHooks
-    );
-  }
-
-  /**
-   * Creates the project creator graph layout.
-   */
-  static createCreatorLayout(): GraphLayout {
-    return new GraphLayout(
-      {},
-      DefaultEvents,
-      KlaySettings,
-      CreatorPreLayoutHooks,
-      CreatorPostLayoutHooks
-    );
   }
 }

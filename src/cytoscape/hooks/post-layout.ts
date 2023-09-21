@@ -1,7 +1,6 @@
 import { EventObject, NodeSingular } from "cytoscape";
 import { LayoutHook, AutoMoveReposition, CytoCore, CyLayout } from "@/types";
 import { cyStore, selectionStore } from "@/hooks";
-import { cyCenterNodes, cyZoomReset } from "@/cytoscape/operations";
 
 /**
  * Adds auto-move handlers to a node, so that its child nodes are dragged along with it.
@@ -78,8 +77,8 @@ export const centerViewOnNode: LayoutHook = (): void => {
   const selectedArtifacts = selectionStore.selectedArtifact?.id;
 
   if (!selectedArtifacts) {
-    cyZoomReset();
-    cyCenterNodes();
+    cyStore.zoomReset();
+    cyStore.centerNodes();
   } else {
     selectionStore.centerOnArtifacts([selectedArtifacts]);
   }
@@ -98,6 +97,6 @@ export const DefaultPostLayoutHooks: LayoutHook[] = [
  * Post layout hooks for the TIM tree.
  */
 export const CreatorPostLayoutHooks: LayoutHook[] = [
-  (): void => cyCenterNodes(false, cyStore.creatorCy),
+  (): void => cyStore.centerNodes(false, "creator"),
   applyCytoEvents,
 ];

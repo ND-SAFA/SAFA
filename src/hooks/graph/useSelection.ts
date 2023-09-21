@@ -14,8 +14,8 @@ import {
   artifactStore,
   traceStore,
   appStore,
+  cyStore,
 } from "@/hooks";
-import { cyCenterOnArtifacts, cyIfNotAnimated } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -147,7 +147,7 @@ export const useSelection = defineStore("selection", {
      * @param artifactIds - The artifacts whose average point will be centered.
      */
     centerOnArtifacts(artifactIds: string[]): void {
-      cyCenterOnArtifacts(
+      cyStore.centerOnArtifacts(
         this.centeredArtifacts,
         artifactIds,
         (ids) => (this.centeredArtifacts = ids || [])
@@ -267,7 +267,7 @@ export const useSelection = defineStore("selection", {
       } else if (filterAction.type === "subtree") {
         this.selectedSubtreeIds = filterAction.nodeIds;
 
-        cyIfNotAnimated(() =>
+        cyStore.ifNotAnimated(() =>
           this.centerOnArtifacts(filterAction.centerIds || filterAction.nodeIds)
         );
       }

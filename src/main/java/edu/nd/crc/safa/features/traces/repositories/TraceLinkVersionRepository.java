@@ -11,12 +11,12 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.GeneralRepository;
 
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TraceLinkVersionRepository extends GeneralRepository<TraceLinkVersion, UUID>,
+public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVersion, UUID>,
     IVersionRepository<TraceLinkVersion, TraceAppEntity> {
 
     default List<TraceLinkVersion> getTraceVersionsRelatedToArtifacts(List<UUID> artifactIds) {

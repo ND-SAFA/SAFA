@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -19,18 +18,9 @@ public class JobMessageController {
     JobService jobService;
 
     @MessageMapping("/jobs/{jobId}")
-    @SendToUser("/queue/job-updates")
-    public JobAppEntity sendJobState(@DestinationVariable UUID jobId, SimpMessageHeaderAccessor headerAccessor) {
-        // TODO: How to send message back to user?
-        // User has to be subscribed to a topic to receive messages.
-        // Create user channels?
-        // User channels; receive any custom messages.
-
-        // What does custom mean?
-        // GenericMessage.
-        // EntityChangeNotification
-        // JobUpdate
-        // UserUpdate
-        return JobAppEntity.createFromJob(jobService.getJobById(jobId));
+    public void sendJobState(@DestinationVariable UUID jobId, SimpMessageHeaderAccessor headerAccessor) {
+        JobAppEntity job = JobAppEntity.createFromJob(jobService.getJobById(jobId));
+//        String userDestination = "/user/:userId";
+//        messagingTemplate.convertAndSend(userDestination, "Subscribed to job updates for job " + jobId);
     }
 }

@@ -89,17 +89,6 @@ public class JobService {
     }
 
     /**
-     * Retrieves all jobs associated with all projects shared with user.
-     *
-     * @return The list of jobs.
-     */
-    public List<JobAppEntity> getAllProjectJobs() {
-        SafaUser user = safaUserService.getCurrentUser();
-        List<Project> userProjects = projectMembershipService.getProjectsForUser(user);
-        return getJobsInProjects(userProjects);
-    }
-
-    /**
      * Creates new job with:
      * - given authenticated user as creator
      * - status as In Progress
@@ -253,7 +242,7 @@ public class JobService {
      */
     public List<JobAppEntity> getJobsInProjects(List<Project> projects) {
         List<UUID> projectIds = projects.stream().map(Project::getProjectId).collect(Collectors.toList());
-        return this.jobDbRepository.findByCompletedEntityIdInOrderByLastUpdatedAtDesc(projectIds)
+        return this.jobDbRepository.findByProjectProjectIdInOrderByLastUpdatedAtDesc(projectIds)
             .stream()
             .map(JobAppEntity::createFromJob)
             .collect(Collectors.toList());

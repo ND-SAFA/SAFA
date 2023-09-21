@@ -14,5 +14,5 @@ public interface JobDbRepository extends CrudRepository<JobDbEntity, UUID> {
 
     List<JobDbEntity> findByUserOrderByLastUpdatedAtDesc(SafaUser user);
 
-    List<JobDbEntity> findByCompletedEntityIdInOrderByLastUpdatedAtDesc(List<UUID> completedEntityIds);
+    List<JobDbEntity> findByProjectProjectIdInOrderByLastUpdatedAtDesc(List<UUID> completedEntityIds);
 }

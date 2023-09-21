@@ -2,9 +2,7 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +27,9 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.CommitJobUtility;
+import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONException;
@@ -47,9 +46,9 @@ public class FlatFileProjectCreationJob extends CommitJob {
      */
     private final boolean shouldSummarize;
     /**
-     * The initial project version
+     * Whether job is updating project.
      */
-    private ProjectVersion projectVersion;
+    private final boolean isNewProject;
     /**
      * Path to Tim file upload.
      */
@@ -62,47 +61,23 @@ public class FlatFileProjectCreationJob extends CommitJob {
      * Path to uploaded files.
      */
     private String pathToFiles;
-    private String projectName;
-    private String projectDescription;
-    private SafaUser user;
+
 
     public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
                                       ServiceProvider serviceProvider,
-                                      ProjectVersion projectVersion,
-                                      boolean shouldSummarize) {
-        super(jobDbEntity, serviceProvider, new ProjectCommitDefinition(projectVersion, true));
-        this.projectVersion = projectVersion;
-        this.shouldSummarize = shouldSummarize;
-    }
-
-    public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
-                                      ServiceProvider serviceProvider,
-                                      SafaUser user,
-                                      String projectName,
-                                      String projectDescription,
+                                      ProjectCommitDefinition commit,
                                       String uploadedFilesPath,
-                                      boolean shouldSummarize) {
-        super(jobDbEntity, serviceProvider);
-        this.projectName = projectName;
-        this.projectDescription = projectDescription;
+                                      boolean shouldSummarize,
+                                      boolean isNewProject) {
+        super(jobDbEntity, serviceProvider, commit);
         this.pathToFiles = uploadedFilesPath;
-        this.user = user;
         this.shouldSummarize = shouldSummarize;
-    }
-
-    private void createProject() throws IOException {
-        this.projectVersion = createProject(user, projectName, projectDescription);
-        String projectPath = ProjectPaths.Storage.projectPath(this.projectVersion.getProject(), true);
-        Files.move(Path.of(this.pathToFiles), Path.of(projectPath), StandardCopyOption.REPLACE_EXISTING);
+        this.isNewProject = isNewProject;
     }
 
     @IJobStep(value = "Uploading Flat Files", position = 1)
     public void initJobData(JobLogger jobLogger) throws SafaError, IOException {
-        if (this.projectVersion == null) {
-            createProject();
-        }
-
-        Project project = this.projectVersion.getProject();
+        Project project = this.getProjectCommitDefinition().getCommitVersion().getProject();
         this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
         this.pathToFiles = ProjectPaths.Storage.projectUploadsPath(project, false);
         parseTimFile(jobLogger);
@@ -162,6 +137,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
     private List<CommitError> createErrors(List<String> errorMessages,
                                            ProjectEntity projectEntity) {
         CommitErrorRepository commitErrorRepository = this.getServiceProvider().getCommitErrorRepository();
+        ProjectVersion projectVersion = this.getProjectCommitDefinition().getCommitVersion();
         return
             errorMessages
                 .stream()
@@ -196,5 +172,17 @@ public class FlatFileProjectCreationJob extends CommitJob {
         logger.log("%d traces generated.", generatedLinks.size());
 
         projectCommitDefinition.getTraces().getAdded().addAll(generatedLinks);
+    }
+
+    @Override
+    protected void jobFailed(Exception error) throws RuntimeException, IOException {
+        if (this.isNewProject) {
+            CommitJobUtility.deleteCommitProject(this);
+        }
+    }
+
+    @Override
+    protected void afterJob(boolean success) throws Exception {
+        FileUtilities.deletePath(this.pathToFiles);
     }
 }

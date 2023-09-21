@@ -16,11 +16,10 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class CreateProjectViaJsonJob extends CommitJob {
     private final ProjectAppEntity projectAppEntity;
-    private final SafaUser projectOwner;
     /**
      * Trace links to generate.
      */
-    private TraceGenerationRequest traceGenerationRequest;
+    private final TraceGenerationRequest traceGenerationRequest;
 
     public CreateProjectViaJsonJob(JobDbEntity jobDbEntity,
                                    ProjectAppEntity projectAppEntity,
@@ -30,13 +29,12 @@ public class CreateProjectViaJsonJob extends CommitJob {
         super(jobDbEntity, serviceProvider);
         this.traceGenerationRequest = traceGenerationRequest;
         this.projectAppEntity = projectAppEntity;
-        this.projectOwner = projectOwner;
     }
 
     @IJobStep(value = "Creating Project", position = 1)
     public void createProjectStep() {
-        ProjectVersion projectVersion =
-            createProject(projectOwner, projectAppEntity.getName(), projectAppEntity.getDescription());
+        createProjectAndCommit(projectAppEntity.getName(), projectAppEntity.getDescription());
+        ProjectVersion projectVersion = getProjectVersion();
         this.projectAppEntity.setProjectVersion(projectVersion);
         this.traceGenerationRequest.setProjectVersion(projectVersion);
 

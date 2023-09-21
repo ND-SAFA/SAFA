@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.GeneralRepositoryUtility;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
@@ -34,7 +35,8 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
 
     @Override
     public List<TraceAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-        return this.traceLinkVersionRepository.getByIds(entityIds)
+
+        return GeneralRepositoryUtility.getByIds(entityIds, this.traceLinkVersionRepository)
             .stream()
             .map(this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity)
             .collect(Collectors.toList());

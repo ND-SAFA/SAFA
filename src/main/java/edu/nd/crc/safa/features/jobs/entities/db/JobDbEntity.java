@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,6 +38,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @NoArgsConstructor
 public class JobDbEntity {
+
     /**
      * The name of job (e.g. project creation).
      */
@@ -96,7 +98,6 @@ public class JobDbEntity {
     @NotNull
     @Column(name = "current_step", nullable = false)
     private int currentStep;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
@@ -104,10 +105,10 @@ public class JobDbEntity {
         name = "user_id",
         nullable = false)
     private SafaUser user;
-
-    /**
-     * The id of the entity that been created or modified with this job.
-     */
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "project_id")
+    private Project project;
     @Column(name = "completed_entity_id")
     @Type(type = "uuid-char")
     private UUID completedEntityId;

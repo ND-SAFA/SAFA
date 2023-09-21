@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.services.VersionService;
+import edu.nd.crc.safa.utilities.GeneralRepositoryUtility;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
 
     @Override
     public List<TypeAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user, List<UUID> entityIds) {
-        return artifactTypeRepository.getByIds(entityIds)
+        return GeneralRepositoryUtility.getByIds(entityIds, this.artifactTypeRepository)
             .stream()
             .map(TypeAppEntity::new)
             .collect(Collectors.toList());

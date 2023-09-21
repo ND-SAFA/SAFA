@@ -89,13 +89,10 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
 
         @Setter
         boolean allowProjectCreation = false;
-
-        SafaUser newProjectOwner;
-
+        
         protected DummyCommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
                                  ProjectCommitDefinition projectCommitDefinition, SafaUser newProjectOwner) {
             super(jobDbEntity, serviceProvider);
-            this.newProjectOwner = newProjectOwner;
             setProjectCommitDefinition(projectCommitDefinition);
         }
 
@@ -103,7 +100,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         public void makeProject() {
             if (getProjectCommitDefinition() == null) {
                 if (allowProjectCreation) {
-                    createProject(newProjectOwner, "test project name", "test project desc");
+                    createProjectAndCommit("test project name", "test project desc");
                 } else {
                     throw new AssertionError("Not allowed to create a new project");
                 }

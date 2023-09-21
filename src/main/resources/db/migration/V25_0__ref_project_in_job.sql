@@ -1,0 +1,2 @@
+ALTER TABLE job
+    ADD COLUMN project_id VARCHAR(255) REFERENCES project (project_id) ON DELETE CASCADE;

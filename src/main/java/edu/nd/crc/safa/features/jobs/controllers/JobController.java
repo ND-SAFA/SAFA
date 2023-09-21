@@ -82,23 +82,12 @@ public class JobController extends BaseController {
      * @throws SafaError If authentication error occurs.
      */
     @GetMapping(AppRoutes.Jobs.Meta.GET_PROJECT_JOBS)
-    public List<JobAppEntity> getProjectJobs(UUID projectId) throws SafaError {
+    public List<JobAppEntity> getProjectJobs(@PathVariable UUID projectId) throws SafaError {
         ServiceProvider serviceProvider = this.getServiceProvider();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         Project project = this.getResourceBuilder().fetchProject(projectId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         return this.jobService.getProjectJobs(project);
-    }
-
-    /**
-     * Returns the list of jobs associated with all projects shared with user.
-     *
-     * @return The list of jobs created by user.
-     * @throws SafaError If authentication error occurs.
-     */
-    @GetMapping(AppRoutes.Jobs.Meta.GET_ALL_JOBS)
-    public List<JobAppEntity> getAllJobs() throws SafaError {
-        return this.jobService.getAllProjectJobs();
     }
 
     /**

@@ -130,7 +130,6 @@ public class AppRoutes {
         public static class Meta {
             public static final String GET_USER_JOBS = JOBS_PREFIX + "/user";
             public static final String GET_PROJECT_JOBS = JOBS_PREFIX + "/project/{projectId}";
-            public static final String GET_ALL_JOBS = JOBS_PREFIX;
             private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
             public static final String DELETE_JOB = JOB_ID;
         }

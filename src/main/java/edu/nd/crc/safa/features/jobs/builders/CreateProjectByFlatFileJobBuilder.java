@@ -1,14 +1,15 @@
 package edu.nd.crc.safa.features.jobs.builders;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.utilities.CommitJobUtility;
+import edu.nd.crc.safa.utilities.FlatFileUtility;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,19 +39,19 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        String uploadLocation = ProjectPaths.Storage.createTemporaryDirectory();
-        FileUploadService fileUploadService = this.getServiceProvider().getFileUploadService();
-        fileUploadService.uploadFilesToServer(uploadLocation, Arrays.asList(files));
+        ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), this.projectName,
+            this.projectDescription);
+        Project project = commit.getCommitVersion().getProject();
+        String uploadLocation = FlatFileUtility.uploadFlatFiles(this.getServiceProvider(), project, this.files);
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
             this.getJobDbEntity(),
             this.getServiceProvider(),
-            this.getUser(),
-            this.projectName,
-            this.projectDescription,
+            commit,
             uploadLocation,
-            this.shouldSummarize);
+            this.shouldSummarize,
+            true);
     }
 
     @Override
@@ -62,5 +63,4 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     protected Class<? extends AbstractJob> getJobType() {
         return FlatFileProjectCreationJob.class;
     }
-
 }

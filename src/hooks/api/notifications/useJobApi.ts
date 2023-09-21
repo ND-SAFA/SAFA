@@ -2,16 +2,10 @@ import { defineStore } from "pinia";
 
 import { ref } from "vue";
 import { saveAs } from "file-saver";
-import {
-  ChangeMessageSchema,
-  IOHandlerCallback,
-  JobApiHook,
-  JobLogStepSchema,
-  JobSchema,
-} from "@/types";
+import { ChangeMessageSchema, IOHandlerCallback, JobApiHook, JobLogStepSchema, JobSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { jobStore, projectStore, stompApiStore, useApi } from "@/hooks";
-import { deleteJobById, fillEndpoint, getJobLog, getProjectJobs } from "@/api";
+import { deleteJobById, fillEndpoint, getJobLog, getProjectJobs, getUserJobs } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -107,17 +101,23 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
   async function handleReload(): Promise<void> {
     await jobApi.handleRequest(
       async () => {
-        const jobs = await getProjectJobs(projectStore.projectId);
+        if (projectStore.projectId) {
+          const projectJobs = await getProjectJobs(projectStore.projectId);
+          jobStore.projectJobs = projectJobs;
+          console.log("Project Id:", projectStore.projectId);
+        }
 
-        for (const job of jobs) {
+        const userJobs = await getUserJobs();
+
+        for (const job of userJobs) {
           await subscribeToJob(job.id);
         }
 
-        jobStore.jobs = jobs;
+        jobStore.jobs = userJobs;
 
-        if (jobs.length === 0) return;
+        if (userJobs.length === 0) return;
 
-        jobStore.selectedJob = jobs[0];
+        jobStore.selectedJob = userJobs[0];
       },
       { useAppLoad: true }
     );

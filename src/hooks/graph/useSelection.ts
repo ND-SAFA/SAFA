@@ -267,9 +267,7 @@ export const useSelection = defineStore("selection", {
       } else if (filterAction.type === "subtree") {
         this.selectedSubtreeIds = filterAction.nodeIds;
 
-        cyStore.ifNotAnimated(() =>
-          this.centerOnArtifacts(filterAction.centerIds || filterAction.nodeIds)
-        );
+        this.centerOnArtifacts(filterAction.centerIds || filterAction.nodeIds);
       }
     },
     /**

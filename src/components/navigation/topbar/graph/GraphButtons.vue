@@ -43,14 +43,14 @@ const viewButtons = computed(() => [
     ? []
     : [
         {
-          handler: () => cyStore.zoomIn(),
+          handler: () => cyStore.zoom("in"),
           label: "Zoom In",
           icon: "graph-zoom-in" as IconVariant,
           disabled: layoutStore.isTableMode,
           dataCy: "button-nav-graph-zoom-in",
         },
         {
-          handler: () => cyStore.zoomOut(),
+          handler: () => cyStore.zoom("out"),
           label: "Zoom Out",
           icon: "graph-zoom-out" as IconVariant,
           disabled: layoutStore.isTableMode,

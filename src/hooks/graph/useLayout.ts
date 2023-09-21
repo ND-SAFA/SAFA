@@ -17,11 +17,7 @@ import {
   CSSCursor,
 } from "@/types";
 import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
-import {
-  KlaySettings,
-  GENERATED_LINK_SELECTOR,
-  GENERATED_TRACE_MAX_WIDTH,
-} from "@/cytoscape";
+import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -82,14 +78,14 @@ export const useLayout = defineStore("layout", {
     createLayout(type?: "project" | "creator"): CyLayout {
       if (type === "creator") {
         return {
-          klaySettings: KlaySettings,
+          klaySettings: CYTO_CONFIG.KLAY_CONFIG,
           preLayoutHooks: [],
           postLayoutHooks: [this.applyCytoEvents],
           cytoEventHandlers: {},
         };
       } else {
         return {
-          klaySettings: KlaySettings,
+          klaySettings: CYTO_CONFIG.KLAY_CONFIG,
           preLayoutHooks: [this.styleGeneratedLinks],
           postLayoutHooks: [this.applyAutoMoveEvents, this.applyCytoEvents],
           cytoEventHandlers: {},
@@ -198,16 +194,18 @@ export const useLayout = defineStore("layout", {
      * @param cy - The cy instance.
      */
     styleGeneratedLinks(cy: CytoCore): void {
-      cy.edges(GENERATED_LINK_SELECTOR).forEach((edge: EdgeSingular) => {
-        const score = edge.data().score;
+      cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach(
+        (edge: EdgeSingular) => {
+          const score = edge.data().score;
 
-        edge.style({
-          width: Math.min(
-            score * GENERATED_TRACE_MAX_WIDTH,
-            GENERATED_TRACE_MAX_WIDTH
-          ),
-        });
-      });
+          edge.style({
+            width: Math.min(
+              score * CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH,
+              CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
+            ),
+          });
+        }
+      );
     },
     /**
      * Applies cytoscape event handlers in the layout.

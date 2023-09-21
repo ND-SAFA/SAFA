@@ -15,7 +15,10 @@ import {
 } from "@/cytoscape/styles/config";
 import { edgeStyles, nodeStyles } from "@/cytoscape/styles/stylesheets";
 
-export const KlaySettings: KlayLayoutSettings = {
+/**
+ * Settings for generating the graph layout.
+ */
+export const KLAY_CONFIG: KlayLayoutSettings = {
   spacing: LAYOUT_NODE_SPACING,
   direction: LAYOUT_NODE_DIRECTION,
   fixedAlignment: LAYOUT_ALIGNMENT,
@@ -26,6 +29,9 @@ export const KlaySettings: KlayLayoutSettings = {
   randomizationSeed: LAYOUT_RANDOM_SEED,
 };
 
+/**
+ * The configuration for the graph.
+ */
 export const GRAPH_CONFIG: CytoscapeOptions = {
   style: [...nodeStyles, ...edgeStyles],
   motionBlur: USE_MOTION_BLUR,

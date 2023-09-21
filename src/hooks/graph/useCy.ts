@@ -22,16 +22,7 @@ import {
   traceMatrixApiStore,
   traceStore,
 } from "@/hooks";
-import {
-  GRAPH_CONFIG,
-  CREATOR_PLUGINS,
-  PROJECT_PLUGINS,
-  DEFAULT_ARTIFACT_TREE_ZOOM,
-  ZOOM_INCREMENT,
-  CENTER_GRAPH_PADDING,
-  ANIMATION_DURATION,
-  EDGE_HANDLERS_OPTIONS,
-} from "@/cytoscape";
+import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
 /**
@@ -41,7 +32,6 @@ export const useCy = defineStore("cy", {
   state() {
     let creatorResolveCy: ResolveCy = null;
     let projectResolveCy: ResolveCy = null;
-
     const creatorCy: CyPromise = new Promise((resolve) => {
       creatorResolveCy = resolve;
     });
@@ -87,9 +77,9 @@ export const useCy = defineStore("cy", {
     buildCreatorGraph(): CytoCoreGraph {
       return {
         name: "tim-tree-graph",
-        config: GRAPH_CONFIG,
+        config: CYTO_CONFIG.GRAPH_CONFIG,
         saveCy: this.creatorResolveCy,
-        plugins: CREATOR_PLUGINS,
+        plugins: CYTO_CONFIG.CREATOR_PLUGINS,
         afterInit: () => this.centerNodes(false, "creator"),
       };
     },
@@ -99,14 +89,14 @@ export const useCy = defineStore("cy", {
     buildProjectGraph(): CytoCoreGraph {
       return {
         name: "artifact-tree-graph",
-        config: GRAPH_CONFIG,
+        config: CYTO_CONFIG.GRAPH_CONFIG,
         saveCy: this.projectResolveCy,
-        plugins: PROJECT_PLUGINS,
+        plugins: CYTO_CONFIG.PROJECT_PLUGINS,
         afterInit: (cy) => {
           const selectedArtifacts = selectionStore.selectedArtifact?.id;
 
           if (!selectedArtifacts) {
-            this.zoomReset();
+            this.zoom("reset");
             this.centerNodes();
           } else {
             selectionStore.centerOnArtifacts([selectedArtifacts]);
@@ -116,7 +106,6 @@ export const useCy = defineStore("cy", {
         },
       };
     },
-
     /**
      * Resets the graph window.
      * @param type - The type of graph to use.
@@ -138,43 +127,19 @@ export const useCy = defineStore("cy", {
       }
     },
     /**
-     * Runs the given callback if cy is not animated.
-     * @param callback - The callback to run.
+     * Zooms the graph in or out.
+     * @param method - The zoom method to use.
      * @param type - The type of graph to use.
      */
-    ifNotAnimated(callback: () => void, type?: "project" | "creator") {
+    zoom(method: "in" | "out" | "reset", type?: "project" | "creator") {
       this.getCy(type).then((cy) => {
-        if (!cy.animated()) {
-          callback();
+        if (method === "in") {
+          cy.zoom(cy.zoom() + CYTO_CONFIG.ZOOM_INCREMENT);
+        } else if (method === "out") {
+          cy.zoom(cy.zoom() - CYTO_CONFIG.ZOOM_INCREMENT);
+        } else {
+          cy.zoom(CYTO_CONFIG.DEFAULT_ARTIFACT_TREE_ZOOM);
         }
-      });
-    },
-
-    /**
-     * Zooms the graph to the default zoom level.
-     * @param type - The type of graph to use.
-     */
-    zoomReset(type?: "project" | "creator") {
-      this.getCy(type).then((cy) => {
-        cy.zoom(DEFAULT_ARTIFACT_TREE_ZOOM);
-      });
-    },
-    /**
-     * Zooms the graph in.
-     * @param type - The type of graph to use.
-     */
-    zoomIn(type?: "project" | "creator") {
-      this.getCy(type).then((cy) => {
-        cy.zoom(cy.zoom() + ZOOM_INCREMENT);
-      });
-    },
-    /**
-     * Zooms the graph out.
-     * @param type - The type of graph to use.
-     */
-    zoomOut(type?: "project" | "creator") {
-      this.getCy(type).then((cy) => {
-        cy.zoom(cy.zoom() - ZOOM_INCREMENT);
       });
     },
     /**
@@ -192,11 +157,11 @@ export const useCy = defineStore("cy", {
           }
 
           cy.animate({
-            fit: { eles: nodes, padding: CENTER_GRAPH_PADDING },
-            duration: ANIMATION_DURATION,
+            fit: { eles: nodes, padding: CYTO_CONFIG.CENTER_GRAPH_PADDING },
+            duration: CYTO_CONFIG.ANIMATION_DURATION,
           });
         } else if (nodes.length > 10) {
-          cy.fit(nodes, CENTER_GRAPH_PADDING);
+          cy.fit(nodes, CYTO_CONFIG.CENTER_GRAPH_PADDING);
         } else {
           cy.center(nodes);
         }
@@ -229,14 +194,13 @@ export const useCy = defineStore("cy", {
             : cy.nodes().filter((n) => artifactIds.includes(n.data().id));
 
         cy.animate({
-          zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
+          zoom: CYTO_CONFIG.DEFAULT_ARTIFACT_TREE_ZOOM,
           center: { eles: collection },
-          duration: ANIMATION_DURATION,
+          duration: CYTO_CONFIG.ANIMATION_DURATION,
           complete: () => setCenteredArtifacts(undefined),
         });
       });
     },
-
     /**
      * Set the visibility of nodes and edges related to given list of artifact names.
      * @param artifactIds - The artifacts to display or hide.
@@ -274,26 +238,23 @@ export const useCy = defineStore("cy", {
         cy.edges().style({ display: "element" });
       });
     },
-
     /**
      *  Enables draw mode for the graph.
      */
     drawMode(action: "enable" | "disable" | "toggle"): void {
-      if (!this.edgeHandles) return;
-
       if (
         action === "disable" ||
         (action === "toggle" && appStore.popups.drawTrace)
       ) {
-        this.edgeHandles.disableDrawMode();
-        this.edgeHandles.disable();
+        this.edgeHandles?.disableDrawMode();
+        this.edgeHandles?.disable();
         appStore.close("drawTrace");
       } else if (
         action === "enable" ||
         (action === "toggle" && !appStore.popups.drawTrace)
       ) {
-        this.edgeHandles.enable();
-        this.edgeHandles.enableDrawMode();
+        this.edgeHandles?.enable();
+        this.edgeHandles?.enableDrawMode();
         appStore.open("drawTrace");
       }
     },
@@ -303,7 +264,7 @@ export const useCy = defineStore("cy", {
      */
     configureDrawMode(cy: CytoCore): void {
       this.edgeHandles = cy.edgehandles({
-        ...EDGE_HANDLERS_OPTIONS,
+        ...CYTO_CONFIG.EDGE_HANDLERS_OPTIONS,
         canConnect: (source, target) =>
           traceStore.isLinkAllowed(source.data(), target.data()) === true,
         edgeParams: (source, target) => ({

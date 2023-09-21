@@ -13,10 +13,11 @@ import {
   GraphMode,
   CytoCore,
   AutoMoveReposition,
+  CytoEvent,
+  CSSCursor,
 } from "@/types";
 import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
 import {
-  ArtifactTreeAutoMoveHandlers,
   disableDrawMode,
   KlaySettings,
   GENERATED_LINK_SELECTOR,
@@ -86,7 +87,6 @@ export const useLayout = defineStore("layout", {
           preLayoutHooks: [],
           postLayoutHooks: [this.applyCytoEvents],
           cytoEventHandlers: {},
-          autoMoveHandlers: {},
         };
       } else {
         return {
@@ -94,7 +94,6 @@ export const useLayout = defineStore("layout", {
           preLayoutHooks: [this.styleGeneratedLinks],
           postLayoutHooks: [this.applyAutoMoveEvents, this.applyCytoEvents],
           cytoEventHandlers: {},
-          autoMoveHandlers: ArtifactTreeAutoMoveHandlers,
         };
       }
     },
@@ -186,9 +185,10 @@ export const useLayout = defineStore("layout", {
      * Resets all automove events.
      */
     applyAutomove(): void {
+      if (!this.layout) return;
+
       cyStore.getCy("project").then((cy) => {
-        if (!this.layout) return;
-        this.applyAutoMoveEvents(cy, this.layout);
+        this.applyAutoMoveEvents(cy);
       });
     },
 
@@ -233,9 +233,8 @@ export const useLayout = defineStore("layout", {
     /**
      * Adds auto-move handlers to all nodes, so that their children are dragged along with then.
      * @param cy - The cy instance.
-     * @param layout - The layout instance.
      */
-    applyAutoMoveEvents(cy: CytoCore, layout: CyLayout) {
+    applyAutoMoveEvents(cy: CytoCore) {
       cy.automove("destroy");
 
       cy.nodes().forEach((node) => {
@@ -243,17 +242,20 @@ export const useLayout = defineStore("layout", {
           .connectedEdges(`edge[source='${node.data().id}']`)
           .targets();
 
-        const rule = cy.automove({
+        cy.automove({
           nodesMatching: children.union(children.successors()),
           reposition: AutoMoveReposition.DRAG,
           dragWith: node,
         });
 
-        for (const eventDefinition of Object.values(layout.autoMoveHandlers)) {
-          node.on(eventDefinition.triggers.join(" "), (event: EventObject) => {
-            eventDefinition.action(node, rule, event);
+        node.on(CytoEvent.CXT_TAP, (event: EventObject) => {
+          document.body.style.cursor = CSSCursor.GRAB;
+          const nodePosition = event.target.renderedPosition();
+          event.target.renderedPosition({
+            x: nodePosition.x + event.originalEvent.movementX / 2,
+            y: nodePosition.y + event.originalEvent.movementY / 2,
           });
-        }
+        });
       });
     },
   },

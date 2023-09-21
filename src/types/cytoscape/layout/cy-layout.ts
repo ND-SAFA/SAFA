@@ -1,8 +1,4 @@
-import {
-  KlayLayoutSettings,
-  LayoutHook,
-  AutoMoveEventHandlers,
-} from "@/types/cytoscape/plugins";
+import { KlayLayoutSettings, LayoutHook } from "@/types/cytoscape/plugins";
 import { CytoEventHandlers } from "@/types/cytoscape/core";
 
 /**
@@ -12,6 +8,5 @@ export interface CyLayout {
   klaySettings: KlayLayoutSettings | undefined;
   preLayoutHooks: LayoutHook[];
   postLayoutHooks: LayoutHook[];
-  autoMoveHandlers: AutoMoveEventHandlers;
   cytoEventHandlers: CytoEventHandlers;
 }

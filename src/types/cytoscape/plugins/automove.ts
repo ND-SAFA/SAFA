@@ -1,6 +1,5 @@
-import { NodeSingular, NodeCollection, EventObject } from "cytoscape";
+import { NodeSingular, NodeCollection } from "cytoscape";
 import { EmptyLambda } from "@/types";
-import { CytoEvent } from "@/types/cytoscape";
 
 /**
  * Types were manually constructed from: https://github.com/cytoscape/cytoscape.js-automove
@@ -100,36 +99,4 @@ export interface AutoMoveRule {
    * Removes and cleans up this rule.
    */
   destroy(): void;
-}
-
-/**
- * A collection of auto move event handlers.
- */
-export type AutoMoveEventHandlers = Record<string, AutoMoveEventDefinition>;
-
-/**
- * Fired on an auto move event.
- *
- * @param node - The node being moved.
- * @param rule - The rules for moving.
- * @param event - The event for moving.
- */
-export type AutoMoveNodeEvent = (
-  node: NodeSingular,
-  rule: AutoMoveRule,
-  event: EventObject
-) => void;
-
-/**
- * Defines an auto move event.
- */
-export interface AutoMoveEventDefinition {
-  /**
-   * Events that trigger this auto move.
-   */
-  triggers: CytoEvent[];
-  /**
-   * The auto move action.
-   */
-  action: AutoMoveNodeEvent;
 }

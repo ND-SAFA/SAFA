@@ -1,9 +1,14 @@
 <template>
-  <private-page full-window graph>
+  <private-page full-window graph class="bg-neutral">
     <project-tree />
     <graph-fab />
 
-    <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs" class="q-pa-lg">
+    <tab-list
+      v-if="isTableMode"
+      v-model="tab"
+      :tabs="tabs"
+      class="q-pa-lg bg-background"
+    >
       <template #artifact>
         <artifact-table />
       </template>

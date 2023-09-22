@@ -1,5 +1,3 @@
-import { CytoCore, CyLayout } from "@/types/cytoscape/";
-
 /**
  * Types were extracted from: https://github.com/cytoscape/cytoscape.js-klay
  */
@@ -124,8 +122,3 @@ export interface KlayLayoutOptions {
   name: "klay";
   klay: KlayLayoutSettings;
 }
-
-/**
- * A hook for performing layout changes.
- */
-export type LayoutHook = (cy: CytoCore, layout: CyLayout) => void;

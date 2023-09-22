@@ -88,12 +88,13 @@ REFINE_STEPS = {
                            enumeration_chars=["*"]),
     5: QuestionPrompt("Map and document where duplicates were found and the selection rationale. "
                       "Add comments explaining the elimination decisions. "
-                      "Add comments explaining why remaining {target_types} are unique. ",
+                      "Add comments explaining why remaining {target_type}s are unique. ",
                       response_manager=PromptResponseManager(response_tag="notes")),
     6: QuestionPrompt("Output just the {target_type} numbers for the refined list in the specified format:"
-                      "\n* Comma delimited numbers",
+                      f"{NEW_LINE}{PromptUtil.indent_for_markdown('* Comma delimited numbers')}",
                       response_manager=PromptResponseManager(response_tag="selected-artifacts",
-                                                             response_instructions_format="\n* Enclosed in {} XML tags.",
+                                                             response_instructions_format=f"{NEW_LINE}"
+                                                                                          f"{PromptUtil.indent_for_markdown('* Enclosed in {} XML tags.')}",
                                                              expected_response_type=int,
                                                              formatter=lambda tag, val: [v.strip().strip(NEW_LINE)
                                                                                          for v in val.split(COMMA)])

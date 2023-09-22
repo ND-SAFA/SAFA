@@ -3,23 +3,38 @@ import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union
+from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union, Optional
 
 import yaml
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
+from tgen.common.constants.path_constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM, CURRENT_PROJECT_PARAM
 from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.logging.logger_manager import logger
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
                    "PL", "R", "PY", "JAVA", "VUE", "CC"]
+
+ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
 
 
 class FileUtil:
     JSON_EXT = "json"
     CSV_EXT = "csv"
     YAML_EXT = "yaml"
+
+    @staticmethod
+    def get_directory_path(file_path: str) -> str:
+        """
+        Gets the lowest level directory path from the file path (if it's already a directory, just return as is)
+        :param file_path: The path to file/directory
+        :return: The path to the lowest level directory
+        """
+        if os.path.splitext(file_path)[-1]:
+            return os.path.join(*os.path.split(file_path)[:-1])
+        return file_path
 
     @staticmethod
     def get_file_ext(path: str) -> str:
@@ -42,10 +57,11 @@ class FileUtil:
         return output_path
 
     @staticmethod
-    def read_file(file_path: str) -> str:
+    def read_file(file_path: str, raise_exception: bool = True) -> Optional[str]:
         """
         Reads file at given path if exists.
         :param file_path: Path of the file to read.
+        :param raise_exception: If True, raises an exception if reading fails
         :return: The content of the file.
         """
         try:
@@ -53,8 +69,10 @@ class FileUtil:
                 file_content = file.read()
                 return file_content
         except Exception as e:
-            print(f"Failed reading file: {file_path}")
-            raise e
+            logger.exception(f"Failed reading file: {file_path}")
+            if raise_exception:
+                raise e
+            return None
 
     @staticmethod
     def read_file_lines(file_path: str) -> List[str]:
@@ -65,6 +83,33 @@ class FileUtil:
         """
         with open(file_path) as file:
             return file.readlines()
+
+    @staticmethod
+    def pre_process_path(filepath: str) -> str:
+        """
+        Replaces env variables, expands the user, and converts relative path to absolute
+        :param filepath: The filepath to process
+        :return: The processed path ready to be read/written to
+        """
+        filepath = FileUtil.expand_paths_in_dictionary(filepath,
+                                                       FileUtil.get_env_replacements(ENV_REPLACEMENT_VARIABLES))
+        filepath = os.path.expanduser(filepath)
+        if os.path.isabs(filepath):
+            filepath = os.path.abspath(filepath)
+        return filepath
+
+    @staticmethod
+    def get_env_replacements(env_variables: List[str]) -> Dict[str, str]:
+        """
+        :return: Dictionary of environment variables to their values.
+        """
+        replacements = {}
+        for replacement_path in env_variables:
+            path_value = os.environ.get(replacement_path, None)
+            if path_value:
+                path_key = "[%s]" % replacement_path
+                replacements[path_key] = os.path.expanduser(path_value)
+        return replacements
 
     @staticmethod
     def get_file_list(data_path: str, exclude: List[str] = None, exclude_ext: List[str] = None) -> List[str]:

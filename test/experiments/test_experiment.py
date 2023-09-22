@@ -12,7 +12,7 @@ from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 
 class TestExperiment(BaseExperimentTest):
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run(self, hf_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         hf_run_mock.side_effect = self.job_fake_run
@@ -22,7 +22,7 @@ class TestExperiment(BaseExperimentTest):
         result_dirs = os.listdir(os.path.join(experiment.output_dir, "experiment_0"))
         self.assertEqual(len(result_dirs), len(experiment.steps))
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run_no_metric(self, hf_run_mock: mock.MagicMock,
                            definition_mock: mock.MagicMock):

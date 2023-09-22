@@ -1,12 +1,12 @@
 import os
 
+from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
+from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
-
-ARTIFACT_FILE_NAME = "artifacts.csv"
 
 
 class Summarizer:
@@ -31,7 +31,9 @@ class Summarizer:
             artifact_df = self._resummarize_artifacts(project_summary)
             if self.args.do_resummarize_project:
                 project_summary = self._create_project_summary(artifact_df=artifact_df)
-        return PromptDataset(artifact_df=artifact_df, project_summary=project_summary)
+        self.args.dataset.update_artifact_df(artifact_df)
+        self.args.dataset.project_summary = project_summary
+        return self.args.dataset
 
     @staticmethod
     def create_summarizer(args: SummarizerArgs, project_summary: str = None) -> ArtifactsSummarizer:
@@ -43,10 +45,7 @@ class Summarizer:
         """
         if not project_summary:
             project_summary = args.project_summary
-        summarizer = ArtifactsSummarizer(args.llm_manager_for_artifact_summaries,
-                                         project_summary=project_summary,
-                                         code_summary_type=args.code_summary_type,
-                                         code_or_exceeds_limit_only=args.summarize_code_only)
+        summarizer = ArtifactsSummarizer(SummarizerArgs(**DataclassUtil.convert_to_dict(args, project_summary=project_summary)))
         return summarizer
 
     def _resummarize_artifacts(self, project_summary: str) -> ArtifactDataFrame:
@@ -62,6 +61,7 @@ class Summarizer:
         summarizer = self.create_summarizer(self.args, project_summary)
         artifact_df.summarize_content(summarizer)
         if self.args.export_dir:
+            os.makedirs(self.args.export_dir, exist_ok=True)
             artifact_export_path = os.path.join(self.args.export_dir, ARTIFACT_FILE_NAME)
             artifact_df.to_csv(artifact_export_path)
         return artifact_df

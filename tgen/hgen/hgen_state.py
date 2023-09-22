@@ -24,14 +24,14 @@ class HGenState(State):
     """
     Step 3 - Artifact generation
     """
-    generation_predictions: Dict[str, List[str]] = None # dictionary mapping generated content to a list of related source ids
-    n_generations: int = 0 # number of runs of artifact generation
+    generation_predictions: Dict[str, List[str]] = None  # dictionary mapping generated content to a list of related source ids
+    n_generations: int = 0  # number of runs of artifact generation
     summary: str = None  # The summary of all the source artifacts.
 
     """
     Optional Step - Refine content on rerun of hgen
     """
-    all_generated_content: Dict[str, List[str]] = None # All generated content across all runs
+    all_generated_content: Dict[str, List[str]] = None  # All generated content across all runs
     refined_content: Dict[str, List[str]] = None  # The final selected artifact content
 
     """

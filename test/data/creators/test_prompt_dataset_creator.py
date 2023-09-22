@@ -1,9 +1,15 @@
+import os
+from copy import deepcopy
 from typing import Dict, List
+from unittest import mock
+from unittest.mock import MagicMock
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -14,16 +20,28 @@ from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
+from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_openai import mock_openai
 from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 
 class TestPromptDatasetCreator(BaseTest):
+    class FakeArtifactReader:
+
+        def __init__(self, artifact_df: ArtifactDataFrame):
+            self.artifact_df = artifact_df
+            self.project_path = os.path.join(TEST_OUTPUT_DIR, "prompt_dataset_creator")
+
+        def read_project(self):
+            return self.artifact_df
 
     def test_project_reader_artifact(self):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
@@ -41,8 +59,9 @@ class TestPromptDatasetCreator(BaseTest):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
-                                                          summarizer=ArtifactsSummarizer(llm_manager,
-                                                                                         code_or_exceeds_limit_only=False))
+                                                          summarizer=ArtifactsSummarizer(
+                                                              SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager,
+                                                                             summarize_code_only=False)))
 
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=ArtifactTestProject.get_artifact_entries())
 
@@ -68,8 +87,10 @@ class TestPromptDatasetCreator(BaseTest):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         llm_manager = self.create_llm_manager()
         dataset_creator: PromptDatasetCreator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
-                                                                                summarizer=ArtifactsSummarizer(llm_manager,
-                                                                                                               code_or_exceeds_limit_only=False))
+                                                                                summarizer=ArtifactsSummarizer(
+                                                                                    SummarizerArgs(
+                                                                                        llm_manager_for_artifact_summaries=llm_manager,
+                                                                                        summarize_code_only=False)))
         artifact_entries = self.get_expected_bodies()
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=artifact_entries)
 
@@ -109,9 +130,38 @@ class TestPromptDatasetCreator(BaseTest):
             else prompt_dataset.trace_dataset.artifact_df
         TestAssertions.verify_entities_in_df(self, expected_entries, artifact_df)
 
+    @mock.patch.object(ProjectSummarizer, "summarize")
+    @mock_anthropic
+    def test_dataset_creator_with_no_code_summaries(self, anthropic_ai_manager: TestAIManager, project_summarizer_mock: MagicMock):
+        # contains no summaries so all should be summarized
+        project_summary = "summary of project"
+        project_summarizer_mock.return_value = project_summary
+        anthropic_ai_manager.mock_summarization()
+
+        artifacts_ids = ["a1", "code.py", "a2", "code.c"]
+        artifact_bodies = ["content" for _ in artifacts_ids]
+        artifact_layers = ["NL", "PY", "NL", "C"]
+        artifact_reader = self.FakeArtifactReader(artifact_df=ArtifactDataFrame({"id": artifacts_ids, "content": artifact_bodies,
+                                                                                 "layer_id": artifact_layers}))
+        dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_reader, ensure_code_is_summarized=True)
+        dataset1 = dataset_creator.create()
+        number_of_summarization_calls = deepcopy(anthropic_ai_manager.mock_calls)
+        dataset2 = dataset_creator.create()  # ensure summaries are reused
+        self.assertEqual(number_of_summarization_calls, anthropic_ai_manager.mock_calls)
+        for dataset in [dataset1, dataset2]:
+            for i, artifact_info in enumerate(dataset.artifact_df.itertuples()):
+                id_, artifact = artifact_info
+                summary = artifact[ArtifactKeys.SUMMARY]
+                if artifact_layers[i] == "NL":
+                    self.assertIsNone(DataFrameUtil.get_optional_value(summary))
+                else:
+                    self.assertIn("summary", summary.lower())
+        self.assertEqual(dataset1.project_summary, project_summary)
+        self.assertIsNone(dataset2.project_summary)
+
     @staticmethod
-    def get_prompt_dataset_creator(**params):
-        return PromptDatasetCreator(**params)
+    def get_prompt_dataset_creator(ensure_code_is_summarized=False, **params):
+        return PromptDatasetCreator(**params, ensure_code_is_summarized=ensure_code_is_summarized)
 
     @staticmethod
     def create_llm_manager() -> AbstractLLMManager:

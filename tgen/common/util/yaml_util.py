@@ -7,6 +7,7 @@ from yaml.constructor import ConstructorError
 from yaml.loader import SafeLoader
 
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.constants.deliminator_constants import COLON
 from tqdm import tqdm
@@ -28,13 +29,17 @@ class CustomLoader(SafeLoader):
             return cls
         if isinstance(cls, EnumMeta):
             return self._create_enum_from_meta(cls, node)
-        data = cls.__new__(cls)
-
-        if hasattr(data, '__setstate__'):
-            state = self.construct_mapping(node, deep=True)
+        deep = hasattr(cls, '__setstate__')
+        state = self.construct_mapping(node, deep=deep)
+        if hasattr(cls, '__init__'):
+            param_specs = ParamSpecs.create_from_method(cls.__init__)
+            init_params = {name: val for name, val in state.items() if name in param_specs.param_names}
+            data = cls(**init_params)
+        else:
+            data = cls.__new__(cls)
+        if deep:
             data.__setstate__(state)
         else:
-            state = self.construct_mapping(node)
             data.__dict__.update(state)
         return data
 

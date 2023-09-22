@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Set, Type, Union
 
 import pandas as pd
 
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
@@ -56,11 +57,19 @@ def save_dataset_checkpoint(dataset: Any, export_path: str = None,
         full_export_path = FileUtil.add_ext(full_export_path, FileUtil.YAML_EXT)
         FileUtil.write_yaml(dataset, full_export_path)
     else:
-        if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
-            dataset = dataset.trace_dataset
+        saved_proj_summary = False
+        if isinstance(dataset, PromptDataset):
+            if dataset.project_summary:
+                saved_proj_summary = True
+                full_export_path = os.path.splitext(full_export_path)[0]
+                FileUtil.write(dataset.project_summary, os.path.join(full_export_path, PROJECT_SUMMARY_FILENAME))
+            if dataset.trace_dataset is not None:
+                dataset = dataset.trace_dataset
         if exporter_class is None:
             exporter_class = DataFrameExporter if isinstance(dataset, TraceDataset) else CSVExporter
         if issubclass(exporter_class, CSVExporter):
+            if saved_proj_summary:
+                full_export_path = os.path.join(full_export_path, filename)
             full_export_path = FileUtil.add_ext(full_export_path, FileUtil.CSV_EXT)
         exporter = exporter_class(export_path=full_export_path, dataset=dataset)
         exporter.export()
@@ -171,7 +180,9 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
                                       task_prompt: Union[QuestionnairePrompt, Prompt],
                                       base_prompt: Union[SupportedPrompts, str] = SupportedPrompts.HGEN_GENERATION,
                                       summary_prompt: Prompt = None, artifact_type: str = None,
-                                      combine_summary_and_task_prompts: bool = False) -> PromptBuilder:
+                                      combine_summary_and_task_prompts: bool = False,
+                                      build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML) \
+        -> PromptBuilder:
     """
     Gets the prompt builder used for the generations
     :param hgen_args: The arguments for the hierarchy generator
@@ -180,6 +191,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
     :param summary_prompt: Instructions for the model to create a summary of the system first
     :param artifact_type: The type of artifact being presented in the prompt
     :param combine_summary_and_task_prompts: If True combines the summary and task prompts into a single Questionnaire prompt
+    :param build_method: The method to use to build the artifacts into the prompt
     :return: The prompt builder used for the generations
     """
     if isinstance(base_prompt, SupportedPrompts):
@@ -193,8 +205,9 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
 
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type
     artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
-                                          build_method=MultiArtifactPrompt.BuildMethod.XML,
-                                          include_ids=True, data_type=MultiArtifactPrompt.DataType.ARTIFACT,
+                                          build_method=build_method,
+                                          include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
+                                          data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                           xml_tags={convert_spaces_to_dashes(artifact_type.lower()): ["id", "description"]})
     prompts = [base_prompt, artifact_prompt]
 

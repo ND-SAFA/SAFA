@@ -9,6 +9,7 @@ class PipelineArgs(BaseObject):
     """
     The pipeline configuration and arguments.
     """
-    export_dir: str = None
+    export_dir: str = EMPTY_STRING
     load_dir: str = EMPTY_STRING
+    interactive_mode: bool = False
 

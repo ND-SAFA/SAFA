@@ -34,7 +34,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         super().__init__(overrides, project_path)
         if conversions is None:
             conversions = {}
-        self.definition_reader = self._get_definition_reader()
+        self.definition_reader = None
         self._definition = None
         self.conversions = conversions
 
@@ -57,6 +57,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         :return: The definition for reading the project in the correct format
         """
         if self._definition is None:
+            self.definition_reader = self.get_definition_reader()
             self._definition = self.definition_reader.read_project_definition(self.get_project_path())
         return self._definition
 
@@ -141,7 +142,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         JsonUtil.require_properties(definition, [StructuredKeys.TRACES])
         return definition[StructuredKeys.TRACES]
 
-    def _get_definition_reader(self) -> AbstractProjectDefinition:
+    def get_definition_reader(self, raise_exception: bool = True) -> AbstractProjectDefinition:
         """
         If tim.json file exists in project, then TimProjectDefinition is returned. Otherwise, StructuredProjectDefinition is returned.
         :return: AbstractProjectDefinition corresponding to definition file found.
@@ -154,4 +155,5 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
             return StructureProjectDefinition()
         else:
             required_paths = [tim_path, structure_definition_path]
-            raise ValueError(f"{self.get_project_path()} does not contain: {required_paths}")
+            if raise_exception:
+                raise ValueError(f"{self.get_project_path()} does not contain: {required_paths}")

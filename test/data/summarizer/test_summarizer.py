@@ -8,6 +8,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary_types import SummaryTypes
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
@@ -41,7 +42,7 @@ class TestSummarizer(BaseTest):
     def test_code_or_exceeds_limit_true(self, ai_manager: TestAIManager):
         ai_manager.mock_summarization()
         short_text = "This is a short text under the token limit"
-        summarizer = self.get_summarizer(code_or_exceeds_limit_only=True)
+        summarizer = self.get_summarizer(summarize_code_only=True)
         content_summary = summarizer.summarize_single(content=short_text)
         self.assertEqual(content_summary, short_text)  # shouldn't have summarized
 
@@ -67,7 +68,7 @@ class TestSummarizer(BaseTest):
         # data
         nl_content = "Hello, this is a short text."
         contents = [nl_content, self.CODE_CONTENT]
-        summarizer = self.get_summarizer(code_or_exceeds_limit_only=False)
+        summarizer = self.get_summarizer(summarize_code_only=False)
 
         response_manager.set_responses([lambda prompt: self.get_response(prompt, SummaryTypes.NL_BASE, NL_SUMMARY),
                                         lambda prompt: self.get_response(prompt, SummaryTypes.CODE_BASE, PL_SUMMARY)])
@@ -78,13 +79,13 @@ class TestSummarizer(BaseTest):
         self.assertEqual(PL_SUMMARY, summaries[1])
 
     @mock_openai
-    def test_summarize_bulk_code_or_exceeds_limit_only(self, response_manager: TestAIManager):
+    def test_summarize_bulk_summarize_code_only(self, response_manager: TestAIManager):
         """
         Tests bulk summaries with code or exceeds limit only.
         - Verifies that only content over limit is summarized.
         """
         summarizer = self.get_summarizer(
-            code_or_exceeds_limit_only=True)
+            summarize_code_only=True)
         TEXT_1 = self.CODE_CONTENT
         TEXT_2 = "short text"
         TEXTS = [TEXT_1, TEXT_2]
@@ -98,10 +99,10 @@ class TestSummarizer(BaseTest):
         self.assertEqual(summaries[1], TEXT_2)  # shouldn't have summarized
 
     def get_summarizer(self, **kwargs):
-        internal_kwargs = {"code_or_exceeds_limit_only": False}
+        internal_kwargs = {"summarize_code_only": False}
         internal_kwargs.update(kwargs)
         llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = ArtifactsSummarizer(llm_manager, **internal_kwargs)
+        summarizer = ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager, **internal_kwargs))
         return summarizer
 
     @staticmethod

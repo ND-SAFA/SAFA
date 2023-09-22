@@ -1,10 +1,14 @@
+import os
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field, DataclassUtil
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+from tgen.common.util.str_util import StrUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -94,10 +98,11 @@ class HGenArgs(PipelineArgs, BaseObject):
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-4-0314'))
+        self.export_dir = os.path.join(self.export_dir, str(uuid.uuid4())) \
+            if self.export_dir and not StrUtil.is_uuid(os.path.split(self.export_dir)[-1]) else self.export_dir
         for e in PredictionStep:
             if e.value not in self.max_tokens:
                 if e in [PredictionStep.NAME, PredictionStep.FORMAT]:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
-        self.generate_trace_links = True

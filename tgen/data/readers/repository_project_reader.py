@@ -8,7 +8,7 @@ class RepositoryProjectReader(StructuredProjectReader):
     Overrides structured project to return repository project definition.
     """
 
-    def _get_definition_reader(self) -> AbstractProjectDefinition:
+    def get_definition_reader(self) -> AbstractProjectDefinition:
         """
         :return: Returns repository project definition.
         """

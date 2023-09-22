@@ -23,11 +23,12 @@ def mock_ai(libraries: Union[str, List[str]], func=None):
 
         def test_function_wrapper(local_managers, *wrapper_args, **wrapper_kwargs):
             self, *local_args = wrapper_args
-            test_func(self, *local_managers, *test_func_args, *local_args, **test_func_kwargs, **wrapper_kwargs)
+            res = test_func(self, *local_managers, *test_func_args, *local_args, **test_func_kwargs, **wrapper_kwargs)
             for ai_manager in library_ai_managers:
                 n_used = ai_manager.start_index
                 n_expected = len(ai_manager._responses)
                 assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses."
+            return res
 
         function_name = test_func.__name__ if hasattr(test_func, "__name__") else func.__name__
         test_function_wrapper.__name__ = function_name
@@ -50,8 +51,8 @@ def run_with_patches(patches: List[str], ai_managers, runnable: Callable, *args,
     if len(patches) == 1:
         with patch(patch_name) as other_func:
             other_func.side_effect = ai_managers[-1]
-            runnable(ai_managers, *args, **kwargs)
+            return runnable(ai_managers, *args, **kwargs)
     else:
         with patch(patch_name) as other_func:
             other_func.side_effect = ai_managers[0]
-            run_with_patches(patches[1:], ai_managers, runnable, *args, **kwargs)
+            return run_with_patches(patches[1:], ai_managers, runnable, *args, **kwargs)

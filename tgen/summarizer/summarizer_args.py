@@ -4,9 +4,8 @@ from dataclasses import dataclass, field
 from typing import List, Dict
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
-from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, \
+    DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -16,10 +15,6 @@ from tgen.summarizer.summary_types import SummaryTypes
 
 @dataclass
 class SummarizerArgs(PipelineArgs):
-    """
-    Dataset creator used to make dataset containing original artifacts
-    """
-    dataset_creator: PromptDatasetCreator = None
     """
     Dataset creator used to make dataset containing original artifacts
     """
@@ -68,6 +63,10 @@ class SummarizerArgs(PipelineArgs):
     If True, only summarizes the code
     """
     summarize_code_only: bool = True
+    """
+    The name of the directory to save the summaries to
+    """
+    summary_dirname = "summaries"
 
     def __post_init__(self) -> None:
         """
@@ -75,5 +74,5 @@ class SummarizerArgs(PipelineArgs):
         :return: None
         """
         if self.export_dir:
-            os.makedirs(self.export_dir, exist_ok=True)
-        self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
+            if not self.export_dir.endswith(self.summary_dirname):
+                self.export_dir = os.path.join(self.export_dir, self.summary_dirname)

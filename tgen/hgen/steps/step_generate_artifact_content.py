@@ -4,6 +4,7 @@ import uuid
 from typing import Tuple
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, COMMA
+from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
@@ -32,7 +33,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         filename = "artifact_gen_response"
         if state.n_generations > 0:
             filename = f"{filename}_{state.n_generations}"
-            args.hgen_llm_manager_best.llm_args.temperature = 0.25
+            args.hgen_llm_manager_best.llm_args.temperature = TEMPERATURE_ON_RERUNS
         export_path = os.path.join(state.export_dir, filename) if state.export_dir else None
 
         task_prompt, target_tag_id, source_tag_id = self._create_task_prompt(args, state)
@@ -51,7 +52,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                  tags_for_response={generated_artifacts_tag},
                                                  return_first=False,
                                                  export_path=export_path)[0]
-        state.generation_predictions = {p[target_tag_id][0]: p[source_tag_id][0] for p in generation_predictions}
+        state.generation_predictions = {p[target_tag_id][0]: (p[source_tag_id][0] if len(p[source_tag_id]) > 0 else [])
+                                        for p in generation_predictions if target_tag_id in p}
         state.n_generations += 1
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:

@@ -18,16 +18,13 @@ from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 from tgen.testres.mocking.mock_libraries import mock_libraries
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestMultiLayerHGenJob(BaseJobTest):
-    args = HGenArgs(source_layer_id="C++ Code",
-                    target_type="Test User Story",
-                    dataset_creator_for_sources=PromptDatasetCreator(
-                        trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))
     higher_levels = ["requirement", "design document"]
     ranking_calls = 0
 
@@ -43,20 +40,28 @@ class TestMultiLayerHGenJob(BaseJobTest):
         """
         Tests that job is completed succesfully.
         """
-        source_arts = self.args.dataset_creator_for_sources.create().artifact_df.filter_by_row(lambda row:
-                                                                                               row[ArtifactKeys.LAYER_ID.value]
-                                                                                               ==
-                                                                                               self.args.source_layer_id)
+        args: HGenArgs = self.get_args()
+        source_arts = args.dataset_for_sources.artifact_df.filter_by_row(lambda row:
+                                                                         row[ArtifactKeys.LAYER_ID.value]
+                                                                         ==
+                                                                         args.source_layer_id)
         self.ranking_calls = 0
-        expected_user_story_names, anthropic_responses = get_all_responses(target_type=self.args.target_type)
+        expected_user_story_names, anthropic_responses = get_all_responses(target_type=args.target_type)
 
         requirements = ["This is a requirement for a user story.", "This is another requirement for some user stories."]
         design_document = ["Here is the final, top level design document"]
-        expected_requirements_names, responses = get_all_responses(content=requirements, target_type=self.higher_levels[0])
+        expected_requirements_names, responses = get_all_responses(content=requirements, target_type=self.higher_levels[0],
+                                                                   source_type=args.target_type,
+                                                                   sources=[expected_user_story_names[:2],
+                                                                            [expected_user_story_names[-1]]])
         anthropic_responses.extend(responses)
-        expected_design_doc_name, responses = get_all_responses(content=design_document, target_type=self.higher_levels[1])
+        expected_design_doc_name, responses = get_all_responses(content=design_document, target_type=self.higher_levels[1],
+                                                                source_type=self.higher_levels[0],
+                                                                sources=[[expected_requirements_names[0]],
+                                                                         [expected_requirements_names[1]]])
         anthropic_responses.extend(responses)
 
+        anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses(anthropic_responses)
         open_ai_responses = HGenTestConstants.open_ai_responses * 3
         openai_ai_manager.set_responses(open_ai_responses)
@@ -70,15 +75,16 @@ class TestMultiLayerHGenJob(BaseJobTest):
 
     def _assert_success(self, job: AbstractJob, job_result: JobResult):
         self.assertEqual(job_result.status, Status.SUCCESS)
-        target_types = [self.args.target_type] + self.higher_levels
-        source_types = [self.args.source_type, self.args.target_type, self.higher_levels[0]]
+        args = self.get_args()
+        target_types = [args.target_type] + self.higher_levels
+        source_types = [args.source_type, args.target_type, self.higher_levels[0]]
         for target, source in zip(target_types, source_types):
             FileUtil.delete_file_safely(GenerateInputsStep._get_inputs_save_path(target, source))
-        orig_dataset = self.args.dataset_creator_for_sources.create()
+        orig_dataset = args.dataset_creator_for_sources.create()
         dataset: TraceDataset = job_result.body
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
-        layers = [self.args.source_layer_id] + [self.args.target_type, self.higher_levels[0],
-                                                self.higher_levels[1]]
+        layers = [args.source_layer_id] + [args.target_type, self.higher_levels[0],
+                                           self.higher_levels[1]]
         n_expected_links = 0
         for i, layer in enumerate(layers):
             target_artifacts = dataset.artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer)
@@ -98,6 +104,16 @@ class TestMultiLayerHGenJob(BaseJobTest):
                 self.assertGreater(len(as_source), 0)
         self.assertEqual(n_expected_links + len(orig_dataset.trace_dataset.trace_df), len(dataset.trace_df))
 
+    @mock_anthropic
+    def get_args(self, anthropic_ai_manager: TestAIManager):
+        anthropic_ai_manager.mock_summarization()
+        args = HGenArgs(source_layer_id="C++ Code",
+                        target_type="Test User Story",
+                        dataset_creator_for_sources=PromptDatasetCreator(
+                            trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))),
+                        create_new_code_summaries=False)
+        return args
+
     def _get_job(self):
-        starting_hgen_job = BaseHGenJob(self.args)
+        starting_hgen_job = BaseHGenJob(self.get_args())
         return MultiLayerHGenJob(starting_hgen_job, self.higher_levels)

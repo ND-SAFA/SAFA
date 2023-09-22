@@ -64,9 +64,9 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                 continue
             change_details.append(PromptUtil.as_markdown_header(change_type.title(), level=2))
             for change, filenames in changes.items():
-                change_details.append(PromptUtil.format_as_bullet_point(change))
+                change_details.append(PromptUtil.as_bullet_point(change))
                 for filename in filenames:
-                    change_details.append(PromptUtil.format_as_bullet_point(filename, level=2))
+                    change_details.append(PromptUtil.as_bullet_point(filename, level=2))
         return change_details
 
     def _create_change_type_mapping(self, change_summary_output: Dict, task_prompt: QuestionnairePrompt) -> Dict[str, Dict[str, List]]:

@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Tuple, Type, Set, Union, Iterable
+from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
+import pandas as pd
 
 from tgen.common.artifact import Artifact
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -156,7 +157,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         for layer_id in layer_ids:
             df = self if not layer_id else self.get_type(layer_id)
             summaries = df[ArtifactKeys.SUMMARY.value]
-            if DataFrameUtil.contains_na(summaries):
+            if DataFrameUtil.contains_na(summaries) or DataFrameUtil.contains_empty_string(summaries):
                 return False
         return True
 

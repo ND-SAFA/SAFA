@@ -2,10 +2,22 @@ import { defineStore } from "pinia";
 
 import { ref } from "vue";
 import { saveAs } from "file-saver";
-import { ChangeMessageSchema, IOHandlerCallback, JobApiHook, JobLogStepSchema, JobSchema } from "@/types";
+import {
+  ChangeMessageSchema,
+  IOHandlerCallback,
+  JobApiHook,
+  JobLogStepSchema,
+  JobSchema,
+} from "@/types";
 import { timestampToDisplay } from "@/util";
 import { jobStore, projectStore, stompApiStore, useApi } from "@/hooks";
-import { deleteJobById, fillEndpoint, getJobLog, getProjectJobs, getUserJobs } from "@/api";
+import {
+  deleteJobById,
+  fillEndpoint,
+  getJobLog,
+  getProjectJobs,
+  getUserJobs,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -104,7 +116,6 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
         if (projectStore.projectId) {
           const projectJobs = await getProjectJobs(projectStore.projectId);
           jobStore.projectJobs = projectJobs;
-          console.log("Project Id:", projectStore.projectId);
         }
 
         const userJobs = await getUserJobs();

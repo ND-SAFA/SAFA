@@ -31,6 +31,6 @@ import ProjectVersionStepper from "./ProjectVersionStepper.vue";
 
 const hasProject = computed(() => projectStore.projectId !== "");
 const allTabs = loaderTabOptions();
-const tabs = hasProject.value ? allTabs : allTabs.slice(0, 2);
-const tab = ref(tabs[0].id);
+const tabs = computed(() => (hasProject.value ? allTabs : allTabs.slice(0, 2)));
+const tab = ref(tabs.value[0].id);
 </script>

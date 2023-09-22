@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.CommitJobUtility;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,8 @@ import lombok.Setter;
  */
 public abstract class CommitJob extends AbstractJob {
     private final boolean deleteProjectOnFail;
+    @Getter(AccessLevel.PROTECTED)
+    private final SafaUser user;
     @Setter
     @Getter
     private ProjectCommitDefinition projectCommitDefinition;
@@ -36,13 +39,16 @@ public abstract class CommitJob extends AbstractJob {
      * @param serviceProvider         Service provider
      * @param projectCommitDefinition The project commit all changes from this job should go into
      */
-    protected CommitJob(JobDbEntity jobDbEntity,
+    protected CommitJob(SafaUser user,
+                        JobDbEntity jobDbEntity,
                         ServiceProvider serviceProvider,
                         ProjectCommitDefinition projectCommitDefinition,
                         boolean deleteProjectOnFail) {
         super(jobDbEntity, serviceProvider);
-        setProjectCommitDefinition(projectCommitDefinition);
         this.deleteProjectOnFail = deleteProjectOnFail;
+        this.user = user;
+        projectCommitDefinition.setUser(user);
+        setProjectCommitDefinition(projectCommitDefinition);
     }
 
     @IJobStep(value = "Committing Entities", position = -2)

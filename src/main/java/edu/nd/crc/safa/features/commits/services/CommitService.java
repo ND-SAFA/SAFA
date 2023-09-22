@@ -70,13 +70,13 @@ public class CommitService {
      * @param modificationType The modification type to store them under.
      * @return The project commit.
      */
-    public ProjectCommitAppEntity saveArtifacts(ProjectVersion projectVersion,
+    public ProjectCommitAppEntity saveArtifacts(SafaUser user,
+                                                ProjectVersion projectVersion,
                                                 List<ArtifactAppEntity> artifacts,
                                                 ModificationType modificationType) {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition();
         projectCommitDefinition.setCommitVersion(projectVersion);
         projectCommitDefinition.addArtifacts(modificationType, artifacts);
-        SafaUser user = safaUserService.getCurrentUser();
         return this.performCommit(projectCommitDefinition, user);
     }
 

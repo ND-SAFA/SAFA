@@ -1,12 +1,12 @@
 package edu.nd.crc.safa.features.generation.projectsummary;
 
 import java.util.List;
+import java.util.Map;
 
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.json.JSONObject;
 
 @AllArgsConstructor
 @Data
@@ -18,5 +18,5 @@ public class ProjectSummaryRequest {
     /**
      * Additional keyword arguments.
      */
-    private JSONObject kwargs;
+    private Map<String, Boolean> kwargs;
 }

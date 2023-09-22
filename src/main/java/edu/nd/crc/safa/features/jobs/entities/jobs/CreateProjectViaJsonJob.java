@@ -20,15 +20,15 @@ public class CreateProjectViaJsonJob extends CommitJob {
     /**
      * Trace links to generate.
      */
-    private final TGenRequestAppEntity TGenRequestAppEntity;
+    private final TGenRequestAppEntity tgenRequestAppEntity;
 
-    public CreateProjectViaJsonJob(JobDbEntity jobDbEntity,
+    public CreateProjectViaJsonJob(SafaUser user,
+                                   JobDbEntity jobDbEntity,
                                    ProjectAppEntity projectAppEntity,
                                    ServiceProvider serviceProvider,
-                                   SafaUser user,
-                                   TGenRequestAppEntity TGenRequestAppEntity) {
-        super(jobDbEntity, serviceProvider, new ProjectCommitDefinition(user), true);
-        this.TGenRequestAppEntity = TGenRequestAppEntity;
+                                   TGenRequestAppEntity tgenRequestAppEntity) {
+        super(user, jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
+        this.tgenRequestAppEntity = tgenRequestAppEntity;
         this.projectAppEntity = projectAppEntity;
     }
 
@@ -40,7 +40,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
         ProjectVersion projectVersion = getProjectVersion();
         linkProjectToJob(projectVersion.getProject());
         this.projectAppEntity.setProjectVersion(projectVersion);
-        this.TGenRequestAppEntity.setProjectVersion(projectVersion);
+        this.tgenRequestAppEntity.setProjectVersion(projectVersion);
 
         getProjectCommitDefinition().addArtifacts(ModificationType.ADDED, this.projectAppEntity.getArtifacts());
         getProjectCommitDefinition().addTraces(ModificationType.ADDED, this.projectAppEntity.getTraces());
@@ -48,7 +48,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
 
     @IJobStep(value = "Generating Trace Links", position = 2)
     public void generateLinks(JobLogger logger) {
-        TGenRequestAppEntity request = this.TGenRequestAppEntity;
+        TGenRequestAppEntity request = this.tgenRequestAppEntity;
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommitDefinition());
 
         List<TraceAppEntity> generatedTraces = this.getServiceProvider()

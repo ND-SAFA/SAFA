@@ -94,9 +94,11 @@ class TestCommitJobProjectCreation extends ApplicationBaseTest {
 
         SafaUser user;
 
-        protected DummyCommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
-                                 ProjectCommitDefinition projectCommitDefinition, SafaUser user) {
-            super(jobDbEntity, serviceProvider, projectCommitDefinition, true);
+        protected DummyCommitJob(SafaUser user,
+                                 JobDbEntity jobDbEntity,
+                                 ServiceProvider serviceProvider,
+                                 ProjectCommitDefinition projectCommitDefinition) {
+            super(user, jobDbEntity, serviceProvider, projectCommitDefinition, true);
             setProjectCommitDefinition(projectCommitDefinition);
             this.user = user;
         }
@@ -128,7 +130,7 @@ class TestCommitJobProjectCreation extends ApplicationBaseTest {
                                      boolean allowProjectCreation,
                                      boolean fail) {
 
-            super(serviceProvider, user);
+            super(user, serviceProvider);
             this.commit = commit;
             this.allowProjectCreation = allowProjectCreation;
             this.fail = fail;
@@ -139,8 +141,10 @@ class TestCommitJobProjectCreation extends ApplicationBaseTest {
             if (this.commit == null) {
                 this.commit = new ProjectCommitDefinition();
             }
-            DummyCommitJob job = new DummyCommitJob(this.getJobDbEntity(), this.getServiceProvider(),
-                this.commit, this.getUser());
+            DummyCommitJob job = new DummyCommitJob(getUser(),
+                this.getJobDbEntity(),
+                this.getServiceProvider(),
+                this.commit);
             job.setAllowProjectCreation(allowProjectCreation);
             job.setFailStep(fail);
             return job;

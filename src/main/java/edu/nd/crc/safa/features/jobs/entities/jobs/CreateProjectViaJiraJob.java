@@ -67,7 +67,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
     public CreateProjectViaJiraJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
                                    JiraIdentifier jiraIdentifier, SafaUser user) {
-        super(jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
+        super(user, jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
         this.jiraIdentifier = jiraIdentifier;
         this.issues = new ArrayList<>();
         this.user = user;

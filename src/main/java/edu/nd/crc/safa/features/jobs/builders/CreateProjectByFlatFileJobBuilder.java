@@ -30,7 +30,7 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
     public CreateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider, MultipartFile[] files, SafaUser user,
                                              String projectName, String projectDescription, boolean shouldSummarize) {
-        super(serviceProvider, user);
+        super(user, serviceProvider);
         this.files = files;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
@@ -39,7 +39,7 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        SafaUser user = getUser();
         ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), user, this.projectName,
             this.projectDescription);
         Project project = commit.getCommitVersion().getProject();
@@ -47,6 +47,7 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
+            user,
             this.getJobDbEntity(),
             this.getServiceProvider(),
             commit,

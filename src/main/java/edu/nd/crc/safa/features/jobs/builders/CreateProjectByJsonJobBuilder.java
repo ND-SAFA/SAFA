@@ -14,8 +14,6 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  * Builds job for creating a project via JSON.
  */
 public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
-
-    private final SafaUser projectOwner;
     /**
      * The project requested to create.
      */
@@ -25,25 +23,24 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
      */
     private final TGenRequestAppEntity TGenRequestAppEntity;
 
-    public CreateProjectByJsonJobBuilder(ServiceProvider serviceProvider,
+    public CreateProjectByJsonJobBuilder(SafaUser user,
+                                         ServiceProvider serviceProvider,
                                          ProjectAppEntity projectAppEntity,
-                                         List<TracingRequest> tracingRequests,
-                                         SafaUser projectOwner) {
-        super(serviceProvider);
+                                         List<TracingRequest> tracingRequests) {
+        super(user, serviceProvider);
         this.projectAppEntity = projectAppEntity;
         this.TGenRequestAppEntity = new TGenRequestAppEntity();
         this.TGenRequestAppEntity.setRequests(tracingRequests);
-        this.projectOwner = projectOwner;
     }
 
     @Override
     protected AbstractJob constructJobForWork() {
         // Step - Create job
         return new CreateProjectViaJsonJob(
+            getUser(),
             this.getJobDbEntity(),
             this.projectAppEntity,
             this.getServiceProvider(),
-            this.projectOwner,
             this.TGenRequestAppEntity
         );
     }

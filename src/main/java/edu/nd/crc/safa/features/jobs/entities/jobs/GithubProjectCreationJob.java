@@ -91,12 +91,12 @@ public class GithubProjectCreationJob extends CommitJob {
     private GithubProject githubProject;
     private Predicate<String> shouldImportPredicate;
 
-    public GithubProjectCreationJob(JobDbEntity jobDbEntity,
+    public GithubProjectCreationJob(SafaUser user,
+                                    JobDbEntity jobDbEntity,
                                     ServiceProvider serviceProvider,
                                     GithubIdentifier githubIdentifier,
-                                    GithubImportDTO githubImportDTO,
-                                    SafaUser user) {
-        super(jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
+                                    GithubImportDTO githubImportDTO) {
+        super(user, jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
         this.githubIdentifier = githubIdentifier;
         this.user = user;
         this.importSettings = githubImportDTO;

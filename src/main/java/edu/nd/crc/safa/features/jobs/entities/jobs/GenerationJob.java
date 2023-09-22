@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,9 +24,11 @@ public abstract class GenerationJob extends CommitJob {
     private ProjectAppEntity projectAppEntity;
     private String projectSummary;
 
-    protected GenerationJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
+    protected GenerationJob(SafaUser user,
+                            JobDbEntity jobDbEntity,
+                            ServiceProvider serviceProvider,
                             ProjectCommitDefinition projectCommitDefinition) {
-        super(jobDbEntity, serviceProvider, projectCommitDefinition, false);
+        super(user, jobDbEntity, serviceProvider, projectCommitDefinition, false);
     }
 
     /**
@@ -45,9 +48,11 @@ public abstract class GenerationJob extends CommitJob {
     @IJobStep(value = "Summarizing Project Entities", position = 2)
     public void summarizeProjectEntities() {
         ProjectSummaryService service = this.getServiceProvider().getProjectSummaryService();
-        Pair<String, List<ArtifactAppEntity>> summarizedEntities = service.summarizeProjectEntities(getProjectVersion(),
-            projectAppEntity.getArtifacts(),
-            this.getDbLogger());
+        Pair<String, List<ArtifactAppEntity>> summarizedEntities =
+            service.summarizeProjectEntities(this.getUser(),
+                getProjectVersion(),
+                projectAppEntity.getArtifacts(),
+                this.getDbLogger());
         this.projectSummary = summarizedEntities.getValue0();
         this.projectAppEntity.setArtifacts(summarizedEntities.getValue1());
     }

@@ -15,10 +15,10 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 public class GenerateLinksJobBuilder extends AbstractJobBuilder {
     private final TGenRequestAppEntity request;
 
-    public GenerateLinksJobBuilder(ServiceProvider serviceProvider,
-                                   TGenRequestAppEntity request,
-                                   SafaUser user) {
-        super(serviceProvider);
+    public GenerateLinksJobBuilder(SafaUser user,
+                                   ServiceProvider serviceProvider,
+                                   TGenRequestAppEntity request) {
+        super(user, serviceProvider);
         this.request = request;
         this.setUser(user);
     }
@@ -27,8 +27,11 @@ public class GenerateLinksJobBuilder extends AbstractJobBuilder {
     protected AbstractJob constructJobForWork() throws IOException {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.request.getProjectVersion(),
             false);
-        return new GenerateLinksJob(this.getJobDbEntity(), this.getServiceProvider(),
-            projectCommitDefinition, this.request, this.getUser());
+        return new GenerateLinksJob(getUser(),
+            this.getJobDbEntity(),
+            this.getServiceProvider(),
+            projectCommitDefinition,
+            this.request);
     }
 
     @Override

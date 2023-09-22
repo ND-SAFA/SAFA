@@ -1,12 +1,12 @@
 package edu.nd.crc.safa.features.jobs.builders;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.FlatFileUtility;
 
@@ -32,12 +32,13 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
      */
     private final boolean shouldSummarize;
 
-    public UpdateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider,
-                                             UUID versionId,
+    public UpdateProjectByFlatFileJobBuilder(SafaUser user,
+                                             ServiceProvider serviceProvider,
+                                             ProjectVersion projectVersion,
                                              MultipartFile[] files,
                                              boolean shouldSummarize) {
-        super(serviceProvider);
-        this.projectVersion = this.getServiceProvider().getProjectVersionRepository().findByVersionId(versionId);
+        super(user, serviceProvider);
+        this.projectVersion = projectVersion;
         this.files = files;
         this.shouldSummarize = shouldSummarize;
     }
@@ -51,6 +52,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
+            getUser(),
             this.getJobDbEntity(),
             getServiceProvider(),
             commit,

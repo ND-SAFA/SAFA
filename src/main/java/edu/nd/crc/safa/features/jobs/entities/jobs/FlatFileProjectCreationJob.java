@@ -27,6 +27,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.CommitJobUtility;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -62,13 +63,14 @@ public class FlatFileProjectCreationJob extends CommitJob {
      */
     private String pathToFiles;
 
-    public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
+    public FlatFileProjectCreationJob(SafaUser user,
+                                      JobDbEntity jobDbEntity,
                                       ServiceProvider serviceProvider,
                                       ProjectCommitDefinition commit,
                                       String uploadedFilesPath,
                                       boolean shouldSummarize,
                                       boolean isNewProject) {
-        super(jobDbEntity, serviceProvider, commit, isNewProject);
+        super(user, jobDbEntity, serviceProvider, commit, isNewProject);
         this.pathToFiles = uploadedFilesPath;
         this.shouldSummarize = shouldSummarize;
         this.isNewProject = isNewProject;

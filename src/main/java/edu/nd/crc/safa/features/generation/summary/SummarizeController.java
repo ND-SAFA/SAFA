@@ -59,6 +59,6 @@ public class SummarizeController extends BaseController {
             .fetchVersion(versionId)
             .withPermission(ProjectPermission.EDIT, user)
             .get();
-        return new ProjectSummaryJobBuilder(this.getServiceProvider(), projectVersion).perform();
+        return new ProjectSummaryJobBuilder(user, this.getServiceProvider(), projectVersion).perform();
     }
 }

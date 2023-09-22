@@ -25,6 +25,5 @@ class TestJobMessage extends ApplicationBaseTest {
         notificationService.createNewConnection(clientId);
         notificationService.subscribeToJob(clientId, jobDbEntity);
         String changeMessage = notificationService.getMessageInQueue(clientId);
-        System.out.println("hello");
     }
 }

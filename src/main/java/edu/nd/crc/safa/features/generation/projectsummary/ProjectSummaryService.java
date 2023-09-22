@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.projectsummary;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,13 +14,13 @@ import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -39,7 +40,8 @@ public class ProjectSummaryService {
      * @param logger         Optional. Job logger to store logs under.
      * @return Project summary and artifacts with summaries included.
      */
-    public Pair<String, List<ArtifactAppEntity>> summarizeProjectEntities(ProjectVersion projectVersion,
+    public Pair<String, List<ArtifactAppEntity>> summarizeProjectEntities(SafaUser user,
+                                                                          ProjectVersion projectVersion,
                                                                           List<ArtifactAppEntity> artifacts,
                                                                           JobLogger logger) {
         Project project = projectVersion.getProject();
@@ -52,17 +54,18 @@ public class ProjectSummaryService {
                 summaryService.addSummariesToCode(artifacts, projectSummary, logger);
             }
         } else {
-            JSONObject kwargs = new JSONObject();
+            Map<String, Boolean> kwargs = new HashMap<>();
             kwargs.put("do_resummarize_project", !hasCodeSummaries);
             kwargs.put("summarize_artifacts", !hasCodeSummaries);
+            logger.log(String.format("Kwargs: %s", kwargs));
             ProjectSummaryResponse summarizationResponse = this.summarizeProject(artifacts, kwargs, logger);
 
             // Save project summary
             projectSummary = summarizationResponse.getSummary();
-            saveProjectSummary(project, projectSummary);
+            saveProjectSummary(project, projectSummary, logger);
 
             // Save artifact summaries
-            saveArtifactSummaries(projectVersion, artifacts, summarizationResponse);
+            saveArtifactSummaries(user, projectVersion, artifacts, summarizationResponse, logger);
         }
         return new Pair<>(projectSummary, artifacts);
     }
@@ -76,7 +79,7 @@ public class ProjectSummaryService {
      * @return The project summary.
      */
     public ProjectSummaryResponse summarizeProject(List<ArtifactAppEntity> artifacts,
-                                                   JSONObject kwargs,
+                                                   Map<String, Boolean> kwargs,
                                                    JobLogger jobLogger) {
         artifacts = artifacts.stream().filter(a -> a.getTraceString().length() > 0).collect(Collectors.toList());
         ProjectSummaryRequest request = new ProjectSummaryRequest(artifacts.stream().map(GenerationArtifact::new)
@@ -93,25 +96,32 @@ public class ProjectSummaryService {
         return true;
     }
 
-    private void saveArtifactSummaries(ProjectVersion projectVersion,
+    private void saveArtifactSummaries(SafaUser user,
+                                       ProjectVersion projectVersion,
                                        List<ArtifactAppEntity> artifacts,
-                                       ProjectSummaryResponse summarizationResponse) {
+                                       ProjectSummaryResponse summarizationResponse,
+                                       JobLogger logger) {
         Map<String, ArtifactAppEntity> artifactMap = ProjectDataStructures.createArtifactNameMap(artifacts);
         List<GenerationArtifact> summarizedArtifacts = summarizationResponse.getArtifacts();
-        if (summarizedArtifacts != null && !summarizedArtifacts.isEmpty()) {
+        boolean hasSummaries = summarizedArtifacts != null && !summarizedArtifacts.isEmpty();
+        int nSummaries = hasSummaries ? summarizedArtifacts.size() : 0;
+        if (hasSummaries) {
             for (GenerationArtifact summarizedArtifact : summarizedArtifacts) {
                 ArtifactAppEntity artifact = artifactMap.get(summarizedArtifact.getId());
                 artifact.setSummary(summarizedArtifact.getSummary());
             }
-            commitService.saveArtifacts(projectVersion, artifacts, ModificationType.MODIFIED);
+            commitService.saveArtifacts(user, projectVersion, artifacts, ModificationType.MODIFIED);
+
         }
+        logger.log(String.format("Saved  %s artifact summaries.", nSummaries));
     }
 
-    private void saveProjectSummary(Project project, String projectSummary) {
+    private void saveProjectSummary(Project project, String projectSummary, JobLogger logger) {
         if (project.getDescription().isEmpty()) {
             project.setDescription(projectSummary);
         }
         project.setSpecification(projectSummary);
         this.projectRepository.save(project);
+        logger.log("Project summary (%s) was saved.", projectSummary.length());
     }
 }

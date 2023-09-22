@@ -27,7 +27,6 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
  * Generates trace links between artifacts defined in request.
  */
 public class GenerateLinksJob extends GenerationJob {
-    private final SafaUser user;
     /**
      * The request to generate trace links.
      */
@@ -41,15 +40,14 @@ public class GenerateLinksJob extends GenerationJob {
      */
     private List<TraceAppEntity> generatedTraces;
 
-    public GenerateLinksJob(JobDbEntity jobDbEntity,
+    public GenerateLinksJob(SafaUser user,
+                            JobDbEntity jobDbEntity,
                             ServiceProvider serviceProvider,
                             ProjectCommitDefinition projectCommitDefinition,
-                            TGenRequestAppEntity TGenRequestAppEntity,
-                            SafaUser user) {
-        super(jobDbEntity, serviceProvider, projectCommitDefinition);
+                            TGenRequestAppEntity TGenRequestAppEntity) {
+        super(user, jobDbEntity, serviceProvider, projectCommitDefinition);
         this.TGenRequestAppEntity = TGenRequestAppEntity;
         this.generatedTraces = new ArrayList<>();
-        this.user = user;
         this.projectVersion = projectCommitDefinition.getCommitVersion();
     }
 
@@ -110,7 +108,7 @@ public class GenerateLinksJob extends GenerationJob {
     private void fillWithExistingLinks(HashMap<String, List<String>> traceHashMap) {
         this.getServiceProvider()
             .getTraceService()
-            .getAppEntities(projectVersion, user, t -> t.getApprovalStatus() == ApprovalStatus.APPROVED
+            .getAppEntities(projectVersion, getUser(), t -> t.getApprovalStatus() == ApprovalStatus.APPROVED
                 || t.getTraceType() == TraceType.MANUAL)
             .forEach(t -> {
                 if (traceHashMap.containsKey(t.getSourceName())) {

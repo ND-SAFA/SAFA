@@ -32,12 +32,8 @@ public abstract class AbstractJobBuilder {
     @Getter(AccessLevel.PROTECTED)
     @Setter(AccessLevel.PROTECTED)
     private SafaUser user;
-
-    protected AbstractJobBuilder(ServiceProvider serviceProvider) {
-        this(serviceProvider, null);
-    }
-
-    protected AbstractJobBuilder(ServiceProvider serviceProvider, SafaUser user) {
+    
+    protected AbstractJobBuilder(SafaUser user, ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
         this.user = user;
     }

@@ -126,11 +126,14 @@ public class JobController extends BaseController {
         @RequestParam Optional<MultipartFile[]> files,
         @RequestParam(required = false, defaultValue = "false") boolean summarize)
         throws Exception {
-
+        SafaUser user = safaUserService.getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT, user).get();
         UpdateProjectByFlatFileJobBuilder jobBuilder =
             new UpdateProjectByFlatFileJobBuilder(
+                user,
                 getServiceProvider(),
-                versionId,
+                projectVersion,
                 files.orElseGet(this::defaultFileListSupplier),
                 summarize);
 
@@ -180,7 +183,11 @@ public class JobController extends BaseController {
         // Step - Create and start job.
         SafaUser requester = safaUserService.getCurrentUser();
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
-            getServiceProvider(), payload.getProject(), payload.getRequests(), requester);
+            requester,
+            getServiceProvider(),
+            payload.getProject(),
+            payload.getRequests()
+        );
         return createProjectByJsonJobBuilder.perform();
     }
 
@@ -201,7 +208,7 @@ public class JobController extends BaseController {
         request.setProjectVersion(projectVersion);
 
         // Step - Create and start job.
-        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(getServiceProvider(), request, user);
+        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(user, getServiceProvider(), request);
         return jobBuilder.perform();
     }
 

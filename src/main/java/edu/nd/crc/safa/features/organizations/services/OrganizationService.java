@@ -17,7 +17,6 @@ import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
-import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.organizations.repositories.OrganizationRepository;
 import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
@@ -49,11 +48,10 @@ public class OrganizationService {
 
         organization = organizationRepo.save(organization);  // Save once so it gets an id
 
-        Team orgTeam = teamService.createNewTeam(organization.getName(), organization, true);
+        Team orgTeam = teamService.createNewTeam(organization.getName(), organization, true, organization.getOwner());
         organization.setFullOrgTeamId(orgTeam.getId());
         organization = organizationRepo.save(organization);  // Save again to add the team ID
 
-        teamMembershipService.addUserRole(organization.getOwner(), orgTeam, TeamRole.ADMIN);
         organizationMembershipService.addUserRole(organization.getOwner(), organization, OrganizationRole.ADMIN);
 
         return organization;

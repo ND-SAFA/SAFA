@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.organizations.repositories.TeamRepository;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
@@ -53,11 +54,14 @@ public class TeamService {
      * @param name The name of the team
      * @param organization The organization the team belongs to
      * @param fullOrgTeam Whether the team is a full organization team
+     * @param user The user creating the team. This user will be given the admin role initially
      * @return The newly created team
      */
-    public Team createNewTeam(String name, Organization organization, boolean fullOrgTeam) {
+    public Team createNewTeam(String name, Organization organization, boolean fullOrgTeam, SafaUser user) {
         Team team = new Team(name, organization, fullOrgTeam);
-        return teamRepo.save(team);
+        team = teamRepo.save(team);
+        teamMembershipService.addUserRole(user, team, TeamRole.ADMIN);
+        return team;
     }
 
     /**

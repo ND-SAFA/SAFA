@@ -107,6 +107,7 @@ public class JobDbEntity {
     private SafaUser user;
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     @JoinColumn(name = "project_id")
     private Project project;
     @Column(name = "completed_entity_id")

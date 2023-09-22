@@ -125,6 +125,39 @@ class PromptDataset(iDataset):
             self.prompt_df = PromptDataFrame(prompt_entries)
         return self.prompt_df
 
+    def as_creator(self, project_path: str, dataset_dirname: str = None):
+        """
+        Converts the dataset into a creator that can remake it
+        :param project_path: The path to save the dataset at for reloading
+        :param dataset_dirname: The directory that the dataset will be saved to
+        :return: The dataset creator
+        """
+        from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+        if self.trace_dataset is not None:
+            creator = self.trace_dataset.as_creator(project_path, dataset_dirname)
+            project_path = creator.project_reader.project_path
+            prompt_creator = PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path, dataset_dirname))
+        elif self.artifact_df is not None:
+            from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
+            creator = TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame()).as_creator(project_path, dataset_dirname)
+            project_path = creator.project_reader.project_path
+            prompt_creator = PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
+        else:
+            raise NotImplementedError("Cannot get creator for prompt dataset without an artifact df or trace dataset")
+        if self.project_summary:
+            FileUtil.write(self.project_summary, os.path.join(project_path, PROJECT_SUMMARY_FILENAME))
+        return prompt_creator
+
+    def update_artifact_df(self, artifact_df: ArtifactDataFrame) -> None:
+        """
+        Updates the artifact dataframe of the prompt dataset as well as the trace dataset if it exists
+        :param artifact_df: The artifact df to replace the existing one with
+        :return: None
+        """
+        self.artifact_df = artifact_df
+        if self.trace_dataset is not None:
+            self.trace_dataset.artifact_df = artifact_df
+
     def _get_generation_method(self, prompt_args: PromptArgs, prompt_builder: PromptBuilder) -> Callable:
         """
         Returns the generation method for building prompts.
@@ -228,29 +261,6 @@ class PromptDataset(iDataset):
         :return: True when project data in the form of an artifact_df or trace_dataset has been provided, else False
         """
         return not (self.artifact_df is None and self.trace_dataset is None)
-
-    def as_creator(self, project_path: str, dataset_dirname: str = None):
-        """
-        Converts the dataset into a creator that can remake it
-        :param project_path: The path to save the dataset at for reloading
-        :param dataset_dirname: The directory that the dataset will be saved to
-        :return: The dataset creator
-        """
-        from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-        if self.trace_dataset is not None:
-            creator = self.trace_dataset.as_creator(project_path, dataset_dirname)
-            project_path = creator.project_reader.project_path
-            prompt_creator = PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path, dataset_dirname))
-        elif self.artifact_df is not None:
-            from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
-            creator = TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame()).as_creator(project_path, dataset_dirname)
-            project_path = creator.project_reader.project_path
-            prompt_creator = PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
-        else:
-            raise NotImplementedError("Cannot get creator for prompt dataset without an artifact df or trace dataset")
-        if self.project_summary:
-            FileUtil.write(self.project_summary, os.path.join(project_path, PROJECT_SUMMARY_FILENAME))
-        return prompt_creator
 
     def __getattr__(self, item: str) -> Any:
         """

@@ -44,8 +44,7 @@ class ProjectSummarizer(BaseObject):
         logger.log_title("Creating project specification.")
 
         if self.args.summarize_artifacts:
-            summarizer = ArtifactsSummarizer(llm_manager=self.args.llm_manager_for_artifact_summaries,
-                                             code_or_exceeds_limit_only=self.args.summarize_code_only)
+            summarizer = ArtifactsSummarizer(self.args)
             self.artifact_df.summarize_content(summarizer)
 
         project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True, summary_args=self.args)

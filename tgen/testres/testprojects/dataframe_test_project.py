@@ -1,9 +1,13 @@
 from typing import List
 
+from tgen.common.artifact import Artifact
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.testres.paths.project_paths import DATAFRAME_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.testprojects.entry_creator import LayerEntry
+from tgen.testres.testprojects.api_test_project import ApiTestProject
+from tgen.testres.testprojects.csv_test_project import CsvTestProject
+from tgen.testres.testprojects.safa_test_project import SafaTestProject
+from tgen.testres.testprojects.structured_test_project import StructuredTestProject
 
 
 class DataFrameTestProject(AbstractTestProject):
@@ -11,21 +15,13 @@ class DataFrameTestProject(AbstractTestProject):
     Contains safa test project testing details.
     """
 
-    @staticmethod
-    def get_source_artifacts() -> List[LayerEntry]:
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_target_artifacts() -> List[LayerEntry]:
-        raise NotImplementedError()
+    @classmethod
+    def get_source_artifacts(cls) -> List[Artifact]:
+        return SafaTestProject.get_source_artifacts()
 
     @classmethod
-    def get_trace_entries(cls) -> LayerEntry:
-        raise NotImplementedError()
-
-    @classmethod
-    def get_trace_layers(cls) -> LayerEntry:
-        raise NotImplementedError()
+    def get_target_artifacts(cls) -> List[Artifact]:
+        return SafaTestProject.get_target_artifacts()
 
     @staticmethod
     def get_n_links() -> int:

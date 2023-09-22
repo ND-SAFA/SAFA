@@ -26,6 +26,17 @@ class FileUtil:
     YAML_EXT = "yaml"
 
     @staticmethod
+    def get_directory_path(file_path: str) -> str:
+        """
+        Gets the lowest level directory path from the file path (if it's already a directory, just return as is)
+        :param file_path: The path to file/directory
+        :return: The path to the lowest level directory
+        """
+        if os.path.splitext(file_path)[-1]:
+            return os.path.join(*os.path.split(file_path)[:-1])
+        return file_path
+
+    @staticmethod
     def get_file_ext(path: str) -> str:
         """
         Gets the file extension for a given path

@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from unittest.mock import MagicMock
 
 import mock
@@ -24,6 +25,8 @@ from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
+from tgen.summarizer.summarizer import Summarizer
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
@@ -32,10 +35,13 @@ from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestHierarchyGenerator(BaseTest):
-    HGEN_ARGS = get_test_hgen_args()
+    HGEN_ARGS = None
     HGEN_STATE = HGenState()
 
-    def test_run(self):
+    @mock_anthropic
+    def test_run(self, anthropic_ai_manager: TestAIManager):
+        anthropic_ai_manager.mock_summarization()
+        self.HGEN_ARGS = get_test_hgen_args()()
         self.HGEN_STATE.export_dir = self.HGEN_ARGS.export_dir
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
@@ -68,14 +74,19 @@ class TestHierarchyGenerator(BaseTest):
         yaml_content = FileUtil.read_yaml(yaml_save_path)
         self.assertDictEqual(non_dataset, yaml_content)
 
+    @mock.patch.object(ProjectSummarizer, "summarize")
     @mock_anthropic
-    def assert_initialize_dataset_step(self, anthropic_ai_manager: TestAIManager):
+    def assert_initialize_dataset_step(self, anthropic_ai_manager: TestAIManager,  project_summarizer_mock: MagicMock,):
+        # contains a project summary but no artifact summaries so artifacts are summarized while project is not
         anthropic_ai_manager.mock_summarization()
         orig_dataset = self.HGEN_ARGS.dataset_creator_for_sources.create()
         InitializeDatasetStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assertSetEqual(set(self.HGEN_STATE.original_dataset.artifact_df.index), set(orig_dataset.artifact_df.index))
+        self.assertEqual(project_summarizer_mock.call_count, 0)
         for id_, artifact in self.HGEN_STATE.source_dataset.artifact_df.itertuples():
             self.assertEqual(artifact[ArtifactKeys.LAYER_ID], "C++ Code")
+            self.assertIsNotNone(artifact[ArtifactKeys.SUMMARY])
+            self.assertIn("summary", artifact[ArtifactKeys.SUMMARY].lower())
 
     @mock_libraries
     def assert_generate_input_step(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager):
@@ -139,3 +150,35 @@ class TestHierarchyGenerator(BaseTest):
                                    {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
                                     LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)
+
+    @mock.patch.object(ArtifactDataFrame, "summarize_content")
+    @mock.patch.object(ProjectSummarizer, "summarize")
+    def test_initialize_dataset_step_with_summaries(self, project_summarizer_mock: MagicMock, artifact_summarizer_mock: MagicMock):
+        project_summarizer_mock.return_value = "summary of project"
+        args = get_test_hgen_args()()
+        artifact_summarizer_mock.call_count = 0
+
+        # with no project summary, it should summarize project but not artifacts
+        state = HGenState(export_dir=args.export_dir)
+        args.dataset_for_sources.project_summary = None
+        InitializeDatasetStep().run(args, state)
+        self.assertEqual(project_summarizer_mock.call_count, 1)
+        self.assertEqual(artifact_summarizer_mock.call_count, 0)
+
+    @mock.patch.object(ProjectSummarizer, "summarize")
+    @mock_anthropic
+    def test_initialize_dataset_step_with_no_summaries(self, anthropic_ai_manager: TestAIManager, project_summarizer_mock: MagicMock):
+        # contains no summaries so all should be summarized
+        project_summary = "summary of project"
+        project_summarizer_mock.return_value = project_summary
+        anthropic_ai_manager.mock_summarization()
+        args = get_test_hgen_args()()
+        args.dataset_for_sources.project_summary = None
+        state = HGenState(export_dir=args.export_dir)
+        InitializeDatasetStep().run(args, state)
+
+        self.assertEqual(project_summarizer_mock.call_count, 1)
+        for id_, artifact in state.source_dataset.artifact_df.itertuples():
+            self.assertIsNotNone(artifact[ArtifactKeys.SUMMARY])
+            self.assertIn("summary", artifact[ArtifactKeys.SUMMARY].lower())
+        self.assertEqual(state.original_dataset.project_summary, project_summary)

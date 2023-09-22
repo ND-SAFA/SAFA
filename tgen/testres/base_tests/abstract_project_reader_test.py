@@ -5,6 +5,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
@@ -38,7 +39,8 @@ class AbstractProjectReaderTest(BaseTest):
         """
         project_reader: AbstractProjectReader = test_project.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
-        project_reader.set_summarizer(ArtifactsSummarizer(llm_manager, code_or_exceeds_limit_only=False))
+        project_reader.set_summarizer(ArtifactsSummarizer(
+            SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager, summarize_code_only=False)))
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         summary_artifacts = test_project.get_artifact_entries()
         for row in summary_artifacts:

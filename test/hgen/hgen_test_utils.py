@@ -87,7 +87,7 @@ def get_all_responses(content=None, target_type="User Story", sources=None, sour
 
 
 def get_test_hgen_args():
-    return HGenArgs(source_layer_id="C++ Code",
-                    target_type="Test User Story",
-                    dataset_creator_for_sources=PromptDatasetCreator(
-                        trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))
+    return lambda: HGenArgs(source_layer_id="C++ Code",
+                            target_type="Test User Story",
+                            dataset_creator_for_sources=PromptDatasetCreator(
+                                trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))

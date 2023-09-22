@@ -27,13 +27,10 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The original dataset and a dataset with only the source layer
         """
         original_dataset_complete = args.dataset_for_sources
-        code_layers = original_dataset_complete.artifact_df.get_code_layers()
-        should_summarize_artifacts = args.create_new_code_summaries \
-                                     or not original_dataset_complete.artifact_df.is_summarized(code_layers)
-        if not original_dataset_complete.project_summary or should_summarize_artifacts:
+        if not original_dataset_complete.project_summary or args.create_new_code_summaries:
             original_dataset_complete = self._summarize(args, export_path=state.export_dir,
                                                         project_summary=original_dataset_complete.project_summary,
-                                                        should_summarize_artifacts=should_summarize_artifacts)
+                                                        should_summarize_artifacts=args.create_new_code_summaries)
         state.summary = original_dataset_complete.project_summary
         save_dataset_checkpoint(original_dataset_complete, state.export_dir, filename="initial_dataset_with_sources")
 
@@ -57,13 +54,12 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         hgen_section_questionnaire.format_value(target_type=args.target_type)
         new_sections = {self.HGEN_SECTION_TITLE: hgen_section_questionnaire}
 
-        do_resummarize_project = not project_summary
         project_summary = project_summary if project_summary else args.system_summary
-        summarizer_args = SummarizerArgs(export_dir=os.path.join(export_path, "summaries") if export_path else EMPTY_STRING,
+        summarizer_args = SummarizerArgs(export_dir=export_path,
                                          dataset=dataset,
                                          project_summary=project_summary,
                                          summarize_code_only=True,
-                                         do_resummarize_project=do_resummarize_project,
+                                         do_resummarize_project=False,
                                          summarize_artifacts=should_summarize_artifacts,
                                          project_summary_sections=[PS_ENTITIES_TITLE,
                                                                    PS_DATA_FLOW_TITLE,

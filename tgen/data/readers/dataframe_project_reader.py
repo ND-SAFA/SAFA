@@ -1,6 +1,7 @@
 import os
 from typing import Dict
 
+from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -13,7 +14,7 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     Reads projects exported by the DataFrameExporter
     """
 
-    def __init__(self, project_path: str, artifact_df_filename: str = "artifact_df.csv", trace_df_filename: str = "trace_df.csv",
+    def __init__(self, project_path: str, artifact_df_filename: str = ARTIFACT_FILE_NAME, trace_df_filename: str = "trace_df.csv",
                  layer_df_filename: str = "layer_df.csv", overrides: dict = None):
         """
         Initializes the reader with the necessary information to the files containing each dataframe

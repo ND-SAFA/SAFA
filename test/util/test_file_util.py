@@ -91,3 +91,14 @@ class TestFileUtil(BaseTest):
         with_no_ext = "home/test"
         with_yaml = FileUtil.add_ext(with_no_ext, FileUtil.YAML_EXT)
         self.assertEqual(with_yaml, "home/test.yaml")
+
+    def test_get_directory_path(self):
+        expected_dirname = "/home/dir1"
+
+        file_path_with_filename = expected_dirname + "/test.txt"
+        dirname = FileUtil.get_directory_path(file_path_with_filename)
+        self.assertEqual(dirname, expected_dirname)
+
+        dirname = FileUtil.get_directory_path(expected_dirname)  # no filename
+        self.assertEqual(dirname, expected_dirname)
+

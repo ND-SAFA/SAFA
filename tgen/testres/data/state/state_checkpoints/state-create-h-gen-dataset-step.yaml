@@ -29,6 +29,7 @@ final_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptD
   project_file_id: null
   project_reader: null
   summarizer: null
+  ensure_code_is_summarized: True
   trace_dataset_creator: !!python/object:tgen.data.creators.trace_dataset_creator.TraceDatasetCreator
     allowed_missing_sources: -1
     allowed_missing_targets: -1
@@ -60,6 +61,7 @@ original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prom
     steps: []
   data_export_path: null
   project_file_id: null
+  ensure_code_is_summarized: True
   project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
@@ -81,6 +83,7 @@ questions:
 - Is there any user interface code and what does it do?
 refined_content: *id001
 source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  ensure_code_is_summarized: True
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []

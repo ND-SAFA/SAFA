@@ -35,6 +35,7 @@ public class ProjectSummaryService {
     /**
      * Summarizes project and saves summary to project. If any artifacts were summarized, those are saved to.
      *
+     * @param user           The user saving the project summary and artifact summaries.
      * @param projectVersion The project to store summary under.
      * @param artifacts      The artifacts of the project to summarize.
      * @param logger         Optional. Job logger to store logs under.

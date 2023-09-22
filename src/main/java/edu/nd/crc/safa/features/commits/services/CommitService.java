@@ -65,6 +65,7 @@ public class CommitService {
     /**
      * Saves the artifacts under the project version with given modification type.
      *
+     * @param user             The user saving the artifacts.
      * @param projectVersion   The project version to save to.
      * @param artifacts        The artifacts to save.
      * @param modificationType The modification type to store them under.

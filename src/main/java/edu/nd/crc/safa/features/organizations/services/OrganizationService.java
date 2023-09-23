@@ -5,12 +5,12 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
-import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
@@ -33,7 +33,6 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepo;
     private final TeamService teamService;
-    private final TeamMembershipService teamMembershipService;
     private final OrganizationMembershipService organizationMembershipService;
 
     /**
@@ -101,8 +100,18 @@ public class OrganizationService {
      * @return The org
      */
     public Organization getOrganizationById(UUID id) {
-        return organizationRepo.findById(id)
+        return getOrganizationOptionalById(id)
             .orElseThrow(() -> new SafaItemNotFoundError("No organization with the given ID found"));
+    }
+
+    /**
+     * Gets an organization by its ID. Returns an optional in case the org isn't found
+     *
+     * @param id Org ID
+     * @return The org
+     */
+    public Optional<Organization> getOrganizationOptionalById(UUID id) {
+        return organizationRepo.findById(id);
     }
 
     /**

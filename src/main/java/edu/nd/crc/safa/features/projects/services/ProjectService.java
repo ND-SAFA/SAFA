@@ -3,6 +3,8 @@ package edu.nd.crc.safa.features.projects.services;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,6 +20,7 @@ import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -197,5 +200,26 @@ public class ProjectService {
             teamService.getUserPermissions(project.getOwningTeam(), currentUser).stream();
 
         return Stream.concat(permissions, teamPermissions).collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Gets a project by its ID.
+     *
+     * @param id Project ID
+     * @return The project
+     */
+    public Project getProjectById(UUID id) {
+        return getProjectOptionalById(id)
+            .orElseThrow(() -> new SafaItemNotFoundError("No project with the given ID found"));
+    }
+
+    /**
+     * Gets a project by its ID. Returns an optional in case the project isn't found
+     *
+     * @param id Project ID
+     * @return The project
+     */
+    public Optional<Project> getProjectOptionalById(UUID id) {
+        return projectRepository.findById(id);
     }
 }

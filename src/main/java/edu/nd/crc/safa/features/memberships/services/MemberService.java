@@ -17,7 +17,6 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Responsible for CRUD operations related to project memberships
@@ -60,43 +59,4 @@ public class MemberService implements IAppEntityService<MembershipAppEntity> {
         return members;
     }
 
-    /**
-     * Returns list of members in given project with any of the given roles.
-     *
-     * @param project The project whose members are retrieved.
-     * @param projectRoles The project roles to match.
-     * @return List of project memberships relating members to projects.
-     */
-    public List<UserProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
-        return this.userProjectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
-    }
-
-    /**
-     * Returns list of members in given project with the given role.
-     *
-     * @param project The project whose members are retrieved.
-     * @param projectRole The project role to match.
-     * @return List of project memberships relating members to projects.
-     */
-    public List<UserProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
-        return getProjectMembersWithRoles(project, List.of(projectRole));
-    }
-
-    /**
-     * Deletes project membership effectively removing user from
-     * associated project
-     *
-     * @param projectMembershipId ID of the membership linking user and project.
-     * @return ProjectMembers The membership object identified by given id, or null if none found.
-     */
-    public UserProjectMembership deleteProjectMembershipById(@PathVariable UUID projectMembershipId) {
-        Optional<UserProjectMembership> projectMembershipQuery =
-            this.userProjectMembershipRepository.findById(projectMembershipId);
-        if (projectMembershipQuery.isPresent()) {
-            UserProjectMembership projectMembership = projectMembershipQuery.get();
-            this.userProjectMembershipRepository.delete(projectMembership);
-            return projectMembership;
-        }
-        return null;
-    }
 }

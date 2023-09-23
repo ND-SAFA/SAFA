@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
@@ -23,7 +25,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TeamProjectMembership {
+public class TeamProjectMembership implements EntityMembership {
 
     @Id
     @GeneratedValue
@@ -43,5 +45,25 @@ public class TeamProjectMembership {
     public TeamProjectMembership(Project project, Team team) {
         this.project = project;
         this.team = team;
+    }
+
+    @Override
+    public String getEmail() {
+        return null;
+    }
+
+    @Override
+    public String getRole() {
+        return ProjectRole.VIEWER.name();
+    }
+
+    @Override
+    public MembershipType getMembershipType() {
+        return MembershipType.PROJECT;
+    }
+
+    @Override
+    public UUID getEntityId() {
+        return project.getProjectId();
     }
 }

@@ -44,12 +44,10 @@ public class ProjectMembershipService {
         Optional<UserProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        if (membershipOptional.isEmpty()) {
+        return membershipOptional.orElseGet(() -> {
             UserProjectMembership newMembership = new UserProjectMembership(project, user, role);
             return userProjectMembershipRepo.save(newMembership);
-        } else {
-            return membershipOptional.get();
-        }
+        });
     }
 
     /**

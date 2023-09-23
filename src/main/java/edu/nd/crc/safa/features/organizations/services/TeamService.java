@@ -4,6 +4,7 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertNotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,8 +166,18 @@ public class TeamService {
      * @throws SafaItemNotFoundError if the team is not found.
      */
     public Team getTeamById(UUID teamId) {
-        return teamRepo.findById(teamId)
+        return getTeamOptionalById(teamId)
             .orElseThrow(() -> new SafaItemNotFoundError("No team with the given ID found."));
+    }
+
+    /**
+     * Get a team by its team ID.
+     *
+     * @param teamId The ID of the team.
+     * @return The team with the given ID, if it exists.
+     */
+    public Optional<Team> getTeamOptionalById(UUID teamId) {
+        return teamRepo.findById(teamId);
     }
 
     /**

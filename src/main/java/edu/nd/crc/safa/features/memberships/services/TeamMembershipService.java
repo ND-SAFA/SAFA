@@ -26,15 +26,16 @@ public class TeamMembershipService {
      * @param user The user to get the new role
      * @param team The team the role applies to
      * @param role The role
+     * @return The new team membership, or the old one if it already existed
      */
-    public void addUserRole(SafaUser user, Team team, TeamRole role) {
+    public TeamMembership addUserRole(SafaUser user, Team team, TeamRole role) {
         Optional<TeamMembership> membershipOptional =
                 teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
 
-        if (membershipOptional.isEmpty()) {
+        return membershipOptional.orElseGet(() -> {
             TeamMembership newMembership = new TeamMembership(user, team, role);
-            teamMembershipRepo.save(newMembership);
-        }
+            return teamMembershipRepo.save(newMembership);
+        });
     }
 
     /**

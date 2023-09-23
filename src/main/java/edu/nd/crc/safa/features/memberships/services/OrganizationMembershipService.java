@@ -23,18 +23,19 @@ public class OrganizationMembershipService {
      * Applies a role to a user within an organization. If the user already has this
      * role in this organization, this function does nothing.
      *
-     * @param user The user to get the new role
+     * @param user         The user to get the new role
      * @param organization The organization the role applies to
-     * @param role The role
+     * @param role         The role
+     * @return The new membership, or the existing membership if the user already had that role
      */
-    public void addUserRole(SafaUser user, Organization organization, OrganizationRole role) {
+    public OrganizationMembership addUserRole(SafaUser user, Organization organization, OrganizationRole role) {
         Optional<OrganizationMembership> membershipOptional =
                 orgMembershipRepo.findByUserAndOrganizationAndRole(user, organization, role);
 
-        if (membershipOptional.isEmpty()) {
+        return membershipOptional.orElseGet(() -> {
             OrganizationMembership newMembership = new OrganizationMembership(user, organization, role);
-            orgMembershipRepo.save(newMembership);
-        }
+            return orgMembershipRepo.save(newMembership);
+        });
     }
 
     /**

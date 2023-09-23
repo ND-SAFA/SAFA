@@ -308,4 +308,11 @@ public class AppRoutes {
             public static final String SELF = ROOT + "/self";
         }
     }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Memberships {
+        public static final String ROOT = "/members";
+        public static final String BY_ENTITY_ID = ROOT + "/{entityId}";
+        public static final String BY_ENTITY_ID_AND_MEMBERSHIP_ID = BY_ENTITY_ID + "/{membershipId}";
+    }
 }

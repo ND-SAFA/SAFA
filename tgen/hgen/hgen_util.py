@@ -1,12 +1,10 @@
 import os
 import re
-import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Set, Type, Union
 
 import pandas as pd
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
@@ -18,6 +16,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
+from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -57,21 +56,17 @@ def save_dataset_checkpoint(dataset: Any, export_path: str = None,
         full_export_path = FileUtil.add_ext(full_export_path, FileUtil.YAML_EXT)
         FileUtil.write_yaml(dataset, full_export_path)
     else:
-        saved_proj_summary = False
-        if isinstance(dataset, PromptDataset):
-            if dataset.project_summary:
-                saved_proj_summary = True
-                full_export_path = os.path.splitext(full_export_path)[0]
-                FileUtil.write(dataset.project_summary, os.path.join(full_export_path, PROJECT_SUMMARY_FILENAME))
-            if dataset.trace_dataset is not None:
-                dataset = dataset.trace_dataset
+        save_as_trace_dataset = isinstance(dataset, TraceDataset) \
+                                or (isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None)
         if exporter_class is None:
-            exporter_class = DataFrameExporter if isinstance(dataset, TraceDataset) else CSVExporter
-        if issubclass(exporter_class, CSVExporter):
-            if saved_proj_summary:
-                full_export_path = os.path.join(full_export_path, filename)
+            exporter_class = DataFrameExporter if save_as_trace_dataset else CSVExporter
+        if issubclass(exporter_class, CSVExporter) or not save_as_trace_dataset:
             full_export_path = FileUtil.add_ext(full_export_path, FileUtil.CSV_EXT)
-        exporter = exporter_class(export_path=full_export_path, dataset=dataset)
+        if isinstance(dataset, PromptDataset):
+            exporter = PromptDatasetExporter(export_path=full_export_path, trace_dataset_exporter_type=exporter_class,
+                                             dataset=dataset)
+        else:
+            exporter = exporter_class(export_path=full_export_path, dataset=dataset)
         exporter.export()
     logger.info(f"Dataset checkpoint saved to {full_export_path} ")
     return full_export_path

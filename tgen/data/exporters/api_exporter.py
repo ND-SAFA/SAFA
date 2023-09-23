@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from tgen.common.artifact import Artifact
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.json_util import JsonUtil
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -17,7 +18,7 @@ from tgen.tracing.ranking.common.trace_layer import TraceLayer
 
 class ApiExporter(AbstractDatasetExporter):
 
-    def __init__(self, dataset_creator: TraceDatasetCreator = None, dataset: TraceDataset = None, export_path: str = ''):
+    def __init__(self, dataset_creator: TraceDatasetCreator = None, dataset: TraceDataset = None, export_path: str = EMPTY_STRING):
         """
         Initializes exporter for given trace dataset.
         :param dataset: The dataset to export

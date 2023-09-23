@@ -5,15 +5,17 @@ from typing import Any, Callable, List, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
+from tgen.common.util.date_time_util import DateTimeUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.core.trainers.trainer_task import TrainerTask
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -133,19 +135,17 @@ class PromptDataset(iDataset):
         :return: The dataset creator
         """
         from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+        from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
+        dataset_dirname = DateTimeUtil.now_as_string() if not dataset_dirname else dataset_dirname
+        project_path = os.path.join(project_path, dataset_dirname)
+        PromptDatasetExporter(export_path=project_path, trace_dataset_exporter_type=SafaExporter, dataset=self).export()
         if self.trace_dataset is not None:
-            creator = self.trace_dataset.as_creator(project_path, dataset_dirname)
-            project_path = creator.project_reader.project_path
-            prompt_creator = PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path, dataset_dirname))
+            prompt_creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(StructuredProjectReader(project_path)))
         elif self.artifact_df is not None:
             from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
-            creator = TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame()).as_creator(project_path, dataset_dirname)
-            project_path = creator.project_reader.project_path
             prompt_creator = PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
         else:
             raise NotImplementedError("Cannot get creator for prompt dataset without an artifact df or trace dataset")
-        if self.project_summary:
-            FileUtil.write(self.project_summary, os.path.join(project_path, PROJECT_SUMMARY_FILENAME))
         return prompt_creator
 
     def update_artifact_df(self, artifact_df: ArtifactDataFrame) -> None:

@@ -5,6 +5,7 @@ from typing import Type
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
@@ -34,7 +35,7 @@ class AbstractDatasetExporter(BaseObject):
         os.makedirs(export_path, exist_ok=True)
         return self.export_path
 
-    def get_dataset(self) -> TraceDataset:
+    def get_dataset(self) -> iDataset:
         """
         Gets the dataset to export
         :return: The dataset

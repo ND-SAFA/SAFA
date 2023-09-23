@@ -32,9 +32,20 @@ class FileUtil:
         :param file_path: The path to file/directory
         :return: The path to the lowest level directory
         """
-        if os.path.splitext(file_path)[-1]:
+        if FileUtil.is_file(file_path):
             return os.path.join(*os.path.split(file_path)[:-1])
         return file_path
+
+    @staticmethod
+    def is_file(path: str) -> bool:
+        """
+        Returns whether the given path contains a filename at the end or not
+        :param path: The path
+        :return: True if the given path contains a filename at the end
+        """
+        if FileUtil.get_file_ext(path):
+            return True
+        return False
 
     @staticmethod
     def get_file_ext(path: str) -> str:

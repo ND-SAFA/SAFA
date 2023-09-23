@@ -1,4 +1,6 @@
 import os
+from unittest import mock
+from unittest.mock import MagicMock
 
 from test.hgen.hgen_test_utils import HGenTestConstants
 from tgen.common.util.param_specs import ParamSpecs
@@ -10,7 +12,10 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.state.state import State
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_STATE_PATH
 
 
@@ -26,7 +31,11 @@ class TestState(BaseTest):
         self.assertEqual(State._get_path_to_state_checkpoint(without_checkpoint, "StepName"),
                          os.path.join(with_checkpoint, "state-step-name.yaml"))
 
-    def test_load_latest(self):
+    @mock.patch.object(ProjectSummarizer, "summarize")
+    @mock_anthropic
+    def test_load_latest(self, anthropic_manager: TestAIManager, project_summary_mock: MagicMock):
+        project_summary_mock.return_value = "project_summary"
+        anthropic_manager.mock_summarization()
         steps = [step.get_step_name() for step in HierarchyGenerator.steps if step.get_step_name()]
         state = HGenState.load_latest(TEST_STATE_PATH, steps)
         self.assertSetEqual(set(steps), set(state.completed_steps.keys()))
@@ -47,7 +56,12 @@ class TestState(BaseTest):
         failed_state = HGenState.load_latest(TEST_STATE_PATH, ["BadFile"])
         self.assertSize(0, failed_state.completed_steps)
 
-    def test_save(self):
+    @mock.patch.object(ProjectSummarizer, "summarize")
+    @mock_anthropic
+    def test_save(self, anthropic_manager: TestAIManager, project_summary_mock: MagicMock):
+        project_summary_mock.return_value = "project_summary"
+        anthropic_manager.mock_summarization()
+
         def assert_check_type(name, val):
             if isinstance(val, AbstractDatasetCreator):
                 val = HGenState._check_type(name, val, param_specs)
@@ -71,7 +85,7 @@ class TestState(BaseTest):
         self.assertListEqual(orig_state.questions, reloaded_attrs["questions"])
         self.assertDictEqual(orig_state.generation_predictions, reloaded_attrs["generation_predictions"])
         self.assertEqual(orig_state.format_of_artifacts, reloaded_attrs["format_of_artifacts"])
-        reloaded_dataset_original = assert_check_type("original_dataset", reloaded_attrs["original_dataset"],)
+        reloaded_dataset_original = assert_check_type("original_dataset", reloaded_attrs["original_dataset"], )
         self.assertSetEqual(set(orig_state.original_dataset.artifact_df.index), set(reloaded_dataset_original.artifact_df.index))
         reloaded_dataset_source = assert_check_type("source_dataset", reloaded_attrs["source_dataset"])
         self.assertSetEqual(set(orig_state.source_dataset.artifact_df.index), set(reloaded_dataset_source.artifact_df.index))

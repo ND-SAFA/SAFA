@@ -42,7 +42,7 @@ class ProjectSummarizer(BaseObject):
         :return: The summary of the project.
         """
         logger.log_title("Creating project specification.")
-        if self.args.summarize_artifacts or not self.artifact_df.is_summarized():
+        if self.args.summarize_artifacts or not self.artifact_df.is_summarized(self.artifact_df.get_code_layers()):
             self.artifact_df.summarize_content(ArtifactsSummarizer(self.args))
 
         project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True, summary_args=self.args)

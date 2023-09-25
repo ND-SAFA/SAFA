@@ -25,21 +25,22 @@ public class AuthorizationTestService {
     ServiceProvider serviceProvider;
     DbEntityBuilder dbEntityBuilder;
 
-    public void defaultLogin() throws Exception {
+    public String defaultLogin() throws Exception {
         String defaultUser = ApplicationBaseTest.defaultUser;
         String defaultUserPassword = ApplicationBaseTest.defaultUserPassword;
         createUser(defaultUser, defaultUserPassword);
-        loginUser(defaultUser, defaultUserPassword);
+        String authorizationCode = loginUser(defaultUser, defaultUserPassword);
         ApplicationBaseTest.currentUser = serviceProvider
             .getAccountLookupService()
             .getUserFromUsername(defaultUser);
+        return authorizationCode;
     }
 
     public void createUser(String email, String password) throws Exception {
         SafaUser user = new SafaUser(email, password);
         SafaRequest
             .withRoute(AppRoutes.Accounts.CREATE_ACCOUNT)
-            .postWithJsonObject(user);
+            .postWithJsonObject(user, SafaUser.class);
     }
 
     public void createUser(String email, String password, ResultMatcher test) throws Exception {
@@ -49,12 +50,12 @@ public class AuthorizationTestService {
             .postWithJsonObject(user, test);
     }
 
-    public void loginUser(String email, String password) throws Exception {
-        this.loginUser(email, password, true);
+    public String loginUser(String email, String password) throws Exception {
+        return this.loginUser(email, password, true);
     }
 
-    public void loginUser(String email, String password, boolean setToken) throws Exception {
-        loginUser(email, password, status().is2xxSuccessful(), setToken);
+    public String loginUser(String email, String password, boolean setToken) throws Exception {
+        return loginUser(email, password, status().is2xxSuccessful(), setToken);
     }
 
     public void loginUser(String email, String password, ResultMatcher test) throws Exception {
@@ -72,10 +73,10 @@ public class AuthorizationTestService {
      * @param setToken      Whether to set authorization token.
      * @throws Exception If http error occurs.
      */
-    public void loginUser(String email,
-                          String password,
-                          ResultMatcher resultMatcher,
-                          boolean setToken) throws Exception {
+    public String loginUser(String email,
+                            String password,
+                            ResultMatcher resultMatcher,
+                            boolean setToken) throws Exception {
         // Step - Clear token if setting new one
         if (setToken) {
             SafaRequest.clearAuthorizationToken();
@@ -87,7 +88,12 @@ public class AuthorizationTestService {
                 resultMatcher, SecurityConstants.JWT_COOKIE_NAME);
 
         if (setToken && token.isPresent()) {
-            SafaRequest.setAuthorizationToken(token.get());
+            Cookie authorizationCookie = token.get();
+            SafaRequest.setAuthorizationToken(authorizationCookie);
+            String authorizationCode = authorizationCookie.getValue();
+            return authorizationCode;
+        } else {
+            return null;
         }
     }
 

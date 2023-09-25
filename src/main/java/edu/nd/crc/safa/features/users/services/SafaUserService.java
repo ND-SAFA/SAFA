@@ -8,7 +8,7 @@ import edu.nd.crc.safa.authentication.SafaUserDetails;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
@@ -29,18 +29,15 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class SafaUserService {
 
+    // This exists solely so that it can be set to false during testing so that we can disable the check in that context
+    private static boolean CHECK_USER_THREAD = true;
     private final Logger logger = LoggerFactory.getLogger(SafaUserService.class);
-
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
     private final OrganizationService organizationService;
-
-    // This exists solely so that it can be set to false during testing so that we can disable the check in that context
-    private static boolean CHECK_USER_THREAD = true;
-
     private final Predicate<String> httpThreadPredicate = Pattern
-            .compile("http(?:s-jsse)?-nio-\\d{1,5}-exec-\\d+")
-            .asMatchPredicate();
+        .compile("http(?:s-jsse)?-nio-\\d{1,5}-exec-\\d+")
+        .asMatchPredicate();
 
     /**
      * @return the current {@link SafaUser} logged in
@@ -62,7 +59,7 @@ public class SafaUserService {
      *
      * @param email    User's email. Must be unique.
      * @param password Account password
-     * @return {@link UserIdentifierDTO} representing created user
+     * @return {@link UserAppEntity} representing created user
      */
     public SafaUser createUser(String email, String password) {
         String encodedPassword = this.passwordEncoder.encode(password);
@@ -75,7 +72,7 @@ public class SafaUserService {
         safaUser = this.safaUserRepository.save(safaUser);  // Save once so it gets an id
 
         Organization personalOrg =
-                organizationService.createNewOrganization(new Organization(email, "", safaUser, "free", true));
+            organizationService.createNewOrganization(new Organization(email, "", safaUser, "free", true));
         safaUser.setPersonalOrgId(personalOrg.getId());
         safaUser = this.safaUserRepository.save(safaUser);  // Save again so it gets the org id
 
@@ -109,6 +106,6 @@ public class SafaUserService {
     public SafaUser getUserByEmail(String email) {
         return this.safaUserRepository
             .findByEmail(email)
-            .orElseThrow(() ->  new SafaError("No user exists with given email: %s.", email));
+            .orElseThrow(() -> new SafaError("No user exists with given email: %s.", email));
     }
 }

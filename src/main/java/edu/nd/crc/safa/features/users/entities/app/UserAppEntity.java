@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class UserIdentifierDTO {
+public class UserAppEntity {
     /**
      * Unique identifier for user.
      */
@@ -28,7 +28,7 @@ public class UserIdentifierDTO {
     @NotEmpty
     private String email;
 
-    public UserIdentifierDTO(SafaUser safaUser) {
+    public UserAppEntity(SafaUser safaUser) {
         this.userId = safaUser.getUserId();
         this.email = safaUser.getEmail();
     }

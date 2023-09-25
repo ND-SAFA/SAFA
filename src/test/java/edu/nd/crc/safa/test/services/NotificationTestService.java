@@ -40,6 +40,13 @@ public class NotificationTestService {
         this.port = port;
     }
 
+    public <T> T getNextMessage(String clientId, Class<T> classType) throws JsonProcessingException,
+        InterruptedException {
+        String response = getMessageInQueue(clientId);
+        assert response != null;
+        return MappingTestService.toClass(response, classType);
+    }
+
     private WebSocketStompClient createStompClient() {
         StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
         WebSocketTransport transport = new WebSocketTransport(webSocketClient);
@@ -54,6 +61,10 @@ public class NotificationTestService {
         idToQueue = new HashMap<>();
     }
 
+    public NotificationTestService createNewConnection(String clientId) {
+        return this;
+    }
+
     /**
      * Creates a new stomp session and stores connection for given client id.
      *
@@ -61,12 +72,16 @@ public class NotificationTestService {
      * @return Current object allowing for builder pattern.
      * @throws Exception Throws error if a problem occurs connecting to stomp endpoint.
      */
-    public NotificationTestService createNewConnection(String clientId) throws Exception {
-        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+    public NotificationTestService createNewConnection(String clientId, String token) throws Exception {
+        WebSocketHttpHeaders wsHeaders = new WebSocketHttpHeaders();
+        wsHeaders.put("SAFA-TOKEN", List.of(token));
+        StompHeaders connectHeaders = new StompHeaders();
+        connectHeaders.put("SAFA-TOKEN", List.of(token));
         StompSession session = stompClient
-            .connect(String.format(Constants.WEBSOCKET_URI, port), new StompSessionHandlerAdapter() {
-            })
-            .get(1, SECONDS);
+            .connect(String.format(Constants.WEBSOCKET_URI, port), wsHeaders, connectHeaders,
+                new StompSessionHandlerAdapter() {
+                })
+            .get(30, SECONDS);
         idToSession.put(clientId, session);
         idToQueue.put(clientId, new LinkedBlockingDeque<>());
         return this;
@@ -104,8 +119,27 @@ public class NotificationTestService {
         subscribeToTopic(clientId, jobDbEntity.getId());
     }
 
+    @Deprecated
     public NotificationTestService subscribeToTopic(String clientId, UUID id) {
         String projectVersionSubscriptionDestination = NotificationService.getTopic(id);
+        this.subscribe(clientId, projectVersionSubscriptionDestination);
+        return this;
+    }
+
+    public NotificationTestService subscribeUser(String clientId, UUID userId) {
+        String projectVersionSubscriptionDestination = NotificationService.getUserTopic(userId);
+        this.subscribe(clientId, projectVersionSubscriptionDestination);
+        return this;
+    }
+
+    public NotificationTestService subscribeProject(String clientId, Project project) {
+        String projectVersionSubscriptionDestination = NotificationService.getProjectTopic(project.getProjectId());
+        this.subscribe(clientId, projectVersionSubscriptionDestination);
+        return this;
+    }
+
+    public NotificationTestService subscribeVersion(String clientId, ProjectVersion projectVersion) {
+        String projectVersionSubscriptionDestination = NotificationService.getVersionTopic(projectVersion.getVersionId());
         this.subscribe(clientId, projectVersionSubscriptionDestination);
         return this;
     }
@@ -119,9 +153,7 @@ public class NotificationTestService {
      * @throws JsonProcessingException Throws error if cannot parse message into target class.
      */
     public EntityChangeMessage getNextMessage(String clientId) throws JsonProcessingException, InterruptedException {
-        String response = getMessageInQueue(clientId);
-        assert response != null;
-        return MappingTestService.toClass(response, EntityChangeMessage.class);
+        return getNextMessage(clientId, EntityChangeMessage.class);
     }
 
     /**

@@ -12,13 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -27,16 +24,13 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  */
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
-    private final TokenService tokenService;
+    private final AuthorizationService authorizationService;
 
-    private final UserDetailsService userDetailsService;
 
     public AuthorizationFilter(AuthenticationManager authManager,
-                               TokenService tokenService,
-                               UserDetailsService userDetailsService) {
+                               AuthorizationService authorizationService) {
         super(authManager);
-        this.tokenService = tokenService;
-        this.userDetailsService = userDetailsService;
+        this.authorizationService = authorizationService;
     }
 
     @Override
@@ -57,7 +51,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 return;
             }
 
-            UsernamePasswordAuthenticationToken authenticationToken = authenticate(token.get());
+            UsernamePasswordAuthenticationToken authenticationToken = authorizationService.authenticate(token.get());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } catch (UsernameNotFoundException ignored) {
             // This happens if the user has a token for a deleted account. We have code that is supposed
@@ -70,19 +64,5 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         } finally {
             chain.doFilter(request, response);
         }
-    }
-
-    /**
-     * Parses the principal user within the JWT request token.
-     *
-     * @param token Request JWT
-     * @return Successful authorization token if successful otherwise null.
-     */
-    private UsernamePasswordAuthenticationToken authenticate(String token) throws SafaError {
-        Claims userClaims = this.tokenService.getTokenClaims(token);
-        String username = userClaims.getSubject();
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 }

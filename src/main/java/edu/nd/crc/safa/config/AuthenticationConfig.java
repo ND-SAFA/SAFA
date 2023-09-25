@@ -3,12 +3,13 @@ package edu.nd.crc.safa.config;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Resource;
 
 import edu.nd.crc.safa.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.authentication.AuthorizationFilter;
+import edu.nd.crc.safa.authentication.AuthorizationService;
 import edu.nd.crc.safa.authentication.TokenService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -47,11 +48,12 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 
     private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
-    @Resource
-    private UserDetailsService userDetailsService;
-
-    @Resource
+    @Autowired
+    private AuthorizationService authorizationService;
+    @Autowired
     private TokenService tokenService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
@@ -100,14 +102,13 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             // Authentication Filters
             .and()
             .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
+            .addFilter(new AuthorizationFilter(authenticationManager(), authorizationService))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean
     public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;

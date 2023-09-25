@@ -5,10 +5,11 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -16,18 +17,14 @@ import org.springframework.stereotype.Service;
 /**
  * Responsible for sending notifications to subscribers of certain topics.
  */
+@AllArgsConstructor
 @Service
 @Scope("singleton")
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final SafaUserService safaUserService;
-
-    @Autowired
-    public NotificationService(SimpMessagingTemplate template, SafaUserService safaUserService) {
-        this.messagingTemplate = template;
-        this.safaUserService = safaUserService;
-    }
+    private final ProjectRepository projectRepository;
 
     /**
      * Returns topic for given entity id.
@@ -37,6 +34,18 @@ public class NotificationService {
      */
     public static String getTopic(UUID id) {
         return String.format("/topic/%s", id);
+    }
+
+    public static String getProjectTopic(UUID id) {
+        return String.format("/topic/project/%s", id);
+    }
+
+    public static String getVersionTopic(UUID id) {
+        return String.format("/topic/version/%s", id);
+    }
+
+    public static String getUserTopic(UUID userId) {
+        return String.format("/user/%s/updates", userId);
     }
 
     /**
@@ -70,7 +79,7 @@ public class NotificationService {
      * @param topic   The destination for the object.
      * @param payload Object to be sent to topic
      */
-    private void broadcastObject(String topic, Object payload) {
+    public void broadcastObject(String topic, Object payload) {
         messagingTemplate.convertAndSend(topic, payload);
     }
 }

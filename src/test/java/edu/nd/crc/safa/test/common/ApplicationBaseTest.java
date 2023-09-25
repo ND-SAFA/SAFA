@@ -143,7 +143,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         SafaRequest.setMockMvc(mockMvc);
         SafaRequest.clearAuthorizationToken();
         token = null;
-        this.authorizationService.defaultLogin();
+        token = this.authorizationService.defaultLogin();
         this.dbEntityBuilder.setCurrentUser(currentUser);
 
         ReflectionTestUtils.setField(SafaUserService.class, "CHECK_USER_THREAD", false);

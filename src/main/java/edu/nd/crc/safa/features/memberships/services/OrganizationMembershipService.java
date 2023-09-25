@@ -2,12 +2,14 @@ package edu.nd.crc.safa.features.memberships.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
 import edu.nd.crc.safa.features.memberships.repositories.OrganizationMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -64,6 +66,29 @@ public class OrganizationMembershipService {
         return orgMembershipRepo.findByUserAndOrganization(user, organization).stream()
                 .map(OrganizationMembership::getRole)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Search for an organization membership by its ID.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     */
+    public Optional<OrganizationMembership> getMembershipOptionalById(UUID membershipId) {
+        return orgMembershipRepo.findById(membershipId);
+    }
+
+    /**
+     * Search for an organization membership by its ID. Throw an exception
+     * if it's not found.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     * @throws SafaItemNotFoundError If the membership could not be found
+     */
+    public OrganizationMembership getMembershipById(UUID membershipId) {
+        return getMembershipOptionalById(membershipId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No membership found with the specified ID"));
     }
 
     /**

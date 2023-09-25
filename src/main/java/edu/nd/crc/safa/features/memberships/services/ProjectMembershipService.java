@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.db.TeamProjectMembership;
@@ -15,6 +16,7 @@ import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRe
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -220,5 +222,28 @@ public class ProjectMembershipService {
                 });
 
         return users;
+    }
+
+    /**
+     * Search for a project membership by its ID.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     */
+    public Optional<UserProjectMembership> getUserMembershipOptionalById(UUID membershipId) {
+        return userProjectMembershipRepo.findById(membershipId);
+    }
+
+    /**
+     * Search for a project membership by its ID. Throw an exception
+     * if it's not found.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     * @throws SafaItemNotFoundError If the membership could not be found
+     */
+    public UserProjectMembership getUserMembershipById(UUID membershipId) {
+        return getUserMembershipOptionalById(membershipId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No membership found with the specified ID"));
     }
 }

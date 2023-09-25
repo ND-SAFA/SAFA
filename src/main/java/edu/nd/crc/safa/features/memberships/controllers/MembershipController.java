@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.memberships.controllers;
 
+import static edu.nd.crc.safa.utilities.AssertUtils.assertEqual;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,6 +14,9 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.EntityMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
@@ -23,15 +28,19 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -104,6 +113,80 @@ public class MembershipController extends BaseController {
     }
 
     /**
+     * Modify a user membership within an entity. An entity can be an organization, a team,
+     * or a project. Note that due to how the back end handles roles, the modified
+     * membership will actually be a new membership with a new ID.
+     *
+     * @param entityId The ID of the entity
+     * @param membershipId The ID of the membership to modify
+     * @param membership The modified membership definition. Only the role field is used
+     * @return The new membership entity
+     */
+    @PutMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
+    public MembershipAppEntity modifyMembership(@PathVariable UUID entityId, @PathVariable UUID membershipId,
+                                                @RequestBody MembershipAppEntity membership) {
+        return new MembershipAppEntity(
+            transformEntity(
+                entityId,
+                org -> modifyOrgMembership(membershipId, org, membership.getRole()),
+                team -> modifyTeamMembership(membershipId, team, membership.getRole()),
+                project -> modifyProjectMembership(membershipId, project, membership.getRole())
+            )
+        );
+    }
+
+    /**
+     * Delete a membership within an entity. An entity can be an organization, a team,
+     * or a project.
+     *
+     * @param entityId The ID of the entity
+     * @param membershipId The ID of the membership to delete
+     */
+    @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
+    public void deleteMembership(@PathVariable UUID entityId, @PathVariable UUID membershipId) {
+        consumeEntity(
+            entityId,
+            org -> modifyOrgMembership(membershipId, org, null),
+            team -> modifyTeamMembership(membershipId, team, null),
+            project -> modifyProjectMembership(membershipId, project, null)
+        );
+    }
+
+    /**
+     * Delete all roles for a user within a given entity. An entity can be an organization, a team,
+     * or a project. Either userId or userEmail must be supplied. If both are supplied, userId takes
+     * precedence.
+     *
+     * @param entityId the ID of the entity
+     * @param userId The ID of the user
+     * @param userEmail The email of the user
+     */
+    @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID)
+    public void deleteAllMembershipsForUser(@PathVariable UUID entityId, @RequestParam(required = false) UUID userId,
+                                            @RequestParam(required = false) String userEmail) {
+        SafaUser member;
+        if (userId != null) {
+            member = getServiceProvider().getSafaUserService().getUserById(userId);
+        } else if (userEmail != null) {
+            member = getServiceProvider().getSafaUserService().getUserByEmail(userEmail);
+        } else {
+            throw new SafaError("Must supply either userId or userEmail");
+        }
+
+        consumeEntity(
+            entityId,
+            org -> orgMembershipService.getUserRoles(member, org)
+                .forEach(role -> orgMembershipService.removeUserRole(member, org, role)),
+            team -> teamMembershipService.getUserRoles(member, team)
+                .forEach(role -> teamMembershipService.removeUserRole(member, team, role)),
+            project -> projectMembershipService.getUserRoles(member, project)
+                .forEach(role -> projectMembershipService.removeUserRole(member, project, role))
+        );
+    }
+
+    /**
+     * This is the same as {@link #transformEntity(UUID, Function, Function, Function)} except that
+     * it supports functions without a return type.
      * This is the same as {@link #transformEntity(UUID, Function, Function, Function)} except that
      * it supports functions without a return type.
      *
@@ -126,6 +209,78 @@ public class MembershipController extends BaseController {
 
         if (optionalOrganization.isEmpty() && optionalTeam.isEmpty() && optionalProject.isEmpty()) {
             throw createNoEntityFoundError();
+        }
+    }
+
+    /**
+    * Modify an organization membership by removing the current role and adding a new one
+    *
+    * @param membershipId The ID of the original membership
+    * @param org The organization the membership is in
+    * @param newRole The new role to give the user. Set to null to delete the membership
+    * @return The new membership
+    */
+    private OrganizationMembership modifyOrgMembership(UUID membershipId, Organization org, String newRole) {
+        OrganizationMembership currentMembership = orgMembershipService.getMembershipById(membershipId);
+        SafaUser member = currentMembership.getUser();
+
+        assertEqual(currentMembership.getOrganization().getId(), org.getId(),
+            "No membership with the given ID found in the current org");
+
+        orgMembershipService.removeUserRole(member, org, currentMembership.getRole());
+
+        if (newRole != null) {
+            return orgMembershipService.addUserRole(member, org, OrganizationRole.valueOf(newRole));
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Modify a team membership by removing the current role and adding a new one
+     *
+     * @param membershipId The ID of the original membership
+     * @param team The team the membership is in
+     * @param newRole The new role to give the user. Set to null to delete the membership
+     * @return The new membership
+     */
+    private TeamMembership modifyTeamMembership(UUID membershipId, Team team, String newRole) {
+        TeamMembership currentMembership = teamMembershipService.getMembershipById(membershipId);
+        SafaUser member = currentMembership.getUser();
+
+        assertEqual(currentMembership.getTeam().getId(), team.getId(),
+            "No membership with the given ID found in the current team");
+
+        teamMembershipService.removeUserRole(member, team, currentMembership.getRole());
+
+        if (newRole != null) {
+            return teamMembershipService.addUserRole(member, team, TeamRole.valueOf(newRole));
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Modify a project membership by removing the current role and adding a new one
+     *
+     * @param membershipId The ID of the original membership
+     * @param project The project the membership is in
+     * @param newRole The new role to give the user. Set to null to delete the membership
+     * @return The new membership
+     */
+    private UserProjectMembership modifyProjectMembership(UUID membershipId, Project project, String newRole) {
+        UserProjectMembership currentMembership = projectMembershipService.getUserMembershipById(membershipId);
+        SafaUser member = currentMembership.getMember();
+
+        assertEqual(currentMembership.getProject().getProjectId(), project.getProjectId(),
+            "No membership with the given ID found in the current project");
+
+        projectMembershipService.removeUserRole(member, project, currentMembership.getRole());
+
+        if (newRole != null) {
+            return projectMembershipService.addUserRole(member, project, ProjectRole.valueOf(newRole));
+        } else {
+            return null;
         }
     }
 

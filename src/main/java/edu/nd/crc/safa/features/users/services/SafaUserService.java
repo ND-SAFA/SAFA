@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.users.services;
 
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import edu.nd.crc.safa.authentication.SafaUserDetails;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
@@ -105,10 +107,23 @@ public class SafaUserService {
      *
      * @param email The email of the user to retrieve.
      * @return The user queried for
+     * @throws SafaItemNotFoundError If the user could not be found
      */
     public SafaUser getUserByEmail(String email) {
         return this.safaUserRepository
             .findByEmail(email)
-            .orElseThrow(() ->  new SafaError("No user exists with given email: %s.", email));
+            .orElseThrow(() ->  new SafaItemNotFoundError("No user exists with given email: %s.", email));
+    }
+
+    /**
+     * Get a user by their ID.
+     *
+     * @param userId The ID of the user
+     * @return The user, if found
+     * @throws SafaItemNotFoundError If the user could not be found
+     */
+    public SafaUser getUserById(UUID userId) {
+        return safaUserRepository.findById(userId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No user exists with given ID: %s.", userId));
     }
 }

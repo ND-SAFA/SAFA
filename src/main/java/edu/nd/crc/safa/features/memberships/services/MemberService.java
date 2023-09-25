@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
-import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
@@ -33,8 +33,8 @@ public class MemberService implements IAppEntityService<MembershipAppEntity> {
      * @param projectMembershipId ID of membership being retrieved.
      * @return The project membership.
      */
-    public UserProjectMembership getMembershipById(UUID projectMembershipId) {
-        Optional<UserProjectMembership> projectMembershipQuery =
+    public ProjectMembership getMembershipById(UUID projectMembershipId) {
+        Optional<ProjectMembership> projectMembershipQuery =
             this.userProjectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isEmpty()) {
             throw new SafaError("Could not find membership with id: %s.", projectMembershipId);
@@ -54,7 +54,7 @@ public class MemberService implements IAppEntityService<MembershipAppEntity> {
         // TODO pull members the right way
         SafaUser owner = projectVersion.getProject().getOwningTeam().getOrganization().getOwner();
         members.add(new MembershipAppEntity(
-                new UserProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
+                new ProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
 
         return members;
     }

@@ -60,6 +60,11 @@ public class TeamMembership implements EntityMembership {
     }
 
     @Override
+    public String getRoleAsString() {
+        return role.name();
+    }
+
+    @Override
     public MembershipType getMembershipType() {
         return MembershipType.TEAM;
     }

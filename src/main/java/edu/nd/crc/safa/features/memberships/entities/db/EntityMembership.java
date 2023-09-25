@@ -9,7 +9,7 @@ public interface EntityMembership {
 
     String getEmail();
 
-    String getRole();
+    String getRoleAsString();
 
     MembershipType getMembershipType();
 

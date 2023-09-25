@@ -18,7 +18,7 @@ public class MembershipAppEntity implements IAppEntity {
     public MembershipAppEntity(EntityMembership membership) {
         this.id = membership.getId();
         this.email = membership.getEmail();
-        this.role = membership.getRole();
+        this.role = membership.getRoleAsString();
         this.entityType = membership.getMembershipType();
         this.entityId = membership.getEntityId();
 

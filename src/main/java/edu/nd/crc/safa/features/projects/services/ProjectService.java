@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
@@ -150,8 +150,8 @@ public class ProjectService {
      * @return The project identifier
      */
     public ProjectIdAppEntity getIdAppEntity(Project project, SafaUser currentUser) {
-        List<UserProjectMembership> projectMemberships =
-            projectMembershipService.getAllProjectMembers(project);
+        List<ProjectMembership> projectMemberships =
+            projectMembershipService.getProjectMembers(project);
 
         List<MembershipAppEntity> membershipAppEntities =
             projectMemberships

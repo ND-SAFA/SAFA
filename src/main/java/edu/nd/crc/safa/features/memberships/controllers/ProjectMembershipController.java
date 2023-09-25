@@ -9,7 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
-import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
@@ -55,7 +55,7 @@ public class ProjectMembershipController extends BaseController {
      *
      * @param projectId The UUID of the project which the member is being added to.
      * @param request   The request containing project, member to add, and their given role.
-     * @return {@link UserProjectMembership} Updated project membership.
+     * @return {@link ProjectMembership} Updated project membership.
      */
     @PostMapping(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
     public MembershipAppEntity addOrUpdateProjectMembership(@PathVariable UUID projectId,
@@ -68,7 +68,7 @@ public class ProjectMembershipController extends BaseController {
         Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.SHARE, user).get();
 
-        UserProjectMembership updatedProjectMembership =
+        ProjectMembership updatedProjectMembership =
                 projectMembershipService.addUserRole(userToUpdate, project, request.getProjectRole());
 
         getServiceProvider()
@@ -91,7 +91,7 @@ public class ProjectMembershipController extends BaseController {
         Project project = getResourceBuilder().fetchProject(projectId)
                 .withPermission(ProjectPermission.VIEW, user).get();
         return projectMembershipService
-            .getAllProjectMembers(project)
+            .getProjectMembers(project)
             .stream()
             .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
@@ -108,7 +108,7 @@ public class ProjectMembershipController extends BaseController {
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
         MemberService memberService = getServiceProvider().getMemberService();
 
-        UserProjectMembership projectMembership = memberService.getMembershipById(projectMembershipId);
+        ProjectMembership projectMembership = memberService.getMembershipById(projectMembershipId);
 
         // Step - Verify user has sufficient permissions
         // You can always remove yourself, and you can remove others if you have admin permissions

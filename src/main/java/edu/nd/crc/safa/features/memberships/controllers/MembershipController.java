@@ -15,8 +15,8 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.EntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
-import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
@@ -82,7 +82,7 @@ public class MembershipController extends BaseController {
                 entityId,
                 orgMembershipService::getAllMembershipsByOrganization,
                 teamMembershipService::getTeamMemberships,
-                projectMembershipService::getAllProjectMembers
+                projectMembershipService::getProjectMembers
             )
         );
     }
@@ -268,8 +268,8 @@ public class MembershipController extends BaseController {
      * @param newRole The new role to give the user. Set to null to delete the membership
      * @return The new membership
      */
-    private UserProjectMembership modifyProjectMembership(UUID membershipId, Project project, String newRole) {
-        UserProjectMembership currentMembership = projectMembershipService.getUserMembershipById(membershipId);
+    private ProjectMembership modifyProjectMembership(UUID membershipId, Project project, String newRole) {
+        ProjectMembership currentMembership = projectMembershipService.getUserMembershipById(membershipId);
         SafaUser member = currentMembership.getMember();
 
         assertEqual(currentMembership.getProject().getProjectId(), project.getProjectId(),

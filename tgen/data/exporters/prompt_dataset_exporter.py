@@ -46,7 +46,8 @@ class PromptDatasetExporter(AbstractDatasetExporter):
             project_summary_path = os.path.join(FileUtil.get_directory_path(self.export_path), PROJECT_SUMMARY_FILENAME)
             FileUtil.write(dataset.project_summary, project_summary_path)
         if dataset.trace_dataset is not None:
-            exporter: AbstractDatasetExporter = self.trace_dataset_exporter_type(self.export_path, dataset=dataset.trace_dataset)
+            exporter: AbstractDatasetExporter = self.trace_dataset_exporter_type(export_path=self.export_path,
+                                                                                 dataset=dataset.trace_dataset)
             exporter.export(**kwargs)
         elif dataset.artifact_df is not None:
             export_path = self.export_path if FileUtil.is_file(self.export_path) \

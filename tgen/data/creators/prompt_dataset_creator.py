@@ -104,7 +104,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         :return: The project summary
         """
         project_path = self.get_project_path() if not project_path else project_path
-        project_summary_path = os.path.join(project_path, PROJECT_SUMMARY_FILENAME)
+        project_summary_path = os.path.join(FileUtil.get_directory_path(project_path), PROJECT_SUMMARY_FILENAME)
         if not os.path.exists(project_summary_path):
             return None
         project_summary = FileUtil.read_file(project_summary_path, raise_exception=False)

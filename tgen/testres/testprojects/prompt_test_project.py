@@ -1,7 +1,8 @@
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from tgen.common.artifact import Artifact
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
@@ -9,6 +10,11 @@ from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
@@ -84,6 +90,47 @@ class PromptTestProject:
             test_case.assertTrue(found, msg=f"Could not find artifact: {artifact}")
 
     @staticmethod
+    def verify_prompts_artifacts_project(test_case: BaseTest, prompts_df: PromptDataFrame, **params):
+        """
+        Verifies the correct prompts are made from the test Artifacts project
+        :param test_case: The test calling the method
+        :param prompts_df: The prompt dataframe to verify
+        :return:
+        """
+        artifacts = PromptTestProject.get_safa_artifacts()
+        test_case.assertEqual(len(prompts_df), len(artifacts), **params)
+        for artifact in artifacts:
+            content = artifact[ArtifactKeys.CONTENT.value]
+            found = False
+            for i, row in prompts_df.itertuples():
+                prompt = row[PromptKeys.PROMPT]
+                if content in prompt:
+                    found = True
+                    break
+            test_case.assertTrue(found, msg=f"Could not find artifact: {artifact}")
+
+    @staticmethod
+    def verify_dataset(test_case: BaseTest, dataset: Union[PromptDataset, PromptDatasetCreator], **params):
+        """
+        Verifies the correct prompts are made from the test Artifacts project
+        :param test_case: The test calling the method
+        :param dataset: The prompt dataset to verify
+        :return:
+        """
+        if isinstance(dataset, PromptDatasetCreator):
+            artifact_df, trace_df, _ = PromptTestProject.SAFA_PROJECT.get_project_reader().read_project()
+            return PromptTestProject.verify_dataset_creator(test_case, dataset, trace_df=trace_df, use_targets_only=True,
+                                                            include_prompt_builder=False)
+        artifacts = PromptTestProject.get_safa_artifacts()
+        test_case.assertEqual(len(dataset.artifact_df), len(artifacts), **params)
+        for artifact in artifacts:
+            test_case.assertIn(artifact[ArtifactKeys.ID.value], dataset.artifact_df)
+        if dataset.trace_dataset:
+            traces = PromptTestProject.get_trace_dataset_creator().create()
+            for id_, trace in traces.trace_df.itertuples():
+                test_case.assertIn(id_, dataset.trace_dataset.trace_df)
+
+    @staticmethod
     def verify_prompts_safa_project_traces_for_classification(test_case: BaseTest, prompt_df: PromptDataFrame,
                                                               trace_df: TraceDataFrame, **params):
         """
@@ -139,3 +186,18 @@ class PromptTestProject:
         for i, (id_, row) in enumerate(artifact_df.itertuples()):
             prompt = prompt_df.get_row(i)
             test_case.assertIn(row["content"], prompt[PromptKeys.PROMPT], **params)
+
+    @staticmethod
+    def verify_dataset_creator(test_case, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame,
+                               use_targets_only: bool = False,
+                               prompt_builder: PromptBuilder = None, include_prompt_builder: bool = True):
+        if prompt_builder is None and include_prompt_builder:
+            prompt1 = QuestionPrompt("Tell me about this artifact:")
+            prompt2 = MultiArtifactPrompt(data_type=MultiArtifactPrompt.DataType.TRACES)
+            prompt_builder = PromptBuilder([prompt1, prompt2])
+        prompt_dataset = dataset_creator.create()
+        prompts_df = prompt_dataset.get_prompt_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args, )
+        if not use_targets_only:
+            PromptTestProject.verify_prompts_safa_project_traces_for_classification(test_case, prompts_df, trace_df)
+        else:
+            PromptTestProject.verify_prompts_safa_project_traces_for_generation(test_case, prompts_df, trace_df)

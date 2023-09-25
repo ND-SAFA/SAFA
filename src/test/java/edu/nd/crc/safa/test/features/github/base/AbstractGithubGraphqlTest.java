@@ -5,16 +5,14 @@ import java.util.stream.IntStream;
 
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
 import edu.nd.crc.safa.test.common.AbstractRemoteApiTest;
+import edu.nd.crc.safa.test.server.SafaMockServer;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import okhttp3.mockwebserver.MockResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public abstract class AbstractGithubGraphqlTest extends AbstractRemoteApiTest {
+public abstract class AbstractGithubGraphqlTest extends AbstractRemoteApiTest<SafaMockServer> {
     private String githubUrlSave;
 
     @BeforeEach
@@ -47,8 +45,6 @@ public abstract class AbstractGithubGraphqlTest extends AbstractRemoteApiTest {
     }
 
     protected void enqueueResponse(String name) throws IOException {
-        getMockWebServer().enqueue(new MockResponse()
-            .setBody(loadGithubResponseFile(name))
-            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        getServer().setStringResponse(loadGithubResponseFile(name));
     }
 }

@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.TraceLayer;
 import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenAlgorithms;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.traces.vsm.VSMController;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -27,7 +31,7 @@ import org.springframework.stereotype.Service;
 @Scope("singleton")
 public class TraceGenerationService {
     private static final String DELIMITER = "*";
-    private ITraceGenerationController traceGenerationController;
+    private GenApi genApi;
 
     /**
      * Retrieves artifacts associated with the source and target types defined in the tracing request.
@@ -62,22 +66,34 @@ public class TraceGenerationService {
         return new GenerationDataset(generationArtifacts, layers);
     }
 
-    public List<TraceAppEntity> generateTraceLinks(TraceGenerationRequest traceGenerationRequest,
+    /**
+     * Generates the traces defined in tracing request.
+     *
+     * @param TGenRequestAppEntity The tracing request.
+     * @param projectAppEntity     The project used to extract entities defiend by request.
+     * @return Generated trace links.
+     */
+    public List<TraceAppEntity> generateTraceLinks(TGenRequestAppEntity TGenRequestAppEntity,
                                                    ProjectAppEntity projectAppEntity) {
-        List<TraceAppEntity> generatedTraces = new ArrayList<>();
-        for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
+        List<TraceAppEntity> allGeneratedTraces = new ArrayList<>();
+        for (TracingRequest tracingRequest : TGenRequestAppEntity.getRequests()) {
+            ITraceGenerationController controller = selectTracingMethod(tracingRequest.getMethod());
             GenerationDataset tracingPayload = extractPayload(tracingRequest, projectAppEntity);
-            generatedTraces.addAll(generateLinksWithMethod(tracingPayload));
+            List<TraceAppEntity> generatedTraces = controller.generateLinks(tracingPayload, null);
+            allGeneratedTraces.addAll(generatedTraces);
         }
-        return generatedTraces;
+        return allGeneratedTraces;
     }
 
-    public List<TraceAppEntity> generateLinksWithMethod(GenerationDataset tracingPayload) {
-        return new ArrayList<>(traceGenerationController.generateLinks(tracingPayload, null));
-    }
-
-    public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,
-                                                              List<TraceAppEntity> generatedLinks) {
+    /**
+     * Removes the generated links whose been defined by manual links.
+     *
+     * @param manualLinks    The manually defined links (or links wanting to remove).
+     * @param generatedLinks List of generated links being filtered.
+     * @return The generated links not present in manual links.
+     */
+    public List<TraceAppEntity> removeOverlappingLinks(List<TraceAppEntity> manualLinks,
+                                                       List<TraceAppEntity> generatedLinks) {
         List<String> approvedLinks = manualLinks.stream()
             .filter(link -> link.getApprovalStatus() == ApprovalStatus.APPROVED)
             .map(link -> link.getSourceName() + DELIMITER + link.getTargetName())
@@ -90,5 +106,22 @@ public class TraceGenerationService {
                 return !approvedLinks.contains(tId);
             })
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the controller associated with tracing algorithm.
+     *
+     * @param algorithm The tracing algorithm.
+     * @return The tracing controller.
+     */
+    public ITraceGenerationController selectTracingMethod(TGenAlgorithms algorithm) {
+        switch (algorithm) {
+            case GENERATION:
+                return genApi;
+            case VSM:
+                return new VSMController();
+            default:
+                throw new SafaError("Unknown tracing algorithm: " + algorithm);
+        }
     }
 }

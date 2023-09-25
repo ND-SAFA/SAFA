@@ -62,11 +62,4 @@ public @interface IJobStep {
      * @return {@link String} The name of the job.
      */
     String value();
-
-    /**
-     * Whether the given step requires the generation server.
-     *
-     * @return True if server is required.
-     */
-    boolean requiredGeneration() default false;
 }

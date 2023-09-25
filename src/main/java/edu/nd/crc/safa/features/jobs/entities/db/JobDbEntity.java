@@ -17,12 +17,12 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -33,10 +33,10 @@ import org.hibernate.annotations.UpdateTimestamp;
  */
 @Entity
 @Table(name = "job")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class JobDbEntity {
+
     /**
      * The name of job (e.g. project creation).
      */
@@ -96,7 +96,6 @@ public class JobDbEntity {
     @NotNull
     @Column(name = "current_step", nullable = false)
     private int currentStep;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
@@ -104,10 +103,10 @@ public class JobDbEntity {
         name = "user_id",
         nullable = false)
     private SafaUser user;
-
-    /**
-     * The id of the entity that been created or modified with this job.
-     */
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "project_id")
+    private Project project;
     @Column(name = "completed_entity_id")
     @Type(type = "uuid-char")
     private UUID completedEntityId;
@@ -143,5 +142,9 @@ public class JobDbEntity {
     public void incrementProgress(int nSteps) {
         float percentComplete = 100 * (this.currentStep / (float) nSteps);
         this.setCurrentProgress(round(percentComplete));
+    }
+
+    public UUID getProjectId() {
+        return this.project == null ? null : this.getProject().getProjectId();
     }
 }

@@ -19,7 +19,7 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -133,7 +133,7 @@ public class FlatFileService {
                                                 boolean asCompleteSet) {
         try {
             // Step - Parse artifacts, traces, and trace generation requests
-            Pair<ProjectCommitDefinition, TraceGenerationRequest> parseTIMResponse = parseTIMIntoCommit(
+            Pair<ProjectCommitDefinition, TGenRequestAppEntity> parseTIMResponse = parseTIMIntoCommit(
                 projectVersion,
                 timFileJson);
 
@@ -141,13 +141,13 @@ public class FlatFileService {
             ProjectCommitDefinition projectCommitDefinition = parseTIMResponse.getValue0();
 
             // Step - Generate trace link requests (post-artifact construction if successful)
-            TraceGenerationRequest traceGenerationRequest = parseTIMResponse.getValue1();
+            TGenRequestAppEntity TGenRequestAppEntity = parseTIMResponse.getValue1();
             ProjectAppEntity projectAppEntity = new ProjectAppEntity(projectCommitDefinition);
             List<TraceAppEntity> generatedLinks = this.traceGenerationService.generateTraceLinks(
-                traceGenerationRequest,
+                TGenRequestAppEntity,
                 projectAppEntity
             );
-            generatedLinks = this.traceGenerationService.filterDuplicateGeneratedLinks(
+            generatedLinks = this.traceGenerationService.removeOverlappingLinks(
                 projectCommitDefinition.getTraces().getAdded(),
                 generatedLinks);
 
@@ -181,7 +181,7 @@ public class FlatFileService {
      *                     - syntax error or unknown reference in the tim.json.
      * @throws IOException Throws IOException if an errors occurs while reading files in tim.json.
      */
-    public Pair<ProjectCommitDefinition, TraceGenerationRequest> parseTIMIntoCommit(
+    public Pair<ProjectCommitDefinition, TGenRequestAppEntity> parseTIMIntoCommit(
         ProjectVersion projectVersion,
         JSONObject timFileJson
     ) throws SafaError, IOException {
@@ -208,7 +208,7 @@ public class FlatFileService {
             projectVersion,
             ProjectEntity.TRACES);
 
-        return new Pair<>(projectCommitDefinition, flatFileParser.getTraceGenerationRequest());
+        return new Pair<>(projectCommitDefinition, flatFileParser.getTGenRequestAppEntity());
     }
 
     private void addErrorsToCommit(ProjectCommitDefinition projectCommitDefinition,

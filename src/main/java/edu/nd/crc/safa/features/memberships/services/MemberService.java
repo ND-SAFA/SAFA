@@ -53,17 +53,33 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
             .collect(Collectors.toList());
 
         // TODO pull members the right way
+        addOwnerMember(projectVersion, members);
+
+        return members;
+    }
+
+    private void addOwnerMember(ProjectVersion projectVersion, List<ProjectMemberAppEntity> members) {
         SafaUser owner = projectVersion.getProject().getOwningTeam().getOrganization().getOwner();
         members.add(new ProjectMemberAppEntity(
-                new UserProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
+            new UserProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
+    }
 
+    @Override
+    public List<ProjectMemberAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                            List<UUID> appEntityIds) {
+        List<ProjectMemberAppEntity> members = this.userProjectMembershipRepository
+            .findByProjectAndMembershipIdIn(projectVersion.getProject(), appEntityIds)
+            .stream()
+            .map(ProjectMemberAppEntity::new)
+            .collect(Collectors.toList());
+        addOwnerMember(projectVersion, members);
         return members;
     }
 
     /**
      * Returns list of members in given project with any of the given roles.
      *
-     * @param project The project whose members are retrieved.
+     * @param project      The project whose members are retrieved.
      * @param projectRoles The project roles to match.
      * @return List of project memberships relating members to projects.
      */
@@ -74,7 +90,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
     /**
      * Returns list of members in given project with the given role.
      *
-     * @param project The project whose members are retrieved.
+     * @param project     The project whose members are retrieved.
      * @param projectRole The project role to match.
      * @return List of project memberships relating members to projects.
      */

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.test.features.jobs.logic.jira;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -7,10 +9,12 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.jobs.base.JiraBaseFlatFileTest;
+import edu.nd.crc.safa.test.services.CommonRequestService;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +22,7 @@ import org.junit.jupiter.api.Test;
  * Tests that JIRA issues and links can be parsed from JSON
  * and created in the form of artifacts and trace links.
  */
-class TestFlatFileJiraProjectCreation extends JiraBaseFlatFileTest {
+class TestCreateProjectViaJiraJob extends JiraBaseFlatFileTest {
 
     /**
      * Tests that the sample DroneResponse JSON file is able
@@ -70,6 +74,10 @@ class TestFlatFileJiraProjectCreation extends JiraBaseFlatFileTest {
         verifyNumberOfItems("artifacts",
             () -> this.artifactVersionRepository.findByProjectVersion(projectVersion),
             nArtifacts);
+
+        // VP - Verify that job is associated with project
+        List<JobAppEntity> projectJobs = CommonRequestService.Project.getProjectJobs(projectVersion.getProject());
+        assertEquals(1, projectJobs.size());
     }
 
     private JiraProjectResponseDTO createMockJiraProject() {

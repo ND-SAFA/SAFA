@@ -19,22 +19,22 @@ public class CreateProjectViaGithubBuilder extends AbstractJobBuilder {
      * Identifier GitHub project to import.
      */
     @Getter(AccessLevel.PROTECTED)
-    private GithubIdentifier githubIdentifier;
+    private final GithubIdentifier githubIdentifier;
 
     @Getter(AccessLevel.PROTECTED)
-    private GithubImportDTO githubImportDTO;
+    private final GithubImportDTO githubImportDTO;
 
     public CreateProjectViaGithubBuilder(ServiceProvider serviceProvider, GithubIdentifier githubIdentifier,
                                          GithubImportDTO githubImportDTO, SafaUser user) {
-        super(serviceProvider, user);
+        super(user, serviceProvider);
         this.githubIdentifier = githubIdentifier;
         this.githubImportDTO = githubImportDTO;
     }
 
     @Override
     protected AbstractJob constructJobForWork() {
-        return new GithubProjectCreationJob(getJobDbEntity(), getServiceProvider(), githubIdentifier,
-            githubImportDTO, getUser());
+        return new GithubProjectCreationJob(getUser(), getJobDbEntity(), getServiceProvider(), githubIdentifier,
+            githubImportDTO);
     }
 
     @Override

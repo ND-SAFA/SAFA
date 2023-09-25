@@ -15,10 +15,12 @@ import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.github.base.AbstractGithubGraphqlTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.CommonRequestService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,6 +85,9 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         }
 
         assertLayout(githubProject.getProject(), "GitHub File");
+
+        List<JobAppEntity> jobs = CommonRequestService.Project.getProjectJobs(githubProject.getProject());
+        Assertions.assertEquals(1, jobs.size());
     }
 
     private void assertLayout(Project project, String typeName) {
@@ -255,17 +260,17 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
     }
 
     @Test
-    public void testNoDefaultBranch() throws Exception {
+    void testNoDefaultBranch() throws Exception {
         enqueueResponse("repository_response_no_default_branch.json");
         enqueueResponse("filetree_response.json");
         enqueueResponse("filetree_response_src.json");
         enqueueResponse("filetree_response_include.json");
 
         SafaRequest
-                .withRoute(AppRoutes.Github.Import.BY_NAME)
-                .withRepositoryName(repositoryName)
-                .withOwner(owner)
-                .postWithJsonObject(new GithubImportDTO(), status().is2xxSuccessful());
+            .withRoute(AppRoutes.Github.Import.BY_NAME)
+            .withRepositoryName(repositoryName)
+            .withOwner(owner)
+            .postWithJsonObject(new GithubImportDTO(), status().is2xxSuccessful());
 
         // We should have one version created
         Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
@@ -273,7 +278,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         GithubProject githubProject = serviceProvider.getGithubProjectRepository().findAll().get(0);
 
         List<ArtifactAppEntity> importedFiles =
-                serviceProvider.getArtifactService().getAppEntities(githubProject.getProject());
+            serviceProvider.getArtifactService().getAppEntities(githubProject.getProject());
 
         // We should have the corespondent project and user set
         Assertions.assertNotNull(githubProject.getProject());

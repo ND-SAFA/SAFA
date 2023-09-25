@@ -14,4 +14,8 @@ public class TracingRequest {
      * List of artifact levels to trace.
      */
     private List<ArtifactLevelRequest> artifactLevels;
+    /**
+     * The tracing algorithm to use.
+     */
+    private TGenAlgorithms method = TGenAlgorithms.GENERATION;
 }

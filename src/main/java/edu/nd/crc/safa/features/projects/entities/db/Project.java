@@ -57,8 +57,7 @@ public class Project implements Serializable {
     private String description;
 
     @Lob
-    @Column(name = "specification",
-        columnDefinition = "mediumtext")
+    @Column(name = "specification", columnDefinition = "mediumtext")
     private String specification;
 
     @Column(name = "last_edited")

@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
-import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
+import edu.nd.crc.safa.features.generation.tgen.TGenRequest;
+import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
@@ -29,10 +29,10 @@ public class GenerateLinksApi {
     public List<TraceAppEntity> generateLinks(
         GenerationDataset dataset, JobLogger logger) {
         // Step - Build request
-        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
+        TGenRequest payload = new TGenRequest(dataset);
 
         // Step - Send request
-        TGenTraceGenerationResponse output = this.sendTraceLinkRequest(payload, logger);
+        TGenResponse output = this.sendTraceLinkRequest(payload, logger);
         return convertPredictionsToLinks(output.getPredictions());
     }
 
@@ -43,12 +43,12 @@ public class GenerateLinksApi {
      * @param logger  The logger used to store trace link logs.
      * @return TGEN's response.
      */
-    private TGenTraceGenerationResponse sendTraceLinkRequest(TGenPredictionRequestDTO payload, JobLogger logger) {
+    private TGenResponse sendTraceLinkRequest(TGenRequest payload, JobLogger logger) {
         String predictEndpoint;
         int candidates = payload.getDataset().getNumOfCandidates();
         apiController.log(logger, String.format("Number of candidates: %s", candidates));
         predictEndpoint = TGenConfig.getEndpoint("predict");
-        return apiController.performJob(predictEndpoint, payload, TGenTraceGenerationResponse.class, logger);
+        return apiController.performJob(predictEndpoint, payload, TGenResponse.class, logger);
     }
 
     /**

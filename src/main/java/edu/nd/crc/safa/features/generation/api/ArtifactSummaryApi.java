@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.generation.api;
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.RequestService;
 import edu.nd.crc.safa.features.generation.summary.GenArtifactSummaryRequest;
-import edu.nd.crc.safa.features.generation.summary.TGenSummaryResponse;
+import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ public class ArtifactSummaryApi {
      * @param logger  Optional. Job logger to store logs under.
      * @return Summary response.
      */
-    public TGenSummaryResponse sendSummarizeRequest(GenArtifactSummaryRequest payload, JobLogger logger) {
+    public SummaryResponse sendSummarizeRequest(GenArtifactSummaryRequest payload, JobLogger logger) {
         String predictEndpoint;
 
         int nArtifacts = payload.getArtifacts().size();
@@ -31,10 +31,10 @@ public class ArtifactSummaryApi {
         if (nArtifacts <= SUMMARY_ARTIFACT_THRESHOLD) {
             predictEndpoint = TGenConfig.getEndpoint("summarize-sync");
             return this.requestService
-                .sendPost(predictEndpoint, payload, TGenSummaryResponse.class);
+                .sendPost(predictEndpoint, payload, SummaryResponse.class);
         } else {
             predictEndpoint = TGenConfig.getEndpoint("summarize");
-            return apiController.performJob(predictEndpoint, payload, TGenSummaryResponse.class, logger);
+            return apiController.performJob(predictEndpoint, payload, SummaryResponse.class, logger);
         }
     }
 }

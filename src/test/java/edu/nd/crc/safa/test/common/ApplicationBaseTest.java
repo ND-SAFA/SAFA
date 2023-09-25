@@ -129,6 +129,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      * @throws IOException If error occurs while deleting data.
      */
     private void clearData() throws IOException {
+        this.serviceProvider.getJobRepository().deleteAll();
         this.safaUserRepository.deleteAll();
         this.dbEntityBuilder.createEmptyData();
         this.jsonBuilder.createEmptyData();
@@ -145,7 +146,6 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         token = null;
         token = this.authorizationService.defaultLogin();
         this.dbEntityBuilder.setCurrentUser(currentUser);
-
         ReflectionTestUtils.setField(SafaUserService.class, "CHECK_USER_THREAD", false);
     }
 }

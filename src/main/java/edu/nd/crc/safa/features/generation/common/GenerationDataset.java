@@ -24,11 +24,6 @@ public class GenerationDataset {
      */
     private List<GenerationArtifact> artifacts; // snake_case to match TGEN
     /**
-     * List of layers being traced (child -> parent).
-     */
-    @JsonProperty()
-    private List<TraceLayer> layers;
-    /**
      * The trace links between artifacts in all artifact layers.
      */
     @Nullable
@@ -38,6 +33,11 @@ public class GenerationDataset {
      */
     @Nullable
     private String summary;
+    /**
+     * List of layers being traced (child -> parent).
+     */
+    @JsonProperty()
+    private List<TraceLayer> layers;
 
     @JsonIgnore
     private Map<String, List<String>> layerIds = new HashMap<>();
@@ -51,13 +51,6 @@ public class GenerationDataset {
         return this.artifacts
             .stream()
             .filter(a -> a.getLayerId().equals(artifactType))
-            .collect(Collectors.toList());
-    }
-
-    public List<String> getArtifactBodies(String artifactType) {
-        return this.getArtifacts(artifactType)
-            .stream()
-            .map(GenerationArtifact::getContent)
             .collect(Collectors.toList());
     }
 

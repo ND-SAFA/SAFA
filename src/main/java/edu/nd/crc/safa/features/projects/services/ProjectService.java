@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final JobService jobService;
     private final TeamService teamService;
 
     /**
@@ -36,6 +38,7 @@ public class ProjectService {
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */
     public void deleteProject(Project project) throws SafaError, IOException {
+        this.jobService.removeProjectFromJobs(project);
         this.projectRepository.delete(project);
         FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
     }

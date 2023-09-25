@@ -21,7 +21,7 @@ public class HGenJobBuilder extends AbstractJobBuilder {
                           ProjectVersion projectVersion,
                           HGenRequest request,
                           SafaUser user) {
-        super(serviceProvider, user);
+        super(user, serviceProvider);
         this.projectVersion = projectVersion;
         this.request = request;
     }
@@ -29,7 +29,8 @@ public class HGenJobBuilder extends AbstractJobBuilder {
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.projectVersion, false);
-        return new HGenJob(this.getJobDbEntity(), this.getServiceProvider(), projectCommitDefinition, this.request);
+        return new HGenJob(getUser(), this.getJobDbEntity(), this.getServiceProvider(), projectCommitDefinition,
+            this.request);
     }
 
     @Override

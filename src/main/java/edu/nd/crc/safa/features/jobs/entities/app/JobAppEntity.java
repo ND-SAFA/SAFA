@@ -41,7 +41,7 @@ public class JobAppEntity  {
         this.completedAt = jobDbEntity.getCompletedAt();
         this.currentProgress = jobDbEntity.getCurrentProgress();
         this.currentStep = jobDbEntity.getCurrentStep();
-        this.projectId = jobDbEntity.getProject().getProjectId();
+        this.projectId = jobDbEntity.getProjectId();
         this.completedEntityId = jobDbEntity.getCompletedEntityId();
         this.taskId = jobDbEntity.getTaskId();
     }
@@ -60,4 +60,6 @@ public class JobAppEntity  {
     public String getTopic() {
         return NotificationService.getTopic(this.getId());
     }
+
+
 }

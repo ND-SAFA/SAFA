@@ -145,4 +145,7 @@ public class JobDbEntity {
         float percentComplete = 100 * (this.currentStep / (float) nSteps);
         this.setCurrentProgress(round(percentComplete));
     }
+    public UUID getProjectId(){
+        return this.project==null ?null:this.getProject().getProjectId();
+    }
 }

@@ -46,6 +46,7 @@ public class JobService {
     private static final Logger logger = LoggerFactory.getLogger(JobService.class);
     private final JobDbRepository jobDbRepository;
     private final SafaUserService safaUserService;
+
     public void removeProjectFromJobs(Project project){
         List<JobDbEntity> projectJobs = getJobDbEntitiesInProjects(List.of(project));
         projectJobs.forEach(jobDbEntity -> jobDbEntity.setProject(null));

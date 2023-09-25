@@ -38,8 +38,8 @@ public class ProjectService {
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */
     public void deleteProject(Project project) throws SafaError, IOException {
-        this.projectRepository.delete(project);
         this.jobService.removeProjectFromJobs(project);
+        this.projectRepository.delete(project);
         FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
     }
 

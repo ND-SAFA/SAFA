@@ -129,6 +129,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      * @throws IOException If error occurs while deleting data.
      */
     private void clearData() throws IOException {
+        this.serviceProvider.getJobRepository().deleteAll();
         this.safaUserRepository.deleteAll();
         this.dbEntityBuilder.createEmptyData();
         this.jsonBuilder.createEmptyData();

@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import edu.nd.crc.safa.MainApplication;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.controllers.ProjectController;
 
 import org.springframework.batch.core.repository.JobRepository;

@@ -85,7 +85,7 @@ public abstract class CommitJob extends AbstractJob {
      */
     @Override
     protected void jobFailed(Exception error) throws RuntimeException, IOException {
-        if (this.deleteProjectOnFail) {
+        if (this.deleteProjectOnFail && createdProjectVersion != null) {
             this.getDbLogger().log("Job failed, deleting job.");
             Project project = createdProjectVersion.getProject();
             getServiceProvider().getProjectService().deleteProject(project);

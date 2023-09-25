@@ -32,7 +32,7 @@ public class JobAppEntity  {
     private UUID taskId;
     private List<String> steps;
 
-    public JobAppEntity(JobDbEntity jobDbEntity){
+    public JobAppEntity(JobDbEntity jobDbEntity) {
         this.name = jobDbEntity.getName();
         this.id = jobDbEntity.getId();
         this.status = jobDbEntity.getStatus();
@@ -60,6 +60,4 @@ public class JobAppEntity  {
     public String getTopic() {
         return NotificationService.getTopic(this.getId());
     }
-
-
 }

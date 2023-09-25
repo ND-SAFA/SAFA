@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
-import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -47,7 +46,7 @@ public class JobService {
     private final JobDbRepository jobDbRepository;
     private final SafaUserService safaUserService;
 
-    public void removeProjectFromJobs(Project project){
+    public void removeProjectFromJobs(Project project) {
         List<JobDbEntity> projectJobs = getJobDbEntitiesInProjects(List.of(project));
         projectJobs.forEach(jobDbEntity -> jobDbEntity.setProject(null));
         this.jobDbRepository.saveAll(projectJobs);
@@ -252,7 +251,7 @@ public class JobService {
             .collect(Collectors.toList());
     }
 
-    private List<JobDbEntity> getJobDbEntitiesInProjects(List<Project> projects){
+    private List<JobDbEntity> getJobDbEntitiesInProjects(List<Project> projects) {
         List<UUID> projectIds = projects.stream().map(Project::getProjectId).collect(Collectors.toList());
         return this.jobDbRepository.findByProjectProjectIdInOrderByLastUpdatedAtDesc(projectIds);
     }

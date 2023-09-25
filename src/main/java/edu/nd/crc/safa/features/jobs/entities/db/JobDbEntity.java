@@ -22,9 +22,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -145,7 +143,8 @@ public class JobDbEntity {
         float percentComplete = 100 * (this.currentStep / (float) nSteps);
         this.setCurrentProgress(round(percentComplete));
     }
-    public UUID getProjectId(){
-        return this.project==null ?null:this.getProject().getProjectId();
+
+    public UUID getProjectId() {
+        return this.project == null ? null : this.getProject().getProjectId();
     }
 }

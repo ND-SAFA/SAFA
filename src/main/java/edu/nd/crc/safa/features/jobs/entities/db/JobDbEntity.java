@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,8 +35,7 @@ import org.hibernate.annotations.UpdateTimestamp;
  */
 @Entity
 @Table(name = "job")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class JobDbEntity {
 
@@ -106,7 +106,6 @@ public class JobDbEntity {
         nullable = false)
     private SafaUser user;
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     @JoinColumn(name = "project_id")
     private Project project;

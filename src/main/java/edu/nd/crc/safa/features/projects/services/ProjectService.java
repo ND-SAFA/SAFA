@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final JobService jobService;
     private final TeamService teamService;
 
     /**
@@ -37,6 +39,7 @@ public class ProjectService {
      */
     public void deleteProject(Project project) throws SafaError, IOException {
         this.projectRepository.delete(project);
+        this.jobService.removeProjectFromJobs(project);
         FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
     }
 

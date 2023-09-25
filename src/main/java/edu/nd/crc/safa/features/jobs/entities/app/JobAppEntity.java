@@ -29,7 +29,7 @@ public class JobAppEntity  {
     private int currentStep;
     private UUID projectId;
     private UUID completedEntityId;
-    private UUID taskId ;
+    private UUID taskId;
     private List<String> steps;
 
     public JobAppEntity(JobDbEntity jobDbEntity){

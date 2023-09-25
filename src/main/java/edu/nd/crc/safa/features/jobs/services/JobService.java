@@ -46,7 +46,11 @@ public class JobService {
     private static final Logger logger = LoggerFactory.getLogger(JobService.class);
     private final JobDbRepository jobDbRepository;
     private final SafaUserService safaUserService;
-    private final ProjectMembershipService projectMembershipService;
+    public void removeProjectFromJobs(Project project){
+        List<JobDbEntity> projectJobs = getJobDbEntitiesInProjects(List.of(project));
+        projectJobs.forEach(jobDbEntity -> jobDbEntity.setProject(null));
+        this.jobDbRepository.saveAll(projectJobs);
+    }
 
     /**
      * Deletes the job with given ID. Terminates any task associated with the job.
@@ -241,10 +245,14 @@ public class JobService {
      * @return The list of jobs.
      */
     public List<JobAppEntity> getJobsInProjects(List<Project> projects) {
-        List<UUID> projectIds = projects.stream().map(Project::getProjectId).collect(Collectors.toList());
-        return this.jobDbRepository.findByProjectProjectIdInOrderByLastUpdatedAtDesc(projectIds)
+        return getJobDbEntitiesInProjects(projects)
             .stream()
             .map(JobAppEntity::createFromJob)
             .collect(Collectors.toList());
+    }
+
+    private List<JobDbEntity> getJobDbEntitiesInProjects(List<Project> projects){
+        List<UUID> projectIds = projects.stream().map(Project::getProjectId).collect(Collectors.toList());
+        return this.jobDbRepository.findByProjectProjectIdInOrderByLastUpdatedAtDesc(projectIds);
     }
 }

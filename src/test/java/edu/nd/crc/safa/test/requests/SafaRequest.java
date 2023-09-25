@@ -107,6 +107,10 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
     }
 
+    public <T> T postAndParseResponse(Object body, TypeReference<T> type) throws Exception {
+        return postWithResponseParser(body, resp -> this.jacksonParse(resp, type));
+    }
+
     public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
         return sendAuthenticatedRequest(
             put(this.buildEndpoint())
@@ -120,6 +124,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject putWithJsonObject(Object body) throws Exception {
         return putWithJsonObject(body, status().is2xxSuccessful());
+    }
+
+    public <T> T putAndParseResponse(Object body, TypeReference<T> type) throws Exception {
+        JSONObject result = putWithJsonObject(body);
+        return jacksonParse(result.toString(), type);
     }
 
     public <T> T postWithResponseParser(Object body,

@@ -20,6 +20,18 @@ public class OrganizationAppEntity {
     private List<TeamAppEntity> teams;
     private List<String> permissions;
 
+    /**
+     * This constructor sets the fields that are read by our creation/modification endpoints.
+     * It should only be used for testing
+     *
+     * @param name The name of the org
+     * @param description The org description
+     */
+    public OrganizationAppEntity(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     public OrganizationAppEntity(Organization organization, List<MembershipAppEntity> members,
                                  List<TeamAppEntity> teams, List<String> permissions) {
         this.id = organization.getId();

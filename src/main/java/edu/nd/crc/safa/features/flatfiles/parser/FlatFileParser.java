@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IDataFile;
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IProjectDefinitionParser;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -29,16 +29,16 @@ public class FlatFileParser {
     /**
      * List of trace generation requests.
      */
-    private TraceGenerationRequest traceGenerationRequest;
+    private TGenRequestAppEntity TGenRequestAppEntity;
 
     private IProjectDefinitionParser timParser;
 
     public FlatFileParser(IProjectDefinitionParser projectDefinitionParser) throws IOException {
         this.artifactFiles = projectDefinitionParser.parseArtifactFiles();
-        Pair<List<IDataFile<TraceAppEntity>>, TraceGenerationRequest> response =
+        Pair<List<IDataFile<TraceAppEntity>>, TGenRequestAppEntity> response =
             projectDefinitionParser.parseTraceFiles();
         this.traceFiles = response.getValue0();
-        this.traceGenerationRequest = response.getValue1();
+        this.TGenRequestAppEntity = response.getValue1();
         this.timParser = projectDefinitionParser;
     }
 

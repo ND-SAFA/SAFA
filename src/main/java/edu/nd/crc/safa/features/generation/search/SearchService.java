@@ -14,8 +14,8 @@ import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.generation.common.TraceLayer;
-import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
+import edu.nd.crc.safa.features.generation.tgen.TGenRequest;
+import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.graph.ArtifactNode;
 import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
@@ -97,8 +97,8 @@ public class SearchService {
         List<GenerationArtifact> generationArtifacts = artifacts.stream()
             .map(GenerationArtifact::new).collect(Collectors.toList());
         GenerationDataset dataset = new GenerationDataset(generationArtifacts, traceLayers);
-        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
-        TGenTraceGenerationResponse response = this.genApi.performSearch(payload, null);
+        TGenRequest payload = new TGenRequest(dataset);
+        TGenResponse response = this.genApi.performSearch(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
             .map(GenerationLink::getSource)

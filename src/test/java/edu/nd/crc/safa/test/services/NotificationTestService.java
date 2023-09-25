@@ -131,7 +131,7 @@ public class NotificationTestService {
      * @return The next message in the queue.
      * @throws InterruptedException If interrupted while polling for message.
      */
-    private String getMessageInQueue(String clientId) throws InterruptedException {
+    public String getMessageInQueue(String clientId) throws InterruptedException {
         return idToQueue.get(clientId).poll(Constants.TIME_TO_POLL_SECONDS, SECONDS);
     }
 

@@ -36,16 +36,17 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
     }
 
     @Test
-    public void testGetRepositories() throws Exception {
+    void testGetRepositories() throws Exception {
         enqueueResponse("repositories_response.json");
         enqueueResponse("repositories_continued.json");
         enqueueResponse("branches_continued.json");
 
         List<GithubRepositoryDTO> response = SafaRequest
             .withRoute(AppRoutes.Integrations.Github.Repos.ROOT)
-            .getAsType(new TypeReference<>(){});
+            .getAsType(new TypeReference<>() {
+            });
 
-        RecordedRequest recordedRequest = getMockWebServer().takeRequest();
+        RecordedRequest recordedRequest = getServer().takeRequest();
 
         assertEquals("POST", recordedRequest.getMethod());
         assertEquals("token " + accessToken, recordedRequest.getHeader(HttpHeaders.AUTHORIZATION));
@@ -81,9 +82,10 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
             .withRoute(AppRoutes.Integrations.Github.Repos.BY_OWNER_AND_NAME)
             .withOwner("owner")
             .withRepositoryName("name")
-            .getAsType(new TypeReference<>(){});
+            .getAsType(new TypeReference<>() {
+            });
 
-        RecordedRequest recordedRequest = getMockWebServer().takeRequest();
+        RecordedRequest recordedRequest = getServer().takeRequest();
 
         assertEquals("POST", recordedRequest.getMethod());
         assertEquals("token " + accessToken, recordedRequest.getHeader(HttpHeaders.AUTHORIZATION));

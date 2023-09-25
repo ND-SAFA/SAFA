@@ -54,6 +54,7 @@ import lombok.Setter;
  */
 public class GithubProjectCreationJob extends CommitJob {
 
+    protected static final int CREATE_PROJECT_STEP_NUM = 3;
     private final String[] DEFAULT_BRANCHES = {
         "master",
         "main",
@@ -62,50 +63,40 @@ public class GithubProjectCreationJob extends CommitJob {
         "prod",
         "production"
     };
-
     /**
      * Internal project identifier
      */
     @Getter(AccessLevel.PROTECTED)
     private final GithubIdentifier githubIdentifier;
-
+    private final SafaUser user;
+    private final GithubImportDTO importSettings;
     /**
      * Last commit for the repository we're pulling
      */
     private String commitSha;
-
     /**
      * Credentials used to pull GitHub data
      */
     @Getter(AccessLevel.PROTECTED)
     private GithubAccessCredentials credentials;
-
     /**
      * Repository pulled data
      */
     private Repository githubRepository;
-
     /**
      * Internal project representation
      */
     @Getter(AccessLevel.PROTECTED)
     @Setter(AccessLevel.PROTECTED)
     private GithubProject githubProject;
-
-    private GithubImportDTO importSettings;
-
-    private final SafaUser user;
-
     private Predicate<String> shouldImportPredicate;
 
-    protected static final int CREATE_PROJECT_STEP_NUM = 3;
-
-    public GithubProjectCreationJob(JobDbEntity jobDbEntity,
+    public GithubProjectCreationJob(SafaUser user,
+                                    JobDbEntity jobDbEntity,
                                     ServiceProvider serviceProvider,
                                     GithubIdentifier githubIdentifier,
-                                    GithubImportDTO githubImportDTO,
-                                    SafaUser user) {
-        super(jobDbEntity, serviceProvider);
+                                    GithubImportDTO githubImportDTO) {
+        super(user, jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
         this.githubIdentifier = githubIdentifier;
         this.user = user;
         this.importSettings = githubImportDTO;
@@ -192,9 +183,10 @@ public class GithubProjectCreationJob extends CommitJob {
         if (projectDescription == null) {
             projectDescription = projectName;
         }
-
-        ProjectVersion projectVersion = createProject(user, projectName, projectDescription);
+        createProjectAndCommit(this.user, projectName, projectDescription);
+        ProjectVersion projectVersion = getProjectVersion();
         this.githubIdentifier.setProjectVersion(projectVersion);
+        linkProjectToJob(projectVersion.getProject());
 
         Project project = projectVersion.getProject();
         logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());

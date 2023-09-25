@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @AllArgsConstructor
 @Data
-public class TGenPredictionRequestDTO {
+public class TGenRequest {
     /**
      * Dataset containing artifacts to predict trace links against.
      */

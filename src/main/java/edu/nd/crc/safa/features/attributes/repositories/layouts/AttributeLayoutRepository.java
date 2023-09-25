@@ -10,4 +10,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface AttributeLayoutRepository extends CrudRepository<AttributeLayout, UUID> {
     List<AttributeLayout> findByProject(Project project);
+
+    List<AttributeLayout> findByProjectAndIdIn(Project project, List<UUID> ids);
 }

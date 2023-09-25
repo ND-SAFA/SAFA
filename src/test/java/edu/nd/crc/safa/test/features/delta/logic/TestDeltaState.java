@@ -31,7 +31,6 @@ class TestDeltaState extends AbstractDeltaTest {
      */
     @Test
     void testDeltaStateInDefaultProject() throws Exception {
-
         // VP - Verify that # of entities in before version
         List<ArtifactVersion> originalBodies = this.artifactVersionRepository.findByProjectVersion(beforeVersion);
         assertThat(originalBodies).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);

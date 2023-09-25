@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TGenPromptResponse implements ITGenResponse {
+public class PromptResponse implements ITGenResponse {
     /**
      * The completion to prompt.
      */

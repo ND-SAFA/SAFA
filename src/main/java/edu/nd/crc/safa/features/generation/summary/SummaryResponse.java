@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
-public class TGenSummaryResponse implements ITGenResponse {
+public class SummaryResponse implements ITGenResponse {
     /**
      * The content sent to summarize.
      */

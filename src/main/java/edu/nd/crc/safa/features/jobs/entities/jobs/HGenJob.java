@@ -4,19 +4,16 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
-import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.StringUtil;
 
 /**
  * Generates trace links between artifacts defined in request.
  */
-public class HGenJob extends CommitJob {
+public class HGenJob extends GenerationJob {
     /**
      * The request to generate trace links.
      */
@@ -26,11 +23,12 @@ public class HGenJob extends CommitJob {
      */
     private final ProjectVersion projectVersion;
 
-    public HGenJob(JobDbEntity jobDbEntity,
+    public HGenJob(SafaUser user,
+                   JobDbEntity jobDbEntity,
                    ServiceProvider serviceProvider,
                    ProjectCommitDefinition projectCommitDefinition,
                    HGenRequest hGenRequest) {
-        super(jobDbEntity, serviceProvider, projectCommitDefinition);
+        super(user, jobDbEntity, serviceProvider, projectCommitDefinition);
         this.hGenRequest = hGenRequest;
         this.projectVersion = projectCommitDefinition.getCommitVersion();
     }
@@ -40,18 +38,7 @@ public class HGenJob extends CommitJob {
         return String.format("Generating artifacts: %s", result);
     }
 
-    @IJobStep(value = "Summarizing Project", position = 1)
-    public void summarizeProject() {
-        Project project = this.projectVersion.getProject();
-        ProjectSummaryService service = this.getServiceProvider().getProjectSummaryService();
-        ProjectAppEntity projectAppEntity =
-            this.getServiceProvider().getProjectRetrievalService().getProjectAppEntity(
-                this.getJobDbEntity().getUser(),
-                this.projectVersion);
-        service.generateProjectSummary(project, projectAppEntity.getArtifacts(), this.getDbLogger());
-    }
-
-    @IJobStep(value = "Generating Artifacts", position = 2)
+    @IJobStep(value = "Generating Artifacts", position = 3)
     public void generatingArtifacts() {
         HGenService hGenService = this.getServiceProvider().getHGenService();
         String summary = this.projectVersion.getProject().getSpecification();

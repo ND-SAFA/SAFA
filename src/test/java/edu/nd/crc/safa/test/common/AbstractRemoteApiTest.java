@@ -1,42 +1,60 @@
 package edu.nd.crc.safa.test.common;
 
 import java.io.IOException;
-import java.util.Queue;
+
+import edu.nd.crc.safa.test.server.SafaMockServer;
 
 import lombok.Getter;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.QueueDispatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.TestInstance;
 
-public abstract class AbstractRemoteApiTest extends ApplicationBaseTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public abstract class AbstractRemoteApiTest<T extends SafaMockServer> extends ApplicationBaseTest {
     @Getter
-    private static MockWebServer mockWebServer;
+    private T server;
 
-    @Getter
-    private static String remoteApiUrl;
-
+    /**
+     * Creates the common server and starts it.
+     */
     @BeforeAll
-    public static void setupWebServer() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-
-        remoteApiUrl = String.format("http://localhost:%s", mockWebServer.getPort());
+    public void initSuite() {
+        server = createServer();
+        server.start();
     }
 
+    /**
+     * Clears the response queue before each test.
+     */
     @BeforeEach
     public void clearWebServerQueue() {
-        QueueDispatcher dispatcher = (QueueDispatcher) mockWebServer.getDispatcher();
-        Queue<MockResponse> responseQueue = (Queue<MockResponse>) ReflectionTestUtils.getField(dispatcher, "responseQueue");
-        assert responseQueue != null;
-        responseQueue.clear();
+        server.clear();
     }
 
+    /**
+     * Stops server after all tests have finished.
+     *
+     * @throws IOException If error occurs during shutdown.
+     */
     @AfterAll
-    public static void teardownWebServer() throws IOException {
-        mockWebServer.shutdown();
+    public void teardownWebServer() throws IOException {
+        server.stop();
+    }
+
+    /**
+     * @return Returns the path to server URL.
+     */
+    public String getRemoteApiUrl() {
+        return server.getRemoteApiUrl();
+    }
+
+    /**
+     * Creates server instance. Used to override with different types of servers.
+     *
+     * @return The server to use in test.
+     */
+    public T createServer() {
+        return (T) new SafaMockServer();
     }
 }

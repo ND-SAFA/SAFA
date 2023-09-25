@@ -18,4 +18,6 @@ public interface TraceMatrixRepository extends CrudRepository<TraceMatrixEntry, 
     Optional<TraceMatrixEntry> getById(UUID id);
 
     List<TraceMatrixEntry> getByProjectVersion(ProjectVersion projectVersion);
+
+    List<TraceMatrixEntry> getByProjectVersionAndIdIn(ProjectVersion projectVersion, List<UUID> ids);
 }

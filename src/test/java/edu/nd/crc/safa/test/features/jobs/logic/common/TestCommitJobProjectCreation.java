@@ -19,13 +19,13 @@ import lombok.Setter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class TestCommitJobProjectCreation extends ApplicationBaseTest {
+class TestCommitJobProjectCreation extends ApplicationBaseTest {
 
     @Autowired
     ProjectMembershipService projectMemberService;
 
     @Test
-    public void testCommitIntoExistingProject() throws Exception {
+    void testCommitIntoExistingProject() throws Exception {
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
 
@@ -41,7 +41,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
     }
 
     @Test
-    public void testFailedCommitIntoExistingProject() throws Exception {
+    void testFailedCommitIntoExistingProject() throws Exception {
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
 
@@ -57,7 +57,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
     }
 
     @Test
-    public void testCommitIntoNewProject() throws Exception {
+    void testCommitIntoNewProject() throws Exception {
         DummyCommitJobBuilder jobBuilder =
             new DummyCommitJobBuilder(serviceProvider, null, currentUser, true, false);
         JobAppEntity result = jobBuilder.perform();
@@ -70,7 +70,9 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
     }
 
     @Test
-    public void testFailedCommitIntoNewProject() throws Exception {
+    void testFailedCommitIntoNewProject() throws Exception {
+        assertEquals(0, projectMemberService.getProjectsForUser(currentUser).size());
+
         DummyCommitJobBuilder jobBuilder =
             new DummyCommitJobBuilder(serviceProvider, null, currentUser, true, true);
         JobAppEntity result = jobBuilder.perform();
@@ -90,23 +92,21 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         @Setter
         boolean allowProjectCreation = false;
 
-        SafaUser newProjectOwner;
+        SafaUser user;
 
-        protected DummyCommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
-                                 ProjectCommitDefinition projectCommitDefinition, SafaUser newProjectOwner) {
-            super(jobDbEntity, serviceProvider);
-            this.newProjectOwner = newProjectOwner;
+        protected DummyCommitJob(SafaUser user,
+                                 JobDbEntity jobDbEntity,
+                                 ServiceProvider serviceProvider,
+                                 ProjectCommitDefinition projectCommitDefinition) {
+            super(user, jobDbEntity, serviceProvider, projectCommitDefinition, true);
             setProjectCommitDefinition(projectCommitDefinition);
+            this.user = user;
         }
 
-        @IJobStep(value = "", position = 1)
+        @IJobStep(value = "Creation Optional Project", position = 1)
         public void makeProject() {
-            if (getProjectCommitDefinition() == null) {
-                if (allowProjectCreation) {
-                    createProject(newProjectOwner, "test project name", "test project desc");
-                } else {
-                    throw new AssertionError("Not allowed to create a new project");
-                }
+            if (allowProjectCreation) {
+                createProjectAndCommit(this.user, "test project name", "test project desc");
             }
         }
 
@@ -120,9 +120,9 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
 
     private static class DummyCommitJobBuilder extends AbstractJobBuilder {
 
-        private final ProjectCommitDefinition commit;
         private final boolean allowProjectCreation;
         private final boolean fail;
+        private ProjectCommitDefinition commit;
 
         public DummyCommitJobBuilder(ServiceProvider serviceProvider,
                                      ProjectCommitDefinition commit,
@@ -130,7 +130,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
                                      boolean allowProjectCreation,
                                      boolean fail) {
 
-            super(serviceProvider, user);
+            super(user, serviceProvider);
             this.commit = commit;
             this.allowProjectCreation = allowProjectCreation;
             this.fail = fail;
@@ -138,8 +138,13 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
 
         @Override
         public AbstractJob constructJobForWork() {
-            DummyCommitJob job = new DummyCommitJob(this.getJobDbEntity(), this.getServiceProvider(),
-                this.commit, this.getUser());
+            if (this.commit == null) {
+                this.commit = new ProjectCommitDefinition();
+            }
+            DummyCommitJob job = new DummyCommitJob(getUser(),
+                this.getJobDbEntity(),
+                this.getServiceProvider(),
+                this.commit);
             job.setAllowProjectCreation(allowProjectCreation);
             job.setFailStep(fail);
             return job;

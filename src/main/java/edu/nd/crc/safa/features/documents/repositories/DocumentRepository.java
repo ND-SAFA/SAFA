@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface DocumentRepository extends CrudRepository<Document, UUID> {
 
     List<Document> findByProject(Project project);
+
+    List<Document> findByProjectAndDocumentIdIn(Project project, List<UUID> entityIds);
 }

@@ -11,7 +11,7 @@ import lombok.Data;
  * Output of predicting trace links.
  */
 @Data
-public class TGenTraceGenerationResponse implements ITGenResponse {
+public class TGenResponse implements ITGenResponse {
     /**
      * List of links with their predicted similarity score.
      */

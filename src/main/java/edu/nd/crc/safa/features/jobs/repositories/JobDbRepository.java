@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface JobDbRepository extends CrudRepository<JobDbEntity, UUID> {
 
     List<JobDbEntity> findByUserOrderByLastUpdatedAtDesc(SafaUser user);
+
+    List<JobDbEntity> findByProjectProjectIdInOrderByLastUpdatedAtDesc(List<UUID> completedEntityIds);
 }

@@ -120,11 +120,9 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public Optional<ArtifactVersion> findExistingVersionEntity(ArtifactVersion artifactVersion) {
-        Optional<ArtifactVersion> version = this.artifactVersionRepository
-            .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
-        version.ifPresent(attributeValueService::attachCustomAttributesToArtifact);
-        return version;
+    public Optional<ArtifactVersion> queryVersionEntity(ArtifactVersion artifactVersion) {
+        return this.artifactVersionRepository.findByProjectVersionAndArtifactName(
+            artifactVersion.getProjectVersion(), artifactVersion.getName());
     }
 
     @Override
@@ -159,6 +157,7 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
+        attributeValueService.attachCustomAttributesToArtifact(artifactVersion);
 
         ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
             artifactVersion.getArtifact().getArtifactId(),

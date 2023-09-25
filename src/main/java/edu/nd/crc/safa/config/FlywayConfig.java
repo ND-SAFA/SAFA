@@ -28,7 +28,7 @@ public class FlywayConfig {
             .configure()
             .dataSource(dataSource)
             .baselineOnMigrate(baselineOnMigrate)
-            .outOfOrder(true)
+            .outOfOrder(false)
             .placeholders(flywayPlaceholders())
             .load();
 

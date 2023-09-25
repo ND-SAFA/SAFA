@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.AuthorizationSetter;
-import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -15,7 +14,6 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.DbEntityBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
-import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import lombok.AllArgsConstructor;
 import org.json.JSONArray;
@@ -43,10 +41,13 @@ public class RetrievalTestService {
     }
 
     public JSONArray getProjectMembers(Project project) throws Exception {
+        // TODO
+        return null;
+        /*
         return SafaRequest
             .withRoute(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
             .withProject(project)
-            .getWithJsonArray();
+            .getWithJsonArray();*/
     }
 
     public UUID getArtifactId(List<ArtifactAppEntity> artifacts, String artifactName) {

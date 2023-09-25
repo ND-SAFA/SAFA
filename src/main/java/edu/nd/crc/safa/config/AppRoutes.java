@@ -160,9 +160,6 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {
-            public static final String ADD_PROJECT_MEMBER = ROOT + "/{projectId}/members";
-            public static final String GET_PROJECT_MEMBERS = ROOT + "/{projectId}/members";
-            public static final String DELETE_PROJECT_MEMBERSHIP = ROOT + "/members/{projectMembershipId}";
             public static final String GET_USER_PROJECTS = ROOT;
         }
 

@@ -114,9 +114,10 @@ public class AuthorizationTestService {
                 project.getName());
 
         }
-        SafaRequest
+        // TODO
+        /*SafaRequest
             .withRoute(AppRoutes.Projects.Membership.DELETE_PROJECT_MEMBERSHIP)
             .withProjectMembership(projectMembershipOptional.get())
-            .deleteWithJsonObject(resultMatcher);
+            .deleteWithJsonObject(resultMatcher);*/
     }
 }

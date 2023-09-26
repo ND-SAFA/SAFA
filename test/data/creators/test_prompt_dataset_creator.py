@@ -38,6 +38,9 @@ class TestPromptDatasetCreator(BaseTest):
             self.artifact_df = artifact_df
             self.project_path = os.path.join(TEST_OUTPUT_DIR, "prompt_dataset_creator")
 
+        def get_project_path(self):
+            return self.project_path
+
         def read_project(self):
             return self.artifact_df
 

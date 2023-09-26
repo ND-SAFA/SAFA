@@ -26,16 +26,18 @@ class AbstractProjectReader(BaseObject, ABC, Generic[ProjectData]):
         :param overrides: The overrides to apply to project creator.
         """
         self.project_path = project_path
-        self.project_path = self.get_project_path()
+        self.project_path = project_path
         self.overrides = overrides if overrides else {}
         self.summarizer: Optional[ArtifactsSummarizer] = None
 
-    def get_project_path(self) -> str:
+    def get_full_project_path(self) -> str:
         """
         Gets the project path for the reader
         :return: the project path
         """
-        return FileUtil.expand_paths_in_dictionary(self.project_path, FileUtil.get_env_replacements(ENV_REPLACEMENT_VARIABLES))
+        if self.project_path:
+            return FileUtil.expand_paths(self.project_path)
+        return self.project_path
 
     @abstractmethod
     def read_project(self) -> ProjectData:

@@ -86,14 +86,27 @@ class State(BaseObject):
 
         try:
             save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
-            as_dict = {k: (v.as_creator(self._get_path_to_state_checkpoint(self.export_dir), k)
+            as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self._get_path_to_state_checkpoint(self.export_dir)), k)
                            if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()}
-            YamlUtil.write(as_dict, save_path)
+            collapsed_paths = self.collapse_paths(as_dict)
+            YamlUtil.write(collapsed_paths, save_path)
             logger.info(f"Saved state to {save_path}")
             return True
         except Exception:
             logger.exception("Unable to save current state.")
             return False
+
+    @staticmethod
+    def collapse_paths(as_dict: Dict) -> Dict:
+        """
+        Collapses all path variables in the dictionary of vars
+        :param as_dict: The vars dictionary
+        :return: The dictionary with collapsed paths
+        """
+        output = {}
+        for k, v in as_dict.items():
+            output[k] = FileUtil.collapse_paths(v) if "path" in k or "dir" in k else v
+        return output
 
     @classmethod
     def load_latest(cls, load_dir: str, step_names: List[str]) -> "State":

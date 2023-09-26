@@ -1,6 +1,7 @@
 import os
 
 from test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
+from tgen.common.constants.path_constants import PROJ_PATH
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
@@ -102,3 +103,45 @@ class TestFileUtil(BaseTest):
         dirname = FileUtil.get_directory_path(expected_dirname)  # no filename
         self.assertEqual(dirname, expected_dirname)
 
+    def test_expand_paths(self):
+        expected_path = f"{os.path.dirname(PROJ_PATH)}/test/util/test_file_util.py"
+        replacement_var = "[replacement]"
+        replacements_relative = {replacement_var: ".."}
+        relative_path = f"{replacement_var}/test/util/test_file_util.py"
+        expanded_path_relative = FileUtil.expand_paths(relative_path, replacements_relative)
+        self.assertEqual(expected_path, expanded_path_relative)
+
+        user_path = os.path.expanduser('~')
+        without_user_path = expected_path.replace(user_path, "~")
+        expanded_path_user = FileUtil.expand_paths(without_user_path)
+        self.assertEqual(expanded_path_user, expected_path)
+
+        replacements = {"[replacement1]": "hi", "[replacement2]": "hola"}
+        path_list = ["[replacement1]/one.txt", "[replacement2]/two.txt"]
+        paths_dict = {i: path for i, path in enumerate(path_list)}
+        for iterable_paths in [path_list, paths_dict]:
+            expanded_path_iter = FileUtil.expand_paths(iterable_paths, replacements)
+            self.assertTrue(expanded_path_iter[0].startswith(os.path.join(PROJ_PATH, "hi")))
+            self.assertTrue(expanded_path_iter[1].startswith(os.path.join(PROJ_PATH, "hola")))
+
+        self.assertEqual(expected_path, FileUtil.expand_paths(expected_path))
+
+    def test_order_paths_by_least_to_most_overlap(self):
+        paths = ["root/path1", "root/path1/path2", "unrelated/path1", "root/other", "root", "unrelated"]
+        expected_order = ['root', 'root/path1', 'root/path1/path2', 'root/other', 'unrelated', 'unrelated/path1']
+        orderings = FileUtil.order_paths_by_overlap(paths)
+        self.assertListEqual(expected_order, orderings)
+
+    def test_collapse_paths(self):
+        expanded_path = f"{os.path.dirname(PROJ_PATH)}/test/util/test_file_util.py"
+        relative_path = f"../test/util/test_file_util.py"
+        collapsed_path_relative = FileUtil.collapse_paths(expanded_path)
+        self.assertEqual(relative_path, collapsed_path_relative)
+
+        replacements = {"[path1]": "root/path1",
+                        "[path2]": "unrelated/path1",
+                        "[ROOT]": "root"}
+        paths = ["root/path1/code.py", "unrelated/path1/text.txt"]
+        collapsed_paths = FileUtil.collapse_paths(paths, replacements)
+        expanded_paths = ['[path1]/code.py', '[path2]/text.txt']
+        self.assertListEqual(collapsed_paths, expanded_paths)

@@ -3,6 +3,7 @@ from abc import abstractmethod
 from typing import Type
 
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
@@ -29,9 +30,8 @@ class AbstractDatasetExporter(BaseObject):
         :param export_path: New path to export to
         :return: Export path
         """
-        self.export_path = export_path
-        path, file_extension = os.path.splitext(self.export_path)
-        export_path = self.export_path if not file_extension else os.path.dirname(path)
+        self.export_path = FileUtil.expand_paths(export_path)
+        export_path = FileUtil.get_directory_path(self.export_path)
         os.makedirs(export_path, exist_ok=True)
         return self.export_path
 

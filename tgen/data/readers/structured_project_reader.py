@@ -58,7 +58,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         if self._definition is None:
             self.definition_reader = self.get_definition_reader()
-            self._definition = self.definition_reader.read_project_definition(self.get_project_path())
+            self._definition = self.definition_reader.read_project_definition(self.get_full_project_path())
         return self._definition
 
     def get_project_conversions(self) -> Dict:
@@ -74,7 +74,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         :return: Returns the name of the project directory.
         """
-        return FileUtil.get_file_name(self.get_project_path())
+        return FileUtil.get_file_name(self.get_full_project_path())
 
     def read_artifact_df(self) -> pd.DataFrame:
         """
@@ -84,7 +84,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         artifact_df = ArtifactDataFrame()
         artifact_definitions = self._get_artifact_definitions()
         for artifact_type, artifact_definition in artifact_definitions.items():
-            artifact_reader = EntityReader(self.get_project_path(),
+            artifact_reader = EntityReader(self.get_full_project_path(),
                                            artifact_definition,
                                            conversions=self.get_project_conversions())
             artifact_type_df = artifact_reader.read_entities()
@@ -102,7 +102,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         trace_links = TraceDataFrame()
         for _, trace_definition_json in self._get_trace_definitions().items():
-            trace_reader = EntityReader(self.get_project_path(), trace_definition_json,
+            trace_reader = EntityReader(self.get_full_project_path(), trace_definition_json,
                                         conversions=self.get_project_conversions())
             trace_links = pd.concat([trace_links, trace_reader.read_entities()], ignore_index=True)
         trace_links[StructuredKeys.Trace.LABEL.value] = [1 for link in trace_links.index]
@@ -147,8 +147,8 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         If tim.json file exists in project, then TimProjectDefinition is returned. Otherwise, StructuredProjectDefinition is returned.
         :return: AbstractProjectDefinition corresponding to definition file found.
         """
-        tim_path = os.path.join(self.get_project_path(), SafaKeys.TIM_FILE)
-        structure_definition_path = os.path.join(self.get_project_path(), StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
+        tim_path = os.path.join(self.get_full_project_path(), SafaKeys.TIM_FILE)
+        structure_definition_path = os.path.join(self.get_full_project_path(), StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
         if os.path.exists(tim_path):
             return TimProjectDefinition()
         elif os.path.exists(structure_definition_path):
@@ -156,4 +156,4 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         else:
             required_paths = [tim_path, structure_definition_path]
             if raise_exception:
-                raise ValueError(f"{self.get_project_path()} does not contain: {required_paths}")
+                raise ValueError(f"{self.get_full_project_path()} does not contain: {required_paths}")

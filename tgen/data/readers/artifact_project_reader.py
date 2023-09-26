@@ -35,8 +35,8 @@ class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
             self.structured_project_reader.get_project_definition()
             artifact_df = self.structured_project_reader.read_artifact_df()
         else:
-            if not self.get_project_path().endswith(FileUtil.CSV_EXT):
-                self.project_path = os.path.join(self.get_project_path(), ARTIFACT_FILE_NAME)
+            if not self.get_full_project_path().endswith(FileUtil.CSV_EXT):
+                self.project_path = os.path.join(self.get_full_project_path(), ARTIFACT_FILE_NAME)
             artifact_df = ArtifactDataFrame(pd.read_csv(self.project_path))
         filtered_artifacts = [artifact_id for artifact_id in artifact_df.index if artifact_id not in artifact_df.index]
         if len(filtered_artifacts) >= 1:

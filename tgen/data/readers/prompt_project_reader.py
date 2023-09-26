@@ -25,7 +25,7 @@ class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):
         Reads project data from files.
         :return: Returns the data frames containing the project artifacts.
         """
-        prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(self.get_project_path()))
+        prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(self.get_full_project_path()))
         if self.summarizer is not None:
             prompt_df[PromptKeys.PROMPT.value] = self.summarizer.summarize_dataframe(prompt_df, PromptKeys.PROMPT.value)
         return prompt_df
@@ -35,4 +35,4 @@ class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):
         Gets the name of the project being read.
         :return:  Returns the name of the project being read.
         """
-        return FileUtil.get_file_name(self.get_project_path())
+        return FileUtil.get_file_name(self.get_full_project_path())

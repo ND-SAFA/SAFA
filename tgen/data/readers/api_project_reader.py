@@ -38,8 +38,8 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Extracts artifacts and trace links from API payload.
         :return: Artifacts, Traces, and Layer Mappings.
         """
-        if self.get_project_path():
-            api_dict = JsonUtil.read_json_file(self.get_project_path())
+        if self.get_full_project_path():
+            api_dict = JsonUtil.read_json_file(self.get_full_project_path())
             self.api_definition = ApiDefinition.from_dict(**api_dict)
         artifact_df = self.create_artifact_df()
         layer_mapping_df = self.create_layer_df()

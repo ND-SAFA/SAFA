@@ -161,7 +161,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         load_path = input("Enter the path to the new state or press 'b' to go back to the menu: \n").strip()
         if load_path.lower() == "b":
             return None
-        load_path = FileUtil.pre_process_path(load_path)
+        load_path = FileUtil.expand_paths(load_path)
         if not os.path.exists(load_path):
             print(f"File not found: {load_path}")
             return AbstractPipeline._load_new_state_from_user(state)

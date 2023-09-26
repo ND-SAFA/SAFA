@@ -43,11 +43,11 @@ class TestPromptDataset(BaseTest):
     def test_as_creator(self):
         datasets = self.get_prompt_datasets()
         artifact_dataset = datasets["artifact"]
-        creator = artifact_dataset.as_creator(TEST_OUTPUT_DIR)
+        creator = artifact_dataset.as_creator(TEST_OUTPUT_DIR, "dir1")
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(artifact_dataset.artifact_df.index))
         trace_dataset = datasets["dataset"]
-        creator = trace_dataset.as_creator(TEST_OUTPUT_DIR)
+        creator = trace_dataset.as_creator(TEST_OUTPUT_DIR,  "dir2")
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
         for i, link in trace_dataset.trace_dataset.trace_df.itertuples():

@@ -127,7 +127,7 @@ class PromptDataset(iDataset):
             self.prompt_df = PromptDataFrame(prompt_entries)
         return self.prompt_df
 
-    def as_creator(self, project_path: str, dataset_dirname: str = None):
+    def as_creator(self, project_path: str, dataset_dirname: str):
         """
         Converts the dataset into a creator that can remake it
         :param project_path: The path to save the dataset at for reloading
@@ -136,7 +136,6 @@ class PromptDataset(iDataset):
         """
         from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
         from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-        dataset_dirname = DateTimeUtil.now_as_string() if not dataset_dirname else dataset_dirname
         project_path = os.path.join(project_path, dataset_dirname)
         PromptDatasetExporter(export_path=project_path, trace_dataset_exporter_type=SafaExporter, dataset=self).export()
         if self.trace_dataset is not None:

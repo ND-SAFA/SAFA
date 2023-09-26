@@ -116,7 +116,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         :return: The project path
         """
         project_reader = self.trace_dataset_creator.project_reader if self.trace_dataset_creator else self.project_reader
-        project_path = project_reader.project_path if project_reader else EMPTY_STRING
+        project_path = project_reader.get_project_path() if project_reader else EMPTY_STRING
         return project_path
 
     def get_name(self) -> str:

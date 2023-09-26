@@ -35,7 +35,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         all_generation_predictions = deepcopy(state.generation_predictions)
         refined_content = deepcopy(state.generation_predictions)
         generate_artifact_content_step = GenerateArtifactContentStep()
-        for i in tqdm(range(max(state.n_generations, 1) + 1, args.n_reruns + 1),
+        for i in tqdm(range(max(state.n_generations, 1), args.n_reruns + 1),
                       desc=f"Re-running generations of {args.target_type}s"):
             generate_artifact_content_step.run(args, state, re_run=True)
             all_generation_predictions.update(state.generation_predictions)
@@ -47,14 +47,14 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     @staticmethod
     def perform_refinement(hgen_args: HGenArgs,
-                           generated_artifact_content: Dict[str, List[str]],
+                           new_generated_artifact_content: Dict[str, List[str]],
                            refined_artifact_content: Dict[str, List[str]],
                            summary: str,
                            export_path: str) -> Dict[str, List[str]]:
         """
         Performs the refinement of the original generated artifact content
         :param hgen_args: The arguments for the hierarchy generation
-        :param generated_artifact_content: The content originally generated
+        :param new_generated_artifact_content: The content originally generated
         :param refined_artifact_content: The artifact content that was selected from previous runs
         :param summary: The summary of the system
         :param export_path: The path to export the checkpoint to
@@ -73,7 +73,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                     build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                                     include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                                     starting_num=len(refined_artifact_content) + 1) \
-                .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in generated_artifact_content.keys()])
+                .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in new_generated_artifact_content.keys()])
             prompt_builder.add_prompt(Prompt(refined_artifacts), -1)
             artifacts = create_artifact_df_from_generated_artifacts(hgen_args,
                                                                     artifact_generations=list(refined_artifact_content.keys()),
@@ -90,7 +90,8 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                      export_path=os.path.join(export_path, "gen_refinement_response.yaml"))[0]
             selected_artifact_nums = set(selected_artifact_nums)
             selected_artifacts = RefineGenerationsStep._get_selected_artifacts(refined_artifact_content, selected_artifact_nums)
-            selected_artifacts.update(RefineGenerationsStep._get_selected_artifacts(generated_artifact_content, selected_artifact_nums,
+            selected_artifacts.update(RefineGenerationsStep._get_selected_artifacts(new_generated_artifact_content,
+                                                                                    selected_artifact_nums,
                                                                                     offset=len(refined_artifact_content)))
 
         except Exception as e:

@@ -38,7 +38,7 @@ class HGenTestConstants:
                     "As a game developer, I want an Image class to load image files as textures using "
                     "STB Image, so that I can apply detailed textures to 3D models."]
     code_files = [["/Player.cpp"], ["/Rendering/RenderEngine.cpp"], ["/Rendering/Image.cpp", "/Rendering/stb_image.cpp"]]
-
+    n_reruns = 2
 
 def get_generated_artifacts_response(contents=None, sources=None, target_type="user-story", source_type="code"):
     if contents is None:
@@ -47,7 +47,7 @@ def get_generated_artifacts_response(contents=None, sources=None, target_type="u
         sources = HGenTestConstants.code_files
     contents = deepcopy(contents)
     for i, content in enumerate(contents):
-        source = sources[i % len(HGenTestConstants.code_files)]
+        source = sources[i % len(sources)]
         content += PromptUtil.create_xml(source_type, COMMA.join(source))
         contents[i] = content
     response = PromptUtil.create_xml("summary", HGenTestConstants.summary)
@@ -86,8 +86,10 @@ def get_all_responses(content=None, target_type="User Story", sources=None, sour
     return step4[1], step2 + step3 + step4[-1]
 
 
-def get_test_hgen_args():
+def get_test_hgen_args(test_refinement: bool = False):
     return lambda: HGenArgs(source_layer_id="C++ Code",
                             target_type="Test User Story",
+                            optimize_with_reruns=test_refinement,
+                            n_reruns=HGenTestConstants.n_reruns,
                             dataset_creator_for_sources=PromptDatasetCreator(
                                 trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))

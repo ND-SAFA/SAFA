@@ -9,6 +9,7 @@ from test.hgen.hgen_test_utils import get_test_hgen_args, get_name_responses, ge
     get_ranking_job_result
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerKeys
@@ -41,7 +42,7 @@ class TestHierarchyGenerator(BaseTest):
     @mock_anthropic
     def test_run(self, anthropic_ai_manager: TestAIManager):
         anthropic_ai_manager.mock_summarization()
-        self.HGEN_ARGS = get_test_hgen_args()()
+        self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
         self.HGEN_STATE.export_dir = self.HGEN_ARGS.export_dir
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
@@ -76,7 +77,7 @@ class TestHierarchyGenerator(BaseTest):
 
     @mock.patch.object(ProjectSummarizer, "summarize")
     @mock_anthropic
-    def assert_initialize_dataset_step(self, anthropic_ai_manager: TestAIManager,  project_summarizer_mock: MagicMock,):
+    def assert_initialize_dataset_step(self, anthropic_ai_manager: TestAIManager, project_summarizer_mock: MagicMock, ):
         # contains a project summary but no artifact summaries so artifacts are summarized while project is not
         anthropic_ai_manager.mock_summarization()
         orig_dataset = self.HGEN_ARGS.dataset_creator_for_sources.create()
@@ -118,8 +119,22 @@ class TestHierarchyGenerator(BaseTest):
 
     @mock_anthropic
     def assert_refined_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
-        # TODO
+        refined_user_stories1 = ["#1" + us for us in HGenTestConstants.user_stories]
+        refined_user_stories2 = ["#2" + us for us in HGenTestConstants.user_stories]
+        refine_response1 = [PromptUtil.create_xml("selected-artifacts", "1,5,6")]  # orig content no. 1 and refined us #1 no. 2,3
+        refine_response2 = [PromptUtil.create_xml("selected-artifacts", "1,2,6")]  # orig content no. 1, refined no. 2 (#1) and 3 (#2)
+        anthropic_ai_manager.set_responses(get_generated_artifacts_response(contents=refined_user_stories1)
+                                           + refine_response1
+                                           + get_generated_artifacts_response(contents=refined_user_stories2)
+                                           + refine_response2
+                                           )
         RefineGenerationsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
+        us1 = HGenTestConstants.user_stories[0]
+        us2 = refined_user_stories1[1]
+        us3 = refined_user_stories2[2]
+        for i, us in enumerate([us1, us2, us3]):
+            self.assertIn(us, self.HGEN_STATE.refined_content)
+            self.assertEqual(self.HGEN_STATE.refined_content[us], HGenTestConstants.code_files[i])
 
     @mock_anthropic
     @mock.patch.object(RankingJob, "run")

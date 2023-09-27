@@ -1,4 +1,4 @@
-_checkpoint_dir: state_checkpoints
+_CHECKPOINT_DIRNAME: state_checkpoints
 all_generated_content: &id001
   ? As a game developer, I want a Player class to store player state, apply movement,
     handle collisions, perform raycasting for block selection, and render the player,

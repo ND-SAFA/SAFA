@@ -10,7 +10,7 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
-from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -27,7 +27,9 @@ class State(BaseObject):
 
     export_dir: str = EMPTY_STRING
 
-    _checkpoint_dir: str = "state_checkpoints"
+    _CHECKPOINT_DIRNAME: str = "state_checkpoints"
+
+    _PATH_TERMS = {"path", "dir", "directory"}
 
     def __post_init__(self):
         """
@@ -96,8 +98,8 @@ class State(BaseObject):
             logger.exception("Unable to save current state.")
             return False
 
-    @staticmethod
-    def collapse_paths(as_dict: Dict) -> Dict:
+    @classmethod
+    def collapse_paths(cls, as_dict: Dict) -> Dict:
         """
         Collapses all path variables in the dictionary of vars
         :param as_dict: The vars dictionary
@@ -105,7 +107,8 @@ class State(BaseObject):
         """
         output = {}
         for k, v in as_dict.items():
-            output[k] = FileUtil.collapse_paths(v) if "path" in k or "dir" in k else v
+            should_collapse = not ReflectionUtil.is_function(v) and cls._is_a_path_variable(k)
+            output[k] = FileUtil.collapse_paths(v) if should_collapse else v
         return output
 
     @classmethod
@@ -149,6 +152,19 @@ class State(BaseObject):
                 raise e
             return e
 
+    @staticmethod
+    def _is_a_path_variable(varname: str) -> bool:
+        """
+        Returns True if the variable name contains a path term, suggesting it is intended to be a a path
+        :param varname: The variable name
+        :return: True if it contains a path term
+        """
+        snake_case_separated = varname.split(UNDERSCORE)
+        for path_term in State._PATH_TERMS:
+            if path_term in snake_case_separated:
+                return True
+        return False
+
     @classmethod
     def _check_type(cls, name: str, val: Any, param_specs: ParamSpecs) -> Any:
         """
@@ -175,8 +191,8 @@ class State(BaseObject):
         :param run_num: The number of times the step has been run
         :return: The path to the checkpoint for the state corresponding to the given step name
         """
-        if os.path.split(directory)[-1] != State._checkpoint_dir:
-            directory = os.path.join(directory, State._checkpoint_dir)
+        if os.path.split(directory)[-1] != State._CHECKPOINT_DIRNAME:
+            directory = os.path.join(directory, State._CHECKPOINT_DIRNAME)
         FileUtil.create_dir_safely(directory)
         if not step_name:
             return directory

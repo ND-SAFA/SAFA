@@ -1,4 +1,4 @@
-_checkpoint_dir: state_checkpoints
+_CHECKPOINT_DIRNAME: state_checkpoints
 all_generated_content: null
 completed_steps:
   InitializeDatasetStep: 1

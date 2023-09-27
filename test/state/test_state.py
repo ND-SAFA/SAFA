@@ -4,10 +4,12 @@ from unittest.mock import MagicMock
 
 from test.hgen.hgen_test_utils import HGenTestConstants
 from tgen.common.util.param_specs import ParamSpecs
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.delta.delta_state import DeltaState
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
@@ -17,6 +19,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_STATE_PATH
+from tgen.tracing.ranking.ranking_state import RankingState
 
 
 class TestState(BaseTest):
@@ -101,3 +104,8 @@ class TestState(BaseTest):
         self.assertEqual(state.completed_steps[step_name], 2)
         state.mark_step_as_incomplete(step_name)
         self.assertFalse(state.step_is_complete(step_name))
+
+    def test_is_a_path_variable(self):
+        path_vars = {k for k, v in vars(State).items() if not ReflectionUtil.is_function(v) and State._is_a_path_variable(k)}
+        self.assertEqual(len(path_vars), 1)
+        self.assertIn('export_dir', path_vars)

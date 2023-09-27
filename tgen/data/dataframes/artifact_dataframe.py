@@ -1,5 +1,4 @@
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
-
 import pandas as pd
 
 from tgen.common.artifact import Artifact
@@ -11,6 +10,7 @@ from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+import pandas as pd
 
 ArtifactKeys = StructuredKeys.Artifact
 
@@ -142,7 +142,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 self[ArtifactKeys.SUMMARY] = summaries
             else:
                 ids, content = self._find_missing_summaries()
-                summaries = summarizer.summarize_bulk(bodies=content, filenames=ids)
+                summaries = summarizer.summarize_bulk(bodies=content, filenames=ids, use_content_if_unsummarized=False)
                 self.update_values(ArtifactKeys.SUMMARY, ids, summaries)
         return self[ArtifactKeys.SUMMARY]
 
@@ -180,7 +180,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         ids = []
         content = []
         for i, artifact in self.itertuples():
-            if not artifact[ArtifactKeys.SUMMARY]:
+            if not DataFrameUtil.get_optional_value(artifact[ArtifactKeys.SUMMARY]):
                 ids.append(i)
                 content.append(artifact[ArtifactKeys.CONTENT])
         return ids, content

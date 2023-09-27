@@ -13,7 +13,8 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.base_summarizer_job import BaseSummarizerJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
-from tgen.summarizer.summarizer import ARTIFACT_FILE_NAME, Summarizer
+from tgen.summarizer.summarizer import Summarizer
+from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 
 
 class SummarizeArtifactsJob(BaseSummarizerJob):

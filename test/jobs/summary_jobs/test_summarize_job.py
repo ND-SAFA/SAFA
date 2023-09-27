@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_SECTIONS
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -37,7 +37,7 @@ class TestSummarizeJob(BaseJobTest):
         responses = self.get_summarize_responses()[:self.N_ARTIFACTS]
 
         ai_manager.set_responses(responses)
-        job = SummarizeArtifactsJob(self.project.ARTIFACTS, is_subset=True)
+        job = SummarizeArtifactsJob(self.project.ARTIFACTS, is_subset=True, summarize_code_only=False)
         job.run()
         self.assert_output_on_success(job, job.result, resummarized=False)
 
@@ -53,7 +53,7 @@ class TestSummarizeJob(BaseJobTest):
             responses.append(PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, summary))
         project_summary_components = MockResponses.project_summary_responses
         if resummarize:
-            project_summary_components = [create(t, body_prefix=f"{self.RESUMMARIZED} ") for t in PROJECT_SUMMARY_SECTIONS]
+            project_summary_components = [create(t, body_prefix=f"{self.RESUMMARIZED} ") for t in DEFAULT_PROJECT_SUMMARY_SECTIONS]
         responses.extend(project_summary_components)
         return responses
 
@@ -76,4 +76,4 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertIn(f"{self.RESUMMARIZED} {ps_section_body}", job_result.body["summary"])
 
     def _get_job(self) -> AbstractJob:
-        return SummarizeArtifactsJob(self.project.ARTIFACTS)
+        return SummarizeArtifactsJob(self.project.ARTIFACTS, summarize_code_only=False)

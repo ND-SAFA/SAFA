@@ -1,11 +1,9 @@
 import os
 from typing import Any, Dict, List, Tuple
 
-from tgen.common.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil, ENV_REPLACEMENT_VARIABLES
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
-
-ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
+from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
 
 
 class ScriptDefinition:
@@ -30,12 +28,12 @@ class ScriptDefinition:
             raise ValueError(f"{definition_path} does not exists.")
 
         definition_path = os.path.expanduser(definition_path)
-        env_replacements = ScriptDefinition.get_env_replacements(env_replacements)
+        env_replacements = FileUtil.get_env_replacements(env_replacements)
         job_definition = JsonUtil.read_json_file(definition_path)
 
         script_name = ScriptDefinition.get_script_name(definition_path)
         job_definition = ScriptDefinition.set_output_paths(job_definition, script_name)
-        result = FileUtil.expand_paths_in_dictionary(job_definition, env_replacements)
+        result = FileUtil.expand_paths(job_definition, env_replacements)
         return result
 
     @staticmethod
@@ -58,19 +56,6 @@ class ScriptDefinition:
             ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, script_output_path),
             script_definition)
         return script_definition
-
-    @staticmethod
-    def get_env_replacements(env_variables: List[str]) -> Dict[str, str]:
-        """
-        :return: Dictionary of environment variables to their values.
-        """
-        replacements = {}
-        for replacement_path in env_variables:
-            path_value = os.environ.get(replacement_path, None)
-            if path_value:
-                path_key = "[%s]" % replacement_path
-                replacements[path_key] = os.path.expanduser(path_value)
-        return replacements
 
     @staticmethod
     def set_object_property(object_properties: Tuple[str, str, Any], object_data: Dict) -> Dict:

@@ -1,23 +1,26 @@
-_checkpoint_dir: state_checkpoints
-completed_steps: !!set
-  InitializeDatasetStep: null
-dataset: null
+_CHECKPOINT_DIRNAME: state_checkpoints
+all_generated_content: null
+completed_steps:
+  InitializeDatasetStep: 1
 description_of_artifact: null
-export_dir: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/59a77a1d-4149-496d-8207-f9ec25c3ddd1
+export_dir: "[ROOT_PATH]/testres/output"
+final_dataset: null
 format_of_artifacts: null
-generated_artifact_content: null
+generation_predictions: null
+n_generations: 0
 original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
   project_file_id: null
+  ensure_code_is_summarized: True
   project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
     project_path: "[ROOT_PATH]/testres/data/state/original_dataset"
     structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
-      _AbstractProjectReader__processed_project_path: false
+      _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
       definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
@@ -27,8 +30,13 @@ original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prom
     summarizer: null
   summarizer: null
   trace_dataset_creator: null
-questions: null
+questions:
+- What are the main classes/functions in the code?
+- What are the inputs and outputs of the main functions?
+- Is there any user interface code and what does it do?
+refined_content: null
 source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  ensure_code_is_summarized: True
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
@@ -39,7 +47,7 @@ source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prompt
     overrides: {}
     project_path: "[ROOT_PATH]/testres/data/state/source_dataset"
     structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
-      _AbstractProjectReader__processed_project_path: false
+      _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
       definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
@@ -49,4 +57,4 @@ source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prompt
     summarizer: null
   summarizer: null
   trace_dataset_creator: null
-summary: null
+summary: "Here is a summary of the key technical details and design aspects of the system based on the provided code"

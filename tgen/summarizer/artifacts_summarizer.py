@@ -3,7 +3,6 @@ from typing import Dict, List, Optional, Set, Union
 import pandas as pd
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.model_constants import get_efficient_default_llm_manager
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
@@ -27,39 +26,34 @@ class ArtifactsSummarizer(BaseObject):
     """
     SUMMARY_TAG = "summary"
 
-    def __init__(self, llm_manager: AbstractLLMManager = None,
-                 code_or_exceeds_limit_only: bool = False,
-                 nl_summary_type: SummaryTypes = SummaryTypes.NL_BASE,
-                 code_summary_type: SummaryTypes = SummaryTypes.CODE_BASE,
-                 project_summary: str = None):
+    def __init__(self, summarizer_args,
+                 nl_summary_type: SummaryTypes = SummaryTypes.NL_BASE):
         """
         Initializes a summarizer for a specific model
-        :param llm_manager: the manager in charge of generating the summaries
-        :param code_or_exceeds_limit_only: if True, only performs summarization for text that exceeds the token limit or for code
+        :param summary_args: The args for the summary
         :param nl_summary_type: The default prompt to use for summarization.
-        :param code_summary_type: The default summarization prompt to use for code.
-        :param project_summary: Optionally provide a project summary to improve individual summaries
         """
-        self.llm_manager = get_efficient_default_llm_manager() if llm_manager is None else llm_manager
+        self.llm_manager = summarizer_args.llm_manager_for_artifact_summaries
         self.args_for_summarizer_model = self.llm_manager.llm_args
-        self.code_or_above_limit_only = code_or_exceeds_limit_only
+        self.code_or_above_limit_only = summarizer_args.summarize_code_only
         self.prompt_args = self.llm_manager.prompt_args
-        self.project_summary = project_summary
-        code_prompts = code_summary_type.value
+        self.project_summary = summarizer_args.project_summary
+        code_prompts = summarizer_args.code_summary_type.value
         nl_prompts = nl_summary_type.value
-        if project_summary:
+        if self.project_summary:
             nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            nl_prompts.insert(1, Prompt(project_summary))
+            nl_prompts.insert(1, Prompt(self.project_summary))
             code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            code_prompts.insert(1, Prompt(project_summary))
+            code_prompts.insert(1, Prompt(self.project_summary))
         self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
         self.nl_prompt_builder = PromptBuilder(nl_prompts)
 
-    def summarize_bulk(self, bodies: List[str], filenames: List[str] = None) -> List[str]:
+    def summarize_bulk(self, bodies: List[str], filenames: List[str] = None, use_content_if_unsummarized: bool = True) -> List[str]:
         """
         Summarizes a file or body of text  to create shorter, more succinct input for model
         :param bodies: List of content to summarize
         :param filenames: The list of filenames to use to determine if the bodies are code or not
+        :param use_content_if_unsummarized: If True, uses the artifacts orig content instead of a summary if it is not being summarized
         :return: The summarization
         """
         logger.info(f"Received {len(bodies)} artifacts to summarize.")
@@ -76,7 +70,8 @@ class ArtifactsSummarizer(BaseObject):
         logger.info(f"Selected {len(indices2summarize)} artifacts to summarize.")
         summarized_content = self._summarize_selective(contents=bodies,
                                                        indices2summarize=indices2summarize,
-                                                       prompts_for_summaries=summary_prompts)
+                                                       prompts_for_summaries=summary_prompts,
+                                                       use_content_if_unsummarized=use_content_if_unsummarized)
         return summarized_content
 
     def summarize_single(self, content: str, filename: str = EMPTY_STRING) -> str:
@@ -112,7 +107,7 @@ class ArtifactsSummarizer(BaseObject):
         else:
             filenames = [EMPTY_STRING for _ in ids]
 
-        summaries = self.summarize_bulk(list(df[col2summarize]), filenames)
+        summaries = self.summarize_bulk(list(df[col2summarize]), filenames, use_content_if_unsummarized=False)
         return summaries
 
     @staticmethod
@@ -152,18 +147,21 @@ class ArtifactsSummarizer(BaseObject):
         return prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
                                     artifact={StructuredKeys.Artifact.CONTENT: content})[PromptKeys.PROMPT.value]
 
-    def _summarize_selective(self, contents: List[str], indices2summarize: Set[int], prompts_for_summaries) -> List[str]:
+    def _summarize_selective(self, contents: List[str], indices2summarize: Set[int], prompts_for_summaries: List[str],
+                             use_content_if_unsummarized: bool) -> List[str]:
         """
         Summarizes only the content whose index is in indices2summarize
         :param contents: Contents to summarize
         :param indices2summarize: Index of the content that should be summarized
         :param prompts_for_summaries: The prompts for summarization (corresponds to only the content selected for summarization)
+        :param use_content_if_unsummarized: If True, uses the artifacts orig content instead of a summary if it is not being summarized
         :return: The summarization if summarized else the original content
         """
         summarized_contents = self._summarize(self.llm_manager, prompts_for_summaries)
         summaries_iter = iter(summarized_contents)
         summaries = []
         for index, content in enumerate(contents):
-            summary = next(summaries_iter) if index in indices2summarize else content
+            default = content if use_content_if_unsummarized else None
+            summary = next(summaries_iter) if index in indices2summarize else default
             summaries.append(summary)
         return summaries

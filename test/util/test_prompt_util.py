@@ -16,15 +16,15 @@ class TestPromptUtil(BaseTest):
 
     def test_format_as_bullet_point(self):
         bullets = ['*', '-', '+']
-        high_level = PromptUtil.format_as_bullet_point("high-level", level=1)
+        high_level = PromptUtil.as_bullet_point("high-level", level=1)
         self.assertIn(bullets[0], high_level)
         self.assertEqual(0, high_level.count("\t"))
-        mid_level = PromptUtil.format_as_bullet_point("med-level", level=2)
+        mid_level = PromptUtil.as_bullet_point("med-level", level=2)
         self.assertIn(bullets[1], mid_level)
         self.assertEqual(1, mid_level.count("\t"))
-        low_level = PromptUtil.format_as_bullet_point("low-level", level=3)
+        low_level = PromptUtil.as_bullet_point("low-level", level=3)
         self.assertIn(bullets[2], low_level)
         self.assertEqual(2, low_level.count("\t"))
-        lowest_level = PromptUtil.format_as_bullet_point("lowest-level", level=4)
+        lowest_level = PromptUtil.as_bullet_point("lowest-level", level=4)
         self.assertIn(bullets[0], lowest_level)
         self.assertEqual(3, lowest_level.count("\t"))

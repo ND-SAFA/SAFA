@@ -3,23 +3,50 @@ import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union
+from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union, Optional
 
 import yaml
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
+from tgen.common.constants.path_constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM, CURRENT_PROJECT_PARAM, USER_SYM, \
+    PROJ_PATH
 from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.logging.logger_manager import logger
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
-                   "PL", "R", "PY", "JAVA"]
+                   "PL", "R", "PY", "JAVA", "VUE", "CC"]
+
+ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
 
 
 class FileUtil:
     JSON_EXT = "json"
     CSV_EXT = "csv"
     YAML_EXT = "yaml"
+
+    @staticmethod
+    def get_directory_path(file_path: str) -> str:
+        """
+        Gets the lowest level directory path from the file path (if it's already a directory, just return as is)
+        :param file_path: The path to file/directory
+        :return: The path to the lowest level directory
+        """
+        if FileUtil.is_file(file_path):
+            return os.path.join(*os.path.split(file_path)[:-1])
+        return file_path
+
+    @staticmethod
+    def is_file(path: str) -> bool:
+        """
+        Returns whether the given path contains a filename at the end or not
+        :param path: The path
+        :return: True if the given path contains a filename at the end
+        """
+        if FileUtil.get_file_ext(path):
+            return True
+        return False
 
     @staticmethod
     def get_file_ext(path: str) -> str:
@@ -42,10 +69,11 @@ class FileUtil:
         return output_path
 
     @staticmethod
-    def read_file(file_path: str) -> str:
+    def read_file(file_path: str, raise_exception: bool = True) -> Optional[str]:
         """
         Reads file at given path if exists.
         :param file_path: Path of the file to read.
+        :param raise_exception: If True, raises an exception if reading fails
         :return: The content of the file.
         """
         try:
@@ -53,8 +81,10 @@ class FileUtil:
                 file_content = file.read()
                 return file_content
         except Exception as e:
-            print(f"Failed reading file: {file_path}")
-            raise e
+            logger.exception(f"Failed reading file: {file_path}")
+            if raise_exception:
+                raise e
+            return None
 
     @staticmethod
     def read_file_lines(file_path: str) -> List[str]:
@@ -65,6 +95,19 @@ class FileUtil:
         """
         with open(file_path) as file:
             return file.readlines()
+
+    @staticmethod
+    def get_env_replacements(env_variables: List[str]) -> Dict[str, str]:
+        """
+        :return: Dictionary of environment variables to their values.
+        """
+        replacements = {}
+        for replacement_path in env_variables:
+            path_value = os.environ.get(replacement_path, None)
+            if path_value:
+                path_key = "[%s]" % replacement_path
+                replacements[path_key] = os.path.expanduser(path_value)
+        return replacements
 
     @staticmethod
     def get_file_list(data_path: str, exclude: List[str] = None, exclude_ext: List[str] = None) -> List[str]:
@@ -93,24 +136,104 @@ class FileUtil:
         return files
 
     @staticmethod
-    def expand_paths_in_dictionary(value: Union[List, Dict, str], replacements: Dict[str, str] = None):
+    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
         """
-        For every string found in value, if its a path its expanded and
-        :param value: List, Dict, or String containing one or more values.
+        For every string found in value, if its a path its expanded completed path
+        :param paths: List, Dict, or String containing one or more paths.
         :param replacements: Dictionary from source to target string replacements in paths.
         :return: Same type as value, but with its content processed.
         """
-        if isinstance(value, list):
-            return [FileUtil.expand_paths_in_dictionary(v, replacements=replacements) for v in value]
-        if isinstance(value, dict):
-            return {k: FileUtil.expand_paths_in_dictionary(v, replacements=replacements) for k, v in value.items()}
-        if isinstance(value, str):
-            if "~" in value:
-                value = os.path.expanduser(value)
+        def expand(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
             if replacements:
                 for k, v in replacements.items():
-                    value = value.replace(k, v)
-        return value
+                    paths = paths.replace(k, v)
+            paths = os.path.expanduser(paths)
+            return FileUtil.get_path_relative_to_proj_path(paths)
+
+        return FileUtil.perform_function_on_paths(paths, expand, replacements=replacements)
+
+    @staticmethod
+    def collapse_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
+        """
+        For every string found in value, if its a path its collapsed into a shorter form
+        :param paths: List, Dict, or String containing one or more paths.
+        :param replacements: Dictionary from source to target string replacements in paths.
+        :return: Same type as value, but with its content processed.
+        """
+        def collapse(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
+            if replacements:
+                path2var = {v: k for k, v in replacements.items()}
+                ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
+                for path in ordered_paths:
+                    paths = paths.replace(path, path2var[path])
+            if os.path.isabs(paths):
+                paths = os.path.relpath(paths, PROJ_PATH)
+            return paths
+
+        return FileUtil.perform_function_on_paths(paths, collapse, replacements=replacements)
+
+    @staticmethod
+    def perform_function_on_paths(paths: Union[List, Dict, str], func: Callable, replacements: Dict[str, str] = None, **kwargs):
+        """
+        For every string found in value, if its a path its collapsed into a shorter form
+        :param paths: List, Dict, or String containing one or more paths.
+        :param func: Function to perform
+        :param replacements: Dictionary from source to target string replacements in paths.
+        :return: Same type as value, but with its content processed.
+        """
+        if replacements is None:
+            replacements = FileUtil.get_env_replacements(ENV_REPLACEMENT_VARIABLES)
+        if isinstance(paths, list):
+            return [FileUtil.perform_function_on_paths(v, func, replacements=replacements, **kwargs) for v in paths]
+        if isinstance(paths, dict):
+            return {k: FileUtil.perform_function_on_paths(v, func, replacements=replacements, **kwargs) for k, v in paths.items()}
+        if isinstance(paths, str):
+            paths = func(paths, replacements=replacements, **kwargs)
+        return paths
+
+    @staticmethod
+    def get_path_relative_to_proj_path(abspath) -> str:
+        """
+        Gets the path relative to the proj path
+        :param abspath: The absolute path
+        :return: The path relative to the proj path
+        """
+        return os.path.normpath(os.path.join(PROJ_PATH, abspath))
+
+    @staticmethod
+    def get_user_path() -> str:
+        """
+        Gets the current users home path
+        :return: The current users home path
+        """
+        return os.path.expanduser(USER_SYM)
+
+    @staticmethod
+    def order_paths_by_overlap(paths: List[str], reverse: bool = False) -> List[str]:
+        """
+        Orders the paths so that base paths come before any branches (e.g. root before root/dir1 before root/dir1/dir2)
+        :param paths: The list of unordered paths
+        :param reverse: If True, returns the most overlap to the least (e.g. root AFTER root/dir1 AFTEr root/dir1/dir2)
+        :return: The ordered paths
+        """
+        orderings = {}
+        for a in paths:
+            ordered = [a]
+            for b in paths:
+                if a == b:
+                    continue
+                if a in b:
+                    ordered.append(b)
+                elif b in a:
+                    ordered.insert(0, b)
+            orderings[a] = ordered
+        final_orderings = []
+        for path, ordering in orderings.items():
+            if path == ordering[0]:
+                if reverse:
+                    ordering.reverse()
+                final_orderings.extend(ordering)
+        return final_orderings
 
     @staticmethod
     def write(content: Union[str, Dict], output_file_path: str):

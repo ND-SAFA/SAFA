@@ -1,6 +1,5 @@
 import os
 import re
-import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Set, Type, Union
 
@@ -17,6 +16,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
+from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -56,13 +56,17 @@ def save_dataset_checkpoint(dataset: Any, export_path: str = None,
         full_export_path = FileUtil.add_ext(full_export_path, FileUtil.YAML_EXT)
         FileUtil.write_yaml(dataset, full_export_path)
     else:
-        if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
-            dataset = dataset.trace_dataset
+        save_as_trace_dataset = isinstance(dataset, TraceDataset) \
+                                or (isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None)
         if exporter_class is None:
-            exporter_class = DataFrameExporter if isinstance(dataset, TraceDataset) else CSVExporter
-        if issubclass(exporter_class, CSVExporter):
+            exporter_class = DataFrameExporter if save_as_trace_dataset else CSVExporter
+        if issubclass(exporter_class, CSVExporter) or not save_as_trace_dataset:
             full_export_path = FileUtil.add_ext(full_export_path, FileUtil.CSV_EXT)
-        exporter = exporter_class(export_path=full_export_path, dataset=dataset)
+        if isinstance(dataset, PromptDataset):
+            exporter = PromptDatasetExporter(export_path=full_export_path, trace_dataset_exporter_type=exporter_class,
+                                             dataset=dataset)
+        else:
+            exporter = exporter_class(export_path=full_export_path, dataset=dataset)
         exporter.export()
     logger.info(f"Dataset checkpoint saved to {full_export_path} ")
     return full_export_path
@@ -171,7 +175,9 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
                                       task_prompt: Union[QuestionnairePrompt, Prompt],
                                       base_prompt: Union[SupportedPrompts, str] = SupportedPrompts.HGEN_GENERATION,
                                       summary_prompt: Prompt = None, artifact_type: str = None,
-                                      combine_summary_and_task_prompts: bool = False) -> PromptBuilder:
+                                      combine_summary_and_task_prompts: bool = False,
+                                      build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML) \
+        -> PromptBuilder:
     """
     Gets the prompt builder used for the generations
     :param hgen_args: The arguments for the hierarchy generator
@@ -180,6 +186,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
     :param summary_prompt: Instructions for the model to create a summary of the system first
     :param artifact_type: The type of artifact being presented in the prompt
     :param combine_summary_and_task_prompts: If True combines the summary and task prompts into a single Questionnaire prompt
+    :param build_method: The method to use to build the artifacts into the prompt
     :return: The prompt builder used for the generations
     """
     if isinstance(base_prompt, SupportedPrompts):
@@ -193,8 +200,10 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
 
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type
     artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
-                                          build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
-                                          include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
+                                          build_method=build_method,
+                                          include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
+                                          data_type=MultiArtifactPrompt.DataType.ARTIFACT,
+                                          xml_tags={convert_spaces_to_dashes(artifact_type.lower()): ["id", "description"]})
     prompts = [base_prompt, artifact_prompt]
 
     task_preface = f"{NEW_LINE}{PromptUtil.as_markdown_header('TASKS:')}{NEW_LINE}"

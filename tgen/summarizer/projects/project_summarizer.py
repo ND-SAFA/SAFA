@@ -1,4 +1,7 @@
-from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_QUESTIONS_HEADER
+from copy import copy
+
+from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG
 from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
@@ -11,6 +14,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.project_summary_prompts import PROJECT_SUMMARY_CONTEXT_PROMPT
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.projects.project_summary import ProjectSummary
@@ -38,13 +42,16 @@ class ProjectSummarizer(BaseObject):
         :return: The summary of the project.
         """
         logger.log_title("Creating project specification.")
+        if self.args.summarize_artifacts or not self.artifact_df.is_summarized(self.artifact_df.get_code_layers()):
+            self.artifact_df.summarize_content(ArtifactsSummarizer(self.args))
 
-        if self.args.summarize_artifacts or not self.artifact_df.is_summarized():
-            self.artifact_df.summarize_content(ArtifactsSummarizer())
-
-        project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True)
+        project_summary = ProjectSummary(export_dir=self.export_dir, save_progress=True, summary_args=self.args)
         for task_title, task_prompt in project_summary.get_generation_iterator():
             logger.log_step(f"Creating section: `{task_title}`")
+            task_id = copy(task_title)
+            assert isinstance(task_prompt, QuestionnairePrompt), f"Expected section {task_title} prompt " \
+                                                                 f"to be a {QuestionnairePrompt.__class__.__name__}"
+            task_tag = task_prompt.get_response_tags_for_question(-1)
             artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
                                                    build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                    include_ids=True)
@@ -64,13 +71,15 @@ class ProjectSummarizer(BaseObject):
                                                                                       PromptDataset(artifact_df=self.artifact_df)})
             trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
                                                  prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
-            task_tag = PROJECT_SUMMARY_TAGS[task_title]
-            res = trainer.perform_prediction()
-            id2res = prompt_builder.parse_responses(res.original_response[0])
-            parsed_response = id2res[prompt_builder._prompts[-1].id][task_tag]
+            predictions = trainer.perform_prediction().predictions[0]
+            parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
+            body_res = parsed_responses[task_tag]
 
-            task_body = parsed_response[0] if len(parsed_response) <= 1 else "\n".join(parsed_response)
-            project_summary.set_section_body(task_title, task_body)
+            if CUSTOM_TITLE_TAG in parsed_responses:
+                task_title = parsed_responses[CUSTOM_TITLE_TAG][0]
+
+            task_body = body_res[0] if len(body_res) <= 1 else NEW_LINE.join(body_res)
+            project_summary.set_section_body(task_id, task_title, task_body)
             project_summary.save()
 
         summary = project_summary.get_summary(raise_exception_on_not_found=True)

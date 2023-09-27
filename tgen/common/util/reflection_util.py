@@ -173,6 +173,16 @@ class ReflectionUtil:
             raise ValueError("Unable ")
 
     @staticmethod
+    def is_function(unknown_obj) -> bool:
+        """
+        Returns true if the object is a function else false
+        :param unknown_obj: The obj to test if its a function
+        :return: True if it is a function else False
+        """
+        return type(unknown_obj).__name__ in ["function", "builtin_function_or_method", "method", "classmethod",
+                                              "staticmethod", "abstractmethod"]
+
+    @staticmethod
     def is_typed_class(class_obj: Type):
         """
         Returns whether the class is a typed class. (Optional, List, Dict, Tuple, ect.)

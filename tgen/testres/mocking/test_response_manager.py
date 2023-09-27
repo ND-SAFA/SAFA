@@ -1,5 +1,6 @@
 from typing import Callable, Dict, List, Union
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.llm_response_util import LLMResponseUtil
 
 
@@ -14,6 +15,7 @@ class TestAIManager:
         self.start_index = 0
         self.end_index = 0
         self.handlers = []
+        self.mock_calls = 0
 
     def __call__(self, *args, **kwargs) -> List[str]:
         prompts_global = self.get_prompts(kwargs)
@@ -25,6 +27,7 @@ class TestAIManager:
         responses = handled_responses + manual_responses
         responses = self.response_formatter(responses)
         self.n_used += n_manual_prompts
+        self.mock_calls += n_manual_prompts
         return responses
 
     def run_prompt_handlers(self, prompts):
@@ -56,6 +59,7 @@ class TestAIManager:
         def summarization_handler(p: str):
             summary_tag = "<summary>"
             if summary_tag in p:
+                self.mock_calls += 1
                 return self.create_summarization_response(p)
             return None
 
@@ -78,7 +82,12 @@ class TestAIManager:
         """
         start_body_tag = "</summary>"
         end_body_tag = "Assistant:"
-        artifact_body = LLMResponseUtil.parse(p, "artifact")
+        artifact_body = LLMResponseUtil.parse(p, "artifact", return_res_on_failure=False)
+        if not artifact_body:
+            artifact_body = EMPTY_STRING
+            split_prompt = p.split("# Code")
+            if len(split_prompt) > 1:
+                artifact_body = [v for v in split_prompt[1].split("\n") if v]
         if len(artifact_body) == 0:
             body_start = p.find(start_body_tag)
             body_end = p.find(end_body_tag)

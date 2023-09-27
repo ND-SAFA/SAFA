@@ -29,7 +29,7 @@ class TestExperimentStep(BaseExperimentTest):
     EXPERIMENT_VARS = ["trainer_dataset_manager.train_dataset_creator.project_path",
                        "trainer_args.num_train_epochs"]
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         FileUtil.delete_dir(TEST_OUTPUT_DIR)
@@ -50,7 +50,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEqual(max(self.accuracies), best_job.result.body.metrics["accuracy"])
         self.assertEqual(train_job_run_mock.call_count, 4)
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run_failed(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         train_job_run_mock.side_effect = ValueError()
@@ -60,7 +60,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEqual(experiment_step.status, Status.FAILURE)
         self.assertEqual(train_job_run_mock.call_count, 1)
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         predict_job_run_mock.side_effect = self.job_fake_run
@@ -73,7 +73,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEqual(best_job.model_manager.model_path, expected_model_path)
         self.assertEqual(predict_job_run_mock.call_count, 1)
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     def test_divide_jobs_into_runs(self, definition_mock: mock.MagicMock):
         definition_mock.return_value = StructureProjectDefinition()
         train_step = self.get_experiment_step()
@@ -82,7 +82,7 @@ class TestExperimentStep(BaseExperimentTest):
         for run_ in runs:
             self.assertLessEqual(len(run_), train_step.MAX_JOBS)
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     def test_update_jobs_undetermined_vars(self, definition_mock: mock.MagicMock):
         definition_mock.return_value = StructureProjectDefinition()
         train_step = self.get_experiment_step()
@@ -100,7 +100,7 @@ class TestExperimentStep(BaseExperimentTest):
         failed_jobs = ExperimentStep._get_failed_jobs(jobs)
         self.assertEqual(1, len(failed_jobs))
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     def test_run_on_all_jobs(self, definition_mock: mock.MagicMock):
         definition_mock.return_value = StructureProjectDefinition()
         jobs = self.get_test_jobs()
@@ -108,7 +108,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0], results[1])  # Nothing differentiating the two paths other than id which is set by experiment
 
-    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    @patch.object(StructuredProjectReader, "get_definition_reader")
     @patch.object(AbstractTrainerJob, "get_trainer")
     def test_get_best_job(self, get_trainer_mock, definition_mock: mock.MagicMock):
         definition_mock.return_value = StructureProjectDefinition()

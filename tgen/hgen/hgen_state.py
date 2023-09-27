@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, List
+from typing import Union, List, Dict
 
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -24,17 +24,17 @@ class HGenState(State):
     """
     Step 3 - Artifact generation
     """
-    generated_artifact_content: List[str] = None  # The content generated from the questionnaire.
-    n_generations: int = 0 # number of runs of artifact generation
+    generation_predictions: Dict[str, List[str]] = None  # dictionary mapping generated content to a list of related source ids
+    n_generations: int = 0  # number of runs of artifact generation
     summary: str = None  # The summary of all the source artifacts.
 
     """
     Optional Step - Refine content on rerun of hgen
     """
-    all_generated_content: List[str] = None # All generated content across all runs
-    refined_content: List[str] = None  # The final selected artifact content
+    all_generated_content: Dict[str, List[str]] = None  # All generated content across all runs
+    refined_content: Dict[str, List[str]] = None  # The final selected artifact content
 
     """
     Step 4 - Dataset Construction
     """
-    dataset: TraceDataset = None  # The final dataset with generated artifacts.
+    final_dataset: PromptDataset = None  # The final dataset with generated artifacts.

@@ -272,7 +272,7 @@ class TestTraceDataset(BaseTraceTest):
 
     def test_as_creator(self):
         trace_dataset = self.get_trace_dataset()
-        creator = trace_dataset.as_creator(TEST_OUTPUT_DIR)
+        creator = trace_dataset.as_creator(TEST_OUTPUT_DIR, "dir1")
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
         for i, link in trace_dataset.trace_df.itertuples():

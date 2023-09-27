@@ -72,20 +72,23 @@ class QuestionnairePrompt(Prompt):
         return parsed
 
     @overrides(Prompt)
-    def _build(self, **kwargs) -> str:
+    def _build(self, child: bool = False, **kwargs) -> str:
         """
         Constructs the prompt in the following format:
         [Instructions]
         A) Question 1
         B) ...
         C) Question n
+        :param child: If True, adds additional indents
         :return: The formatted prompt
         """
         self.format_value(**kwargs)
         question_format = "{}) {}" if not self.use_bullets_for_enumeration else "{} {}"
-        formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i], question.build())
+        if child:
+            question_format = PromptUtil.indent_for_markdown(question_format)
+        formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i], question.build(child=True))
                                              for i, question in enumerate(self.question_prompts)])
-        instructions = f"{self.value}{NEW_LINE}" if self.value else ""
+        instructions = f"{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         return f"{instructions}{formatted_questions}{NEW_LINE}"
 
     @staticmethod
@@ -100,7 +103,7 @@ class QuestionnairePrompt(Prompt):
         enumerations_for_task = f'{COMMA}{SPACE}'.join(enumeration_chars[:n_questions - 1])
         base_instructions = f"Below are {len(question_prompts)} steps to complete. " \
                             f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions - 1]}"
-        instructions = [PromptUtil.as_markdown_header('TASKS:'), PromptUtil.format_as_markdown_italics(base_instructions)]
+        instructions = [PromptUtil.as_markdown_header('TASKS:'), PromptUtil.as_markdown_italics(base_instructions)]
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
     def set_instructions(self, instructions: str) -> None:

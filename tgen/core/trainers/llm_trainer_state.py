@@ -7,6 +7,7 @@ from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.state.state import State
+from tgen.summarizer.summarizer_args import SummarizerArgs
 
 
 @dataclass
@@ -38,4 +39,5 @@ class LLMTrainerState(State):
 
     def __post_init__(self):
         if self.summarizer is None:
-            self.summarizer = ArtifactsSummarizer(self.llm_manager, code_or_exceeds_limit_only=False)
+            self.summarizer = ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=self.llm_manager,
+                                                                 summarize_code_only=False))

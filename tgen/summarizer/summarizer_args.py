@@ -1,21 +1,20 @@
 import os
 from dataclasses import dataclass, field
 
+from typing import List, Dict
+
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, \
+    DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.summarizer.summary_types import SummaryTypes
 
 
 @dataclass
 class SummarizerArgs(PipelineArgs):
-    """
-    Dataset creator used to make dataset containing original artifacts
-    """
-    dataset_creator: PromptDatasetCreator = None
     """
     Dataset creator used to make dataset containing original artifacts
     """
@@ -37,6 +36,18 @@ class SummarizerArgs(PipelineArgs):
     """
     project_summary: str = None
     """
+    The titles of the sections that make up the project summary 
+    """
+    project_summary_sections: List[str] = field(default_factory=lambda: DEFAULT_PROJECT_SUMMARY_SECTIONS)
+    """
+    Mapping of title to prompt for any non-standard sections to include in the summary
+    """
+    new_sections: Dict[str, QuestionnairePrompt] = field(default_factory=dict)
+    """
+    The list of the section titles in the order they should appear in the project summary
+    """
+    section_order: List[str] = field(default_factory=lambda: DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER)
+    """
     If True, resummarizes the project with the new artifact summaries
     """
     do_resummarize_project: bool = True
@@ -48,6 +59,14 @@ class SummarizerArgs(PipelineArgs):
     Path to save to
     """
     export_dir: str = None
+    """
+    If True, only summarizes the code
+    """
+    summarize_code_only: bool = True
+    """
+    The name of the directory to save the summaries to
+    """
+    summary_dirname = "summaries"
 
     def __post_init__(self) -> None:
         """
@@ -55,5 +74,5 @@ class SummarizerArgs(PipelineArgs):
         :return: None
         """
         if self.export_dir:
-            os.makedirs(self.export_dir, exist_ok=True)
-        self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
+            if not self.export_dir.endswith(self.summary_dirname):
+                self.export_dir = os.path.join(self.export_dir, self.summary_dirname)

@@ -12,19 +12,33 @@ add_subdirectory(""Graphics"")
 add_subdirectory(""Rendering"")
 add_subdirectory(""Utils"")
 add_subdirectory(""World"")
-",C++ Code,"This code is adding source files and subdirectories to a CMake project. It is using relative paths to add the main.cpp, Player.cpp and Game.cpp source files from the current directory. It is then adding the Debug, Exception, Graphics, Rendering, Utils and World subdirectories to the project."
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/main.cpp
+                        ${CURR_DIR}/Player.cpp
+                        ${CURR_DIR}/Game.cpp"" CACHE STRING ""Sources for project"" FORCE)
+
+add_subdirectory(""Debug"")
+add_subdirectory(""Exception"")
+add_subdirectory(""Graphics"")
+add_subdirectory(""Rendering"")
+add_subdirectory(""Utils"")
+add_subdirectory(""World"")
+"
 /Debug/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
 set(SOURCES ""${SOURCES} ${CURR_DIR}/DebugOptions.cpp"" CACHE STRING ""Sources for project"" FORCE)
 
 add_subdirectory(""Graphics"")
-",C++ Code,"This code performs the following:
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
 
-1. Calculates the relative path from a root directory to the current source directory and saves it in CURR_DIR.
-2. Prints a message showing the relative path.
-3. Appends the .cpp file in that relative path to the SOURCES variable, which contains source files for the project. 
-4. Adds a subdirectory named ""Graphics"", likely including its source files in the build."
+set(SOURCES ""${SOURCES} ${CURR_DIR}/DebugOptions.cpp"" CACHE STRING ""Sources for project"" FORCE)
+
+add_subdirectory(""Graphics"")
+"
 /Debug/DebugOptions.cpp,"#include ""Debug/DebugOptions.h""
 
 /*
@@ -37,18 +51,16 @@ bool DebugOptions::_renderEntityHitboxes = true;
 bool DebugOptions::_renderPlayerHitbox   = true;
 bool DebugOptions::_showFpsCounter       = true;
 bool DebugOptions::_showDebug            = false;
-",C++ Code,"This code defines default values for debug options used in the system. Debug options allow developers to enable or disable certain debugging features at runtime, like showing hitboxes, frames per second counters, and other debug information. This helps developers test and troubleshoot issues in the system. By default, some debug options like showing hitboxes and FPS are enabled, while generic debug mode is disabled. These default values can then be overridden at runtime as needed. The debug options help support the development and testing of the system functionality by providing visual aids and performance information."
+",C++ Code,"The code defines default values for debugging options in a 3D game engine that handles rendering a 3D world with blocks, textures, and UI elements. When initialized, the render engine will enable rendering of entity hitboxes and the player hitbox, show an FPS counter, and have debugging mode disabled. The engine loads shaders, images, and manages blocks that make up chunks and the game world. It handles player movement, collision detection with axis aligned bounding boxes, and contains various UI components like menus, buttons, and a color selector."
 /Debug/Graphics/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
 set(SOURCES ""${SOURCES} ${CURR_DIR}/FPSCounter.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,"This code performs the following:
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
 
-1. It finds the relative path of the current source directory with respect to a root directory. It stores this relative path in the CURR_DIR variable.
-
-2. It prints a message stating that it is adding the relative path stored in CURR_DIR.
-
-3. It appends the .cpp file in the current source directory to the SOURCES variable, which contains a list of source files for a project. It also caches this variable and forces it to be updated."
+set(SOURCES ""${SOURCES} ${CURR_DIR}/FPSCounter.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /Debug/Graphics/FPSCounter.cpp,"#include ""Debug/DebugOptions.h""
 #include ""Debug/Graphics/FPSCounter.h""
 #include ""Utils/Font.h""
@@ -144,25 +156,16 @@ long FPSCounter::getRefreshRate() {
 void FPSCounter::setRefreshRate(long r) {
     _refreshRate = r;
 }
-",C++ Code,"This code implements an FPS counter that displays the current frames per second of the application. It does this by:
-
-- Initializing a sf::Text object that will display the FPS value
-- In the update() method, it counts the number of frames since the last update and measures the elapsed time. It calculates the FPS from these values and updates the sf::Text string to show the FPS.
-- It only updates the FPS value every _refreshRate milliseconds, as specified in the constructor. This is to avoid updating too frequently.
-- In the render() method, it draws the sf::Text to the screen if DebugOptions::showFpsCounter() returns true.
-
-This functionality helps developers monitor the performance of their application by showing them the current frame rate. A low FPS may indicate performance issues that need to be addressed. The FPS counter exists to provide this performance metric in an easy-to-read format."
+",C++ Code,"This code implements a frames per second (FPS) counter that displays the current FPS as text on the screen. It does this by counting the number of rendered frames and measuring the elapsed time between frames using a high resolution clock. The FPS value is calculated from these measurements and displayed as text that is updated periodically based on a specified refresh rate, which determines how often the displayed text is updated. The FPS counter utilizes several utility functions and interfaces to handle rendering the text to the screen, setting various text properties, and determining whether the FPS counter should be displayed based on debug options. The FPS counter is designed to provide a real-time display of performance for a game or 3D rendering application."
 /Exception/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
 set(SOURCES ""${SOURCES} ${CURR_DIR}/Exception.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,"This code performs the following:
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
 
-1. It finds the relative path of the current source directory with respect to a root directory. It stores this relative path in the CURR_DIR variable.
-
-2. It prints a message stating that it is adding the relative path stored in CURR_DIR.
-
-3. It appends the Exception.cpp source file in the current relative directory to the SOURCES variable, which contains a list of sources for the project. It also forces an update of the SOURCES variable."
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Exception.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /Exception/Exception.cpp,"// Including both and putting the if statements in the files makes Visual Studio happier
 // Doesn't really affect the code too much so eh
 #include ""Exception_Linux.cpp""
@@ -220,13 +223,7 @@ const char* Exception::what() const noexcept {
     strcpy(*_out, ss.str().c_str());
     return *_out;
 }
-",C++ Code,"This code implements an Exception class that handles exceptions in the system. It captures information about the exception like the reason, stack trace, and address where it occurred. When an exception is thrown, this class is instantiated with that information.
-
-The constructor captures the reason for the exception, the stack skip (how many levels up the call stack the actual exception occurred), and the address where it occurred. It logs the exception using the global logger and saves the stack trace.
-
-The what() method overrides the std::runtime_error::what() method to provide a human readable explanation of the exception. It generates a string stream containing the reason and stack trace, then allocates memory for a C string and copies the string stream into it. This C string is returned when what() is called.
-
-This allows exceptions to be thrown in the system and captured meaningful information about them, which can then be logged, printed to the user, or used for debugging."
+",C++ Code,"The code defines an Exception class that handles creating, storing information, and representing exceptions raised during program execution. When an exception is constructed, it stores the provided reason, stack skip count, and optional address that caused the exception. It then saves the stack trace by walking up the call stack. When the exception's string representation is requested using the what() method, it generates a readable string containing the exception reason and stack trace by translating the stack trace into text using line number information obtained from an external utility. The string representation is cached to avoid repeatedly generating it unnecessarily. The class is designed to be subclassed so that child exceptions can increment the stack skip count when calling the parent constructor."
 /Exception/Exception_Linux.cpp,"#include ""Utils/Platforms.h""
 #ifdef JOC_LINUX_BUILD
 
@@ -358,11 +355,7 @@ void Exception::saveStackTrace() {
 
 
 #endif
-",C++ Code,"This code provides functionality for demangling C++ stack traces on Linux systems. When C++ code is compiled, function names are ""mangled"" to make them valid symbols for the compiler. This mangling makes the names unreadable.
-
-This code uses the __cxa_demangle() function to demangle the function names in a stack trace. It parses the mangled names from a stack trace, calls __cxa_demangle() to demangle them into readable names, and then uses addr2line to resolve the function locations. The demangled names and locations are then written to a string stream, providing a human readable stack trace.
-
-This functionality allows an exception handler to capture a stack trace at the time an exception is thrown, demangle the function names, and then print a readable stack trace to help diagnose the issue that caused the exception."
+",C++ Code,"This code implements stack trace functionality for debugging purposes. When an exception is thrown, it saves the stack trace by calling the `backtrace()` function, which captures the call stack up to that point. It then demangles the function names in the stack trace, which are mangled by the compiler, to make them human readable. Finally, it can print the formatted stack trace to a string stream, giving developers useful information to debug the issue that caused the exception. Having the ability to see the call stack that led to an exception allows developers to quickly identify the root cause and fix bugs in their software system."
 /Exception/Exception_Windows.cpp,"#include ""Utils/Platforms.h""
 #ifdef JOC_WINDOWS_BUILD
 
@@ -422,7 +415,7 @@ void Exception::saveStackTrace() {
 }
 
 #endif
-",C++ Code,"This code provides functionality for printing a stack trace when an exception occurs. This helps debug and diagnose issues in the system by showing the sequence of function calls that led to the exception. When an exception is thrown, the saveStackTrace() method is called to capture the current stack frames. Then the printStackTrace() method prints relevant information about each stack frame, including the function name and source code location if available. This allows a developer to see the exact flow of function calls that resulted in the exception, which helps identify the root cause and location of the bug. The code exists to provide debugging information when exceptions occur, to make it easier for developers to fix issues in the system."
+",C++ Code,"The code implements a 3D rendering engine that handles window creation, OpenGL context, shader programs, textures, 3D objects, player input, collision detection, and UI elements to render a 3D scene and provide a user interface. It contains classes for representing blocks, chunks, and a world that make up the 3D scene, as well as components for rendering, selecting, and highlighting blocks. It also includes player, menu, and UI classes to handle player input and provide an in-game menu system. Finally, it implements exception handling functionality to print stack traces for debugging purposes."
 /Game.cpp,"#include <SFML/Window.hpp>
 
 #include <GlobalLogger.hpp>
@@ -510,29 +503,20 @@ bool Game::handleEvent(const sf::Event& e) {
             return false;
     }
 }
-",C++ Code,"This code provides the core functionality for running a game. It initializes the render engine, starts the main loop that polls for events and handles them, and ends the game when requested.
-
-It handles a few basic events itself:
- - When the window is closed, it ends the game
- - When the window is resized, it notifies the render engine
- - When F3 is pressed, it toggles a debug option to show debug information on screen
-
-For most events, it forwards them to the current screen to handle. This allows different screens to handle events in screen-specific ways.
-
-The main loop runs continuously, polling for events, handling them, updating the current screen, rendering the screen, and then repeating. This provides the interactive gameplay experience.
-
-The purpose of this code is to provide a basic game loop and event handling system, while delegating specific functionality to the current screen. This allows for reusability and separation of concerns between the core game and individual screens."
+",C++ Code,"The code initializes a game engine by constructing a `Game` object that initializes a `RenderEngine` for rendering 2D and 3D graphics to a window. It then loads a `WorldScreen` that represents the main game screen. The `run()` method contains the main loop that polls for window events, passes them to the appropriate handler, ticks the `WorldScreen` to update game state, and renders the screen's graphics. The `Game` class handles a subset of events like window close and resize, delegating the rest to the `WorldScreen`. When the game ends, the main loop is stopped."
 /Graphics/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
 add_subdirectory(""Components"")
 add_subdirectory(""Menu"")
 add_subdirectory(""Screen"")
-",C++ Code,"This code snippet is adding subdirectories to a CMake build. It performs the following:
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
 
-1. Calculates the relative path of the current source directory from the root directory and stores it in CURR_DIR
-2. Prints a message stating that it is adding that relative path 
-3. Adds subdirectories ""Components"", ""Menu"", and ""Screen"" to the build"
+add_subdirectory(""Components"")
+add_subdirectory(""Menu"")
+add_subdirectory(""Screen"")
+"
 /Graphics/Components/Button.cpp,"#include ""Graphics/Components/Button.h""
 #include ""Utils/Font.h""
 
@@ -566,7 +550,7 @@ void Button::layout(const sf::RenderWindow& w) {
     sf::Vector2i textSize = _text->getSize();
     _text->setLocalPosition(sf::Vector2i(size.x / 2.f - textSize.x / 2.f, size.y / 2.f - textSize.y / 2.f));
 }
-",C++ Code,"This code implements the functionality of a graphical button component. It helps support user interaction with the system through a graphical user interface. When the mouse moves over the button, the button color changes, providing visual feedback. When the mouse clicks on the button, an associated function is called, allowing the button to trigger an action. The code exists to encapsulate the button logic in a reusable component, keeping the system modular and maintainable."
+",C++ Code,The code defines a Button class that represents a clickable UI element. It handles mouse events to change the button's color when the mouse hovers over it and calls a function when the button is clicked. The layout method positions the button's rectangle shape and text label within the given window size to properly display the button. The Button class provides the basic functionality for rendering clickable UI elements within the software system's graphical user interface.
 /Graphics/Components/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
@@ -576,7 +560,16 @@ set(SOURCES ""${SOURCES} ${CURR_DIR}/Component.cpp
                         ${CURR_DIR}/Text.cpp
                         ${CURR_DIR}/HBox.cpp
                         ${CURR_DIR}/VBox.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,This code is adding source files to a SOURCES variable in a CMakeLists.txt file. It uses the RELATIVE_PATH command to get the relative path from the root directory to the current source directory. It then constructs a string of all the .cpp files in that directory and assigns it to the SOURCES variable. This will allow all of those source files to be compiled as part of the project.
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Component.cpp
+                        ${CURR_DIR}/Button.cpp
+                        ${CURR_DIR}/Rectangle.cpp
+                        ${CURR_DIR}/Text.cpp
+                        ${CURR_DIR}/HBox.cpp
+                        ${CURR_DIR}/VBox.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /Graphics/Components/Component.cpp,"#include <algorithm>
 #include <stdexcept>
 
@@ -767,15 +760,7 @@ bool Component::handleMouseButtonReleased(const sf::Event::MouseButtonEvent& e) 
 bool Component::handleResize(const sf::Event::SizeEvent& e) {
     return delegateToChildren([e](auto& child){return child.handleResize(e);});
 }
-",C++ Code,"This code defines a Component class that represents UI elements in a graphical user interface. The Component manages its position, size, and child components. This allows UI elements to be nested and positioned relative to their parent.
-
-When a Component is created, it is given an initial position and size. It can then be moved and resized using the set*Position and setSize functions. Components keep track of their local position relative to their parent, as well as their global position on the screen.
-
-Components can have child components, which are managed by the _children vector. Child components are added and removed using the add() and remove() functions. When a component is rendered, it first renders itself, then renders all of its children. This allows complex UI hierarchies to be built up.
-
-The functions handleKeyPressed(), handleMouseMoved(), etc. are event handlers that are delegated to child components. This allows events to propagate down the component tree.
-
-Overall, the Component class provides the basic functionality needed for a UI system. It allows elements to be positioned, sized, and nested in a hierarchy. This allows building up complex UIs from simple components."
+",C++ Code,"The code defines various classes that comprise a 3D rendering system, including components for loading and compiling shaders, managing blocks and chunks in a 3D world, handling a player object, creating UI elements, and displaying debug information. The classes define functions for initializing the components, setting properties like position and size, rendering to a window using an underlying render engine, and handling input events from the mouse and keyboard. Together, the components form a system that takes image files and shader programs as input, renders a 3D scene to an output window, and allows interaction through the UI and input handling. The class definitions focus on encapsulating responsibilities and exposing a clean interface while managing relationships between dependent components."
 /Graphics/Components/HBox.cpp,"#include <algorithm>
 
 #include ""Graphics/Components/HBox.h""
@@ -807,17 +792,7 @@ void HBox::layout(const sf::RenderWindow& w) {
         currX += child->getSize().x;
     }
 }
-",C++ Code,"This code implements an HBox component, which lays out its child components horizontally. When laid out, it:
-
-- Sets its own position to (0,0)
-- Finds the maximum height of its children
-- Calculates its own width as the sum of its children's widths
-- Sets its own size to that width and maximum height
-- Lays out each child component:
-  - Calculates a y position centered within the HBox
-  - Sets the child's local position to (x, y) where x is the running total of widths so far
-
-This allows components to be arranged horizontally within a fixed-height container, distributing the available vertical space evenly among the children. It exists to provide a simple layout mechanism for GUI components."
+",C++ Code,"The code implements a render engine that handles window creation, OpenGL context, and scene rendering. It contains classes for loading and compiling shaders, managing shader programs, loading image files, rendering block selections, representing individual blocks, managing chunks of blocks, containing the entire world, storing the player state, performing collision detection, and creating various UI components and menus for color selection, pausing, settings, and debugging options. The HBox class implements a horizontal box layout manager for arranging child UI components horizontally, calculating their total width and maximum height, and positioning them accordingly within the box."
 /Graphics/Components/Rectangle.cpp,"#include ""Graphics/Components/Rectangle.h""
 
 void Rectangle::renderComponent(sf::RenderWindow& w) {
@@ -852,17 +827,7 @@ const sf::Color& Rectangle::getOutlineColor() const {
 float Rectangle::getOutlineThickness() const {
     return _theRectangle.getOutlineThickness();
 }
-",C++ Code,"This code defines a Rectangle component that can be rendered on the screen. It helps support the system's graphical user interface functionality by rendering rectangular shapes.
-
-The renderComponent() method draws the rectangle shape onto the given render window, making it visible on the screen. 
-
-The layout() method positions and sizes the rectangle based on the component's global position and size.
-
-The set methods allow changing the rectangle's fill color, outline color, and outline thickness.
-
-The get methods allow reading the rectangle's current color and thickness values.
-
-This component exists to provide a simple rectangular shape that can be used as a basic graphical building block for the UI."
+",C++ Code,"The code defines a Rectangle component class that encapsulates the functionality for rendering, laying out, and updating the properties of a rectangular UI element. The component renders itself to an SFML window by drawing an SFML rectangle shape, lays itself out by positioning and sizing that rectangle shape based on the component's properties, and provides setter functions for the component's fill color, outline color, outline thickness, and getter functions to read those properties. The component functions act upon an SFML rectangle shape member variable to render the rectangle UI element to the screen."
 /Graphics/Components/Text.cpp,"#include ""Graphics/Components/Text.h""
 
 Text::Text() : Text(sf::Vector2i(0,0)) {}
@@ -919,7 +884,7 @@ float Text::textWidth() {
 float Text::textHeight() {
     return _theText.getLocalBounds().height;
 }
-",C++ Code,"This code defines a Text component class that represents text in a graphical user interface. It allows setting properties of the text like color, font size, and string, and provides methods to render and layout the text. This allows the system to display text to the user in a consistent way, and allows other components to depend on the Text component to show information. The code exists to encapsulate the logic for displaying text, so that other parts of the system do not have to handle the details of positioning, sizing, and rendering text themselves."
+",C++ Code,"The code defines a Text component class that represents a UI text element within a larger software system. The Text class handles setting the text string, font, color, and size, and it renders the text to a window using the RenderEngine. It inherits from a base Component class and implements functions for setting properties, laying out the component size, and rendering the text to a window."
 /Graphics/Components/VBox.cpp,"#include <algorithm>
 
 #include ""Graphics/Components/VBox.h""
@@ -951,13 +916,7 @@ void VBox::layout(const sf::RenderWindow& w) {
         currY += child->getSize().y;
     }
 }
-",C++ Code,"This code implements a vertical box layout component. It allows other UI components to be added as children, and arranges them vertically within itself. This helps structure the UI and organize components.
-
-When layout() is called, it first determines the maximum width of all its children. It then calculates the total height needed by summing the heights of all children. 
-
-It then positions each child component by centering them horizontally within the maximum width, and placing them below the previous child, starting from the top.
-
-This allows other components to be organized in a column, with automatic centering and spacing. This exists to provide a basic vertical layout mechanism for UI components."
+",C++ Code,"The code handles the rendering of a 3D game world by managing resources and components required for 3D graphics. It loads images, shader programs, and handles window creation using a RenderEngine class. Game objects like blocks, chunks, and the player are represented by classes that manage their rendering and collision detection. UI components like menus and buttons are used for the in-game interface. Debugging aids like the FPS counter are also available. The VBox class implements a vertical box layout manager for arranging UI components. It positions and sizes child components to fill the available vertical space, centering them horizontally."
 /Graphics/Menu/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
@@ -965,9 +924,14 @@ set(SOURCES ""${SOURCES} ${CURR_DIR}/Menu.cpp
                         ${CURR_DIR}/ColorSelectorMenu.cpp
                         ${CURR_DIR}/EscapeMenu.cpp
                         ${CURR_DIR}/SettingsMenu.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,"This code is adding source files to a variable named SOURCES. It uses the RELATIVE_PATH command to get the relative path from a root directory to the current source directory. It then stores this relative path in the CURR_DIR variable. It prints a message showing this relative path.
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
 
-Finally, it appends the .cpp files within the current directory to the SOURCES variable, separated by newlines. It also sets the SOURCES variable as a cache variable, likely for use in a CMakeLists.txt file."
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Menu.cpp
+                        ${CURR_DIR}/ColorSelectorMenu.cpp
+                        ${CURR_DIR}/EscapeMenu.cpp
+                        ${CURR_DIR}/SettingsMenu.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /Graphics/Menu/ColorSelectorMenu.cpp,"#include ""Graphics/Menu/ColorSelectorMenu.h""
 
 #define SLIDER_WIDTH      30
@@ -1047,13 +1011,7 @@ void ColorSelectorMenu::layout(const sf::RenderWindow& w) {
     _titleText->setLocalPosition(sf::Vector2i((float)bounds.width / 2 - _titleText->textWidth() / 2, 25));
 
 }
-",C++ Code,"This code implements a color selector menu GUI. It allows the user to select a color by adjusting red, green, and blue slider bars. The color selected is then applied to a color variable passed into the constructor.
-
-The sliders modify references to the original color values, allowing the color variable to be updated in real time as the user adjusts the sliders. A color preview rectangle is also displayed and updated to show the user the color they are selecting.
-
-Text labels are placed under each slider to indicate which color component the slider controls. A title text is also displayed at the top of the menu.
-
-The layout() method positions all the GUI elements within the menu bounds. It centers the color preview rectangle to the right of the blue slider. It positions the text labels under their corresponding sliders. And it centers the title text at the top of the menu."
+",C++ Code,"The code defines a ColorSelectorMenu class that provides a UI for modifying a color value. The constructor initializes UI elements like sliders, a preview rectangle and text labels. The layout() method positions these elements based on the window size, centering the title text at the top and placing the sliders, preview rectangle and text labels below in a grid-like fashion. This allows the ColorSelectorMenu to be rendered and provide a UI for modifying a color in an organized and user-friendly manner."
 /Graphics/Menu/EscapeMenu.cpp,"#include <GlobalLogger.hpp>
 
 #include ""Graphics/Menu/EscapeMenu.h""
@@ -1141,15 +1099,7 @@ bool EscapeMenu::handleResize(const sf::Event::SizeEvent& e) {
     setSize(sf::Vector2i(e.width, e.height));
     return false;
 }
-",C++ Code,"This code implements an escape menu that is displayed when the user presses the escape key. The menu provides options for the user to quit the game, resume the game, or open the settings menu. 
-
-When the escape menu is created, it initializes buttons for each of these options and lays them out vertically in the center of the screen. 
-
-When a button is clicked, the buttonCallback function is called which dispatches the action for that button. The quit button calls the Game::end() function to quit the game. The resume button simply sets a flag to close the menu. And the settings button adds a SettingsMenu to the screen.
-
-The escape menu handles mouse button presses and resize events to properly manage the menu display and button interactions.
-
-The escape menu exists to provide the user a way to pause the game and access important game options without disrupting the main game flow. It allows the user to quickly resume the game or make configuration changes as needed."
+",C++ Code,"The code implements an in-game pause menu for a 3D game engine. It creates buttons for quitting the game, resuming the game, and opening a settings menu. When initialized, it passes the game window size and a reference to the main game object. It then lays out the buttons vertically in the center of the screen and assigns callback functions for when each button is pressed. The callbacks either quit the game, resume the game by hiding the menu, or display the settings menu. It also overrides functions to handle mouse clicks and window resizes, passing them to the component class or re-laying out the buttons respectively."
 /Graphics/Menu/Menu.cpp,"#include ""Graphics/Menu/Menu.h""
 
 /*! \callergraph
@@ -1204,13 +1154,7 @@ bool Menu::handleMouseButtonPressed(const sf::Event::MouseButtonEvent& e) {
     Component::handleMouseButtonPressed(e);
     return getBounds().contains(sf::Vector2i(e.x, e.y));
 }
-",C++ Code,"This code defines a Menu class that provides the basic functionality for displaying a menu in a graphical user interface. It helps support the system behavior of displaying menus to the user.
-
-The Menu class defines the basic visual appearance of a menu, including a semi-transparent black background box with a thick black outline. It also handles centering the menu on the window and redrawing the menu when needed.
-
-The code exists to provide a reusable base class that derived menu classes, like option menus or context menus, can extend. By inheriting from this Menu class, the derived classes get the basic menu appearance and functionality for free, and only need to implement the specific menu options and logic.
-
-The code is written for a novice developer to understand the basic purpose and functionality of the Menu class, including what methods exist, what parameters they take, and what they do at a high level."
+",C++ Code,"The code defines a base Menu class that handles the common functionality for rendering and interacting with menus in a 2D graphics application. The Menu class initializes the menu with a black semi-transparent box outline, centers the menu on the application window, renders the menu background and calls the child class's rendering function, and handles mouse button presses by checking if they are within the menu bounds. The code is written in an object-oriented manner with an emphasis on reusability and extensibility, allowing child menu classes to inherit this base functionality and implement their specific features."
 /Graphics/Menu/SettingsMenu.cpp,"#include ""Graphics/Menu/SettingsMenu.h""
 
 #define WIDTH  500
@@ -1231,7 +1175,7 @@ SettingsMenu::SettingsMenu() : Menu(sf::Vector2f(WIDTH, HEIGHT), Menu::Type::Set
 {
     add(_vbox);
 }
-",C++ Code,"This code defines a Settings Menu that allows the user to adjust the position of a light source in 3D space. It contains sliders and text boxes to set the X, Y and Z position values of the light. By adjusting these values, the user can change where the light is positioned, which affects how objects in the 3D scene are illuminated. This functionality exists to give the user control over the lighting in the 3D scene to customize the visuals to their preferences."
+",C++ Code,"The code defines various classes that work together to render a 3D scene in real time. It handles lower level tasks like creating an OpenGL context and loading shaders, as well as higher level tasks like managing blocks, chunks, and a player within a 3D world. Various UI elements are defined to provide settings and debugging options to control aspects of the rendering. The SettingsMenu class shown creates a menu for adjusting the position of a light source within the scene, using slider and text components to allow the user to modify the X, Y, and Z coordinates of the light. The classes work cooperatively to process inputs, update the scene, and render it to the window for the user."
 /Graphics/Menu/new_menu.sh,"#!/bin/bash
 
 if [ ""$#"" -ne 1 ]; then
@@ -1254,21 +1198,7 @@ rm ""$1""Menu.cpp.tmp
 rm ""$1""Menu.h.tmp
 
 echo ""Don't forget to add the new menu type!""
-",C++ Code,"This code helps generate C++ header and source files for a new menu type in a system. It supports adding new menu types to the system in an automated way.
-
-When run, it takes a menu name as an argument and uses that to generate two files: a .cpp file containing the implementation and a .h header file containing the interface.
-
-It does this by:
-
-1. Checking that exactly one argument is provided, otherwise showing an error
-2. Changing to the directory containing this script  
-3. Using sed to replace placeholders in template files with the provided menu name
-4. Converting the menu name to upper case for use as a class name  
-5. Writing the final .cpp and .h files
-6. Deleting the temporary files
-7. Printing a reminder message
-
-This exists to automate the repetitive and error-prone process of manually creating new menu files, allowing developers to focus on the menu logic rather than boilerplate code."
+",C++ Code,"The code handles the rendering of a 3D game world by managing various rendering and game entities. It contains a render engine that creates the window and OpenGL context for displaying the scene. It loads shaders and images to apply textures. It represents game entities like blocks, chunks, and players, and manages collision detection. It also contains UI components for menus and debugging aids to display information to the user. Overall, the code processes inputs like images, shaders, and user input, and outputs a rendered 3D game world to a window for the user to interact with."
 /Graphics/Menu/skeleton/menu_skeleton.cpp,"#include ""Graphics/Menu/{NAME}Menu.h""
 
 #define WIDTH  500
@@ -1299,24 +1229,16 @@ bool {NAME}Menu::handleMouseButtonReleased(const sf::Event::MouseButtonEvent& e)
 bool {NAME}Menu::handleResize(const sf::Event::SizeEvent& e) {
     return false;
 }
-",C++ Code,"This code defines a menu class that inherits from a base Menu class. It defines the functionality for a specific type of menu, as indicated by the {NAME}Menu class name. The code exists to support the rendering and user interaction of a menu screen within the system. 
-
-When the menu is rendered, the renderMenu() method is called, which in this case simply returns as the functionality has not been implemented.
-
-The handleKeyPressed(), handleMouseMoved(), handleMouseButtonPressed(), handleMouseButtonReleased(), and handleResize() methods exist to handle user input events for the menu. In this case, they simply return false as the functionality has not yet been implemented.
-
-Overall, this menu class provides the basic structure for a specific type of menu within the system. The functionality will need to be filled in to actually render the menu contents and handle user input to navigate and interact with the menu."
+",C++ Code,The code defines a base class for rendering and handling input for a menu in a graphical user interface. It defines a Menu class that handles rendering to a window and responding to window events. It then defines a subclass for a specific menu type that inherits the base rendering and input handling behavior while customizing aspects for that menu type. The base class and subclass work together to provide a reusable framework for defining and rendering different menu types within a graphical user interface for the software system.
 /Graphics/Screen/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
 set(SOURCES ""${SOURCES} ${CURR_DIR}/WorldScreen.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,"This code performs the following:
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
 
-1. It finds the relative path of the current source directory with respect to a root directory. It stores this relative path in the CURR_DIR variable.
-
-2. It prints a message stating that it is adding the relative path stored in CURR_DIR.
-
-3. It appends the .cpp file in the current source directory to the SOURCES variable, which contains a list of source files for a project. It also caches this variable and forces it to be updated."
+set(SOURCES ""${SOURCES} ${CURR_DIR}/WorldScreen.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /Graphics/Screen/WorldScreen.cpp,"#include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 
@@ -1703,7 +1625,7 @@ void WorldScreen::render(RenderEngine& re, sf::RenderWindow& w) {
         w.popGLStates();
     }
 }
-",C++ Code,"This code handles the in-game world screen of a 3D block-based game, allowing the player to place and remove blocks, select block colors, copy colors, and open an escape menu. It manages mouse/key inputs, block placement, menu management, player movement, and FPS display. This functionality provides the core in-game interactions for a block-based game world, letting the player build and modify the world using simple inputs while also providing options to change settings, save progress, and quit the game."
+",C++ Code,"The code represents a 3D game world with blocks, chunks, and a player that can move and interact with the world. It handles rendering the 3D world and UI elements using OpenGL by loading and compiling shaders, image textures, and representing the game objects. It also handles user input from the keyboard and mouse for player movement, block placement, and menu interactions. The code contains classes for rendering, shaders, blocks, chunks, world, player, collision detection, and various UI elements like menus and an FPS counter. The WorldScreen class acts as the main screen that handles rendering the entire scene, updating the player, and dispatching input events to the appropriate handlers."
 /Player.cpp,"#include <SFML/System.hpp>
 
 #include ""Debug/DebugOptions.h""
@@ -2008,13 +1930,7 @@ sf::Vector3f Player::getHeadLocation() const {
     sf::Vector3f size = getBoundingBox().getSize();
     return _position + sf::Vector3f(size.x / 2, size.y * 7 / 8, size.z / 2);
 }
-",C++ Code,"The code implements the basic functionality for a player entity in a 3D voxel game:
-- Moving the player around the game world  
-- Preventing the player from passing through blocks
-- Showing the player's position and orientation
-- Determining which block the player is looking at, to allow interactions like mining
-It handles the player's movement, rendering, and block selection. This allows the game to determine the player's actions and respond accordingly.
-The code casts a ray from the player's head position and rotation to find the first solid block that intersects the ray. This allows the player to select blocks in the world to interact with, mimicking how a player would naturally select a block they are looking at."
+",C++ Code,"The code defines the Player class which represents a player entity in the game world. It contains logic for initializing the player, applying movement and handling collisions with blocks, performing raycasting to determine which block the player is looking at for selection highlighting, and rendering the player and selection highlight to the screen. The movement logic handles collisions by shrinking the player's velocity along an axis if moving at that velocity would cause a collision, ensuring the player ends up right against a block boundary. The raycasting algorithm traces a ray from the player's head position and uses a technique based on finding the minimum t value to reach the next block intersection, allowing it to determine the first solid block in front of the player."
 /Rendering/AABBRenderer.cpp,"#include ""Rendering/AABBRenderer.h""
 
 AABBRenderer AABBRenderer::renderer{};
@@ -2168,7 +2084,7 @@ void AABBRenderer::pushBlockVertices(std::vector<Vertex>& vertexes, const sf::Ve
     vertexes.emplace_back(points[0b101], color, posX, texCoords);
     vertexes.emplace_back(points[0b111], color, posX, texCoords);
 }
-",C++ Code,"This code renders an axis-aligned bounding box (AABB) in 3D space using OpenGL. When run, it initializes buffers, calculates the AABB position and size, loops through each edge calculating vertex data, and sends that data to OpenGL to render the bounding box as colored lines. The code exists to visualize the spatial extent and orientation of 3D objects for debugging purposes. It adds vertices defining points in 3D space with color and position to create the polygons that make up the 3D shape. The vertex data contains the information needed for the rendering system to position pixels on the screen and apply the correct color and texture."
+",C++ Code,"This code handles rendering an outline around an axis-aligned bounding box in 3D space. It initializes a vertex buffer if needed, calculates the vertices for each edge of the bounding box based on its position and size, pushes those vertices to the buffer, sets the buffer data, and draws the vertices as triangles to render the outline. The code uses a RenderEngine to handle window creation, OpenGL context, and scene rendering. It renders the outline with a specified color and line width."
 /Rendering/BlockSelection.cpp,"#include <optional>
 
 #include ""Rendering/AABBRenderer.h""
@@ -2182,12 +2098,16 @@ void BlockSelection::render(RenderEngine& e, sf::RenderWindow& w) {
     }
 }
 
-",C++ Code,"This code handles selecting and rendering blocks in a 3D world. It allows a user to select a block face, representing a cube in the 3D world. When a block face is selected, it renders an axis-aligned bounding box (AABB) around that block to visualize the selection to the user. This provides visual feedback for whatever further functionality depends on having a selected block, like modifying or destroying the selected block. The code exists to separate the concerns of block selection and rendering, following the single responsibility principle."
+",C++ Code,"The code handles rendering block selection highlights in the 3D world by rendering axis aligned bounding boxes around selected blocks. When a block is selected, the selection position is stored and an AABB is rendered around that block's position using the AABBRenderer. This provides visual feedback to the user, indicating which block has been selected. The code takes in a RenderEngine and window as inputs to perform the rendering, and outputs the selection highlight boxes."
 /Rendering/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
 set(SOURCES ""${SOURCES} ${CURR_DIR}/AABBRenderer.cpp ${CURR_DIR}/Image.cpp ${CURR_DIR}/stb_image.cpp ${CURR_DIR}/BlockSelection.cpp ${CURR_DIR}/RenderEngine.cpp ${CURR_DIR}/Renderable.cpp ${CURR_DIR}/Shader.cpp ${CURR_DIR}/ShaderProgram.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,"This code is adding source files to a SOURCES variable in CMake. It uses the RELATIVE_PATH command to determine the relative path from a root directory to the current source directory. It then uses that relative path to construct full paths to source files and adds them to the SOURCES variable. This allows the source files to be found relative to the root directory, rather than absolute paths."
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/AABBRenderer.cpp ${CURR_DIR}/Image.cpp ${CURR_DIR}/stb_image.cpp ${CURR_DIR}/BlockSelection.cpp ${CURR_DIR}/RenderEngine.cpp ${CURR_DIR}/Renderable.cpp ${CURR_DIR}/Shader.cpp ${CURR_DIR}/ShaderProgram.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /Rendering/Image.cpp,"#include <filesystem>
 
 #include ""Rendering/Image.h""
@@ -2217,7 +2137,7 @@ Image& Image::operator=(Image&& other) {
     return *this;
 }
 
-",C++ Code,"This code provides functionality for loading and managing image data. It helps support rendering and displaying images within the system. It does so by using the stb_image library to load image data from files on disk, storing the image width, height, and number of color channels. It then provides functions to manage the memory for that image data. This exists in the system to allow images to be loaded and used for rendering and display, without needing to manage the low-level image file loading details."
+",C++ Code,"The code encapsulates functionality for loading and managing image resources used by a 3D rendering engine. It defines an Image class that loads image files from disk using the STB image library, stores the pixel data and dimensions of the image, and frees the memory when images are destroyed. It implements move constructors and move assignment operators to allow Image objects to be passed efficiently. The code ensures memory is freed properly when Image objects are destroyed to avoid memory leaks."
 /Rendering/RenderEngine.cpp,"#include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -2413,17 +2333,7 @@ void RenderEngine::translatePlayer(const Player& player) {
 sf::RenderWindow& RenderEngine::getWindow() {
     return _window;
 }
-",C++ Code,"This code provides the functionality for rendering 3D graphics to the screen. It helps support the system's ability to display visual elements to the user. 
-
-It does this by initializing an OpenGL rendering context and SFML window, compiling shader programs for lighting and no lighting, and providing functions for:
-
-- Setting the perspective projection matrix based on the window size
-- Handling window resize events 
-- Switching between lighting and no lighting shaders
-- Starting and ending a render pass
-- Translating the camera view based on the player's position
-
-This exists in the system to allow 3D graphics and objects to be displayed to the user. The code initializes the necessary OpenGL state, shader programs, and window, then provides helper functions to actually perform the rendering."
+",C++ Code,"The code handles the rendering of a 3D game world by creating an OpenGL window, compiling shader programs, setting up OpenGL state, translating the camera based on the player's position, and rendering game entities. It loads image files and shader programs, handles player input, and outputs a rendered 3D scene to the screen. Classes like `RenderEngine`, `Shader`, `Block`, and `Chunk` work together to manage the various aspects of rendering the game world, while taking input from the `Player` to translate the camera view. The code uses modern OpenGL and follows an object-oriented design, encapsulating responsibilities into cohesive classes."
 /Rendering/Renderable.cpp,"#include <filesystem>
 
 #include <GlobalLogger.hpp>
@@ -2567,14 +2477,7 @@ void Renderable::setTexture(std::string name) {
         glBindTexture(GL_TEXTURE_2D, _textureIndexes[name]);
     }
 }
-",C++ Code,"This code provides functionality for rendering 2D textures and 3D models in a scene. It:
-
-- Initializes OpenGL buffers for vertex attributes and texture coordinates, allowing shapes to be rendered 
-- Loads PNG image files from disk and uploads them as 2D textures in OpenGL
-- Stores a map of texture names to OpenGL texture indices, allowing textures to be reused 
-- Provides functions to set a texture for rendering and draw from a vertex buffer
-
-This exists to abstract away some of the lower level OpenGL API and provide a simple interface for rendering textures and shapes. A novice developer can call the provided functions to load and render textures without needing to understand the details of OpenGL buffer initialization and texture setup."
+",C++ Code,"This code provides functionality for loading and managing textures in an OpenGL rendering system. It defines a Renderable class that can initialize vertex buffer objects and load texture files. The Renderable class uses helper classes like Image and VertexAttribsCalculator to load image data and set vertex attributes. When a texture is loaded, an OpenGL texture object is generated and image data is uploaded. The texture is then stored in a map using its name as the key so it can be retrieved and bound later when rendering objects that use that texture. This allows 3D objects to have color and detail defined by the texture images."
 /Rendering/Shader.cpp,"#include <fstream>
 
 #include <GlobalLogger.hpp>
@@ -2620,9 +2523,7 @@ void Shader::compile() {
         globalLogger.info(""Successfully compiled "", _fileName, ""!"");
     }
 }
-",C++ Code,"This code defines a Shader class that helps load and compile OpenGL shader programs. It supports rendering functionality by loading shader source code files and compiling them into executable shaders that define how objects should be rendered. 
-
-The constructor initializes an OpenGL shader object identifier. The getCode() method loads the source code from the specified file. The compile() method compiles the shader code and checks for any compilation errors. If errors occur, an exception is thrown containing the error log. Otherwise, a success message is logged."
+",C++ Code,"The code handles loading and compiling OpenGL shader programs from source files. It opens the shader source files, reads the code, and compiles the shaders using OpenGL functions. Any compilation errors are caught and thrown as exceptions with relevant information. Logging statements are used to inform the user of successful and failed compilation attempts. The code follows good practices like error handling, logging, and exception throwing to ensure robustness."
 /Rendering/ShaderProgram.cpp,"#include <GlobalLogger.hpp>
 
 #include ""Exception/ShaderCompilationFailureException.h""
@@ -2720,16 +2621,10 @@ void ShaderProgram::safeCallMatrix(std::function<void(GLint, GLsizei, GLboolean,
         }
     }
 }
-",C++ Code,"This code defines a ShaderProgram class that manages OpenGL shader programs. It allows compiling vertex and fragment shaders into a program, binding that program for use, and setting uniform variables. This allows the system to render 3D geometry and images using programmable shaders.
-
-The class loads vertex and fragment shader files, compiles them into OpenGL shader objects, and links them into a program object. It checks for compilation errors. It caches uniform variable locations to avoid repeatedly querying OpenGL.
-
-When setting uniform variables, it checks if the current OpenGL program is already the desired one. If not, it temporarily binds the program, sets the uniform, then restores the original program. This allows setting uniforms for a shader program without permanently binding it.
-
-This abstraction allows the rest of the system to manage shader programs in a consistent way, hiding low-level OpenGL details and error handling from other components."
+",C++ Code,"The code actively compiles shader programs from vertex and fragment shader files by loading the shader files, compiling the shaders, linking them into a shader program, and checking for compilation errors. It then manages the shader program by binding it for use, unbinding it, and retrieving uniform locations. Finally, it safely calls OpenGL functions to set uniform values by first binding the shader program if it is not currently active, calling the OpenGL function, and then unbinding it. This ensures uniform values are set for the correct shader program. Overall, the code handles the basic functionality for compiling and managing OpenGL shader programs in an active and robust manner."
 /Rendering/stb_image.cpp,"#define STB_IMAGE_IMPLEMENTATION
 #include ""Rendering/stb_image.h""
-",C++ Code,"This code includes the stb_image library, which provides functionality for loading and decoding image files. It allows the system to load and process image files to be used for rendering and display. The code exists to provide image loading capabilities that the system requires in order to render and display images. The stb_image library is a single-file public domain library for loading images into memory from files or memory buffers. It supports a number of common image file formats like PNG, BMP, TGA, and others."
+",C++ Code,"The code implements the core components of a 3D game engine, handling the rendering of a 3D world comprised of blocks, a player, and various UI elements. A RenderEngine handles window creation and OpenGL context to display the rendered scene. Shader and ShaderProgram classes load and compile shader programs for rendering. An Image class loads texture images. Various classes represent game entities like Block, Chunk, and World to manage the 3D world, while a Player class stores the player state and handles movement. Collision detection is implemented using an AABB class. A variety of UI components like buttons and menus are defined to display the game's user interface, including debug and settings menus."
 /Utils/AABB.cpp,"#include ""Utils/AABB.h""
 
 /*! \callergraph
@@ -2815,21 +2710,27 @@ bool AABB::checkCollision(const AABB& other) const {
 bool AABB::checkOverlap(float low1, float high1, float low2, float high2) const {
     return (!(high1 <= low2 || low1 >= high2));
 }
-",C++ Code,"This code defines an Axis Aligned Bounding Box (AABB) class that represents a 3D box shape. It allows defining the position and size of the box, getting information about it, and checking for collisions with other AABB objects. This exists to help represent 3D objects in space and detect collisions between them, which is important for supporting physics and interactions in a 3D game or simulation system. The constructor defines the initial position and size of the box. The getter and setter methods allow retrieving and updating that information. The getCenter() method finds the center point of the box. The checkCollision() method determines if the current box overlaps or intersects with another box, indicating a collision. This is done by checking for overlap on each axis (x, y, and z) separately. The checkOverlap() helper method checks for overlap between two 1D intervals, which is used by checkCollision()."
+",C++ Code,"The code implements an axis aligned bounding box for collision detection in a 3D game engine. An AABB is initialized with a position and size and provides functions to retrieve its position, size, and center point. The primary function checks if the AABB is colliding with another AABB by checking for overlap in each dimension. If there is overlap in all three dimensions, a collision is reported. This allows objects in the game engine to detect collisions with simple axis aligned bounding boxes, enabling basic collision detection and response."
 /Utils/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
 set(SOURCES ""${SOURCES} ${CURR_DIR}/AABB.cpp
                         ${CURR_DIR}/ICollidable.cpp
                         ${CURR_DIR}/Font.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,"This code is adding source files to a variable named SOURCES. It is using the CMake file() command to get the relative path of the current source directory from a root directory. It then uses that relative path to construct the full paths of several source files (AABB.cpp, ICollidable.cpp, and Font.cpp) within that directory. It then appends those full paths to the SOURCES variable, and sets that variable using the CMake set() command."
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/AABB.cpp
+                        ${CURR_DIR}/ICollidable.cpp
+                        ${CURR_DIR}/Font.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /Utils/Font.cpp,"#include ""Utils/Font.h""
 
 // Gotta define static members in a seperate file
 // Such as waste of a file
 /*! The default font to use when a font is needed */
 Font Font::defaultFont;
-",C++ Code,"This code defines a Font class that represents a font style and provides functionality for rendering text using that font. It allows text to be displayed consistently throughout the system using the same font properties. The static defaultFont member represents the default font that will be used if no other font is specified. This allows text to be rendered simply by using the Font class, without having to explicitly specify a font each time. This ensures a consistent default font across the system, while also providing the flexibility to use different fonts when needed."
+",C++ Code,"The code defines classes that handle various aspects of rendering 3D graphics and game objects for a 3D game. It defines classes for managing the rendering engine, shaders, images, blocks, chunks, the world, the player, collision detection, and UI components. The RenderEngine handles window creation and scene rendering. The Shader and ShaderProgram classes manage compiling and linking shader programs. The Image class loads image files. BlockSelection renders selection highlights around blocks. The Block and Chunk classes represent individual blocks and chunks of blocks with render data. The World contains all chunks that make up the game world. The Player stores player state and handles movement and rendering. The AABB class detects collisions using axis aligned bounding boxes. The Component and Button classes define the base UI elements. Various menus like the ColorSelectorMenu and EscapeMenu are defined to provide functionality to the player. DebugOptions stores debugging options and FPSCounter displays the frames per second."
 /Utils/ICollidable.cpp,"#include ""Utils/ICollidable.h""
 
 /*! \callergraph
@@ -2841,7 +2742,7 @@ Font Font::defaultFont;
 bool ICollidable::checkCollision(const ICollidable& other) const {
     return getBoundingBox().checkCollision(other.getBoundingBox());
 }
-",C++ Code,"This code checks for collisions between two ICollidable objects. An ICollidable is an interface that defines objects that can collide with each other in the system. The checkCollision() function takes another ICollidable object and checks if their bounding boxes, which define the spatial extents of the objects, are intersecting. This collision detection is important functionality for any system that simulates physical objects interacting in space, like a game or physics simulation. By detecting collisions, the system can then take appropriate actions like resolving the collision or triggering collision events. The code exists to encapsulate this collision detection logic in a reusable way that can be implemented for different specific object types in the system."
+",C++ Code,"The code defines a function that checks for collision between two objects that implement the ICollidable interface. It does this by calling the getBoundingBox() method on each object to retrieve their axis-aligned bounding boxes. It then checks if those two bounding boxes are colliding by calling the checkCollision() method, and returns true if a collision is detected, false otherwise. This provides a generic way to detect collisions between any objects that implement the ICollidable interface, allowing them to interact physically in the simulation."
 /World/Block.cpp,"#include <SFML/Graphics/Color.hpp>
 #include <SFML/System.hpp>
 
@@ -2917,7 +2818,7 @@ AABB Block::getBoundingBox() const {
     }
     return AABB(sf::Vector3f(_position.x, _position.y, _position.z), sf::Vector3f(1, 1, 1));
 }
-",C++ Code,"This code defines a Block class that represents a 3D cube in a 3D world. It supports functionality like setting the block's position, color, and type (solid or air). This allows the system to manage 3D blocks in the world, render them to the screen, perform collision detection, and other behaviors that require knowledge of the blocks. The class provides a simple API for manipulating and querying block properties, hiding the implementation details."
+",C++ Code,"The code defines a Block class that represents a single cube-shaped block in a 3D world. It stores the position, color, and type of solid or air for the block. The class provides getter and setter methods for manipulating and accessing the block's properties. It also has a method for retrieving the axis-aligned bounding box of the block, returning either a zero-sized box for air blocks or a unit cube for solid blocks. This allows the block to be used for collision detection and interaction with other objects in the 3D world managed by the larger software system."
 /World/BlockFace.cpp,"#include ""Utils/EnumClassHash.h""
 #include ""World/BlockFace.h""
 
@@ -3029,19 +2930,7 @@ void BlockFace::setFaceFromNormal(const sf::Vector3f& normal) {
         }
     }
 }
-",C++ Code,"This code defines a BlockFace class that represents a face on a 3D block. It contains functionality to:
-
-- Initialize a BlockFace from either a normal vector or a face name  
-- Get and set the position, normal vector, and face name  
-- Get and set the color of the face
-
-The code exists to model individual faces on 3D blocks in the system. By representing each face as an object, the system can interact with faces independently. This allows the system to:
-
-- Assign different colors to different faces  
-- Detect when blocks are touching by comparing adjacent face normals
-- Detect which face the player or other entities are looking at or interacting with
-
-The class provides a simple abstraction to represent a single face, hiding the implementation details of how the face normal and name are stored and initialized. This allows other parts of the system to interact with BlockFace objects without knowing the internal representation."
+",C++ Code,"The code defines a BlockFace class that encapsulates the properties and functionality of representing a face of a block in a 3D world. It contains properties for the block's position, normal vector pointing away from the face, a color and a face name. The class has constructors that can initialize a BlockFace from either a position and normal vector, or a position and face name. It also has getter and setter methods for each property to manipulate a BlockFace object. The class defines a utility function to determine the face name from a given normal vector, allowing BlockFace objects to be constructed from either a normal vector or face name. Overall, the BlockFace class provides an abstraction for representing and working with individual faces of blocks in the 3D world."
 /World/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 MESSAGE(""Adding ${CURR_DIR}"")
 
@@ -3049,11 +2938,14 @@ set(SOURCES ""${SOURCES} ${CURR_DIR}/Block.cpp
                         ${CURR_DIR}/Chunk.cpp
                         ${CURR_DIR}/World.cpp
                         ${CURR_DIR}/BlockFace.cpp"" CACHE STRING ""Sources for project"" FORCE)
-",C++ Code,"This code is adding source files to a CMake build. It does the following:
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
 
-1. Uses RELATIVE_PATH to get the current directory relative to a root directory
-2. Prints a message showing the relative path 
-3. Adds all .cpp files in that relative path to the SOURCES variable, which contains source files for the project"
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Block.cpp
+                        ${CURR_DIR}/Chunk.cpp
+                        ${CURR_DIR}/World.cpp
+                        ${CURR_DIR}/BlockFace.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
 /World/Chunk.cpp,"#include <SFML/Graphics/Color.hpp>
 #include <SFML/System.hpp>
 
@@ -3338,7 +3230,7 @@ bool Chunk::isInChunk(const sf::Vector3i& pos) const {
 void Chunk::notifyChanged() {
     _changed = true;
 }
-",C++ Code,"This code handles rendering 3D blocks in a chunk-based voxel world by initializing block colors based on position, rebuilding the vertex array when chunks change, and adding faces to the vertex array using a helper function. Only visible faces are rendered, optimizing performance. This defines a Chunk class representing a section of the 3D world containing Block objects. The Chunk functionality supports rendering the 3D world by storing blocks based on position within the chunk, converting between local and global positions, rebuilding vertex arrays when blocks change, sending vertex arrays to OpenGL, and setting textures and shaders. This allows managing the world in chunks while rendering the whole world. The Chunk class encapsulates functionality for a section of the world."
+",C++ Code,"The code handles rendering of a chunk of blocks within a larger 3D world. When initialized, the chunk populates its blocks with solid or air blocks based on their Y position, and assigns them a color based on their position within the chunk. The core functionality involves rebuilding the vertex array for rendering block faces. It iterates through each block, including blocks outside the chunk, and creates faces between air blocks and solid blocks within the chunk. This vertex data is then used to render the chunk using OpenGL. The chunk manages converting between local and global block positions, accessing individual blocks, and notifying when blocks change and the vertex data needs to be rebuilt. Overall, the code encapsulates the rendering logic for a subsection of the larger world, managing the vertex data for rendering visible block faces within that chunk."
 /World/World.cpp,"#include <cmath>
 
 #include <SFML/System.hpp>
@@ -3576,17 +3468,7 @@ sf::Vector3i World::getMinPosition() const {
 sf::Vector3i World::getMaxPosition() const {
     return sf::Vector3i(NUM_CHUNKS_LENGTH * Chunk::BLOCK_COUNT, NUM_CHUNKS_HEIGHT * Chunk::BLOCK_COUNT, NUM_CHUNKS_LENGTH * Chunk::BLOCK_COUNT);
 }
-",C++ Code,"This code defines a World class that represents a 3D world composed of chunks. Each chunk contains blocks that have a type and color. The World class provides functionality to:
-
-- Render the entire world by forwarding rendering to each chunk 
-- Get the chunk that a given position belongs to
-- Get and set the block type and color at a given position
-- Check if a position contains a valid block
-- Notify chunks when a block changes so they can re-render
-- Check for collisions between the player and blocks
-- Get the minimum and maximum positions of the world
-
-This allows the system to represent a 3D world that is larger than memory by dividing it into chunks, only loading the chunks currently needed. The World provides an interface to access and modify blocks, check collisions, and render the entire world. This chunk-based system allows for a large 3D world without consuming excessive memory."
+",C++ Code,"The code manages a 3D voxel world by dividing it into chunks. It handles rendering chunks to an SFML window using an OpenGL render engine. It allows getting and setting blocks by their position, notifying chunks when blocks change, and checking for collisions between a player and blocks. The chunk management and notification system allows efficiently rendering and updating only the relevant chunks as the world changes."
 /main.cpp,"#include <fstream>
 
 #include <GlobalLogger.hpp>
@@ -3704,4 +3586,4 @@ void registerSegfaultHandler() {
     SetUnhandledExceptionFilter(segvHandler);
 }
 #endif
-",C++ Code,"This code provides exception handling functionality for the application. When an exception occurs, either from a null pointer dereference or a segmentation fault, a custom exception is thrown containing a stack trace. This allows the exception to be caught and logged, along with relevant details, before terminating the application. This helps ensure any issues are properly documented for debugging. The code registers signal handlers for the operating system signals that indicate an exception has occurred, and throws the custom exceptions from those handlers. The main() function catches any unhandled exceptions, logs details about them, and exits the application. This provides a consistent way to handle and log unexpected errors."
+",C++ Code,"The code handles the core functionality of a 3D game engine by providing classes for rendering a 3D world, loading shaders and images, handling player input, collision detection, and UI elements. Classes such as RenderEngine handle window creation and scene rendering. Shader and ShaderProgram classes manage shader compilation and linking. The World class contains all chunks that make up the game world, while the Player class stores the player state and handles movement and rendering. The code also catches exceptions and logs useful error information to aid in debugging."

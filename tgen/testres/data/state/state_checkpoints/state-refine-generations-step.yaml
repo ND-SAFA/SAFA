@@ -1,0 +1,77 @@
+_CHECKPOINT_DIRNAME: state_checkpoints
+all_generated_content: &id001
+  ? As a game developer, I want a Player class to store player state, apply movement,
+    handle collisions, perform raycasting for block selection, and render the player,
+    so that I can implement a controllable character that interacts with the 3D world.
+  : - /Player.cpp
+  ? As a game developer, I want a RenderEngine class to handle window creation, OpenGL
+    context, camera view, and scene rendering, so that I have a reusable graphics
+    engine for displaying 3D scenes.
+  : - /Rendering/RenderEngine.cpp
+  ? As a game developer, I want an Image class to load image files as textures using
+    STB Image, so that I can apply detailed textures to 3D models.
+  : - /Rendering/Image.cpp
+    - /Rendering/stb_image.cpp
+completed_steps:
+  GenerateArtifactContentStep: 1
+  GenerateInputsStep: 1
+  InitializeDatasetStep: 1
+  RefineGenerationsStep: 1
+description_of_artifact: A User story is a concise, informal description of a software
+  feature or functionality, written from the perspective of the end user
+export_dir: "[ROOT_PATH]/testres/output"
+final_dataset: null
+format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
+  or benefit].
+generation_predictions: *id001
+n_generations: 1
+original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  ensure_code_is_summarized: True
+  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: "[ROOT_PATH]/testres/data/state/original_dataset"
+    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: true
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: "[ROOT_PATH]/testres/data/state/original_dataset"
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+questions:
+- What are the main classes/functions in the code?
+- What are the inputs and outputs of the main functions?
+- Is there any user interface code and what does it do?
+refined_content: *id001
+source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  ensure_code_is_summarized: True
+  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: "[ROOT_PATH]/testres/data/state/source_dataset"
+    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: true
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: "[ROOT_PATH]/testres/data/state/source_dataset"
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+summary: "Here is a summary of the key technical details and design aspects of the system based on the provided code"

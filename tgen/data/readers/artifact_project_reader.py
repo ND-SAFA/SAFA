@@ -1,7 +1,12 @@
+import os
+
+from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+import pandas as pd
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
@@ -26,8 +31,13 @@ class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
         Reads project data from files.
         :return: Returns the data frames containing the project artifacts.
         """
-        self.structured_project_reader.get_project_definition()
-        artifact_df = self.structured_project_reader.read_artifact_df()
+        if self.structured_project_reader.get_definition_reader(raise_exception=False) is not None:
+            self.structured_project_reader.get_project_definition()
+            artifact_df = self.structured_project_reader.read_artifact_df()
+        else:
+            if not self.get_full_project_path().endswith(FileUtil.CSV_EXT):
+                self.project_path = os.path.join(self.get_full_project_path(), ARTIFACT_FILE_NAME)
+            artifact_df = ArtifactDataFrame(pd.read_csv(self.project_path))
         filtered_artifacts = [artifact_id for artifact_id in artifact_df.index if artifact_id not in artifact_df.index]
         if len(filtered_artifacts) >= 1:
             logger.warning(f"The following artifacts did not contain any content so they have been removed: {filtered_artifacts}")

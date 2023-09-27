@@ -40,7 +40,7 @@ class PromptResponseManager:
     """
     :param expected_responses: A dictionary mapping the tag id to the expected responses for that tag
     """
-    expected_responses: Union[List, Dict[str, List]] = field(default_factory=dict)
+    expected_responses: Union[List, Dict[str, Set]] = field(default_factory=dict)
     """
     :param formatter: A method that takes in the tag id and returns the correct format for the associated response
     """
@@ -139,7 +139,9 @@ class PromptResponseManager:
         if isinstance(self.response_tag, dict):
             for parent, child_tags in self.response_tag.items():
                 values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
-                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in child_tags} for val in values]
+                tags = child_tags + [parent]
+                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in tags if c_tag in val or c_tag != parent}
+                          for val in values]
                 output[self._tag2id[parent]] = values
         else:
             tags, _ = self._convert2list(self.response_tag)
@@ -247,7 +249,7 @@ class PromptResponseManager:
         :return: Default value
         """
         assert no_exception or tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
-        logger.warning(f"Unexpected response for {tag_id}: {e}.")
+        logger.warning(f"Unexpected response for {tag_id}: {val} - {e}.")
         if self.default_factory:
             return self.default_factory(tag_id, val)
         return val if not return_none_on_fail else None

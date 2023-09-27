@@ -1,3 +1,4 @@
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
@@ -25,8 +26,8 @@ class BaseHGenJob(AbstractJob):
         Runs the hierarchy generator and exports the resulting dataset
         :return: The result of the job
         """
-        generated_dataset = self.hgen.run()
-        return generated_dataset
+        generated_dataset: PromptDataset = self.hgen.run()
+        return generated_dataset.trace_dataset if isinstance(generated_dataset, PromptDataset) else generated_dataset
 
     def get_hgen_args(self) -> HGenArgs:
         """

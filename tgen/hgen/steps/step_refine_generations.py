@@ -1,6 +1,6 @@
 import os
 from copy import deepcopy
-from typing import List, Set
+from typing import List, Set, Dict
 
 from tqdm import tqdm
 
@@ -29,31 +29,32 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         if not args.optimize_with_reruns:
-            state.all_generated_content = state.generated_artifact_content
+            state.all_generated_content = state.generation_predictions
+            state.refined_content = state.generation_predictions
             return
-        generated_artifacts = deepcopy(state.generated_artifact_content)
-        refined_content = deepcopy(state.generated_artifact_content)
+        all_generation_predictions = deepcopy(state.generation_predictions)
+        refined_content = deepcopy(state.generation_predictions)
         generate_artifact_content_step = GenerateArtifactContentStep()
-        for i in tqdm(range(max(state.n_generations, 1) + 1, args.n_reruns + 1),
+        for i in tqdm(range(max(state.n_generations, 1), args.n_reruns + 1),
                       desc=f"Re-running generations of {args.target_type}s"):
-            generate_artifact_content_step.run(args, state, force_run=True)
-            state.save(generate_artifact_content_step.get_step_name(), run_num=i)
-            generated_artifacts.extend(state.generated_artifact_content)
-            refined_content = self.perform_refinement(args, state.generated_artifact_content,
+            generate_artifact_content_step.run(args, state, re_run=True)
+            all_generation_predictions.update(state.generation_predictions)
+            refined_content = self.perform_refinement(args, state.generation_predictions,
                                                       refined_content,
                                                       state.summary, state.export_dir)
-        state.all_generated_content = generated_artifacts
+        state.refined_content = refined_content
+        state.all_generated_content = all_generation_predictions
 
     @staticmethod
     def perform_refinement(hgen_args: HGenArgs,
-                           generated_artifact_content: List[str],
-                           refined_artifact_content: List[str],
+                           new_generated_artifact_content: Dict[str, List[str]],
+                           refined_artifact_content: Dict[str, List[str]],
                            summary: str,
-                           export_path: str) -> List[str]:
+                           export_path: str) -> Dict[str, List[str]]:
         """
         Performs the refinement of the original generated artifact content
         :param hgen_args: The arguments for the hierarchy generation
-        :param generated_artifact_content: The content originally generated
+        :param new_generated_artifact_content: The content originally generated
         :param refined_artifact_content: The artifact content that was selected from previous runs
         :param summary: The summary of the system
         :param export_path: The path to export the checkpoint to
@@ -65,40 +66,42 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             prompt_builder = get_prompt_builder_for_generation(hgen_args,
                                                                questionnaire,
                                                                base_prompt=SupportedPrompts.HGEN_REFINEMENT,
-                                                               artifact_type=f"V1 {hgen_args.target_type}")
+                                                               artifact_type=f"V1 {hgen_args.target_type}",
+                                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED)
             prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
-            refined_artifacts = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown_header(f"V2 "
-                                                                                                       f"{hgen_args.target_type}"),
+            refined_artifacts = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"V2 {hgen_args.target_type}"),
                                                     build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                                     include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                                     starting_num=len(refined_artifact_content) + 1) \
-                .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in generated_artifact_content])
+                .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in new_generated_artifact_content.keys()])
             prompt_builder.add_prompt(Prompt(refined_artifacts), -1)
             artifacts = create_artifact_df_from_generated_artifacts(hgen_args,
-                                                                    artifact_generations=refined_artifact_content,
+                                                                    artifact_generations=list(refined_artifact_content.keys()),
                                                                     target_layer_id=hgen_args.target_type,
                                                                     generate_names=False)
             generated_artifacts_tag: str = questionnaire.get_response_tags_for_question(-1)
             selected_artifact_nums = get_predictions(prompt_builder,
-                                                       PromptDataset(artifact_df=artifacts),
-                                                       hgen_args=hgen_args,
-                                                       prediction_step=PredictionStep.REFINEMENT,
-                                                       response_prompt_ids=questionnaire.id,
-                                                       tags_for_response={generated_artifacts_tag},
-                                                       return_first=True,
-                                                       export_path=os.path.join(export_path, "gen_refinement_response.yaml"))[0]
+                                                     PromptDataset(artifact_df=artifacts),
+                                                     hgen_args=hgen_args,
+                                                     prediction_step=PredictionStep.REFINEMENT,
+                                                     response_prompt_ids=questionnaire.id,
+                                                     tags_for_response={generated_artifacts_tag},
+                                                     return_first=True,
+                                                     export_path=os.path.join(export_path, "gen_refinement_response.yaml"))[0]
             selected_artifact_nums = set(selected_artifact_nums)
             selected_artifacts = RefineGenerationsStep._get_selected_artifacts(refined_artifact_content, selected_artifact_nums)
-            selected_artifacts += RefineGenerationsStep._get_selected_artifacts(generated_artifact_content, selected_artifact_nums,
-                                                                                offset=len(refined_artifact_content))
+            selected_artifacts.update(RefineGenerationsStep._get_selected_artifacts(new_generated_artifact_content,
+                                                                                    selected_artifact_nums,
+                                                                                    offset=len(refined_artifact_content)))
 
         except Exception as e:
             logger.exception("Refining the artifact content failed. Using original content instead.")
-            selected_artifacts = selected_artifacts
+            selected_artifacts = refined_artifact_content
         return selected_artifacts
 
     @staticmethod
-    def _get_selected_artifacts(original_artifact_content: List[str], selected_artifact_nums: Set[int], offset: int = 0) -> List[str]:
+    def _get_selected_artifacts(original_artifact_content: Dict[str, List[str]],
+                                selected_artifact_nums: Set[int], offset: int = 0) -> Dict[str, List[str]]:
         """
         Retrieves only the content selected in the artifact nums
         :param original_artifact_content: The list of original artifact content
@@ -106,5 +109,5 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param offset: The amount to offset the artifact numbers by
         :return: The list of selected artifact content
         """
-        return [content for i, content in enumerate(original_artifact_content)
-                                   if i + 1 + offset in selected_artifact_nums]
+        return {items[0]: items[1] for i, items in enumerate(original_artifact_content.items())
+                if i + 1 + offset in selected_artifact_nums}

@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from tgen.common.util.date_time_util import DateTimeUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
@@ -385,7 +386,7 @@ class TraceDataset(iDataset):
             tracing_types.append((parent_type, child_type))
         return tracing_types
 
-    def as_creator(self, project_path: str, dataset_dirname: str = None):
+    def as_creator(self, project_path: str, dataset_dirname: str):
         """
         Converts the dataset into a creator that can remake it
         :param project_path: The path to save the dataset at for reloading
@@ -395,7 +396,6 @@ class TraceDataset(iDataset):
         from tgen.data.exporters.safa_exporter import SafaExporter
         from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
         from tgen.data.readers.structured_project_reader import StructuredProjectReader
-        dataset_dirname = DateTimeUtil.now_as_string() if not dataset_dirname else dataset_dirname
         project_path = os.path.join(project_path, dataset_dirname)
         SafaExporter(project_path, dataset=self).export()
         return TraceDatasetCreator(project_reader=StructuredProjectReader(project_path=project_path))

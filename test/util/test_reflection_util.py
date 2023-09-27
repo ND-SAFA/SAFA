@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Union, Tuple
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.testres.test_data_manager import TestDataManager
+from abc import abstractmethod
 
 
 class TestClassOne:
@@ -11,6 +12,21 @@ class TestClassOne:
         self.local = "local"
         self._protected = "protected"
         self.__private = "private"
+
+    def test_method(self):
+        return
+
+    @staticmethod
+    def test_static_method():
+        return
+
+    @classmethod
+    def test_class_method(cls):
+        return
+
+    @abstractmethod
+    def test_abstract_method(self):
+        return
 
 
 class TestClassTwo:
@@ -74,8 +90,17 @@ class TestReflectionUtil(BaseTest):
         cls = ReflectionUtil.get_cls_from_path("bad.path")
         self.assertIsNone(cls)
 
-        cls = ReflectionUtil.get_cls_from_path("tgen.testres.test_data_manager.Keys") # nested
+        cls = ReflectionUtil.get_cls_from_path("tgen.testres.test_data_manager.Keys")  # nested
         self.assertEqual(cls.__name__, TestDataManager.Keys.__name__)
+
+    def test_is_a_function(self):
+        self.assertTrue(ReflectionUtil.is_function(lambda x: x))
+        self.assertTrue(ReflectionUtil.is_function(TestClassOne.test_method))
+        self.assertTrue(ReflectionUtil.is_function(TestClassOne.test_class_method))
+        self.assertTrue(ReflectionUtil.is_function(TestClassOne.test_static_method))
+        self.assertTrue(ReflectionUtil.is_function(TestClassOne.test_abstract_method))
+        self.assertFalse(ReflectionUtil.is_function(TestClassOne()))
+        self.assertFalse(ReflectionUtil.is_function(TestClassOne))
 
     def __assert_scope(self, param_name, expected_scope: ParamScope, class_name: str = None):
         param_scope = ReflectionUtil.get_field_scope(param_name, class_name=class_name)

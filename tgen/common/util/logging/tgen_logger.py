@@ -10,15 +10,16 @@ class TGenLogger(Logger):
     """
     DEFAULT_TITLE_LENGTH = 100
 
-    def log_with_title(self, title: str, message: str = EMPTY_STRING) -> None:
+    def log_with_title(self, title: str, message: str = EMPTY_STRING, formatting: str = None) -> None:
         """
         Logs the message with a title
         :param title: The title to the message
         :param message: The message
+        :param formatting: If provided, will use the string to format the title
         :return: None
         """
-        message = "" if message is None else message
-        title = TGenLogger.__create_title(title)
+        message = EMPTY_STRING if message is None else message
+        title = TGenLogger.__create_title(title) if not formatting else formatting.format(title)
         msg = f"{title}\n{message}"
         self.info(msg)
 

@@ -39,11 +39,11 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
         :return: Artifact and Trace DataFrame
         """
-        logger.info(f"Reading file: {self.get_project_path()}")
-        entity_df = pd.read_csv(self.get_project_path())
+        logger.info(f"Reading file: {self.get_full_project_path()}")
+        entity_df = pd.read_csv(self.get_full_project_path())
         trace_df_entries = []
         artifact_df_entries = {}
-        project_name = os.path.basename(self.get_project_path())
+        project_name = os.path.basename(self.get_full_project_path())
 
         def read_artifact(row_batches):
             for row_index in row_batches:
@@ -82,7 +82,7 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         :return: Returns the file name of the csv file.
         """
-        return FileUtil.get_file_name(self.get_project_path())
+        return FileUtil.get_file_name(self.get_full_project_path())
 
     @staticmethod
     def should_generate_negative_links() -> bool:

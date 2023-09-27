@@ -1,6 +1,8 @@
 from tgen.common.constants.dataset_constants import NO_CHECK
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.json_util import JsonUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -14,13 +16,14 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     Responsible for converting JSON from API into DataFrames containing artifacts and traces.
     """
 
-    def __init__(self, api_definition: ApiDefinition, overrides: dict = None):
+    def __init__(self, api_definition: ApiDefinition = None, project_path: str = EMPTY_STRING, overrides: dict = None):
         """
         Constructs project reader targeting given api.
         :param api_definition: The API payload containing artifacts and trace links.
         :param overrides: The parameters to override.
         """
-        super().__init__(overrides)
+        super().__init__(project_path=project_path, overrides=overrides)
+        assert api_definition or project_path, "Must supply an api definition or project path"
         self.api_definition = api_definition
         self.remove_orphans = False
         self.overrides = {
@@ -35,6 +38,9 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Extracts artifacts and trace links from API payload.
         :return: Artifacts, Traces, and Layer Mappings.
         """
+        if self.get_full_project_path():
+            api_dict = JsonUtil.read_json_file(self.get_full_project_path())
+            self.api_definition = ApiDefinition.from_dict(**api_dict)
         artifact_df = self.create_artifact_df()
         layer_mapping_df = self.create_layer_df()
         trace_df = self.create_trace_df()

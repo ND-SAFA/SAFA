@@ -10,7 +10,6 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
@@ -31,15 +30,12 @@ public class TeamController extends BaseController {
 
     private final OrganizationService organizationService;
     private final TeamService teamService;
-    private final TeamMembershipService teamMembershipService;
 
     public TeamController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
-                          OrganizationService organizationService, TeamService teamService,
-                          TeamMembershipService teamMembershipService) {
+                          OrganizationService organizationService, TeamService teamService) {
         super(resourceBuilder, serviceProvider);
         this.organizationService = organizationService;
         this.teamService = teamService;
-        this.teamMembershipService = teamMembershipService;
     }
 
     /**

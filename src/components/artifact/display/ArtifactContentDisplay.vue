@@ -1,7 +1,7 @@
 <template>
   <q-splitter v-if="showSummary" v-model="splitterModel" :horizontal="!isCode">
     <template #before>
-      <div>
+      <div class="q-mr-md">
         <typography variant="caption" value="Summary" />
         <typography
           variant="expandable"

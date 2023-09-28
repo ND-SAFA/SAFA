@@ -22,7 +22,11 @@
       </q-btn>
     </div>
   </div>
-  <div v-else-if="variant === 'code'" class="width-100">
+  <div
+    v-else-if="variant === 'code'"
+    class="width-100"
+    style="max-height: 100vh"
+  >
     <div class="flex nowrap overflow-auto">
       <q-btn flat dense @click.stop="expanded = !expanded">
         <q-separator vertical class="q-mx-xs" />

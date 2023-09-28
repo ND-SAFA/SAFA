@@ -60,7 +60,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
             logItems[logItems.length - 1]?.timestamp || ""
           ),
           entry,
-          error: entry.includes("rror"),
+          error: entry.includes("Error executing job"),
         };
       });
     });

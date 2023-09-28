@@ -3,8 +3,11 @@
     <template #load>
       <project-version-stepper />
     </template>
-    <template #uploads>
-      <jobs-table />
+    <template v-if="hasProject" #project>
+      <jobs-table :display-project-jobs="true" />
+    </template>
+    <template #user>
+      <jobs-table :display-project-jobs="false" />
     </template>
   </tab-list>
 </template>
@@ -18,13 +21,16 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
-import { ref } from "vue";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
 import { loaderTabOptions } from "@/util";
+import { projectStore } from "@/hooks";
 import { TabList } from "@/components/common";
 import { JobsTable } from "@/components/jobs";
 import ProjectVersionStepper from "./ProjectVersionStepper.vue";
 
-const tabs = loaderTabOptions();
-const tab = ref(tabs[0].id);
+const hasProject = computed(() => projectStore.projectId !== "");
+const allTabs = loaderTabOptions();
+const tabs = computed(() => (hasProject.value ? allTabs : allTabs.slice(0, 2)));
+const tab = ref(tabs.value[0].id);
 </script>

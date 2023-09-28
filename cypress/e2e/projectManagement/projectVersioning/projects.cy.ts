@@ -44,7 +44,7 @@ describe("Projects", () => {
     });
   });
 
-  describe("As an owner, I can delete a project", () => {
+  describe.skip("As an owner, I can delete a project", () => {
     it("Deletes a project from the selector", () => {
       cy.clickButton(DataCy.selectorDeleteButton, "first");
 

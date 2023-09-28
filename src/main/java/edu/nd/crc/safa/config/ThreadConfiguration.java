@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.config;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 

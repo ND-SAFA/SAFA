@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.utilities.StringUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

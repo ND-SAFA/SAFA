@@ -82,8 +82,10 @@ public class DbEntityBuilder extends AbstractBuilder {
     SafaUser currentUser;
 
     @Autowired
-    public DbEntityBuilder(ServiceProvider serviceProvider, CustomAttributeRepository customAttributeRepository,
-                           AttributeSystemServiceProvider attributeSystemServiceProvider) {
+    public DbEntityBuilder(ServiceProvider serviceProvider,
+                           CustomAttributeRepository customAttributeRepository,
+                           AttributeSystemServiceProvider attributeSystemServiceProvider,
+                           ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl) {
 
         this.projectRepository = serviceProvider.getProjectRepository();
         this.projectService = serviceProvider.getProjectService();
@@ -96,7 +98,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
         this.userProjectMembershipRepository = serviceProvider.getUserProjectMembershipRepository();
-        this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
+        this.artifactVersionRepositoryImpl = artifactVersionRepositoryImpl;
         this.customAttributeRepository = customAttributeRepository;
         this.attributeSystemServiceProvider = attributeSystemServiceProvider;
         this.versionService = serviceProvider.getVersionService();
@@ -193,7 +195,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         int versionIndex = getProjectVersions(projectName).size() - 1;
         return this.getProjectVersion(projectName, versionIndex);
     }
-    
+
     public DbEntityBuilder newVersion(String projectName) {
         Project project = getProject(projectName);
         ProjectVersion projectVersion = versionService.createNewVersion(project,

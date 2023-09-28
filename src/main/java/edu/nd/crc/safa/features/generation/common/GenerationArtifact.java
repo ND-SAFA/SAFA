@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.generation.common;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 

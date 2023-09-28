@@ -26,7 +26,7 @@ public class RetrievalTestService {
     DbEntityBuilder dbEntityBuilder;
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
-        AuthorizationSetter.setSessionAuthorization(ApplicationBaseTest.defaultUser, this.serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(ApplicationBaseTest.currentUserName, this.serviceProvider);
         return this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(projectVersion);
     }
 

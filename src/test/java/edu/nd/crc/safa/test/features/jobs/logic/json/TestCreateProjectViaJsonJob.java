@@ -46,8 +46,8 @@ class TestCreateProjectViaJsonJob extends ApplicationBaseTest {
         UUID jobId = UUID.fromString(jobIdString);
 
         // Step - Get Job and subscribe for updates
-        notificationService.createNewConnection(defaultUser).subscribeToJob(defaultUser,
-            jobService.getJobById(jobId));
+        notificationService.initializeUser(currentUser, this.token);
+        notificationService.subscribeToJob(currentUser, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
         JobTestService.verifyJobWasCompleted(serviceProvider, jobId, N_STEPS);

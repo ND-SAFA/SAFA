@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
+
+import jakarta.transaction.Transactional;
 
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeExtraInfoType;
@@ -92,7 +93,7 @@ public class AttributeService {
      * Retrieves selection options for a custom attribute sorted by the given sort.
      *
      * @param attribute The attribute to get options for.
-     * @param sort The sort to use for the retrieved data.
+     * @param sort      The sort to use for the retrieved data.
      * @return The options, if they are found.
      * @throws IllegalArgumentException If this attribute is not supposed to have selection options.
      */
@@ -119,10 +120,11 @@ public class AttributeService {
 
     /**
      * Retrieves float bounds for a custom attribute.
+     *
      * @param attribute The attribute to get the bounds of.
      * @return The bounds, if they are found.
      * @throws IllegalArgumentException If this attribute is not supposed to have float bounds.
-     * @throws IllegalStateException If this attribute is supposed to have float bounds, but they are not found.
+     * @throws IllegalStateException    If this attribute is supposed to have float bounds, but they are not found.
      */
     public FloatAttributeInfo getFloatAttributeInfoForAttribute(CustomAttribute attribute) {
         if (attribute.getType().getExtraInfoType() != CustomAttributeExtraInfoType.FLOAT_BOUNDS) {
@@ -143,10 +145,11 @@ public class AttributeService {
 
     /**
      * Retrieves integer bounds for a custom attribute.
+     *
      * @param attribute The attribute to get the bounds of.
      * @return The bounds, if they are found.
      * @throws IllegalArgumentException If this attribute is not supposed to have integer bounds.
-     * @throws IllegalStateException If this attribute is supposed to have integer bounds, but they are not found.
+     * @throws IllegalStateException    If this attribute is supposed to have integer bounds, but they are not found.
      */
     public IntegerAttributeInfo getIntegerAttributeInfoForAttribute(CustomAttribute attribute) {
         if (attribute.getType().getExtraInfoType() != CustomAttributeExtraInfoType.INT_BOUNDS) {
@@ -183,7 +186,7 @@ public class AttributeService {
     /**
      * Creates selection options based on the given front-end entity.
      *
-     * @param appEntity The front-end attribute entity.
+     * @param appEntity       The front-end attribute entity.
      * @param parentAttribute The custom attribute these options belong to.
      * @return Newly created selection options.
      * @throws IllegalArgumentException If this object is not supposed to have selection options.
@@ -209,7 +212,7 @@ public class AttributeService {
     /**
      * Creates a float bounds object based on the data in the given front-end object.
      *
-     * @param appEntity The front-end attribute entity.
+     * @param appEntity       The front-end attribute entity.
      * @param parentAttribute The custom attribute these bounds belong to.
      * @return Newly created float bounds.
      * @throws IllegalArgumentException If this object is not supposed to have float bounds.
@@ -239,7 +242,7 @@ public class AttributeService {
     /**
      * Creates an int bounds object based on the data in the given front-end object.
      *
-     * @param appEntity The front-end attribute entity.
+     * @param appEntity       The front-end attribute entity.
      * @param parentAttribute The custom attribute these bounds belong to.
      * @return Newly created int bounds.
      * @throws IllegalArgumentException If this object is not supposed to have int bounds.
@@ -271,8 +274,8 @@ public class AttributeService {
      * has permission to modify project attributes and does not check to ensure this is true.
      *
      * @param appEntity The attribute object from the front-end.
-     * @param project The project the attribute is a part of.
-     * @param isNew Whether this is a new attribute being created or an existing attribute being updated.
+     * @param project   The project the attribute is a part of.
+     * @param isNew     Whether this is a new attribute being created or an existing attribute being updated.
      * @throws SafaError If the attribute was marked as new, but an attribute with that key already exists
      *                   within the project; or if the attribute was marked as not new, but no attribute with
      *                   that key was found withing the project.
@@ -434,7 +437,7 @@ public class AttributeService {
      * Returns all custom attributes in a given project sorted by the given sort.
      *
      * @param project The project to search.
-     * @param sort The sort order to use.
+     * @param sort    The sort order to use.
      * @return All attributes in the given project.
      */
     public List<CustomAttribute> getAttributesForProject(Project project, Sort sort) {
@@ -458,7 +461,7 @@ public class AttributeService {
      * Returns all custom attributes in a given project as front-end entities sorted by the given sort.
      *
      * @param project The project to search.
-     * @param sort The sort order to use.
+     * @param sort    The sort order to use.
      * @return All attributes in the given project.
      */
     public List<CustomAttributeAppEntity> getAttributeEntitiesForProject(Project project, Sort sort) {

@@ -1,11 +1,12 @@
 package edu.nd.crc.safa.features.users.entities.app;
 
 import java.util.UUID;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class UserAppEntity {
+public class UserAppEntity implements IUser {
     /**
      * Unique identifier for user.
      */

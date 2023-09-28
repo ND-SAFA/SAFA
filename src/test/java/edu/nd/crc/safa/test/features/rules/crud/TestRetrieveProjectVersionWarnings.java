@@ -66,7 +66,8 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(ruleViolated.getString("ruleName")).isEqualTo("Missing child");
 
         // Step - Subscribe to project version
-        notificationService.createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
+        notificationService.initializeUser(currentUser, this.token);
+        notificationService.subscribeToVersion(currentUser, projectVersion);
 
         // Step - Create Design artifact and link
         JSONObject designJson =

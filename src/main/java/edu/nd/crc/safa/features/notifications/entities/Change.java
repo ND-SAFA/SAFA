@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.notifications.entities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,8 +29,10 @@ public class Change {
      */
     private List<UUID> entityIds = new ArrayList<>();
 
-    public List<UUID> getEntityIds() {
-        return this.entityIds.stream().collect(Collectors.toList());
+    private List<Object> entities = new ArrayList<>();
+
+    public <T extends Object> void setEntities(List<T> entities) {
+        this.entities = (List<Object>) entities;
     }
 
     /**
@@ -53,12 +54,12 @@ public class Change {
     public enum Entity {
         PROJECT,
         MEMBERS,
+        ACTIVE_MEMBERS,
         VERSION,
         TYPES,
         DOCUMENT,
         ARTIFACTS,
         TRACES,
-        MODELS,
         WARNINGS,
         JOBS,
         TRACE_MATRICES;

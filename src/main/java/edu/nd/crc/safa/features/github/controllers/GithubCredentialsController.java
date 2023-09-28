@@ -1,8 +1,6 @@
 package edu.nd.crc.safa.features.github.controllers;
 
 import java.util.Optional;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -18,6 +16,8 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;

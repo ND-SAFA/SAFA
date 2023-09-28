@@ -24,7 +24,7 @@ class TestJobRetrieval extends ApplicationBaseTest {
      */
     @Test
     void testUserJobs() throws Exception {
-        Project project = createBothJobs(false, defaultUser);
+        Project project = createBothJobs(false, currentUserName);
         assertJobs(project, 1, 0);
     }
 
@@ -33,13 +33,13 @@ class TestJobRetrieval extends ApplicationBaseTest {
      */
     @Test
     void testProjectJobs() throws Exception {
-        Project project = createBothJobs(true, defaultUser);
+        Project project = createBothJobs(true, currentUserName);
         assertJobs(project, 1, 1);
     }
 
     @Test
     void otherUserJobs() throws Exception {
-        Project project = createBothJobs(true, defaultUser);
+        Project project = createBothJobs(true, currentUserName);
         assertJobs(project, 1, 1);
 
         // Setup new user

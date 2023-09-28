@@ -2,7 +2,8 @@ package edu.nd.crc.safa.features.generation.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+
+import jakarta.annotation.Nullable;
 
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 

@@ -2,17 +2,6 @@ package edu.nd.crc.safa.features.traces.entities.db;
 
 import java.io.Serializable;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.common.IVersionEntity;
@@ -20,10 +9,22 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Responsible for marking each trace link in each project.
@@ -41,7 +42,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     @Id
     @GeneratedValue
-    @Type(type = "uuid-char")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "trace_link_version_id")
     private UUID traceLinkVersionId;
 
@@ -62,13 +63,15 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     private TraceLink traceLink;
 
     @Column(name = "modification_type", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER)
     @Enumerated(EnumType.ORDINAL)
     private ModificationType modificationType;
 
     @Column(name = "trace_type", nullable = false)
+    @JdbcTypeCode(SqlTypes.INTEGER)
     @Enumerated(EnumType.ORDINAL)
     private TraceType traceType;
-
+    @JdbcTypeCode(SqlTypes.INTEGER)
     @Column(name = "approval_status")
     private ApprovalStatus approvalStatus;
 

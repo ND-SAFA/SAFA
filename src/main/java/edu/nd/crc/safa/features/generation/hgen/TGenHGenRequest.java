@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.features.generation.hgen;
 
 import java.util.List;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

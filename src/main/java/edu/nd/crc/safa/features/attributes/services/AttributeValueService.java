@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import javax.transaction.Transactional;
+
+import jakarta.transaction.Transactional;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
@@ -87,9 +88,9 @@ public class AttributeValueService {
      * Saves the given json node as the value of the given attribute within the given version
      * of the given artifact.
      *
-     * @param attribute The schema of the attribute we are saving a value to.
+     * @param attribute       The schema of the attribute we are saving a value to.
      * @param artifactVersion The version of the artifact we are setting a value within.
-     * @param value The value to set.
+     * @param value           The value to set.
      */
     @Transactional
     public void saveAttributeValue(CustomAttribute attribute, ArtifactVersion artifactVersion, JsonNode value) {
@@ -128,7 +129,7 @@ public class AttributeValueService {
      * Gets the current attribute version matching the given attribute and artifact version, if it exists. Else
      * returns a newly constructed one.
      *
-     * @param attribute The attribute object we want to access.
+     * @param attribute       The attribute object we want to access.
      * @param artifactVersion The artifact version we want to access an attribute for.
      * @return The attribute version if it existed previously, or a new one.
      */

@@ -1,7 +1,8 @@
 package edu.nd.crc.safa.features.generation.common;
 
 import java.util.UUID;
-import javax.annotation.Nullable;
+
+import jakarta.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

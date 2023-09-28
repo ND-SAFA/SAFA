@@ -2,8 +2,10 @@ package edu.nd.crc.safa.test.common;
 
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
@@ -23,6 +25,11 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
      * Project shared with sharee.
      */
     protected Project project;
+    /**
+     * The user used to share resources with.
+     */
+    @Getter
+    protected IUser sharee;
 
     @BeforeEach
     public void setupProject() throws Exception {
@@ -35,7 +42,10 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
         this.project = this.projectVersion.getProject();
 
         // Step - Create other user to share project with.
-        this.authorizationService.createUser(Sharee.email, Sharee.password);
+        this.sharee = this.authorizationService.createUser(Sharee.email, Sharee.password);
+        String shareeToken = this.authorizationService.loginUser(Sharee.email, Sharee.password);
+
+        this.authorizationService.logicDefaultUser();
 
         // Step - Share project with sharee
         creationService.shareProject(
@@ -44,14 +54,9 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
             this.otherUserProjectRole);
 
         // Step - Subscribe Sharee to project  notifications
-        notificationService
-            .createNewConnection(Sharee.email)
-            .subscribeToProject(Sharee.email, project);
-
-        // Step - Subscribe Sharee to version notifications
-        notificationService
-            .createNewConnection(Sharee.email)
-            .subscribeToVersion(Sharee.email, projectVersion);
+        notificationService.initializeUser(sharee, shareeToken);
+        notificationService.subscribeToProject(sharee, project);
+        notificationService.subscribeToVersion(sharee, projectVersion);
     }
 
     /**

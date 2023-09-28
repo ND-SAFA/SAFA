@@ -1,12 +1,12 @@
 package edu.nd.crc.safa.features.traces.entities.app;
 
 import java.util.UUID;
-import javax.validation.constraints.NotEmpty;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.features.users.controllers;
 
 import java.util.Date;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
+
+import jakarta.transaction.Transactional;
 
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -25,6 +25,7 @@ import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import io.jsonwebtoken.Claims;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

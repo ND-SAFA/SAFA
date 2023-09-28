@@ -26,7 +26,7 @@ public abstract class AbstractDocumentNotificationTest extends AbstractNotificat
 
     protected void createDocumentAndVerifyMessage() throws Exception {
         this.createDocument();
-        EntityChangeMessage message = this.notificationService.getNextMessage(Sharee.email);
+        EntityChangeMessage message = this.notificationService.getEntityMessage(sharee);
         this.changeMessageVerifies.verifyDocumentChange(
             message,
             this.documentId,

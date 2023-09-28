@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -18,12 +17,13 @@ import edu.nd.crc.safa.test.services.CommitTestService;
 import edu.nd.crc.safa.test.services.CreationTestService;
 import edu.nd.crc.safa.test.services.LayoutTestService;
 import edu.nd.crc.safa.test.services.MessageVerificationTestService;
-import edu.nd.crc.safa.test.services.NotificationTestService;
 import edu.nd.crc.safa.test.services.RetrievalTestService;
+import edu.nd.crc.safa.test.services.notifications.NotificationTestService;
 
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -34,7 +34,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     /**
      * Authentication
      */
-    public static final String defaultUser = "root-test-user@gmail.com";
+    public static final String currentUserName = "root-test-user@gmail.com";
     public static final String defaultUserPassword = "r{QjR3<Ec2eZV@?";
     public static SafaUser currentUser;
     public String token;
@@ -79,7 +79,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     private void initBuilders() {
         assert this.serviceProvider != null;
         this.dbEntityBuilder = new DbEntityBuilder(serviceProvider, customAttributeRepository,
-            attributeSystemServiceProvider);
+            attributeSystemServiceProvider, artifactVersionRepositoryImpl);
         this.jsonBuilder = new JsonBuilder();
     }
 
@@ -100,7 +100,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      * @throws Exception If error encountered during afterPropertiesSet.
      */
     private void initJobLauncher() throws Exception {
-        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+        TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
         jobLauncher.setJobRepository(jobRepository);
         jobLauncher.setTaskExecutor(new SyncTaskExecutor());
         jobLauncher.afterPropertiesSet();
@@ -133,6 +133,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         this.safaUserRepository.deleteAll();
         this.dbEntityBuilder.createEmptyData();
         this.jsonBuilder.createEmptyData();
+        this.notificationService.clearServer();
     }
 
     /**
@@ -144,7 +145,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         SafaRequest.setMockMvc(mockMvc);
         SafaRequest.clearAuthorizationToken();
         token = null;
-        token = this.authorizationService.defaultLogin();
+        token = this.authorizationService.createDefaultAccount();
         this.dbEntityBuilder.setCurrentUser(currentUser);
         ReflectionTestUtils.setField(SafaUserService.class, "CHECK_USER_THREAD", false);
     }

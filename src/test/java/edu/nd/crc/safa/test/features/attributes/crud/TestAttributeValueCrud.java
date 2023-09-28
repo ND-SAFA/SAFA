@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
@@ -25,16 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> {
 
+    private final AttributesForTesting attributesForTesting = new AttributesForTesting();
     @Autowired
     AttributeSystemServiceProvider attributeServiceProvider;
-
     private CustomAttributeType currentType;
-
     private CustomAttribute currentAttribute;
-
     private UUID currentId;
-
-    private final AttributesForTesting attributesForTesting = new AttributesForTesting();
 
     @Override
     @Test
@@ -42,12 +39,13 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
         for (CustomAttributeType attributeType : CustomAttributeType.values()) {
             currentType = attributeType;
             super.testCrud();
+            this.notificationService.clearServer();
         }
     }
 
     @Override
-    protected UUID getTopicId() {
-        return projectVersion.getVersionId();
+    protected String getTopic() {
+        return TopicCreator.getVersionTopic(projectVersion.getVersionId());
     }
 
     @Override

@@ -2,7 +2,6 @@ package edu.nd.crc.safa.features.flatfiles.services;
 
 import java.io.IOException;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
@@ -15,6 +14,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.formats.json.JsonTraceFile;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 

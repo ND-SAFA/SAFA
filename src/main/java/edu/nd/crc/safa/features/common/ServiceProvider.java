@@ -1,11 +1,8 @@
 package edu.nd.crc.safa.features.common;
 
-import javax.annotation.PostConstruct;
-
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
@@ -65,6 +62,7 @@ import edu.nd.crc.safa.features.versions.services.VersionService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -105,7 +103,6 @@ public class ServiceProvider {
     private final ArtifactPositionRepository artifactPositionRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
-    private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     // Custom Attributes
     private final AttributeService attributeService;
     private final AttributeValueService attributeValueService;

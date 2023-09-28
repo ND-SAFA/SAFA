@@ -1,7 +1,8 @@
 package edu.nd.crc.safa.test.features.notifications.documentartifact;
 
 import java.util.UUID;
-import javax.annotation.PostConstruct;
+
+import jakarta.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.test.common.EntityConstants;

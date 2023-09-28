@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -56,4 +61,13 @@ public class AssertionTestService {
         }
     }
 
+    public void verifyOnlyActiveMember(SafaUser user, EntityChangeMessage message) throws Exception {
+        List<Change> changes = message.getChanges();
+        assertThat(changes).hasSize(1);
+        Change change = changes.get(0);
+        assertThat(change.getEntity()).isEqualTo(Change.Entity.ACTIVE_MEMBERS);
+        assertThat(change.getEntities()).hasSize(1);
+        UserAppEntity messageUser = (UserAppEntity) change.getEntities().get(0);
+        assertThat(messageUser.getUserId()).isEqualTo(user.getUserId());
+    }
 }

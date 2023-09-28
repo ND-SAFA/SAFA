@@ -119,7 +119,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
             .retrieveAppEntityFromVersionEntity(artifactVersion);
 
         // Required because getting currentDocument requires a user be logged in
-        AuthorizationSetter.setSessionAuthorization(defaultUser, serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(currentUserName, serviceProvider);
 
         ProjectEntities projectEntities = new ProjectEntities(Collections.singletonList(artifactApp));
         ProjectChanger projectChanger = new ProjectChanger(newVersion, serviceProvider);
@@ -158,7 +158,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
             new Hashtable<>());
 
         // VP - Verify that artifact body is detected to be modified
-        AuthorizationSetter.setSessionAuthorization(defaultUser, this.serviceProvider); // Required because getting
+        AuthorizationSetter.setSessionAuthorization(currentUserName, this.serviceProvider); // Required because getting
         // currentDocument requires a user
         // be logged in
         ProjectEntities projectEntities = new ProjectEntities(List.of(appEntity));

@@ -11,7 +11,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.stream.XMLStreamException;
 
@@ -36,6 +35,7 @@ import edu.nd.crc.safa.utilities.reqif.datatypes.SpecType;
 import edu.nd.crc.safa.utilities.reqif.datatypes.Specification;
 import edu.nd.crc.safa.utilities.reqif.parsing.ReqIfFileParser;
 
+import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -146,10 +146,10 @@ public class TestReqIfParsing {
     private void assertSpecTypes(ReqIfContent content) {
         assertNotNull(content.getSpecTypes());
         assertNotNull(content.getSpecTypes().getSpecTypes());
-        
+
         List<SpecType> specTypes = content.getSpecTypes().getSpecTypes();
         assertEquals(1, specTypes.size());
-        
+
         assertInstanceOf(SpecObjectType.class, specTypes.get(0));
         SpecObjectType specType = (SpecObjectType) specTypes.get(0);
         assertEquals("This is an example SpecType with some common attributes.", specType.getDesc());

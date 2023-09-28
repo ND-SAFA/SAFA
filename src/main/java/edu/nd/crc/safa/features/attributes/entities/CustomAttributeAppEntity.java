@@ -1,9 +1,9 @@
 package edu.nd.crc.safa.features.attributes.entities;
 
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

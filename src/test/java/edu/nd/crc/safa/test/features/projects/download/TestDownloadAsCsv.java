@@ -25,7 +25,7 @@ class TestDownloadAsCsv extends ApplicationBaseTest {
     void downloadDefaultProject() throws Exception {
         Pair<ProjectVersion, ProjectVersion> response = creationService.createDualVersions(projectName, true);
         ProjectVersion projectVersion = response.getValue0();
-        AuthorizationSetter.setSessionAuthorization(defaultUser, serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(currentUserName, serviceProvider);
         ProjectAppEntity projectAppEntity = this.serviceProvider
             .getProjectRetrievalService().getProjectAppEntity(projectVersion);
         List<File> projectFiles = new SafaRequest(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)

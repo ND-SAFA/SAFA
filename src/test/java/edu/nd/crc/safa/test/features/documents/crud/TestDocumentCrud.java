@@ -10,6 +10,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
@@ -31,8 +32,14 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     );
 
     @Override
-    protected UUID getTopicId() {
-        return this.project.getProjectId();
+    protected void onPostSubscribe() throws Exception {
+        EntityChangeMessage message = this.notificationService.getEntityMessage(currentUser);
+        this.assertionService.verifyOnlyActiveMember(currentUser, message);
+    }
+
+    @Override
+    protected String getTopic() {
+        return TopicCreator.getProjectTopic(this.project.getProjectId());
     }
 
     @Override

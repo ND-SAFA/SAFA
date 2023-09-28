@@ -1,21 +1,22 @@
 package edu.nd.crc.safa.features.artifacts.entities.db;
 
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Persists the information needed to represent safety-case specific
@@ -29,13 +30,14 @@ public class SafetyCaseArtifact implements IArtifact {
 
     @Id
     @GeneratedValue
-    @Type(type = "uuid-char")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "safety_case_artifact_id")
     private UUID safetyCaseArtifactId;
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false, unique = true)
     private Artifact artifact;
+    @JdbcTypeCode(SqlTypes.INTEGER)
     @Column(name = "safety_case_type")
     private SafetyCaseType safetyCaseType;
 

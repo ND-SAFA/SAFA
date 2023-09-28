@@ -3,7 +3,6 @@ package edu.nd.crc.safa.test.services;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
-import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.SecurityConstants;
@@ -11,11 +10,13 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.test.builders.DbEntityBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
+import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -25,22 +26,30 @@ public class AuthorizationTestService {
     ServiceProvider serviceProvider;
     DbEntityBuilder dbEntityBuilder;
 
-    public String defaultLogin() throws Exception {
-        String defaultUser = ApplicationBaseTest.defaultUser;
+    public String createDefaultAccount() throws Exception {
+        String defaultUser = ApplicationBaseTest.currentUserName;
         String defaultUserPassword = ApplicationBaseTest.defaultUserPassword;
         createUser(defaultUser, defaultUserPassword);
-        String authorizationCode = loginUser(defaultUser, defaultUserPassword);
         ApplicationBaseTest.currentUser = serviceProvider
             .getAccountLookupService()
             .getUserFromUsername(defaultUser);
+        return logicDefaultUser();
+    }
+
+    public String logicDefaultUser() throws Exception {
+        String authorizationCode = loginUser(ApplicationBaseTest.currentUserName,
+            ApplicationBaseTest.defaultUserPassword);
+        ApplicationBaseTest.currentUser = serviceProvider
+            .getAccountLookupService()
+            .getUserFromUsername(ApplicationBaseTest.currentUserName);
         return authorizationCode;
     }
 
-    public void createUser(String email, String password) throws Exception {
+    public UserAppEntity createUser(String email, String password) throws Exception {
         SafaUser user = new SafaUser(email, password);
-        SafaRequest
+        return SafaRequest
             .withRoute(AppRoutes.Accounts.CREATE_ACCOUNT)
-            .postWithJsonObject(user, SafaUser.class);
+            .postWithJsonObject(user, UserAppEntity.class);
     }
 
     public void createUser(String email, String password, ResultMatcher test) throws Exception {

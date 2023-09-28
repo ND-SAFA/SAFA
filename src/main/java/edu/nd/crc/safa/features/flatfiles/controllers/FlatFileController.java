@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -18,6 +17,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,6 +57,9 @@ public class FlatFileController extends BaseController {
         @RequestParam("files") List<MultipartFile> files,
         @RequestPart(value = ProjectVariables.AS_COMPLETE_SET, required = false) Boolean asCompleteSet)
         throws SafaError, IOException {
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT, user).get();
 
         if (files.isEmpty()) {
             throw new SafaError("Could not create project because no files were received.");
@@ -65,15 +68,13 @@ public class FlatFileController extends BaseController {
             asCompleteSet = false;
         }
 
-        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-
         ProjectAppEntity projectCreated = getServiceProvider().getFlatFileService().updateProjectFromFlatFiles(
             versionId, user, files, asCompleteSet);
 
         getServiceProvider().getNotificationService().broadcastChange(
             EntityChangeBuilder
-                .create(versionId)
-                .withVersionUpdate(versionId)
+                .create(user, projectVersion.getProject())
+                .withVersionUpdate(projectVersion)
         );
         return projectCreated;
     }
@@ -84,7 +85,7 @@ public class FlatFileController extends BaseController {
                                   HttpServletResponse response) throws Exception {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         String projectName = projectVersion.getProject().getName();
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);

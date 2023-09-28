@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.google.errorprone.annotations.ForOverride;
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractCrudTest<T extends IAppEntity> extends ApplicationBaseTest {
@@ -29,7 +30,11 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         // Step - Setup project
         this.projectVersion = this.setupProject();
         this.project = this.projectVersion.getProject();
-        notificationService.createNewConnection(defaultUser).subscribeToTopic(defaultUser, getTopicId());
+        this.notificationService.initializeUser(currentUser, this.token);
+        this.notificationService.subscribe(currentUser, getTopic());
+
+        // Verifies any messages related to subscribing to topic (e.g. active members).
+        onPostSubscribe();
 
         // Step - Create entity and retrieve message
         this.entityId = createEntity();
@@ -40,9 +45,8 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         verifyCreatedEntity(entity);
 
         // VP - Verify creation message
-        // TODO - fails due to intercepting a notification that's not meant for it
-        //EntityChangeMessage creationMessage = notificationService.getNextMessage(defaultUser);
-        //verifyCreationMessage(creationMessage);
+        EntityChangeMessage creationMessage = notificationService.getEntityMessage(currentUser);
+        verifyCreationMessage(creationMessage);
 
         // Step - Update entity and retrieve message
         updateEntity();
@@ -53,8 +57,8 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
 
         // VP - Verify update message
         // TODO - fails due to intercepting a notification that's not meant for it
-        //EntityChangeMessage updateMessage = notificationService.getNextMessage(defaultUser);
-        //verifyUpdateMessage(updateMessage);
+        EntityChangeMessage updateMessage = notificationService.getEntityMessage(currentUser);
+        verifyUpdateMessage(updateMessage);
 
         // Step - Delete entity
         deleteEntity(updatedEntity);
@@ -65,8 +69,8 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
 
         // VP - Verify deletion message
         // TODO - fails due to intercepting a notification that's not meant for it
-        //EntityChangeMessage deleteMessage = notificationService.getNextMessage(defaultUser);
-        //verifyDeletionMessage(deleteMessage);
+        EntityChangeMessage deleteMessage = notificationService.getEntityMessage(currentUser);
+        verifyDeletionMessage(deleteMessage);
     }
 
     private T getEntity(ProjectVersion projectVersion, SafaUser user, UUID entityId) {
@@ -77,10 +81,14 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         return this.getAppService().getAppEntitiesByIds(projectVersion, user, List.of(entityId));
     }
 
+    @ForOverride
+    protected void onPostSubscribe() throws Exception {
+    }
+
     /**
      * @return {@link UUID} of topic to receive messages for entity changes.
      */
-    protected abstract UUID getTopicId();
+    protected abstract String getTopic();
 
     /**
      * @return {@link IAppEntityService} Service for retrieving app entities being tested.

@@ -33,7 +33,6 @@ import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
-import lombok.Setter;
 import org.javatuples.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +56,6 @@ public class FlatFileService {
     private final FileUploadService fileUploadService;
     private final ProjectRetrievalService projectRetrievalService;
 
-    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ServiceProvider serviceProvider;
 
     public FlatFileService(ResourceBuilder resourceBuilder, CommitErrorRepository commitErrorRepository,
@@ -229,5 +227,11 @@ public class FlatFileService {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
         return JsonFileUtilities.readJSONFile(pathToTimFile);
+    }
+
+    @Autowired
+    @Lazy
+    public void setServiceProvider(ServiceProvider serviceProvider) {
+        this.serviceProvider = serviceProvider;
     }
 }

@@ -8,7 +8,6 @@ import edu.nd.crc.safa.features.organizations.repositories.TeamRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -16,18 +15,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class TeamService {
 
-    @Setter(onMethod = @__({@Autowired}))
     private TeamRepository teamRepo;
-
-    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private OrganizationService orgService;
 
     /**
      * Create a new team.
      *
-     * @param name The name of the team
+     * @param name         The name of the team
      * @param organization The organization the team belongs to
-     * @param fullOrgTeam Whether the team is a full organization team
+     * @param fullOrgTeam  Whether the team is a full organization team
      * @return The newly created team
      */
     public Team createNewTeam(String name, Organization organization, boolean fullOrgTeam) {
@@ -55,5 +51,16 @@ public class TeamService {
     public Team getFullOrganizationTeam(Organization organization) {
         UUID teamId = organization.getFullOrgTeamId();
         return teamRepo.findById(teamId).orElseThrow(() -> new SafaError("Organization does not have an org team"));
+    }
+
+    @Autowired
+    public void setTeamRepo(TeamRepository teamRepo) {
+        this.teamRepo = teamRepo;
+    }
+
+    @Autowired
+    @Lazy
+    public void setOrgService(OrganizationService orgService) {
+        this.orgService = orgService;
     }
 }

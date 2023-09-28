@@ -222,18 +222,18 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
             .collect(Collectors.toList());
 
         // Step - broadcast change to artifact type and affected artifacts
-        notificationService.broadcastChangeToUser(
-            EntityChangeBuilder.create(project.getProjectId())
+        notificationService.broadcastChange(
+            EntityChangeBuilder.create(user, project)
                 .withTypeUpdate(artifactType.getId())
-                .withArtifactsUpdate(artifactIds), user);
+                .withArtifactsUpdate(artifactIds));
     }
 
     private void notifyTypeDeleted(ArtifactType artifactType, SafaUser user) {
-        notificationService.broadcastChangeToUser(
+        notificationService.broadcastChange(
             EntityChangeBuilder
-                .create(artifactType.getProject().getProjectId())
+                .create(user, artifactType.getProject())
                 .withTypeDelete(artifactType.getId())
-                .withUpdateLayout(), user);
+                .withUpdateLayout());
     }
 
     public void deleteAll() {

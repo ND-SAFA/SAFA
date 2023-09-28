@@ -67,7 +67,7 @@ public class DocumentArtifactController extends BaseDocumentController {
     ) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         Document document = getDocumentById(getDocumentRepository(), documentId);
         for (ArtifactAppEntity a : artifacts) {
             UUID artifactId = a.getId();
@@ -86,7 +86,7 @@ public class DocumentArtifactController extends BaseDocumentController {
 
         this.notificationService.broadcastChange(
             EntityChangeBuilder
-                .create(versionId)
+                .create(user, projectVersion.getProject())
                 .withDocumentUpdate(List.of(documentId))
                 .withArtifactsUpdate(artifactIds)
         );
@@ -100,7 +100,7 @@ public class DocumentArtifactController extends BaseDocumentController {
                                            @PathVariable UUID artifactId) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         Document document = getDocumentById(getDocumentRepository(), documentId);
         Artifact artifact = getArtifactById(artifactId);
         Optional<DocumentArtifact> documentArtifactQuery =
@@ -110,7 +110,7 @@ public class DocumentArtifactController extends BaseDocumentController {
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
 
         this.notificationService.broadcastChange(
-            EntityChangeBuilder.create(versionId)
+            EntityChangeBuilder.create(user, projectVersion.getProject())
                 .withDocumentUpdate(List.of(documentId))
                 .withArtifactsUpdate(List.of(artifactId))
         );

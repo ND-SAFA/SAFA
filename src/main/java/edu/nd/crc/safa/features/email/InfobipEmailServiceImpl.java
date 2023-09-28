@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.email;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import com.infobip.ApiClient;
 import com.infobip.api.SendEmailApi;

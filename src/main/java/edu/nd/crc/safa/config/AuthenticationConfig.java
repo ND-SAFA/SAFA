@@ -1,27 +1,23 @@
 package edu.nd.crc.safa.config;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import edu.nd.crc.safa.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.authentication.AuthorizationFilter;
 import edu.nd.crc.safa.authentication.AuthorizationService;
 import edu.nd.crc.safa.authentication.TokenService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.cors.CorsConfiguration;
-
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Creates the authentication solution for our app including:
@@ -29,81 +25,38 @@ import org.springframework.web.cors.CorsConfiguration;
  * 2. Disabled Cross Site Request Forgery policy (TODO: Replace with some policy).
  * 3. Enabled app-wide authentication except for login and create account routes. TODO: Add forgot password route.
  */
+@AllArgsConstructor
+@EnableWebSecurity
 @Configuration
-public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
+public class AuthenticationConfig {
 
-    private static final List<String> allowedOrigins = Arrays.asList(
-        "http://localhost:8080",
-        "http://localhost:8081",
-        "https://localhost:8080",
-        "https://localhost:8081",
-        "https://localhost.safa.ai:8080",
-        "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
-        "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
-        "https://dev.safa.ai",
-        "https://app.safa.ai",
-        "https://dev-fend.safa.ai",
-        "https://prod-fend.safa.ai"
-    );
+    private final AuthorizationService authorizationService;
+    private final TokenService tokenService;
+    private final UserDetailsService userDetailsService;
 
-    private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
-
-    @Autowired
-    private AuthorizationService authorizationService;
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authProvider());
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
-            // CORS
-            .cors().configurationSource(request -> {
-                CorsConfiguration cors = new CorsConfiguration();
-
-                cors.setAllowedOrigins(allowedOrigins);
-                cors.setAllowedMethods(allowedMethods);
-                cors.setAllowedHeaders(Collections.singletonList("*"));
-                cors.setAllowCredentials(true);
-                return cors;
-            })
-            .and()
-            .csrf()
-            .disable()
-            // Endpoint Settings
-            .authorizeRequests()
-            .antMatchers(
-                AppRoutes.Accounts.LOGIN,
-                AppRoutes.Accounts.CREATE_ACCOUNT,
-                AppRoutes.Accounts.FORGOT_PASSWORD,
-                AppRoutes.Accounts.RESET_PASSWORD,
-                "/websocket/**",
-                "/swagger-ui/**", // Needed to get config
-                "/v3/api-docs/**",
-                "/docs/**")
-            .permitAll()
-            .and()
-            .logout()
-            .logoutUrl(AppRoutes.Accounts.LOGOUT)
-            .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
-            .logoutSuccessHandler((a, b, c) -> {
-            })
-            .and()
-            .authorizeRequests()
-            // Close authentication settings
-            .anyRequest()
-            .authenticated()
+            .authorizeHttpRequests(requests -> requests.requestMatchers(
+                    AppRoutes.Accounts.LOGIN,
+                    AppRoutes.Accounts.CREATE_ACCOUNT,
+                    AppRoutes.Accounts.FORGOT_PASSWORD,
+                    AppRoutes.Accounts.RESET_PASSWORD,
+                    "/websocket/**",
+                    "/swagger-ui/**", // Needed to get config
+                    "/v3/api-docs/**",
+                    "/docs/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated())
+            .csrf(AbstractHttpConfigurer::disable)
             // Authentication Filters
-            .and()
-            .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-            .addFilter(new AuthorizationFilter(authenticationManager(), authorizationService))
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .addFilter(new AuthenticationFilter(authenticationManager, tokenService))
+            .addFilter(new AuthorizationFilter(authenticationManager, authorizationService))
+            .sessionManagement((sessionManager) -> {
+                sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            });
+        return http.build();
     }
 
     @Bean

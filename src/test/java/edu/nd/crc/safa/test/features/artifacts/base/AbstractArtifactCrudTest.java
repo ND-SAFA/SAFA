@@ -7,6 +7,7 @@ import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
@@ -16,8 +17,8 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     ArtifactAppEntity artifact = getStartingArtifact();
 
     @Override
-    protected UUID getTopicId() {
-        return this.projectVersion.getVersionId();
+    protected String getTopic() {
+        return TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
     }
 
     @Override

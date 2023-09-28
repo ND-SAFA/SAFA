@@ -2,7 +2,6 @@ package edu.nd.crc.safa.features.users.services;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.SafaUserDetails;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
@@ -12,6 +11,7 @@ import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

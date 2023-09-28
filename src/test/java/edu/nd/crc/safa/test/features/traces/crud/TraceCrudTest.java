@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -39,8 +40,8 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     }
 
     @Override
-    protected UUID getTopicId() {
-        return this.projectVersion.getVersionId();
+    protected String getTopic() {
+        return TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
     }
 
     @Override

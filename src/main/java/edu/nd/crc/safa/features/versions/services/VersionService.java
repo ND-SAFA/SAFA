@@ -15,7 +15,6 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,13 @@ public class VersionService {
     private final ArtifactTypeCountService typeCountService;
     private final TraceMatrixService traceMatrixService;
 
-    @Setter(onMethod = @__({@Autowired, @Lazy}))  // Prevents circular dependency
     private TypeService typeService;
+
+    @Autowired
+    @Lazy
+    public void setTypeService(TypeService typeService) {
+        this.typeService = typeService;
+    }
 
     public List<ProjectVersion> getProjectVersions(@PathVariable Project project) {
         return this.projectVersionRepository.findByProjectInBackwardsOrder(project);
@@ -99,7 +103,7 @@ public class VersionService {
     /**
      * Create type count entities for the given version for all types in a project
      *
-     * @param version The version to add counts for
+     * @param version     The version to add counts for
      * @param prevVersion The previous version
      */
     private void createTypeCountEntries(ProjectVersion version, ProjectVersion prevVersion) {
@@ -119,7 +123,7 @@ public class VersionService {
     /**
      * Copy trace count entries from one version to another
      *
-     * @param version The version to add counts for
+     * @param version     The version to add counts for
      * @param prevVersion The previous version
      */
     private void createTraceCountEntries(ProjectVersion version, ProjectVersion prevVersion) {

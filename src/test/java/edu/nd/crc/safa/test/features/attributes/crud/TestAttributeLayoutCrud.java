@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
@@ -23,27 +24,33 @@ import org.junit.jupiter.api.Test;
 public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutAppEntity> {
 
     AttributeLayoutAppEntity attributeLayoutAppEntity = new AttributeLayoutAppEntity(
-            null,
-            "test layout",
-            List.of("type1", "type2"),
-            List.of(
-                    new AttributePositionAppEntity("key1", 1, 2, 3, 4),
-                    new AttributePositionAppEntity("key2", 5, 6, 7, 8)
-            )
+        null,
+        "test layout",
+        List.of("type1", "type2"),
+        List.of(
+            new AttributePositionAppEntity("key1", 1, 2, 3, 4),
+            new AttributePositionAppEntity("key2", 5, 6, 7, 8)
+        )
     );
 
     AttributeLayoutAppEntity updatedAttributeLayoutAppEntity = new AttributeLayoutAppEntity(
-            null,
-            "test layout - update",
-            List.of("type3"),
-            List.of(
-                    new AttributePositionAppEntity("key3", 9, 10, 11, 12)
-            )
+        null,
+        "test layout - update",
+        List.of("type3"),
+        List.of(
+            new AttributePositionAppEntity("key3", 9, 10, 11, 12)
+        )
     );
 
     @Override
-    protected UUID getTopicId() {
-        return project.getProjectId();
+    protected void onPostSubscribe() throws Exception {
+        EntityChangeMessage message = this.notificationService.getEntityMessage(currentUser);
+        this.assertionService.verifyOnlyActiveMember(currentUser, message);
+    }
+
+    @Override
+    protected String getTopic() {
+        return TopicCreator.getProjectTopic(project.getProjectId());
     }
 
     @Override
@@ -53,17 +60,22 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
 
     @Override
     protected UUID createEntity() throws Exception {
-        dbEntityBuilder.newType(projectName, "type1")
-                .newType(projectName, "type2")
-                .newType(projectName, "type3")
-                .newCustomAttribute(projectName, CustomAttributeType.BOOLEAN, "key1", "key1")
-                .newCustomAttribute(projectName, CustomAttributeType.BOOLEAN, "key2", "key2")
-                .newCustomAttribute(projectName, CustomAttributeType.BOOLEAN, "key3", "key3");
+        dbEntityBuilder
+            .newType(projectName, "type1")
+            .newType(projectName, "type2")
+            .newType(projectName, "type3")
+            .newCustomAttribute(projectName, CustomAttributeType.BOOLEAN, "key1", "key1")
+            .newCustomAttribute(projectName, CustomAttributeType.BOOLEAN, "key2", "key2")
+            .newCustomAttribute(projectName, CustomAttributeType.BOOLEAN, "key3", "key3");
+
+        List<EntityChangeMessage> messages = this.notificationService.getMessages(currentUser);
+        assertEquals(3, messages.size());
+        this.notificationService.clearQueue(currentUser);
 
         JSONObject response = SafaRequest
-                        .withRoute(AppRoutes.AttributeLayout.ROOT)
-                        .withProject(project)
-                        .postWithJsonObject(attributeLayoutAppEntity);
+            .withRoute(AppRoutes.AttributeLayout.ROOT)
+            .withProject(project)
+            .postWithJsonObject(attributeLayoutAppEntity);
 
         return UUID.fromString(response.getString("id"));
     }
@@ -85,10 +97,10 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
     @Override
     protected void updateEntity() throws Exception {
         SafaRequest
-                .withRoute(AppRoutes.AttributeLayout.BY_ID)
-                .withProject(project)
-                .withId(entityId)
-                .putWithJsonObject(updatedAttributeLayoutAppEntity);
+            .withRoute(AppRoutes.AttributeLayout.BY_ID)
+            .withProject(project)
+            .withId(entityId)
+            .putWithJsonObject(updatedAttributeLayoutAppEntity);
     }
 
     @Override
@@ -108,10 +120,10 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
     @Override
     protected void deleteEntity(AttributeLayoutAppEntity entity) throws Exception {
         SafaRequest
-                .withRoute(AppRoutes.AttributeLayout.BY_ID)
-                .withProject(project)
-                .withId(entityId)
-                .deleteWithJsonObject();
+            .withRoute(AppRoutes.AttributeLayout.BY_ID)
+            .withProject(project)
+            .withId(entityId)
+            .deleteWithJsonObject();
     }
 
     @Override
@@ -121,28 +133,37 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
     }
 
     @Test
-    public void testGetLayout() throws Exception {
+    void testGetLayout() throws Exception {
         project = dbEntityBuilder.newProjectWithReturn(projectName);
+
+        this.notificationService.initializeUser(currentUser, this.token);
+        this.notificationService.subscribeToProject(currentUser, project);
+
+        EntityChangeMessage activeMemberMessage = this.notificationService.getEntityMessage(currentUser);
+        this.assertionService.verifyOnlyActiveMember(currentUser, activeMemberMessage);
+
         UUID entityId = createEntity();
 
         AttributeLayoutAppEntity layoutEntity = SafaRequest
-                .withRoute(AppRoutes.AttributeLayout.BY_ID)
-                .withProject(project)
-                .withId(entityId)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.AttributeLayout.BY_ID)
+            .withProject(project)
+            .withId(entityId)
+            .getAsType(new TypeReference<>() {
+            });
 
         verifyCreatedEntity(layoutEntity);
     }
 
     @Test
-    public void testGetAllLayouts() throws Exception {
+    void testGetAllLayouts() throws Exception {
         project = dbEntityBuilder.newProjectWithReturn(projectName);
         createEntity();
 
         List<AttributeLayoutAppEntity> layoutEntityList = SafaRequest
-                .withRoute(AppRoutes.AttributeLayout.ROOT)
-                .withProject(project)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.AttributeLayout.ROOT)
+            .withProject(project)
+            .getAsType(new TypeReference<>() {
+            });
 
         assertEquals(1, layoutEntityList.size());
         verifyCreatedEntity(layoutEntityList.get(0));

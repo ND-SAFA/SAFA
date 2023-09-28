@@ -2,23 +2,25 @@ package edu.nd.crc.safa.features.jobs.logging.entities;
 
 import java.sql.Timestamp;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "job_log_entry")
@@ -30,6 +32,7 @@ public class JobLogEntry {
 
     @Id
     @GeneratedValue
+    @JdbcTypeCode(SqlTypes.BINARY)
     @Column
     private UUID id;
 

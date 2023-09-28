@@ -46,7 +46,12 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactOptional).isPresent();
 
         // Step - Subscribe to version updates as other member
-        notificationService.createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
+        notificationService.initializeUser(currentUser, this.token);
+        notificationService.subscribeToProject(currentUser, projectVersion.getProject());
+        notificationService.subscribeToVersion(currentUser, projectVersion);
+
+        EntityChangeMessage activeMembersMessage = this.notificationService.getEntityMessage(currentUser);
+        this.assertionService.verifyOnlyActiveMember(currentUser, activeMembersMessage);
 
         // Step - Request artifact is removed from document
         String route = RouteBuilder
@@ -62,7 +67,7 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactList).isEmpty();
 
         // VP - Verify that 2 changes are detected (document + artifacts).
-        EntityChangeMessage message = notificationService.getNextMessage(defaultUser); //TODO: fails on rare occasions
+        EntityChangeMessage message = notificationService.getEntityMessage(currentUser); //TODO: fails on rare occasions
         assertThat(message.getChanges()).hasSize(2);
 
         // VP - Verify that change is for a deleted member

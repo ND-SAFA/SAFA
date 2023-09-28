@@ -2,14 +2,14 @@ package edu.nd.crc.safa.authentication;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;

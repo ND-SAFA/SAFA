@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
@@ -20,6 +19,7 @@ import edu.nd.crc.safa.utilities.JsonFileUtilities;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;

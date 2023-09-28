@@ -33,7 +33,7 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
     @Test
     void downloadAndReuploadFlatFiles() throws Exception {
-        AuthorizationSetter.setSessionAuthorization(defaultUser, this.serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(currentUserName, this.serviceProvider);
         // Step - Create project with artifacts from docs: artifact tree, safety case, fta
         ProjectVersion projectVersion = ProjectBuilder
             .withProject(projectName)
@@ -55,12 +55,12 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
         // Step - Create files with flat files downloaded
         String newVersionIdString = SafaRequest
-                .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
-                .withVersion(version)
-                .getFlatFileHelper()
-                .postWithFiles(projectFiles, new JSONObject())
-                .getJSONObject("projectVersion")
-                .getString("versionId");
+            .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+            .withVersion(version)
+            .getFlatFileHelper()
+            .postWithFiles(projectFiles, new JSONObject())
+            .getJSONObject("projectVersion")
+            .getString("versionId");
 
         // Step - Retrieve new project
         UUID newVersionId = UUID.fromString(newVersionIdString);

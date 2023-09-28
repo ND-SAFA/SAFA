@@ -3,7 +3,8 @@ package edu.nd.crc.safa.features.jira.entities.app;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.Nullable;
+
+import jakarta.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

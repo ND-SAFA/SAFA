@@ -1,24 +1,18 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
-import java.lang.reflect.Field;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.notifications.services.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * Represents a job's information for presenting its current progress.
  */
 @Data
-public class JobAppEntity  {
+public class JobAppEntity {
     private String name;
     private UUID id;
     private JobStatus status;
@@ -54,10 +48,5 @@ public class JobAppEntity  {
         JobAppEntity jobAppEntity = new JobAppEntity(jobDbEntity);
         jobAppEntity.steps = JobSteps.getJobSteps(jobDbEntity.getJobType());
         return jobAppEntity;
-    }
-
-    @JsonIgnore
-    public String getTopic() {
-        return NotificationService.getTopic(this.getId());
     }
 }

@@ -3,11 +3,13 @@ package edu.nd.crc.safa.test.features.notifications.documentartifact;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.services.CommitTestService;
 import edu.nd.crc.safa.test.services.MessageVerificationTestService;
-import edu.nd.crc.safa.test.services.NotificationTestService;
+import edu.nd.crc.safa.test.services.notifications.NotificationTestService;
 
 import lombok.AllArgsConstructor;
 
@@ -34,11 +36,10 @@ public class DocumentArtifactNotificationTestService {
 
         // VP - Verify commit message
         // TODO - fails due to intercepting a notification that's not meant for it
-        /*EntityChangeMessage commitMessage = this.notificationService.getNextMessage(test.getShareeEmail());
+        EntityChangeMessage commitMessage = this.notificationService.getEntityMessage(test.getSharee());
         this.changeMessageVerifies.verifyArtifactMessage(commitMessage,
             artifactAdded.getId(),
-            Change.Action.UPDATE
-        );*/
+            Change.Action.UPDATE);
 
         // Step - Set current artifact with created id
         test.setArtifact(artifactAdded);

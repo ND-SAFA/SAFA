@@ -1,7 +1,8 @@
 package edu.nd.crc.safa.features.documents.services;
 
 import java.util.Optional;
-import javax.annotation.Nullable;
+
+import jakarta.annotation.Nullable;
 
 import edu.nd.crc.safa.features.documents.entities.db.CurrentDocument;
 import edu.nd.crc.safa.features.documents.entities.db.Document;

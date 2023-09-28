@@ -2,21 +2,30 @@ package edu.nd.crc.safa.features.notifications.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import edu.nd.crc.safa.features.users.entities.IUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Notification message for automatic updates of entities.
  * Contains list of entities that need updated.
  */
+@NoArgsConstructor
 @Data
 public class EntityChangeMessage {
     /**
      * The user initiating the change.
      */
-    private String user;
+    private UUID userId;
+    /**
+     * Project ID | Version ID | Job ID
+     */
+    private String topic;
     /**
      * The change that should be resolved by client.
      */
@@ -27,6 +36,11 @@ public class EntityChangeMessage {
      */
     private boolean updateLayout = false;
 
+    public EntityChangeMessage(IUser user, Change change) {
+        this.userId = user.getUserId();
+        this.changes.add(change);
+    }
+
     @JsonIgnore
     public Change getChangeForEntity(Change.Entity entity) {
         List<Change> changeQuery = changes
@@ -36,16 +50,6 @@ public class EntityChangeMessage {
         assert !changeQuery.isEmpty();
         assert changeQuery.size() <= 1;
         return changeQuery.get(0);
-    }
-
-    /**
-     * Returns list of entities changed in message.
-     *
-     * @return List of {@link Change.Entity}, one per change.
-     */
-    @JsonIgnore
-    public List<Change.Entity> getChangedEntities() {
-        return this.changes.stream().map(Change::getEntity).collect(Collectors.toList());
     }
 
     public void addChange(Change change) {

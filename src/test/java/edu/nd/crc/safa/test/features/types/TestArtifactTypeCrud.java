@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
@@ -74,8 +75,14 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
     }
 
     @Override
-    protected UUID getTopicId() {
-        return this.project.getProjectId();
+    protected void onPostSubscribe() throws Exception {
+        EntityChangeMessage message = this.notificationService.getEntityMessage(currentUser);
+        this.assertionService.verifyOnlyActiveMember(currentUser, message);
+    }
+
+    @Override
+    protected String getTopic() {
+        return TopicCreator.getProjectTopic(this.project.getProjectId());
     }
 
     protected TypeService getAppService() {

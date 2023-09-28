@@ -66,15 +66,15 @@ public class ProjectMembershipController extends BaseController {
         SafaUser userToUpdate = getServiceProvider().getSafaUserService().getUserByEmail(request.getMemberEmail());
 
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.SHARE, user).get();
+            .withPermission(ProjectPermission.SHARE, user).get();
 
         UserProjectMembership updatedProjectMembership =
-                projectMembershipService.addUserRole(userToUpdate, project, request.getProjectRole());
+            projectMembershipService.addUserRole(userToUpdate, project, request.getProjectRole());
 
         getServiceProvider()
             .getNotificationService()
             .broadcastChange(EntityChangeBuilder
-                .create(projectId)
+                .create(user, project)
                 .withMembersUpdate(updatedProjectMembership.getMembershipId()));
         return new ProjectMemberAppEntity(updatedProjectMembership);
     }
@@ -89,7 +89,7 @@ public class ProjectMembershipController extends BaseController {
     public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         return projectMembershipService
             .getAllProjectMembers(project)
             .stream()
@@ -126,7 +126,7 @@ public class ProjectMembershipController extends BaseController {
             .getNotificationService()
             .broadcastChange(
                 EntityChangeBuilder
-                    .create(project.getProjectId())
+                    .create(user, project)
                     .withMembersDelete(projectMembershipId)
             );
     }

@@ -33,6 +33,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Implements custom any custom artifact repository logic.
@@ -40,32 +41,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ArtifactVersionRepositoryImpl
     extends GenericVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity> {
 
-    @Autowired
     private ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
     private ArtifactRepository artifactRepository;
-
     @Autowired
     private TypeService artifactTypeService;
-
     @Autowired
     private DocumentArtifactRepository documentArtifactRepository;
-
     @Autowired
     private DocumentRepository documentRepository;
-
     @Autowired
     private FTAArtifactRepository ftaArtifactRepository;
-
     @Autowired
     private SafetyCaseArtifactRepository safetyCaseArtifactRepository;
-
     @Autowired
     private AttributeValueService attributeValueService;
-
     @Autowired
     private ArtifactTypeCountService typeCountService;
+
+    @Lazy
+    @Autowired
+    public void setArtifactVersionRepository(ArtifactVersionRepository artifactVersionRepository) {
+        this.artifactVersionRepository = artifactVersionRepository;
+    }
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {

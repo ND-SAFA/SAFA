@@ -298,7 +298,7 @@ public abstract class AbstractJob implements Job {
      * Broadcast a change in this job to any clients that are listening for it.
      */
     private void notifyStateChange() {
-        notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
+        notificationService.sendJob(JobAppEntity.createFromJob(jobDbEntity));
     }
 
     /**

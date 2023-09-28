@@ -7,7 +7,9 @@ import edu.nd.crc.safa.features.commits.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.builders.ProjectVersionChangeBuilder;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class SendNotifications implements ICommitStep {
@@ -25,9 +27,10 @@ public class SendNotifications implements ICommitStep {
         ProjectVersion projectVersion = commitDefinition.getCommitVersion();
         ProjectChange<ArtifactAppEntity> artifactChanges = result.getArtifacts();
         ProjectChange<TraceAppEntity> traceChanges = result.getTraces();
+        SafaUser user = commitDefinition.getUser();
 
-        EntityChangeBuilder builder = new EntityChangeBuilder(projectVersion.getVersionId());
-        builder
+        ProjectVersionChangeBuilder builder = EntityChangeBuilder
+            .create(user, projectVersion)
             .withArtifactsUpdate(artifactChanges.getUpdatedIds())
             .withArtifactsDelete(artifactChanges.getDeletedIds())
             .withTracesUpdate(traceChanges.getUpdatedIds())
@@ -38,6 +41,6 @@ public class SendNotifications implements ICommitStep {
             builder.withUpdateLayout();
         }
 
-        service.getNotificationService().broadcastChangeToUser(builder, commitDefinition.getUser());
+        service.getNotificationService().broadcastChange(builder);
     }
 }

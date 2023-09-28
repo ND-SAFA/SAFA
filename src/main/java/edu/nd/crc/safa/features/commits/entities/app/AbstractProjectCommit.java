@@ -2,7 +2,6 @@ package edu.nd.crc.safa.features.commits.entities.app;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
@@ -11,6 +10,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import jakarta.validation.Valid;
 import lombok.Data;
 
 @Data

@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
@@ -21,7 +22,6 @@ import edu.nd.crc.safa.test.services.MappingTestService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONObject;
-import org.webjars.NotFoundException;
 
 public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
     protected String projectName = "project name";
@@ -93,7 +93,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
             .collect(Collectors.toList());
 
         if (documents.size() == 0) {
-            throw new NotFoundException("Document id not found in project:" + documentId);
+            throw new SafaError("Document id not found in project:" + documentId);
         } else if (documents.size() > 1) {
             throw new IllegalStateException("Found more than one document with id:" + documentId);
         }

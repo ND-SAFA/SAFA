@@ -56,10 +56,12 @@ const tab = computed({
 const layouts = computed(() => attributesStore.attributeLayouts);
 
 const tabs = computed<SelectOption[]>(() => {
-  const tabs = attributesStore.attributeLayouts.map(({ id, name }) => ({
-    id: getTabId(id),
-    name,
-  }));
+  const tabs = attributesStore.attributeLayouts.map<SelectOption>(
+    ({ id, name }) => ({
+      id: getTabId(id),
+      name,
+    })
+  );
 
   if (createOpen.value) {
     tabs.push({ id: getTabId(), name: "New Layout" });

@@ -119,7 +119,7 @@ const artifact = computed(() => selectionStore.selectedArtifact);
 const parents = computed(() =>
   artifact.value
     ? (subtreeStore
-        .getParents(artifact.value.id)
+        .getParents(artifact.value!.id)
         .map((id) => artifactStore.getArtifactById(id))
         .filter((artifact) => !!artifact) as ArtifactSchema[])
     : []
@@ -128,7 +128,7 @@ const parents = computed(() =>
 const children = computed(() =>
   artifact.value
     ? (subtreeStore
-        .getChildren(artifact.value.id)
+        .getChildren(artifact.value!.id)
         .map((id) => artifactStore.getArtifactById(id))
         .filter((artifact) => !!artifact) as ArtifactSchema[])
     : []
@@ -158,7 +158,7 @@ function getTraceLinkClassName(artifactName: string): string {
 
   const traceLink = traceStore.getTraceLinkByArtifacts(
     relatedArtifact.id,
-    artifact.value.id,
+    artifact.value!.id,
     true
   );
 
@@ -195,7 +195,7 @@ function handleTraceLinkClick(artifactName: string): void {
 
   const traceLink = traceStore.getTraceLinkByArtifacts(
     relatedArtifact.id,
-    artifact.value.id,
+    artifact.value!.id,
     true
   );
 
@@ -212,7 +212,7 @@ function handleLinkParent(): void {
 
   traceSaveStore.openPanel({
     type: "source",
-    artifactId: artifact.value.id,
+    artifactId: artifact.value!.id,
   });
 }
 
@@ -224,7 +224,7 @@ function handleLinkChild(): void {
 
   traceSaveStore.openPanel({
     type: "target",
-    artifactId: artifact.value.id,
+    artifactId: artifact.value!.id,
   });
 }
 </script>

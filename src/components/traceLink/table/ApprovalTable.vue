@@ -147,7 +147,7 @@ const rows = computed(() => approvalStore.traceLinks);
 
 const loading = computed(() => appStore.isLoading > 0);
 
-const expanded = computed({
+const expanded = computed<string[]>({
   get() {
     return approvalStore.expandedIds;
   },

@@ -1,5 +1,3 @@
-import { Routes } from "@/fixtures";
-
 const apiUrl = "https://dev-api.safa.ai";
 
 Cypress.on("window:before:load", (window) => {

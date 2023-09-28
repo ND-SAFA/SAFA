@@ -23,7 +23,7 @@ import {
   computed,
   Ref,
 } from "vue";
-import { Selector, Core, Position, EventObject } from "cytoscape";
+import { Selector, Core, EventObject } from "cytoscape";
 import { CyElementProps, CytoEvent, GraphElementType } from "@/types";
 
 const props = defineProps<CyElementProps>();
@@ -62,9 +62,9 @@ function addElement(): void {
   const def = JSON.parse(JSON.stringify(props.definition));
 
   // Add the element to cytoscape.
-  const eles = instance.value.add(def);
+  const eles = instance.value!.add(def);
 
-  emit("add", instance.value);
+  emit("add", instance.value!);
 
   if (id.value || !eles) return;
 
@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
  */
 watch(
   () => props.definition.data,
-  (data: Record<string, unknown>) => {
+  (data) => {
     const ele = instance.value?.getElementById(id.value);
 
     ele?.data(data);
@@ -143,7 +143,7 @@ watch(
  */
 watch(
   () => props.definition.position,
-  (position: Position | null = null) => {
+  (position) => {
     if (!position) return;
 
     const ele = instance.value?.getElementById(id.value);

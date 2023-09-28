@@ -13,6 +13,10 @@ export const useJobs = defineStore("jobs", {
      */
     jobs: [] as JobSchema[],
     /**
+     * The list of jobs for the current project.
+     */
+    projectJobs: [] as JobSchema[],
+    /**
      * The index of the selected job.
      */
     selectedJob: undefined as JobSchema | undefined,

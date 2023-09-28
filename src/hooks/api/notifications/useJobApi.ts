@@ -10,8 +10,14 @@ import {
   JobSchema,
 } from "@/types";
 import { timestampToDisplay } from "@/util";
-import { jobStore, useApi, stompApiStore } from "@/hooks";
-import { deleteJobById, fillEndpoint, getJobLog, getUserJobs } from "@/api";
+import { jobStore, projectStore, stompApiStore, useApi } from "@/hooks";
+import {
+  deleteJobById,
+  fillEndpoint,
+  getJobLog,
+  getProjectJobs,
+  getUserJobs,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -107,17 +113,22 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
   async function handleReload(): Promise<void> {
     await jobApi.handleRequest(
       async () => {
-        const jobs = await getUserJobs();
+        if (projectStore.projectId) {
+          const projectJobs = await getProjectJobs(projectStore.projectId);
+          jobStore.projectJobs = projectJobs;
+        }
 
-        for (const job of jobs) {
+        const userJobs = await getUserJobs();
+
+        for (const job of userJobs) {
           await subscribeToJob(job.id);
         }
 
-        jobStore.jobs = jobs;
+        jobStore.jobs = userJobs;
 
-        if (jobs.length === 0) return;
+        if (userJobs.length === 0) return;
 
-        jobStore.selectedJob = jobs[0];
+        jobStore.selectedJob = userJobs[0];
       },
       { useAppLoad: true }
     );

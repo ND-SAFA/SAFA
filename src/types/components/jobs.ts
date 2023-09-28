@@ -17,3 +17,10 @@ export interface JobRowProps {
    */
   expanded: boolean;
 }
+
+export interface JobTableProps {
+  /**
+   * Whether to show project jobs. Otherwise, user jobs are shown.
+   */
+  displayProjectJobs: boolean;
+}

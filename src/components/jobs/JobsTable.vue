@@ -2,54 +2,54 @@
   <panel-card>
     <data-table
       :columns="jobColumns"
-      :rows="rows"
-      row-key="id"
-      :loading="loading"
-      :rows-per-page="10"
       :expanded="expanded"
+      :loading="loading"
+      :rows="rows"
+      :rows-per-page="10"
       data-cy="job-table"
+      row-key="id"
     >
       <template #body="quasarProps: { row: JobSchema; expand: boolean }">
         <job-row
           v-model:expanded="quasarProps.expand"
-          :quasar-props="quasarProps"
           :job="quasarProps.row"
+          :quasar-props="quasarProps"
           @view-logs="jobApiStore.handleViewLogs"
         />
       </template>
     </data-table>
 
     <modal
+      :open="jobApiStore.jobLog.length > 0"
       size="xl"
       title="Logs"
-      :open="jobApiStore.jobLog.length > 0"
       @close="jobApiStore.handleCloseLogs"
     >
       <q-timeline data-cy="text-job-log">
         <q-virtual-scroll
           v-slot="{ item, index }: { item: JobLogStepSchema }"
-          style="max-height: 70vh"
           :items="jobApiStore.jobLog"
           separator
+          style="max-height: 70vh"
         >
           <q-timeline-entry
             v-if="!!item.entry"
             :key="index"
-            :subtitle="item.timestamp"
             :color="item.error ? 'negative' : 'positive'"
+            :subtitle="item.timestamp"
           >
             <q-expansion-item
-              default-opened
-              switch-toggle-side
               :label="item.stepName"
               class="text-h5"
+              default-opened
+              switch-toggle-side
             >
               <typography
-                variant="expandable"
-                l="3"
+                :collapse-length="0"
                 :value="item.entry"
                 default-expanded
-                :collapse-length="0"
+                l="3"
+                variant="expandable"
               />
             </q-expansion-item>
           </q-timeline-entry>
@@ -57,15 +57,15 @@
       </q-timeline>
       <template #actions>
         <text-button
-          label="Download Logs"
           icon="download"
+          label="Download Logs"
           @click="jobApiStore.handleDownloadLogs"
         />
         <text-button
           color="negative"
-          text
           icon="logs"
           label="Report a Bug"
+          text
           @click="handleFeedback"
         />
       </template>
@@ -82,17 +82,20 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { JobLogStepSchema, JobSchema } from "@/types";
+import { JobLogStepSchema, JobSchema, JobTableProps } from "@/types";
 import { FEEDBACK_LINK, jobColumns } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import TextButton from "@/components/common/button/TextButton.vue";
 import JobRow from "./JobRow.vue";
 
-const rows = computed(() => jobStore.jobs);
+const props = defineProps<JobTableProps>();
+const rows = computed(() =>
+  props.displayProjectJobs ? jobStore.projectJobs : jobStore.jobs
+);
 const loading = computed(() => appStore.isLoading > 0);
 const expanded = computed(() =>
   jobStore.selectedJob ? [jobStore.selectedJob.id] : []

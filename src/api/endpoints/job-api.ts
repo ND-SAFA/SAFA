@@ -47,6 +47,14 @@ export async function getUserJobs(): Promise<JobSchema[]> {
 }
 
 /**
+ * Returns list of jobs associated with project.
+ * @param projectId
+ */
+export async function getProjectJobs(projectId: string): Promise<JobSchema[]> {
+  return buildRequest<JobSchema[]>("getProjectJobs", { projectId }).get();
+}
+
+/**
  * Deletes the job with given id.
  *
  * @param jobId - The job to delete.

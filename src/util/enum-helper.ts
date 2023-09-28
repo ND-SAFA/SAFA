@@ -2,20 +2,20 @@ import {
   ApprovalType,
   ArtifactDeltaState,
   AttributeType,
+  CreatorTab,
   DocumentType,
   FTANodeType,
-  OrganizationTabTypes,
+  LoaderTab,
   MemberRole,
+  MembershipType,
+  OrganizationTabTypes,
+  ProjectTableTab,
   SafetyCaseType,
   SearchSelectOption,
   SelectOption,
-  MembershipType,
+  SettingsTab,
   TeamTabTypes,
   TraceCountTypes,
-  CreatorTab,
-  LoaderTab,
-  SettingsTab,
-  ProjectTableTab,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
 
@@ -198,7 +198,8 @@ export function creatorTabOptions(): SelectOption<CreatorTab>[] {
 export function loaderTabOptions(): SelectOption<LoaderTab>[] {
   return [
     createOption("load", "Open Project"),
-    createOption("uploads", "Project Uploads"),
+    createOption("user", "User Jobs"),
+    createOption("project", "Project Jobs"),
   ];
 }
 

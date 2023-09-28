@@ -1,8 +1,8 @@
 <template>
   <div v-if="expandable" class="width-100">
-    <markdown
+    <q-markdown
       v-if="expanded"
-      :source="value"
+      :src="value"
       :class="className + ' text-white-space-normal'"
     />
     <div v-else :class="className + ' text-ellipsis text-expanded'">
@@ -22,19 +22,15 @@
       </q-btn>
     </div>
   </div>
-  <div
-    v-else-if="variant === 'code'"
-    class="width-100"
-    style="max-height: 100vh"
-  >
+  <div v-else-if="variant === 'code'" class="width-100">
     <div class="flex nowrap overflow-auto">
       <q-btn flat dense @click.stop="expanded = !expanded">
         <q-separator vertical class="q-mx-xs" />
         <q-tooltip :delay="300"> {{ expandLabel }} </q-tooltip>
       </q-btn>
-      <pre v-if="expanded" v-highlightjs :class="className">
-        <code>{{value}}</code>
-      </pre>
+      <q-markdown v-if="expanded">
+        {{ "```" + codeExt + "\n" + value + "\n```" }}
+      </q-markdown>
       <div v-else :class="className + ' text-textCaption'">Code hidden</div>
     </div>
     <q-btn
@@ -81,7 +77,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults, watch } from "vue";
-import Markdown from "vue3-markdown-it";
+import { QMarkdown } from "@quasar/quasar-ui-qmarkdown";
 import { TypographyProps } from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 
@@ -100,6 +96,7 @@ const props = withDefaults(defineProps<TypographyProps>(), {
   b: "",
   class: "",
   collapseLength: 500,
+  codeExt: "",
 });
 
 const { darkMode } = useTheme();
@@ -137,6 +134,26 @@ const expanded = ref(
 const expandable = computed(() => props.variant === "expandable");
 
 const expandLabel = computed(() => (expanded.value ? "See Less" : "See More"));
+
+const codeExt = computed(() => {
+  if (!props.codeExt) {
+    return "";
+  } else {
+    return (
+      {
+        cpp: "clike",
+        cc: "clike",
+        c: "clike",
+        h: "clike",
+        js: "js",
+        ts: "js",
+        vue: "vue",
+        java: "clike",
+        py: "python",
+      }[props.codeExt] || ""
+    );
+  }
+});
 
 /**
  * Collapse the text if it changes and is too long.

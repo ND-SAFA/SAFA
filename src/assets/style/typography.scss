@@ -109,3 +109,12 @@ pre {
 .clickable {
   cursor: pointer;
 }
+
+// Markdown
+
+.q-markdown--line-numbers-wrapper,
+.q-markdown--line-numbers,
+.q-markdown--code-wrapper,
+.q-markdown--code {
+  background-color: transparent !important;
+}

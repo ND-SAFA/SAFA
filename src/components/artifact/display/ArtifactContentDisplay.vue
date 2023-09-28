@@ -18,6 +18,7 @@
           :variant="isCode ? 'code' : 'expandable'"
           :value="props.artifact.body"
           :default-expanded="!isCode"
+          :code-ext="props.artifact.name.split('.').pop()"
         />
       </div>
     </template>
@@ -28,6 +29,7 @@
       :variant="isCode ? 'code' : 'expandable'"
       :value="props.artifact.body"
       :default-expanded="!isCode"
+      :code-ext="props.artifact.name.split('.').pop()"
     />
   </div>
 </template>

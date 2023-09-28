@@ -90,6 +90,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-chart-timeline-variant-shimmer";
     case "notification":
       return "mdi-bell-outline";
+    case "feedback":
+      return "mdi-comment-quote";
     case "share":
       return "mdi-share-variant";
     case "logs":

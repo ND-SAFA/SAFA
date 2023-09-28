@@ -10,7 +10,7 @@ Cypress.Commands.add(
   {
     prevSubject: true,
   },
-  (subject: Cypress.Response<any>, cb) => {
+  (subject: Cypress.Response<unknown>, cb) => {
     return cy.request(cb(subject));
   }
 );

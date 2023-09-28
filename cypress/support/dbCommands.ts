@@ -26,7 +26,7 @@ Cypress.Commands.add("dbResetJobs", () => {
     .then(() => {
       cy.request<{ id: string }[]>({
         method: "GET",
-        url: `${apiUrl}/jobs`,
+        url: `${apiUrl}/jobs/user`,
       }).then(({ body: jobs }) =>
         jobs.forEach((job) =>
           cy.request({

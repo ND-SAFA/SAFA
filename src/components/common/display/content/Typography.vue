@@ -2,6 +2,7 @@
   <div v-if="expandable" class="width-100">
     <q-markdown
       v-if="expanded"
+      no-heading-anchor-links
       :src="value"
       :class="className + ' text-white-space-normal'"
     />
@@ -28,7 +29,7 @@
         <q-separator vertical class="q-mx-xs" />
         <q-tooltip :delay="300"> {{ expandLabel }} </q-tooltip>
       </q-btn>
-      <q-markdown v-if="expanded">
+      <q-markdown v-if="expanded" no-heading-anchor-links>
         {{ "```" + codeExt + "\n" + value + "\n```" }}
       </q-markdown>
       <div v-else :class="className + ' text-textCaption'">Code hidden</div>

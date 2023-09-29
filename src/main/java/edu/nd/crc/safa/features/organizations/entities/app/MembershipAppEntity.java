@@ -17,6 +17,17 @@ public class MembershipAppEntity implements IAppEntity {
     private MembershipType entityType;
     private UUID entityId;
 
+    /**
+     * This constructor is mainly intended for testing
+     *
+     * @param email The email of the user involved
+     * @param role The role to assign them
+     */
+    public MembershipAppEntity(String email, String role) {
+        this.email = email;
+        this.role = role;
+    }
+
     public MembershipAppEntity(EntityMembership membership) {
         this.id = membership.getId();
         this.email = membership.getEmail();

@@ -9,13 +9,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-<<<<<<< HEAD
+import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
-=======
-import edu.nd.crc.safa.features.jobs.services.JobService;
->>>>>>> 5ac3d9f1a3c5731843e4d7383f54789aed7695a7
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;

@@ -2,12 +2,13 @@ package edu.nd.crc.safa.test.features.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.services.TypeService;
@@ -55,7 +56,7 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
         assertThat(message.getChanges()).hasSize(1);
         this.changeMessageVerifies.verifyTypeChange(message,
             entityId,
-            Change.Action.UPDATE);
+            NotificationAction.UPDATE);
         this.changeMessageVerifies.verifyUpdateLayout(message, false);
     }
 
@@ -70,14 +71,13 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
         assertThat(message.getChanges()).hasSize(1);
         this.changeMessageVerifies.verifyTypeChange(message,
             entityId,
-            Change.Action.DELETE);
+            NotificationAction.DELETE);
         this.changeMessageVerifies.verifyUpdateLayout(message, true);
     }
 
     @Override
     protected void onPostSubscribe() throws Exception {
-        EntityChangeMessage message = this.notificationService.getEntityMessage(currentUser);
-        this.assertionService.verifyOnlyActiveMember(currentUser, message);
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
     }
 
     @Override

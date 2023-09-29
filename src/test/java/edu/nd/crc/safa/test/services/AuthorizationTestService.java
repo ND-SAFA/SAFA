@@ -33,10 +33,10 @@ public class AuthorizationTestService {
         ApplicationBaseTest.currentUser = serviceProvider
             .getAccountLookupService()
             .getUserFromUsername(defaultUser);
-        return logicDefaultUser();
+        return loginDefaultUser();
     }
 
-    public String logicDefaultUser() throws Exception {
+    public String loginDefaultUser() throws Exception {
         String authorizationCode = loginUser(ApplicationBaseTest.currentUserName,
             ApplicationBaseTest.defaultUserPassword);
         ApplicationBaseTest.currentUser = serviceProvider

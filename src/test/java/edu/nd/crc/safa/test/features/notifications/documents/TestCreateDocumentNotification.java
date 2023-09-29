@@ -1,7 +1,11 @@
 package edu.nd.crc.safa.test.features.notifications.documents;
 
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 
 /**
  * Test that creating a document sends notification containing:
@@ -18,11 +22,13 @@ public class TestCreateDocumentNotification extends AbstractDocumentNotification
     }
 
     @Override
-    protected void verifyShareeMessage(EntityChangeMessage message) {
+    protected void verifyShareeMessage(List<EntityChangeMessage> messages) {
+        assertEquals(1, messages.size());
+        EntityChangeMessage message = messages.get(0);
         this.changeMessageVerifies.verifyDocumentChange(
             message,
             this.documentId,
-            Change.Action.UPDATE
+            NotificationAction.UPDATE
         );
         this.changeMessageVerifies.verifyUpdateLayout(message, false);
     }

@@ -8,8 +8,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.features.notifications.AbstractNotificationTest;
 
 import org.json.JSONObject;
@@ -30,7 +30,7 @@ public abstract class AbstractDocumentNotificationTest extends AbstractNotificat
         this.changeMessageVerifies.verifyDocumentChange(
             message,
             this.documentId,
-            Change.Action.UPDATE
+            NotificationAction.UPDATE
         );
         this.changeMessageVerifies.verifyUpdateLayout(message, false);
     }

@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.notifications.WebSocketMessageService;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 
 import lombok.AllArgsConstructor;
@@ -89,9 +91,9 @@ public class MessageInterceptor implements ChannelInterceptor {
 
     private Change createChange(List<UserAppEntity> activeUsers) {
         Change change = new Change();
-        change.setAction(Change.Action.UPDATE);
+        change.setAction(NotificationAction.UPDATE);
         change.setEntities(activeUsers);
-        change.setEntity(Change.Entity.ACTIVE_MEMBERS);
+        change.setEntity(NotificationEntity.ACTIVE_MEMBERS);
         return change;
     }
 }

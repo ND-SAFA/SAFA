@@ -3,8 +3,12 @@ package edu.nd.crc.safa.test.features.memberships.logic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
@@ -30,8 +34,7 @@ class TestMembershipNotifications extends ApplicationBaseTest {
         notificationService.initializeUser(currentUser, this.token);
         notificationService.subscribeToProject(currentUser, project);
 
-        EntityChangeMessage message = this.notificationService.getEntityMessage(currentUser);
-        this.assertionService.verifyOnlyActiveMember(currentUser, message);
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
 
         // Step - Create two users
         authorizationService.createUser(newMemberEmail, newMemberPassword);
@@ -42,24 +45,24 @@ class TestMembershipNotifications extends ApplicationBaseTest {
 
         // VP - Verify that single change was broadcast.
         EntityChangeMessage addMemberMessage = notificationService.getEntityMessage(currentUser);
-        verifyMessageContent(addMemberMessage, Change.Action.UPDATE);
+        verifyMessageContent(addMemberMessage, NotificationAction.UPDATE);
 
         // Step - Remove member from project
         authorizationService.removeMemberFromProject(project, newMemberEmail);
 
         // VP - Verify that message is sent to update members after deletion
         EntityChangeMessage removeMemberMessage = notificationService.getEntityMessage(currentUser);
-        verifyMessageContent(removeMemberMessage, Change.Action.DELETE);
+        verifyMessageContent(removeMemberMessage, NotificationAction.DELETE);
     }
 
     private void verifyMessageContent(EntityChangeMessage message,
-                                      Change.Action action) {
+                                      NotificationAction action) {
         // VP - Verify that only one change was broadcast.
         assertThat(message.getChanges()).hasSize(1);
 
         // VP - Verify that membership notification is received.
         Change change = message.getChanges().get(0);
-        assertThat(change.getEntity()).isEqualTo(Change.Entity.MEMBERS);
+        assertThat(change.getEntity()).isEqualTo(NotificationEntity.MEMBERS);
         assertThat(change.getAction()).isEqualTo(action);
         assertThat(change.getEntityIds()).hasSize(1);
     }

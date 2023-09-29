@@ -15,8 +15,8 @@ import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.features.attributes.AttributesForTesting;
@@ -88,7 +88,7 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        changeMessageVerifies.verifyArtifactMessage(creationMessage, currentId, Change.Action.UPDATE);
+        changeMessageVerifies.verifyArtifactMessage(creationMessage, currentId, NotificationAction.UPDATE);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        changeMessageVerifies.verifyArtifactMessage(updateMessage, currentId, Change.Action.UPDATE);
+        changeMessageVerifies.verifyArtifactMessage(updateMessage, currentId, NotificationAction.UPDATE);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        changeMessageVerifies.verifyArtifactMessage(deletionMessage, currentId, Change.Action.DELETE);
+        changeMessageVerifies.verifyArtifactMessage(deletionMessage, currentId, NotificationAction.DELETE);
     }
 
 }

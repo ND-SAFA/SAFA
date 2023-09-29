@@ -57,7 +57,7 @@ public abstract class CommitJob extends AbstractJob {
         this.getDbLogger().log(this.projectCommitDefinition.getSummary());
         ProjectChanger projectChanger = new ProjectChanger(projectCommitDefinition.getCommitVersion(),
             this.getServiceProvider());
-        projectChanger.commitAsUser(projectCommitDefinition, getJobDbEntity().getUser());
+        projectChanger.commit(getJobDbEntity().getUser(), projectCommitDefinition);
     }
 
     /**

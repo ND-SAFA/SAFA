@@ -224,7 +224,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
         // Step - broadcast change to artifact type and affected artifacts
         notificationService.broadcastChange(
             EntityChangeBuilder.create(user, project)
-                .withTypeUpdate(artifactType.getId())
+                .withTypeUpdate(artifactType)
                 .withArtifactsUpdate(artifactIds));
     }
 

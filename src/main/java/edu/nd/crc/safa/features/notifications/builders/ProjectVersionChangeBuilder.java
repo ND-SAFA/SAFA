@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-public class ProjectVersionChangeBuilder extends AbstractEntityChangeBuilder {
+public class ProjectVersionChangeBuilder extends AbstractEntityChangeBuilder<ProjectVersionChangeBuilder> {
 
     public ProjectVersionChangeBuilder(SafaUser user, ProjectVersion projectVersion) {
         super(user.getUserId());
@@ -17,27 +20,36 @@ public class ProjectVersionChangeBuilder extends AbstractEntityChangeBuilder {
         this.getEntityChangeMessage().setTopic(versionTopic);
     }
 
-    public ProjectVersionChangeBuilder withVersionDelete(UUID versionId) {
-        return (ProjectVersionChangeBuilder) withEntityDelete(Change.Entity.VERSION, List.of(versionId));
+    public ProjectVersionChangeBuilder withDocumentUpdate(List<DocumentAppEntity> documents) {
+        return withEntitiesUpdate(NotificationEntity.DOCUMENT, documents);
     }
 
-    public ProjectVersionChangeBuilder withArtifactsUpdate(List<UUID> artifactIds) {
-        return (ProjectVersionChangeBuilder) withEntityUpdate(Change.Entity.ARTIFACTS, artifactIds);
+    public ProjectVersionChangeBuilder withVersionDelete(UUID versionId) {
+        return (ProjectVersionChangeBuilder) withEntityDelete(NotificationEntity.VERSION, List.of(versionId));
+    }
+
+    public ProjectVersionChangeBuilder withArtifactsUpdate(List<ArtifactAppEntity> artifacts) {
+        return (ProjectVersionChangeBuilder) withEntitiesUpdate(NotificationEntity.ARTIFACTS, artifacts);
     }
 
     public ProjectVersionChangeBuilder withArtifactsDelete(List<UUID> artifactIds) {
-        return (ProjectVersionChangeBuilder) withEntityDelete(Change.Entity.ARTIFACTS, artifactIds);
+        return (ProjectVersionChangeBuilder) withEntityDelete(NotificationEntity.ARTIFACTS, artifactIds);
     }
 
     public ProjectVersionChangeBuilder withWarningsUpdate() {
-        return (ProjectVersionChangeBuilder) withEntityUpdate(Change.Entity.WARNINGS, new ArrayList<>(), false);
+        return (ProjectVersionChangeBuilder) withEntityUpdate(NotificationEntity.WARNINGS, new ArrayList<>(), false);
     }
 
-    public ProjectVersionChangeBuilder withTracesUpdate(List<UUID> traceIds) {
-        return (ProjectVersionChangeBuilder) withEntityUpdate(Change.Entity.TRACES, traceIds);
+    public ProjectVersionChangeBuilder withTracesUpdate(List<TraceAppEntity> traces) {
+        return (ProjectVersionChangeBuilder) withEntitiesUpdate(NotificationEntity.TRACES, traces);
     }
 
     public ProjectVersionChangeBuilder withTracesDelete(List<UUID> traceLinkIds) {
-        return (ProjectVersionChangeBuilder) withEntityDelete(Change.Entity.TRACES, traceLinkIds);
+        return (ProjectVersionChangeBuilder) withEntityDelete(NotificationEntity.TRACES, traceLinkIds);
+    }
+
+    @Override
+    protected ProjectVersionChangeBuilder self() {
+        return this;
     }
 }

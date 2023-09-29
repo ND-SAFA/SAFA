@@ -42,7 +42,7 @@ public class EntityChangeMessage {
     }
 
     @JsonIgnore
-    public Change getChangeForEntity(Change.Entity entity) {
+    public Change getChangeForEntity(NotificationEntity entity) {
         List<Change> changeQuery = changes
             .stream()
             .filter(c -> c.getEntity().equals(entity))

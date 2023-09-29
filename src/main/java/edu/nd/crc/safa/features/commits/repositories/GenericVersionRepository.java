@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -54,14 +55,6 @@ public abstract class GenericVersionRepository<
             .collect(Collectors.toList());
     }
 
-    @Override
-    public List<AppEntity> retrieveAppEntitiesByProject(Project project) {
-        List<VersionEntity> versions = retrieveVersionEntitiesByProject(project);
-        return versions.stream()
-            .map(this::retrieveAppEntityFromVersionEntity)
-            .collect(Collectors.toList());
-    }
-
     /**
      * Calculates contents of each artifact at given version and returns bodies at version.
      *
@@ -106,6 +99,16 @@ public abstract class GenericVersionRepository<
     public Map<UUID, List<VersionEntity>> createVersionEntityMap(ProjectVersion projectVersion,
                                                                  List<UUID> baseEntityIds) {
         Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
+        addToVersionEntityMap(projectVersion, entityHashTable, baseEntityIds);
+        return entityHashTable;
+    }
+
+    public Map<UUID, List<VersionEntity>> addToVersionEntityMap(ProjectVersion projectVersion,
+                                                                Map<UUID, List<VersionEntity>> entityHashTable,
+                                                                List<UUID> baseEntityIds) {
+        if (baseEntityIds.contains(null)) {
+            throw new SafaError("Expected all values to be valid version entity ids, found null.");
+        }
         this.retrieveVersionEntitiesByBaseIds(baseEntityIds)
             .forEach(versionEntity -> {
                 if (entityHashTable.containsKey(versionEntity.getBaseEntityId())) {
@@ -116,6 +119,12 @@ public abstract class GenericVersionRepository<
                     entityHashTable.put(versionEntity.getBaseEntityId(), versionEntities);
                 }
             });
+        Set<UUID> registeredIds = entityHashTable.keySet();
+        if (!registeredIds.containsAll(baseEntityIds)) {
+            List<UUID> missingIds = baseEntityIds.stream().filter(id -> !registeredIds.contains(id)).collect(Collectors.toList());
+            throw new SafaError(String.format("Unable to find find all : %s", missingIds));
+        }
+
         return entityHashTable;
     }
 
@@ -159,19 +168,13 @@ public abstract class GenericVersionRepository<
         Map<UUID, List<VersionEntity>> entityHashTable) {
 
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
-            Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
-
-            if (baseEntityOptional.isPresent()) {
-                BaseEntity baseEntity = baseEntityOptional.get();
-                VersionEntity removedVersionEntity = this.instantiateVersionEntityFromAppEntity(
-                    projectVersion,
-                    baseEntity,
-                    null);
-                this.createOrUpdateVersionEntity(removedVersionEntity, user, entityHashTable);
-                return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
-            } else {
-                return Optional.empty();
-            }
+            BaseEntity baseEntity = this.findBaseEntityById(baseEntityId).orElseThrow();
+            VersionEntity removedVersionEntity = this.instantiateVersionEntityFromAppEntity(
+                projectVersion,
+                baseEntity,
+                null); // null tells method that this is a deletion.
+            this.createOrUpdateVersionEntity(removedVersionEntity, user, entityHashTable);
+            return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
         };
         return commitErrorHandler(projectVersion, versionEntityAction, baseEntityId, this.getProjectActivity());
     }
@@ -230,7 +233,6 @@ public abstract class GenericVersionRepository<
      * @param asCompleteSet  Whether appEntities are complete set of artifacts at project version
      * @return List of pairs of VersionEntities or commit errors
      */
-
     @Override
     public List<Pair<VersionEntity, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
@@ -239,7 +241,11 @@ public abstract class GenericVersionRepository<
         SafaUser user) {
 
         List<UUID> processedAppEntities = new ArrayList<>();
-        List<UUID> entityIds = appEntities.stream().map(IAppEntity::getId).collect(Collectors.toList());
+        List<UUID> entityIds = appEntities
+            .stream()
+            .map(IAppEntity::getId)
+            .filter(t -> t != null)
+            .collect(Collectors.toList());
         Map<UUID, List<VersionEntity>> entityHashTable = createVersionEntityMap(projectVersion, entityIds);
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
@@ -256,12 +262,21 @@ public abstract class GenericVersionRepository<
             .collect(Collectors.toList());
 
         if (asCompleteSet) { // calculates deleted entities if this is complete set
-            List<Pair<VersionEntity, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
+            List<UUID> deletedBaseEntityIds = this.retrieveBaseEntitiesByProject(
                     projectVersion.getProject())
                 .stream()
                 .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
-                .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(projectVersion, baseEntity.getBaseEntityId(),
-                    user, entityHashTable))
+                .map(BaseEntity::getBaseEntityId)
+                .collect(Collectors.toList());
+
+            addToVersionEntityMap(projectVersion, entityHashTable, deletedBaseEntityIds);
+
+            List<Pair<VersionEntity, CommitError>> removedVersionEntities = deletedBaseEntityIds
+                .stream()
+                .map(baseEntityId -> this.deleteVersionEntityByBaseEntityId(projectVersion,
+                    baseEntityId,
+                    user,
+                    entityHashTable))
                 .collect(Collectors.toList());
             response.addAll(removedVersionEntities);
         }
@@ -276,13 +291,14 @@ public abstract class GenericVersionRepository<
             this.queryVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
                 versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
 
-            Optional<VersionEntity> previousEntity =
+            Optional<VersionEntity> previousEntityOptional =
                 findVersionEntityByProjectVersionAndBaseEntityId(versionEntity.getProjectVersion(),
                     versionEntity.getBaseEntityId(), entityHashTable);
+            VersionEntity previousEntity = previousEntityOptional.orElse(null);
 
             this.save(versionEntity);
 
-            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null), user);
+            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity, user);
         } catch (Exception e) {
             e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();

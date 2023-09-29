@@ -4,10 +4,10 @@ import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-public class JobChangeBuilder extends AbstractEntityChangeBuilder {
+public class JobChangeBuilder extends AbstractEntityChangeBuilder<JobChangeBuilder> {
 
     public JobChangeBuilder(SafaUser user, JobDbEntity job) {
         super(user.getUserId());
@@ -16,10 +16,15 @@ public class JobChangeBuilder extends AbstractEntityChangeBuilder {
     }
 
     public JobChangeBuilder withJobUpdate(JobDbEntity job) {
-        return (JobChangeBuilder) withEntityUpdate(Change.Entity.JOBS, List.of(job.getId()));
+        return (JobChangeBuilder) withEntityUpdate(NotificationEntity.JOBS, List.of(job.getId()));
     }
 
     public JobChangeBuilder withJobDelete(JobDbEntity job) {
-        return (JobChangeBuilder) withEntityDelete(Change.Entity.JOBS, List.of(job.getId()));
+        return (JobChangeBuilder) withEntityDelete(NotificationEntity.JOBS, List.of(job.getId()));
+    }
+
+    @Override
+    protected JobChangeBuilder self() {
+        return this;
     }
 }

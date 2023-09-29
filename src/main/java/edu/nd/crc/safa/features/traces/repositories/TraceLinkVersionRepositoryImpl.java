@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
@@ -158,7 +159,7 @@ public class TraceLinkVersionRepositoryImpl
             && (previousVersionEntity == null || previousVersionEntity.getApprovalStatus() == ApprovalStatus.DECLINED);
 
         boolean removed = approvalStatus == ApprovalStatus.DECLINED
-            && previousVersionEntity.getApprovalStatus() != ApprovalStatus.DECLINED;
+            && (previousVersionEntity.getApprovalStatus() != ApprovalStatus.DECLINED);
 
         boolean modified = previousVersionEntity != null
             && versionEntity.getApprovalStatus() != previousVersionEntity.getApprovalStatus();
@@ -196,14 +197,14 @@ public class TraceLinkVersionRepositoryImpl
     private void notifyTraceMatrixUpdate(TraceMatrixEntry entry, SafaUser user) {
         ProjectChangeBuilder builder = EntityChangeBuilder
             .create(user, entry.getProjectVersion().getProject())
-            .withTraceMatrixUpdate(entry.getId());
+            .withTraceMatrixUpdate(new TraceMatrixAppEntity(entry));
         notificationService.broadcastChange(builder);
     }
 
     private void notifyTraceMatrixDelete(TraceMatrixEntry entry, SafaUser user) {
         ProjectChangeBuilder builder = EntityChangeBuilder
             .create(user, entry.getProjectVersion().getProject())
-            .withTraceMatrixUpdate(entry.getId());
+            .withTraceMatrixDelete(entry.getId());
         notificationService.broadcastChange(builder);
     }
 

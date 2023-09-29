@@ -71,6 +71,7 @@ public class WebSocketServer {
      * @throws InterruptedException If interrupted while polling for message.
      */
     public String getMessage(UUID clientId, int timeToPoll) throws InterruptedException {
+        assertClientExists(clientId);
         return idToQueue.get(clientId).poll(timeToPoll, SECONDS);
     }
 
@@ -83,6 +84,7 @@ public class WebSocketServer {
      * @throws InterruptedException If interrupted during sleep.
      */
     public List<String> getMessages(UUID clientId, int timeToPoll) throws InterruptedException {
+        assertClientExists(clientId);
         Thread.sleep(timeToPoll);
         return new ArrayList<>(idToQueue.get(clientId));
     }
@@ -96,6 +98,7 @@ public class WebSocketServer {
      * @throws JsonProcessingException If error occurs while serializing object.
      */
     public void send(UUID clientId, String destination, Object object) throws JsonProcessingException {
+        assertClientExists(clientId);
         byte[] message = objectMapper.writeValueAsBytes(object);
         idToSession.get(clientId).send(destination, message);
     }
@@ -115,12 +118,19 @@ public class WebSocketServer {
      * @param clientId The client whose queue is returned.
      */
     public BlockingQueue<String> getQueue(UUID clientId, int timeToPoll) throws InterruptedException {
-        if (!this.idToQueue.containsKey(clientId)) {
-            String error = String.format("%s does not have a queue. Has session been initialized?", clientId);
-            throw new SafaError(error);
-        }
+        assertClientExists(clientId);
         Thread.sleep(timeToPoll);
         return this.idToQueue.get(clientId);
+    }
+
+    private void assertClientExists(UUID clientId) {
+        String errorMessage = "%s does not have a %s. Has session been initialized?";
+        if (!this.idToQueue.containsKey(clientId)) {
+            throw new SafaError(String.format(errorMessage, clientId, "queue"));
+        }
+        if (!this.idToSession.containsKey(clientId)) {
+            throw new SafaError(String.format(errorMessage, clientId, "session"));
+        }
     }
 
     /**
@@ -129,6 +139,7 @@ public class WebSocketServer {
      * @param clientId ID of client to clear messages for.
      */
     public void clearQueue(UUID clientId) {
+        assertClientExists(clientId);
         this.idToQueue.get(clientId).clear();
     }
 
@@ -139,6 +150,7 @@ public class WebSocketServer {
      * @param destination The destionation to subscribe to.
      */
     public void subscribe(UUID clientId, String destination) {
+        assertClientExists(clientId);
         idToSession.get(clientId).subscribe(destination, new StompFrameHandler() {
             @NotNull
             public Type getPayloadType(@NotNull StompHeaders stompHeaders) {

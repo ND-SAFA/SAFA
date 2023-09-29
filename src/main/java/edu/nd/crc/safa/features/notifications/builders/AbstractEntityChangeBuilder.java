@@ -1,10 +1,13 @@
 package edu.nd.crc.safa.features.notifications.builders;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +15,7 @@ import lombok.Getter;
 /**
  * Used to build multiple changes into an entity change.
  */
-public abstract class AbstractEntityChangeBuilder {
+public abstract class AbstractEntityChangeBuilder<T extends AbstractEntityChangeBuilder<T>> {
     /**
      * The change being built.
      */
@@ -24,47 +27,58 @@ public abstract class AbstractEntityChangeBuilder {
         this.entityChangeMessage.setUserId(userID);
     }
 
-    public AbstractEntityChangeBuilder withUpdateLayout() {
-        this.getEntityChangeMessage().setUpdateLayout(true);
-        return this;
+    public T withUpdateLayout() {
+        return withUpdateLayout(true);
     }
 
-    protected AbstractEntityChangeBuilder withEntityUpdate(Change.Entity entity, List<UUID> entityIds) {
-        return withEntityUpdate(entity, entityIds, true);
+    public T withUpdateLayout(boolean shouldUpdate) {
+        this.getEntityChangeMessage().setUpdateLayout(shouldUpdate);
+        return self();
     }
 
-    protected AbstractEntityChangeBuilder withEntityUpdate(Change.Entity entity,
-                                                           List<UUID> entityIds,
-                                                           boolean checkIfEmpty) {
+    protected <EntityType extends Object> T withEntitiesUpdate(NotificationEntity entity,
+                                                               List<EntityType> entities) {
+        return addChange(entity, NotificationAction.UPDATE, new ArrayList<>(), entities, true);
+    }
+
+    protected T withEntityUpdate(NotificationEntity entity, List<UUID> entityIds) {
+        return addChange(entity, NotificationAction.UPDATE, entityIds, new ArrayList<>(), true);
+    }
+
+    protected T withEntityUpdate(NotificationEntity entity,
+                                 List<UUID> entityIds,
+                                 boolean checkIfEmpty) {
+        return addChange(entity, NotificationAction.UPDATE, entityIds, new ArrayList<>(), checkIfEmpty);
+    }
+
+    protected T withEntityDelete(NotificationEntity entity, List<UUID> entityIds) {
+        return addChange(entity, NotificationAction.DELETE, entityIds, new ArrayList<>(), true);
+    }
+
+    private <EntityType> T addChange(NotificationEntity entity,
+                                     NotificationAction action,
+                                     List<UUID> entityIds,
+                                     List<EntityType> entities,
+                                     boolean checkIfEmpty) {
         Change change = new Change();
         change.setEntity(entity);
-        change.setAction(Change.Action.UPDATE);
+        change.setAction(action);
         change.setEntityIds(entityIds);
+        change.setEntities(entities);
         return addChange(change, checkIfEmpty);
     }
 
-    protected AbstractEntityChangeBuilder withEntityDelete(Change.Entity entity, List<UUID> entityIds) {
-        return withEntityDelete(entity, entityIds, true);
-    }
-
-    protected AbstractEntityChangeBuilder withEntityDelete(Change.Entity entity,
-                                                           List<UUID> entityIds,
-                                                           boolean checkIfEmpty) {
-        Change change = new Change();
-        change.setEntity(entity);
-        change.setAction(Change.Action.DELETE);
-        change.setEntityIds(entityIds);
-        return addChange(change, checkIfEmpty);
-    }
-
-    private AbstractEntityChangeBuilder addChange(Change change, boolean checkIfEmpty) {
+    private T addChange(Change change, boolean checkIfEmpty) {
         if (checkIfEmpty) {
-            if (!change.getEntityIds().isEmpty()) {
-                this.entityChangeMessage.addChange(change);
+            if (change.getEntityIds().isEmpty() && change.getEntities().isEmpty()) {
+                return self();
             }
+            this.entityChangeMessage.addChange(change);
         } else {
             this.entityChangeMessage.addChange(change);
         }
-        return this;
+        return self();
     }
+
+    protected abstract T self();
 }

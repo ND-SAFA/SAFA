@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.test.common;
 
+import java.util.List;
+
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.IUser;
@@ -41,11 +43,18 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
         this.projectVersion = creationService.createProjectWithNewVersion(projectName);
         this.project = this.projectVersion.getProject();
 
+        // Step
+        this.authorizationService.loginDefaultUser();
+        this.notificationService.initializeUser(currentUser, this.token);
+        this.notificationService.subscribeToProject(currentUser, this.project);
+
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
+
         // Step - Create other user to share project with.
         this.sharee = this.authorizationService.createUser(Sharee.email, Sharee.password);
         String shareeToken = this.authorizationService.loginUser(Sharee.email, Sharee.password);
 
-        this.authorizationService.logicDefaultUser();
+        this.authorizationService.loginDefaultUser();
 
         // Step - Share project with sharee
         creationService.shareProject(
@@ -57,6 +66,8 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
         notificationService.initializeUser(sharee, shareeToken);
         notificationService.subscribeToProject(sharee, project);
         notificationService.subscribeToVersion(sharee, projectVersion);
+
+        this.assertionService.verifyActiveMembers(List.of(sharee, currentUser), this.notificationService);
     }
 
     /**

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.commits.pipeline.steps;
 
+import java.util.List;
+
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
@@ -29,11 +31,17 @@ public class SendNotifications implements ICommitStep {
         ProjectChange<TraceAppEntity> traceChanges = result.getTraces();
         SafaUser user = commitDefinition.getUser();
 
+        List<TraceAppEntity> updatedTraces = traceChanges.getModified();
+        updatedTraces.addAll(traceChanges.getAdded());
+
+        List<ArtifactAppEntity> updatedArtifacts = artifactChanges.getModified();
+        updatedArtifacts.addAll(artifactChanges.getAdded());
+
         ProjectVersionChangeBuilder builder = EntityChangeBuilder
             .create(user, projectVersion)
-            .withArtifactsUpdate(artifactChanges.getUpdatedIds())
+            .withArtifactsUpdate(updatedArtifacts)
             .withArtifactsDelete(artifactChanges.getDeletedIds())
-            .withTracesUpdate(traceChanges.getUpdatedIds())
+            .withTracesUpdate(updatedTraces)
             .withTracesDelete(traceChanges.getDeletedIds())
             .withWarningsUpdate();
 

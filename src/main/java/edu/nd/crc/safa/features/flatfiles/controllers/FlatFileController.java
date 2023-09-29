@@ -10,7 +10,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -68,15 +67,9 @@ public class FlatFileController extends BaseController {
             asCompleteSet = false;
         }
 
-        ProjectAppEntity projectCreated = getServiceProvider().getFlatFileService().updateProjectFromFlatFiles(
-            versionId, user, files, asCompleteSet);
-
-        getServiceProvider().getNotificationService().broadcastChange(
-            EntityChangeBuilder
-                .create(user, projectVersion.getProject())
-                .withVersionUpdate(projectVersion)
-        );
-        return projectCreated;
+        return getServiceProvider()
+            .getFlatFileService()
+            .updateProjectFromFlatFiles(versionId, user, files, asCompleteSet);
     }
 
     @GetMapping(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)

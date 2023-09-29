@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.context.request.async.DeferredResult;
 
 /**
  * Responsible for pulling and syncing GitHub projects with Safa projects.
@@ -54,22 +53,16 @@ public class GithubController extends BaseController {
      * @return A {@link JobAppEntity} representing the import job.
      */
     @PostMapping(AppRoutes.Github.Import.BY_NAME)
-    public DeferredResult<JobAppEntity> pullGithubProject(@PathVariable("repositoryName") String repositoryName,
-                                                          @PathVariable("owner") String owner,
-                                                          @RequestBody GithubImportDTO importSettings) {
+    public JobAppEntity pullGithubProject(@PathVariable("repositoryName") String repositoryName,
+                                          @PathVariable("owner") String owner,
+                                          @RequestBody GithubImportDTO importSettings) throws Exception {
 
-        return makeDeferredRequest(user -> {
-            checkCredentials(user);
-            GithubIdentifier identifier = new GithubIdentifier(null, owner, repositoryName);
-            CreateProjectViaGithubBuilder builder
-                = new CreateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
-
-            try {
-                return builder.perform();
-            } catch (Exception e) {
-                throw new SafaError("Failed to start job", e);
-            }
-        });
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        checkCredentials(user);
+        GithubIdentifier identifier = new GithubIdentifier(null, owner, repositoryName);
+        CreateProjectViaGithubBuilder builder
+            = new CreateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
+        return builder.perform();
     }
 
     /**
@@ -83,25 +76,17 @@ public class GithubController extends BaseController {
      * @return Information about the started job
      */
     @PutMapping(AppRoutes.Github.Import.UPDATE)
-    public DeferredResult<JobAppEntity> updateGithubProject(@PathVariable("versionId") UUID versionId,
-                                                            @PathVariable("repositoryName") String repositoryName,
-                                                            @PathVariable("owner") String owner,
-                                                            @RequestBody GithubImportDTO importSettings) {
-
-        return makeDeferredRequest(user -> {
-            checkCredentials(user);
-            ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                    .withPermission(ProjectPermission.EDIT, user).get();
-            GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
-            UpdateProjectViaGithubBuilder builder
-                = new UpdateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
-
-            try {
-                return builder.perform();
-            } catch (Exception e) {
-                throw new SafaError("Failed to start job", e);
-            }
-        });
+    public JobAppEntity updateGithubProject(@PathVariable("versionId") UUID versionId,
+                                            @PathVariable("repositoryName") String repositoryName,
+                                            @PathVariable("owner") String owner,
+                                            @RequestBody GithubImportDTO importSettings) throws Exception {
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT, user).get();
+        GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
+        UpdateProjectViaGithubBuilder builder
+            = new UpdateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
+        return builder.perform();
     }
 
     /**
@@ -115,25 +100,18 @@ public class GithubController extends BaseController {
      * @return Information about the started job
      */
     @PostMapping(AppRoutes.Github.Import.IMPORT_INTO_EXISTING)
-    public DeferredResult<JobAppEntity> importIntoExistingProject(@PathVariable("versionId") UUID versionId,
-                                                                  @PathVariable("repositoryName") String repositoryName,
-                                                                  @PathVariable("owner") String owner,
-                                                                  @RequestBody GithubImportDTO importSettings) {
-
-        return makeDeferredRequest(user -> {
-            checkCredentials(user);
-            ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                    .withPermission(ProjectPermission.EDIT, user).get();
-            GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
-            ImportIntoProjectViaGithubBuilder builder
-                = new ImportIntoProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
-
-            try {
-                return builder.perform();
-            } catch (Exception e) {
-                throw new SafaError("Failed to start job", e);
-            }
-        });
+    public JobAppEntity importIntoExistingProject(@PathVariable("versionId") UUID versionId,
+                                                  @PathVariable("repositoryName") String repositoryName,
+                                                  @PathVariable("owner") String owner,
+                                                  @RequestBody GithubImportDTO importSettings) throws Exception {
+        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        checkCredentials(user);
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT, user).get();
+        GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
+        ImportIntoProjectViaGithubBuilder builder
+            = new ImportIntoProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
+        return builder.perform();
     }
 
     private void checkCredentials(SafaUser user) {

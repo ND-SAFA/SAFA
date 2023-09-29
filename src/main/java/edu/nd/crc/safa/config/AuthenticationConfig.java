@@ -37,6 +37,7 @@ public class AuthenticationConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(requests -> requests.requestMatchers(
                     AppRoutes.Accounts.LOGIN,
                     AppRoutes.Accounts.CREATE_ACCOUNT,
@@ -49,7 +50,6 @@ public class AuthenticationConfig {
                 .permitAll()
                 .anyRequest()
                 .authenticated())
-            .csrf(AbstractHttpConfigurer::disable)
             // Authentication Filters
             .addFilter(new AuthenticationFilter(authenticationManager, tokenService))
             .addFilter(new AuthorizationFilter(authenticationManager, authorizationService))

@@ -145,9 +145,15 @@ public class FlatFileService {
                 TGenRequestAppEntity,
                 projectAppEntity
             );
+
             generatedLinks = this.traceGenerationService.removeOverlappingLinks(
                 projectCommitDefinition.getTraces().getAdded(),
                 generatedLinks);
+
+            for (TraceAppEntity traceAppEntity : generatedLinks) {
+                this.serviceProvider.getTraceLinkRepository().getByProjectAndSourceAndTarget(projectVersion.getProject(),
+                    traceAppEntity.getSourceName(), traceAppEntity.getTargetName()).ifPresent(t -> traceAppEntity.setId(t.getTraceLinkId()));
+            }
 
             // Step - Commit generated trace links
             projectCommitDefinition.getTraces().getAdded().addAll(generatedLinks);
@@ -161,7 +167,7 @@ public class FlatFileService {
             if (asCompleteSet) {
                 projectChanger.setEntitiesAsCompleteSet(projectEntities, user);
             } else {
-                projectChanger.commit(projectCommitDefinition);
+                projectChanger.commit(user, projectCommitDefinition);
             }
             this.commitErrorRepository.saveAll(projectCommitDefinition.getErrors());
         } catch (IOException | JSONException e) {
@@ -192,6 +198,10 @@ public class FlatFileService {
         // Step - parse artifacts
         EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
         List<ArtifactAppEntity> artifactsAdded = artifactCreationResponse.getEntities();
+        for (ArtifactAppEntity artifact : artifactsAdded) {
+            this.serviceProvider.getArtifactRepository().findByProjectAndName(projectVersion.getProject(),
+                artifact.getName()).ifPresent(a -> artifact.setId(a.getArtifactId()));
+        }
         projectCommitDefinition.getArtifacts().setAdded(artifactCreationResponse.getEntities());
         addErrorsToCommit(projectCommitDefinition,
             artifactCreationResponse.getErrors(),
@@ -200,6 +210,12 @@ public class FlatFileService {
 
         // Step - parse traces
         EntityParsingResult<TraceAppEntity, String> traceCreationResponse = flatFileParser.parseTraces(artifactsAdded);
+        List<TraceAppEntity> tracesAdded = traceCreationResponse.getEntities();
+        System.out.println("");
+        for (TraceAppEntity traceAppEntity : tracesAdded) {
+            this.serviceProvider.getTraceLinkRepository().getByProjectAndSourceAndTarget(projectVersion.getProject(),
+                traceAppEntity.getSourceName(), traceAppEntity.getTargetName()).ifPresent(t -> traceAppEntity.setId(t.getTraceLinkId()));
+        }
         projectCommitDefinition.getTraces().setAdded(traceCreationResponse.getEntities());
         addErrorsToCommit(projectCommitDefinition,
             traceCreationResponse.getErrors(),

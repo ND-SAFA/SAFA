@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -98,11 +98,11 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
 
     @Override
     protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        changeMessageVerifies.verifyTraceMessage(deletionMessage, entityId, Change.Action.DELETE);
+        changeMessageVerifies.verifyTraceMessage(deletionMessage, entityId, NotificationAction.DELETE);
     }
 
     private void verifyTraceUpdateMessage(EntityChangeMessage message) {
-        changeMessageVerifies.verifyTraceMessage(message, entityId, Change.Action.UPDATE);
+        changeMessageVerifies.verifyTraceMessage(message, entityId, NotificationAction.UPDATE);
     }
 
     private TraceAppEntity commitTrace() throws Exception {

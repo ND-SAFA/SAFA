@@ -12,6 +12,8 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.common.EntityConstants;
@@ -50,8 +52,7 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         notificationService.subscribeToProject(currentUser, projectVersion.getProject());
         notificationService.subscribeToVersion(currentUser, projectVersion);
 
-        EntityChangeMessage activeMembersMessage = this.notificationService.getEntityMessage(currentUser);
-        this.assertionService.verifyOnlyActiveMember(currentUser, activeMembersMessage);
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
 
         // Step - Request artifact is removed from document
         String route = RouteBuilder
@@ -71,21 +72,21 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(message.getChanges()).hasSize(2);
 
         // VP - Verify that change is for a deleted member
-        List<Change.Entity> changedEntities =
+        List<NotificationEntity> changedEntities =
             message.getChanges().stream().map(Change::getEntity).collect(Collectors.toList());
         Change change = message.getChanges().get(0);
         assertThat(changedEntities)
-            .contains(Change.Entity.DOCUMENT)
-            .contains(Change.Entity.ARTIFACTS);
+            .contains(NotificationEntity.DOCUMENT)
+            .contains(NotificationEntity.ARTIFACTS);
 
         // VP - Verify document change has action: UPDATE
-        Change documentChange = message.getChangeForEntity(Change.Entity.DOCUMENT);
-        assertThat(documentChange.getAction()).isEqualTo(Change.Action.UPDATE);
+        Change documentChange = message.getChangeForEntity(NotificationEntity.DOCUMENT);
+        assertThat(documentChange.getAction()).isEqualTo(NotificationAction.UPDATE);
         assertThat(documentChange.getEntityIds()).hasSize(1);
 
         // VP - Verify that artifact change has action: UPDATE
-        Change artifactChange = message.getChangeForEntity(Change.Entity.ARTIFACTS);
-        assertThat(artifactChange.getAction()).isEqualTo(Change.Action.UPDATE);
+        Change artifactChange = message.getChangeForEntity(NotificationEntity.ARTIFACTS);
+        assertThat(artifactChange.getAction()).isEqualTo(NotificationAction.UPDATE);
         assertThat(artifactChange.getEntityIds()).hasSize(1);
     }
 

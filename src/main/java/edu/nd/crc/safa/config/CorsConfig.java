@@ -7,9 +7,6 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class CorsConfig {
@@ -30,7 +27,7 @@ public class CorsConfig {
     private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfiguration corsConfigurationSource() {
         CorsConfiguration cors = new CorsConfiguration();
 
         cors.setAllowedOrigins(allowedOrigins);
@@ -38,14 +35,6 @@ public class CorsConfig {
         cors.setAllowedHeaders(Collections.singletonList("*"));
         cors.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", cors);
-
-        return source;
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        return new CorsFilter(corsConfigurationSource());
+        return cors;
     }
 }

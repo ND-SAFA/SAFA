@@ -48,9 +48,12 @@ class TestDeltaState extends AbstractDeltaTest {
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
 
         // VP - Verify that artifact changes are detected
-        verifyArtifactInDelta(artifactDelta, "modified", Constants.ARTIFACT_MODIFIED);
-        verifyArtifactInDelta(artifactDelta, "added", Constants.ARTIFACT_ADDED);
-        verifyArtifactInDelta(artifactDelta, "removed", Constants.ARTIFACT_REMOVED);
+        assertionService.verifyArtifactInDelta(retrievalService, projectName, artifactDelta, "modified",
+            Constants.ARTIFACT_MODIFIED);
+        assertionService.verifyArtifactInDelta(retrievalService, projectName, artifactDelta, "added",
+            Constants.ARTIFACT_ADDED);
+        assertionService.verifyArtifactInDelta(retrievalService, projectName, artifactDelta, "removed",
+            Constants.ARTIFACT_REMOVED);
 
         ProjectAppEntity beforeAppEntity = retrievalService.getProjectAtVersion(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity.getArtifactNames();
@@ -79,8 +82,8 @@ class TestDeltaState extends AbstractDeltaTest {
 
         // VP - Verify that trace link changes are detected
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
-        verifyNumOfChangesInDelta(traceDelta, "added", Constants.N_TRACES_ADDED);
-        verifyNumOfChangesInDelta(traceDelta, "removed", Constants.N_TRACES_REMOVED);
-        verifyNumOfChangesInDelta(traceDelta, "modified", Constants.N_TRACES_MODIFIED);
+        assertionService.verifyNumOfChangesInDelta(traceDelta, "added", Constants.N_TRACES_ADDED);
+        assertionService.verifyNumOfChangesInDelta(traceDelta, "removed", Constants.N_TRACES_REMOVED);
+        assertionService.verifyNumOfChangesInDelta(traceDelta, "modified", Constants.N_TRACES_MODIFIED);
     }
 }

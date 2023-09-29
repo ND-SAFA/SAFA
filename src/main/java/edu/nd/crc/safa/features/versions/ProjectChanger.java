@@ -1,15 +1,23 @@
 package edu.nd.crc.safa.features.versions;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
+import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
+import edu.nd.crc.safa.features.notifications.builders.AbstractEntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.builders.ProjectVersionChangeBuilder;
+import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
@@ -38,20 +46,10 @@ public class ProjectChanger {
      * Performs modifications specified in project commit and updates the layout accordingly.
      *
      * @param projectCommitDefinition Commit containing addition, modifications, and deletions of entities.
-     * @return {@link ProjectCommitDefinition} Commit containing persisted entities and any errors.
-     */
-    public ProjectCommitAppEntity commit(ProjectCommitDefinition projectCommitDefinition) {
-        return commitAsUser(projectCommitDefinition, serviceProvider.getSafaUserService().getCurrentUser());
-    }
-
-    /**
-     * Performs modifications specified in project commit and updates the layout accordingly.
-     *
-     * @param projectCommitDefinition Commit containing addition, modifications, and deletions of entities.
      * @param user                    The user performing the commit
      * @return {@link ProjectCommitDefinition} Commit containing persisted entities and any errors.
      */
-    public ProjectCommitAppEntity commitAsUser(ProjectCommitDefinition projectCommitDefinition, SafaUser user) {
+    public ProjectCommitAppEntity commit(SafaUser user, ProjectCommitDefinition projectCommitDefinition) {
         ProjectCommitAppEntity committedChanges = serviceProvider
             .getCommitService()
             .performCommit(projectCommitDefinition, user);
@@ -84,6 +82,10 @@ public class ProjectChanger {
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
         layoutManager.generateLayoutForProject();
+
+        AbstractEntityChangeBuilder changeBuilder = createChangeNotification(user, artifactResponse,
+            artifacts, traceResponse, traces);
+        this.serviceProvider.getNotificationService().broadcastChange(changeBuilder);
     }
 
     private <T> void saveCommitErrors(List<Pair<T, CommitError>> commitResponse,
@@ -97,5 +99,42 @@ public class ProjectChanger {
                     .save(commitError);
             }
         }
+    }
+
+    public ProjectVersionChangeBuilder createChangeNotification(
+        SafaUser user,
+        List<Pair<ArtifactVersion, CommitError>> artifactResponse,
+        List<ArtifactAppEntity> artifacts,
+        List<Pair<TraceLinkVersion, CommitError>> traceResponse,
+        List<TraceAppEntity> traces
+    ) {
+        List<UUID> removedArtifactIds = getEntitiesInResponse(artifactResponse, ModificationType.REMOVED);
+        List<UUID> modifiedArtifactIds = getEntitiesInResponse(artifactResponse, ModificationType.ADDED);
+        modifiedArtifactIds.addAll(getEntitiesInResponse(artifactResponse, ModificationType.MODIFIED));
+
+        List<UUID> removedTraceIds = getEntitiesInResponse(traceResponse, ModificationType.REMOVED);
+        List<UUID> modifiedTraceIds = getEntitiesInResponse(traceResponse, ModificationType.ADDED);
+        boolean shouldUpdateLayout = !modifiedTraceIds.isEmpty();
+        modifiedTraceIds.addAll(getEntitiesInResponse(traceResponse, ModificationType.MODIFIED));
+
+
+        return EntityChangeBuilder
+            .create(user, projectVersion)
+            .withArtifactsDelete(removedArtifactIds)
+            .withArtifactsUpdate(artifacts)
+            .withTracesDelete(removedTraceIds)
+            .withTracesUpdate(traces)
+            .withUpdateLayout(shouldUpdateLayout);
+    }
+
+    public <A extends IAppEntity, T extends IVersionEntity<A>> List<UUID> getEntitiesInResponse(
+        List<Pair<T, CommitError>> response,
+        ModificationType modificationType) {
+        return response
+            .stream()
+            .map(Pair::getValue0)
+            .filter(a -> a.getModificationType().equals(modificationType))
+            .map(IVersionEntity::getBaseEntityId)
+            .collect(Collectors.toList());
     }
 }

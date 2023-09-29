@@ -14,7 +14,6 @@ import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.utils.GithubControllerUtils;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
-import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -38,21 +37,18 @@ public class GithubCredentialsController extends BaseController {
     private final SafaUserService safaUserService;
     private final GithubConnectionService githubConnectionService;
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
-    private final ExecutorDelegate executorDelegate;
     private final GithubControllerUtils githubControllerUtils;
 
     public GithubCredentialsController(ResourceBuilder resourceBuilder,
                                        SafaUserService safaUserService,
                                        GithubConnectionService githubConnectionService,
                                        GithubAccessCredentialsRepository githubAccessCredentialsRepository,
-                                       ExecutorDelegate executorDelegate,
                                        ServiceProvider serviceProvider,
                                        GithubControllerUtils githubControllerUtils) {
         super(resourceBuilder, serviceProvider);
         this.safaUserService = safaUserService;
         this.githubConnectionService = githubConnectionService;
         this.githubAccessCredentialsRepository = githubAccessCredentialsRepository;
-        this.executorDelegate = executorDelegate;
         this.githubControllerUtils = githubControllerUtils;
     }
 

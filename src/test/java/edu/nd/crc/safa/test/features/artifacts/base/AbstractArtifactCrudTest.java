@@ -8,8 +8,8 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 
@@ -47,7 +47,7 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        verifyArtifactMessage(creationMessage, Change.Action.UPDATE, true);
+        verifyArtifactMessage(creationMessage, NotificationAction.UPDATE, true);
     }
 
     @Override
@@ -66,7 +66,7 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        verifyArtifactMessage(updateMessage, Change.Action.UPDATE, false);
+        verifyArtifactMessage(updateMessage, NotificationAction.UPDATE, false);
     }
 
     @Override
@@ -79,11 +79,11 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        verifyArtifactMessage(deletionMessage, Change.Action.DELETE, true);
+        verifyArtifactMessage(deletionMessage, NotificationAction.DELETE, true);
     }
 
     private void verifyArtifactMessage(EntityChangeMessage message,
-                                       Change.Action action,
+                                       NotificationAction action,
                                        boolean updateLayout) {
         this.changeMessageVerifies.verifyArtifactMessage(message, entityId, action);
         this.changeMessageVerifies.verifyWarningMessage(message);

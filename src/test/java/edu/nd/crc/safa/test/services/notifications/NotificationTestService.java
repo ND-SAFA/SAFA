@@ -14,8 +14,8 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.notifications.AcknowledgeMessage;
 import edu.nd.crc.safa.features.notifications.AuthenticationMessage;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
@@ -43,37 +43,15 @@ public class NotificationTestService {
         return messagesRaw
             .stream()
             .map(m -> MappingTestService.toClass(m, EntityChangeMessage.class))
+            .peek(this::convertTypes)
             .collect(Collectors.toList());
     }
 
     public EntityChangeMessage getEntityMessage(IUser user) throws JsonProcessingException,
         InterruptedException {
         EntityChangeMessage message = getNextMessage(getClientId(user), EntityChangeMessage.class);
-        message.getChanges().forEach(c -> {
-            Class changeType = getChangeClass(c.getEntity());
-            List<Object> entities = c.getEntities()
-                .stream()
-                .map(e -> objectMapper.convertValue(e, changeType))
-                .collect(Collectors.toList());
-            c.setEntities(entities);
-        });
+        convertTypes(message);
         return message;
-    }
-
-    private Class getChangeClass(Change.Entity entity) {
-        return switch (entity) {
-            case ACTIVE_MEMBERS -> UserAppEntity.class;
-            case PROJECT -> Project.class;
-            case MEMBERS -> UserAppEntity.class;
-            case VERSION -> ProjectVersion.class;
-            case TYPES -> ArtifactType.class;
-            case DOCUMENT -> DocumentAppEntity.class;
-            case ARTIFACTS -> ArtifactAppEntity.class;
-            case TRACES -> TraceAppEntity.class;
-            case JOBS -> JobAppEntity.class;
-            case TRACE_MATRICES -> TraceMatrixAppEntity.class;
-            default -> String.class;
-        };
     }
 
 
@@ -215,5 +193,32 @@ public class NotificationTestService {
 
     private UUID getClientId(IUser user) {
         return user.getUserId();
+    }
+
+    private void convertTypes(EntityChangeMessage message) {
+        message.getChanges().forEach(c -> {
+            Class changeType = getChangeClass(c.getEntity());
+            List<Object> entities = c.getEntities()
+                .stream()
+                .map(e -> objectMapper.convertValue(e, changeType))
+                .collect(Collectors.toList());
+            c.setEntities(entities);
+        });
+    }
+
+    private Class getChangeClass(NotificationEntity entity) {
+        return switch (entity) {
+            case ACTIVE_MEMBERS -> UserAppEntity.class;
+            case PROJECT -> Project.class;
+            case MEMBERS -> UserAppEntity.class;
+            case VERSION -> ProjectVersion.class;
+            case TYPES -> ArtifactType.class;
+            case DOCUMENT -> DocumentAppEntity.class;
+            case ARTIFACTS -> ArtifactAppEntity.class;
+            case TRACES -> TraceAppEntity.class;
+            case JOBS -> JobAppEntity.class;
+            case TRACE_MATRICES -> TraceMatrixAppEntity.class;
+            default -> String.class;
+        };
     }
 }

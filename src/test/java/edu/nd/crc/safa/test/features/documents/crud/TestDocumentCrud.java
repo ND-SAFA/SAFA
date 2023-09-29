@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
@@ -11,8 +12,8 @@ import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
@@ -33,8 +34,7 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
 
     @Override
     protected void onPostSubscribe() throws Exception {
-        EntityChangeMessage message = this.notificationService.getEntityMessage(currentUser);
-        this.assertionService.verifyOnlyActiveMember(currentUser, message);
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
         changeMessageVerifies.verifyDocumentChange(
             creationMessage,
             entityId,
-            Change.Action.UPDATE);
+            NotificationAction.UPDATE);
         changeMessageVerifies.verifyUpdateLayout(creationMessage, false);
     }
 
@@ -89,7 +89,7 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
         changeMessageVerifies.verifyDocumentChange(
             updateMessage,
             entityId,
-            Change.Action.UPDATE);
+            NotificationAction.UPDATE);
         changeMessageVerifies.verifyUpdateLayout(updateMessage, false);
     }
 
@@ -106,7 +106,7 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
         changeMessageVerifies.verifyDocumentChange(
             deletionMessage,
             entityId,
-            Change.Action.DELETE);
+            NotificationAction.DELETE);
         changeMessageVerifies.verifyUpdateLayout(deletionMessage, false);
 
     }

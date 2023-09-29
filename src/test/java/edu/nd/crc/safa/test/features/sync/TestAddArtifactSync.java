@@ -8,8 +8,8 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.EntityConstants;
@@ -31,7 +31,7 @@ public class TestAddArtifactSync extends AbstractSyncTest {
         this.changeMessageVerifies.verifyArtifactMessage(
             message,
             this.artifactId,
-            Change.Action.UPDATE);
+            NotificationAction.UPDATE);
         this.changeMessageVerifies.verifyWarningMessage(message);
         this.changeMessageVerifies.verifyUpdateLayout(message, true);
     }

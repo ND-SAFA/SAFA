@@ -2,11 +2,11 @@ package edu.nd.crc.safa.test.features.notifications.documentartifact;
 
 import java.util.UUID;
 
-import jakarta.annotation.PostConstruct;
-
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.test.common.EntityConstants;
 import edu.nd.crc.safa.test.features.notifications.documents.TestUpdateDocumentNotification;
+
+import jakarta.annotation.PostConstruct;
 
 public abstract class AbstractDocumentArtifactTest
     extends TestUpdateDocumentNotification implements IDocumentArtifactTest {
@@ -31,7 +31,8 @@ public abstract class AbstractDocumentArtifactTest
         this.testService = new DocumentArtifactNotificationTestService(
             this.commitService,
             this.notificationService,
-            this.changeMessageVerifies);
+            this.changeMessageVerifies,
+            this.assertionService);
     }
 
     @Override

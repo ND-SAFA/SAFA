@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
@@ -22,7 +21,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutAppEntity> {
-
     AttributeLayoutAppEntity attributeLayoutAppEntity = new AttributeLayoutAppEntity(
         null,
         "test layout",
@@ -32,7 +30,6 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
             new AttributePositionAppEntity("key2", 5, 6, 7, 8)
         )
     );
-
     AttributeLayoutAppEntity updatedAttributeLayoutAppEntity = new AttributeLayoutAppEntity(
         null,
         "test layout - update",
@@ -42,10 +39,29 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
         )
     );
 
+    @Test
+    void testGetAllLayouts() throws Exception {
+        project = dbEntityBuilder.newProjectWithReturn(projectName);
+
+        this.notificationService.initializeUser(currentUser, this.token);
+        this.notificationService.subscribeToProject(currentUser, project);
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
+
+        createEntity();
+
+        List<AttributeLayoutAppEntity> layoutEntityList = SafaRequest
+            .withRoute(AppRoutes.AttributeLayout.ROOT)
+            .withProject(project)
+            .getAsType(new TypeReference<>() {
+            });
+
+        assertEquals(1, layoutEntityList.size());
+        verifyCreatedEntity(layoutEntityList.get(0));
+    }
+
     @Override
     protected void onPostSubscribe() throws Exception {
-        EntityChangeMessage message = this.notificationService.getEntityMessage(currentUser);
-        this.assertionService.verifyOnlyActiveMember(currentUser, message);
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
     }
 
     @Override
@@ -90,8 +106,7 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
 
     @Override
     protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        changeMessageVerifies.verifyChangeInMessage(creationMessage, project.getProjectId(),
-            Change.Entity.PROJECT, Change.Action.UPDATE);
+        changeMessageVerifies.verifyProjectMessage(creationMessage, project);
     }
 
     @Override
@@ -113,8 +128,7 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
 
     @Override
     protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        changeMessageVerifies.verifyChangeInMessage(updateMessage, project.getProjectId(),
-            Change.Entity.PROJECT, Change.Action.UPDATE);
+        changeMessageVerifies.verifyProjectMessage(updateMessage, project);
     }
 
     @Override
@@ -128,8 +142,7 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
 
     @Override
     protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        changeMessageVerifies.verifyChangeInMessage(deletionMessage, project.getProjectId(),
-            Change.Entity.PROJECT, Change.Action.UPDATE);
+        changeMessageVerifies.verifyProjectMessage(deletionMessage, project);
     }
 
     @Test
@@ -139,8 +152,7 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
         this.notificationService.initializeUser(currentUser, this.token);
         this.notificationService.subscribeToProject(currentUser, project);
 
-        EntityChangeMessage activeMemberMessage = this.notificationService.getEntityMessage(currentUser);
-        this.assertionService.verifyOnlyActiveMember(currentUser, activeMemberMessage);
+        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
 
         UUID entityId = createEntity();
 
@@ -152,20 +164,5 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
             });
 
         verifyCreatedEntity(layoutEntity);
-    }
-
-    @Test
-    void testGetAllLayouts() throws Exception {
-        project = dbEntityBuilder.newProjectWithReturn(projectName);
-        createEntity();
-
-        List<AttributeLayoutAppEntity> layoutEntityList = SafaRequest
-            .withRoute(AppRoutes.AttributeLayout.ROOT)
-            .withProject(project)
-            .getAsType(new TypeReference<>() {
-            });
-
-        assertEquals(1, layoutEntityList.size());
-        verifyCreatedEntity(layoutEntityList.get(0));
     }
 }

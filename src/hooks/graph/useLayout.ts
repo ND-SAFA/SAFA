@@ -72,9 +72,9 @@ export const useLayout = defineStore("layout", {
           : this.mode === "tim" ||
             Object.keys(this.artifactPositions).length === 0;
 
-      appStore.onLoadStart();
-
       cyPromise.then((cy) => {
+        appStore.onLoadStart();
+
         if (generate) {
           cy.layout({
             name: "klay",
@@ -86,13 +86,13 @@ export const useLayout = defineStore("layout", {
 
         this.styleGeneratedLinks();
         this.applyAutomove();
-      });
 
-      // Wait for the graph to render.
-      setTimeout(() => {
-        cyStore.resetWindow(type);
-        appStore.onLoadEnd();
-      }, 300);
+        // Wait for the graph to render.
+        setTimeout(() => {
+          cyStore.resetWindow(type);
+          appStore.onLoadEnd();
+        }, 300);
+      });
     },
     /**
      * Resets the layout of the graph.

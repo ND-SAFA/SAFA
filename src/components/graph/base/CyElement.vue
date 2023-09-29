@@ -90,7 +90,8 @@ function listenForMove(): void {
     }
   };
 
-  instance.value?.on(CytoEvent.POSITION_BOUNDS, selector.value, onMove);
+  instance.value?.on(CytoEvent.POSITION, selector.value, onMove);
+  // instance.value?.on(CytoEvent.POSITION_BOUNDS, selector.value, onMove);
 }
 
 /**

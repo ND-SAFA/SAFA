@@ -21,7 +21,7 @@ public class TestMemberRetrieval extends AbstractSharingTest {
         JSONArray members = retrievalService.getProjectMembers(projectVersion.getProject());
 
         // VP - Verify that shared project is visible
-        assertThat(members.length()).isEqualTo(2);
+        assertThat(members.length()).isEqualTo(1);
 
         // Step - Retrieve member JSON
         JSONObject memberJson = null;

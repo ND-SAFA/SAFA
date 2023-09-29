@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
@@ -26,6 +28,7 @@ public class ProjectMembershipService {
     private final ProjectService projectService;
     private final UserProjectMembershipRepository userProjectMembershipRepo;
     private final TeamMembershipService teamMembershipService;
+    private final NotificationService notificationService;
 
     /**
      * Applies a role to a user within a project. If the user already has this
@@ -40,10 +43,17 @@ public class ProjectMembershipService {
         Optional<ProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        return membershipOptional.orElseGet(() -> {
+        ProjectMembership membership = membershipOptional.orElseGet(() -> {
             ProjectMembership newMembership = new ProjectMembership(project, user, role);
             return userProjectMembershipRepo.save(newMembership);
         });
+
+        notificationService.broadcastChange(
+            EntityChangeBuilder.create(project.getProjectId())
+                .withMembersUpdate(membership.getId())
+        );
+
+        return membership;
     }
 
     /**
@@ -58,7 +68,14 @@ public class ProjectMembershipService {
         Optional<ProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        membershipOptional.ifPresent(userProjectMembershipRepo::delete);
+        if (membershipOptional.isPresent()) {
+            userProjectMembershipRepo.delete(membershipOptional.get());
+
+            notificationService.broadcastChange(
+                EntityChangeBuilder.create(project.getProjectId())
+                    .withMembersDelete(membershipOptional.get().getId())
+            );
+        }
     }
 
     /**

@@ -38,8 +38,9 @@ public class HGenController extends BaseController {
     public JobAppEntity generateHierarchy(@PathVariable UUID versionId,
                                           @RequestBody @Valid HGenRequest request) throws Exception {
         SafaUser currentUser = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, currentUser).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.VIEW, currentUser).get();
         HGenJobBuilder jobBuilder = new HGenJobBuilder(getServiceProvider(), projectVersion, request, currentUser);
         return jobBuilder.perform();
     }

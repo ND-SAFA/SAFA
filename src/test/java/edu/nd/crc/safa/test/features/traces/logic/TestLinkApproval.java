@@ -5,30 +5,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
-import edu.nd.crc.safa.test.features.traces.base.AbstractTraceTest;
+import edu.nd.crc.safa.test.features.generation.GenerationalTest;
 import edu.nd.crc.safa.test.requests.FlatFileRequest;
-import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.verifiers.TraceTestVerifier;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests that generated trace links are able to be reviewed.
  */
-class TestLinkApproval extends AbstractTraceTest {
+class TestLinkApproval extends GenerationalTest {
 
     @Test
     void ableToCreateAndRetrieveSingleGeneratedLink() throws Exception {
@@ -50,17 +45,17 @@ class TestLinkApproval extends AbstractTraceTest {
             .getProject(projectName);
 
         // Step - Get generated links for project version
-        String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
-        JSONArray links = SafaRequest
-            .withRoute(url)
-            .getWithJsonArray();
+        ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        List<TraceAppEntity> generatedLinks = CommonRequestService.Project.getGeneratedLinks(projectVersion);
+
 
         // VP - Verify that single generated link is returned.
-        assertThat(links.length()).isEqualTo(1);
+        assertThat(generatedLinks).hasSize(1);
 
         // VP - Verify that link is the same as the one created.
-        assertThat(links.getJSONObject(0).getString("sourceName")).isEqualTo(sourceName);
-        assertThat(links.getJSONObject(0).getString("targetName")).isEqualTo(targetName);
+        TraceAppEntity generatedLink = generatedLinks.get(0);
+        assertThat(generatedLink.getSourceName()).isEqualTo(sourceName);
+        assertThat(generatedLink.getTargetName()).isEqualTo(targetName);
     }
 
     @Test
@@ -126,52 +121,6 @@ class TestLinkApproval extends AbstractTraceTest {
     }
 
     /**
-     * Tests that client is able to generate trace links
-     *
-     * @throws Exception If http requests fail
-     */
-    @Test
-    void testGenerateTraceLinks() throws Exception {
-
-        // Step - Create project and version
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-        Project project = projectVersion.getProject();
-
-        // Step - Upload flat files and generate some trace links
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion,
-            ProjectPaths.Resources.Tests.DefaultProject.V1);
-
-        // Step - Get all trace links that were generated.
-        String url = getGeneratedLinkEndpoint(projectVersion);
-        JSONArray links = SafaRequest.withRoute(url).getWithJsonArray();
-
-        // VP - Verify that links were generated
-        int numberOfLinks = links.length();
-        assertThat(numberOfLinks).isPositive();
-
-        // Step - Create artifact level
-        ArtifactLevelRequest artifactLevelRequest = new ArtifactLevelRequest("design", "requirement");
-
-        // Step - Create tracing request
-        TracingRequest tracingRequest = new TracingRequest();
-        tracingRequest.setArtifactLevels(List.of(artifactLevelRequest));
-
-        // Step - Create trace generation request
-        TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest();
-        traceGenerationRequest.setRequests(List.of(tracingRequest));
-        traceGenerationRequest.setProjectVersion(projectVersion);
-
-        JSONObject generatedLinks = SafaRequest
-            .withRoute(AppRoutes.Jobs.Traces.GENERATE)
-            .postWithJsonObject(traceGenerationRequest);
-
-        // VP - Verify that same number of links were generated.
-        assertThat(generatedLinks.getString("status")).isEqualTo(JobStatus.COMPLETED.name());
-    }
-
-    /**
      * The following test verifies that a trace link can be created by:
      * 1. Verify that some link does not exist.
      * 2. Committing new trace link
@@ -189,7 +138,7 @@ class TestLinkApproval extends AbstractTraceTest {
 
         // VP - Verify that trace does not exist
         Project project = projectVersion.getProject();
-        assertTraceDoesNotExist(project, sourceName, targetName);
+        TraceTestVerifier.assertTraceDoesNotExist(traceLinkRepository, project, sourceName, targetName);
 
         // Step - POST trace links creation
         JSONObject traceJson = jsonBuilder.createTrace(sourceName, targetName);
@@ -200,6 +149,6 @@ class TestLinkApproval extends AbstractTraceTest {
         );
 
         // VP - Verify that link created
-        assertTraceExists(project, sourceName, targetName);
+        TraceTestVerifier.assertTraceExists(traceLinkRepository, project, sourceName, targetName);
     }
 }

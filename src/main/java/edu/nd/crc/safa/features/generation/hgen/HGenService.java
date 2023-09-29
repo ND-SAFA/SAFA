@@ -42,7 +42,6 @@ public class HGenService {
     public ProjectCommitDefinition generateHierarchy(ProjectVersion projectVersion, HGenRequest request,
                                                      JobLogger jobLogger) {
         List<String> targetTypes = request.getTargetTypes();
-
         List<ArtifactAppEntity> sourceArtifacts = this.artifactService.getAppEntities(projectVersion);
         List<GenerationArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());
         TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes, request.getSummary());

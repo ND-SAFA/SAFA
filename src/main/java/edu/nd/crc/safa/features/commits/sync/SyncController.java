@@ -46,7 +46,7 @@ public class SyncController extends BaseController {
         ProjectAppEntity projectAppEntity = new ProjectAppEntity();
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         for (Change change : message.getChanges()) {
             projectAppEntity = updateProjectAppEntity(projectAppEntity, projectVersion, change);
         }
@@ -90,7 +90,7 @@ public class SyncController extends BaseController {
             case TRACES:
                 List<TraceAppEntity> traces = getServiceProvider()
                     .getTraceService()
-                    .getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
+                    .getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setTraces(traces);
                 break;
             case DOCUMENT:

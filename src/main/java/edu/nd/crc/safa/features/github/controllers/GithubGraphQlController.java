@@ -16,6 +16,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 @Controller
 public class GithubGraphQlController extends BaseController {
+    private static final long REQUEST_TIMEOUT = 30000L;
+
     private final GithubGraphQlService graphQlService;
 
     public GithubGraphQlController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
@@ -32,7 +34,7 @@ public class GithubGraphQlController extends BaseController {
     public DeferredResult<List<GithubRepositoryDTO>> retrieveGithubRepositories() {
         return makeDeferredRequest(user -> {
             return GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepositories(user));
-        });
+        }, REQUEST_TIMEOUT);
     }
 
     /**

@@ -17,11 +17,13 @@ import edu.nd.crc.safa.utilities.StringUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
  * The model used to commit a change to the versioning system.
  */
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Data
 public class ProjectCommitDefinition extends AbstractProjectCommit {

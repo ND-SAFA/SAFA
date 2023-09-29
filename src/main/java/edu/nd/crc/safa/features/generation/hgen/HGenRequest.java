@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.hgen;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -20,13 +21,13 @@ public class HGenRequest {
      * List of artifact ids to generate hierarchy for.
      */
     @NotNull
-    private List<UUID> artifacts;
+    private List<UUID> artifacts = new ArrayList<>();
     /**
      * The target type of artifact to create.
      */
     @NotNull
     @Valid
-    private List<@Valid String> targetTypes;
+    private List<@Valid String> targetTypes = new ArrayList<>();
     /**
      * Optional. Project summary.
      */

@@ -14,14 +14,14 @@ import lombok.Getter;
  */
 public class CreateProjectViaJiraBuilder extends AbstractJobBuilder {
     @Getter(AccessLevel.PROTECTED)
-    private JiraIdentifier jiraIdentifier;
+    private final JiraIdentifier jiraIdentifier;
 
     public CreateProjectViaJiraBuilder(
         ServiceProvider serviceProvider,
         JiraIdentifier jiraIdentifier,
         SafaUser user
     ) {
-        super(serviceProvider, user);
+        super(user, serviceProvider);
         this.jiraIdentifier = jiraIdentifier;
     }
 

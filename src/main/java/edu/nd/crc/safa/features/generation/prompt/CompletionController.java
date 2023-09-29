@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides endpoints for completing prompts.
  */
 @RestController
-public class PromptController extends BaseController {
-    public PromptController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
+public class CompletionController extends BaseController {
+    public CompletionController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
     }
 
@@ -27,7 +27,7 @@ public class PromptController extends BaseController {
      * @return The completion.
      */
     @PostMapping(AppRoutes.Prompts.COMPLETE)
-    public TGenPromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request) {
+    public PromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request) {
         return getServiceProvider().getGenApi().generatePrompt(request);
     }
 }

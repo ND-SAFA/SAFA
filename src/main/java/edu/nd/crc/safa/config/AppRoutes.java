@@ -128,7 +128,8 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Meta {
-            public static final String GET_JOBS = JOBS_PREFIX;
+            public static final String GET_USER_JOBS = JOBS_PREFIX + "/user";
+            public static final String GET_PROJECT_JOBS = JOBS_PREFIX + "/project/{projectId}";
             private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
             public static final String DELETE_JOB = JOB_ID;
         }
@@ -269,6 +270,7 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Summarize {
         public static final String SUMMARIZE_ARTIFACTS = Projects.ROOT + "/versions/{versionId}/artifacts/summarize";
+        public static final String SUMMARIZE_PROJECT = Projects.ROOT + "/versions/{versionId}/summarize";
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

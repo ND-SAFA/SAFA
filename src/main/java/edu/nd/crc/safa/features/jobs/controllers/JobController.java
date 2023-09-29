@@ -11,7 +11,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.api.GenApi;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
@@ -23,6 +23,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -68,9 +69,25 @@ public class JobController extends BaseController {
      * @return The list of jobs created by user.
      * @throws SafaError If authentication error occurs.
      */
-    @GetMapping(AppRoutes.Jobs.Meta.GET_JOBS)
+    @GetMapping(AppRoutes.Jobs.Meta.GET_USER_JOBS)
     public List<JobAppEntity> getUserJobs() throws SafaError {
         return this.jobService.retrieveCurrentUserJobs();
+    }
+
+    /**
+     * Returns the list of jobs associated with project.
+     *
+     * @param projectId The ID of project.
+     * @return The list of jobs created by user.
+     * @throws SafaError If authentication error occurs.
+     */
+    @GetMapping(AppRoutes.Jobs.Meta.GET_PROJECT_JOBS)
+    public List<JobAppEntity> getProjectJobs(@PathVariable UUID projectId) throws SafaError {
+        ServiceProvider serviceProvider = this.getServiceProvider();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        Project project = this.getResourceBuilder().fetchProject(projectId)
+            .withPermission(ProjectPermission.VIEW, user).get();
+        return this.jobService.getProjectJobs(project);
     }
 
     /**
@@ -109,11 +126,14 @@ public class JobController extends BaseController {
         @RequestParam Optional<MultipartFile[]> files,
         @RequestParam(required = false, defaultValue = "false") boolean summarize)
         throws Exception {
-
+        SafaUser user = safaUserService.getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT, user).get();
         UpdateProjectByFlatFileJobBuilder jobBuilder =
             new UpdateProjectByFlatFileJobBuilder(
+                user,
                 getServiceProvider(),
-                versionId,
+                projectVersion,
                 files.orElseGet(this::defaultFileListSupplier),
                 summarize);
 
@@ -163,7 +183,11 @@ public class JobController extends BaseController {
         // Step - Create and start job.
         SafaUser requester = safaUserService.getCurrentUser();
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
-            getServiceProvider(), payload.getProject(), payload.getRequests(), requester);
+            requester,
+            getServiceProvider(),
+            payload.getProject(),
+            payload.getRequests()
+        );
         return createProjectByJsonJobBuilder.perform();
     }
 
@@ -175,16 +199,16 @@ public class JobController extends BaseController {
      * @throws Exception If an error occurs while starting job.
      */
     @PostMapping(AppRoutes.Jobs.Traces.GENERATE)
-    public JobAppEntity generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) throws Exception {
+    public JobAppEntity generateTraceLinks(@RequestBody @Valid TGenRequestAppEntity request) throws Exception {
         // Step - Check permissions and retrieve persistent properties
         UUID versionId = request.getProjectVersion().getVersionId();
         SafaUser user = safaUserService.getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         request.setProjectVersion(projectVersion);
 
         // Step - Create and start job.
-        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(getServiceProvider(), request, user);
+        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(user, getServiceProvider(), request);
         return jobBuilder.perform();
     }
 

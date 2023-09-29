@@ -14,7 +14,6 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.DbEntityBuilder;
@@ -46,11 +45,24 @@ public class CreationTestService {
             .getProjectVersion(projectName, 0);
     }
 
-    public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {
+    public ProjectVersion createProjectFromFiles(String projectName, String projectPath) throws Exception {
+        ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, projectPath);
+        return projectVersion;
+    }
+
+    public ProjectVersion uploadDefaultProject(String projectName) throws IOException {
+        return uploadFilesToProject(
+            projectName,
+            ProjectPaths.Resources.Tests.DefaultProject.V1
+        );
+    }
+
+    public ProjectVersion uploadFilesToProject(String projectName, String projectPath) throws IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.Resources.Tests.DefaultProject.V1,
+            projectPath,
             "files");
         this.serviceProvider.getFileUploadService().uploadFilesToServer(project, files);
         return projectVersion;

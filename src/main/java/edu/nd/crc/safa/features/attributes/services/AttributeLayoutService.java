@@ -41,9 +41,18 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     @Override
     public List<AttributeLayoutAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         return layoutRepo.findByProject(projectVersion.getProject())
-                .stream()
-                .map(this::appEntityFromAttributeLayout)
-                .collect(Collectors.toList());
+            .stream()
+            .map(this::appEntityFromAttributeLayout)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AttributeLayoutAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion,
+                                                              SafaUser user, List<UUID> appEntityIds) {
+        return layoutRepo.findByProjectAndIdIn(projectVersion.getProject(), appEntityIds)
+            .stream()
+            .map(this::appEntityFromAttributeLayout)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -54,17 +63,17 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
      */
     public AttributeLayoutAppEntity appEntityFromAttributeLayout(AttributeLayout attributeLayout) {
         List<String> artifactTypes = typeToLayoutRepo.findByLayout(attributeLayout)
-                .stream()
-                .map(mapping -> mapping.getArtifactType().getName())
-                .collect(Collectors.toList());
+            .stream()
+            .map(mapping -> mapping.getArtifactType().getName())
+            .collect(Collectors.toList());
 
         List<AttributePositionAppEntity> positions = positionRepo.findByLayout(attributeLayout)
-                .stream()
-                .map(this::appEntityFromAttributePosition)
-                .collect(Collectors.toList());
+            .stream()
+            .map(this::appEntityFromAttributePosition)
+            .collect(Collectors.toList());
 
         return new AttributeLayoutAppEntity(attributeLayout.getId(), attributeLayout.getName(),
-                artifactTypes, positions);
+            artifactTypes, positions);
     }
 
     /**
@@ -75,14 +84,14 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
      */
     public AttributePositionAppEntity appEntityFromAttributePosition(AttributePosition attributePosition) {
         return new AttributePositionAppEntity(attributePosition.getAttribute().getKeyname(), attributePosition.getX(),
-                attributePosition.getY(), attributePosition.getWidth(), attributePosition.getHeight());
+            attributePosition.getY(), attributePosition.getWidth(), attributePosition.getHeight());
     }
 
     /**
      * Constructs a back-end attribute layout object from the front-end version. This only converts the base
      * attribute layout object, not the child position objects or type mappings.
      *
-     * @param project The project we're working in.
+     * @param project   The project we're working in.
      * @param appEntity The front-end entity to convert.
      * @return The back-end representation of the front-end layout entity.
      */
@@ -93,8 +102,8 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     /**
      * Constructs a back-end attribute position object from the front-end version.
      *
-     * @param project The project we're working in.
-     * @param layout The layout object the position exists in.
+     * @param project   The project we're working in.
+     * @param layout    The layout object the position exists in.
      * @param appEntity The front-end position entity.
      * @return The back-end representation of the front-end position entity.
      */
@@ -102,7 +111,7 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
                                                             AttributePositionAppEntity appEntity) {
         Optional<CustomAttribute> attribute = attributeService.getByProjectAndKeyname(project, appEntity.getKey());
         return new AttributePosition(null, appEntity.getX(), appEntity.getY(), appEntity.getWidth(),
-                appEntity.getHeight(), layout, attribute.orElseThrow());
+            appEntity.getHeight(), layout, attribute.orElseThrow());
     }
 
     /**
@@ -129,7 +138,7 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
      * Deletes a layout by its ID.
      *
      * @param user The user making the request.
-     * @param id The ID of the layout to delete.
+     * @param id   The ID of the layout to delete.
      */
     @Transactional
     public void deleteLayoutById(SafaUser user, UUID id) {
@@ -148,12 +157,12 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     /**
      * Save a front-end layout entity to the database.
      *
-     * @param user The user making the request.
+     * @param user      The user making the request.
      * @param appEntity The entity to save.
-     * @param project The project the layout is associated with.
-     * @param isNew True if this layout is being newly created, false otherwise. If this is set to false and
-     *              there is no layout with an ID that matches the given entity, the operation will fail and
-     *              nothing will be saved.
+     * @param project   The project the layout is associated with.
+     * @param isNew     True if this layout is being newly created, false otherwise. If this is set to false and
+     *                  there is no layout with an ID that matches the given entity, the operation will fail and
+     *                  nothing will be saved.
      * @return The database entity that was created/updated.
      */
     @Transactional
@@ -180,29 +189,29 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     /**
      * Saves all given position objects to the database under the given layout.
      *
-     * @param layout The layout these positions belong to.
+     * @param layout    The layout these positions belong to.
      * @param positions The front-end position representations.
      */
     @Transactional
     private void savePositions(AttributeLayout layout, List<AttributePositionAppEntity> positions) {
         positionRepo.deleteByLayout(layout);
         positions.stream()
-                .map(position -> this.attributePositionFromAppEntity(layout.getProject(), layout, position))
-                .forEach(positionRepo::save);
+            .map(position -> this.attributePositionFromAppEntity(layout.getProject(), layout, position))
+            .forEach(positionRepo::save);
     }
 
     /**
      * Maps all given artifact types to the given layout and saves the mappings to the database.
      *
-     * @param layout The layout associated with these artifact types.
+     * @param layout        The layout associated with these artifact types.
      * @param artifactTypes The names of the artifact types.
      */
     @Transactional
     private void saveArtifactTypes(AttributeLayout layout, List<String> artifactTypes) {
         typeToLayoutRepo.deleteByLayout(layout);
         artifactTypes.stream()
-                .map(typeName -> artifactTypeService.findArtifactType(layout.getProject(), typeName))
-                .map(type -> new ArtifactTypeToLayoutMapping(layout, type))
-                .forEach(typeToLayoutRepo::save);
+            .map(typeName -> artifactTypeService.findArtifactType(layout.getProject(), typeName))
+            .map(type -> new ArtifactTypeToLayoutMapping(layout, type))
+            .forEach(typeToLayoutRepo::save);
     }
 }

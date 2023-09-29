@@ -16,7 +16,8 @@ import edu.nd.crc.safa.features.flatfiles.parser.tim.TimArtifactDefinition;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimSchema;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimTraceDefinition;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenAlgorithms;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -70,9 +71,9 @@ public class TimFileParser implements IProjectDefinitionParser {
     }
 
     @Override
-    public Pair<List<IDataFile<TraceAppEntity>>, TraceGenerationRequest> parseTraceFiles() throws IOException {
+    public Pair<List<IDataFile<TraceAppEntity>>, TGenRequestAppEntity> parseTraceFiles() throws IOException {
         List<IDataFile<TraceAppEntity>> traceFiles = new ArrayList<>();
-        TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest();
+        TGenRequestAppEntity TGenRequestAppEntity = new TGenRequestAppEntity();
 
         List<String> artifactTypes = getArtifactTypes();
 
@@ -94,8 +95,8 @@ public class TimFileParser implements IProjectDefinitionParser {
 
             // Step - If generation is set, create generation request.\
             if (trace.generateLinks()) {
-                String generationMethod = trace.getGenerationMethod();
-                traceGenerationRequest.addTracingRequest(source, target);
+                TGenAlgorithms algorithm = TGenAlgorithms.valueOf(trace.getGenerationMethod());
+                TGenRequestAppEntity.addTracingRequest(source, target, algorithm);
             }
 
             if (trace.hasFilename()) {
@@ -106,7 +107,7 @@ public class TimFileParser implements IProjectDefinitionParser {
             }
         }
 
-        return new Pair<>(traceFiles, traceGenerationRequest);
+        return new Pair<>(traceFiles, TGenRequestAppEntity);
     }
 
     private List<String> getArtifactTypes() {

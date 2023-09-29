@@ -1,13 +1,18 @@
 package edu.nd.crc.safa.features.generation.common;
 
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.TraceType;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * A predicted trace link.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@NoArgsConstructor
 public class GenerationLink {
     /**
      * The child name;
@@ -29,4 +34,12 @@ public class GenerationLink {
      * The trace explanation.
      */
     private String explanation;
+
+    public GenerationLink(TraceAppEntity trace) {
+        this.source = trace.getSourceName();
+        this.target = trace.getTargetName();
+        this.score = trace.getScore();
+        this.explanation = trace.getExplanation();
+        this.label = trace.getTraceType() == TraceType.MANUAL ? 1 : -1;
+    }
 }

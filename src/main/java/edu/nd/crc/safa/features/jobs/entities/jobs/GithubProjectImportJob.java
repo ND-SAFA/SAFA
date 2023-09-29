@@ -23,12 +23,12 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
  */
 public class GithubProjectImportJob extends GithubProjectCreationJob {
 
-    public GithubProjectImportJob(JobDbEntity jobDbEntity,
+    public GithubProjectImportJob(SafaUser projectOwner,
+                                  JobDbEntity jobDbEntity,
                                   ServiceProvider serviceProvider,
                                   GithubIdentifier githubIdentifier,
-                                  GithubImportDTO githubImportDTO,
-                                  SafaUser projectOwner) {
-        super(jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO, projectOwner);
+                                  GithubImportDTO githubImportDTO) {
+        super(projectOwner, jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO);
         setProjectCommitDefinition(new ProjectCommitDefinition(githubIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }

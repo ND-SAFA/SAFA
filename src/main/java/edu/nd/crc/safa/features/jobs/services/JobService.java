@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
@@ -45,6 +46,12 @@ public class JobService {
     private final JobDbRepository jobDbRepository;
     private final SafaUserService safaUserService;
 
+    public void removeProjectFromJobs(Project project) {
+        List<JobDbEntity> projectJobs = getJobDbEntitiesInProjects(List.of(project));
+        projectJobs.forEach(jobDbEntity -> jobDbEntity.setProject(null));
+        this.jobDbRepository.saveAll(projectJobs);
+    }
+
     /**
      * Deletes the job with given ID. Terminates any task associated with the job.
      *
@@ -73,6 +80,16 @@ public class JobService {
             .stream()
             .map(JobAppEntity::createFromJob)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all jobs associated with project.
+     *
+     * @param project The project whose jobs are retrieved.
+     * @return The list of jobs.
+     */
+    public List<JobAppEntity> getProjectJobs(Project project) {
+        return this.getJobsInProjects(List.of(project));
     }
 
     /**
@@ -219,5 +236,23 @@ public class JobService {
     public void setJobTask(JobDbEntity jobDbEntity, UUID taskId) {
         jobDbEntity.setTaskId(taskId);
         this.jobDbRepository.save(jobDbEntity);
+    }
+
+    /**
+     * Returns the jobs associated with projects.
+     *
+     * @param projects The list of projects whose collective jobs are returned sorted by last updated.
+     * @return The list of jobs.
+     */
+    public List<JobAppEntity> getJobsInProjects(List<Project> projects) {
+        return getJobDbEntitiesInProjects(projects)
+            .stream()
+            .map(JobAppEntity::createFromJob)
+            .collect(Collectors.toList());
+    }
+
+    private List<JobDbEntity> getJobDbEntitiesInProjects(List<Project> projects) {
+        List<UUID> projectIds = projects.stream().map(Project::getProjectId).collect(Collectors.toList());
+        return this.jobDbRepository.findByProjectProjectIdInOrderByLastUpdatedAtDesc(projectIds);
     }
 }

@@ -26,8 +26,8 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
      * Get the trace matrix entry associated with a project version and source and target artifact types
      *
      * @param projectVersion The project version
-     * @param sourceType The source type
-     * @param targetType The target type
+     * @param sourceType     The source type
+     * @param targetType     The target type
      * @return The entry, if it exists
      */
     public Optional<TraceMatrixEntry> getEntry(ProjectVersion projectVersion, ArtifactType sourceType,
@@ -49,8 +49,8 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
      * Create a new trace matrix entry for the given version and types
      *
      * @param projectVersion The project version
-     * @param sourceType The source type
-     * @param targetType The target type
+     * @param sourceType     The source type
+     * @param targetType     The target type
      * @return The newly created trace entry
      */
     public TraceMatrixEntry createEntry(ProjectVersion projectVersion, ArtifactType sourceType,
@@ -68,8 +68,8 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
      * Retrieves the entry associated with the parameters, creating it if needed
      *
      * @param projectVersion The project version
-     * @param sourceType The source type
-     * @param targetType The target type
+     * @param sourceType     The source type
+     * @param targetType     The target type
      * @return The entry
      */
     public TraceMatrixEntry getOrCreateEntry(ProjectVersion projectVersion, ArtifactType sourceType,
@@ -102,6 +102,15 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
     @Override
     public List<TraceMatrixAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         return getEntries(projectVersion).stream()
+            .map(TraceMatrixAppEntity::new)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TraceMatrixAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                          List<UUID> appEntityIds) {
+        return repo.getByProjectVersionAndIdIn(projectVersion, appEntityIds)
+            .stream()
             .map(TraceMatrixAppEntity::new)
             .collect(Collectors.toList());
     }

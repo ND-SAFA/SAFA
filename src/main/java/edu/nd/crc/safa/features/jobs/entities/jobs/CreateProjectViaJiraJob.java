@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -36,11 +37,13 @@ import lombok.Setter;
  * 4. Returning project created
  */
 public class CreateProjectViaJiraJob extends CommitJob {
+    protected static final int CREATE_PROJECT_STEP_INDEX = 3;
+    private final SafaUser user;
     /**
      * The project version to upload entities to.
      */
     @Getter(AccessLevel.PROTECTED)
-    private JiraIdentifier jiraIdentifier;
+    private final JiraIdentifier jiraIdentifier;
     /**
      * The credentials used to access the project.
      */
@@ -62,13 +65,9 @@ public class CreateProjectViaJiraJob extends CommitJob {
     @Getter(AccessLevel.PROTECTED)
     private JiraProject jiraProject;
 
-    private final SafaUser user;
-
-    protected static final int CREATE_PROJECT_STEP_INDEX = 3;
-
     public CreateProjectViaJiraJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
                                    JiraIdentifier jiraIdentifier, SafaUser user) {
-        super(jobDbEntity, serviceProvider);
+        super(user, jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
         this.jiraIdentifier = jiraIdentifier;
         this.issues = new ArrayList<>();
         this.user = user;
@@ -114,7 +113,10 @@ public class CreateProjectViaJiraJob extends CommitJob {
         String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
 
-        ProjectVersion projectVersion = createProject(user, projectName, projectDescription);
+        createProjectAndCommit(this.user, projectName, projectDescription);
+        ProjectVersion projectVersion = getProjectVersion();
+        linkProjectToJob(projectVersion.getProject());
+
         Project project = projectVersion.getProject();
         this.jiraIdentifier.setProjectVersion(projectVersion);
 

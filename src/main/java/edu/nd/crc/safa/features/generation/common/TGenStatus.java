@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.common;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -27,7 +28,7 @@ public class TGenStatus {
     /**
      * The current logs of the job.
      */
-    private List<String> logs;
+    private List<String> logs = new ArrayList<>();
     /**
      * The current index of the log to read next.
      */

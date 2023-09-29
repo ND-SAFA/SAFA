@@ -52,11 +52,67 @@ public class MemberService implements IAppEntityService<MembershipAppEntity> {
             .collect(Collectors.toList());
 
         // TODO pull members the right way
-        SafaUser owner = projectVersion.getProject().getOwningTeam().getOrganization().getOwner();
-        members.add(new MembershipAppEntity(
-                new ProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
+        addOwnerMember(projectVersion, members);
 
         return members;
     }
 
+    private void addOwnerMember(ProjectVersion projectVersion, List<MembershipAppEntity> members) {
+        SafaUser owner = projectVersion.getProject().getOwningTeam().getOrganization().getOwner();
+
+        members.add(new MembershipAppEntity(
+                new ProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
+    }
+
+    @Override
+    public List<MembershipAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                            List<UUID> appEntityIds) {
+        List<MembershipAppEntity> members = this.userProjectMembershipRepository
+            .findByProjectAndMembershipIdIn(projectVersion.getProject(), appEntityIds)
+            .stream()
+            .map(MembershipAppEntity::new)
+            .collect(Collectors.toList());
+        addOwnerMember(projectVersion, members);
+        return members;
+    }
+
+    /**
+     * Returns list of members in given project with any of the given roles.
+     *
+     * @param project      The project whose members are retrieved.
+     * @param projectRoles The project roles to match.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<ProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
+        return this.userProjectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
+    }
+
+    /**
+     * Returns list of members in given project with the given role.
+     *
+     * @param project     The project whose members are retrieved.
+     * @param projectRole The project role to match.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<ProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
+        return getProjectMembersWithRoles(project, List.of(projectRole));
+    }
+
+    /**
+     * Deletes project membership effectively removing user from
+     * associated project
+     *
+     * @param projectMembershipId ID of the membership linking user and project.
+     * @return ProjectMembers The membership object identified by given id, or null if none found.
+     */
+    public ProjectMembership deleteProjectMembershipById(UUID projectMembershipId) {
+        Optional<ProjectMembership> projectMembershipQuery =
+            this.userProjectMembershipRepository.findById(projectMembershipId);
+        if (projectMembershipQuery.isPresent()) {
+            ProjectMembership projectMembership = projectMembershipQuery.get();
+            this.userProjectMembershipRepository.delete(projectMembership);
+            return projectMembership;
+        }
+        return null;
+    }
 }

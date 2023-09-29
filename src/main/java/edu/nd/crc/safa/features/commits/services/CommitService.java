@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.app.CommitAction;
@@ -14,6 +15,7 @@ import edu.nd.crc.safa.features.commits.pipeline.CommitPipeline;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
@@ -23,6 +25,7 @@ import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -42,6 +45,7 @@ public class CommitService {
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final NotificationService notificationService;
     private final ProjectRepository projectRepository;
+    private final SafaUserService safaUserService;
 
     /**
      * Saves entities in commit to specified project version.
@@ -56,6 +60,25 @@ public class CommitService {
         projectCommitDefinition.setUser(user);
         CommitPipeline pipeline = new CommitPipeline(projectCommitDefinition);
         return pipeline.commit(this);
+    }
+
+    /**
+     * Saves the artifacts under the project version with given modification type.
+     *
+     * @param user             The user saving the artifacts.
+     * @param projectVersion   The project version to save to.
+     * @param artifacts        The artifacts to save.
+     * @param modificationType The modification type to store them under.
+     * @return The project commit.
+     */
+    public ProjectCommitAppEntity saveArtifacts(SafaUser user,
+                                                ProjectVersion projectVersion,
+                                                List<ArtifactAppEntity> artifacts,
+                                                ModificationType modificationType) {
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition();
+        projectCommitDefinition.setCommitVersion(projectVersion);
+        projectCommitDefinition.addArtifacts(modificationType, artifacts);
+        return this.performCommit(projectCommitDefinition, user);
     }
 
     /**

@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.documents.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,18 +47,24 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
      * Returns list of documents in given project
      *
      * @param projectVersion The version used to calculate artifact positions within the document.
-     * @param user The user making the request
+     * @param user           The user making the request
      * @return List of documents in project.
      */
     @Override
     public List<DocumentAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
-        List<Document> projectDocuments = this.documentRepository.findByProject(projectVersion.getProject());
-        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
-        for (Document document : projectDocuments) {
-            DocumentAppEntity documentAppEntity = createDocumentAppEntity(document, projectVersion);
-            documentAppEntities.add(documentAppEntity);
-        }
-        return documentAppEntities;
+        return this.documentRepository.findByProject(projectVersion.getProject())
+            .stream()
+            .map(d -> createDocumentAppEntity(d, projectVersion))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocumentAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                       List<UUID> appEntityIds) {
+        return this.documentRepository.findByProjectAndDocumentIdIn(projectVersion.getProject(), appEntityIds)
+            .stream()
+            .map(d -> createDocumentAppEntity(d, projectVersion))
+            .collect(Collectors.toList());
     }
 
     /**

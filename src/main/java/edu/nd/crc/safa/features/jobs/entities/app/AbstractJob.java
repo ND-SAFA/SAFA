@@ -64,7 +64,7 @@ public abstract class AbstractJob implements Job {
     /**
      * Service used to send job updates.
      */
-    @Getter(AccessLevel.PROTECTED)
+    @Getter(AccessLevel.PUBLIC)
     private ServiceProvider serviceProvider;
     private JobService jobService;
     private NotificationService notificationService;
@@ -101,7 +101,6 @@ public abstract class AbstractJob implements Job {
 
         try {
             execution.setStatus(BatchStatus.STARTED);
-
             notifyBeforeJob();
             for (JobStepImplementation stepImplementation : jobSteps) {
                 executeJobStep(stepImplementation, nSteps);

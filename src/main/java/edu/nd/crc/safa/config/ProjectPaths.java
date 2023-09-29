@@ -93,6 +93,7 @@ public class ProjectPaths {
             public static final String MISSING_DATA_FILE = PATH + "/missing_data_file";
             public static final String CUSTOM_ATTRIBUTES_CSV = PATH + "/custom_attributes_csv";
             public static final String CUSTOM_ATTRIBUTES_JSON = PATH + "/custom_attributes_json";
+            public static final String DRONE_SLICE = PATH + "/DroneSlice";
 
             @NoArgsConstructor(access = AccessLevel.PRIVATE)
             public static class DefaultProject {

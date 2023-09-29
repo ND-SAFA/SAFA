@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -33,6 +35,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
  * to and from the SAFA back-end.
  */
 public class SafaRequest extends RouteBuilder<SafaRequest> {
+    private static final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private static MockMvc mockMvc;
     private static Cookie authorizationToken = null;
 
@@ -76,6 +79,19 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return sendGet(ResponseParser::arrayCreator);
     }
 
+    public <T> List<T> getAsArray(Class<T> classType) throws Exception {
+        JSONArray jsonArray = getWithJsonArray();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
+        List<T> entities = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = jsonArray.getJSONObject(i);
+            String objStr = obj.toString();
+            T entity = objectMapper.readValue(objStr, classType);
+            entities.add(entity);
+        }
+        return entities;
+    }
+
     public JSONObject getWithJsonObject() throws Exception {
         return sendGet(ResponseParser::jsonCreator);
     }
@@ -101,6 +117,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject postWithJsonObject(Object body) throws Exception {
         return postWithResponseParser(body, ResponseParser::jsonCreator);
+    }
+
+    public <T> T postWithJsonObject(Object body, Class<T> responseClass) throws Exception {
+        JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
+        return objectMapper.readValue(responseJson.toString(), responseClass);
     }
 
     public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {

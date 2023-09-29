@@ -31,12 +31,12 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
 
     private static final Logger log = LoggerFactory.getLogger(GithubProjectUpdateJob.class);
 
-    public GithubProjectUpdateJob(JobDbEntity jobDbEntity,
+    public GithubProjectUpdateJob(SafaUser user,
+                                  JobDbEntity jobDbEntity,
                                   ServiceProvider serviceProvider,
                                   GithubIdentifier githubIdentifier,
-                                  GithubImportDTO githubImportDTO,
-                                  SafaUser user) {
-        super(jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO, user);
+                                  GithubImportDTO githubImportDTO) {
+        super(user, jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO);
         setProjectCommitDefinition(new ProjectCommitDefinition(githubIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }

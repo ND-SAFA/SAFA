@@ -273,7 +273,7 @@ public abstract class GenericVersionRepository<
                                              Map<UUID, List<VersionEntity>> entityHashTable) throws SafaError {
         try {
 
-            this.findExistingVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
+            this.queryVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
                 versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
 
             Optional<VersionEntity> previousEntity =
@@ -469,5 +469,5 @@ public abstract class GenericVersionRepository<
      * @param versionEntity The version entity being saved.
      * @return Optional possibly containing existing version entity.
      */
-    protected abstract Optional<VersionEntity> findExistingVersionEntity(VersionEntity versionEntity);
+    protected abstract Optional<VersionEntity> queryVersionEntity(VersionEntity versionEntity);
 }

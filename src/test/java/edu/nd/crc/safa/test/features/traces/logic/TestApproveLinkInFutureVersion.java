@@ -12,25 +12,19 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
-import edu.nd.crc.safa.test.features.traces.base.AbstractTraceTest;
+import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.FlatFileRequest;
-import edu.nd.crc.safa.test.requests.SafaRequest;
-import edu.nd.crc.safa.test.services.MappingTestService;
+import edu.nd.crc.safa.test.services.CommonRequestService;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests that generated trace links are able to be reviewed in subsequent versions after generation
  */
-class TestApproveLinkInFutureVersion extends AbstractTraceTest {
+class TestApproveLinkInFutureVersion extends ApplicationBaseTest {
 
     @Test
     void ableToEditGeneratedLinksInFutureVersions() throws Exception {
-        String sourceName = "RE-8";
-        String targetName = "DD-10";
-
         // Step - Create base version
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
@@ -41,25 +35,24 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
             ProjectPaths.Resources.Tests.DefaultProject.V1);
 
         // Step - Get generated links
-        String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
-        JSONArray links = SafaRequest.withRoute(url).getWithJsonArray();
-        JSONObject link = links.getJSONObject(0);
+        List<TraceAppEntity> generatedLinks = CommonRequestService.Project.getGeneratedLinks(projectVersion);
+        assertThat(generatedLinks).hasSize(7);
 
         // Step - Set link to approved
-        link.put("approvalStatus", ApprovalStatus.APPROVED);
-        TraceAppEntity traceAppEntity = MappingTestService.toClass(link.toString(), TraceAppEntity.class);
+        TraceAppEntity link = generatedLinks.get(0);
+        link.setApprovalStatus(ApprovalStatus.APPROVED);
 
         // Step - Commit link change to new version
         ProjectVersion projectVersionLater = dbEntityBuilder.newVersionWithReturn(projectName);
         CommitBuilder commitBuilder = CommitBuilder
             .withVersion(projectVersionLater)
-            .withModifiedTrace(traceAppEntity);
+            .withModifiedTrace(link);
 
         // Step - Commit
         commitService.commit(commitBuilder);
 
         // VP - Verify that two versions exist of the trace link
-        UUID traceLinkId = UUID.fromString(link.getString("traceLinkId"));
+        UUID traceLinkId = link.getTraceLinkId();
         List<TraceLinkVersion> linkVersions = this.traceLinkVersionRepository.findByTraceLinkTraceLinkId(traceLinkId);
         assertThat(linkVersions).hasSize(2);
 

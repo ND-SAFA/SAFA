@@ -9,9 +9,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+<<<<<<< HEAD
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+=======
+import edu.nd.crc.safa.features.jobs.services.JobService;
+>>>>>>> 5ac3d9f1a3c5731843e4d7383f54789aed7695a7
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
@@ -48,6 +52,9 @@ public class ProjectService {
     @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ProjectMembershipService projectMembershipService;
 
+    @Setter(onMethod = @__({@Autowired}))
+    private JobService jobService;
+
     /**
      * Deletes given project and all related entities through cascade property.
      *
@@ -55,6 +62,7 @@ public class ProjectService {
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */
     public void deleteProject(Project project) throws SafaError, IOException {
+        this.jobService.removeProjectFromJobs(project);
         this.projectRepository.delete(project);
         FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
     }

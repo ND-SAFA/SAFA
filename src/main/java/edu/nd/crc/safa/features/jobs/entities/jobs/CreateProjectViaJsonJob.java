@@ -2,9 +2,10 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -16,29 +17,30 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class CreateProjectViaJsonJob extends CommitJob {
     private final ProjectAppEntity projectAppEntity;
-    private final SafaUser projectOwner;
     /**
      * Trace links to generate.
      */
-    private TraceGenerationRequest traceGenerationRequest;
+    private final TGenRequestAppEntity tgenRequestAppEntity;
 
-    public CreateProjectViaJsonJob(JobDbEntity jobDbEntity,
+    public CreateProjectViaJsonJob(SafaUser user,
+                                   JobDbEntity jobDbEntity,
                                    ProjectAppEntity projectAppEntity,
                                    ServiceProvider serviceProvider,
-                                   TraceGenerationRequest traceGenerationRequest,
-                                   SafaUser projectOwner) {
-        super(jobDbEntity, serviceProvider);
-        this.traceGenerationRequest = traceGenerationRequest;
+                                   TGenRequestAppEntity tgenRequestAppEntity) {
+        super(user, jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
+        this.tgenRequestAppEntity = tgenRequestAppEntity;
         this.projectAppEntity = projectAppEntity;
-        this.projectOwner = projectOwner;
     }
 
     @IJobStep(value = "Creating Project", position = 1)
     public void createProjectStep() {
-        ProjectVersion projectVersion =
-            createProject(projectOwner, projectAppEntity.getName(), projectAppEntity.getDescription());
+        createProjectAndCommit(getProjectCommitDefinition().getUser(),
+            projectAppEntity.getName(),
+            projectAppEntity.getDescription());
+        ProjectVersion projectVersion = getProjectVersion();
+        linkProjectToJob(projectVersion.getProject());
         this.projectAppEntity.setProjectVersion(projectVersion);
-        this.traceGenerationRequest.setProjectVersion(projectVersion);
+        this.tgenRequestAppEntity.setProjectVersion(projectVersion);
 
         getProjectCommitDefinition().addArtifacts(ModificationType.ADDED, this.projectAppEntity.getArtifacts());
         getProjectCommitDefinition().addTraces(ModificationType.ADDED, this.projectAppEntity.getTraces());
@@ -46,7 +48,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
 
     @IJobStep(value = "Generating Trace Links", position = 2)
     public void generateLinks(JobLogger logger) {
-        TraceGenerationRequest request = this.traceGenerationRequest;
+        TGenRequestAppEntity request = this.tgenRequestAppEntity;
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommitDefinition());
 
         List<TraceAppEntity> generatedTraces = this.getServiceProvider()

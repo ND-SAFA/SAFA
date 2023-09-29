@@ -6,8 +6,8 @@
           "object_type": "RANKING",
           "ranking_pipeline": "LLM",
           "sorter": "embedding",
-          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]",
-          "load_dir": "[DATA_PATH]/[CURRENT_PROJECT]",
+          "export_dir": "[OUTPUT_PATH]/ranking/[CURRENT_PROJECT]",
+          "load_dir": "[OUTPUT_PATH]/ranking/[CURRENT_PROJECT]",
           "dataset_creator": {
             "object_type": "TRACE",
             "project_reader": {

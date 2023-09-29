@@ -42,7 +42,8 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
     def create_prompts(artifact_map: Dict[str, str],
                        parent_id: str,
                        args: RankingArgs,
-                       state: RankingState, max_children: int = None) -> str:
+                       state: RankingState,
+                       max_children: int = None) -> str:
         """
         Creates ranking prompt for parent artifact.
         :param artifact_map: Map of artifact id to body.
@@ -74,7 +75,7 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :return: The prompt builder used to rank candidate children artifacts.
         """
         prompt_builder = PromptBuilder(prompts=[
-            Prompt(args.ranking_goal),
+            args.ranking_goal,
             Prompt(PromptUtil.create_xml(args.query_tag, parent_body, prefix="\n", suffix="\n")),
         ])
 
@@ -87,8 +88,7 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
                                                       build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                       include_ids=True))
 
-        question_prompts = [QuestionPrompt(question=q, response_manager=rm) for q, rm in
-                            args.ranking_questions]
-        prompt_builder.add_prompt(QuestionnairePrompt(question_prompts=question_prompts, instructions=args.ranking_instructions))
+        for q in args.ranking_questions:
+            prompt_builder.add_prompt(q)
 
         return prompt_builder

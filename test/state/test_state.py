@@ -9,7 +9,6 @@ from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.delta.delta_state import DeltaState
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
@@ -19,7 +18,6 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_STATE_PATH
-from tgen.tracing.ranking.ranking_state import RankingState
 
 
 class TestState(BaseTest):
@@ -41,6 +39,7 @@ class TestState(BaseTest):
         anthropic_manager.mock_summarization()
         steps = [step.get_step_name() for step in HierarchyGenerator.steps if step.get_step_name()]
         state = HGenState.load_latest(TEST_STATE_PATH, steps)
+        self.assertEqual(state.export_dir, TEST_OUTPUT_DIR)
         self.assertSetEqual(set(steps), set(state.completed_steps.keys()))
         self.assertEqual(state.description_of_artifact, HGenTestConstants.description)
         self.assertEqual(state.summary, HGenTestConstants.summary)

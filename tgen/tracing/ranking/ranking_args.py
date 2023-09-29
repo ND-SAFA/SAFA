@@ -13,8 +13,8 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS, \
-    DEFAULT_RANKING_QUESTIONS
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.tracing.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 
@@ -67,9 +67,9 @@ class RankingArgs(PipelineArgs):
     embedding_model: str = DEFAULT_EMBEDDING_MODEL
     parent_primary_threshold = DEFAULT_PARENT_THRESHOLD
     parent_min_threshold = DEFAULT_PARENT_MIN_THRESHOLD
-    ranking_goal: str = DEFAULT_RANKING_GOAL
-    ranking_instructions: str = DEFAULT_RANKING_INSTRUCTIONS
-    ranking_questions: List[Tuple] = None
+    ranking_goal: Prompt = field(default_factory=lambda: SupportedPrompts.RANKING_GOAL_INSTRUCTIONS.value)
+    ranking_questions: List[Tuple] = field(default_factory=lambda: (SupportedPrompts.RANKING_QUESTION1.value,
+                                                                    SupportedPrompts.RANKING_QUESTION2.value))
     query_tag: str = RANKING_PARENT_TAG
     artifact_header: str = DEFAULT_ARTIFACT_HEADER
     max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS

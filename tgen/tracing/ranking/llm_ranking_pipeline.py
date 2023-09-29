@@ -1,6 +1,7 @@
 import os
-from typing import Dict, Tuple, Type
+from typing import Dict, Tuple, Type, List
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
@@ -32,7 +33,7 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         return RankingState
 
-    def run(self) -> Tuple[Dict, Dict]:
+    def run(self) -> List[Dict]:
         """
         Runs the pipeline to rank the artifacts
         :return: a dictionary mapping the parent to its child rankings
@@ -43,4 +44,4 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
             self.state.export_dir = self.args.export_dir
         super().run()
         prediction_entries = self.state.children_entries
-        return prediction_entries
+        return [EnumDict(entry) for entry in prediction_entries]

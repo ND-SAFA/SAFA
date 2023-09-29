@@ -14,6 +14,7 @@ class TracePredictionEntry(TypedDict):
     """
     A trace prediction for a pair of artifacts.
     """
+    id: Optional[int]
     source: str
     target: str
     score: Optional[float]

@@ -10,9 +10,13 @@ class TestSelectQuestionPrompt(BaseTest):
     DEFAULT = 1
 
     def test_build(self):
-        prompt = self.get_prompt()
-        output = prompt._build()
-        self.eval_format(output)
+        prompt1 = self.get_prompt()
+        output1 = prompt1._build()
+        self.eval_format(output1)
+
+        prompt2 = self.get_prompt(categories=list(self.CATEGORIES.values()), numeric_category_range=range(1, 4))
+        output2 = prompt2._build()
+        self.assertEqual(output1, output2)
 
     def test_parse_response(self):
         prompt = self.get_prompt()
@@ -45,10 +49,11 @@ class TestSelectQuestionPrompt(BaseTest):
         self.assertEqual(prompt_single.response_format, "Enclose the category inside of {}")
         self.assertEqual(prompt_single.instructions, "Select one of the following categories:")
 
-    def get_prompt(self, allow_multiple: bool = False):
-        return SelectQuestionPrompt(self.CATEGORIES, instructions=self.PROMPT,
+    def get_prompt(self, categories=CATEGORIES, allow_multiple: bool = False, **params):
+        return SelectQuestionPrompt(categories, instructions=self.PROMPT,
                                     multiple_responses_allowed=allow_multiple,
-                                    response_tag=self.TAG, default_factory=lambda v, t: self.DEFAULT)
+                                    response_tag=self.TAG, default_factory=lambda v, t: self.DEFAULT,
+                                    **params)
 
     def eval_format(self, output: str):
         res = output.split(NEW_LINE)

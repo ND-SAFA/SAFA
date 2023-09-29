@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional, Tuple, Union
 
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
@@ -63,7 +64,7 @@ class RankingJob(AbstractJob):
             predicted_entries = self.trace_layer(artifact_df, tracing_type)
             global_predictions.extend(predicted_entries)
 
-        self.optional_eval(dataset, global_predictions)
+        self.optional_eval(self.dataset, global_predictions)
 
         return TracePredictionOutput(prediction_entries=global_predictions)
 
@@ -104,23 +105,31 @@ class RankingJob(AbstractJob):
                                     project_summary=self.project_summary,
                                     **self.ranking_kwargs)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
-        predicted_entries = pipeline.run()
+        predicted_entries: List[EnumDict] = pipeline.run()
         self.project_summary = pipeline.state.project_summary
         has_positive_links = self.dataset is not None and self.dataset.trace_df is not None and len(
             self.dataset.trace_df.get_links_with_label(1)) > 1
-        if has_positive_links:
-            for entry in predicted_entries:
-                trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value])
+        for entry in predicted_entries:
+            trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
+            if has_positive_links and trace_id in self.dataset.trace_df:
                 trace_entry = self.dataset.trace_df.loc[trace_id]
                 label = trace_entry[TraceKeys.LABEL.value]
-                entry[TraceKeys.LABEL.value] = label
+                entry[TraceKeys.LABEL] = label
+            self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
+            self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
 
         if self.select_top_predictions:
-            predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE.value] >= pipeline_args.link_threshold]
+            predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE] >= pipeline_args.link_threshold]
         return predicted_entries
 
     @staticmethod
-    def optional_eval(dataset, predictions):
+    def optional_eval(dataset: TraceDataset, predictions: List) -> None:
+        """
+        Evaluates the results of the predictions if the dataset contains positive labeled links.
+        :param dataset: The dataset representing the ground truth.
+        :param predictions: The predictions for the links in the dataset.
+        :return: None
+        """
         if dataset is None or dataset.trace_df is None or len(dataset.trace_df.get_links_with_label(1)) == 0:
             return
         RankingUtil.evaluate_trace_predictions(dataset.trace_df, predictions)

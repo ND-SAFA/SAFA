@@ -90,7 +90,7 @@ class State(BaseObject):
             save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
             as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self._get_path_to_state_checkpoint(self.export_dir)), k)
                            if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()}
-            collapsed_paths = self.collapse_paths(as_dict)
+            collapsed_paths = self.collapse_or_expand_paths(as_dict)
             YamlUtil.write(collapsed_paths, save_path)
             logger.info(f"Saved state to {save_path}")
             return True
@@ -99,16 +99,18 @@ class State(BaseObject):
             return False
 
     @classmethod
-    def collapse_paths(cls, as_dict: Dict) -> Dict:
+    def collapse_or_expand_paths(cls, as_dict: Dict, collapse: bool = True) -> Dict:
         """
-        Collapses all path variables in the dictionary of vars
+        Collapses or expands all path variables in the dictionary of vars
         :param as_dict: The vars dictionary
-        :return: The dictionary with collapsed paths
+        :parma collapse: If True, collapses the path
+        :return: The dictionary with collapsed or expanded paths
         """
+        method = FileUtil.collapse_paths if collapse else FileUtil.expand_paths
         output = {}
         for k, v in as_dict.items():
-            should_collapse = not ReflectionUtil.is_function(v) and cls._is_a_path_variable(k)
-            output[k] = FileUtil.collapse_paths(v) if should_collapse else v
+            is_path = not ReflectionUtil.is_function(v) and cls._is_a_path_variable(k)
+            output[k] = method(v) if is_path else v
         return output
 
     @classmethod
@@ -144,7 +146,8 @@ class State(BaseObject):
             logger.info(f"Reading step state: {path}")
             param_specs = ParamSpecs.create_from_method(cls.__init__)
             attrs = {name: cls._check_type(name, val, param_specs) for name, val in YamlUtil.read(path).items()}
-            obj = cls(**attrs)
+            expanded_paths = cls.collapse_or_expand_paths(attrs, collapse=False)
+            obj = cls(**expanded_paths)
             logger.info(f"Loaded previous state from {path}")
             return obj
         except Exception as e:

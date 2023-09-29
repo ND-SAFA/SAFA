@@ -30,8 +30,8 @@ class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
             logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
             self._run(args, state)
             step_ran = True
-        state.on_step_complete(step_name=self.get_step_name())
         if step_ran:
+            state.on_step_complete(step_name=self.get_step_name())
             logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
         return step_ran
 

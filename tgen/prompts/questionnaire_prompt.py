@@ -3,6 +3,7 @@ from string import ascii_uppercase
 from typing import Any, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
+from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
@@ -34,7 +35,13 @@ class QuestionnairePrompt(Prompt):
         if self.use_bullets_for_enumeration:
             self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
         if use_multi_step_task_instructions:
-            instructions = self._create_multi_step_task_instructions(enumeration_chars, question_prompts)
+            instructions = self._create_multi_step_task_instructions(enumeration_chars, question_prompts, instructions)
+        if response_manager and not isinstance(response_manager.response_tag, dict):
+            all_tags = self.get_all_response_tags()
+            if len(all_tags) > 0:
+                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags})
+                response_manager = PromptResponseManager(**params)
+
         super().__init__(instructions, response_manager=response_manager, prompt_id=prompt_id)
 
     def get_response_tags_for_question(self, question_index: int) -> Union[str, List[str]]:
@@ -47,6 +54,20 @@ class QuestionnairePrompt(Prompt):
         if len(tag_ids) == 1:
             return tag_ids[0]
         return tag_ids
+
+    def get_all_response_tags(self) -> List[str]:
+        """
+        Gets the response tags for all questions
+        :return: All response tag ids
+        """
+        all_tags = []
+        for i in range(len(self.question_prompts)):
+            tag_ids = self.question_prompts[i].response_manager.get_all_tag_ids()
+            if isinstance(tag_ids, list):
+                all_tags.extend(tag_ids)
+            else:
+                all_tags.append(tag_ids)
+        return all_tags
 
     @overrides(Prompt)
     def format_value(self, *args: object, **kwargs: object) -> None:
@@ -67,9 +88,33 @@ class QuestionnairePrompt(Prompt):
         :return: The formatted response
         """
         parsed = self.response_manager.parse_response(response)
+        if isinstance(self.response_manager.response_tag, dict):
+            start = 0
+            parent_tag = self.response_manager.get_all_tag_ids()[0]
+            parsed_items = []
+            for item in parsed[parent_tag]:
+                start = response.find(PromptUtil.create_xml_opening(parent_tag), start)
+                end = response.find(PromptUtil.create_xml_closing(parent_tag), start)
+                questions_parsed = self._parse_for_each_question(response[start:end])
+                parsed_item = {k: v if k not in questions_parsed else questions_parsed[k] for k, v in item.items()}
+                parsed_items.append(parsed_item)
+                start = end
+            parsed[parent_tag] = parsed_items
+        else:
+            parsed = self._parse_for_each_question(response)
+
+        return parsed
+
+    def _parse_for_each_question(self, response: str) -> Dict:
+        """
+        Parses the response for each of the question prompts
+        :param response: The response
+        :return: A dictionary containing all the parsed responses
+        """
+        parsed = {}
         for prompt in self.question_prompts:
             parsed.update(prompt.response_manager.parse_response(response))
-        return parsed
+        return  parsed
 
     @overrides(Prompt)
     def _build(self, child: bool = False, **kwargs) -> str:
@@ -92,7 +137,8 @@ class QuestionnairePrompt(Prompt):
         return f"{instructions}{formatted_questions}{NEW_LINE}"
 
     @staticmethod
-    def _create_multi_step_task_instructions(enumeration_chars: List[str], question_prompts: List[Prompt]) -> str:
+    def _create_multi_step_task_instructions(enumeration_chars: List[str], question_prompts: List[Prompt],
+                                             special_instructions: str = None) -> str:
         """
         Creates the default instructions for a multi-step task
         :param enumeration_chars: The enumeration chars being used
@@ -104,6 +150,8 @@ class QuestionnairePrompt(Prompt):
         base_instructions = f"Below are {len(question_prompts)} steps to complete. " \
                             f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions - 1]}"
         instructions = [PromptUtil.as_markdown_header('TASKS:'), PromptUtil.as_markdown_italics(base_instructions)]
+        if special_instructions:
+            instructions.append(special_instructions)
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
     def set_instructions(self, instructions: str) -> None:

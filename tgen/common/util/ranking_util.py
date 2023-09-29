@@ -1,7 +1,8 @@
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from tgen.common.constants.tracing.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
@@ -65,7 +66,7 @@ class RankingUtil:
         return predicted_entries
 
     @staticmethod
-    def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[TracePredictionEntry]) -> Dict:
+    def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[EnumDict]) -> Optional[Dict]:
         """
         Calculates ranking metrics for ranking predictions.
         :param trace_df: The trace data frame containing true labels.
@@ -82,7 +83,7 @@ class RankingUtil:
         all_link_ids = list(trace_df.index)
         positive_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(1)]
         negative_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(0)]
-        predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for
+        predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET]) for
                               entry in predicted_entries]
         predicted_t_map = {t_id: t for t_id, t in zip(predicted_link_ids, predicted_entries)}
 
@@ -93,6 +94,7 @@ class RankingUtil:
         RankingUtil.log_artifacts("False Positives", predicted_t_map, false_positive_ids)
 
         other_link_ids = set(all_link_ids).difference(predicted_link_ids)
+        bad_link = [link_id for link_id in predicted_link_ids if link_id not in all_link_ids]
         ordered_link_ids = predicted_link_ids + list(other_link_ids)
         scores = [entry[TraceKeys.SCORE.value] for entry in predicted_entries]
         missing_scores = [0 for i in other_link_ids]
@@ -175,6 +177,5 @@ class RankingUtil:
         :return: Formatted string.
         """
         a_id = a[artifact_id_key]
-        a_score = a.get(TraceKeys.SCORE.value, "")
-        a_explanation = a.get(TraceKeys.EXPLANATION.value, "")
-        return f"{a_id}: ({a_score}) :{a_explanation}"
+        a_score = a.get(TraceKeys.SCORE.value)
+        return f"{a_id}: ({a_score})"

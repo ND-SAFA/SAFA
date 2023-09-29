@@ -65,7 +65,7 @@ class OpenAIArgs(AbstractLLMArgs):
             assert "prompt_builder" in instructions, "Expected prompt_creator to be defined when including classification metrics."
             prompt_creator = instructions["prompt_builder"]
             pos_class = None
-            for prompt in prompt_creator._prompts:
+            for prompt in prompt_creator.prompts:
                 choices = getattr(prompt, "choices", None)
                 if choices is not None:
                     pos_class = choices[0]

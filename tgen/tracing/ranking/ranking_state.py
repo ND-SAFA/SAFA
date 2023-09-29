@@ -20,7 +20,7 @@ class RankingState(State):
     # Ranking
     ranking_responses: Optional[GenerationResponse] = field(default=None, repr=False)
     ranking_prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
-    children_entries: List[TracePredictionEntry] = field(default=None, repr=False)
+    children_entries: List[Dict] = field(default=None, repr=False)
 
     # IO
     export_path: str = None

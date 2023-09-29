@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Any
+from typing import Callable, Dict, Any, Union, List
 
 from tgen.common.util.override import overrides
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, COMMA
@@ -20,7 +20,9 @@ class SelectQuestionPrompt(QuestionPrompt):
     DEFAULT_RESPONSE_TAG = {1: "category",
                             2: "categories"}
 
-    def __init__(self, categories: Dict[Any, str], question: str = EMPTY_STRING,
+    def __init__(self, categories: Union[List[str], Dict[Any, str]],
+                 numeric_category_range: range = range(0),
+                 question: str = EMPTY_STRING,
                  instructions: str = None,
                  response_format: str = None,
                  response_tag: str = None,
@@ -28,10 +30,19 @@ class SelectQuestionPrompt(QuestionPrompt):
                  default_factory: Callable = None):
         """
         Initializes the prompt with the categories that a model can select
-        :param categories: A dictionary mapping category name to its description
+        :param categories: A dictionary mapping category name to its description or a list of category descriptions
+        :param numeric_category_range: A range from min score to max score if the category names should be scores (defaults to 0-n)
         :param question: The question being asked
+        :param instructions: Additional instructions
+        :param response_format: The format of the response
+        :param response_tag: The tag to use for the response
+        :param multiple_responses_allowed: If True, accepts multiple answers instead of a single category
         :param default_factory: Method to define a default if response is not as expected
         """
+        if isinstance(categories, list):
+            numeric_category_range = range(len(categories)) \
+                if len(numeric_category_range) < len(categories) else numeric_category_range
+            categories = {i: cat for i, cat in zip(numeric_category_range, categories)}
         self.categories = categories
         default_key = 2 if multiple_responses_allowed else 1
 

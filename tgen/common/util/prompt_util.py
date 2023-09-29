@@ -16,6 +16,15 @@ class PromptUtil:
         return f"<{tag_name}>"
 
     @staticmethod
+    def create_xml_closing(tag_name: str):
+        """
+        Creates an opening xml tag.
+        :param tag_name: The name of the tag.
+        :return: The opening tag.
+        """
+        return f"</{tag_name}>"
+
+    @staticmethod
     def create_xml(tag_name: str, tag_content: str = EMPTY_STRING, prefix: str = None, suffix: str = None) -> str:
         """
         Creates xml as follows: <[tag_name]>tag_content</[tag_name]>
@@ -28,7 +37,8 @@ class PromptUtil:
         prefix = prefix if prefix else EMPTY_STRING
         suffix = suffix if suffix else EMPTY_STRING
         opening_tag = PromptUtil.create_xml_opening(tag_name)
-        return f"{prefix}{opening_tag}{tag_content}</{tag_name}>{suffix}"
+        closing_tag = PromptUtil.create_xml_closing(tag_name)
+        return f"{prefix}{opening_tag}{tag_content}{closing_tag}{suffix}"
 
     @staticmethod
     def as_markdown_italics(original_string: str) -> str:

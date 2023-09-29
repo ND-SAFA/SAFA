@@ -1,3 +1,4 @@
+import traceback
 from enum import Enum, EnumMeta
 from typing import Any, Dict
 
@@ -7,6 +8,7 @@ from yaml.constructor import ConstructorError
 from yaml.loader import SafeLoader
 
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.constants.deliminator_constants import COLON
@@ -23,25 +25,29 @@ class CustomLoader(SafeLoader):
         :param node: The yaml node being parsed
         :return: The created object
         """
-        class_path = node.tag.split(COLON)[-1]
-        cls = ReflectionUtil.get_cls_from_path(class_path)
-        if ReflectionUtil.is_function(cls) or "builtins" in class_path:
-            return cls
-        if isinstance(cls, EnumMeta):
-            return self._create_enum_from_meta(cls, node)
-        deep = hasattr(cls, '__setstate__')
-        state = self.construct_mapping(node, deep=deep)
-        if hasattr(cls, '__init__'):
-            param_specs = ParamSpecs.create_from_method(cls.__init__)
-            init_params = {name: val for name, val in state.items() if name in param_specs.param_names}
-            data = cls(**init_params)
-        else:
-            data = cls.__new__(cls)
-        if deep:
-            data.__setstate__(state)
-        else:
-            data.__dict__.update(state)
-        return data
+        try:
+            class_path = node.tag.split(COLON)[-1]
+            cls = ReflectionUtil.get_cls_from_path(class_path)
+            if ReflectionUtil.is_function(cls) or "builtins" in class_path:
+                return cls
+            if isinstance(cls, EnumMeta):
+                return self._create_enum_from_meta(cls, node)
+            deep = hasattr(cls, '__setstate__')
+            state = self.construct_mapping(node, deep=True)
+            if hasattr(cls, '__init__'):
+                param_specs = ParamSpecs.create_from_method(cls.__init__)
+                init_params = {name: val for name, val in state.items() if name in param_specs.param_names}
+                data = cls(**init_params)
+            else:
+                data = cls.__new__(cls)
+            if deep:
+                data.__setstate__(state)
+            else:
+                data.__dict__.update(state)
+            return data
+        except Exception as e:
+            logger.error(f"Problem loading node {node.tag}")
+            raise e
 
     def _create_enum_from_meta(self, enum_meta: EnumMeta, node: Node) -> Enum:
         """

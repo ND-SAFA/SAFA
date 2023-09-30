@@ -87,7 +87,7 @@ const summary = computed<string>({
   set(value) {
     if (!generateConfirmation.value) return;
 
-    generateConfirmation.value!.summary = value;
+    generateConfirmation.value.summary = value;
   },
 });
 

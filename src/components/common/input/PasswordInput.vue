@@ -55,7 +55,7 @@ const showPassword = ref(false);
 const model = useVModel(props, "modelValue");
 
 const showError = computed(
-  () => !!props.errorMessage && props.errorMessage.length > 0
+  () => props.errorMessage && props.errorMessage.length > 0
 );
 
 /**

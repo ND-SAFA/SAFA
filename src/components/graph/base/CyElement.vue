@@ -62,7 +62,7 @@ function addElement(): void {
   const def = JSON.parse(JSON.stringify(props.definition));
 
   // Add the element to cytoscape.
-  const eles = instance.value!.add(def);
+  const eles = instance.value.add(def);
 
   emit("add", instance.value!);
 

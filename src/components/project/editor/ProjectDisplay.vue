@@ -28,7 +28,7 @@
         t="2"
       >
         <attribute-chip artifact-type :value="parent" />
-        <flex-box l="4">
+        <flex-box v-if="children.length > 0" l="4">
           <icon
             class="q-mx-xs q-mt-xs"
             size="sm"
@@ -103,7 +103,12 @@ const artifactTypeMap = computed(() =>
           matrix.sourceType,
         ],
       }),
-      {} as Record<string, string[]>
+      timStore.artifactTypes
+        .map(({ name }) => ({ [name]: [] }))
+        .reduce(
+          (acc, cur) => ({ ...acc, ...cur }),
+          {} as Record<string, string[]>
+        )
     )
   )
 );

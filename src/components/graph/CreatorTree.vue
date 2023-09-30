@@ -45,21 +45,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { TimTreeProps } from "@/types";
+import { computed, onMounted, ref } from "vue";
 import { appStore, layoutStore, projectSaveStore, cyStore } from "@/hooks";
 import { FlexBox, TextButton, PanelCard } from "@/components/common";
 import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 
-const props = defineProps<TimTreeProps>();
-
 const graph = ref(cyStore.buildCreatorGraph());
 
 const className = computed(() => {
-  if (!props.visible) {
-    return "artifact-view disabled";
-  } else if (!appStore.isLoading) {
+  if (!appStore.isLoading) {
     return "artifact-view visible elevation-3";
   } else {
     return "artifact-view";
@@ -87,12 +82,7 @@ const traces = computed(() =>
     }))
 );
 
-watch(
-  () => props.visible,
-  () => {
-    if (!props.visible) return;
-
-    layoutStore.setGraphLayout("creator");
-  }
-);
+onMounted(() => {
+  layoutStore.setGraphLayout("creator");
+});
 </script>

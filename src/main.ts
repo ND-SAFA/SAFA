@@ -2,10 +2,10 @@ import { createApp } from "vue";
 
 import "@mdi/font/css/materialdesignicons.css";
 import "vue3-drr-grid-layout/dist/style.css";
+import "@quasar/quasar-ui-qmarkdown/dist/index.css";
 
 import { Quasar } from "quasar";
-import VueHighlightJS from "vue3-highlightjs";
-import Markdown from "vue3-markdown-it";
+import { default as QMarkdown } from "@quasar/quasar-ui-qmarkdown";
 import { router } from "@/router";
 import { pinia, gridLayout, codeDiff, quasarOptions } from "@/plugins";
 import App from "@/App.vue";
@@ -17,9 +17,8 @@ app
   .use(router)
   .use(gridLayout)
   .use(codeDiff)
-  .use(VueHighlightJS)
-  .use(Markdown)
-  .use(Quasar, quasarOptions);
+  .use(Quasar, quasarOptions)
+  .use(QMarkdown);
 
 app.mount("#app");
 

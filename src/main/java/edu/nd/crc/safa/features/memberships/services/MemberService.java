@@ -46,34 +46,20 @@ public class MemberService implements IAppEntityService<MembershipAppEntity> {
     public List<MembershipAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         Project project = projectVersion.getProject();
 
-        List<MembershipAppEntity> members = this.userProjectMembershipRepository.findByProject(project)
+        return this.userProjectMembershipRepository.findByProject(project)
             .stream()
             .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
-
-        // TODO pull members the right way
-        addOwnerMember(projectVersion, members);
-
-        return members;
-    }
-
-    private void addOwnerMember(ProjectVersion projectVersion, List<MembershipAppEntity> members) {
-        SafaUser owner = projectVersion.getProject().getOwningTeam().getOrganization().getOwner();
-
-        members.add(new MembershipAppEntity(
-                new ProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
     }
 
     @Override
     public List<MembershipAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
                                                             List<UUID> appEntityIds) {
-        List<MembershipAppEntity> members = this.userProjectMembershipRepository
+        return this.userProjectMembershipRepository
             .findByProjectAndMembershipIdIn(projectVersion.getProject(), appEntityIds)
             .stream()
             .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
-        addOwnerMember(projectVersion, members);
-        return members;
     }
 
     /**

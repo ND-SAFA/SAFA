@@ -80,6 +80,9 @@ class RankingUtil:
         if n_labels == 0:
             logger.info("Skipping evaluation, no labels found in trace data frame.")
             return
+        if not isinstance(predicted_entries[0], EnumDict):
+            predicted_entries = [EnumDict(e) for e in predicted_entries]
+
         all_link_ids = list(trace_df.index)
         positive_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(1)]
         negative_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(0)]
@@ -94,7 +97,6 @@ class RankingUtil:
         RankingUtil.log_artifacts("False Positives", predicted_t_map, false_positive_ids)
 
         other_link_ids = set(all_link_ids).difference(predicted_link_ids)
-        bad_link = [link_id for link_id in predicted_link_ids if link_id not in all_link_ids]
         ordered_link_ids = predicted_link_ids + list(other_link_ids)
         scores = [entry[TraceKeys.SCORE.value] for entry in predicted_entries]
         missing_scores = [0 for i in other_link_ids]

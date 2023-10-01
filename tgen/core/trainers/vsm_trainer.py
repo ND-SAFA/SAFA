@@ -106,6 +106,11 @@ class VSMTrainer(AbstractTrainer):
         self.model.fit(combined)
 
     def get_artifacts(self, artifact_ids: List[str]) -> List[str]:
+        """
+        Gets artifact content for each artifact id
+        :param artifact_ids: The list of artifact ids to retrieve
+        :return: A list of artifacts
+        """
         return [self.artifact_map[a_id] for a_id in artifact_ids]
 
     def predict(self, eval_dataset: TraceDataset, threshold: float) -> TracePredictionOutput:

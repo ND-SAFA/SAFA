@@ -103,7 +103,7 @@ class State(BaseObject):
         """
         Collapses or expands all path variables in the dictionary of vars
         :param as_dict: The vars dictionary
-        :parma collapse: If True, collapses the path
+        :param collapse: If True, collapses the path
         :return: The dictionary with collapsed or expanded paths
         """
         method = FileUtil.collapse_paths if collapse else FileUtil.expand_paths

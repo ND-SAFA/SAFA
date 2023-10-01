@@ -5,7 +5,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput, TracePredictionEntry
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -88,7 +88,6 @@ class RankingJob(AbstractJob):
         """
         Traces the between the child-parent artifact types.
         :param artifact_df: The artifact dataframe containing artifacts ids.
-        :param artifact_map: Map of artifact id to content.
         :param types_to_trace: The child-parent layers being traced.
         :return:
         """
@@ -105,7 +104,8 @@ class RankingJob(AbstractJob):
                                     project_summary=self.project_summary,
                                     **self.ranking_kwargs)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
-        predicted_entries: List[EnumDict] = pipeline.run()
+        predicted_entries: List = pipeline.run()
+        predicted_entries = [EnumDict(entry) for entry in predicted_entries]
         self.project_summary = pipeline.state.project_summary
         has_positive_links = self.dataset is not None and self.dataset.trace_df is not None and len(
             self.dataset.trace_df.get_links_with_label(1)) > 1
@@ -116,7 +116,8 @@ class RankingJob(AbstractJob):
                 label = trace_entry[TraceKeys.LABEL.value]
                 entry[TraceKeys.LABEL] = label
             self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
-            self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+            if TraceKeys.EXPLANATION in entry:
+                self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
 
         if self.select_top_predictions:
             predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE] >= pipeline_args.link_threshold]

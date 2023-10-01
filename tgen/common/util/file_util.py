@@ -168,8 +168,8 @@ class FileUtil:
             if replacements:
                 path2var = {v: k for k, v in replacements.items()}
                 ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
-                for path in ordered_paths:
-                    path = path.replace(path, path2var[path])
+                for path2replace in ordered_paths:
+                    path = path.replace(path2replace, path2var[path2replace])
             if os.path.isabs(path):
                 path = os.path.relpath(path, PROJ_PATH)
             return path

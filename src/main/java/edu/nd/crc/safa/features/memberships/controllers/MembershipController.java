@@ -198,18 +198,20 @@ public class MembershipController extends BaseController {
      */
     private void consumeEntity(UUID entityId, Consumer<Organization> organizationConsumer,
                                Consumer<Team> teamConsumer, Consumer<Project> projectConsumer) {
-        Optional<Organization> optionalOrganization = organizationService.getOrganizationOptionalById(entityId);
-        optionalOrganization.ifPresent(organizationConsumer);
-
-        Optional<Team> optionalTeam = teamService.getTeamOptionalById(entityId);
-        optionalTeam.ifPresent(teamConsumer);
-
-        Optional<Project> optionalProject = projectService.getProjectOptionalById(entityId);
-        optionalProject.ifPresent(projectConsumer);
-
-        if (optionalOrganization.isEmpty() && optionalTeam.isEmpty() && optionalProject.isEmpty()) {
-            throw createNoEntityFoundError();
-        }
+        transformEntity(
+            entityId,
+            org -> {
+                organizationConsumer.accept(org);
+                return null;
+            },
+            team -> {
+                teamConsumer.accept(team);
+                return null;
+            },
+            project -> {
+                projectConsumer.accept(project);
+                return null;
+            });
     }
 
     /**

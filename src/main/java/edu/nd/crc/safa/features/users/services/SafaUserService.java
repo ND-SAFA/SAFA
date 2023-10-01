@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.features.users.services;
 
+import static edu.nd.crc.safa.utilities.AssertUtils.assertPresent;
+
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -79,6 +82,7 @@ public class SafaUserService {
         Organization personalOrg =
                 organizationService.createNewOrganization(new Organization(email, "", safaUser, "free", true));
         safaUser.setPersonalOrgId(personalOrg.getId());
+        safaUser.setDefaultOrgId(personalOrg.getId());
         safaUser = this.safaUserRepository.save(safaUser);  // Save again so it gets the org id
 
         return safaUser;
@@ -125,5 +129,19 @@ public class SafaUserService {
     public SafaUser getUserById(UUID userId) {
         return safaUserRepository.findById(userId)
             .orElseThrow(() -> new SafaItemNotFoundError("No user exists with given ID: %s.", userId));
+    }
+
+    /**
+     * Update a user's default org
+     *
+     * @param user The user
+     * @param newDefaultOrgId The new default org ID
+     */
+    public void updateDefaultOrg(SafaUser user, UUID newDefaultOrgId) {
+        Optional<Organization> orgOpt = organizationService.getOrganizationOptionalById(newDefaultOrgId);
+        assertPresent(orgOpt, "That organization does not exist.");
+
+        user.setDefaultOrgId(newDefaultOrgId);
+        safaUserRepository.save(user);
     }
 }

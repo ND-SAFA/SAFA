@@ -29,6 +29,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * Responsible for sending request and parsing responses
@@ -38,6 +40,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     private static final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private static MockMvc mockMvc;
     private static Cookie authorizationToken = null;
+    private MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
 
     public SafaRequest(String path) {
         super(path);
@@ -296,6 +299,8 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
                                                 ResultMatcher test,
                                                 Function<String, T> stringCreator) throws Exception {
 
+        request.queryParams(queryParams);
+
         MvcResult requestResult = mockMvc
             .perform(request)
             .andDo(result -> {
@@ -338,5 +343,10 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return Arrays.stream(response.getCookies())
             .filter(c -> c.getName().equals(cookieName))
             .findFirst();
+    }
+
+    public SafaRequest withQueryParam(String paramName, String paramValue) {
+        queryParams.add(paramName, paramValue);
+        return this;
     }
 }

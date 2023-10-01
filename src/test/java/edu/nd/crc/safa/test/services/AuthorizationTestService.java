@@ -2,6 +2,7 @@ package edu.nd.crc.safa.test.services;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.Cookie;
 
@@ -104,21 +105,23 @@ public class AuthorizationTestService {
         if (safaUserOptional.isEmpty()) {
             throw new SafaError("Could not find user with name: %s", username);
         }
-        Optional<ProjectMembership> projectMembershipOptional =
+        List<ProjectMembership> projectMemberships =
             this.serviceProvider.getUserProjectMembershipRepository().findByProjectAndMember(
                 project,
                 safaUserOptional.get());
-        if (projectMembershipOptional.isEmpty()) {
+        if (projectMemberships.isEmpty()) {
             throw new SafaError("Could not find membership between {%s} and {%s}.",
                 username,
                 project.getName());
 
         }
 
-        SafaRequest
-            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
-            .withEntityId(project.getProjectId())
-            .withMembershipId(projectMembershipOptional.get().getMembershipId())
-            .deleteWithJsonObject(resultMatcher);
+        for (ProjectMembership membership : projectMemberships) {
+            SafaRequest
+                .withRoute(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
+                .withEntityId(project.getProjectId())
+                .withMembershipId(membership.getMembershipId())
+                .deleteWithJsonObject(resultMatcher);
+        }
     }
 }

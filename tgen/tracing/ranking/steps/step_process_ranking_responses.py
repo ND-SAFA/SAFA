@@ -92,7 +92,7 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
             parsed_entries, unidentified_entries, parsed_artifact_ids = [], [], set()
             for i, answer in enumerate(artifact_answers):
                 try:
-                    a_reasoning = ArtifactReasoning({k: v[0] for k, v in answer.items()})
+                    a_reasoning = ArtifactReasoning({k: v[0] for k, v in answer.items() if len(v) > 0})
                     if a_reasoning.index is None:
                         a_reasoning.index = i
                         a_reasoning.artifact_id = related_children[a_reasoning.index]

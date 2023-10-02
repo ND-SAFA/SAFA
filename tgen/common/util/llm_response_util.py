@@ -5,7 +5,7 @@ from typing import Dict, List, Union
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 
@@ -32,7 +32,11 @@ class LLMResponseUtil:
             if is_nested:
                 content = [LLMResponseUtil._parse_children(tag) for tag in tags]
             else:
-                content = [tag.contents[0] for tag in tags if len(tag.contents) > 0]
+                content = []
+                for tag in tags:
+                    c = LLMResponseUtil._get_content(tag)
+                    if c:
+                        content.append(c)
             assert len(content) > 0, f"Found no tags ({tag_name}) in:\n{res}"
         except Exception:
             error = f"Unable to parse {tag_name}"
@@ -67,6 +71,21 @@ class LLMResponseUtil:
                 children[tag_name] = []
             children[tag_name].append(content)
         return children
+
+    @staticmethod
+    def _get_content(tag: Union[str, Tag]) -> str:
+        """
+        Gets the content from the tag
+        :return: The content
+        """
+        if isinstance(tag, str):
+            return tag
+        if isinstance(tag, Tag):
+            contents = []
+            for c in tag.contents:
+                content = LLMResponseUtil._get_content(c)
+                contents.append(content)
+            return EMPTY_STRING.join(contents)
 
     @staticmethod
     def extract_labels(r: str, labels2props: Union[Dict, List]) -> Dict:

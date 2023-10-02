@@ -5,6 +5,7 @@ import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
 
+from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -55,8 +56,12 @@ class MetricsManager:
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
             args = {"trace_matrix": self.trace_matrix} if metric.name in trace_matrix_metrics else {}
-            metric_result = metric.compute(predictions=scores, references=labels, **args)
             metric_name = get_metric_name(metric)
+            try:
+                metric_result = metric.compute(predictions=scores, references=labels, **args)
+            except Exception:
+                logger.exception(f"Unable to compute {metric_name}")
+                continue
             if isinstance(metric_result, dict):
                 results.update(metric_result)
             else:

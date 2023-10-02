@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestController
@@ -76,6 +77,12 @@ public abstract class BaseController {
             errorMessage.append(createValidationMessage(error)).append("\n");
         }
         return new SafaError(errorMessage.toString());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public SafaError handleArgumentTypeError(MethodArgumentTypeMismatchException exception) {
+        return new SafaError("Failed to dispatch request: " + exception.getMostSpecificCause().getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

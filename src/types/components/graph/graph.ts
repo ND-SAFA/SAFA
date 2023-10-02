@@ -90,16 +90,6 @@ export interface CytoscapeProps extends ClassNameProps {
 }
 
 /**
- * The props for rendering the TIM tree graph.
- */
-export interface TimTreeProps {
-  /**
-   * Whether the tree is visible.
-   */
-  visible: boolean;
-}
-
-/**
  * The props for rendering a cytoscape element wrapper.
  */
 export interface CyElementProps extends StyleProps {

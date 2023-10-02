@@ -5,13 +5,13 @@
         text
         label="Center Graph"
         icon="graph-center"
-        @click="cyResetTim"
+        @click="cyStore.resetWindow('creator')"
       />
     </flex-box>
     <panel-card>
       <cytoscape
         id="cytoscape-tim"
-        :graph="timGraph"
+        :graph="graph"
         :class="className"
         data-cy="view-tim-tree"
       >
@@ -40,26 +40,21 @@
  * and links between them as edges.
  */
 export default {
-  name: "TimTree",
+  name: "CreatorTree",
 };
 </script>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
-import { TimTreeProps } from "@/types";
-import { appStore, layoutStore, projectSaveStore } from "@/hooks";
-import { timGraph, cyResetTim } from "@/cytoscape";
-import { FlexBox, TextButton } from "@/components/common";
-import PanelCard from "@/components/common/layout/PanelCard.vue";
+import { computed, onMounted, ref } from "vue";
+import { appStore, layoutStore, projectSaveStore, cyStore } from "@/hooks";
+import { FlexBox, TextButton, PanelCard } from "@/components/common";
 import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 
-const props = defineProps<TimTreeProps>();
+const graph = ref(cyStore.buildCreatorGraph());
 
 const className = computed(() => {
-  if (!props.visible) {
-    return "artifact-view disabled";
-  } else if (!appStore.isLoading) {
+  if (!appStore.isLoading) {
     return "artifact-view visible elevation-3";
   } else {
     return "artifact-view";
@@ -67,30 +62,27 @@ const className = computed(() => {
 });
 
 const artifacts = computed(() =>
-  projectSaveStore.artifactPanels.map(({ type, artifacts = [] }) => ({
-    type,
-    count: artifacts.length,
-  }))
+  projectSaveStore.artifactPanels
+    .filter(({ valid }) => valid)
+    .map(({ type, artifacts = [] }) => ({
+      type,
+      count: artifacts.length,
+    }))
 );
 
 const traces = computed(() =>
-  projectSaveStore.tracePanels.map(
-    ({ name, type, toType = "", traces = [], isGenerated }) => ({
+  projectSaveStore.tracePanels
+    .filter(({ valid }) => valid)
+    .map(({ name, type, toType = "", traces = [], isGenerated }) => ({
       name,
       sourceType: type,
       targetType: toType,
       count: traces.length,
       isGenerated,
-    })
-  )
+    }))
 );
 
-watch(
-  () => props.visible,
-  () => {
-    if (!props.visible) return;
-
-    layoutStore.setTimTreeLayout();
-  }
-);
+onMounted(() => {
+  layoutStore.setGraphLayout("creator");
+});
 </script>

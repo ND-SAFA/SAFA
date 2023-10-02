@@ -1,5 +1,6 @@
 import {
   ExpandableProps,
+  IconVariant,
   LoadingProps,
   MinimalProps,
   TableColumn,
@@ -207,4 +208,12 @@ export interface SelectorTableProps
    * A hint to display beneath the searchbar.
    */
   searchHint?: string;
+  /**
+   * Optional icons to use for the add, edit, and delete buttons.
+   */
+  icons?: {
+    add: IconVariant;
+    edit: IconVariant;
+    delete: IconVariant;
+  };
 }

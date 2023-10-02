@@ -13,7 +13,7 @@ export type CreatorTab = "standard" | "bulk" | "import";
 /**
  * The types of load project tabs.
  */
-export type LoaderTab = "load" | "uploads";
+export type LoaderTab = "load" | "project" | "user";
 
 /**
  * Represents a panel for uploading files in the project creator.

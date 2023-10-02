@@ -87,6 +87,13 @@ export interface TypographyProps
    * If set to 0, the component will never collapse by default.
    */
   collapseLength?: number;
+  /**
+   * If displaying code, the extension to use.
+   * Supported md code types for prism can be found here:
+   * - https://github.com/jincheng9/markdown_supported_languages?ref=itsfoss.com
+   * - https://prismjs.com/#supported-languages
+   */
+  codeExt?: string;
 }
 
 /**

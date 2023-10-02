@@ -36,7 +36,7 @@ const className = useMargins(props, () => [
   ["justify", `justify-${props.justify}`],
   ["fullWidth", "full-width"],
   ["wrap", "wrap"],
-  [props.wrap === false, "nowrap"],
+  [!props.wrap, "nowrap"],
 ]);
 
 const style = computed(() =>

@@ -4,7 +4,7 @@
     v-model="model"
     filled
     :label="label"
-    :multiple="!!multiple"
+    :multiple="multiple"
     :options="options"
     :hint="hint"
     :error-message="errorMessage || undefined"

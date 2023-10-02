@@ -54,13 +54,8 @@
     class="cursor-pointer"
     @click="emit('click')"
   >
-    <q-td
-      v-for="(column, idx) in props.columns"
-      :key="column.name"
-      :align="idx === 0 ? 'start' : 'end'"
-      :class="column.classes"
-    >
-      <flex-box align="center">
+    <q-td v-for="(column, idx) in props.columns" :key="column.name">
+      <flex-box align="center" :justify="idx === 0 ? 'start' : 'end'">
         <div @click.stop>
           <icon-button
             v-if="idx === 0 && props.expandable"

@@ -25,7 +25,7 @@ export interface TableColumn<Row = Record<string, unknown>> {
   /**
    * How to align the text content.
    */
-  align?: "left" | "center";
+  align?: "left" | "center" | "right";
   /**
    * Any classes to apply.
    */

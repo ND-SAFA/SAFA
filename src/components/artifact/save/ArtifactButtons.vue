@@ -60,7 +60,7 @@ const artifact = computed(() => selectionStore.selectedArtifact);
 function handleDelete(): void {
   if (!artifact.value) return;
 
-  artifactApiStore.handleDelete(artifact.value, {
+  artifactApiStore.handleDelete(artifact.value!, {
     onSuccess: () => appStore.closeSidePanels(),
   });
 }

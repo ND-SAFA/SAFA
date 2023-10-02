@@ -11,7 +11,7 @@
   >
     <template #append>
       <q-icon
-        :name="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :name="showPassword ? getIcon('pw-show') : getIcon('pw-hide')"
         tooltip="Toggle show password"
         class="cursor-pointer"
         @click="handleToggle"
@@ -32,6 +32,7 @@ export default {
 <script setup lang="ts">
 import { withDefaults, ref, computed } from "vue";
 import { PasswordInputProps } from "@/types";
+import { getIcon } from "@/util";
 import { useVModel } from "@/hooks";
 
 const props = withDefaults(defineProps<PasswordInputProps>(), {
@@ -54,7 +55,7 @@ const showPassword = ref(false);
 const model = useVModel(props, "modelValue");
 
 const showError = computed(
-  () => !!props.errorMessage && props.errorMessage.length > 0
+  () => props.errorMessage && props.errorMessage.length > 0
 );
 
 /**

@@ -1,5 +1,4 @@
-import { AttributeCollectionSchema } from "./attribute";
-import { DocumentType } from "./document";
+import { AttributeCollectionSchema, DocumentType } from "@/types";
 
 /**
  * Enumerates the types of FTA nodes.

@@ -33,7 +33,7 @@ import { useVModel } from "@/hooks";
 const props = defineProps<SelectInputProps>();
 
 defineEmits<{
-  (e: "update:modelValue"): void;
+  (e: "update:modelValue", value: string | null): void;
 }>();
 
 const model = useVModel(props, "modelValue");

@@ -6,7 +6,6 @@
         label="Log Out"
         color="negative"
         icon="logout"
-        icon-id="mdi-logout-variant"
         data-cy="button-account-logout"
         @click="handleLogoutClick"
       />

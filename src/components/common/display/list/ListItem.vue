@@ -35,7 +35,7 @@
       <q-item-label class="text-ellipsis">
         <typography v-if="!!props.title" :value="props.title" ellipsis />
         <slot />
-        <separator v-if="!!props.divider" t="1" />
+        <separator v-if="props.divider" t="1" />
       </q-item-label>
       <q-item-label v-if="!!props.subtitle || !!slots.subtitle" caption>
         <typography

@@ -1,2 +1,2 @@
-export * from "./automove";
-export * from "./edge-handles";
+export * from "./edgeHandles";
+export * from "./plugins";

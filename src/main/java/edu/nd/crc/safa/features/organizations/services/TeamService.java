@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
-import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
@@ -40,13 +39,10 @@ public class TeamService {
     @Setter(onMethod = @__({@Autowired, @Lazy}))
     private OrganizationService orgService;
 
-    @Setter(onMethod = @__({@Autowired, @Lazy}))
-    private OrganizationMembershipService orgMembershipService;
-
     @Setter(onMethod = @__({@Autowired}))
     private TeamMembershipService teamMembershipService;
 
-    @Setter(onMethod = @__({@Autowired}))
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ProjectService projectService;
 
     /**

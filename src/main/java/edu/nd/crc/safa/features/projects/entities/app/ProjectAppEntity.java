@@ -84,6 +84,10 @@ public class ProjectAppEntity implements IAppEntity {
 
     private List<String> permissions;
 
+    private UUID orgId;
+
+    private UUID teamId;
+
     public ProjectAppEntity() {
         this.name = "";
         this.description = "";
@@ -139,6 +143,8 @@ public class ProjectAppEntity implements IAppEntity {
         this.subtrees = subtrees;
         this.traceMatrices = traceMatrices;
         this.permissions = permissions;
+        this.teamId = project.getOwningTeam().getId();
+        this.orgId = project.getOwningTeam().getOrganization().getId();
     }
 
     public ProjectAppEntity(ProjectCommitDefinition projectCommitDefinition) {

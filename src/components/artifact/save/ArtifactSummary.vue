@@ -80,7 +80,7 @@ const generateConfirmation = computed(
   () => artifactGenerationApiStore.summaryGenConfirm
 );
 
-const summary = computed({
+const summary = computed<string>({
   get() {
     return generateConfirmation.value?.summary || artifact.value?.summary || "";
   },

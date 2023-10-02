@@ -114,8 +114,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
     await jobApi.handleRequest(
       async () => {
         if (projectStore.projectId) {
-          const projectJobs = await getProjectJobs(projectStore.projectId);
-          jobStore.projectJobs = projectJobs;
+          jobStore.projectJobs = await getProjectJobs(projectStore.projectId);
         }
 
         const userJobs = await getUserJobs();

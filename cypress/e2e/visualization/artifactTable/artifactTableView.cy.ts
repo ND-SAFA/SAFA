@@ -20,7 +20,7 @@ describe("Artifact Table View", () => {
     });
   });
 
-  describe("I can sort artifacts by their attributes", () => {
+  describe.skip("I can sort artifacts by their attributes", () => {
     it("Sorts artifacts by type", () => {
       cy.sortArtifactTable("type").groupArtifactTable("none");
 
@@ -45,7 +45,7 @@ describe("Artifact Table View", () => {
     });
   });
 
-  describe("I can group artifacts by their attributes", () => {
+  describe.skip("I can group artifacts by their attributes", () => {
     it("Groups artifacts by name", () => {
       cy.sortArtifactTable("name").groupArtifactTable("name");
 

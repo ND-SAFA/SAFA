@@ -31,7 +31,15 @@
       <artifact-body-display v-bind="itemProps" display-title :artifact="opt" />
     </template>
     <template
-      #selected-item="{ opt, index, removeAtIndex }: { opt: ArtifactSchema }"
+      #selected-item="{
+        opt,
+        index,
+        removeAtIndex,
+      }: {
+        opt: ArtifactSchema;
+        index: number;
+        removeAtIndex(num: number): void;
+      }"
     >
       <attribute-chip
         v-if="!!opt && opt.name && index < 3"
@@ -52,9 +60,6 @@
 <script lang="ts">
 /**
  * An input for artifacts.
- *
- * @emits `input` (Artifact[]) - On input change.
- * @emits `enter` - On submit.
  */
 export default {
   name: "ArtifactInput",
@@ -63,7 +68,6 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ArtifactInput, ArtifactSchema, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts, sortSelectedArtifactsToTop } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";

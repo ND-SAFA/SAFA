@@ -47,7 +47,7 @@ defineEmits<{
 const model = useVModel(props, "modelValue");
 
 const showError = computed(
-  () => !!props.errorMessage && props.errorMessage.length > 0
+  () => props.errorMessage && props.errorMessage.length > 0
 );
 const label = computed(() => (props.multiple ? "Upload Files" : "Upload File"));
 </script>

@@ -142,7 +142,7 @@ export async function getMembers(
  * @return The created member.
  */
 export async function createMember(
-  member: Omit<MembershipSchema, "projectMembershipId">
+  member: Omit<MembershipSchema, "id">
 ): Promise<MembershipSchema> {
   return buildRequest<
     MembershipSchema,
@@ -163,10 +163,13 @@ export async function createMember(
 export async function editMember(
   member: MembershipSchema
 ): Promise<MembershipSchema> {
-  return buildRequest<MembershipSchema, "entityId", MembershipSchema>(
-    "editMember",
-    { entityId: member.entityId || "" }
-  ).put(member);
+  return buildRequest<
+    MembershipSchema,
+    "entityId" | "memberId",
+    MembershipSchema
+  >("editMember", { entityId: member.entityId || "", memberId: member.id }).put(
+    member
+  );
 }
 
 /**
@@ -176,7 +179,8 @@ export async function editMember(
  * @return The delete member.
  */
 export async function deleteMember(member: MembershipSchema): Promise<void> {
-  await buildRequest<MembershipSchema, "entityId">("deleteMember", {
-    entityId: member.entityId || "",
-  }).delete();
+  await buildRequest<MembershipSchema, "entityId" | "memberId">(
+    "deleteMember",
+    { entityId: member.entityId || "", memberId: member.id }
+  ).delete();
 }

@@ -78,7 +78,7 @@ export interface MembershipSchema extends MemberEntitySchema {
   /**
    * The id of this membership.
    */
-  projectMembershipId: string;
+  id: string;
   /**
    * The email of the member.
    */

@@ -63,7 +63,7 @@ export const useSaveProject = defineStore("saveProject", {
           method: generateMethod,
         }));
       const user: MembershipSchema = {
-        projectMembershipId: "",
+        id: "",
         email: sessionStore.userEmail,
         role: "OWNER",
         entityType: "PROJECT",

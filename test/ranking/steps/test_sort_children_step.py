@@ -1,4 +1,4 @@
-from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
+from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.steps.sort_children_step import SortChildren
@@ -17,7 +17,7 @@ class TestSortChildrenStep(BaseTest):
         expected = {"s1": ["t1", "t3", "t2"]}
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=["s1"],
                                                                     children_ids=["t1", "t2", "t3"],
-                                                                    parent2children=pre_ranked)
+                                                                    pre_sorted_parent2children=pre_ranked)
         step = SortChildren()
         step.run(args, state)
         self.assertDictEqual(expected, state.sorted_parent2children)

@@ -33,10 +33,10 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
 
         :return: List of parents mapped to their ranked children.
         """
-        if self.args.export_dir is not None:
+        if self.args.export_dir:
             os.makedirs(self.args.export_dir, exist_ok=True)
         super().run()
-        parent2rankings = embedding_sorter(self.args.parent_ids, self.args.children_ids, self.args.artifact_map,
+        parent2rankings = embedding_sorter(self.args.parent_ids, self.args.children_ids, self.args.dataset.artifact_df.to_map(),
                                            return_scores=True, model_name=self.args.embedding_model)
         prediction_entries = []
         for parent, parent_payload in parent2rankings.items():

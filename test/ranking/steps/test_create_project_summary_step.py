@@ -1,6 +1,6 @@
 from typing import Any, List, Union
 
-from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
+from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MOCK_PS_RES_MAP, MockResponses

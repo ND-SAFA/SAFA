@@ -40,7 +40,7 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :return: a dictionary mapping the parent to its child rankings
         and a dictionary mapping parent to the explanations for its links
         """
-        if self.args.export_dir is not None:
+        if self.args.export_dir:
             os.makedirs(self.args.export_dir, exist_ok=True)
             self.state.export_dir = self.args.export_dir
         super().run()

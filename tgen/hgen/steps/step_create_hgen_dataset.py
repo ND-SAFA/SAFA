@@ -110,20 +110,22 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             return TraceDataFrame()
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
-        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary,
+        tracing_job = RankingJob(dataset=PromptDataset(artifact_df=artifact_df),
+                                 layer_ids=tracing_layers,
                                  export_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_state.export_dir),
                                  load_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_args.load_dir),
-                                 link_threshold=DEFAULT_HGEN_LINK_THRESHOLD, parent2children=artifact_id_to_link_predictions)
+                                 link_threshold=DEFAULT_HGEN_LINK_THRESHOLD,
+                                 parent2children=artifact_id_to_link_predictions)
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")
-        trace_predictions: List[TracePredictionEntry] = result.body.prediction_entries
+        trace_predictions: List[EnumDict] = result.body.prediction_entries
         traces = {}
         for entry in trace_predictions:
             link = EnumDict({
                 **entry,
-                TraceKeys.SOURCE: entry[TraceKeys.SOURCE.value],
-                TraceKeys.TARGET: entry[TraceKeys.TARGET.value],
+                TraceKeys.SOURCE: entry[TraceKeys.SOURCE],
+                TraceKeys.TARGET: entry[TraceKeys.TARGET],
                 TraceKeys.LABEL: 1
             })
             DataFrameUtil.append(traces, link)

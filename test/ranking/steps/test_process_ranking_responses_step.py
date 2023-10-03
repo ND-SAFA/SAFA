@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
@@ -25,7 +26,7 @@ class TestProcessRankingResponsesStep(TestCase):
         """
         parent_ids = ["parent"]
         children_ids = ["1", "2", "3", "4"]
-        args = RankingArgs(parent_ids=parent_ids, children_ids=children_ids, artifact_df=ArtifactDataFrame())
+        args = RankingArgs(parent_ids=parent_ids, children_ids=children_ids, dataset=PromptDataset(artifact_df=ArtifactDataFrame()))
         state = RankingState(sorted_parent2children={"parent": children_ids},
                              ranking_responses=GenerationResponse(batch_responses=[self.RESPONSE]))
         prompt_builder = CreateRankingPrompts.create_ranking_prompt_builder(args, state, parent_body="")

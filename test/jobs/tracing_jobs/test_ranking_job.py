@@ -1,6 +1,9 @@
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.common.util.status import Status
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_data_manager import TestDataManager
@@ -13,8 +16,11 @@ class TestRankingJob(BaseTest):
     """
 
     def test_data_inputs(self):
-        self.assert_error(lambda: RankingJob(), AssertionError, "Missing required")
-        self.assert_error(lambda: RankingJob(dataset_creator=1, artifact_df=1), AssertionError, "Expected only")
+        self.assert_error(lambda: RankingJob(), AssertionError, "Must supply either a dataset or a creator to make one.")
+        self.assert_error(lambda: RankingJob(dataset_creator=1, dataset=1), AssertionError,
+                          "Must provide only a dataset OR a dataset creator")
+        self.assert_error(lambda: RankingJob(dataset=PromptDataset(artifact_df=ArtifactDataFrame())), AssertionError,
+                          "Must specify parent-child layers or provide trace dataset")
 
     def test_accept_custom_ranking_args(self):
         job = self.create_job(max_context_artifacts=20)
@@ -22,7 +28,7 @@ class TestRankingJob(BaseTest):
 
     def test_multi_layer_tracing_requests(self):
         job = self.create_job()
-        tracing_types, artifact_df, dataset = job.construct_tracing_request()
+        tracing_types = job.dataset.trace_dataset.get_parent_child_types()
         self.assertEqual(2, len(tracing_types))
         for i, (parent_type, child_type) in enumerate(tracing_types):
             self.assertEqual(f"source_{i + 1}", child_type)
@@ -43,6 +49,6 @@ class TestRankingJob(BaseTest):
     @staticmethod
     def create_job(**kwargs):
         project_reader = TestDataManager.get_project_reader()
-        project_creator = TraceDatasetCreator(project_reader=project_reader)
+        project_creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(project_reader=project_reader))
         job = RankingJob(dataset_creator=project_creator, **kwargs)
         return job

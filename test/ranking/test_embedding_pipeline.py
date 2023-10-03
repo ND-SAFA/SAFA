@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.ranking_args import RankingArgs
@@ -24,7 +25,7 @@ class TestEmbeddingPipeline(BaseTest):
         artifact_entries.extend(self.create_artifacts_entries(self.children_ids, "children"))
         artifact_df = ArtifactDataFrame(artifact_entries)
         ranking_args = RankingArgs(run_name="children2parent",
-                                   artifact_df=artifact_df,
+                                   dataset=PromptDataset(artifact_df=artifact_df),
                                    parent_ids=self.parent_ids,
                                    children_ids=self.children_ids)
         pipeline = EmbeddingRankingPipeline(ranking_args)

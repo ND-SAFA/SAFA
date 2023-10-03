@@ -30,12 +30,12 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the ranking run.
         :return: None
         """
-        artifact_map = args.artifact_map
         parent_names = args.parent_ids
 
         prompts = []
         for p_name in parent_names:
-            prompt = CreateRankingPrompts.create_prompts(artifact_map, p_name, args, state, args.max_children_per_query)
+            prompt = CreateRankingPrompts.create_prompts(args.dataset.artifact_df.to_map(),
+                                                         p_name, args, state, args.max_children_per_query)
             prompts.append(prompt)
 
         state.ranking_prompts = prompts

@@ -5,6 +5,7 @@ from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
@@ -69,6 +70,7 @@ class TestLLMRankingPipeline(BaseTest):
         parent_ids = [PARENT_ID]
         children_ids = [CHILD_ID]
         artifact_df = ArtifactDataFrame([parent_artifact, child_artifact])
-        args = RankingArgs(run_name=f"{child_type}2{parent_type}", artifact_df=artifact_df, parent_ids=parent_ids,
+        args = RankingArgs(run_name=f"{child_type}2{parent_type}", dataset=PromptDataset(artifact_df=artifact_df),
+                           parent_ids=parent_ids,
                            children_ids=children_ids)
         return args

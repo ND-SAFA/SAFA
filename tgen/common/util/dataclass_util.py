@@ -77,4 +77,6 @@ class DataclassUtil:
         if not dataset:
             assert dataset_creator, "Must supply either a dataset or a creator to make one."
             dataset = dataset_creator.create()
+        else:
+            assert not dataset_creator, "Must provide only a dataset OR a dataset creator"
         return dataset

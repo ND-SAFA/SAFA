@@ -2,6 +2,7 @@ import uuid
 from copy import deepcopy
 
 from tgen.common.constants.deliminator_constants import COMMA
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -67,7 +68,7 @@ def get_name_responses(generated_artifact_content=None, target_type="User Story"
 
 
 def get_ranking_job_result(expected_names, source_artifact_names):
-    prediction_entries = [{"source": source, "target": target, "score": 0.8, "label": 1, "explanation": "explanation"}
+    prediction_entries = [EnumDict({"source": source, "target": target, "score": 0.8, "label": 1, "explanation": "explanation"})
                           for target in expected_names
                           for source in source_artifact_names]
     job_result = JobResult(status=Status.SUCCESS,

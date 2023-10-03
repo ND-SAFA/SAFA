@@ -22,14 +22,14 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
 
         if state.project_summary:
             summary = state.project_summary
-        elif args.project_summary is not None and len(args.project_summary) > 0:  # MANUAL SUMMARY
-            logger.info("Project summary included in original request.")
-            summary = args.project_summary
+        elif args.dataset.project_summary is not None and len(args.dataset.project_summary) > 0:  # MANUAL SUMMARY
+            logger.info("Project summary included in dataset.")
+            summary = args.dataset.project_summary
         elif not args.generate_summary:  # NO SUMMARY
             logger.info("Skipping project summary.")
             summary = None
         else:  # GENERATED SUMMARY
-            summarizer = ProjectSummarizer(SummarizerArgs(dataset=PromptDataset(artifact_df=args.artifact_df),
+            summarizer = ProjectSummarizer(SummarizerArgs(dataset=args.dataset,
                                                           llm_manager_for_project_summary=args.llm_manager,
                                                           summarize_artifacts=False,
                                                           export_dir=args.export_dir))

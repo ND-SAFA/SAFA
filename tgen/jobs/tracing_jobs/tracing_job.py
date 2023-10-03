@@ -10,6 +10,7 @@ from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
@@ -52,7 +53,7 @@ class TracingJob(AbstractJob):
         """
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
         dataset: TraceDataset = trainer_dataset_manager[DatasetRole.EVAL]
-        artifact_map = dataset.artifact_df.to_map()
+        prompt_dataset = PromptDataset(trace_dataset=dataset)
 
         prompt_builder = PromptBuilder(prompts=[SupportedPrompts.TGEN_CLASSIFICATION.value])
         base_tracing_job = LLMJob(trainer_dataset_manager,
@@ -66,12 +67,12 @@ class TracingJob(AbstractJob):
 
         parent2entries: Dict[str, List[TracePredictionEntry]] = self.create_artifact_predictions_map(entries, TraceKeys.TARGET.value)
         parent_ids = list(parent2entries.keys())
-        parent2children: Dict[str, List[str]] = {target: [t[StructuredKeys.SCORE] for t in entries] for target, entries in
+        parent2children: Dict[str, List[str]] = {target: [t[StructuredKeys.SOURCE] for t in entries] for target, entries in
                                                  parent2entries.items()}
 
         pipeline_args = RankingArgs(parent_ids=parent_ids,
-                                    parent2children=parent2children,
-                                    artifact_map=artifact_map)
+                                    pre_sorted_parent2children=parent2children,
+                                    dataset=prompt_dataset)
         pipeline = LLMRankingPipeline(pipeline_args)
         parent2rankings = pipeline.run()
         predicted_entries = []

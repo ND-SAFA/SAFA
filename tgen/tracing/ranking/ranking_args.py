@@ -12,6 +12,7 @@ from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.tracing.ranking.sorters.vsm_sorter import DEFAULT_EMBEDDING_MODEL
@@ -20,9 +21,9 @@ from tgen.tracing.ranking.sorters.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 @dataclass
 class RankingArgs(PipelineArgs):
     """
-    artifact_df: The data-frame containing all the project aritfacts.
+    - dataset: The dataset containing all the project artifacts.
     """
-    artifact_df: ArtifactDataFrame = required_field(field_name="artifact_df")
+    dataset: PromptDataset = required_field(field_name="dataset")
     """
     parent_ids: List of parent artifact ids.
     """
@@ -32,25 +33,13 @@ class RankingArgs(PipelineArgs):
     """
     children_ids: Optional[List[str]] = required_field(field_name="children_ids")
     """
+    - pre_sorted_parent2children: Maps parent ids to their children ids if there are already some sorted children ids
+    """
+    pre_sorted_parent2children: Optional[Dict[str, List[str]]] = None
+    """
     - run_name: The unique identifier of this run.
     """
     run_name: str = "default_run"
-    """
-    - export_dir: Path to export various checkpoints
-    """
-    export_dir: str = None
-    """
-    - artifact_map: Maps artifact ids to content.
-    """
-    artifact_map: Dict = None
-    """
-    - project_summary: A pre-existing project summary to use.
-    """
-    project_summary: str = None
-    """
-    - parent2children: Maps parent ids to their children ids.
-    """
-    parent2children: Optional[Dict[str, List[str]]] = None
     """
     - max_children_per_query: The number of maximum children to give to claude
     """
@@ -128,10 +117,3 @@ class RankingArgs(PipelineArgs):
         path = os.path.join(self.export_dir, file_name)
         path = os.path.expanduser(path)
         return path
-
-    def __post_init__(self) -> None:
-        """
-        Creates the necessary data structures for operation.
-        :return: None
-        """
-        self.artifact_map = self.artifact_df.to_map()

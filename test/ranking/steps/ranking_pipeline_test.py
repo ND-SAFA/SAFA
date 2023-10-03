@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
@@ -23,7 +24,9 @@ class RankingPipelineTest:
             state_kwargs = {}
         project_reader = TestDataManager.get_project_reader()
         artifact_df, _, _ = project_reader.read_project()
+        project_summary = kwargs.pop("project_summary")  if "project_summary" in kwargs else None
 
-        args = RankingArgs(artifact_df=artifact_df, parent_ids=parent_ids, children_ids=children_ids, **kwargs)
+        args = RankingArgs(dataset=PromptDataset(artifact_df=artifact_df, project_summary=project_summary),
+                           parent_ids=parent_ids, children_ids=children_ids, **kwargs)
         state = RankingState(**state_kwargs)
         return args, state

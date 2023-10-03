@@ -1,14 +1,17 @@
 from typing import Dict, List, Optional, Tuple, Union
 
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
+from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput, TracePredictionEntry
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
@@ -25,9 +28,9 @@ class RankingJob(AbstractJob):
     Uses large claude to rank all source artifacts.
     """
 
-    def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
+    def __init__(self, dataset_creator: PromptDatasetCreator = None, dataset: PromptDataset = None,
                  ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: Tuple[str, str] = None,
-                 select_top_predictions: bool = DEFAULT_SELECT_TOP_PREDICTIONS, project_summary: str = None, **kwargs):
+                 select_top_predictions: bool = DEFAULT_SELECT_TOP_PREDICTIONS, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
@@ -37,18 +40,13 @@ class RankingJob(AbstractJob):
         :param layer_ids
         """
         super().__init__()
-        assert dataset_creator is not None or (artifact_df is not None and layer_ids is not None), DATA_TOO_LITTLE_INPUTS
-        assert dataset_creator is None or artifact_df is None, DATA_TOO_MANY_INPUTS
         self.dataset_creator = dataset_creator
+        self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(dataset, self.dataset_creator)
         self.select_top_predictions = select_top_predictions
         self.ranking_pipeline = ranking_pipeline
-        self.artifact_df = artifact_df
         self.layer_ids = layer_ids
         self.ranking_kwargs = kwargs
-        self.project_summary = project_summary
-        self.dataset: TraceDataset = None
-        if self.artifact_df is not None:
-            assert self.layer_ids is not None, "Please define the layers to trace."
+        assert self.dataset.trace_dataset is not None or self.layer_ids, "Must specify parent-child layers or provide trace dataset"
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -56,57 +54,38 @@ class RankingJob(AbstractJob):
         :param kwargs: Additional keyword arguments.
         :return:
         """
-        tracing_types, artifact_df, dataset = self.construct_tracing_request()
-        self.dataset = dataset
+        tracing_types = self.dataset.trace_dataset.get_parent_child_types() if not self.layer_ids else [self.layer_ids]
         # Predict
         global_predictions = []
         for tracing_type in tracing_types:
-            predicted_entries = self.trace_layer(artifact_df, tracing_type)
+            predicted_entries = self.trace_layer(self.dataset, tracing_type)
             global_predictions.extend(predicted_entries)
 
-        self.optional_eval(self.dataset, global_predictions)
+        self.optional_eval(self.dataset.trace_dataset, global_predictions)
 
         return TracePredictionOutput(prediction_entries=global_predictions)
 
-    def construct_tracing_request(self) -> Tuple[List[Tuple[str, str]], ArtifactDataFrame, Optional[TraceDataset]]:
-        """
-        Reads dataset and constructs what layers will be traced.
-        :return: The tracing requests, the artifact data frame, and optional dataset.
-        """
-        dataset: Optional[TraceDataset] = None
-        if self.dataset_creator:
-            dataset: TraceDataset = self.dataset_creator.create()
-            artifact_df = dataset.artifact_df
-            tracing_types = dataset.get_parent_child_types()
-        else:
-            assert self.layer_ids is not None
-            artifact_df = self.artifact_df
-            tracing_types = [self.layer_ids]
-        return tracing_types, artifact_df, dataset
-
-    def trace_layer(self, artifact_df: ArtifactDataFrame, types_to_trace: Tuple[str, str]):
+    def trace_layer(self, dataset: PromptDataset, types_to_trace: Tuple[str, str]):
         """
         Traces the between the child-parent artifact types.
-        :param artifact_df: The artifact dataframe containing artifacts ids.
+        :param dataset: The dataset containing artifacts to trace.
         :param types_to_trace: The child-parent layers being traced.
         :return:
         """
         parent_type, child_type = types_to_trace
-        parent_ids = list(artifact_df.get_type(parent_type).index)
-        children_ids = list(artifact_df.get_type(child_type).index)
+        parent_ids = list(dataset.artifact_df.get_type(parent_type).index)
+        children_ids = list(dataset.artifact_df.get_type(child_type).index)
         run_name = f"{child_type}({len(parent_ids)}) --> {parent_type} ({len(children_ids)})"
         logger.info(f"Starting to trace: {run_name}")
 
         pipeline_args = RankingArgs(run_name=run_name,
-                                    artifact_df=artifact_df,
+                                    dataset=dataset,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
-                                    project_summary=self.project_summary,
                                     **self.ranking_kwargs)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         predicted_entries: List = pipeline.run()
         predicted_entries = [EnumDict(entry) for entry in predicted_entries]
-        self.project_summary = pipeline.state.project_summary
         has_positive_links = self.dataset is not None and self.dataset.trace_df is not None and len(
             self.dataset.trace_df.get_links_with_label(1)) > 1
         for entry in predicted_entries:

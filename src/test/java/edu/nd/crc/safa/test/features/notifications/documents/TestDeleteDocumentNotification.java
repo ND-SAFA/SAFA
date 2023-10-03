@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.test.features.notifications.documents;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class TestDeleteDocumentNotification extends AbstractDocumentNotification
     }
 
     @Override
-    protected void verifyShareeMessage(List<EntityChangeMessage> messages) {
+    protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
         assertThat(messages).hasSize(1);
         EntityChangeMessage message = messages.get(0);
         this.changeMessageVerifies.verifyDocumentChange(

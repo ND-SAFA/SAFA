@@ -28,7 +28,7 @@ public class TestFlatFileProjectUpdateNotificationsCommonRequests extends Abstra
     }
 
     @Override
-    protected void verifyShareeMessage(List<EntityChangeMessage> messages) {
+    protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
         assertThat(messages).hasSize(4);
 
         this.rootBuilder

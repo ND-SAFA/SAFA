@@ -22,7 +22,7 @@ public abstract class AbstractNotificationTest extends AbstractSharingTest {
      *
      * @param messages Messages as a result of performing action.
      */
-    protected abstract void verifyShareeMessage(List<EntityChangeMessage> messages);
+    protected abstract void verifyShareeMessages(List<EntityChangeMessage> messages);
 
     @Test
     public void notificationTest() throws Exception {
@@ -30,9 +30,6 @@ public abstract class AbstractNotificationTest extends AbstractSharingTest {
         performAction();
 
         // Step - Retrieve action message
-        List<EntityChangeMessage> actionMessage = this.notificationService.getMessages(sharee);
-
-        // VP - Verify message correctness
-        verifyShareeMessage(actionMessage);
+        this.rootBuilder.notifications(n -> n.getMessages(sharee)).consume(this::verifyShareeMessages);
     }
 }

@@ -25,15 +25,14 @@ public abstract class AbstractDocumentNotificationTest extends AbstractNotificat
 
     protected void createDocumentAndVerifyMessage() throws Exception {
         this.createDocument();
-        this.rootBuilder.notifications(n -> n.getEntityMessage(sharee))
-            .consume(m -> {
-                this.changeMessageVerifies.verifyDocumentChange(
-                    m,
-                    this.documentId,
-                    NotificationAction.UPDATE
-                );
-                this.changeMessageVerifies.verifyUpdateLayout(m, false);
-            });
+        this.rootBuilder.notifications((s, n) -> n.getEntityMessage(s.getIUser("sharee-user"))).consume(m -> {
+            this.changeMessageVerifies.verifyDocumentChange(
+                m,
+                this.documentId,
+                NotificationAction.UPDATE
+            );
+            this.changeMessageVerifies.verifyUpdateLayout(m, false);
+        });
     }
 
     protected void createDocument() throws Exception {

@@ -1,11 +1,13 @@
 package edu.nd.crc.safa.test.features.notifications.documentartifact;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
@@ -38,28 +40,16 @@ public class TestNotificationOnAddArtifactToDocument extends AbstractDocumentArt
     }
 
     @Override
-    protected void verifyShareeMessage(List<EntityChangeMessage> messages) {
-        EntityChangeMessage typeCreationMessage = messages.get(0);
+    protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
+        assertThat(messages).hasSize(1);
+        EntityChangeMessage message = messages.get(0);
         this.rootBuilder
             .verify(v -> v.notifications(n -> n
-                .verifyArtifactTypeMessage(typeCreationMessage, getArtifact().getType())));
-
-        EntityChangeMessage artifactCreationMessage = messages.get(1);
-        this.rootBuilder
-            .verify(v -> v
-                .notifications(n -> n
-                    .verifySingleEntityChanges(artifactCreationMessage,
-                        List.of(NotificationEntity.ARTIFACTS, NotificationEntity.WARNINGS),
-                        List.of(1, 0))));
-
-        EntityChangeMessage documentUpdateMessage = messages.get(2);
-        this
-            .rootBuilder
-            .verify(v -> v
-                .notifications(n -> n
-                    .verifySingleEntityChanges(documentUpdateMessage,
-                        List.of(NotificationEntity.DOCUMENT, NotificationEntity.ARTIFACTS),
-                        List.of(1, 1))));
-        assertThat(documentUpdateMessage.isUpdateLayout()).isFalse();
+                .verifyMessage(message,
+                    List.of(NotificationEntity.DOCUMENT, NotificationEntity.ARTIFACTS),
+                    List.of(NotificationAction.UPDATE, NotificationAction.UPDATE),
+                    (i, e) -> {
+                        assertThat(e.size()).isEqualTo(1);
+                    })));
     }
 }

@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.test.features.artifacts.services;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.Hashtable;

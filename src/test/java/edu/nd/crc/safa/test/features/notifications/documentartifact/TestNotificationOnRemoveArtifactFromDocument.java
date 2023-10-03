@@ -48,7 +48,7 @@ public class TestNotificationOnRemoveArtifactFromDocument extends AbstractDocume
     }
 
     @Override
-    protected void verifyShareeMessage(List<EntityChangeMessage> messages) {
+    protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
         EntityChangeMessage typeCreationMessage = messages.get(0);
         String artifactTypeName = getArtifact().getType();
         this.rootBuilder

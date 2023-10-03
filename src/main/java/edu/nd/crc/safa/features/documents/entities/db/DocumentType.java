@@ -12,14 +12,6 @@ public enum DocumentType {
      */
     ARTIFACT_TREE,
     /**
-     * Document containing AND & OR nodes
-     */
-    FTA,
-    /**
-     * Document containing context, goals, strategies, and evidence.
-     */
-    SAFETY_CASE,
-    /**
      * Document being represented in a table.
      */
     FMEA;

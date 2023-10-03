@@ -6,14 +6,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.FTAType;
-import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
@@ -25,7 +21,6 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -65,8 +60,6 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final UserProjectMembershipRepository userProjectMembershipRepository;
-    private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     private final ProjectService projectService;
     private final CustomAttributeRepository customAttributeRepository;
     private final AttributeSystemServiceProvider attributeSystemServiceProvider;
@@ -95,8 +88,6 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactVersionRepository = serviceProvider.getArtifactVersionRepository();
         this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
-        this.userProjectMembershipRepository = serviceProvider.getUserProjectMembershipRepository();
-        this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
         this.customAttributeRepository = customAttributeRepository;
         this.attributeSystemServiceProvider = attributeSystemServiceProvider;
         this.versionService = serviceProvider.getVersionService();
@@ -367,34 +358,6 @@ public class DbEntityBuilder extends AbstractBuilder {
             score
         );
         this.traceLinkVersionRepository.save(traceLinkVersion);
-        return this;
-    }
-
-    public DbEntityBuilder newFtaArtifact(Artifact artifact,
-                                          DocumentType documentType,
-                                          FTAType ftaType
-    ) {
-        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
-        artifactAppEntity.setDocumentType(documentType);
-        artifactAppEntity.setLogicType(ftaType);
-        artifactVersionRepositoryImpl.createOrUpdateDocumentNodeInformation(
-            artifactAppEntity,
-            artifact
-        );
-        return this;
-    }
-
-    public DbEntityBuilder newSafetyArtifact(Artifact artifact,
-                                             DocumentType documentType,
-                                             SafetyCaseType safetyCaseType
-    ) {
-        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
-        artifactAppEntity.setDocumentType(documentType);
-        artifactAppEntity.setSafetyCaseType(safetyCaseType);
-        artifactVersionRepositoryImpl.createOrUpdateDocumentNodeInformation(
-            artifactAppEntity,
-            artifact
-        );
         return this;
     }
 

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import edu.nd.crc.safa.features.artifacts.entities.FTAType;
-import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -90,26 +88,6 @@ public class ProjectBuilder {
         return this;
     }
 
-    public ProjectBuilder withFtaArtifact(FTAType ftaType) {
-        String typeName = ftaType.toString();
-        String artifactName = this.getNextArtifactName(typeName);
-        this.withArtifact(artifactName, typeName, DocumentType.FTA);
-        Artifact artifact = this.dbEntityBuilder.getArtifact(projectName, artifactName);
-        this.dbEntityBuilder
-            .newFtaArtifact(artifact, DocumentType.FTA, ftaType);
-        return this;
-    }
-
-    public ProjectBuilder withSafetyArtifact(SafetyCaseType safetyCaseType) {
-        String typeName = safetyCaseType.toString();
-        String artifactName = this.getNextArtifactName(typeName);
-        this.withArtifact(artifactName, typeName, DocumentType.SAFETY_CASE);
-        Artifact artifact = this.dbEntityBuilder.getArtifact(projectName, artifactName);
-        this.dbEntityBuilder
-            .newSafetyArtifact(artifact, DocumentType.SAFETY_CASE, safetyCaseType);
-        return this;
-    }
-
     public ArtifactType getOrCreateType(String artifactType) {
         Map<String, ArtifactType> projectTypes = this.dbEntityBuilder
             .artifactTypes
@@ -127,7 +105,7 @@ public class ProjectBuilder {
 
     public String getNextArtifactName(String typeName) {
         ArtifactType artifactType = getOrCreateType(typeName);
-        String prefix = "" + artifactType.getName().toUpperCase().charAt(0);
+        String prefix = String.valueOf(artifactType.getName().toUpperCase().charAt(0));
 
         int nArtifactsInType = (int) this.artifactVersions
             .stream()

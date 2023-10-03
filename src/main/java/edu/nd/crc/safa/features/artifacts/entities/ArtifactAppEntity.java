@@ -68,16 +68,6 @@ public class ArtifactAppEntity implements IAppEntity {
     private DocumentType documentType = DocumentType.ARTIFACT_TREE;
 
     /**
-     * For safety case nodes, the type of safety case node.
-     */
-    private SafetyCaseType safetyCaseType;
-
-    /**
-     * For FTA logic nodes,  the logical operator of this node.
-     */
-    private FTAType logicType;
-
-    /**
      * List of document Ids this artifact belongs to.
      */
     private List<UUID> documentIds = new ArrayList<>();

@@ -12,8 +12,6 @@ import java.util.function.Consumer;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.FTAType;
-import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
@@ -50,16 +48,16 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                            DocumentType documentType,
                            List<ArtifactAppEntity> artifacts) {
         super(artifacts);
-        setPossibleNullArgument(this::setArtifactType, artifactType);
-        setPossibleNullArgument(this::setDocumentType, documentType);
+        setPossibleNullArgument(this::setArtifactType, artifactType, "artifactType");
+        setPossibleNullArgument(this::setDocumentType, documentType, "documentType");
     }
 
     public CsvArtifactFile(String artifactType,
                            DocumentType documentType,
                            String pathToFile) throws IOException {
         super(pathToFile, false);
-        setPossibleNullArgument(this::setArtifactType, artifactType);
-        setPossibleNullArgument(this::setDocumentType, documentType);
+        setPossibleNullArgument(this::setArtifactType, artifactType, "artifactType");
+        setPossibleNullArgument(this::setDocumentType, documentType, "documentType");
         this.parseEntities();
     }
 
@@ -67,8 +65,8 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                            DocumentType documentType,
                            MultipartFile file) throws IOException {
         super(file, false);
-        setPossibleNullArgument(this::setArtifactType, artifactType);
-        setPossibleNullArgument(this::setDocumentType, documentType);
+        setPossibleNullArgument(this::setArtifactType, artifactType, "artifactType");
+        setPossibleNullArgument(this::setDocumentType, documentType, "documentType");
         this.parseEntities();
     }
 
@@ -125,10 +123,6 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 return artifact.getBody();
             case Constants.SUMMARY_PARAM:
                 return artifact.getSummary();
-            case Constants.LOGIC_TYPE_PARAM:
-                return artifact.getLogicType() == null ? null : artifact.getLogicType().toString();
-            case Constants.SAFETY_CASE_TYPE_PARAM:
-                return artifact.getSafetyCaseType() == null ? null : artifact.getSafetyCaseType().toString();
             default:
                 Map<String, JsonNode> attributes = artifact.getAttributes();
                 return attributes.containsKey(header) ? attributes.get(header).toString() : null;
@@ -169,22 +163,6 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 DocumentType.ARTIFACT_TREE,
                 recordAttributes
             );
-
-            if (this.documentType == DocumentType.SAFETY_CASE) {
-                // Read optional FTA logic type
-                readAndSetOptionalProperty(
-                    SafetyCaseType.class,
-                    entityRecord.get(Constants.SAFETY_CASE_TYPE_PARAM),
-                    artifactAppEntity::setSafetyCaseType);
-            }
-
-            if (this.documentType == DocumentType.FTA) {
-                // Read optional safety case type
-                readAndSetOptionalProperty(
-                    FTAType.class,
-                    entityRecord.get(Constants.LOGIC_TYPE_PARAM),
-                    artifactAppEntity::setLogicType);
-            }
 
             return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {
@@ -265,18 +243,9 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         }
     }
 
-    private <T extends Enum<T>> void readAndSetOptionalProperty(Class<T> enumClass,
-                                                                String enumValue,
-                                                                Consumer<T> valueSetter) {
-        if (enumValue != null && enumValue.length() > 0) {
-            T value = enumClass.getEnumConstants()[0].valueOf(enumClass, enumValue);
-            valueSetter.accept(value);
-        }
-    }
-
-    public <T> void setPossibleNullArgument(Consumer<T> argumentSetter, T argument) {
+    public <T> void setPossibleNullArgument(Consumer<T> argumentSetter, T argument, String name) {
         if (argument == null) {
-            throw new IllegalArgumentException(argument + "cannot be null.");
+            throw new IllegalArgumentException(name + " cannot be null.");
         }
         argumentSetter.accept(argument);
     }
@@ -286,12 +255,9 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         public static final String NAME_PARAM = "id";
         public static final String SUMMARY_PARAM = "summary";
         public static final String CONTENT_PARAM = "content";
-        public static final String LOGIC_TYPE_PARAM = "logic_type";
-        public static final String SAFETY_CASE_TYPE_PARAM = "safety_case_type";
 
         public static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, CONTENT_PARAM};
-        public static final String[] ALL_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM,
-            LOGIC_TYPE_PARAM, SAFETY_CASE_TYPE_PARAM};
+        public static final String[] ALL_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
 
         public static final Set<String> ALL_COLUMNS_SET = new HashSet<>(List.of(ALL_COLUMNS));
     }

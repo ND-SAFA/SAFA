@@ -34,6 +34,14 @@ public class TestAddArtifactSync extends AbstractSyncTest {
             NotificationAction.UPDATE);
         this.changeMessageVerifies.verifyWarningMessage(message);
         this.changeMessageVerifies.verifyUpdateLayout(message, true);
+        message.getChanges().forEach(c -> {
+            c.getEntities().forEach(e -> {
+                if (e instanceof ArtifactAppEntity) {
+                    UUID artifactId = ((ArtifactAppEntity) e).getId();
+                    c.getEntityIds().add(artifactId);
+                }
+            });
+        });
     }
 
     @Override

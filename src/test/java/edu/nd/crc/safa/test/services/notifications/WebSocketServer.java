@@ -56,7 +56,8 @@ public class WebSocketServer {
                 })
             .get(30, SECONDS);
         if (idToSession.containsKey(clientId)) {
-            throw new SafaError("Attempting to override session");
+            String error = String.format("Attempting to override session, Client %s has session.", clientId);
+            throw new SafaError(error);
         }
         idToSession.put(clientId, session);
         idToQueue.put(clientId, new LinkedBlockingDeque<>());
@@ -83,10 +84,14 @@ public class WebSocketServer {
      * @return List of messages.
      * @throws InterruptedException If interrupted during sleep.
      */
-    public List<String> getMessages(UUID clientId, int timeToPoll) throws InterruptedException {
-        assertClientExists(clientId);
-        Thread.sleep(timeToPoll);
-        return new ArrayList<>(idToQueue.get(clientId));
+    public List<String> getMessages(UUID clientId, int timeToPoll) {
+        try {
+            assertClientExists(clientId);
+            Thread.sleep(timeToPoll);
+            return new ArrayList<>(idToQueue.get(clientId));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -146,8 +151,8 @@ public class WebSocketServer {
     /**
      * Subscribe clientId to destination, storing messages from a topic in the queue.
      *
-     * @param clientId    The client subscribing to messages.
-     * @param destination The destionation to subscribe to.
+     * @param clientId    Unique identifier for user.
+     * @param destination The destination to subscribe to.
      */
     public void subscribe(UUID clientId, String destination) {
         assertClientExists(clientId);

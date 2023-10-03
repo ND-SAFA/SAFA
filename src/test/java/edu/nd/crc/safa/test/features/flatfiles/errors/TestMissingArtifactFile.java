@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.jobs.logging.services.JobLoggingService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.test.features.jobs.base.AbstractUpdateProjectViaFlatFileTest;
+import edu.nd.crc.safa.test.features.jobs.base.AbstractUpdateProjectViaFlatFileTestCommonRequests;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Test that project with missing artifact file propagates error.
  */
-class TestMissingArtifactFile extends AbstractUpdateProjectViaFlatFileTest {
+class TestMissingArtifactFile extends AbstractUpdateProjectViaFlatFileTestCommonRequests {
 
     @Autowired
     JobService jobService;

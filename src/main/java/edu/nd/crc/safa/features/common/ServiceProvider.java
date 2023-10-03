@@ -17,7 +17,6 @@ import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.CheckArtifactNameService;
 import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
-import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
@@ -125,7 +124,6 @@ public class ServiceProvider {
     private final DocumentArtifactRepository documentArtifactRepository;
     // Flat Files
     private final FileUploadService fileUploadService;
-    private final FlatFileService flatFileService;
     private final FileDownloadService fileDownloadService;
     private final ZipFileService zipFileService;
     private final CheckArtifactNameService checkArtifactNameService;

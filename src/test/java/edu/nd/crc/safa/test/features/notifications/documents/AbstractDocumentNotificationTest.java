@@ -8,7 +8,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.features.notifications.AbstractNotificationTest;
 
@@ -26,13 +25,15 @@ public abstract class AbstractDocumentNotificationTest extends AbstractNotificat
 
     protected void createDocumentAndVerifyMessage() throws Exception {
         this.createDocument();
-        EntityChangeMessage message = this.notificationService.getEntityMessage(sharee);
-        this.changeMessageVerifies.verifyDocumentChange(
-            message,
-            this.documentId,
-            NotificationAction.UPDATE
-        );
-        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+        this.rootBuilder.notifications(n -> n.getEntityMessage(sharee))
+            .consume(m -> {
+                this.changeMessageVerifies.verifyDocumentChange(
+                    m,
+                    this.documentId,
+                    NotificationAction.UPDATE
+                );
+                this.changeMessageVerifies.verifyUpdateLayout(m, false);
+            });
     }
 
     protected void createDocument() throws Exception {

@@ -18,7 +18,7 @@ import edu.nd.crc.safa.features.notifications.builders.AbstractEntityChangeBuild
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.builders.ProjectVersionChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -77,8 +77,8 @@ public class ProjectChanger {
             .commitAllAppEntitiesToProjectVersion(projectVersion, artifacts, true, user);
         List<Pair<TraceLinkVersion, CommitError>> traceResponse = serviceProvider.getTraceLinkVersionRepository()
             .commitAllAppEntitiesToProjectVersion(projectVersion, traces, true, user);
-        saveCommitErrors(artifactResponse, ProjectEntity.ARTIFACTS);
-        saveCommitErrors(traceResponse, ProjectEntity.TRACES);
+        saveCommitErrors(artifactResponse, ProjectEntityType.ARTIFACTS);
+        saveCommitErrors(traceResponse, ProjectEntityType.TRACES);
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
         layoutManager.generateLayoutForProject();
@@ -89,11 +89,11 @@ public class ProjectChanger {
     }
 
     private <T> void saveCommitErrors(List<Pair<T, CommitError>> commitResponse,
-                                      ProjectEntity projectEntity) {
+                                      ProjectEntityType projectEntityType) {
         for (Pair<T, CommitError> payload : commitResponse) {
             CommitError commitError = payload.getValue1();
             if (commitError != null) {
-                commitError.setApplicationActivity(projectEntity);
+                commitError.setApplicationActivity(projectEntityType);
                 this.serviceProvider
                     .getCommitErrorRepository()
                     .save(commitError);

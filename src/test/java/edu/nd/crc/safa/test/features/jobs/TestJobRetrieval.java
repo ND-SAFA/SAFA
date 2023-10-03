@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.jobs.entities.jobs.HGenJob;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
-import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.services.requests.CommonProjectRequests;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +43,13 @@ class TestJobRetrieval extends ApplicationBaseTest {
         assertJobs(project, 1, 1);
 
         // Setup new user
-        this.authorizationService.createUser(otherUserName, otherPassword);
-        creationService.shareProject(project, otherUserName, ProjectRole.VIEWER);
-        authorizationService.loginUser(otherUserName, otherPassword);
+        this.rootBuilder
+            .log("Creating new user")
+            .authorize(a -> a.createUser(otherUserName, otherPassword))
+            .and("Sharing project with new user")
+            .request(r -> r.project().shareProject(project, otherUserName, ProjectRole.VIEWER))
+            .and("Setting current user as the new user.")
+            .authorize(a -> a.loginUser(otherUserName, otherPassword));
 
         assertJobs(project, 0, 1);
     }
@@ -63,8 +67,8 @@ class TestJobRetrieval extends ApplicationBaseTest {
     }
 
     private void assertJobs(Project project, int nUser, int nProject) throws Exception {
-        List<JobAppEntity> userJobs = CommonRequestService.Project.getUserJobs();
-        List<JobAppEntity> projectJobs = CommonRequestService.Project.getProjectJobs(project);
+        List<JobAppEntity> userJobs = CommonProjectRequests.getUserJobs();
+        List<JobAppEntity> projectJobs = CommonProjectRequests.getProjectJobs(project);
 
         assertEquals(nUser, userJobs.size(), "User Jobs");
         assertEquals(nProject, projectJobs.size(), "Project Jobs");

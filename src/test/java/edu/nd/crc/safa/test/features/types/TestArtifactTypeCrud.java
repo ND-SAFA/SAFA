@@ -35,8 +35,8 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
         assertThat(retrievedEntity.getIcon()).isNotNull();
     }
 
-    protected void verifyCreationMessage(EntityChangeMessage message) {
-        verifyUpdateMessage(message);
+    protected void verifyCreationMessages(List<EntityChangeMessage> messages) {
+        verifyUpdateMessages(messages);
     }
 
     protected void updateEntity() throws Exception {
@@ -52,7 +52,8 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
         assertThat(retrievedEntity.getIcon()).isEqualTo(Constants.newIconName);
     }
 
-    protected void verifyUpdateMessage(EntityChangeMessage message) {
+    protected void verifyUpdateMessages(List<EntityChangeMessage> messages) {
+        EntityChangeMessage message = messages.get(0);
         assertThat(message.getChanges()).hasSize(1);
         this.changeMessageVerifies.verifyTypeChange(message,
             entityId,
@@ -67,7 +68,9 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
             .deleteWithJsonObject();
     }
 
-    protected void verifyDeletionMessage(EntityChangeMessage message) {
+    protected void verifyDeletionMessages(List<EntityChangeMessage> messages) {
+        assertThat(messages).hasSize(1);
+        EntityChangeMessage message = messages.get(0);
         assertThat(message.getChanges()).hasSize(1);
         this.changeMessageVerifies.verifyTypeChange(message,
             entityId,
@@ -77,12 +80,17 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
 
     @Override
     protected void onPostSubscribe() throws Exception {
-        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
+        this.rootBuilder
+            .notifications(n -> n.getEntityMessage(currentUser)).save("root-project-members")
+            .and()
+            .verify((s, v) -> v.notifications(n -> n.verifyMemberNotification(s.getMessage("root-project-members"),
+                List.of(currentUserName))));
     }
 
     @Override
-    protected String getTopic() {
-        return TopicCreator.getProjectTopic(this.project.getProjectId());
+    protected List<String> getTopic() {
+        String topic = TopicCreator.getProjectTopic(this.project.getProjectId());
+        return List.of(topic);
     }
 
     protected TypeService getAppService() {

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import jakarta.transaction.Transactional;
-
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeExtraInfoType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
@@ -16,9 +14,14 @@ import edu.nd.crc.safa.features.attributes.entities.db.definitions.SelectionAttr
 import edu.nd.crc.safa.features.attributes.repositories.definitions.FloatAttributeInfoRepository;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.IntegerAttributeInfoRepository;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.SelectionAttributeOptionRepository;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +30,11 @@ import org.springframework.stereotype.Service;
  * attributes, particularly with translating between back-end and front-end
  * representations of attribute definitions.
  */
+@AllArgsConstructor
 @Service
 public class AttributeService {
-
+    private final NotificationService notificationService;
     private final AttributeSystemServiceProvider serviceProvider;
-
-    public AttributeService(AttributeSystemServiceProvider serviceProvider) {
-        this.serviceProvider = serviceProvider;
-    }
 
     /**
      * Creates a front-end attribute representation from a back-end attribute representation.
@@ -281,7 +281,7 @@ public class AttributeService {
      *                   that key was found withing the project.
      */
     @Transactional
-    public void saveEntity(CustomAttributeAppEntity appEntity, Project project, boolean isNew) {
+    public void saveEntity(SafaUser user, Project project, CustomAttributeAppEntity appEntity, boolean isNew) {
         CustomAttribute newAttribute = customAttributeFromAppEntity(appEntity);
         newAttribute.setProject(project);
 
@@ -305,6 +305,10 @@ public class AttributeService {
 
         newAttribute = serviceProvider.getCustomAttributeRepository().save(newAttribute);
         saveExtraInfo(newAttribute, appEntity);
+
+        this.notificationService.broadcastChange(
+            EntityChangeBuilder.create(user, project).withAttributeUpdate(appEntity)
+        );
     }
 
     /**

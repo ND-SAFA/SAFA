@@ -82,8 +82,6 @@ public class DocumentController extends BaseDocumentController {
             projectVersion,
             document,
             documentAppEntity.getArtifactIds());
-        List<UUID> affectedArtifactIds =
-            new ArrayList<>(documentAppEntity.getArtifactIds());
 
         // Create or update: columns
         documentService.updateFMEAColumns(documentAppEntity, document);
@@ -93,10 +91,11 @@ public class DocumentController extends BaseDocumentController {
         documentAppEntity.setLayout(documentLayout);
 
         // Update version subscribers
-        notificationService.broadcastChange(
-            EntityChangeBuilder.create(user, project)
-                .withDocumentUpdate(List.of(document.getDocumentId()))
-                .withArtifactsUpdate(affectedArtifactIds)
+        this.documentService.broadcastDocumentChange(
+            user,
+            projectVersion,
+            document,
+            new ArrayList<>()
         );
 
         return documentAppEntity;

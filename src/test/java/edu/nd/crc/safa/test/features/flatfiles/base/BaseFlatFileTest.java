@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -108,7 +108,7 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
         CommitError error = verifyNumberOfItems("Trace Errors",
             () -> commitErrorRepository.findByProjectVersion(projectVersion),
             1).get(0);
-        assertThat(error.getApplicationActivity()).isEqualTo(ProjectEntity.TRACES);
+        assertThat(error.getApplicationActivity()).isEqualTo(ProjectEntityType.TRACES);
         assertThat(error.getDescription()).contains("FX1");
 
         // VP - Verify that remaining links were created.

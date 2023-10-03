@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.notifications.entities.Change;
-import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -48,11 +47,24 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactOptional).isPresent();
 
         // Step - Subscribe to version updates as other member
-        notificationService.initializeUser(currentUser, this.token);
-        notificationService.subscribeToProject(currentUser, projectVersion.getProject());
-        notificationService.subscribeToVersion(currentUser, projectVersion);
+        this.rootBuilder
+            .store(s -> s
+                .save("token", this.token))
+            .and("Subscribe user to project and version.")
+            .notifications((s, n) -> n
+                .initializeUser(currentUser, s.getString("token"))
+                .subscribeToProject(currentUser, projectVersion.getProject())
+                .subscribeToVersion(currentUser, projectVersion)
+            )
+            .and("Retrieve active members on project.")
+            .notifications(n -> n
+                .getEntityMessage(currentUser)).save("root-project-message")
+            .and("Verify that root is single active user.")
+            .verify((s, v) -> v
+                .notifications(n -> n
+                    .verifyMemberNotification(s.getMessage("root-project-message"),
+                        List.of(currentUserName))));
 
-        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
 
         // Step - Request artifact is removed from document
         String route = RouteBuilder
@@ -68,26 +80,27 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactList).isEmpty();
 
         // VP - Verify that 2 changes are detected (document + artifacts).
-        EntityChangeMessage message = notificationService.getEntityMessage(currentUser); //TODO: fails on rare occasions
-        assertThat(message.getChanges()).hasSize(2);
+        this.rootBuilder
+            .notifications(n -> n.getEntityMessage(currentUser))
+            .consume(m -> {
+                // VP - Verify that 2 changes made
+                assertThat(m.getChanges()).hasSize(2);
+                List<NotificationEntity> changedEntities =
+                    m.getChanges().stream().map(Change::getEntity).collect(Collectors.toList());
+                assertThat(changedEntities)
+                    .contains(NotificationEntity.DOCUMENT)
+                    .contains(NotificationEntity.ARTIFACTS);
 
-        // VP - Verify that change is for a deleted member
-        List<NotificationEntity> changedEntities =
-            message.getChanges().stream().map(Change::getEntity).collect(Collectors.toList());
-        Change change = message.getChanges().get(0);
-        assertThat(changedEntities)
-            .contains(NotificationEntity.DOCUMENT)
-            .contains(NotificationEntity.ARTIFACTS);
+                // VP - Verify document change has action: UPDATE
+                Change documentChange = m.getChangeForEntity(NotificationEntity.DOCUMENT);
+                assertThat(documentChange.getAction()).isEqualTo(NotificationAction.UPDATE);
+                assertThat(documentChange.getEntities()).hasSize(1);
 
-        // VP - Verify document change has action: UPDATE
-        Change documentChange = message.getChangeForEntity(NotificationEntity.DOCUMENT);
-        assertThat(documentChange.getAction()).isEqualTo(NotificationAction.UPDATE);
-        assertThat(documentChange.getEntityIds()).hasSize(1);
-
-        // VP - Verify that artifact change has action: UPDATE
-        Change artifactChange = message.getChangeForEntity(NotificationEntity.ARTIFACTS);
-        assertThat(artifactChange.getAction()).isEqualTo(NotificationAction.UPDATE);
-        assertThat(artifactChange.getEntityIds()).hasSize(1);
+                // VP - Verify that artifact change has action: UPDATE
+                Change artifactChange = m.getChangeForEntity(NotificationEntity.ARTIFACTS);
+                assertThat(artifactChange.getAction()).isEqualTo(NotificationAction.UPDATE);
+                assertThat(artifactChange.getEntities()).hasSize(1);
+            });
     }
 
     public ProjectVersion createProjectData() {

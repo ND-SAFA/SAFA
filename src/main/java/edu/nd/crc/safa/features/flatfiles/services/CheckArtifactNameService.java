@@ -34,6 +34,9 @@ public class CheckArtifactNameService {
         boolean artifactExists = false;
         if (artifactQuery.isPresent()) {
             UUID artifactId = artifactQuery.get().getArtifactId();
+            if (artifactId == null) {
+                return false;
+            }
             Optional<ArtifactVersion> artifactVersionQuery =
                 this.artifactVersionRepository.findVersionEntityByProjectVersionAndBaseEntityId(
                     projectVersion,

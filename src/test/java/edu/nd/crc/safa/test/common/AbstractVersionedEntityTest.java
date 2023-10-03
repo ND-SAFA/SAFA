@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * Tests that versioned entities are correctly tracked across different forms of
  * modification.
  *
- * @param <T> AppEntity data type
+ * @param <T>  AppEntity data type
  * @param <TV> Versioned data type
  */
 public abstract class AbstractVersionedEntityTest<T extends IAppEntity, TV extends IVersionEntity<T>>
@@ -139,9 +139,9 @@ public abstract class AbstractVersionedEntityTest<T extends IAppEntity, TV exten
      */
     protected Pair<ProjectVersion, ProjectVersion> setupProject() {
         dbEntityBuilder
-                .newProject(projectName)
-                .newVersion(projectName)
-                .newVersion(projectName);
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newVersion(projectName);
 
         ProjectVersion beforeVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         ProjectVersion afterVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
@@ -150,21 +150,10 @@ public abstract class AbstractVersionedEntityTest<T extends IAppEntity, TV exten
     }
 
     /**
-     * Used to condense code for committing changes to a project version.
-     *
-     * @param <T> Entity type
-     * @param <TV> Entity version type
-     */
-    @FunctionalInterface
-    private interface ChangeEntityForCommit<T extends IAppEntity, TV extends IVersionEntity<T>> {
-        void applyChange(CommitBuilder commitBuilder, TV entity);
-    }
-
-    /**
      * Applies a generic change to an entity based on the changeFunction and then commits it to
      * the project version.
      *
-     * @param entity The entity to change
+     * @param entity         The entity to change
      * @param projectVersion The version in which to make the change
      * @param changeFunction The function to use to apply the change
      * @throws Exception When committing a change fails
@@ -198,7 +187,7 @@ public abstract class AbstractVersionedEntityTest<T extends IAppEntity, TV exten
      * may or may not exist depending on whether some form of modification to the entity was
      * applied in that project version.
      *
-     * @param entity The entity in question
+     * @param entity         The entity in question
      * @param projectVersion The project version to look in
      * @return The entity in the given project version, if it exists
      */
@@ -209,7 +198,7 @@ public abstract class AbstractVersionedEntityTest<T extends IAppEntity, TV exten
      * committed.
      *
      * @param commitBuilder A builder for the commit that will be applied
-     * @param entity The entity to modify
+     * @param entity        The entity to modify
      */
     protected abstract void modifyEntityInCommit(CommitBuilder commitBuilder, TV entity);
 
@@ -217,7 +206,7 @@ public abstract class AbstractVersionedEntityTest<T extends IAppEntity, TV exten
      * Stores the removal of a particular entity within the commit builder.
      *
      * @param commitBuilder A builder for the commit that will be applied
-     * @param entity The entity to remove
+     * @param entity        The entity to remove
      */
     protected abstract void removeEntityInCommit(CommitBuilder commitBuilder, TV entity);
 
@@ -234,5 +223,16 @@ public abstract class AbstractVersionedEntityTest<T extends IAppEntity, TV exten
      * @param entity The entity to check
      */
     protected abstract void verifyNoChangeToEntity(TV entity);
+
+    /**
+     * Used to condense code for committing changes to a project version.
+     *
+     * @param <T>  Entity type
+     * @param <TV> Entity version type
+     */
+    @FunctionalInterface
+    private interface ChangeEntityForCommit<T extends IAppEntity, TV extends IVersionEntity<T>> {
+        void applyChange(CommitBuilder commitBuilder, TV entity);
+    }
 
 }

@@ -6,8 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
@@ -20,6 +22,7 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -42,6 +45,7 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
     private final DocumentColumnRepository documentColumnRepository;
     private final NotificationService notificationService;
     private final ArtifactPositionService artifactPositionService;
+    private final ArtifactService artifactService;
 
     /**
      * Returns list of documents in given project
@@ -216,5 +220,20 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
         } else {
             throw new IllegalArgumentException("Could not find document with id:" + documentId);
         }
+    }
+
+    public void broadcastDocumentChange(SafaUser user, ProjectVersion projectVersion, Document document,
+                                        List<UUID> removedArtifactIds) {
+        DocumentAppEntity documentAppEntity = this.createDocumentAppEntity(document, projectVersion);
+        List<UUID> documentArtifactIds = documentAppEntity.getArtifactIds();
+        documentArtifactIds.addAll(removedArtifactIds); // Artifacts updates with new relationships to documents.
+        List<ArtifactAppEntity> documentArtifacts = artifactService
+            .getAppEntitiesByIds(projectVersion, documentAppEntity.getArtifactIds());
+        this.notificationService.broadcastChange(
+            EntityChangeBuilder
+                .create(user, projectVersion)
+                .withDocumentUpdate(List.of(documentAppEntity))
+                .withArtifactsUpdate(documentArtifacts)
+        );
     }
 }

@@ -5,7 +5,6 @@ import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.builders.AbstractEntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.users.entities.IUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final SafaUserService safaUserService;
 
     /**
      * Sends message to user.

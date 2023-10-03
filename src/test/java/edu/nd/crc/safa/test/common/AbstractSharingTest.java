@@ -44,30 +44,44 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
         this.project = this.projectVersion.getProject();
 
         // Step
-        this.authorizationService.loginDefaultUser();
-        this.notificationService.initializeUser(currentUser, this.token);
-        this.notificationService.subscribeToProject(currentUser, this.project);
-
-        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
-
-        // Step - Create other user to share project with.
-        this.sharee = this.authorizationService.createUser(Sharee.email, Sharee.password);
-        String shareeToken = this.authorizationService.loginUser(Sharee.email, Sharee.password);
-
-        this.authorizationService.loginDefaultUser();
-
-        // Step - Share project with sharee
-        creationService.shareProject(
-            this.projectVersion.getProject(),
-            Sharee.email,
-            this.otherUserProjectRole);
-
-        // Step - Subscribe Sharee to project  notifications
-        notificationService.initializeUser(sharee, shareeToken);
-        notificationService.subscribeToProject(sharee, project);
-        notificationService.subscribeToVersion(sharee, projectVersion);
-
-        this.assertionService.verifyActiveMembers(List.of(sharee, currentUser), this.notificationService);
+        this.rootBuilder
+            .store(s -> s.save("project", this.project).save("user", currentUser))
+            .and()
+            .authorize((s, a) -> a.loginDefaultUser())
+            .and()
+            .notifications((s, n) -> n
+                .initializeUser(currentUser, this.token)
+                .subscribeToProject(currentUser, s.getProject("project"))
+                .getEntityMessage(currentUser)).save("user-project-message")
+            .and()
+            .verify((s, v) -> v
+                .notifications(n -> n
+                    .verifyMemberNotification(s.getMessage("user-project-message"), List.of(currentUserName))))
+            .and()
+            .authorize((s, a) -> a
+                .createUser(Sharee.email, Sharee.password)
+                .save("sharee-user")
+                .and()
+                .loginUser(Sharee.email, Sharee.password)
+                .save("shareeToken"))
+            .and()
+            .authorize((s, a) -> a
+                .loginDefaultUser())
+            .and()
+            .request((s, r) -> r.project().shareProject(s.getProject("project"), Sharee.email,
+                this.otherUserProjectRole))
+            .and()
+            .notifications((s, n) -> n
+                .initializeUser(s.getIUser("sharee-user"), s.getString("shareeToken"))
+                .subscribeToProject(s.getIUser("sharee-user"), s.getProject("project"))
+                .subscribeToVersion(s.getIUser("sharee-user"), projectVersion)
+                .getEntityMessage(s.getIUser("sharee-user")))
+            .save("sharee-project-message")
+            .and()
+            .verify((s, v) -> v
+                .notifications(n -> n
+                    .verifyMemberNotification(s.getMessage("sharee-project-message"),
+                        List.of(currentUserName, Sharee.email))));
     }
 
     /**

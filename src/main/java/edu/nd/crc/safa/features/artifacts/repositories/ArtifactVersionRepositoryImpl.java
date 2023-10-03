@@ -23,7 +23,7 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
@@ -102,8 +102,8 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    protected ProjectEntity getProjectActivity() {
-        return ProjectEntity.ARTIFACTS;
+    protected ProjectEntityType getProjectActivity() {
+        return ProjectEntityType.ARTIFACTS;
     }
 
     @Override

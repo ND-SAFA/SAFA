@@ -16,9 +16,9 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.services.MappingTestService;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONObject;

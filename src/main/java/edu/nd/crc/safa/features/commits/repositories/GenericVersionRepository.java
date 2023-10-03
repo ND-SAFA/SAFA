@@ -21,7 +21,7 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -99,13 +99,12 @@ public abstract class GenericVersionRepository<
     public Map<UUID, List<VersionEntity>> createVersionEntityMap(ProjectVersion projectVersion,
                                                                  List<UUID> baseEntityIds) {
         Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
-        addToVersionEntityMap(projectVersion, entityHashTable, baseEntityIds);
+        addToVersionEntityMap(entityHashTable, baseEntityIds);
         return entityHashTable;
     }
 
-    public Map<UUID, List<VersionEntity>> addToVersionEntityMap(ProjectVersion projectVersion,
-                                                                Map<UUID, List<VersionEntity>> entityHashTable,
-                                                                List<UUID> baseEntityIds) {
+    private Map<UUID, List<VersionEntity>> addToVersionEntityMap(Map<UUID, List<VersionEntity>> entityHashTable,
+                                                                 List<UUID> baseEntityIds) {
         if (baseEntityIds.contains(null)) {
             throw new SafaError("Expected all values to be valid version entity ids, found null.");
         }
@@ -269,7 +268,7 @@ public abstract class GenericVersionRepository<
                 .map(BaseEntity::getBaseEntityId)
                 .collect(Collectors.toList());
 
-            addToVersionEntityMap(projectVersion, entityHashTable, deletedBaseEntityIds);
+            addToVersionEntityMap(entityHashTable, deletedBaseEntityIds);
 
             List<Pair<VersionEntity, CommitError>> removedVersionEntities = deletedBaseEntityIds
                 .stream()
@@ -327,7 +326,7 @@ public abstract class GenericVersionRepository<
     private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
                                                                 VersionEntityAction<VersionEntity> versionEntityAction,
                                                                 UUID entityName,
-                                                                ProjectEntity projectEntity) {
+                                                                ProjectEntityType projectEntityType) {
         String errorDescription = null;
         VersionEntity versionEntity = null;
         CommitError commitError = null;
@@ -347,7 +346,7 @@ public abstract class GenericVersionRepository<
             errorDescription = e.getMessage();
         }
         if (errorDescription != null) {
-            commitError = new CommitError(projectVersion, errorDescription, projectEntity);
+            commitError = new CommitError(projectVersion, errorDescription, projectEntityType);
         }
         return new Pair<>(versionEntity, commitError);
     }
@@ -476,7 +475,7 @@ public abstract class GenericVersionRepository<
      *
      * @return ProjectEntity associated with this repository.
      */
-    protected abstract ProjectEntity getProjectActivity();
+    protected abstract ProjectEntityType getProjectActivity();
 
     /**
      * Given a VersionEntity this methods returns an optional possibly containing the source entity this

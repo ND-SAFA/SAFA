@@ -1,8 +1,10 @@
 package edu.nd.crc.safa.test.features.attributes.crud;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -17,9 +19,9 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.features.attributes.AttributesForTesting;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +41,14 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
         for (CustomAttributeType attributeType : CustomAttributeType.values()) {
             currentType = attributeType;
             super.testCrud();
-            this.notificationService.clearServer();
+            this.rootBuilder.clear();
         }
     }
 
     @Override
-    protected String getTopic() {
-        return TopicCreator.getVersionTopic(projectVersion.getVersionId());
+    protected List<String> getTopic() {
+        String topic = TopicCreator.getVersionTopic(projectVersion.getVersionId());
+        return List.of(topic);
     }
 
     @Override
@@ -87,8 +90,9 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     }
 
     @Override
-    protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        changeMessageVerifies.verifyArtifactMessage(creationMessage, currentId, NotificationAction.UPDATE);
+    protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
+        assertThat(creationMessages).hasSize(1);
+        changeMessageVerifies.verifyArtifactMessage(creationMessages.get(0), currentId, NotificationAction.UPDATE);
     }
 
     @Override
@@ -117,8 +121,9 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     }
 
     @Override
-    protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        changeMessageVerifies.verifyArtifactMessage(updateMessage, currentId, NotificationAction.UPDATE);
+    protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
+        assertThat(updateMessages).hasSize(1);
+        changeMessageVerifies.verifyArtifactMessage(updateMessages.get(0), currentId, NotificationAction.UPDATE);
     }
 
     @Override
@@ -138,8 +143,8 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     }
 
     @Override
-    protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        changeMessageVerifies.verifyArtifactMessage(deletionMessage, currentId, NotificationAction.DELETE);
+    protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
+        assertThat(deletionMessages).hasSize(1);
+        changeMessageVerifies.verifyArtifactMessage(deletionMessages.get(0), currentId, NotificationAction.DELETE);
     }
-
 }

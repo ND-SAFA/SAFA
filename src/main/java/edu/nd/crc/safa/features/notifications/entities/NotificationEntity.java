@@ -11,6 +11,8 @@ public enum NotificationEntity {
     TYPES,
     DOCUMENT,
     ARTIFACTS,
+    LAYOUT,
+    ATTRIBUTES,
     TRACES,
     WARNINGS,
     JOBS,

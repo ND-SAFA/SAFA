@@ -115,20 +115,24 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return postWithResponseParser(body, ResponseParser::arrayCreator);
     }
 
-    public JSONObject postWithJsonObject(Object body) throws Exception {
+    public JSONObject postWithJsonObject(Object body) {
         return postWithResponseParser(body, ResponseParser::jsonCreator);
     }
 
-    public <T> T postWithJsonObject(Object body, Class<T> responseClass) throws Exception {
-        JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
-        return objectMapper.readValue(responseJson.toString(), responseClass);
+    public <T> T postWithJsonObject(Object body, Class<T> responseClass) {
+        try {
+            JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
+            return objectMapper.readValue(responseJson.toString(), responseClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
+    public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
     }
 
-    public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
+    public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) {
         return sendAuthenticatedRequest(
             put(this.buildEndpoint())
                 .content(stringify(body))
@@ -145,7 +149,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public <T> T postWithResponseParser(Object body,
                                         Function<String, T> responseParser,
-                                        ResultMatcher resultMatcher) throws Exception {
+                                        ResultMatcher resultMatcher) {
         return postWithResponseParser(
             body,
             responseParser,
@@ -154,7 +158,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         );
     }
 
-    private <T> T postWithResponseParser(Object body, Function<String, T> responseParser) throws Exception {
+    private <T> T postWithResponseParser(Object body, Function<String, T> responseParser) {
         return postWithResponseParser(
             body,
             responseParser,
@@ -165,7 +169,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
                                          Function<String, T> responseParser,
                                          ResultMatcher resultMatcher,
                                          Cookie localAuthorizationToken
-    ) throws Exception {
+    ) {
         return sendAuthenticatedRequest(
             post(this.buildEndpoint())
                 .content(stringify(body))
@@ -266,7 +270,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return deleteWithJsonObject(status().is2xxSuccessful());
     }
 
-    public JSONObject deleteWithJsonObject(ResultMatcher resultMatcher) throws Exception {
+    public JSONObject deleteWithJsonObject(ResultMatcher resultMatcher) {
         return sendAuthenticatedRequest(MockMvcRequestBuilders.delete(this.buildEndpoint()),
             resultMatcher,
             authorizationToken,
@@ -276,7 +280,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     protected <T> T sendAuthenticatedRequest(MockHttpServletRequestBuilder request,
                                              ResultMatcher test,
                                              Cookie authorizationToken,
-                                             Function<String, T> responseParser) throws Exception {
+                                             Function<String, T> responseParser) {
         if (authorizationToken != null) {
             request = request.cookie(authorizationToken);
         }
@@ -285,49 +289,56 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     protected <T> T sendRequestAndParseResponse(MockHttpServletRequestBuilder request,
                                                 ResultMatcher test,
-                                                Function<String, T> stringCreator) throws Exception {
+                                                Function<String, T> stringCreator) {
 
-        MvcResult requestResult = mockMvc
-            .perform(request)
-            .andDo(result -> {
-                if (!result.getRequest().isAsyncStarted()) {
-                    test.match(result);
+        try {
+            MvcResult requestResult = mockMvc
+                .perform(request)
+                .andDo(result -> {
+                    if (!result.getRequest().isAsyncStarted()) {
+                        test.match(result);
+                    }
+                })
+                .andReturn();
+
+            if (requestResult.getRequest().isAsyncStarted()) {
+                if (requestResult.getRequest().getAsyncContext() != null) {
+                    requestResult.getRequest().getAsyncContext().setTimeout(30000L);
                 }
-            })
-            .andReturn();
-
-        if (requestResult.getRequest().isAsyncStarted()) {
-            if (requestResult.getRequest().getAsyncContext() != null) {
-                requestResult.getRequest().getAsyncContext().setTimeout(30000L);
+                mockMvc.perform(asyncDispatch(requestResult))
+                    .andExpect(test);
             }
-            mockMvc.perform(asyncDispatch(requestResult))
-                .andExpect(test);
-        }
 
-        MockHttpServletResponse response = requestResult.getResponse();
-        String content = response.getContentAsString();
-        return stringCreator.apply(content);
+            MockHttpServletResponse response = requestResult.getResponse();
+            String content = response.getContentAsString();
+            return stringCreator.apply(content);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Optional<Cookie> sendPostRequestAndRetrieveCookie(Object body,
                                                              ResultMatcher test,
-                                                             String cookieName) throws Exception {
-        MvcResult requestResult = mockMvc
-            .perform(post(this.buildEndpoint())
-                .content(stringify(body))
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(test)
-            .andReturn();
+                                                             String cookieName) {
+        try {
+            MvcResult requestResult = mockMvc
+                .perform(post(this.buildEndpoint())
+                    .content(stringify(body))
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(test)
+                .andReturn();
+            MockHttpServletResponse response = requestResult.getResponse();
+            Cookie[] cookies = response.getCookies();
 
-        MockHttpServletResponse response = requestResult.getResponse();
-        Cookie[] cookies = response.getCookies();
+            if (cookies.length == 0) {
+                return Optional.empty();
+            }
 
-        if (cookies.length == 0) {
-            return Optional.empty();
+            return Arrays.stream(response.getCookies())
+                .filter(c -> c.getName().equals(cookieName))
+                .findFirst();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        return Arrays.stream(response.getCookies())
-            .filter(c -> c.getName().equals(cookieName))
-            .findFirst();
     }
 }

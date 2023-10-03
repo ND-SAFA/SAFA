@@ -8,8 +8,8 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
@@ -19,21 +19,25 @@ import org.springframework.test.web.servlet.ResultMatcher;
  * Responsible for providing utilities related to committing
  */
 public class CommitTestService {
-    ObjectMapper objectMapper = ObjectMapperConfig.create();
+    static ObjectMapper objectMapper = ObjectMapperConfig.create();
 
-    public ProjectCommitDefinition commit(CommitBuilder commitBuilder) throws Exception {
-        ProjectCommitDefinition commitRequest = commitBuilder.get();
-        JSONObject commitJson = commitWithStatus(commitBuilder, status().is2xxSuccessful());
-        ProjectCommitDefinition commitResponse = objectMapper.readValue(commitJson.toString(), ProjectCommitDefinition.class);
+    public static ProjectCommitDefinition commit(CommitBuilder commitBuilder) {
+        try {
+            ProjectCommitDefinition commitRequest = commitBuilder.get();
+            JSONObject commitJson = commitWithStatus(commitBuilder, status().is2xxSuccessful());
+            ProjectCommitDefinition commitResponse = objectMapper.readValue(commitJson.toString(), ProjectCommitDefinition.class);
 
-        for (ArtifactAppEntity artifact : commitResponse.getArtifactList(ModificationType.ADDED)) {
-            commitRequest.getArtifact(ModificationType.ADDED, artifact.getName()).setId(artifact.getId());
+            for (ArtifactAppEntity artifact : commitResponse.getArtifactList(ModificationType.ADDED)) {
+                commitRequest.getArtifact(ModificationType.ADDED, artifact.getName()).setId(artifact.getId());
+            }
+
+            return commitResponse;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        return commitResponse;
     }
 
-    public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
+    public static JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         return SafaRequest
             .withRoute(AppRoutes.Commits.COMMIT_CHANGE)

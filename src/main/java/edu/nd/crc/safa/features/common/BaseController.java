@@ -109,7 +109,7 @@ public abstract class BaseController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public SafaError handleGenericError(Exception ex) {
         ex.printStackTrace();
-        return new SafaError("An unexpected server error occurred.", ex);
+        return new SafaError(ex.getMessage(), ex);
     }
 
     private String createValidationMessage(ObjectError error) {
@@ -127,7 +127,7 @@ public abstract class BaseController {
      * Perform a deferred request which will make the request in the background.
      *
      * @param request The request to make.
-     * @param <T> The desired output type.
+     * @param <T>     The desired output type.
      * @return A deferred result that will perform the request.
      */
     protected <T> DeferredResult<T> makeDeferredRequest(Function<SafaUser, T> request) {
@@ -163,7 +163,7 @@ public abstract class BaseController {
      *
      * @param request The request to make.
      * @param timeout The timeout for the request.
-     * @param <T> The desired output type.
+     * @param <T>     The desired output type.
      * @return A deferred result that will perform the request.
      */
     protected <T> DeferredResult<T> makeDeferredRequest(Function<SafaUser, T> request, long timeout) {

@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -24,6 +26,7 @@ import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.services.MappingTestService;
+import edu.nd.crc.safa.test.services.builders.BuilderState;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,34 +35,42 @@ public class NotificationTestService {
     private static final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private static final int MAX_POLL_TIME = 35; // # of seconds to wait for a message until failing
     private static final int MIN_POLL_TIME = 1;
+    private final BuilderState state;
     private final WebSocketServer server;
 
-    public NotificationTestService(int port) {
-        this.server = new WebSocketServer(port);
+    public NotificationTestService(BuilderState state, int port) {
+        this.server = new WebSocketServer(port); // TODO: Does server go in state?
+        this.state = state;
     }
 
-    public List<EntityChangeMessage> getMessages(IUser user) throws InterruptedException {
-        List<String> messagesRaw = this.server.getMessages(getClientId(user), MIN_POLL_TIME);
-        return messagesRaw
+    public List<EntityChangeMessage> getMessages(IUser user) {
+        List<String> messagesRaw = this.server.getMessages(getClientId(user), MAX_POLL_TIME);
+        List<EntityChangeMessage> messages = messagesRaw
             .stream()
             .map(m -> MappingTestService.toClass(m, EntityChangeMessage.class))
             .peek(this::convertTypes)
             .collect(Collectors.toList());
+        this.clearQueue(user);
+        return messages;
     }
 
-    public EntityChangeMessage getEntityMessage(IUser user) throws JsonProcessingException,
-        InterruptedException {
-        EntityChangeMessage message = getNextMessage(getClientId(user), EntityChangeMessage.class);
-        convertTypes(message);
-        return message;
+    public EntityChangeMessage getEntityMessage(IUser user) {
+        try {
+            EntityChangeMessage message = getNextMessage(getClientId(user), EntityChangeMessage.class);
+            convertTypes(message);
+            return message;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     /**
      * Clears all web socket sessions.
      */
-    public void clearServer() {
+    public NotificationTestService clearServer() {
         this.server.clear();
+        return this;
     }
 
     /**
@@ -67,8 +78,9 @@ public class NotificationTestService {
      *
      * @param user The user to clear messages for.
      */
-    public void clearQueue(IUser user) {
+    public NotificationTestService clearQueue(IUser user) {
         this.server.clearQueue(getClientId(user));
+        return this;
     }
 
     /**
@@ -78,9 +90,14 @@ public class NotificationTestService {
      * @param token The user's authorization token.
      * @throws Exception If error occurs during network or parsing of messages.
      */
-    public void initializeUser(IUser user, String token) throws Exception {
-        this.startSession(user);
-        this.authenticate(user, token);
+    public NotificationTestService initializeUser(IUser user, String token) {
+        try {
+            this.startSession(user);
+            this.authenticate(user, token);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return this;
     }
 
     /**
@@ -92,6 +109,7 @@ public class NotificationTestService {
      * @throws InterruptedException    If interrupted during network calls.
      */
     public void authenticate(IUser user, String token) throws JsonProcessingException, InterruptedException {
+        assert token != null && !token.isEmpty();
         AuthenticationMessage authMessage = new AuthenticationMessage(token);
         UUID clientId = getClientId(user);
         this.send(clientId, TopicCreator.getAuthenticationTopic(), authMessage);
@@ -102,8 +120,7 @@ public class NotificationTestService {
     /**
      * Subscribes client with associated id to the given project.
      *
-     * @param user    The user subscribing to project updates.
-     * @param project The project to listen updates to.
+     * @param user The user subscribing to project updates.
      * @return The test instance allowing for the builder pattern.
      */
     public NotificationTestService subscribeToProject(IUser user, Project project) {
@@ -152,8 +169,15 @@ public class NotificationTestService {
      * @param user  The user receiving topic messages.
      * @param topic The topic to subscribe to.
      */
-    public void subscribe(IUser user, String topic) {
+    public NotificationTestService subscribe(IUser user, String topic) {
         this.server.subscribe(getClientId(user), topic);
+        return this;
+    }
+
+    public NotificationTestService subscribe(IUser user, List<String> topics) {
+        UUID clientId = getClientId(user);
+        topics.forEach(t -> this.server.subscribe(clientId, t));
+        return this;
     }
 
     /**
@@ -218,7 +242,10 @@ public class NotificationTestService {
             case TRACES -> TraceAppEntity.class;
             case JOBS -> JobAppEntity.class;
             case TRACE_MATRICES -> TraceMatrixAppEntity.class;
-            default -> String.class;
+            case ATTRIBUTES -> CustomAttributeAppEntity.class;
+            case LAYOUT -> AttributeLayoutAppEntity.class;
+            case WARNINGS -> String.class;
+            default -> throw new RuntimeException("No conversion class registered for: " + entity);
         };
     }
 }

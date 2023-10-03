@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.errors.entities.db;
 import java.io.Serializable;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,7 +46,7 @@ public class CommitError implements Serializable {
     @Column(name = "activity")
     @JdbcTypeCode(SqlTypes.INTEGER)
     @Enumerated(EnumType.ORDINAL)
-    private ProjectEntity applicationActivity;
+    private ProjectEntityType applicationActivity;
 
     @Column(name = "file_name")
     private String fileName;
@@ -59,7 +59,7 @@ public class CommitError implements Serializable {
 
     public CommitError(ProjectVersion projectVersion,
                        String description,
-                       ProjectEntity projectParsingActivity) {
+                       ProjectEntityType projectParsingActivity) {
         this();
         this.projectVersion = projectVersion;
         this.description = description;

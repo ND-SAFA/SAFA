@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.test.features.artifacts.base;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -10,15 +13,16 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<ArtifactAppEntity> {
     ArtifactAppEntity artifact = getStartingArtifact();
 
     @Override
-    protected String getTopic() {
-        return TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
+    protected List<String> getTopic() {
+        String topic = TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
+        return List.of(topic);
     }
 
     @Override
@@ -28,7 +32,12 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected UUID createEntity() throws Exception {
-        dbEntityBuilder.newCustomAttribute(projectName, CustomAttributeType.TEXT, "key", "key");
+        this.rootBuilder
+            .request(r -> r.project()
+                .createCustomAttribute("project", c -> c
+                    .withKeyName("key")
+                    .withLabel("key")
+                    .withType(CustomAttributeType.TEXT)));
 
         ProjectCommitDefinition commit = commitService
             .commit(CommitBuilder
@@ -46,7 +55,9 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     }
 
     @Override
-    protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
+    protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
+        assertThat(creationMessages).hasSize(1);
+        EntityChangeMessage creationMessage = creationMessages.get(0);
         verifyArtifactMessage(creationMessage, NotificationAction.UPDATE, true);
     }
 
@@ -65,12 +76,13 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     }
 
     @Override
-    protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        verifyArtifactMessage(updateMessage, NotificationAction.UPDATE, false);
+    protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
+        assertThat(updateMessages).hasSize(1);
+        verifyArtifactMessage(updateMessages.get(0), NotificationAction.UPDATE, false);
     }
 
     @Override
-    protected void deleteEntity(ArtifactAppEntity entity) throws Exception {
+    protected void deleteEntity(ArtifactAppEntity entity) {
         commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
@@ -78,7 +90,9 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     }
 
     @Override
-    protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
+    protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
+        assertThat(deletionMessages).hasSize(1);
+        EntityChangeMessage deletionMessage = deletionMessages.get(0);
         verifyArtifactMessage(deletionMessage, NotificationAction.DELETE, true);
     }
 

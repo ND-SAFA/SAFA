@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.attributes.entities;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -40,5 +42,9 @@ public class CustomAttributeAppEntity {
         this.options = null;
         this.min = null;
         this.max = null;
+    }
+
+    public CustomAttributeAppEntity(CustomAttribute customAttribute) {
+        this(customAttribute.getKeyname(), customAttribute.getLabel(), customAttribute.getType());
     }
 }

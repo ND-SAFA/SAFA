@@ -22,7 +22,9 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     protected UUID entityId;
 
     protected ProjectVersion setupProject() throws Exception {
-        return creationService.createProjectWithNewVersion(projectName);
+        return this.rootBuilder
+            .log("Creating project and initial version under root user.")
+            .actions(a -> a.createProjectWithVersion(currentUser)).get();
     }
 
     @Test
@@ -30,8 +32,11 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         // Step - Setup project
         this.projectVersion = this.setupProject();
         this.project = this.projectVersion.getProject();
-        this.notificationService.initializeUser(currentUser, this.token);
-        this.notificationService.subscribe(currentUser, getTopic());
+        this.dbEntityBuilder.setProject(projectName, this.project);
+
+        this.rootBuilder
+            .log("Root User: Subscribing to entity topic.")
+            .notifications(n -> n.initializeUser(currentUser, this.token).subscribe(currentUser, getTopic()));
 
         // Verifies any messages related to subscribing to topic (e.g. active members).
         onPostSubscribe();
@@ -44,33 +49,36 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         T entity = getEntity(projectVersion, currentUser, entityId);
         verifyCreatedEntity(entity);
 
-        // VP - Verify creation message
-        EntityChangeMessage creationMessage = notificationService.getEntityMessage(currentUser);
-        verifyCreationMessage(creationMessage);
+        List<EntityChangeMessage> creationMessages = this.rootBuilder.notifications(n -> n.getMessages(currentUser)).get();
+        this.verifyCreationMessages(creationMessages);
 
         // Step - Update entity and retrieve message
         updateEntity();
+
+        List<EntityChangeMessage> updateMessages =
+            this.rootBuilder.notifications(n -> n.getMessages(currentUser)).get();
+
 
         // Step - Verify updated entity
         T updatedEntity = getEntity(projectVersion, currentUser, entityId);
         verifyUpdatedEntity(updatedEntity);
 
         // VP - Verify update message
-        // TODO - fails due to intercepting a notification that's not meant for it
-        EntityChangeMessage updateMessage = notificationService.getEntityMessage(currentUser);
-        verifyUpdateMessage(updateMessage);
+        this.verifyUpdateMessages(updateMessages);
 
         // Step - Delete entity
         deleteEntity(updatedEntity);
+
+        List<EntityChangeMessage> deletedMessages =
+            this.rootBuilder.notifications(n -> n.getMessages(currentUser)).get();
+
 
         // VP - Verify entity deleted
         List<T> entitiesWithId = getEntities(projectVersion, currentUser, entityId);
         assertThat(entitiesWithId).isEmpty();
 
         // VP - Verify deletion message
-        // TODO - fails due to intercepting a notification that's not meant for it
-        EntityChangeMessage deleteMessage = notificationService.getEntityMessage(currentUser);
-        verifyDeletionMessage(deleteMessage);
+        verifyDeletionMessages(deletedMessages);
     }
 
     private T getEntity(ProjectVersion projectVersion, SafaUser user, UUID entityId) {
@@ -88,7 +96,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * @return {@link UUID} of topic to receive messages for entity changes.
      */
-    protected abstract String getTopic();
+    protected abstract List<String> getTopic();
 
     /**
      * @return {@link IAppEntityService} Service for retrieving app entities being tested.
@@ -113,9 +121,9 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Verifies the correctness of message received after entity is created.
      *
-     * @param creationMessage {@link EntityChangeMessage} The message indicating entity was created.
+     * @param messages {@link EntityChangeMessage} The messages received after entity was created.
      */
-    protected abstract void verifyCreationMessage(EntityChangeMessage creationMessage);
+    protected abstract void verifyCreationMessages(List<EntityChangeMessage> messages);
 
     /**
      * Updates given app entity.
@@ -134,9 +142,9 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Verifies that message contains the update message for entity.
      *
-     * @param updateMessage Message indicating that entity was updated
+     * @param messages Messages received after updating entity.
      */
-    protected abstract void verifyUpdateMessage(EntityChangeMessage updateMessage);
+    protected abstract void verifyUpdateMessages(List<EntityChangeMessage> messages);
 
     /**
      * Deletes given entity.
@@ -149,7 +157,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Verifies content of message after entity is deleted.
      *
-     * @param deletionMessage Message received after entity was deleted.
+     * @param messages Messages received after entity deleted.
      */
-    protected abstract void verifyDeletionMessage(EntityChangeMessage deletionMessage);
+    protected abstract void verifyDeletionMessages(List<EntityChangeMessage> messages);
 }

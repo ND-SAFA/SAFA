@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.IUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,8 +48,12 @@ public class EntityChangeMessage {
             .stream()
             .filter(c -> c.getEntity().equals(entity))
             .collect(Collectors.toList());
-        assert !changeQuery.isEmpty();
-        assert changeQuery.size() <= 1;
+        if (changeQuery.size() > 1) {
+            throw new SafaError("Unexpected single change for %s but found %s", entity, changeQuery.size());
+        }
+        if (changeQuery.isEmpty()) {
+            throw new SafaError("Found no changes (%s) with entity %s.", this.changes.size(), entity);
+        }
         return changeQuery.get(0);
     }
 

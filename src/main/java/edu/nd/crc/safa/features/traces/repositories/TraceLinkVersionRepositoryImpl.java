@@ -13,7 +13,7 @@ import edu.nd.crc.safa.features.notifications.builders.ProjectChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -76,8 +76,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    protected ProjectEntity getProjectActivity() {
-        return ProjectEntity.TRACES;
+    protected ProjectEntityType getProjectActivity() {
+        return ProjectEntityType.TRACES;
     }
 
     @Override

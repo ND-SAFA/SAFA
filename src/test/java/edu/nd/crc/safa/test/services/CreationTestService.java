@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.test.services;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -12,19 +10,16 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
-import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
-import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.DbEntityBuilder;
 import edu.nd.crc.safa.test.requests.FlatFileRequest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.builders.DbEntityBuilder;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
@@ -125,20 +120,4 @@ public class CreationTestService {
             .postWithJsonArray(artifactsJson);
     }
 
-    public JSONObject shareProject(Project project,
-                                   String email,
-                                   ProjectRole role) throws Exception {
-        return shareProject(project, email, role, status().is2xxSuccessful());
-    }
-
-    public JSONObject shareProject(Project project,
-                                   String email,
-                                   ProjectRole role,
-                                   ResultMatcher resultMatcher) throws Exception {
-        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
-        return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-            .withProject(project)
-            .postWithJsonObject(request, resultMatcher);
-    }
 }

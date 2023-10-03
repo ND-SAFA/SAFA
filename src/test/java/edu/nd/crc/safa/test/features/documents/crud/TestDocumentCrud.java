@@ -34,12 +34,18 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
 
     @Override
     protected void onPostSubscribe() throws Exception {
-        this.assertionService.verifyActiveMembers(List.of(currentUser), this.notificationService);
+        this.rootBuilder
+            .notifications(n -> n.getEntityMessage(currentUser))
+            .consume(m -> this.rootBuilder
+                .verify(v -> v
+                    .notifications(n -> n.verifyMemberNotification(m, List.of(currentUserName)))));
     }
 
     @Override
-    protected String getTopic() {
-        return TopicCreator.getProjectTopic(this.project.getProjectId());
+    protected List<String> getTopic() {
+        String projectTopic = TopicCreator.getProjectTopic(this.project.getProjectId());
+        String versionTopic = TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
+        return List.of(projectTopic, versionTopic);
     }
 
     @Override
@@ -60,7 +66,9 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     }
 
     @Override
-    protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
+    protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
+        assertThat(creationMessages).hasSize(1);
+        EntityChangeMessage creationMessage = creationMessages.get(0);
         changeMessageVerifies.verifyDocumentChange(
             creationMessage,
             entityId,
@@ -85,7 +93,9 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     }
 
     @Override
-    protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
+    protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
+        assertThat(updateMessages).hasSize(1);
+        EntityChangeMessage updateMessage = updateMessages.get(0);
         changeMessageVerifies.verifyDocumentChange(
             updateMessage,
             entityId,
@@ -102,7 +112,9 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     }
 
     @Override
-    protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
+    protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
+        assertThat(deletionMessages).hasSize(1);
+        EntityChangeMessage deletionMessage = deletionMessages.get(0);
         changeMessageVerifies.verifyDocumentChange(
             deletionMessage,
             entityId,

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.transaction.Transactional;
-
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
@@ -19,6 +17,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -79,7 +78,7 @@ public class AttributeController extends BaseController {
             throw new SafaError("Key is reserved for internal use");
         }
 
-        attributeService.saveEntity(appEntity, project, true);
+        attributeService.saveEntity(user, project, appEntity, true);
 
         return getProjectAttribute(projectId, appEntity.getKey());
     }
@@ -142,7 +141,7 @@ public class AttributeController extends BaseController {
             throw new SafaError("Cannot modify reserved attribute");
         }
 
-        attributeService.saveEntity(appEntity, project, false);
+        attributeService.saveEntity(user, project, appEntity, false);
 
         return getProjectAttribute(projectId, key);
     }

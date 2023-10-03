@@ -11,10 +11,10 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.FlatFileRequest;
-import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
+import edu.nd.crc.safa.test.services.requests.CommonProjectRequests;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ class TestApproveLinkInFutureVersion extends ApplicationBaseTest {
             ProjectPaths.Resources.Tests.DefaultProject.V1);
 
         // Step - Get generated links
-        List<TraceAppEntity> generatedLinks = CommonRequestService.Project.getGeneratedLinks(projectVersion);
+        List<TraceAppEntity> generatedLinks = CommonProjectRequests.getGeneratedLinks(projectVersion);
         assertThat(generatedLinks).hasSize(7);
 
         // Step - Set link to approved

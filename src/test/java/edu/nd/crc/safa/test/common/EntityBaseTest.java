@@ -24,6 +24,7 @@ import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -92,6 +93,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected CustomAttributeRepository customAttributeRepository;
 
     @Autowired
+    @Getter
     protected ServiceProvider serviceProvider;
 
     @Autowired

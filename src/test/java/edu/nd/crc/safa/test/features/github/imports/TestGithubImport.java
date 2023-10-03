@@ -20,7 +20,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.github.base.AbstractGithubGraphqlTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
-import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.services.requests.CommonProjectRequests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,7 +86,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
         assertLayout(githubProject.getProject(), "GitHub File");
 
-        List<JobAppEntity> jobs = CommonRequestService.Project.getProjectJobs(githubProject.getProject());
+        List<JobAppEntity> jobs = CommonProjectRequests.getProjectJobs(githubProject.getProject());
         Assertions.assertEquals(1, jobs.size());
     }
 

@@ -20,7 +20,11 @@ public class NotificationAuthenticationController {
 
     @MessageMapping("/auth")
     public void authenticateUser(AuthenticationMessage message, SimpMessageHeaderAccessor accessor) {
-        UserAppEntity user = authorizationService.getUser(message.getToken());
+        String token = message.getToken();
+        if (token == null || token.isEmpty()) {
+            throw new SafaError("Token is null or empty, invalid token.");
+        }
+        UserAppEntity user = authorizationService.getUser(token);
         Map<String, Object> sessionAttributes = getSessionAttributes(accessor);
         sessionAttributes.put(SimpMessageHeaderAccessor.USER_HEADER, user);
         notificationService.sendToUser(user, new AcknowledgeMessage("OK"));

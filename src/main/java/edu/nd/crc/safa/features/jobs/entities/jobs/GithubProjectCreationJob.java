@@ -200,7 +200,7 @@ public class GithubProjectCreationJob extends CommitJob {
         // Step - Update job name
         this.getServiceProvider().getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
-        createCustomAttributes(project);
+        createCustomAttributes(this.user, project);
 
         // Step - Map GitHub project to SAFA project
         this.githubProject = this.getGithubProjectMapping(project);
@@ -214,12 +214,12 @@ public class GithubProjectCreationJob extends CommitJob {
      *
      * @param project The project we're importing into
      */
-    private void createCustomAttributes(Project project) {
+    private void createCustomAttributes(SafaUser user, Project project) {
         for (CustomAttributeAppEntity attribute : ReservedAttributes.Github.ALL_ATTRIBUTES) {
             AttributeService attributeService = getServiceProvider().getAttributeService();
 
             if (attributeService.getByProjectAndKeyname(project, attribute.getKey()).isEmpty()) {
-                getServiceProvider().getAttributeService().saveEntity(attribute, project, true);
+                getServiceProvider().getAttributeService().saveEntity(user, project, attribute, true);
             }
         }
     }

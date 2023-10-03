@@ -150,7 +150,7 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
             notificationService.broadcastChange(
                 EntityChangeBuilder
                     .create(user, project)
-                    .withProjectUpdate(project.getProjectId())
+                    .withAttributeDelete(id)
             );
         }
     }

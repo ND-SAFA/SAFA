@@ -11,8 +11,8 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.EntityConstants;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 public class TestAddArtifactSync extends AbstractSyncTest {
     private final EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();

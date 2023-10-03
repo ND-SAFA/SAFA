@@ -5,7 +5,7 @@ from tgen.common.util.supported_enum import SupportedEnum
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY, NL_SUMMARY
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_QUESTIONNAIRE
-from tgen.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, QUESTION1, QUESTION2
+from tgen.prompts.supported_prompts.tracing_prompts import DEFAULT_RANKING_GOAL, QUESTION1, QUESTION2
 from tgen.prompts.supported_prompts.delta_prompts import DIFF_SUMMARY_QUESTIONNAIRE, DIFF_SUMMARY_STARTER_PROMPT, \
     CHANGE_SUMMARY_STARTER_PROMPT, CHANGE_SUMMARY_QUESTIONNAIRE, IMPACTS_PROMPT, ADDED_PROMPT, DELETED_PROMPT
 from tgen.prompts.supported_prompts.hgen_prompts import FORMAT_QUESTIONNAIRE, GENERATION_PROMPT, INSTRUCTION_CREATION_PROMPT, \

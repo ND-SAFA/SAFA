@@ -1,6 +1,7 @@
 from typing import Dict
 
-from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
+from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, ARTIFACT_HEADER, RANKING_PARENT_TAG
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -11,6 +12,7 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
@@ -75,8 +77,8 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :return: The prompt builder used to rank candidate children artifacts.
         """
         prompt_builder = PromptBuilder(prompts=[
-            args.ranking_goal,
-            Prompt(PromptUtil.create_xml(args.query_tag, parent_body, prefix="\n", suffix="\n")),
+            SupportedPrompts.RANKING_GOAL_INSTRUCTIONS.value,
+            Prompt(PromptUtil.create_xml(RANKING_PARENT_TAG, parent_body, prefix=NEW_LINE, suffix=NEW_LINE)),
         ])
 
         if state.project_summary is not None and len(state.project_summary) > 0:
@@ -84,11 +86,11 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
             context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
             prompt_builder.add_prompt(Prompt(context_formatted))
 
-        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(args.artifact_header),
+        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(ARTIFACT_HEADER),
                                                       build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                       include_ids=True))
 
-        for q in args.ranking_questions:
+        for q in (SupportedPrompts.RANKING_QUESTION1.value, SupportedPrompts.RANKING_QUESTION2.value):
             prompt_builder.add_prompt(q)
 
         return prompt_builder

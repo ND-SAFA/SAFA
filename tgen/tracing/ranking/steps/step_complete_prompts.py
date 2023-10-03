@@ -29,8 +29,6 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         kwargs = {PromptKeys.PROMPT.value: state.ranking_prompts}
         if args.ranking_llm_model:
             kwargs["model"] = args.ranking_llm_model
-        args.llm_manager.llm_args.set_max_tokens(args.n_completion_tokens)
-        args.llm_manager.llm_args.temperature = 0
         batch_response = args.llm_manager.make_completion_request(LLMCompletionType.GENERATION, **kwargs)
 
         return batch_response

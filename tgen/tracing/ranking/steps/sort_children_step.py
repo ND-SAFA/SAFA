@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.tracing.ranking.common.vsm_sorter import registered_sorters
+from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
 
@@ -58,7 +58,7 @@ class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):
         :param args: The ranking pipeline arguments.
         :return: The map of parent IDs to sorted children IDs.
         """
-        sorting_function = registered_sorters[args.sorter.lower()]
+        sorting_function = SupportedSorter.get_value(args.sorter.upper())
         parent_map = sorting_function(args.parent_ids, args.children_ids, args.artifact_map, model_name=args.embedding_model)
         parent_map = {p: c[:args.max_context_artifacts] for p, c in parent_map.items()}
         return parent_map

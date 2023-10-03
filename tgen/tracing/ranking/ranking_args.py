@@ -1,79 +1,95 @@
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_ARTIFACT_HEADER, DEFAULT_COMPLETION_TOKENS, DEFAULT_LINK_THRESHOLD, \
+from tgen.common.constants.tracing.ranking_constants import DEFAULT_LINK_THRESHOLD, \
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
-    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, DEFAULT_SUMMARY_TOKENS, GENERATE_SUMMARY_DEFAULT, RANKING_PARENT_TAG
+    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.prompts.prompt import Prompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.pipeline_args import PipelineArgs
-from tgen.tracing.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
+from tgen.tracing.ranking.sorters.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 
 
 @dataclass
 class RankingArgs(PipelineArgs):
     """
     artifact_df: The data-frame containing all the project aritfacts.
-    parent_ids: List of parent artifact ids.
-    children_ids: List of children ids to compare to each parent.
     """
     artifact_df: ArtifactDataFrame = required_field(field_name="artifact_df")
+    """
+    parent_ids: List of parent artifact ids.
+    """
     parent_ids: List[str] = required_field(field_name="parent_ids")
+    """
+    children_ids: List of children ids to compare to each parent.
+    """
     children_ids: Optional[List[str]] = required_field(field_name="children_ids")
     """
     - run_name: The unique identifier of this run.
-    - export_dir: Path to export various checkpoints
-    - artifact_map: Maps artifact ids to content.
-    - project_summary: A pre-existing project summary to use.
-    - parent2children: Maps parent ids to their children ids.
-    - max_children_per_query: The number of maximum children to give to claude
-    - sorter: The sorting algorithm to use before ranking with claude
-    - n_summary_tokens: The maximum number of tokens to use for summarizing project
-    - n_completion_tokens: The maximum number of tokens per source artifacts.
-    - generate_summary: Whether to generate a project summary.
-    - ranking_llm_model: The model used to rank
-    - embedding_model: The model whose embeddings are used to rank children.
-    - parent_primary_threshold: The threshold to establish primary parents from.
-    - parent_min_threshold: The minimum threshold to establish a parent if no primary.
-    - ranking_goal: The goal of the ranking prompt. The top portion.
-    - ranking_instructions: The detailed task instructions. The bottom portion. 
-    - ranking_questions: The list of questions to answer for the ranking task.
-    - query_tag: The tag used to encapsulate the parent or query string.
-    - artifact_header: The header to put above all the software artifacts.
-    - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
-    - llm_manager: A custom llm manager to use throughout the pipeline.
-    - link_threshold: The threshold at which to accept links when selecting top predictions.
     """
     run_name: str = "default_run"
+    """
+    - export_dir: Path to export various checkpoints
+    """
     export_dir: str = None
+    """
+    - artifact_map: Maps artifact ids to content.
+    """
     artifact_map: Dict = None
+    """
+    - project_summary: A pre-existing project summary to use.
+    """
     project_summary: str = None
+    """
+    - parent2children: Maps parent ids to their children ids.
+    """
     parent2children: Optional[Dict[str, List[str]]] = None
+    """
+    - max_children_per_query: The number of maximum children to give to claude
+    """
     max_children_per_query: int = None
+    """ 
+    - sorter: The sorting algorithm to use before ranking with claude
+    """
     sorter: str = DEFAULT_SORTING_ALGORITHM
-    n_summary_tokens = DEFAULT_SUMMARY_TOKENS
-    n_completion_tokens = DEFAULT_COMPLETION_TOKENS
+    """
+    - generate_summary: Whether to generate a project summary.
+    """
     generate_summary: bool = GENERATE_SUMMARY_DEFAULT
+    """
+    - ranking_llm_model: The model used to rank
+    """
     ranking_llm_model: str = DEFAULT_RANKING_MODEL
+    """
+    - embedding_model: The model whose embeddings are used to rank children.
+    """
     embedding_model: str = DEFAULT_EMBEDDING_MODEL
+    """
+    - parent_primary_threshold: The threshold to establish primary parents from.
+    """
     parent_primary_threshold = DEFAULT_PARENT_THRESHOLD
+    """
+    - parent_min_threshold: The minimum threshold to establish a parent if no primary.
+    """
     parent_min_threshold = DEFAULT_PARENT_MIN_THRESHOLD
-    ranking_goal: Prompt = field(default_factory=lambda: SupportedPrompts.RANKING_GOAL_INSTRUCTIONS.value)
-    ranking_questions: List[Tuple] = field(default_factory=lambda: (SupportedPrompts.RANKING_QUESTION1.value,
-                                                                    SupportedPrompts.RANKING_QUESTION2.value))
-    query_tag: str = RANKING_PARENT_TAG
-    artifact_header: str = DEFAULT_ARTIFACT_HEADER
+    """
+    - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
+    """
     max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS
+    """
+    - llm_manager: A custom llm manager to use throughout the pipeline.
+    """
     llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
+    """
+    - link_threshold: The threshold at which to accept links when selecting top predictions.
+    """
     link_threshold: float = DEFAULT_LINK_THRESHOLD
 
     def save(self, obj: Any, file_name: str) -> str:
@@ -119,5 +135,3 @@ class RankingArgs(PipelineArgs):
         :return: None
         """
         self.artifact_map = self.artifact_df.to_map()
-        if self.ranking_questions is None:
-            self.ranking_questions = DEFAULT_RANKING_QUESTIONS

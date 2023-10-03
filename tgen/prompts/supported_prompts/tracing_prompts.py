@@ -1,6 +1,6 @@
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_ARTIFACT_HEADER, PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
+from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
     RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
-    RANKING_SCORE_TAG, RANKING_MIN_SCORE
+    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 
@@ -15,7 +15,7 @@ DEFAULT_RANKING_GOAL = Prompt(
     f"This software project is described under `{PromptUtil.as_markdown_header(PROJECT_SUMMARY_HEADER)}`. "
     f"You are tasked with performing software traceability for a parent artifact "
     f"(enclosed in {PromptUtil.create_xml(RANKING_ARTIFACT_TAG)}) "
-    f"against a list of candidate children artifacts under `{PromptUtil.as_markdown_header(DEFAULT_ARTIFACT_HEADER)}`. "
+    f"against a list of candidate children artifacts under `{PromptUtil.as_markdown_header(ARTIFACT_HEADER)}`. "
     "The children have been selected for being similar to the parent, however, there are many false positives. "
     "You're job is to distinguish the artifacts that are truly relevant to the parent's functionality by "
     "focusing on understanding the children artifacts in the context of the system to help achieve this goal."

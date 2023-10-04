@@ -2,6 +2,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
@@ -78,6 +79,8 @@ class RankingJob(AbstractJob):
         run_name = f"{child_type}({len(parent_ids)}) --> {parent_type} ({len(children_ids)})"
         logger.info(f"Starting to trace: {run_name}")
 
+        if not self.select_top_predictions:
+            DictUtil.update_kwarg_values(self.ranking_kwargs, link_threshold=0.0)
         pipeline_args = RankingArgs(run_name=run_name,
                                     dataset=dataset,
                                     parent_ids=parent_ids,
@@ -86,22 +89,32 @@ class RankingJob(AbstractJob):
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         pipeline.run()
         predicted_entries = pipeline.state.children_entries
-        predicted_entries = [EnumDict(entry) for entry in predicted_entries]
+        selected_trace_ids = {self.get_trace_id_from_entry(entry) for entry in pipeline.state.selected_entries}
+        selected_entries = []
         has_positive_links = self.dataset is not None and self.dataset.trace_df is not None and len(
             self.dataset.trace_df.get_links_with_label(1)) > 1
         for entry in predicted_entries:
-            trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
-            if has_positive_links and trace_id in self.dataset.trace_df:
+            trace_id = self.get_trace_id_from_entry(entry)
+            if trace_id in selected_trace_ids and has_positive_links and trace_id in self.dataset.trace_df:
                 trace_entry = self.dataset.trace_df.loc[trace_id]
                 label = trace_entry[TraceKeys.LABEL.value]
                 entry[TraceKeys.LABEL] = label
+                selected_entries.append(entry)
             self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
             if TraceKeys.EXPLANATION in entry:
                 self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+        return selected_entries
 
-        if self.select_top_predictions:
-            predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE] >= pipeline_args.link_threshold]
-        return predicted_entries
+    @staticmethod
+    def get_trace_id_from_entry(entry: EnumDict) -> int:
+        """
+        Gets the trace id from teh entry
+        :param entry: The prediction entry
+        :return: The trace id for the entry
+        """
+        if TraceKeys.LINK_ID in entry:
+            return entry[TraceKeys.LINK_ID]
+        return TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
 
     @staticmethod
     def optional_eval(dataset: TraceDataset, predictions: List) -> None:

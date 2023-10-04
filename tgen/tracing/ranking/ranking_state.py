@@ -23,6 +23,7 @@ class RankingState(State):
     prompt_builder: Optional[PromptBuilder] = field(default=None, repr=False)
     ranking_responses: Optional[GenerationResponse] = field(default=None, repr=False)
     children_entries: List[Dict] = field(default=None, repr=False)
+    selected_entries: List[Dict] = field(default=None, repr=False)  # filtered entries based on score
 
     # IO
     export_path: str = None
@@ -40,4 +41,3 @@ class RankingState(State):
             attrs2ignore = set()
         attrs2ignore.add("prompt_builder")
         return super().save(step_name=step_name, run_num=run_num, attrs2ignore=attrs2ignore)
-

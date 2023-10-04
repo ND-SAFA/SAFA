@@ -75,7 +75,7 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
     }
 
     @Test
-    public void testGetRepository() throws Exception {
+    void testGetRepository() throws Exception {
         enqueueResponse("repository_response.json");
 
         GithubRepositoryDTO response = SafaRequest

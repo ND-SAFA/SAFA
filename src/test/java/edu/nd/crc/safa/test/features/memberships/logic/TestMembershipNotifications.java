@@ -36,7 +36,7 @@ class TestMembershipNotifications extends ApplicationBaseTest {
             .actions(a -> a.verifyActiveMembers(currentUser, List.of(currentUserName)))
             .and()
             .actions(a -> a
-                .createNewUser(newMemberEmail, newMemberPassword))
+                .createNewUser(newMemberEmail, newMemberPassword, false))
             .and()
             .request((s, r) -> r
                 .project()

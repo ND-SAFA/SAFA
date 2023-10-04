@@ -37,18 +37,22 @@ public class ActionBuilder {
         return this;
     }
 
-
     public ActionBuilder createNewUser(String userName, String password) {
-        rootBuilder
+        return createNewUser(userName, password, true);
+    }
+
+    public ActionBuilder createNewUser(String userName, String password, boolean setToken) {
+        String token = rootBuilder
             .authorize(a -> a
                 .createUser(userName, password)
                 .save(userName)
                 .and()
-                .loginUser(userName, password)
-                .save(getTokenName(userName))
-            )
-            .and()
-            .notifications((s, n) -> n.initializeUser(s.getIUser(userName), s.getString(getTokenName(userName))));
+                .loginUser(userName, password, setToken)
+                .get()).get();
+        if (setToken) {
+            this.rootBuilder.store(s -> s.save(getTokenName(userName), token));
+        }
+        this.rootBuilder.notifications((s, n) -> n.initializeUser(s.getIUser(userName), token));
         return this;
     }
 

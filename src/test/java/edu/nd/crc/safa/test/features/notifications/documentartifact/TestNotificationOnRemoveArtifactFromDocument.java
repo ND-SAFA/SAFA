@@ -1,12 +1,9 @@
 package edu.nd.crc.safa.test.features.notifications.documentartifact;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 /**
@@ -30,7 +27,6 @@ public class TestNotificationOnRemoveArtifactFromDocument extends AbstractDocume
         // Step - Create artifact
         this.rootBuilder
             .store(s -> s
-                .save("project", this.project)
                 .save("version", this.projectVersion))
             .and()
             .actions((s, a) -> a
@@ -49,28 +45,7 @@ public class TestNotificationOnRemoveArtifactFromDocument extends AbstractDocume
 
     @Override
     protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
-        EntityChangeMessage typeCreationMessage = messages.get(0);
-        String artifactTypeName = getArtifact().getType();
-        this.rootBuilder
-            .verify(v -> v
-                .notifications(n -> n
-                    .verifyArtifactTypeMessage(typeCreationMessage, artifactTypeName)));
-
-        EntityChangeMessage artifactCreationMessage = messages.get(1);
-        this.rootBuilder
-            .verify(v -> v
-                .notifications(n -> n
-                    .verifySingleEntityChanges(artifactCreationMessage,
-                        List.of(NotificationEntity.ARTIFACTS, NotificationEntity.WARNINGS),
-                        List.of(1, 0))));
-
-        EntityChangeMessage documentUpdateMessage = messages.get(2);
-        assertThat(documentUpdateMessage.isUpdateLayout()).isFalse();
-        this.rootBuilder
-            .verify(v -> v
-                .notifications(n -> n
-                    .verifySingleEntityChanges(documentUpdateMessage,
-                        List.of(NotificationEntity.DOCUMENT, NotificationEntity.ARTIFACTS),
-                        List.of(1, 1))));
+        EntityChangeMessage message = messages.get(0);
+        this.rootBuilder.verify(v -> v.notifications(n -> n.verifyDocumentChangeMessage(message)));
     }
 }

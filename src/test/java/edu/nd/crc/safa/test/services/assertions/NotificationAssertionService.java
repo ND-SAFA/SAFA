@@ -134,4 +134,13 @@ public class NotificationAssertionService {
         return this;
     }
 
+    public NotificationAssertionService verifyDocumentChangeMessage(EntityChangeMessage message) {
+        this.verifyMessage(message,
+            List.of(NotificationEntity.DOCUMENT, NotificationEntity.ARTIFACTS),
+            List.of(NotificationAction.UPDATE, NotificationAction.UPDATE),
+            (i, e) -> {
+                assertThat(e.size()).isEqualTo(1);
+            });
+        return this;
+    }
 }

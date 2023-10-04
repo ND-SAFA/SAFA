@@ -53,7 +53,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     @Getter
     @LocalServerPort
     protected Integer port;
-    protected String projectName = this.getClass().getName();
+    protected String projectName = this.getClass().getSimpleName();
     protected CommitTestService commitService = new CommitTestService();
     protected NotificationTestService notificationService;
     protected CreationTestService creationService;
@@ -81,15 +81,26 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
 
     @BeforeEach
     public void testSetup() throws Exception {
-        initBuilders();
-        setAuthorization();
+        initServices();
+        initDefaultAccount();
         ReflectionTestUtils.setField(ServiceProvider.class, "instance", this.serviceProvider);
+    }
+
+    private void initDefaultAccount() throws Exception {
+        this.currentUser = this.rootBuilder
+            .authorize(a -> a
+                .createUser(currentUserName, defaultUserPassword)
+                .and()
+                .getAccount(currentUserName))
+            .get();
+        this.currentUser.setPassword(defaultUserPassword);
+        setAuthorization(this.currentUser);
     }
 
     /**
      * Creates database and json builders with current service provider.
      */
-    private void initBuilders() {
+    private void initServices() {
         if (this.serviceProvider == null) {
             throw new SafaError("Unable to start test, service provider is null");
         }
@@ -103,6 +114,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         this.retrievalService = new RetrievalTestService(getServiceProvider(), this.dbEntityBuilder);
         this.notificationService = new NotificationTestService(state, this.getPort());
         this.authorizationService = new AuthorizationTestService(this.getServiceProvider(), state);
+        SafaRequest.setMockMvc(mockMvc);
     }
 
 
@@ -141,7 +153,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      * @throws IOException If error occurs while deleting data.
      */
     @AfterEach
-    private void clearData() throws IOException {
+    protected void clearData() throws IOException {
         this.serviceProvider.getJobRepository().deleteAll();
         this.safaUserRepository.deleteAll();
         this.dbEntityBuilder.initializeData();
@@ -154,12 +166,11 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      *
      * @throws Exception If error occurs while logging in.
      */
-    private void setAuthorization() throws Exception {
-        SafaRequest.setMockMvc(mockMvc);
+    private void setAuthorization(SafaUser user) throws Exception {
         SafaRequest.clearAuthorizationToken();
         token = null;
-        token = this.rootBuilder.authorize(AuthorizationTestService::createDefaultAccount).get();
-        this.dbEntityBuilder.setCurrentUser(currentUser);
+        token = this.rootBuilder.authorize(a -> a.loginUser(user.getEmail(), user.getPassword()).get()).get();
+        this.dbEntityBuilder.setCurrentUser(user);
         ReflectionTestUtils.setField(SafaUserService.class, "CHECK_USER_THREAD", false);
     }
 }

@@ -9,12 +9,12 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class ProjectVersionChangeBuilder extends AbstractEntityChangeBuilder<ProjectVersionChangeBuilder> {
 
-    public ProjectVersionChangeBuilder(SafaUser user, ProjectVersion projectVersion) {
+    public ProjectVersionChangeBuilder(IUser user, ProjectVersion projectVersion) {
         super(user.getUserId());
         String versionTopic = TopicCreator.getVersionTopic(projectVersion.getVersionId());
         this.getEntityChangeMessage().setTopic(versionTopic);

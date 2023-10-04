@@ -25,7 +25,6 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -65,7 +64,6 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final UserProjectMembershipRepository userProjectMembershipRepository;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     private final ProjectService projectService;
     private final CustomAttributeRepository customAttributeRepository;
@@ -97,7 +95,6 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactVersionRepository = serviceProvider.getArtifactVersionRepository();
         this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
-        this.userProjectMembershipRepository = serviceProvider.getUserProjectMembershipRepository();
         this.artifactVersionRepositoryImpl = artifactVersionRepositoryImpl;
         this.customAttributeRepository = customAttributeRepository;
         this.attributeSystemServiceProvider = attributeSystemServiceProvider;

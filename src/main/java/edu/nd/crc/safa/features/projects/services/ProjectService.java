@@ -46,9 +46,9 @@ public class ProjectService {
     /**
      * Creates a new project
      *
-     * @param name The name of the project
+     * @param name        The name of the project
      * @param description The description of the project
-     * @param owner The team that owns the project
+     * @param owner       The team that owns the project
      * @return The new project
      */
     public Project createProject(String name, String description, Team owner) {
@@ -59,9 +59,9 @@ public class ProjectService {
     /**
      * Creates a new project
      *
-     * @param name The name of the project
+     * @param name        The name of the project
      * @param description The description of the project
-     * @param owner The user that owns the project
+     * @param owner       The user that owns the project
      * @return The new project
      */
     public Project createProject(String name, String description, SafaUser owner) {
@@ -72,9 +72,9 @@ public class ProjectService {
     /**
      * Creates a new project
      *
-     * @param name The name of the project
+     * @param name        The name of the project
      * @param description The description of the project
-     * @param owner The organization that owns the project
+     * @param owner       The organization that owns the project
      * @return The new project
      */
     public Project createProject(String name, String description, Organization owner) {
@@ -86,7 +86,7 @@ public class ProjectService {
      * Creates a new project
      *
      * @param projectDefinition The definition of the project from the front end
-     * @param owner The user who will own the project
+     * @param owner             The user who will own the project
      * @return The new project
      */
     public Project createProject(ProjectAppEntity projectDefinition, SafaUser owner) {
@@ -97,7 +97,7 @@ public class ProjectService {
      * Creates a new project
      *
      * @param projectDefinition The definition of the project from the front end
-     * @param owner The organization who will own the project
+     * @param owner             The organization who will own the project
      * @return The new project
      */
     public Project createProject(ProjectAppEntity projectDefinition, Organization owner) {
@@ -108,7 +108,7 @@ public class ProjectService {
      * Creates a new project
      *
      * @param projectDefinition The definition of the project from the front end
-     * @param owner The team who will own the project
+     * @param owner             The team who will own the project
      * @return The new project
      */
     public Project createProject(ProjectAppEntity projectDefinition, Team owner) {

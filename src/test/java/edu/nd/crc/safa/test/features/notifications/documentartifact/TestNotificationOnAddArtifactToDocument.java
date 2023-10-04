@@ -7,8 +7,6 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
-import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 /**
@@ -43,13 +41,6 @@ public class TestNotificationOnAddArtifactToDocument extends AbstractDocumentArt
     protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
         assertThat(messages).hasSize(1);
         EntityChangeMessage message = messages.get(0);
-        this.rootBuilder
-            .verify(v -> v.notifications(n -> n
-                .verifyMessage(message,
-                    List.of(NotificationEntity.DOCUMENT, NotificationEntity.ARTIFACTS),
-                    List.of(NotificationAction.UPDATE, NotificationAction.UPDATE),
-                    (i, e) -> {
-                        assertThat(e.size()).isEqualTo(1);
-                    })));
+        this.rootBuilder.verify(v -> v.notifications(n -> n.verifyDocumentChangeMessage(message)));
     }
 }

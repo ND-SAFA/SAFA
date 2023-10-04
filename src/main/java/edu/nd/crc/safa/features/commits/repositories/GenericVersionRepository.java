@@ -105,9 +105,7 @@ public abstract class GenericVersionRepository<
 
     private Map<UUID, List<VersionEntity>> addToVersionEntityMap(Map<UUID, List<VersionEntity>> entityHashTable,
                                                                  List<UUID> baseEntityIds) {
-        if (baseEntityIds.contains(null)) {
-            throw new SafaError("Expected all values to be valid version entity ids, found null.");
-        }
+        baseEntityIds = baseEntityIds.stream().filter(i -> i != null).collect(Collectors.toList());
         this.retrieveVersionEntitiesByBaseIds(baseEntityIds)
             .forEach(versionEntity -> {
                 if (entityHashTable.containsKey(versionEntity.getBaseEntityId())) {

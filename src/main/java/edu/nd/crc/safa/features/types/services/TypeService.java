@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.services.VersionService;
@@ -121,7 +122,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * @param user    The user doing the operation
      * @return the created artifact type
      */
-    public ArtifactType createArtifactType(Project project, String name, SafaUser user) {
+    public ArtifactType createArtifactType(Project project, String name, IUser user) {
         String color = "gradient_" + artifactTypeRepository.countByProject(project);
         return createArtifactType(new ArtifactType(project, name, color), user);
     }
@@ -146,7 +147,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * @param user         The user doing the operation
      * @return The type that got saved to the database
      */
-    private ArtifactType createArtifactType(ArtifactType artifactType, SafaUser user) {
+    private ArtifactType createArtifactType(ArtifactType artifactType, IUser user) {
         ArtifactType existingType = getArtifactType(artifactType.getProject(), artifactType.getName());
         if (existingType != null) {
             throw new SafaError("Type exists: " + artifactType.getName());
@@ -211,7 +212,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
         notifyTypeDeleted(type, user);
     }
 
-    private void notifyTypeUpdate(ArtifactType artifactType, SafaUser user) {
+    private void notifyTypeUpdate(ArtifactType artifactType, IUser user) {
         Project project = artifactType.getProject();
 
         // Step - Calculate affected artifact ids

@@ -9,11 +9,11 @@ import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.entities.IUser;
 
 public class ProjectChangeBuilder extends AbstractEntityChangeBuilder<ProjectChangeBuilder> {
 
-    public ProjectChangeBuilder(SafaUser user, Project project) {
+    public ProjectChangeBuilder(IUser user, Project project) {
         super(user.getUserId());
         String projectTopic = TopicCreator.getProjectTopic(project.getProjectId());
         this.getEntityChangeMessage().setTopic(projectTopic);

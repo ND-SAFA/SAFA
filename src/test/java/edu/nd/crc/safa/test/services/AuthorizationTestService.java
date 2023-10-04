@@ -63,16 +63,16 @@ public class AuthorizationTestService {
     }
 
     public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password) {
-        String result = this.loginUser(email, password, true);
-        return new AndBuilder<>(this, result, this.state);
+        return this.loginUser(email, password, true);
     }
 
-    public String loginUser(String email, String password, boolean setToken) {
-        return loginUser(email, password, status().is2xxSuccessful(), setToken);
+    public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password, boolean setToken) {
+        String token = this.loginUser(email, password, status().is2xxSuccessful(), setToken);
+        return new AndBuilder<>(this, token, this.state);
     }
 
-    public void loginUser(String email, String password, ResultMatcher test) throws Exception {
-        this.loginUser(email, password, test, true);
+    public String loginUser(String email, String password, ResultMatcher test) throws Exception {
+        return this.loginUser(email, password, test, true);
     }
 
     /**
@@ -99,14 +99,16 @@ public class AuthorizationTestService {
             .sendPostRequestAndRetrieveCookie(new SafaUser(email, password),
                 resultMatcher, SecurityConstants.JWT_COOKIE_NAME);
 
-        if (setToken && token.isPresent()) {
-            Cookie authorizationCookie = token.get();
-            SafaRequest.setAuthorizationToken(authorizationCookie);
+
+        if (token.isPresent()) { // Result matcher may have failing reques
+            Cookie authorizationCookie = token.orElseThrow();
             String authorizationCode = authorizationCookie.getValue();
+            if (setToken) {
+                SafaRequest.setAuthorizationToken(authorizationCookie);
+            }
             return authorizationCode;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public AuthorizationTestService removeMemberFromProject(Project project, String username) {
@@ -136,5 +138,9 @@ public class AuthorizationTestService {
             .withRoute(AppRoutes.Projects.Membership.DELETE_PROJECT_MEMBERSHIP)
             .withProjectMembership(projectMembershipOptional.get())
             .deleteWithJsonObject(resultMatcher);
+    }
+
+    public SafaUser getAccount(String email) {
+        return this.serviceProvider.getAccountLookupService().getUserFromUsername(email);
     }
 }

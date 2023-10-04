@@ -82,12 +82,10 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         parent_ids = args.parent_ids
         batch_responses = state.ranking_responses.batch_responses
         sorted_parent2children = state.sorted_parent2children
-        parent2index: Dict[str, int] = {p: i for i, p in enumerate(parent_ids)}
         all_entries = []
         for parent_name, prompt_response in zip(parent_ids, batch_responses):
             related_children = sorted_parent2children[parent_name]
             artifact_answers = ProcessRankingResponses._extract_artifact_answers_from_response(prompt_response=prompt_response,
-                                                                                               parent_index=parent2index[parent_name],
                                                                                                state=state)
             parsed_entries, unidentified_entries, parsed_artifact_ids = [], [], set()
             for i, answer in enumerate(artifact_answers):
@@ -171,16 +169,15 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
             logger.warning(f"Found {n_affected_artifacts} {problem} artifacts after parsing children of {parent_name}")
 
     @staticmethod
-    def _extract_artifact_answers_from_response(prompt_response: str, parent_index: int, state: RankingState) -> List[Dict]:
+    def _extract_artifact_answers_from_response(prompt_response: str, state: RankingState) -> List[Dict]:
         """
         Extracts the parsed dictionary for each artifact included in the model's response
         :param prompt_response: THhe response from the model
-        :param parent_index: The index of the parent artifact
         :param state: THe current state of the ranking
         :return: List of dictionaries containing the answers for each artifact
         """
-        r = state.prompt_builders[parent_index].parse_responses(prompt_response)
-        task_prompt = state.prompt_builders[parent_index].get_all_prompts()[-1]
+        r = state.prompt_builder.parse_responses(prompt_response)
+        task_prompt = state.prompt_builder.get_all_prompts()[-1]
         parsed_tags = r[task_prompt.id]
         artifact_answers = parsed_tags[task_prompt.response_manager.get_all_tag_ids()[0]]
         return artifact_answers

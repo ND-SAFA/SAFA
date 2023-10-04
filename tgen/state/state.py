@@ -74,13 +74,14 @@ class State(BaseObject):
         :return: None
         """
         self.mark_step_as_complete(step_name)
-        self.save(step_name, run_num=self.completed_steps[step_name])
+        self.save(step_name=step_name, run_num=self.completed_steps[step_name])
 
-    def save(self, step_name: str, run_num: int = 1) -> bool:
+    def save(self, step_name: str, run_num: int = 1, attrs2ignore: Set = None) -> bool:
         """
         Saves the current state
         :param step_name: The step name that the pipeline is currently at
         :param run_num: The number of times the step has been run
+        :param attrs2ignore: The attributes to ignore when saving
         :return: True if saved successfully else False
         """
         if not self.export_dir:
@@ -89,7 +90,8 @@ class State(BaseObject):
         try:
             save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
             as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self._get_path_to_state_checkpoint(self.export_dir)), k)
-                           if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()}
+                           if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()
+                       if not attrs2ignore or k not in attrs2ignore}
             collapsed_paths = self.collapse_or_expand_paths(as_dict)
             YamlUtil.write(collapsed_paths, save_path)
             logger.info(f"Saved state to {save_path}")

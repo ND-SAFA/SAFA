@@ -4,8 +4,10 @@ from typing import Any, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
 from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
@@ -31,7 +33,7 @@ class QuestionnairePrompt(Prompt):
             question_prompts = [question_prompts[i] for i in range(starting_number, len(question_prompts) + starting_number)]
         self.question_prompts = [deepcopy(prompt) for prompt in question_prompts]
         self.enumeration_chars = enumeration_chars
-        self.use_bullets_for_enumeration = len(self.enumeration_chars) < len(self.question_prompts)
+        self.use_bullets_for_enumeration = len(self.enumeration_chars) == 1
         if self.use_bullets_for_enumeration:
             self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
         if use_multi_step_task_instructions:
@@ -70,7 +72,7 @@ class QuestionnairePrompt(Prompt):
         return all_tags
 
     @overrides(Prompt)
-    def format_value(self, *args: object, **kwargs: object) -> None:
+    def format_value(self, *args: object, **kwargs: object) -> str:
         """
         Formats the value of all question prompts
         :param args: Args for formatting
@@ -127,14 +129,20 @@ class QuestionnairePrompt(Prompt):
         :param child: If True, adds additional indents
         :return: The formatted prompt
         """
-        self.format_value(**kwargs)
+        update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
+        if update_value:
+            self.format_value(**kwargs)
         question_format = "{}) {}" if not self.use_bullets_for_enumeration else "{} {}"
         if child:
             question_format = PromptUtil.indent_for_markdown(question_format)
-        formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i], question.build(child=True))
+        formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i % len(self.enumeration_chars)],
+                                                                    question.build(child=True))
                                              for i, question in enumerate(self.question_prompts)])
         instructions = f"{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
-        return f"{instructions}{formatted_questions}{NEW_LINE}"
+        final = f"{instructions}{formatted_questions}{NEW_LINE}"
+        if not update_value:
+            final = StrUtil.format_selective(final, **kwargs)
+        return final
 
     @staticmethod
     def _create_multi_step_task_instructions(enumeration_chars: List[str], question_prompts: List[Prompt],

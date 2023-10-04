@@ -1,16 +1,13 @@
 from typing import List
+from unittest import TestCase, mock
 
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
-from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.tracing.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
+from tgen.tracing.ranking.steps.step_complete_prompts import CompleteRankingPrompts
 
 
-class TestCreateRankingPrompts(BaseTest):
-    """
-    TODO: Add notion requirements
-    """
+class TesCompleteRankingResponsesStep(TestCase):
     DEFAULT_PARENT_IDS = ["s4"]
     DEFAULT_CHILDREN_IDS = ["t1", "t6"]
 
@@ -30,7 +27,9 @@ class TestCreateRankingPrompts(BaseTest):
             artifact_body = self.get_artifact_body(artifact_id)
             self.assertIn(artifact_body, prompt)
 
-    def run_step(self, parent_ids: List[str] = None, children_ids: List[str] = None, **state_kwargs) -> str:
+    @mock.patch.object(CompleteRankingPrompts, "complete_ranking_prompts")
+    def run_step(self, complete_ranking_prompts_mock: mock.MagicMock,
+                 parent_ids: List[str] = None, children_ids: List[str] = None, **state_kwargs) -> str:
         """
         Runs the prompt creation step with given configuration variables.
         :param parent_ids: The ids of the parent artifacts.
@@ -48,11 +47,11 @@ class TestCreateRankingPrompts(BaseTest):
                                                                     children_ids=children_ids,
                                                                     state_kwargs=state_kwargs)
         state.sorted_parent2children = parent2children
-        step = CreateRankingPrompts()
+        step = CompleteRankingPrompts()
         step.run(args, state)
-        self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(state.ranking_prompts))
-        self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(state.prompt_builders))
-        prompt = state.ranking_prompts[0]
+        ranking_prompts = step.create_ranking_prompts(args, state)
+        self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(ranking_prompts))
+        prompt = ranking_prompts[0]
         return prompt
 
     @staticmethod

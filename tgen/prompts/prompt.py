@@ -1,6 +1,7 @@
 import uuid
 from typing import Any, Dict
 
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.common.constants.deliminator_constants import SPACE
 from tgen.prompts.prompt_response_manager import PromptResponseManager
@@ -36,15 +37,18 @@ class Prompt:
             prompt = f"{prompt}{SPACE}{expected_response}"
         return prompt
 
-    def format_value(self, *args: object, **kwargs: object) -> str:
+    def format_value(self, update_value: bool = True, *args: object, **kwargs: object) -> str:
         """
         A replacement for the string format to allow the formatting of only selective fields
+        :param update_value: If True, updates the value permanently
         :param args: Ordered params to format the prompt with
         :param kwargs: Key, value pairs to format the prompt with
         :return: The formatted value
         """
-        self.value = StrUtil.format_selective(self.value, *args, **kwargs)
-        return self.value
+        value = StrUtil.format_selective(self.value, *args, **kwargs)
+        if update_value:
+            self.value = value
+        return value
 
     def parse_response(self, response: str) -> Dict[str, Any]:
         """
@@ -60,8 +64,9 @@ class Prompt:
         :param kwargs: Any additional arguments for the prompt
         :return: The formatted prompt
         """
-        self.format_value(**kwargs)
-        return self.value
+        update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
+        value = self.format_value(update_value=update_value, **kwargs)
+        return value
 
     def __repr__(self) -> str:
         """

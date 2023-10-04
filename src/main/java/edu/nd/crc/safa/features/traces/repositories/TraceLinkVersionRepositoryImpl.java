@@ -247,7 +247,9 @@ public class TraceLinkVersionRepositoryImpl
             TraceLinkVersion previousTraceLinkVersion = existingLinkOptional.get();
             if (previousTraceLinkVersion.getTraceType() == TraceType.MANUAL
                 && newTrace.getTraceType() != TraceType.MANUAL) {
-                throw new SafaError("Generated link cannot override manual one.");
+                String error = String.format("Attempting to override manual link with generated link: %s->%s",
+                    newTrace.getSourceName(), newTrace.getTargetName());
+                throw new SafaError(error);
             }
         }
     }

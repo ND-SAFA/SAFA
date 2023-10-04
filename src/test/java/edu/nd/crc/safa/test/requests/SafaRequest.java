@@ -278,13 +278,13 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     protected <T> T sendAuthenticatedRequest(MockHttpServletRequestBuilder request,
-                                             ResultMatcher test,
+                                             ResultMatcher resultMatcher,
                                              Cookie authorizationToken,
                                              Function<String, T> responseParser) {
         if (authorizationToken != null) {
             request = request.cookie(authorizationToken);
         }
-        return sendRequestAndParseResponse(request, test, responseParser);
+        return sendRequestAndParseResponse(request, resultMatcher, responseParser);
     }
 
     protected <T> T sendRequestAndParseResponse(MockHttpServletRequestBuilder request,

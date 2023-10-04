@@ -19,6 +19,7 @@ public class ParseTraces implements IFlatFileBuilderStep {
     public void perform(FlatFileBuilderArgs state, ServiceProvider serviceProvider) throws Exception {
         FlatFileParser flatFileParser = state.getFlatFileParser();
         TimFileParser timFileParser = state.getTimFileParser();
+
         ProjectCommitDefinition projectCommitDefinition = state.getProjectCommitDefinition();
         ProjectVersion projectVersion = state.getProjectVersion();
         List<ArtifactAppEntity> artifactsAdded = state.getArtifactsAdded();
@@ -27,8 +28,10 @@ public class ParseTraces implements IFlatFileBuilderStep {
         List<TraceAppEntity> tracesAdded = traceCreationResponse.getEntities();
 
         for (TraceAppEntity traceAppEntity : tracesAdded) {
-            serviceProvider.getTraceLinkRepository().getByProjectAndSourceAndTarget(projectVersion.getProject(),
-                traceAppEntity.getSourceName(), traceAppEntity.getTargetName()).ifPresent(t -> traceAppEntity.setId(t.getTraceLinkId()));
+            serviceProvider
+                .getTraceLinkRepository()
+                .getByProjectAndSourceAndTarget(projectVersion.getProject(), traceAppEntity.getSourceName(), traceAppEntity.getTargetName())
+                .ifPresent(t -> traceAppEntity.setId(t.getTraceLinkId()));
         }
         projectCommitDefinition.getTraces().setAdded(traceCreationResponse.getEntities());
         BuilderUtility.addErrorsToCommit(projectCommitDefinition,

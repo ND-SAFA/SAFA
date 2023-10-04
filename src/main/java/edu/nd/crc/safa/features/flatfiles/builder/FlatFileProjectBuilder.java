@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.CommitStep;
+import edu.nd.crc.safa.features.flatfiles.builder.steps.GenerateTraceLinksStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.IFlatFileBuilderStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.ParseArtifactStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.ParseTraces;
@@ -25,6 +26,7 @@ public class FlatFileProjectBuilder {
         new ParsingSetupStep(),
         new ParseArtifactStep(),
         new ParseTraces(),
+        new GenerateTraceLinksStep(),
         new CommitStep()
     );
 

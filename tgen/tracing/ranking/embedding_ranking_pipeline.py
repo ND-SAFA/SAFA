@@ -3,6 +3,7 @@ import os
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 from tgen.tracing.ranking.steps.sort_children_step import SortChildren
 
 
@@ -32,5 +33,6 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         if self.args.export_dir:
             os.makedirs(self.args.export_dir, exist_ok=True)
+        self.args.sorter = SupportedSorter.EMBEDDING.name
         super().run()
         self.state.children_entries = [entry for entries in self.state.sorted_parent2children.values() for entry in entries]

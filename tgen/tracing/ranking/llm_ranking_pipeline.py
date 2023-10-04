@@ -1,22 +1,21 @@
 import os
-from typing import Type, List
+from typing import Type
 
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
-from tgen.tracing.ranking.steps.sort_children_step import SortChildren
-from tgen.tracing.ranking.steps.step_complete_prompts import CompleteRankingPrompts
-from tgen.tracing.ranking.steps.step_create_project_summary import CreateProjectSummary
-from tgen.tracing.ranking.steps.step_process_ranking_responses import ProcessRankingResponses
+from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
+from tgen.tracing.ranking.steps.create_project_summary_step import CreateProjectSummaryStep
+from tgen.tracing.ranking.steps.process_ranking_responses_step import ProcessRankingResponsesStep
+from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
 class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     steps = [
-        CreateProjectSummary,
-        SortChildren,
-        CompleteRankingPrompts,
-        ProcessRankingResponses]
+        CreateProjectSummaryStep,
+        SortChildrenStep,
+        CompleteRankingPromptsStep,
+        ProcessRankingResponsesStep]
 
     def __init__(self, args: RankingArgs):
         """

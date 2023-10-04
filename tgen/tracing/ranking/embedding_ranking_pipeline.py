@@ -4,14 +4,14 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
-from tgen.tracing.ranking.steps.sort_children_step import SortChildren
+from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
 class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     """
     Ranks a set of artifacts by using their embeddings to their parents.
     """
-    steps = [SortChildren]
+    steps = [SortChildrenStep]
 
     def __init__(self, args: RankingArgs):
         """

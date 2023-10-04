@@ -5,7 +5,7 @@ from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.common.ranking_utils import create_entry
-from tgen.tracing.ranking.steps.step_complete_prompts import CompleteRankingPrompts
+from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
 
 
 class TesCompleteRankingResponsesStep(TestCase):
@@ -28,7 +28,7 @@ class TesCompleteRankingResponsesStep(TestCase):
             artifact_body = self.get_artifact_body(artifact_id)
             self.assertIn(artifact_body, prompt)
 
-    @mock.patch.object(CompleteRankingPrompts, "complete_ranking_prompts")
+    @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
     def run_step(self, complete_ranking_prompts_mock: mock.MagicMock,
                  parent_ids: List[str] = None, children_ids: List[str] = None, **state_kwargs) -> str:
         """
@@ -48,7 +48,7 @@ class TesCompleteRankingResponsesStep(TestCase):
                                                                     children_ids=children_ids,
                                                                     state_kwargs=state_kwargs)
         state.sorted_parent2children = parent2children
-        step = CompleteRankingPrompts()
+        step = CompleteRankingPromptsStep()
         step.run(args, state)
         ranking_prompts = step.create_ranking_prompts(args, state)
         self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(ranking_prompts))

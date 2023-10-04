@@ -2,7 +2,7 @@ from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.tracing.ranking.steps.sort_children_step import SortChildren
+from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
 class TestSortChildrenStep(BaseTest):
@@ -19,7 +19,7 @@ class TestSortChildrenStep(BaseTest):
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=["s1"],
                                                                     children_ids=["t1", "t2", "t3"],
                                                                     pre_sorted_parent2children=pre_ranked)
-        step = SortChildren()
+        step = SortChildrenStep()
         step.run(args, state)
         parent2entries = state.sorted_parent2children
         result = {p: [entry[TraceKeys.SOURCE] for entry in entries] for p, entries in parent2entries.items()}
@@ -36,6 +36,6 @@ class TestSortChildrenStep(BaseTest):
                                                                     children_ids=before,
                                                                     sorter="embedding",
                                                                     embedding_model=SMALL_EMBEDDING_MODEL)
-        step = SortChildren()
+        step = SortChildrenStep()
         step.run(args, state)
         self.assertEqual([entry[TraceKeys.SOURCE] for entry in state.sorted_parent2children[parent_id]], after)

@@ -10,7 +10,7 @@ from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
 
 
-class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):
+class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
 
     def _run(self, args: RankingArgs, state: RankingState) -> None:
         """
@@ -46,7 +46,7 @@ class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         original_max_content = args.max_context_artifacts
         args.max_context_artifacts = None
-        sorted_parent_map = SortChildren.create_sorted_parent_map(args)
+        sorted_parent_map = SortChildrenStep.create_sorted_parent_map(args)
         final_parent_map = {}
         for p, sorted_children in sorted_parent_map.items():
             defined_children = args.pre_sorted_parent2children.get(p, [])

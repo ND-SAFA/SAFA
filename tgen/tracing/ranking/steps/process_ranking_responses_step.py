@@ -39,7 +39,7 @@ class ArtifactReasoning:
         return NEW_LINE.join(explanation_parts.values())
 
 
-class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
+class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState]):
 
     def _run(self, args: ArgType, state: State) -> None:
         """
@@ -64,8 +64,8 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         all_entries = []
         for parent_name, prompt_response in zip(parent_ids, batch_responses):
             related_children = [entry[TraceKeys.SOURCE] for entry in sorted_parent2children[parent_name]]
-            artifact_answers = ProcessRankingResponses._extract_artifact_answers_from_response(prompt_response=prompt_response,
-                                                                                               state=state)
+            artifact_answers = ProcessRankingResponsesStep._extract_artifact_answers_from_response(prompt_response=prompt_response,
+                                                                                                   state=state)
             parsed_entries, unidentified_entries, parsed_artifact_ids = [], [], set()
             for i, answer in enumerate(artifact_answers):
                 try:
@@ -81,15 +81,15 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
                 except Exception as e:
                     logger.exception(e)
                     logger.info(f"Unable to parse: {answer}")
-            n_unidentified = ProcessRankingResponses._identify_unknown_a_reasoning(unidentified_entries, parsed_entries,
-                                                                                   parsed_artifact_ids)
-            ProcessRankingResponses._log_processing_warning(n_unidentified, parent_name, "unidentified")
+            n_unidentified = ProcessRankingResponsesStep._identify_unknown_a_reasoning(unidentified_entries, parsed_entries,
+                                                                                       parsed_artifact_ids)
+            ProcessRankingResponsesStep._log_processing_warning(n_unidentified, parent_name, "unidentified")
             n_missing = len(related_children) - len(parsed_artifact_ids)
-            ProcessRankingResponses._log_processing_warning(n_missing, parent_name, "missing")
+            ProcessRankingResponsesStep._log_processing_warning(n_missing, parent_name, "missing")
             parsed_entries: List[ArtifactReasoning] = sorted(parsed_entries, key=lambda a: (a.score, -a.index), reverse=True)
 
             # Step - Store results
-            child_entries = ProcessRankingResponses._create_trace_prediction_entries(parsed_entries, parent_name)
+            child_entries = ProcessRankingResponsesStep._create_trace_prediction_entries(parsed_entries, parent_name)
             all_entries.extend(child_entries)
         state.children_entries = all_entries
         return all_entries

@@ -21,7 +21,7 @@ from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
 
 
-class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
+class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]):
 
     @overrides(AbstractPipelineStep)
     def run(self, args: RankingArgs, state: RankingState, re_run: bool = False) -> bool:
@@ -32,7 +32,7 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :param re_run: Whether to rerun the step or not
         :return: Whether the step ran or not
         """
-        state.prompt_builder = CompleteRankingPrompts.create_ranking_prompt_builder(state)
+        state.prompt_builder = CompleteRankingPromptsStep.create_ranking_prompt_builder(state)
         return super().run(args, state, re_run)
 
     def _run(self, args: RankingArgs, state: RankingState) -> None:
@@ -53,7 +53,7 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The ranking store.
         :return: None
         """
-        prompts = CompleteRankingPrompts.create_ranking_prompts(args, state)
+        prompts = CompleteRankingPromptsStep.create_ranking_prompts(args, state)
         kwargs = {PromptKeys.PROMPT.value: prompts}
         if args.ranking_llm_model:
             DictUtil.update_kwarg_values(kwargs, model=args.ranking_llm_model)
@@ -73,7 +73,7 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
 
         prompts = []
         for p_name in parent_names:
-            prompt = CompleteRankingPrompts.create_prompts(p_name, state.prompt_builder, args, state)
+            prompt = CompleteRankingPromptsStep.create_prompts(p_name, state.prompt_builder, args, state)
             prompts.append(prompt)
         return prompts
 

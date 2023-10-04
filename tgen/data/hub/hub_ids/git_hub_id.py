@@ -1,5 +1,6 @@
 from typing import Type
 
+from tgen.common.util.dict_util import DictUtil
 from tgen.data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
@@ -14,7 +15,7 @@ class GitHubId(MultiStageHubId):
         """
         Initializes multi stage with task set to none.
         """
-        if "task" in kwargs:
+        if DictUtil.get_kwarg_values(kwargs, task=None) is not None:
             raise Exception("Task cannot be defined for single-task dataset.")
         super().__init__(task=None, **kwargs)
 

@@ -2,6 +2,7 @@ import os
 from typing import Dict
 
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
+from tgen.common.util.dict_util import DictUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -36,7 +37,9 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         dataframes = []
         for filename, dataframe_cls in self.filename_to_dataframe_cls.items():
-            params = {"index_col": 0} if dataframe_cls.index_name() is None else {}
+            params = {}
+            if dataframe_cls.index_name() is None:
+                DictUtil.update_kwarg_values(params, index_col=0)
             df: pd.DataFrame = pd.read_csv(os.path.join(self.get_full_project_path(), filename), **params)
             df = dataframe_cls(df)
             if isinstance(df, ArtifactDataFrame) and self.summarizer:

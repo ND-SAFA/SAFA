@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_SUMMARY_TOKENS
+from tgen.common.util.dict_util import DictUtil
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.base_summarizer_job import BaseSummarizerJob
@@ -25,7 +26,8 @@ class ProjectSummaryJob(BaseSummarizerJob):
         """
         self.llm_manager: AbstractLLMManager = llm_manager
         self.n_tokens = n_tokens
-        kwargs = {"llm_manager_for_project_summary": self.llm_manager, **kwargs} if self.llm_manager else kwargs
+        if self.llm_manager:
+            DictUtil.update_kwarg_values(kwargs, llm_manager_for_project_summary=self.llm_manager)
         super().__init__(artifacts=artifacts, artifact_reader=artifact_reader, export_dir=export_dir, job_args=job_args, **kwargs)
 
     def _run(self) -> SummaryResponse:

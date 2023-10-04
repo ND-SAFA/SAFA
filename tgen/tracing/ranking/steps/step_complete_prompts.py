@@ -7,6 +7,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import GenerationResponse
@@ -88,9 +89,10 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         artifact_map = args.dataset.artifact_df.to_map()
         max_children = args.max_children_per_query
-        target_names = state.sorted_parent2children[parent_id][:max_children]
+        entries = state.sorted_parent2children[parent_id][:max_children]
         source_body = artifact_map[parent_id]
-        artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[a_id]}) for i, a_id in enumerate(target_names)]
+        artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[entry[TraceKeys.SOURCE]]})
+                     for i, entry in enumerate(entries)]
 
         prompt_dict = prompt_builder.build(model_format_args=AnthropicManager.prompt_args,
                                            parent_body=source_body,

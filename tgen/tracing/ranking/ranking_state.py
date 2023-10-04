@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.prompts.prompt_builder import PromptBuilder
@@ -16,7 +17,7 @@ class RankingState(State):
     # Summarizing
     project_summary: str = None
     # sorting
-    sorted_parent2children: Optional[Dict[str, List[str]]] = None
+    sorted_parent2children: Optional[Dict[str, List[EnumDict]]] = None
 
     # Ranking
     prompt_builder: Optional[PromptBuilder] = field(default=None, repr=False)

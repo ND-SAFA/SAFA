@@ -4,6 +4,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.llm_responses import GenerationResponse
+from tgen.tracing.ranking.common.ranking_utils import create_entry
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
 from tgen.tracing.ranking.steps.step_complete_prompts import CompleteRankingPrompts
@@ -27,7 +28,7 @@ class TestProcessRankingResponsesStep(TestCase):
         parent_ids = ["parent"]
         children_ids = ["1", "2", "3", "4"]
         args = RankingArgs(parent_ids=parent_ids, children_ids=children_ids, dataset=PromptDataset(artifact_df=ArtifactDataFrame()))
-        state = RankingState(sorted_parent2children={"parent": children_ids},
+        state = RankingState(sorted_parent2children={"parent": [create_entry("parent", c) for c in children_ids]},
                              ranking_responses=GenerationResponse(batch_responses=[self.RESPONSE]))
         state.prompt_builder = CompleteRankingPrompts.create_ranking_prompt_builder(state)
         trace_prediction_entries = ProcessRankingResponses.process_ranking_prompts(args, state)

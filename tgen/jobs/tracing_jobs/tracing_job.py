@@ -74,7 +74,8 @@ class TracingJob(AbstractJob):
                                     pre_sorted_parent2children=parent2children,
                                     dataset=prompt_dataset)
         pipeline = LLMRankingPipeline(pipeline_args)
-        parent2rankings = pipeline.run()
+        pipeline.run()
+        parent2rankings = pipeline.state.children_entries
         predicted_entries = []
 
         for parent_id, ranked_sources in parent2rankings.items():

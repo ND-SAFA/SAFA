@@ -30,7 +30,7 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.tracing.ranking.common.utils import extract_tracing_requests
+from tgen.tracing.ranking.common.ranking_utils import extract_tracing_requests
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 

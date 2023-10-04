@@ -4,6 +4,7 @@ from unittest import TestCase, mock
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.testres.test_data_manager import TestDataManager
+from tgen.tracing.ranking.common.ranking_utils import create_entry
 from tgen.tracing.ranking.steps.step_complete_prompts import CompleteRankingPrompts
 
 
@@ -42,7 +43,7 @@ class TesCompleteRankingResponsesStep(TestCase):
         if children_ids is None:
             children_ids = self.DEFAULT_CHILDREN_IDS
 
-        parent2children = {p: children_ids for p in parent_ids}
+        parent2children = {p: [create_entry(p, c) for c in children_ids] for p in parent_ids}
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=parent_ids,
                                                                     children_ids=children_ids,
                                                                     state_kwargs=state_kwargs)

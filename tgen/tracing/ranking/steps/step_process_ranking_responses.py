@@ -1,13 +1,13 @@
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Dict, List, Set
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
+from tgen.common.constants.tracing.ranking_constants import RANKING_ID_TAG, \
     RANKING_MAX_SCORE, RANKING_SCORE_TAG
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.state.state import State
 from tgen.tracing.ranking.ranking_args import RankingArgs
@@ -38,27 +38,6 @@ class ArtifactReasoning:
         """
         return NEW_LINE.join(explanation_parts.values())
 
-    @staticmethod
-    def get_optional(a_dict: Dict, key_name: str, post_process: Callable = None, default_value=None) -> Optional[Any]:
-        """
-        Returns optional value from dictionary.
-        :param a_dict: The dictionary to retrieve the value from.
-        :param key_name: The name of the optional key.
-        :param post_process: Any operation to perform after value is retrieved, if it exists.
-        :param default_value: The value to use if none exists.
-        :return: The optional value.
-        """
-        if post_process is None:
-            post_process = lambda p: p
-        optional_value = a_dict.get(key_name, [])
-        if len(optional_value) == 0:
-            optional_value = [default_value]
-        if optional_value:
-            value = optional_value[0]
-            value = post_process(value)
-            return value
-        return None
-
 
 class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
 
@@ -84,7 +63,7 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         sorted_parent2children = state.sorted_parent2children
         all_entries = []
         for parent_name, prompt_response in zip(parent_ids, batch_responses):
-            related_children = sorted_parent2children[parent_name]
+            related_children = [entry[TraceKeys.SOURCE] for entry in sorted_parent2children[parent_name]]
             artifact_answers = ProcessRankingResponses._extract_artifact_answers_from_response(prompt_response=prompt_response,
                                                                                                state=state)
             parsed_entries, unidentified_entries, parsed_artifact_ids = [], [], set()

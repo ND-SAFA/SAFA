@@ -29,7 +29,8 @@ class TestEmbeddingPipeline(BaseTest):
                                    parent_ids=self.parent_ids,
                                    children_ids=self.children_ids)
         pipeline = EmbeddingRankingPipeline(ranking_args)
-        trace_entries = pipeline.run()
+        pipeline.run()
+        trace_entries = pipeline.state.children_entries
         self.assertGreater(trace_entries[0]["score"], trace_entries[1]["score"])
         self.assertGreater(trace_entries[0]["score"], trace_entries[2]["score"])
 

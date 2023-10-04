@@ -1,6 +1,10 @@
 from typing import Dict, List
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.tracing.ranking.common.ranking_utils import convert_parent2rankings_to_prediction_entries, create_entry
+from tgen.tracing.ranking.sorters.i_sorter import iSorter
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 from tgen.tracing.ranking.ranking_args import RankingArgs
 from tgen.tracing.ranking.ranking_state import RankingState
@@ -21,7 +25,8 @@ class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):
         if use_pre_ranked:
             n_parents = len(args.parent_ids)
             n_children = len(args.children_ids)
-            state.sorted_parent2children = args.pre_sorted_parent2children
+            parent2rankings = args.pre_sorted_parent2children
+            state.sorted_parent2children = {p: [create_entry(p, c) for c in rankings] for p, rankings in parent2rankings.items()}
             add_sorted_children = len(args.pre_sorted_parent2children) < n_parents or any(
                 [len(v) < n_children for v in args.pre_sorted_parent2children.values()])
             if add_sorted_children:
@@ -33,7 +38,7 @@ class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):
             raise AssertionError("Expected sorter or parent2children to be defined.")
 
     @staticmethod
-    def add_missing_children(args) -> Dict[str, List[str]]:
+    def add_missing_children(args) -> Dict[str, List[EnumDict]]:
         """
         Adds any children missing in args.parent2children in the order defined by sorter.
         :param args: The ranking pipeline arguments.
@@ -46,20 +51,21 @@ class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):
         for p, sorted_children in sorted_parent_map.items():
             defined_children = args.pre_sorted_parent2children.get(p, [])
             defined_children_set = set(defined_children)
-            missing_children = [c for c in sorted_children if c not in defined_children_set]
+            missing_children = [c for c in sorted_children if c[TraceKeys.SOURCE] not in defined_children_set]
             final_parent_map[p] = defined_children + missing_children
         args.max_context_artifacts = original_max_content
         return final_parent_map
 
     @staticmethod
-    def create_sorted_parent_map(args):
+    def create_sorted_parent_map(args: RankingArgs) -> Dict[str, List]:
         """
         Sorts the children artifacts against each parent, resulting in a list of children from most to least similar.
         :param args: The ranking pipeline arguments.
         :return: The map of parent IDs to sorted children IDs.
         """
-        sorting_function = SupportedSorter.get_value(args.sorter.upper())
-        parent_map = sorting_function(args.parent_ids, args.children_ids, args.dataset.artifact_df.to_map(),
-                                      model_name=args.embedding_model)
+        sorter: iSorter = SupportedSorter.get_value(args.sorter.upper())
+        parent2rankings = sorter.sort(args.parent_ids, args.children_ids, args.dataset.artifact_df.to_map(),
+                                      model_name=args.embedding_model, return_scores=True)
+        parent_map = convert_parent2rankings_to_prediction_entries(parent2rankings)
         parent_map = {p: c[:args.max_context_artifacts] for p, c in parent_map.items()}
         return parent_map

@@ -21,7 +21,6 @@ import edu.nd.crc.safa.test.services.builders.BuilderState;
 import edu.nd.crc.safa.test.services.builders.DbEntityBuilder;
 import edu.nd.crc.safa.test.services.builders.JsonBuilder;
 import edu.nd.crc.safa.test.services.builders.RootBuilder;
-import edu.nd.crc.safa.test.services.notifications.NotificationTestService;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -55,7 +54,6 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected Integer port;
     protected String projectName = this.getClass().getSimpleName();
     protected CommitTestService commitService = new CommitTestService();
-    protected NotificationTestService notificationService;
     protected CreationTestService creationService;
     protected VerificationTestSerfice assertionService;
     protected RetrievalTestService retrievalService;
@@ -112,7 +110,6 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         this.creationService = new CreationTestService(this.getServiceProvider(), this.dbEntityBuilder);
         this.assertionService = new VerificationTestSerfice(state);
         this.retrievalService = new RetrievalTestService(getServiceProvider(), this.dbEntityBuilder);
-        this.notificationService = new NotificationTestService(state, this.getPort());
         this.authorizationService = new AuthorizationTestService(this.getServiceProvider(), state);
         SafaRequest.setMockMvc(mockMvc);
     }

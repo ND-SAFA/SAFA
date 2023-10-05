@@ -148,9 +148,10 @@ public class NotificationTestService {
      * @param user        The user subscribing to project version updates.
      * @param jobDbEntity The job whose updates are listened for.
      */
-    public void subscribeToJob(IUser user, JobDbEntity jobDbEntity) {
+    public NotificationTestService subscribeToJob(IUser user, JobDbEntity jobDbEntity) {
         String jobTopic = TopicCreator.getJobTopic(jobDbEntity.getId());
         this.server.subscribe(getClientId(user), jobTopic);
+        return this;
     }
 
     /**

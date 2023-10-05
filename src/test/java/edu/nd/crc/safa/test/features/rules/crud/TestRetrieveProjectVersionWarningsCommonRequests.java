@@ -66,8 +66,10 @@ class TestRetrieveProjectVersionWarningsCommonRequests extends ApplicationBaseTe
         assertThat(ruleViolated.getString("ruleName")).isEqualTo("Missing child");
 
         // Step - Subscribe to project version
-        notificationService.initializeUser(currentUser, this.token);
-        notificationService.subscribeToVersion(currentUser, projectVersion);
+        this.rootBuilder
+            .notifications(n -> n.
+                initializeUser(currentUser, this.token)
+                .subscribeToVersion(currentUser, projectVersion));
 
         // Step - Create Design artifact and link
         JSONObject designJson =

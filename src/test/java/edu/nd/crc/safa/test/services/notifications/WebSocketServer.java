@@ -29,16 +29,27 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 public class WebSocketServer {
     private static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
-    private final WebSocketStompClient stompClient;
+    private static WebSocketStompClient client;
     private final int port;
     private final ObjectMapper objectMapper;
     private ConcurrentHashMap<UUID, StompSession> idToSession = new ConcurrentHashMap<>();
     private ConcurrentHashMap<UUID, BlockingQueue<String>> idToQueue = new ConcurrentHashMap<>();
 
     public WebSocketServer(int port) {
-        this.stompClient = createStompClient();
         this.port = port;
         this.objectMapper = ObjectMapperConfig.create();
+    }
+
+    private static WebSocketStompClient getStompClient() {
+        if (WebSocketServer.client == null) {
+            StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
+            WebSocketTransport transport = new WebSocketTransport(webSocketClient);
+            SockJsClient client = new SockJsClient(List.of(transport));
+            WebSocketStompClient stompClient = new WebSocketStompClient(client);
+            stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.MESSAGE_SIZE_LIMIT);
+            WebSocketServer.client = stompClient;
+        }
+        return WebSocketServer.client;
     }
 
     /**
@@ -50,7 +61,7 @@ public class WebSocketServer {
     public void connect(UUID clientId) throws Exception {
         WebSocketHttpHeaders wsHeaders = new WebSocketHttpHeaders();
         StompHeaders connectHeaders = new StompHeaders();
-        StompSession session = stompClient
+        StompSession session = getStompClient()
             .connect(String.format(WEBSOCKET_URI, port), wsHeaders, connectHeaders,
                 new StompSessionHandlerAdapter() {
                 })
@@ -62,7 +73,6 @@ public class WebSocketServer {
         idToSession.put(clientId, session);
         idToQueue.put(clientId, new LinkedBlockingDeque<>());
     }
-
 
     /**
      * Returns the next message in the queue associated with given client id.
@@ -166,14 +176,5 @@ public class WebSocketServer {
                 idToQueue.get(clientId).offer(new String((byte[]) o));
             }
         });
-    }
-
-    private WebSocketStompClient createStompClient() {
-        StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
-        WebSocketTransport transport = new WebSocketTransport(webSocketClient);
-        SockJsClient client = new SockJsClient(List.of(transport));
-        WebSocketStompClient stompClient = new WebSocketStompClient(client);
-        stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.MESSAGE_SIZE_LIMIT);
-        return stompClient;
     }
 }

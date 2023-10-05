@@ -37,14 +37,16 @@ public abstract class AbstractSyncTest extends ApplicationBaseTest {
         this.projectVersion = this.creationService.createProjectWithNewVersion(projectName);
 
         // Step - Subscribe user to version
-        this.notificationService.initializeUser(currentUser, this.token);
-        this.notificationService.subscribeToVersion(currentUser, projectVersion);
+        this.rootBuilder
+            .notifications(n -> n
+                .initializeUser(currentUser, this.token)
+                .subscribeToVersion(currentUser, projectVersion));
 
         // Step - Perform action on project
         this.performAction();
 
         // VP - Verify correctness of message
-        EntityChangeMessage actionMessage = this.notificationService.getEntityMessage(currentUser);
+        EntityChangeMessage actionMessage = this.rootBuilder.notifications(n -> n.getEntityMessage(currentUser)).get();
         this.verifyActionMessage(actionMessage);
 
         // Step - Execute sync call

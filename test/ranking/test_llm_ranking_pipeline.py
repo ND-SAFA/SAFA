@@ -1,5 +1,5 @@
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
+from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_ID_TAG, \
     RANKING_PARENT_SUMMARY_TAG, \
     RANKING_SCORE_TAG
 from tgen.common.util.prompt_util import PromptUtil
@@ -13,7 +13,7 @@ from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
 
 PARENT_ID = "parent_1"
 CHILD_ID = "child_1"

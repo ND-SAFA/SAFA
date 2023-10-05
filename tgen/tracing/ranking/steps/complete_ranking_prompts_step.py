@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, ARTIFACT_HEADER, RANKING_PARENT_TAG
@@ -17,8 +17,8 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 
 
 class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -73,21 +73,22 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
 
         prompts = []
         for p_name in parent_names:
-            prompt = CompleteRankingPromptsStep.create_prompts(p_name, state.prompt_builder, args, state)
+            artifact_map = args.dataset.artifact_df.to_map()
+            prompt = CompleteRankingPromptsStep.create_prompts(p_name, artifact_map, state.prompt_builder, args, state)
             prompts.append(prompt)
         return prompts
 
     @staticmethod
-    def create_prompts(parent_id: str, prompt_builder: PromptBuilder, args: RankingArgs, state: RankingState) -> Prompt:
+    def create_prompts(parent_id: str, artifact_map: Dict, prompt_builder: PromptBuilder, args: RankingArgs, state: RankingState) -> Prompt:
         """
         Creates ranking prompt for parent artifact.
         :param parent_id: The id of the parent to create prompt for.
         :param prompt_builder: The prompt builder to use to create the prompt
+        :param artifact_map: Maps artifact id to content
         :param args: The arguments to the ranking pipeline
         :param state: The state of the current ranking run.
         :return: The ranking prompt.
         """
-        artifact_map = args.dataset.artifact_df.to_map()
         max_children = args.max_children_per_query
         entries = state.sorted_parent2children[parent_id][:max_children]
         source_body = artifact_map[parent_id]

@@ -6,8 +6,8 @@ from tgen.common.constants.tracing.ranking_constants import DEFAULT_HGEN_LINK_TH
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.common.util.status import Status
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -17,7 +17,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME, create_artifact_df_from_generated_artifacts, save_dataset_checkpoint
+from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME, HGenUtil
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
@@ -50,16 +50,18 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             target_layer_id = CreateHGenDatasetStep._get_target_layer_id(args, original_dataset_complete)
 
             generated_artifacts, predicted_links = list(state.refined_content.keys()), list(state.refined_content.values())
-            new_artifact_df = create_artifact_df_from_generated_artifacts(args, generated_artifacts, target_layer_id)
+            new_artifact_df = HGenUtil.create_artifact_df_from_generated_artifacts(args, generated_artifacts, target_layer_id)
             artifact_id_to_link_predictions = {name: predicted_links[i] for i, name in enumerate(new_artifact_df.index)}
-            save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
+            PipelineUtil.save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path,
+                                                 filename="generated_artifacts_only")
 
             new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, target_layer_id)
             combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
             new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state, combined_artifact_df,
                                                                                            artifact_id_to_link_predictions)
-            save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
-                                    export_path, filename="generated_dataset_checkpoint")
+            PipelineUtil.save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df,
+                                                              layer_df=new_layer_df),
+                                                 export_path, filename="generated_dataset_checkpoint")
 
             new_trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=new_layer_df,
                                                                        artifact_df=combined_artifact_df, trace_df=new_trace_df)

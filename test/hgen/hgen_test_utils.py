@@ -10,7 +10,7 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.hgen.hgen_args import HGenArgs
-from tgen.hgen.hgen_util import get_initials
+from tgen.hgen.hgen_util import HGenUtil
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 
@@ -41,6 +41,7 @@ class HGenTestConstants:
     code_files = [["/Player.cpp"], ["/Rendering/RenderEngine.cpp"], ["/Rendering/Image.cpp", "/Rendering/stb_image.cpp"]]
     n_reruns = 2
 
+
 def get_generated_artifacts_response(contents=None, sources=None, target_type="user-story", source_type="code"):
     if contents is None:
         contents = HGenTestConstants.user_stories
@@ -63,7 +64,7 @@ def get_name_responses(generated_artifact_content=None, target_type="User Story"
     if isinstance(generated_artifact_content, dict):
         generated_artifact_content = generated_artifact_content.keys()
     names = [f"{i}" for i, _ in enumerate(generated_artifact_content)]
-    expected_names = [f"{name} {get_initials(target_type)}" for name in names]
+    expected_names = [f"{name} {HGenUtil.get_initials(target_type)}" for name in names]
     return names, expected_names, [PromptUtil.create_xml("title", name) for name in names]
 
 

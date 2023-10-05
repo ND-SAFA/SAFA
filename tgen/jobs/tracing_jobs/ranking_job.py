@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.common.util.dataclass_util import DataclassUtil
@@ -7,17 +7,15 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput, TracePredictionEntry
-from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 DATA_TOO_LITTLE_INPUTS = "Missing required dataset_creator or artifact_df + layer_ids."

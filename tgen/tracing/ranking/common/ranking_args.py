@@ -7,7 +7,7 @@ from tgen.common.constants.tracing.ranking_constants import DEFAULT_LINK_THRESHO
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
-    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL
+    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_MODEL
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -55,6 +55,10 @@ class RankingArgs(PipelineArgs):
     - ranking_llm_model: The model used to rank
     """
     ranking_llm_model: str = DEFAULT_RANKING_MODEL
+    """
+    - explanation_llm_model: The model used to create explanations
+    """
+    explanation_llm_model: str = DEFAULT_SEARCH_MODEL
     """
     - embedding_model: The model whose embeddings are used to rank children.
     """

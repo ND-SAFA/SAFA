@@ -5,8 +5,8 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MOCK_PS_RES_MAP, MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.steps.create_project_summary_step import CreateProjectSummaryStep
 
 

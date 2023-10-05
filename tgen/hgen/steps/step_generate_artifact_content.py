@@ -1,6 +1,5 @@
 import os
 import uuid
-
 from typing import Tuple
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, COMMA
@@ -9,7 +8,7 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation
+from tgen.hgen.hgen_util import HGenUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -38,20 +37,20 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         task_prompt, target_tag_id, source_tag_id = self._create_task_prompt(args, state)
         generated_artifacts_tag, links_tag = task_prompt.response_manager.get_all_tag_ids()
-        prompt_builder = get_prompt_builder_for_generation(args, task_prompt,
-                                                           combine_summary_and_task_prompts=True)
+        prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
+                                                                    combine_summary_and_task_prompts=True)
         if state.summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{state.summary}")
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
-        generation_predictions = get_predictions(prompt_builder,
-                                                 source_layer_only_dataset,
-                                                 hgen_args=args,
-                                                 prediction_step=PredictionStep.GENERATION,
-                                                 response_prompt_ids={task_prompt.id},
-                                                 tags_for_response={generated_artifacts_tag},
-                                                 return_first=False,
-                                                 export_path=export_path)[0]
+        generation_predictions = HGenUtil.get_predictions(prompt_builder,
+                                                          source_layer_only_dataset,
+                                                          hgen_args=args,
+                                                          prediction_step=PredictionStep.GENERATION,
+                                                          response_prompt_ids={task_prompt.id},
+                                                          tags_for_response={generated_artifacts_tag},
+                                                          return_first=False,
+                                                          export_path=export_path)[0]
         state.generation_predictions = {p[target_tag_id][0]: (p[source_tag_id][0] if len(p[source_tag_id]) > 0 else [])
                                         for p in generation_predictions if target_tag_id in p}
         state.n_generations += 1
@@ -65,8 +64,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         task_prompt = SupportedPrompts.HGEN_GENERATION_QUESTIONNAIRE.value
         task_prompt.id = self.TASK_PROMPT_ID
-        target_type_tag, target_tag_id = convert_spaces_to_dashes(args.target_type), "target"
-        source_type_tag, source_tag_id = convert_spaces_to_dashes(args.source_type), "source"
+        target_type_tag, target_tag_id = HGenUtil.convert_spaces_to_dashes(args.target_type), "target"
+        source_type_tag, source_tag_id = HGenUtil.convert_spaces_to_dashes(args.source_type), "source"
         task_prompt.response_manager = PromptResponseManager(
             response_instructions_format=f"Enclose each {args.target_type} in "
                                          + "{target}. Inside of the {target} tag, " +

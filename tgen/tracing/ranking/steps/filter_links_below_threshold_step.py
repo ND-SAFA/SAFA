@@ -1,7 +1,7 @@
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 
 
 class FilterLinksBelowThresholdStep(AbstractPipelineStep[RankingArgs, RankingState]):

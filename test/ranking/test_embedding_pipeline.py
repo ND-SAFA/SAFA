@@ -4,7 +4,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
 
 
 class TestEmbeddingPipeline(BaseTest):

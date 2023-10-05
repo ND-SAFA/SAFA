@@ -1,5 +1,4 @@
 import os
-from copy import deepcopy
 from unittest.mock import MagicMock
 
 import mock
@@ -9,6 +8,7 @@ from test.hgen.hgen_test_utils import get_test_hgen_args, get_name_responses, ge
     get_ranking_job_result
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
@@ -19,7 +19,6 @@ from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import save_dataset_checkpoint
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
@@ -27,12 +26,11 @@ from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
-from tgen.summarizer.summarizer import Summarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 
 
 class TestHierarchyGenerator(BaseTest):
@@ -60,18 +58,18 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df))
 
         export_path = TEST_OUTPUT_DIR
-        safa_save_path = save_dataset_checkpoint(self.HGEN_STATE.final_dataset, export_path, filename="dir",
-                                                 exporter_class=SafaExporter)
+        safa_save_path = PipelineUtil.save_dataset_checkpoint(self.HGEN_STATE.final_dataset, export_path, filename="dir",
+                                                              exporter_class=SafaExporter)
         saved_safa_dataset = TraceDatasetCreator(StructuredProjectReader(project_path=safa_save_path)).create()
         assert_dataset(saved_safa_dataset, self.HGEN_STATE.final_dataset)
-        csv_save_path = save_dataset_checkpoint(self.HGEN_STATE.source_dataset, export_path, filename="artifacts")
+        csv_save_path = PipelineUtil.save_dataset_checkpoint(self.HGEN_STATE.source_dataset, export_path, filename="artifacts")
         saved_csv_dataset = ArtifactDataFrame(pd.read_csv(csv_save_path))
         self.assertSetEqual(set(saved_csv_dataset.index), set(self.HGEN_STATE.source_dataset.artifact_df.index))
-        dataframe_save_path = save_dataset_checkpoint(self.HGEN_STATE.original_dataset, export_path, filename="dir")
+        dataframe_save_path = PipelineUtil.save_dataset_checkpoint(self.HGEN_STATE.original_dataset, export_path, filename="dir")
         saved_dataframe_dataset = TraceDatasetCreator(DataFrameProjectReader(project_path=dataframe_save_path)).create()
         assert_dataset(saved_dataframe_dataset, self.HGEN_STATE.original_dataset)
         non_dataset = {"hello": "world"}
-        yaml_save_path = save_dataset_checkpoint(non_dataset, export_path, filename="non_dataset")
+        yaml_save_path = PipelineUtil.save_dataset_checkpoint(non_dataset, export_path, filename="non_dataset")
         yaml_content = FileUtil.read_yaml(yaml_save_path)
         self.assertDictEqual(non_dataset, yaml_content)
 

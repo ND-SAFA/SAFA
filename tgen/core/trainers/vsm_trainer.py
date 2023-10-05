@@ -30,7 +30,7 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.tracing.ranking.common.ranking_utils import extract_tracing_requests
+from tgen.tracing.ranking.common.ranking_utils import RankingUtil
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 
@@ -97,7 +97,7 @@ class VSMTrainer(AbstractTrainer):
         :param train_dataset: The dataset to use for training
         :return: None
         """
-        tracing_requests = extract_tracing_requests(train_dataset.artifact_df, train_dataset.layer_df.as_list())
+        tracing_requests = RankingUtil.extract_tracing_requests(train_dataset.artifact_df, train_dataset.layer_df.as_list())
         artifacts = []
         for tracing_request in tracing_requests:
             artifacts = artifacts + self.get_artifacts(tracing_request.parent_ids)
@@ -120,7 +120,7 @@ class VSMTrainer(AbstractTrainer):
         :param threshold: All similarity scores above this threshold will be considered traced, otherwise they are untraced
         :return: The output from the prediction
         """
-        tracing_requests = extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
+        tracing_requests = RankingUtil.extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
         prediction_entries = []
 
         for tracing_request in tracing_requests:

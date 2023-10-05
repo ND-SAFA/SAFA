@@ -10,8 +10,8 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.state.state import State
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 

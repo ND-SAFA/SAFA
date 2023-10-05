@@ -1,8 +1,8 @@
 import os
 
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 from tgen.tracing.ranking.steps.filter_links_below_threshold_step import FilterLinksBelowThresholdStep
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep

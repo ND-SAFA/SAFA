@@ -19,7 +19,7 @@ from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
 
 
 class TracingJob(AbstractJob):

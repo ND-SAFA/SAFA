@@ -1,14 +1,11 @@
-import os
 from typing import Any
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE, PS_ENTITIES_TITLE, PS_SUBSYSTEM_TITLE, \
-    PS_DATA_FLOW_TITLE
+from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE, PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE
+from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import save_dataset_checkpoint
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -32,7 +29,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                         project_summary=original_dataset_complete.project_summary,
                                                         should_summarize_artifacts=args.create_new_code_summaries)
         state.summary = original_dataset_complete.project_summary
-        save_dataset_checkpoint(original_dataset_complete, state.export_dir, filename="initial_dataset_with_sources")
+        PipelineUtil.save_dataset_checkpoint(original_dataset_complete, state.export_dir, filename="initial_dataset_with_sources")
 
         source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
                                                                            args.source_layer_id)

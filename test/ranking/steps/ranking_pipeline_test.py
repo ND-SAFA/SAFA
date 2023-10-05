@@ -2,8 +2,8 @@ from typing import Dict, List
 
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 
 
 class RankingPipelineTest:

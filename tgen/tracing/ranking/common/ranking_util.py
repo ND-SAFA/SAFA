@@ -1,70 +1,22 @@
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from tgen.common.constants.tracing.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
+from tgen.tracing.ranking.common.tracing_request import TracingRequest
 
 
 class RankingUtil:
     """
     Contains utility methods for dealing with artifact layers.
     """
-
-    @staticmethod
-    def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]] = None) -> List[TracePredictionEntry]:
-        """
-        Converts ranking to prediction entries.
-        :param parent2rankings: Mapping of parent name to ranked children.
-        :return: List of prediction entries.
-        """
-        predicted_entries = []
-        for parent_id, ranked_children in parent2rankings.items():
-            if isinstance(ranked_children, tuple):
-                ranked_children, children_scores = ranked_children
-            else:
-                children_scores = ListUtil.create_step_list(len(ranked_children))
-
-            explanations = parent2explanations[parent_id] if parent2explanations else None
-            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children, scores=children_scores,
-                                                                              explanations=explanations)
-            predicted_entries.extend(target_predicted_entries)
-        return predicted_entries
-
-    @staticmethod
-    def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str],
-                                   scores: List[float] = None, original_entries: List[TracePredictionEntry] = None,
-                                   explanations: List[str] = None) -> List[TracePredictionEntry]:
-        """
-        Creates ranking predictions by assigning scores to ranking in linear fashion.
-        :param parent_id: The parent artifact id.
-        :param ranked_children_ids: The ranked children for parent.
-        :param original_entries: The original entries to extract labels from.
-        :param min_score: The minimum traceability score.
-        :return:
-        """
-        children2label = {entry["source"]: entry["label"] for entry in original_entries} if original_entries else {}
-        predicted_entries = []
-        for i in range(len(ranked_children_ids)):
-            child_id = ranked_children_ids[i]
-            score = scores[i]
-            label = children2label.get(child_id, None)
-            entry = {
-                "source": child_id,
-                "target": parent_id,
-                "score": score,
-                "label": label
-            }
-            if explanations:
-                entry[TraceKeys.EXPLANATION.value] = explanations[i]
-            predicted_entries.append(entry)
-        return predicted_entries
-
     @staticmethod
     def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[EnumDict]) -> Optional[Dict]:
         """
@@ -109,10 +61,62 @@ class RankingUtil:
         return metrics
 
     @staticmethod
+    def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]] = None) -> List[TracePredictionEntry]:
+        """
+        Converts ranking to prediction entries.
+        :param parent2rankings: Mapping of parent name to ranked children.
+        :param parent2explanations: Dictionary mapping the parent to a list of explanations for each child prediction
+        :return: List of prediction entries.
+        """
+        predicted_entries = []
+        for parent_id, ranked_children in parent2rankings.items():
+            if isinstance(ranked_children, tuple):
+                ranked_children, children_scores = ranked_children
+            else:
+                children_scores = ListUtil.create_step_list(len(ranked_children))
+
+            explanations = parent2explanations[parent_id] if parent2explanations else None
+            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children, scores=children_scores,
+                                                                              explanations=explanations)
+            predicted_entries.extend(target_predicted_entries)
+        return predicted_entries
+
+    @staticmethod
+    def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str],
+                                   scores: List[float] = None, original_entries: List[TracePredictionEntry] = None,
+                                   explanations: List[str] = None) -> List[TracePredictionEntry]:
+        """
+        Creates ranking predictions by assigning scores to ranking in linear fashion.
+        :param parent_id: The parent artifact id.
+        :param ranked_children_ids: The ranked children for parent.
+        :param scores: The list of scores for each child prediction.
+        :param original_entries: The original entries to extract labels from.
+        :param explanations: A list of explanations for each child prediction.
+        :return:
+        """
+        children2label = {entry["source"]: entry["label"] for entry in original_entries} if original_entries else {}
+        predicted_entries = []
+        for i in range(len(ranked_children_ids)):
+            child_id = ranked_children_ids[i]
+            score = scores[i]
+            label = children2label.get(child_id, None)
+            entry = {
+                "source": child_id,
+                "target": parent_id,
+                "score": score,
+                "label": label
+            }
+            if explanations:
+                entry[TraceKeys.EXPLANATION.value] = explanations[i]
+            predicted_entries.append(entry)
+        return predicted_entries
+
+    @staticmethod
     def log_artifacts(title: str, trace_map: Dict, artifact_ids: List[str], group_key: str = TraceKeys.TARGET.value) -> None:
         """
         Logs the missing links (false negatives).
-        :param trace_df: The trace data frame containing the missing links.
+        :param title: The title to use when logging
+        :param trace_map: The trace data mapping id to trace dict
         :param artifact_ids: The IDs of the missing links.
         :param group_key: The key used to group missing ids (either by parent or child).
         :return: None
@@ -160,6 +164,7 @@ class RankingUtil:
         """
         Groups the predictions by the property given.
         :param predictions: The predictions to group.
+        :param key_id: The id of the key to access the child from the entry
         :return: Dictionary of keys in key_id and their associated entries.
         """
         children2entry = {}
@@ -181,3 +186,52 @@ class RankingUtil:
         a_id = a[artifact_id_key]
         a_score = a.get(TraceKeys.SCORE.value)
         return f"{a_id}: ({a_score})"
+
+    @staticmethod
+    def extract_tracing_requests(artifact_df: ArtifactDataFrame, layers: List[Tuple[str, str]]) -> List[TracingRequest]:
+        """
+        Extracts source and target artifact names for each layer
+        :param artifact_df: Artifact data frame containing ids, bodies, and types.
+        :param layers: The layers being traced, containing list of (child, parent) tuples.
+        :return:
+        """
+        requests = []
+        artifact_map = artifact_df.to_map()
+        for child_type, parent_type in layers:
+            parent_df = artifact_df.get_type(parent_type)
+            child_df = artifact_df.get_type(child_type)
+
+            parent_names = list(parent_df.index)
+            child_names = list(child_df.index)
+            requests.append(TracingRequest(child_ids=child_names, parent_ids=parent_names, artifact_map=artifact_map))
+        return requests
+
+    @staticmethod
+    def create_entry(parent: str, child: str, score: float = 0.0) -> EnumDict:
+        """
+        Creates a prediction entry
+        :param parent: The parent artifact id
+        :param child: The child artifact id
+        :param score: The score representing strength of link between child + parent
+        :return: a prediction entry
+        """
+        return EnumDict({
+            TraceKeys.TARGET: parent,
+            TraceKeys.SOURCE: child,
+            TraceKeys.SCORE: score
+        })
+
+    @staticmethod
+    def convert_parent2rankings_to_prediction_entries(parent2rankings: Dict[str, List]) -> Dict[str, List[EnumDict]]:
+        """
+        Converts the parent2ranking dictionary produced by the sorters into a list of prediction entries
+        :param parent2rankings: The dictionary produced by the sorter containing parent art id mapped to ordered children
+        :return: A list of enum dictionaries representing a prediction entry for each parent, child pair
+        """
+        prediction_entries = {}
+        for parent, parent_payload in parent2rankings.items():
+            prediction_entries[parent] = []
+            for child, score in zip(*parent_payload):
+                entry = RankingUtil.create_entry(parent, child, score)
+                prediction_entries[parent].append(entry)
+        return prediction_entries

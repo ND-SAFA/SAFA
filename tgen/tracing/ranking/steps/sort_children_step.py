@@ -5,7 +5,7 @@ from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
-from tgen.tracing.ranking.common.ranking_utils import RankingUtil
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 

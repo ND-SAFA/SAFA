@@ -1,6 +1,6 @@
 from typing import Dict, List, Union
 
-from tgen.common.util.ranking_util import RankingUtil
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput

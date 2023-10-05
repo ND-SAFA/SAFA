@@ -4,7 +4,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.tracing.ranking.common.ranking_utils import create_entry, RankingUtil
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep

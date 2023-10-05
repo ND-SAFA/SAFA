@@ -1,4 +1,4 @@
-from tgen.common.util.ranking_util import RankingUtil
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.metrics.lag_metric import LagMetric
 from tgen.metrics.map_metric import MapMetric

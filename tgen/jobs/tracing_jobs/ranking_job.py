@@ -5,7 +5,7 @@ from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.ranking_util import RankingUtil
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator

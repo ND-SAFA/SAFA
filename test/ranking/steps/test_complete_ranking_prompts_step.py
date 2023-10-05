@@ -4,7 +4,7 @@ from unittest import TestCase, mock
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.tracing.ranking.common.ranking_utils import RankingUtil
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
 
 

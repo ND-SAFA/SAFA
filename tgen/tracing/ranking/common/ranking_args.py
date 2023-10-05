@@ -2,16 +2,15 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from tgen.common.constants.model_constants import get_best_default_llm_manager
+from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_LINK_THRESHOLD, \
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
-    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_MODEL
+    DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
@@ -55,15 +54,15 @@ class RankingArgs(PipelineArgs):
     """
     - ranking_llm_model: The model used to rank
     """
-    ranking_llm_model: str = DEFAULT_RANKING_MODEL
+    ranking_llm_model_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
     """
     - explanation_llm_model: The model used to create explanations
     """
-    explanation_llm_model: str = DEFAULT_SEARCH_MODEL
+    explanation_llm_model: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
     """
     - embedding_model: The model whose embeddings are used to rank children.
     """
-    embedding_model: str = DEFAULT_EMBEDDING_MODEL
+    embedding_model_name: str = DEFAULT_EMBEDDING_MODEL
     """
     - parent_primary_threshold: The threshold to establish primary parents from.
     """
@@ -76,10 +75,6 @@ class RankingArgs(PipelineArgs):
     - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
     """
     max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS
-    """
-    - llm_manager: A custom llm manager to use throughout the pipeline.
-    """
-    llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
     """
     - link_threshold: The threshold at which to accept links when selecting top predictions.
     """

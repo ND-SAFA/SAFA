@@ -81,13 +81,11 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                              target_layer_id=hgen_args.target_type,
                                                                              generate_names=False)
             generated_artifacts_tag: str = questionnaire.get_response_tags_for_question(-1)
-            selected_artifact_nums = HGenUtil.get_predictions(prompt_builder,
-                                                              PromptDataset(artifact_df=artifacts),
-                                                              hgen_args=hgen_args,
+            selected_artifact_nums = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
                                                               prediction_step=PredictionStep.REFINEMENT,
+                                                              dataset=PromptDataset(artifact_df=artifacts),
                                                               response_prompt_ids=questionnaire.id,
-                                                              tags_for_response={generated_artifacts_tag},
-                                                              return_first=True,
+                                                              tags_for_response={generated_artifacts_tag}, return_first=True,
                                                               export_path=os.path.join(export_path, "gen_refinement_response.yaml"))[0]
             selected_artifact_nums = set(selected_artifact_nums)
             selected_artifacts = RefineGenerationsStep._get_selected_artifacts(refined_artifact_content, selected_artifact_nums)

@@ -24,12 +24,12 @@ class TestState(BaseTest):
 
     def test_get_path_to_state_checkpoint(self):
         with_checkpoint = os.path.join(TEST_OUTPUT_DIR, "state_checkpoints")
-        self.assertEqual(State._get_path_to_state_checkpoint(with_checkpoint), with_checkpoint)
+        self.assertEqual(State.get_path_to_state_checkpoint(with_checkpoint), with_checkpoint)
 
         without_checkpoint = TEST_OUTPUT_DIR
-        self.assertEqual(State._get_path_to_state_checkpoint(without_checkpoint), with_checkpoint)
+        self.assertEqual(State.get_path_to_state_checkpoint(without_checkpoint), with_checkpoint)
 
-        self.assertEqual(State._get_path_to_state_checkpoint(without_checkpoint, "StepName"),
+        self.assertEqual(State.get_path_to_state_checkpoint(without_checkpoint, "StepName"),
                          os.path.join(with_checkpoint, "state-step-name.yaml"))
 
     @mock.patch.object(ProjectSummarizer, "summarize")
@@ -71,7 +71,7 @@ class TestState(BaseTest):
             return val
 
         state_name = GenerateArtifactContentStep.get_step_name()
-        attrs = YamlUtil.read(State._get_path_to_state_checkpoint(TEST_STATE_PATH, state_name))
+        attrs = YamlUtil.read(State.get_path_to_state_checkpoint(TEST_STATE_PATH, state_name))
         param_specs = ParamSpecs.create_from_method(HGenState.__init__)
         checked_attrs = {}
         for name, val in attrs.items():
@@ -79,7 +79,7 @@ class TestState(BaseTest):
         orig_state = HGenState(**checked_attrs)
         orig_state.export_dir = TEST_OUTPUT_DIR
         orig_state.save(state_name)
-        path = State._get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name)
+        path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name)
         reloaded_attrs = YamlUtil.read(path)
         self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/testres/output')
         self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])

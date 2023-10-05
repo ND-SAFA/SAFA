@@ -90,10 +90,7 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         for prompt, step in [(format_questionnaire, PredictionStep.FORMAT), (summary_questions_prompt, PredictionStep.INSTRUCTIONS)]:
             prompt_builder = PromptBuilder(prompts=[prompt])
             prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
-            predictions = HGenUtil.get_predictions(prompt_builder,
-                                                   PromptDataset(),
-                                                   hgen_args=hgen_args,
-                                                   prediction_step=step,
+            predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=step,
                                                    response_prompt_ids=prompt.id)[0]
             inputs.update(predictions)
         return inputs

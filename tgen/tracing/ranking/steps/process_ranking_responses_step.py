@@ -1,4 +1,4 @@
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Any
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.tracing.ranking_constants import RANKING_ID_TAG, \
@@ -24,8 +24,8 @@ class ArtifactReasoning:
         :param artifact_dict: Contains the reasoning of the LLM for each artifact
         """
         JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value])
-        self.index = artifact_dict.pop(RANKING_ID_TAG) if RANKING_ID_TAG in artifact_dict else None
-        self.score = artifact_dict.pop(RANKING_SCORE_TAG) / RANKING_MAX_SCORE
+        self.index = self.get_attr(RANKING_ID_TAG, artifact_dict, pop=True)
+        self.score = self.get_attr(RANKING_SCORE_TAG, artifact_dict, 0.0, pop=True) / RANKING_MAX_SCORE
         self.explanation = self.construct_explanation(artifact_dict)
         self.artifact_id = None
 
@@ -36,7 +36,27 @@ class ArtifactReasoning:
         :param explanation_parts: Dictionary mapping explanation part name and content
         :return: The explanation as a str
         """
-        return NEW_LINE.join(explanation_parts.values())
+        explanation_values = [ArtifactReasoning.get_attr(name, explanation_parts) for name in explanation_parts.keys()]
+        return NEW_LINE.join([v for v in explanation_values if v])
+
+    @staticmethod
+    def get_attr(attr_name: str, artifact_dict: Dict, default: Any = None, expected_list: bool = False, pop: bool = False) -> Any:
+        """
+        Gets an attributes from the artifact dict
+        :param attr_name: The key to retrieve
+        :param artifact_dict: The artifact dict to retrieve it from
+        :param default: Default value if it doesnt exist
+        :param expected_list: If True, the value of the attr is expected to be a list
+        :param pop: If True, pops the value during retrieval
+        :return: The value of the attr
+        """
+        if pop:
+            val = artifact_dict.pop(attr_name) if attr_name in attr_name else default
+        else:
+            val = artifact_dict.get(attr_name, default)
+        if isinstance(val, list) and not expected_list:
+            val = val[0] if val else default
+        return val
 
 
 class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -59,17 +79,15 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         :return: Ranked children for each source.
         """
         parent_ids = args.parent_ids
-        batch_responses = state.ranking_responses.batch_responses
+        ranking_responses = state.ranking_responses
         sorted_parent2children = state.sorted_parent2children
         all_entries = []
-        for parent_name, prompt_response in zip(parent_ids, batch_responses):
+        for parent_name, prompt_response in zip(parent_ids, ranking_responses):
             related_children = [entry[TraceKeys.SOURCE] for entry in sorted_parent2children[parent_name]]
-            artifact_answers = ProcessRankingResponsesStep._extract_artifact_answers_from_response(prompt_response=prompt_response,
-                                                                                                   state=state)
             parsed_entries, unidentified_entries, parsed_artifact_ids = [], [], set()
-            for i, answer in enumerate(artifact_answers):
+            for i, artifact_res in enumerate(prompt_response):
                 try:
-                    a_reasoning = ArtifactReasoning({k: v[0] for k, v in answer.items() if len(v) > 0})
+                    a_reasoning = ArtifactReasoning(artifact_res)
                     if a_reasoning.index is None:
                         a_reasoning.index = i
                         a_reasoning.artifact_id = related_children[a_reasoning.index]
@@ -80,7 +98,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
                         parsed_artifact_ids.add(a_reasoning.artifact_id)
                 except Exception as e:
                     logger.exception(e)
-                    logger.info(f"Unable to parse: {answer}")
+                    logger.info(f"Unable to parse: {artifact_res}")
             n_unidentified = ProcessRankingResponsesStep._identify_unknown_a_reasoning(unidentified_entries, parsed_entries,
                                                                                        parsed_artifact_ids)
             ProcessRankingResponsesStep._log_processing_warning(n_unidentified, parent_name, "unidentified")
@@ -146,20 +164,6 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         """
         if n_affected_artifacts > 0:
             logger.warning(f"Found {n_affected_artifacts} {problem} artifacts after parsing children of {parent_name}")
-
-    @staticmethod
-    def _extract_artifact_answers_from_response(prompt_response: str, state: RankingState) -> List[Dict]:
-        """
-        Extracts the parsed dictionary for each artifact included in the model's response
-        :param prompt_response: THhe response from the model
-        :param state: THe current state of the ranking
-        :return: List of dictionaries containing the answers for each artifact
-        """
-        r = state.prompt_builder.parse_responses(prompt_response)
-        task_prompt = state.prompt_builder.get_all_prompts()[-1]
-        parsed_tags = r[task_prompt.id]
-        artifact_answers = parsed_tags[task_prompt.response_manager.get_all_tag_ids()[0]]
-        return artifact_answers
 
     @staticmethod
     def remove_duplicate_ids(artifact_ids: List[str]):

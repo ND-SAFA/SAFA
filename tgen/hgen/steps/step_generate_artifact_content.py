@@ -43,13 +43,9 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{state.summary}")
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
-        generation_predictions = HGenUtil.get_predictions(prompt_builder,
-                                                          source_layer_only_dataset,
-                                                          hgen_args=args,
-                                                          prediction_step=PredictionStep.GENERATION,
-                                                          response_prompt_ids={task_prompt.id},
-                                                          tags_for_response={generated_artifacts_tag},
-                                                          return_first=False,
+        generation_predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
+                                                          dataset=source_layer_only_dataset, response_prompt_ids={task_prompt.id},
+                                                          tags_for_response={generated_artifacts_tag}, return_first=False,
                                                           export_path=export_path)[0]
         state.generation_predictions = {p[target_tag_id][0]: (p[source_tag_id][0] if len(p[source_tag_id]) > 0 else [])
                                         for p in generation_predictions if target_tag_id in p}

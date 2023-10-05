@@ -88,8 +88,8 @@ class State(BaseObject):
             return False
 
         try:
-            save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
-            as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self._get_path_to_state_checkpoint(self.export_dir)), k)
+            save_path = self.get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
+            as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self.get_path_to_state_checkpoint(self.export_dir)), k)
                            if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()
                        if not attrs2ignore or k not in attrs2ignore}
             collapsed_paths = self.collapse_or_expand_paths(as_dict)
@@ -127,7 +127,7 @@ class State(BaseObject):
         steps.reverse()
         try:
             for step in steps:
-                path = cls._get_path_to_state_checkpoint(load_dir, step)
+                path = cls.get_path_to_state_checkpoint(load_dir, step)
                 if os.path.exists(path):
                     state = cls.load_state_from_path(path, raise_exception=True)
                     return state
@@ -188,7 +188,7 @@ class State(BaseObject):
         return val
 
     @staticmethod
-    def _get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1) -> str:
+    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1) -> str:
         """
         Gets the path to the checkpoint for the state corresponding to the given step name
         :param directory: The directory that the checkpoints live in

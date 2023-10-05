@@ -1,11 +1,14 @@
+import os
 from typing import List, Dict
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, ARTIFACT_HEADER, RANKING_PARENT_TAG
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
@@ -22,18 +25,6 @@ from tgen.tracing.ranking.common.ranking_state import RankingState
 
 
 class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]):
-
-    @overrides(AbstractPipelineStep)
-    def run(self, args: RankingArgs, state: RankingState, re_run: bool = False) -> bool:
-        """
-        Ensures the prompt builder is saved to state
-        :param args: The pipeline arguments / configuration.
-        :param state: The state of the current run.
-        :param re_run: Whether to rerun the step or not
-        :return: Whether the step ran or not
-        """
-        state.prompt_builder = CompleteRankingPromptsStep.create_ranking_prompt_builder(state)
-        return super().run(args, state, re_run)
 
     def _run(self, args: RankingArgs, state: RankingState) -> None:
         """
@@ -53,33 +44,24 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
         :param state: The ranking store.
         :return: None
         """
-        prompts = CompleteRankingPromptsStep.create_ranking_prompts(args, state)
-        kwargs = {PromptKeys.PROMPT.value: prompts}
-        if args.ranking_llm_model:
-            DictUtil.update_kwarg_values(kwargs, model=args.ranking_llm_model)
-        batch_response = args.llm_manager.make_completion_request(LLMCompletionType.GENERATION, **kwargs)
+        prompt_builder = CompleteRankingPromptsStep.create_ranking_prompt_builder(state)
+        artifact_map = args.dataset.artifact_df.to_map()
+        prompts = [CompleteRankingPromptsStep.create_prompts(p_name, artifact_map, prompt_builder, args, state)
+                   for p_name in args.parent_ids]
+        save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
+            state.get_path_to_state_checkpoint(args.export_dir), "ranking_response") if args.export_dir else args.export_dir
+        predictions = LLMTrainer.predict_from_prompts(llm_manager=args.ranking_llm_model_manager, prompt_builder=prompt_builder,
+                                                      prompts=prompts, save_and_load_path=save_and_load_path).predictions
+        task_prompt = prompt_builder.prompts[-1]
+        parsed_answers = LLMResponseUtil.extract_predictions_from_response(predictions, response_prompt_ids=task_prompt.id,
+                                                                           tags_for_response=
+                                                                           task_prompt.response_manager.get_all_tag_ids()[0])
 
-        return batch_response
-
-    @staticmethod
-    def create_ranking_prompts(args: RankingArgs, state: RankingState) -> List[Prompt]:
-        """
-        Creates the prompts to rank children.
-        :param args: The configuration of the ranking pipeline.
-        :param state: The state of the ranking run.
-        :return: The list of prompts created
-        """
-        parent_names = args.parent_ids
-
-        prompts = []
-        for p_name in parent_names:
-            artifact_map = args.dataset.artifact_df.to_map()
-            prompt = CompleteRankingPromptsStep.create_prompts(p_name, artifact_map, state.prompt_builder, args, state)
-            prompts.append(prompt)
-        return prompts
+        return parsed_answers
 
     @staticmethod
-    def create_prompts(parent_id: str, artifact_map: Dict, prompt_builder: PromptBuilder, args: RankingArgs, state: RankingState) -> Prompt:
+    def create_prompts(parent_id: str, artifact_map: Dict, prompt_builder: PromptBuilder, args: RankingArgs,
+                       state: RankingState) -> Prompt:
         """
         Creates ranking prompt for parent artifact.
         :param parent_id: The id of the parent to create prompt for.

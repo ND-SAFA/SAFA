@@ -65,6 +65,7 @@ class FileUtil:
         """
         if additional_path_parts:
             output_path = os.path.join(output_path, *additional_path_parts)
+        output_path = FileUtil.get_directory_path(output_path)  # ensure is a directory
         os.makedirs(output_path, exist_ok=True)
         return output_path
 
@@ -145,6 +146,7 @@ class FileUtil:
         :param use_abs_paths: If True, returns the absolute path
         :return: Same type as value, but with its content processed.
         """
+
         def expand(path: str, replacements: Dict[str, str] = None):
             if replacements:
                 for k, v in replacements.items():
@@ -164,6 +166,7 @@ class FileUtil:
         :param replacements: Dictionary from source to target string replacements in paths.
         :return: Same type as value, but with its content processed.
         """
+
         def collapse(path: str, replacements: Dict[str, str] = None):
             if replacements:
                 path2var = {v: k for k, v in replacements.items()}

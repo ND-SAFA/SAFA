@@ -66,7 +66,7 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         sorter: iSorter = SupportedSorter.get_value(args.sorter.upper())
         parent2rankings = sorter.sort(args.parent_ids, args.children_ids, args.dataset.artifact_df.to_map(),
-                                      model_name=args.embedding_model, return_scores=True)
+                                      model_name=args.embedding_model_name, return_scores=True)
         parent_map = RankingUtil.convert_parent2rankings_to_prediction_entries(parent2rankings)
         parent_map = {p: c[:args.max_context_artifacts] for p, c in parent_map.items()}
         return parent_map

@@ -115,7 +115,8 @@ class QuestionnairePrompt(Prompt):
         """
         parsed = {}
         for prompt in self.question_prompts:
-            parsed.update(prompt.response_manager.parse_response(response))
+            parsed_res = prompt.response_manager.parse_response(response)
+            parsed.update(parsed_res)
         return parsed
 
     @overrides(Prompt)

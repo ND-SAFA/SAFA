@@ -43,7 +43,7 @@ class TestRankingJob(BaseTest):
 
     def create_job_using_embeddings(self, **kwargs):
         job = self.create_job(ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
-                              embedding_model=SMALL_EMBEDDING_MODEL, **kwargs)
+                              embedding_model_name=SMALL_EMBEDDING_MODEL, **kwargs)
         return job
 
     @staticmethod

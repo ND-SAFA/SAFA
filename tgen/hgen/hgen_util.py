@@ -5,9 +5,11 @@ from typing import Dict, List, Set, Union
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, DASH
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.core.trace_output.stage_eval import TracePredictions
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -31,10 +33,8 @@ SAVE_DATASET_DIRNAME = "final_generated_dataset"
 class HGenUtil:
 
     @staticmethod
-    def get_predictions(prompt_builder: PromptBuilder,
-                        dataset: PromptDataset,
-                        hgen_args: HGenArgs,
-                        prediction_step: PredictionStep,
+    def get_predictions(prompt_builder: PromptBuilder, hgen_args: HGenArgs,
+                        prediction_step: PredictionStep, dataset: PromptDataset = None,
                         response_prompt_ids: Union[Set, str] = None, tags_for_response: Union[Set, str] = None,
                         return_first: bool = False, export_path: str = None) -> Dict[str, str]:
         """
@@ -52,35 +52,30 @@ class HGenUtil:
         max_tokens = hgen_args.max_tokens[prediction_step.value]
         llm_manager = hgen_args.llm_managers[prediction_step.value]
         llm_manager.llm_args.set_max_tokens(max_tokens)
-        dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
-        trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
-                                             trainer_dataset_manager=dataset_manager,
-                                             prompt_builder=prompt_builder,
-                                             completion_type=LLMCompletionType.GENERATION))
+
         tags_for_response = tags_for_response.pop() \
             if isinstance(tags_for_response, set) and len(tags_for_response) == 1 else tags_for_response
         base_name, file_name = os.path.split(export_path) if export_path else (EMPTY_STRING, EMPTY_STRING)
 
-        load_path = FileUtil.add_ext(os.path.join(hgen_args.load_dir, file_name), FileUtil.YAML_EXT) if file_name else EMPTY_STRING
-        if os.path.exists(load_path):
-            predictions = FileUtil.read_yaml(load_path)
+        load_path = FileUtil.add_ext(os.path.join(hgen_args.load_dir, file_name), FileUtil.YAML_EXT) \
+            if file_name and hgen_args.load_dir else EMPTY_STRING
+        if dataset is None:
+            predictions = LLMTrainer.predict_from_prompts(llm_manager=llm_manager, prompt_builder=prompt_builder,
+                                                          save_and_load_path=load_path).predictions
         else:
-            predictions = trainer.perform_prediction().predictions
+            dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+            trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
+                                                 trainer_dataset_manager=dataset_manager,
+                                                 prompt_builder=prompt_builder,
+                                                 completion_type=LLMCompletionType.GENERATION))
+            predictions = trainer.perform_prediction(save_and_load_path=load_path).predictions
 
         PipelineUtil.save_dataset_checkpoint(predictions, export_path=base_name, filename=file_name)
 
-        response_prompt_ids = {response_prompt_ids} if isinstance(response_prompt_ids, str) else response_prompt_ids
-        if response_prompt_ids:
-            predictions = [DictUtil.combine_child_dicts(p, response_prompt_ids) for p in predictions]
-            if tags_for_response:
-                predictions = [DictUtil.filter_dict_keys(p, keys2keep=tags_for_response) if isinstance(tags_for_response, set)
-                               else p[tags_for_response] for p in predictions]
-                if return_first:
-                    if isinstance(predictions[0], dict):
-                        predictions = [{key: value[0] if isinstance(value, list) else value for key, value in p.items()}
-                                       for p in predictions]
-                    else:
-                        predictions = [p[0] for p in predictions]
+        predictions = LLMResponseUtil.extract_predictions_from_response(predictions=predictions,
+                                                                        response_prompt_ids=response_prompt_ids,
+                                                                        return_first=return_first,
+                                                                        tags_for_response=tags_for_response)
         return predictions
 
     @staticmethod
@@ -169,13 +164,9 @@ class HGenUtil:
                     artifact_prompt = ArtifactPrompt(include_id=False)
                     prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
                     dataset = PromptDataset(artifact_df=new_artifact_df)
-                    names = HGenUtil.get_predictions(prompt_builder,
-                                                     dataset,
-                                                     hgen_args=hgen_args,
-                                                     prediction_step=PredictionStep.NAME,
-                                                     response_prompt_ids=name_prompt.id,
-                                                     tags_for_response=name_prompt.response_manager.response_tag,
-                                                     return_first=True)
+                    names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=PredictionStep.NAME,
+                                                     dataset=dataset, response_prompt_ids=name_prompt.id,
+                                                     tags_for_response=name_prompt.response_manager.response_tag, return_first=True)
                     assert len(set(names)) == len(names), f"Found duplicates names: {names}"
                     assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
                 new_artifact_df.index = names

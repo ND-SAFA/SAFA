@@ -1,16 +1,47 @@
 import html
+import os
 import re
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Set
 
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.path_constants import RESPONSES_DIRNAME
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.str_util import StrUtil
+from tgen.core.trace_output.stage_eval import TracePredictions
 
 
 class LLMResponseUtil:
+
+    @staticmethod
+    def extract_predictions_from_response(predictions: TracePredictions, response_prompt_ids: Union[Set, str] = None,
+                                          tags_for_response: Union[Set, str] = None, return_first: bool = False):
+        """
+        Extracts the desired predictions from the llm output
+        :param predictions: The predictions from the LLMTrainer
+        :param response_prompt_ids: The prompt id to extract from predictions
+        :param tags_for_response: The tag to extract from predictions
+        :param return_first: If True, returns the first item from each list of parsed tags (often there is only one per tag)
+        :return: The model predictions
+        """
+        response_prompt_ids = {response_prompt_ids} if not isinstance(response_prompt_ids, set) else response_prompt_ids
+        if response_prompt_ids:
+            predictions = [DictUtil.combine_child_dicts(p, response_prompt_ids) for p in predictions]
+            if tags_for_response:
+                predictions = [DictUtil.filter_dict_keys(p, keys2keep=tags_for_response) if isinstance(tags_for_response, set)
+                               else p[tags_for_response] for p in predictions]
+                if return_first:
+                    if isinstance(predictions[0], dict):
+                        predictions = [{key: value[0] if isinstance(value, list) else value for key, value in p.items()}
+                                       for p in predictions]
+                    else:
+                        predictions = [p[0] for p in predictions]
+        return predictions
 
     @staticmethod
     def parse(res: str, tag_name: str, is_nested: bool = False, raise_exception: bool = False, return_res_on_failure: bool = False) -> \
@@ -115,3 +146,16 @@ class LLMResponseUtil:
         """
         pattern = r'[^0-9.]'
         return re.sub(pattern, '', string)
+
+    @staticmethod
+    def generate_response_save_and_load_path(base_dir: str, filename: str) -> str:
+        """
+        Generates a save and load path for responses using a given base directory and a filename
+        :param base_dir: The base directory to save/load to
+        :param filename: The base filename to use
+        :param create: If True, creates the directory as well
+        :return: The full path to save and load to
+        """
+        filename = FileUtil.add_ext(filename, FileUtil.YAML_EXT)
+        path = os.path.join(base_dir, RESPONSES_DIRNAME, filename)
+        return path

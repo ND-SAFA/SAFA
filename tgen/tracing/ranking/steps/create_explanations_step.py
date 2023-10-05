@@ -33,7 +33,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
             prompt = prompt_builder.build(artifacts=artifacts)[PromptKeys.PROMPT]
             prompts.append(prompt)
         kwargs = {PromptKeys.PROMPT.value: prompts}
-        if args.ranking_llm_model:
+        if args.explanation_llm_model:
             DictUtil.update_kwarg_values(kwargs, model=args.explanation_llm_model)
         batch_response = args.llm_manager.make_completion_request(LLMCompletionType.GENERATION, **kwargs)
 

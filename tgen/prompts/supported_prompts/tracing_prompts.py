@@ -47,6 +47,7 @@ def default_score(_, __):
 
 
 SCORE_INSTRUCTIONS = SelectQuestionPrompt(
+    categories_are_continuous=True,
     categories=RANKING_CATEGORIES,
     numeric_category_range=range(RANKING_MAX_SCORE, RANKING_MIN_SCORE - 1,
                                  -round((RANKING_MAX_SCORE - RANKING_MIN_SCORE) / len(RANKING_CATEGORIES))),

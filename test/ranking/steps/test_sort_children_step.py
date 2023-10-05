@@ -35,7 +35,7 @@ class TestSortChildrenStep(BaseTest):
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=[parent_id],
                                                                     children_ids=before,
                                                                     sorter="embedding",
-                                                                    embedding_model=SMALL_EMBEDDING_MODEL)
+                                                                    embedding_model_name=SMALL_EMBEDDING_MODEL)
         step = SortChildrenStep()
         step.run(args, state)
         self.assertEqual([entry[TraceKeys.SOURCE] for entry in state.sorted_parent2children[parent_id]], after)

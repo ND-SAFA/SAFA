@@ -117,7 +117,8 @@ class TestPromptDataset(BaseTest):
         return_vals = {}
         for type_, dataset in TestPromptDataset.get_prompt_datasets().items():
             try:
-                return_vals[type_] = func_to_test(dataset)
+                res = func_to_test(dataset)
+                return_vals[type_] = res
             except Exception as e:
                 if type_ in expected_exceptions:
                     continue

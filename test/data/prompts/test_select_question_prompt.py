@@ -17,6 +17,18 @@ class TestSelectQuestionPrompt(BaseTest):
         prompt2 = self.get_prompt(categories=list(self.CATEGORIES.values()), numeric_category_range=range(1, 4))
         output2 = prompt2._build()
         self.assertEqual(output1, output2)
+        bad_res = prompt2.parse_response("<selection>2.2</selection>")
+        self.assertEqual(bad_res['selection'][0], self.DEFAULT)
+
+        prompt3 = self.get_prompt(categories=list(self.CATEGORIES.values()), numeric_category_range=range(1, 4),
+                                  categories_are_continuous=True)
+        output3 = prompt3._build()
+        expected_output = output1
+        for i in self.CATEGORIES.keys():
+            expected_output = expected_output.replace(str(i), str(float(i)))
+        self.assertEqual(expected_output, output3)
+        good_res = prompt3.parse_response("<selection>1.2</selection>")
+        self.assertEqual(good_res['selection'][0], 1.2)
 
     def test_parse_response(self):
         prompt = self.get_prompt()

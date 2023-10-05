@@ -1,0 +1,49 @@
+from copy import deepcopy
+from unittest import TestCase
+
+from test.ranking.steps.ranking_pipeline_test import EXPLANATION_TAG, DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS
+from tgen.common.constants.tracing.ranking_constants import RANKING_MAX_SCORE
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from tgen.tracing.ranking.steps.process_ranking_responses_step import ProcessRankingResponsesStep
+
+
+class TestProcessRankingResponsesStep(TestCase):
+
+    def test_run(self):
+        parent_ids = DEFAULT_PARENT_IDS
+        children_ids = DEFAULT_CHILDREN_IDS
+        scores = [[0.0, 1.0], [1.0, 0.0]]
+        args = RankingArgs(parent_ids=parent_ids, children_ids=children_ids, dataset=PromptDataset(artifact_df=ArtifactDataFrame()))
+        ranking_responses = [[{'id': [0], 'score': [0.0]},
+                              {'id': [], 'score': [1.0]}], [
+                                 {'id': [1], 'score': [0.0]}]]
+        missing = (parent_ids[1], children_ids[0])
+        for res in ranking_responses:
+            for r in res:
+                r.update({tag: tag.upper() for tag in EXPLANATION_TAG})
+        state = RankingState(sorted_parent2children={p_id: [RankingUtil.create_entry(p_id, c_id) for c_id in children_ids]
+                                                     for p_id in parent_ids},
+                             ranking_responses=ranking_responses)
+
+        ProcessRankingResponsesStep().run(args, state)
+        expected = {p_id: deepcopy(children_ids) for p_id in parent_ids}
+        expected[missing[0]].remove(missing[1])
+        found = {p_id: [] for p_id in parent_ids}
+        for entry in state.children_entries:
+            c_id = entry[TraceKeys.SOURCE.value]
+            c_index = children_ids.index(c_id)
+            p_id = entry[TraceKeys.TARGET.value]
+            p_index = parent_ids.index(p_id)
+            score = entry[TraceKeys.SCORE.value]
+            self.assertEqual(score, scores[p_index][c_index]/RANKING_MAX_SCORE)
+            found[p_id].append(c_id)
+        for p_id in found.keys():
+            self.assertEqual(len(found[p_id]), len(expected[p_id]))
+            for c_id in expected[p_id]:
+                self.assertIn(c_id, found[p_id])
+

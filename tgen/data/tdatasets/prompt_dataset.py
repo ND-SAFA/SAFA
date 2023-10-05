@@ -78,6 +78,8 @@ class PromptDataset(iDataset):
             return self.artifact_df
         elif self.get_prompt_dataframe() is not None:
             return self.get_prompt_dataframe()
+        else:
+            raise NotImplementedError("Cannot convert to dataframe without trace data or prompt dataframe")
 
     def export_prompt_dataframe(self, prompt_df: pd.DataFrame, export_path: str = None) -> Tuple[str, bool]:
         """
@@ -121,7 +123,7 @@ class PromptDataset(iDataset):
         :param prompt_builder: The generator of prompts for the dataset
         :return: The prompt dataframe containing prompts and completions
         """
-        if self.prompt_df is None or (prompt_builder and prompt_args):
+        if self._has_trace_data() and (self.prompt_df is None or (prompt_builder and prompt_args)):
             generation_method = self._get_generation_method(prompt_args, prompt_builder)
             prompt_entries = generation_method(prompt_builder=prompt_builder, prompt_args=prompt_args)
             self.prompt_df = PromptDataFrame(prompt_entries)

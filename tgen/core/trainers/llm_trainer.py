@@ -1,17 +1,25 @@
 import json
+import os.path
 from typing import Any, List, Union
 
 from openai.api_resources.fine_tune import FineTune
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
+from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
     REVERSE_CATEGORIES
@@ -63,13 +71,17 @@ class LLMTrainer(AbstractTrainer):
         logger.info(res.events[-1].message)
         return res
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) -> TracePredictionOutput:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
+                           dataset: iDataset = None, save_and_load_path: str = EMPTY_STRING) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :param dataset: The dataset to use instead of from the dataset manager
+        :param save_and_load_path: The path to load or save response
         :return: THe prediction response
         """
+        assert not save_and_load_path or save_and_load_path.endswith(FileUtil.YAML_EXT), "Response must be saved to yaml file."
+
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
         prompt_df = dataset.get_prompt_dataframe(prompt_builder=self.prompt_builder,
@@ -77,9 +89,19 @@ class LLMTrainer(AbstractTrainer):
         if self.llm_manager.llm_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
         first_prompt = prompt_df[PromptKeys.PROMPT][0]
+
         logger.debug(first_prompt)
-        res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
-                                                       prompt=list(prompt_df[PromptKeys.PROMPT]))
+        if os.path.exists(save_and_load_path):
+            logger.info(f"Loading previous LLM responses from {save_and_load_path}")
+            res = YamlUtil.read(save_and_load_path)
+        else:
+            res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
+                                                           prompt=list(prompt_df[PromptKeys.PROMPT]))
+            if save_and_load_path:
+                logger.info(f"Saved LLM responses to {save_and_load_path}")
+                FileUtil.create_dir_safely(save_and_load_path)
+                YamlUtil.write(res, save_and_load_path)
+
         if isinstance(res, ClassificationResponse):
             output = self._create_classification_output(res, dataset, self.prompt_builder)
         elif isinstance(res, GenerationResponse):
@@ -87,6 +109,30 @@ class LLMTrainer(AbstractTrainer):
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
+
+    @staticmethod
+    def predict_from_prompts(llm_manager: AbstractLLMManager,
+                             prompt_builder: PromptBuilder,
+                             prompts: List[Prompt] = None,
+                             save_and_load_path: str = EMPTY_STRING, **prompt_kwargs) -> TracePredictionOutput:
+        """
+        Makes generation predictions from a list of prompts
+        :param llm_manager: The llm manager to use for predictions
+        :param prompt_builder: The prompt builder to parse the response (or additionally create prompts)
+        :param prompts: The list of prompts to use unless built from prompt_builder
+        :param save_and_load_path: Path used to load or save predictions
+        :param prompt_kwargs: Additional arguments used when building prompts (optionally)
+        :return: The output from the predictions
+        """
+        if not prompts:
+            prompts = [prompt_builder.build(llm_manager.prompt_args, **prompt_kwargs)[PromptKeys.PROMPT]]
+        prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts, PromptKeys.COMPLETION: [EMPTY_STRING for _ in prompts]})
+        dataset = PromptDataset(prompt_df=prompt_df)
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+        initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builder=prompt_builder,
+                                        trainer_dataset_manager=trainer_dataset_manager)
+        trainer = LLMTrainer(initial_state)
+        return trainer.perform_prediction(save_and_load_path=save_and_load_path)
 
     def cleanup(self) -> None:
         """

@@ -29,7 +29,6 @@ class CreateProjectSummaryStep(AbstractPipelineStep[RankingArgs, RankingState]):
             summary = None
         else:  # GENERATED SUMMARY
             summarizer = ProjectSummarizer(SummarizerArgs(dataset=args.dataset,
-                                                          llm_manager_for_project_summary=args.llm_manager,
                                                           summarize_artifacts=False,
                                                           export_dir=args.export_dir))
             summary = summarizer.summarize()

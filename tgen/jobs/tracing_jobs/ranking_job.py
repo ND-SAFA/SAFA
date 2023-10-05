@@ -78,7 +78,7 @@ class RankingJob(AbstractJob):
         logger.info(f"Starting to trace: {run_name}")
 
         if not self.select_top_predictions:
-            DictUtil.update_kwarg_values(self.ranking_kwargs, link_threshold=0.0)
+            DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
         pipeline_args = RankingArgs(run_name=run_name,
                                     dataset=dataset,
                                     parent_ids=parent_ids,

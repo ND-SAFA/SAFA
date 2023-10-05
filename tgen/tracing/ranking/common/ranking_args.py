@@ -15,6 +15,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.tracing.ranking.common.selection_methods import SupportedSelectionMethod
 
 
 @dataclass
@@ -83,6 +84,10 @@ class RankingArgs(PipelineArgs):
     - link_threshold: The threshold at which to accept links when selecting top predictions.
     """
     link_threshold: float = DEFAULT_LINK_THRESHOLD
+    """
+    - selection_method: The method to use to select top predictions
+    """
+    selection_method: SupportedSelectionMethod = SupportedSelectionMethod.FILTER_BY_THRESHOLD
 
     def save(self, obj: Any, file_name: str) -> str:
         """

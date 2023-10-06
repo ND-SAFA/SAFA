@@ -12,7 +12,6 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.str_util import StrUtil
 from tgen.core.trace_output.stage_eval import TracePredictions
 
 

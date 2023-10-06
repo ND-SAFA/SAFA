@@ -5,11 +5,12 @@ from tgen.common.util.supported_enum import SupportedEnum
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY, NL_SUMMARY
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_QUESTIONNAIRE
-from tgen.prompts.supported_prompts.tracing_prompts import RANKING_GOAL, QUESTION1, QUESTION2, EXPLANATION_GOAL
 from tgen.prompts.supported_prompts.delta_prompts import DIFF_SUMMARY_QUESTIONNAIRE, DIFF_SUMMARY_STARTER_PROMPT, \
     CHANGE_SUMMARY_STARTER_PROMPT, CHANGE_SUMMARY_QUESTIONNAIRE, IMPACTS_PROMPT, ADDED_PROMPT, DELETED_PROMPT
+from tgen.prompts.supported_prompts.explanation_prompts import EXPLANATION_GOAL, EXPLANATION_TASK_QUESTIONNAIRE
 from tgen.prompts.supported_prompts.hgen_prompts import FORMAT_QUESTIONNAIRE, GENERATION_PROMPT, INSTRUCTION_CREATION_PROMPT, \
     REFINE_PROMPT, REFINE_TASKS, SUMMARY_QUESTIONNAIRE, GENERATATION_QUESTIONNAIRE
+from tgen.prompts.supported_prompts.tracing_prompts import RANKING_GOAL, QUESTION1, QUESTION2
 
 
 class SupportedPrompts(SupportedEnum):
@@ -44,6 +45,7 @@ class SupportedPrompts(SupportedEnum):
     RANKING_QUESTION2 = QUESTION2
 
     EXPLANATIONS_GOAL_INSTRUCTIONS = EXPLANATION_GOAL
+    EXPLANATION_TASK = EXPLANATION_TASK_QUESTIONNAIRE
 
     @DynamicClassAttribute
     def value(self) -> Prompt:

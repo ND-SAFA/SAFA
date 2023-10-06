@@ -33,7 +33,7 @@ class TestLLMRankingPipeline(BaseTest):
         self.assertEqual(PARENT_ID, entry[TraceKeys.TARGET.value])
         for tag in EXPLANATION_TAG:
             self.assertIn(tag, entry[TraceKeys.EXPLANATION.value].lower())
-        self.assertEqual(.4, entry[TraceKeys.SCORE.value])
+        self.assertEqual(.75, entry[TraceKeys.SCORE.value])
 
     @staticmethod
     def create_args() -> RankingArgs:

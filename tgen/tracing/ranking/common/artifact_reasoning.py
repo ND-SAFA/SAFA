@@ -1,8 +1,10 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.tracing.ranking_constants import RANKING_ID_TAG, RANKING_SCORE_TAG, RANKING_MAX_SCORE, RANKING_ARTIFACT_TAG
+from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.common.constants.tracing.ranking_constants import RANKING_ID_TAG, RANKING_SCORE_TAG, RANKING_MAX_SCORE, RANKING_ARTIFACT_TAG, \
+    JUSTIFICATION_TAG, RANKING_MIN_SCORE
 from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 
 
@@ -16,20 +18,22 @@ class ArtifactReasoning:
         if require_id:
             JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value])
         self.index = self.get_attr(RANKING_ID_TAG, artifact_dict, pop=True)
-        self.score = self.get_attr(RANKING_SCORE_TAG, artifact_dict, 0.0, pop=True) / RANKING_MAX_SCORE
+        self.score = MathUtil.normalize_val(self.get_attr(RANKING_SCORE_TAG, artifact_dict, 0.0, pop=True),
+                                            max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
         self.explanation = self.construct_explanation(artifact_dict)
         self.artifact_id = None
 
-    @staticmethod
-    def construct_explanation(explanation_parts: Dict) -> str:
+    def construct_explanation(self, explanation_parts: Dict) -> str:
         """
         Constructs the explanation from its parts
         :param explanation_parts: Dictionary mapping explanation part name and content
         :return: The explanation as a str
         """
-        explanation_values = [ArtifactReasoning.get_attr(name, explanation_parts) for name in explanation_parts.keys()
-                              if name != RANKING_ARTIFACT_TAG]
-        return NEW_LINE.join([v for v in explanation_values if v])
+        explanation_values = {name: ArtifactReasoning.get_attr(name, explanation_parts)
+                              for name in explanation_parts.keys() if name != RANKING_ARTIFACT_TAG}
+        formatted_values = [self.format_for_explanation(val, self.score, remove_score=name == JUSTIFICATION_TAG)
+                            for name, val in explanation_values.items() if val]
+        return NEW_LINE.join(formatted_values)
 
     @staticmethod
     def get_attr(attr_name: str, artifact_dict: Dict, default: Any = None, expected_list: bool = False, pop: bool = False) -> Any:
@@ -49,3 +53,19 @@ class ArtifactReasoning:
         if isinstance(val, list) and not expected_list:
             val = val[0] if val else default
         return val
+
+    @staticmethod
+    def format_for_explanation(explanation_part: str, score: float, remove_score: bool) -> Optional[str]:
+        """
+        Formats the explanation portion of the reasoning
+        :param explanation_part: The part of the explanation to format
+        :param score: The score given to the artifact
+        :param remove_score: If True, removes the score from the explanation
+        :return: The formatted explanation part
+        """
+        if not explanation_part:
+            return
+        lines = explanation_part.strip().split(NEW_LINE)
+        if remove_score:
+            lines = [line for line in lines if str(score) not in line]
+        return EMPTY_STRING.join(lines)

@@ -86,7 +86,7 @@ class RankingJob(AbstractJob):
                                     **self.ranking_kwargs)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         pipeline.run()
-        predicted_entries = pipeline.state.children_entries
+        predicted_entries = pipeline.state.candidate_entries
         selected_trace_ids = {self.get_trace_id_from_entry(entry) for entry in pipeline.state.selected_entries}
         selected_entries = []
         has_positive_links = self.dataset is not None and self.dataset.trace_df is not None and len(

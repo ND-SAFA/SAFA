@@ -75,9 +75,9 @@ class ArtifactPrompt(Prompt):
         """
         relation = None
         if artifact.get(TraceKeys.child_label().value, False):
-            relation = "child"
+            relation = "Child"
         elif artifact.get(TraceKeys.parent_label().value, False):
-            relation = "parent"
+            relation = "Parent"
         return relation
 
     @staticmethod
@@ -115,10 +115,13 @@ class ArtifactPrompt(Prompt):
         :param include_id: Whether to include id or not
         :return: The formatted prompt
         """
-        artifact_id = relation if relation and not include_id else artifact_id
-        assert artifact_id, f"Building artifact as {ArtifactPrompt.BuildMethod.MARKDOWN.name} requires an artifact id to be given."
-
-        header = PromptUtil.as_markdown_header(original_string=artifact_id.capitalize(), level=header_level)
+        assert artifact_id or relation, \
+            f"Building artifact as {ArtifactPrompt.BuildMethod.MARKDOWN.name} requires an artifact id to be given."
+        if artifact_id and relation and include_id:
+            artifact_id = f"{artifact_id} ({relation})"
+        elif relation:
+            artifact_id = relation
+        header = PromptUtil.as_markdown_header(original_string=artifact_id, level=header_level)
         content = PromptUtil.indent_for_markdown(artifact_body)
         return f"{header}{NEW_LINE}{content}"
 

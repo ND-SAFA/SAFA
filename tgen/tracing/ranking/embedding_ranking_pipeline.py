@@ -14,7 +14,7 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     """
     Ranks a set of artifacts by using their embeddings to their parents.
     """
-    steps = [CreateProjectSummaryStep, SortChildrenStep, SelectCandidateLinksStep, CreateExplanationsStep]
+    steps = [CreateProjectSummaryStep, SortChildrenStep, CreateExplanationsStep, SelectCandidateLinksStep]
 
     def __init__(self, args: RankingArgs):
         """

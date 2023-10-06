@@ -1,7 +1,9 @@
 import re
 import uuid
+from copy import deepcopy
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE
+from tgen.common.util.logging.logger_manager import logger
 
 
 class StrUtil:
@@ -21,12 +23,18 @@ class StrUtil:
         if not formatting_fields:
             return string
         updated_args = [arg for arg in args]
+        updated_kwargs = {}
         for i, field in enumerate(formatting_fields):
-            if kwargs and field not in kwargs:
-                kwargs[field] = '{%s}' % field
-            if args and i >= len(args):
-                updated_args.append('{%s}' % field)
-        return string.format(*updated_args, **kwargs)
+            replacement = '{%s}' % field
+            if field:
+                if field in kwargs:
+                    updated_kwargs[field] = kwargs[field]
+                else:
+                    updated_kwargs[field] = replacement
+            if not field and i >= len(updated_args):
+                updated_args.append(replacement)
+        string = string.format(*updated_args, **updated_kwargs)
+        return string
 
     @staticmethod
     def is_uuid(input_string: str) -> bool:

@@ -40,7 +40,9 @@ class CustomLoader(SafeLoader):
                 data = cls(**init_params)
             else:
                 data = cls.__new__(cls)
-            if deep:
+            if 'dictitems' in state:
+                data.update(state['dictitems'])
+            elif deep:
                 data.__setstate__(state)
             else:
                 data.__dict__.update(state)

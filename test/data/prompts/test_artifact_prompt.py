@@ -36,10 +36,15 @@ class TestArtifactPrompt(BaseTest):
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
         markdown_id = ArtifactPrompt(self.PROMPT, build_method=ArtifactPrompt.BuildMethod.MARKDOWN, include_id=True)
+        prompt = markdown_id._build(self.ARTIFACT)
+        expected_artifact_format = f"# {id_}\n    {content}"
+        ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
+
+        markdown_id_and_relation = ArtifactPrompt(self.PROMPT, build_method=ArtifactPrompt.BuildMethod.MARKDOWN, include_id=True)
         source_artifact = deepcopy(self.ARTIFACT)
         source_artifact[TraceKeys.SOURCE] = True
-        prompt = markdown_id._build(source_artifact)
-        expected_artifact_format = f"# {id_.capitalize()}\n    {content}"
+        prompt = markdown_id_and_relation._build(source_artifact)
+        expected_artifact_format = f"# {id_} (Child)\n    {content}"
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
         markdown = ArtifactPrompt(self.PROMPT, build_method=ArtifactPrompt.BuildMethod.MARKDOWN, include_id=False)

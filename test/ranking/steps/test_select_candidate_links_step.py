@@ -39,7 +39,7 @@ class TestSelectCandidateLinksStep(TestCase):
 
         expected_links_missing = [1, 2, 3, 4]
         state = self.get_state(children_ids, parent_ids)
-        for entry in state.children_entries:
+        for entry in state.candidate_entries:
             entry["score"] = 0
         args.selection_method = SupportedSelectionMethod.FILTER_BY_THRESHOLD
         SelectCandidateLinksStep().run(args, state)
@@ -57,4 +57,4 @@ class TestSelectCandidateLinksStep(TestCase):
                             EnumDict({'id': 4, 'source': 't1', 'target': 's5', 'score': 0.7})
                             ]
         return RankingState(sorted_parent2children={p_id: [RankingUtil.create_entry(p_id, c_id) for c_id in children_ids]
-                                                     for p_id in parent_ids}, children_entries=children_entries)
+                                                     for p_id in parent_ids}, candidate_entries=children_entries)

@@ -1,9 +1,10 @@
+from math import floor
+
 from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
     RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
-    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER
+    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, JUSTIFICATION_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
-
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -21,14 +22,6 @@ RANKING_GOAL = Prompt(
     "focusing on understanding the children artifacts in the context of the system to help achieve this goal."
 )
 
-EXPLANATION_GOAL = Prompt(
-    f"\n{PromptUtil.as_markdown_header('Goal')}\n"
-    "You are an expert on the software project below. "
-    f"This software project is described under `{PromptUtil.as_markdown_header(PROJECT_SUMMARY_HEADER)}`. "
-    f"You are tasked with performing software traceability for a parent artifact "
-    f"and a candidate children artifact`. "
-)
-
 QUESTION1 = QuestionnairePrompt(
     instructions="FIRST, Write the detailed paragraph about the parent artifact including:",
     enumeration_chars=["-"],
@@ -43,29 +36,32 @@ QUESTION1 = QuestionnairePrompt(
                           f"to understand the system the parent artifact is operating in.")
                       ], response_manager=PromptResponseManager(response_tag=RANKING_PARENT_SUMMARY_TAG))
 RANKING_CATEGORIES = ["Artifacts have an direct 1:1 mapping based on closely-tied functionality "
-                      "or a direct design or inheritance relationship",
-                      "Artifacts have a clear primary-secondary relationship where one supports key functions of the other",
-                      "Artifacts have some functional overlap, but neither is primarily supporting or dependent on the other",
-                      "Artifacts have indirect relationships through secondary functions or peripheral impacts on each other",
-                      "Artifacts have minimal overlap or impact on each other",
-                      "No discernible relationship between artifacts can be identified"]
-
-
-def default_score(_, __):
-    return RANKING_MIN_SCORE
-
-
+                      "or a direct design or inheritance relationship (definite trace-link)",
+                      "Artifacts have a clear primary-secondary relationship where one supports key functions of the other "
+                      "(likely trace-link)",
+                      "Artifacts have indirect relationships through secondary "
+                      "functions or peripheral impacts on each other (unsure if trace-link)",
+                      "Artifacts have minimal overlap or impact on each other (weak trace-link)",
+                      "No discernible relationship between artifacts can be identified (unlikely trace-link)"]
+RANKING_RANGE = range(RANKING_MAX_SCORE, RANKING_MIN_SCORE - 1,
+                                 -round(((RANKING_MAX_SCORE - RANKING_MIN_SCORE) / len(RANKING_CATEGORIES))))
 SCORE_INSTRUCTIONS = SelectQuestionPrompt(
     categories_are_continuous=True,
     categories=RANKING_CATEGORIES,
-    numeric_category_range=range(RANKING_MAX_SCORE, RANKING_MIN_SCORE - 1,
-                                 -round((RANKING_MAX_SCORE - RANKING_MIN_SCORE) / len(RANKING_CATEGORIES))),
-    instructions=f"Finally and IMPORTANTLY, user your previous answers to determine "
-                 f"a score from {RANKING_MAX_SCORE}-{RANKING_MIN_SCORE} "
+    numeric_category_range=RANKING_RANGE,
+    instructions=f"IMPORTANTLY, use your previous answers to determine "
+                 f"a score from anywhere from {RANKING_MIN_SCORE} to {RANKING_MAX_SCORE} "
                  f"representing the strength of the trace link between "
-                 "the parent and child. Using the following as guidelines: ",
+                 "the parent and child. The following can help guide your decision. "
+                 f"Often, the relationship might fall somewhere between two categories. "
+                 f"Since the score is continuous, you may select a score in between the categories to reflect this (e.g. 2.8). "
+                 f"Rather than give a score of exactly {list(RANKING_RANGE)[floor(len(RANKING_CATEGORIES)/2)]} "
+                 f"indicating you are unsure, provide a score slightly above or below (e.g. 2.8)"
+                 f"to indicate whether it is more likely a trace-link does (> 3) or does not exist (< 2). "
+                 f"Note, generally if a relationship is truly unclear, no trace-link exists.",
     response_tag=RANKING_SCORE_TAG,
-    default_factory=default_score)
+    response_format="Enclose the score in {}",
+    default_factory=lambda tag, val: RANKING_MIN_SCORE)
 
 QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps used to determine "
                                              "if each artifact is a child of the parent artifact. "
@@ -101,5 +97,5 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                                   SCORE_INSTRUCTIONS,
                                                   QuestionPrompt("Write a brief explanation of why this score reflects the "
                                                                  "relationship between the two artifacts",
-                                                                 PromptResponseManager(response_tag="justification"))
+                                                                 PromptResponseManager(response_tag=JUSTIFICATION_TAG))
                                                   ])

@@ -32,9 +32,11 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param args: The arguments to the ranking pipeline
         :param state: The current state of the ranking pipeline
         """
+        weight = args.weight_of_explanation_scores
         a_reasonings = self._get_artifact_reasoning(args, state)
-        for a_reasoning, entry in zip(a_reasonings, state.selected_entries):
+        for a_reasoning, entry in zip(a_reasonings, state.get_current_entries()):
             entry[TraceKeys.EXPLANATION.value] = a_reasoning.explanation
+            entry[TraceKeys.SCORE.value] = a_reasoning.score * weight + entry[TraceKeys.SCORE.value] * (1-weight)
 
     @staticmethod
     def _get_artifact_reasoning(args: RankingArgs, state: RankingState) -> List[ArtifactReasoning]:
@@ -53,10 +55,9 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
                                              trainer_dataset_manager=trainer_dataset_manager))
         predictions = trainer.perform_prediction(save_and_load_path=save_and_load_path).predictions
         task_prompt: QuestionnairePrompt = prompt_builder.prompts[-1]
-        tag_id = task_prompt.response_manager.get_all_tag_ids()[0]
         parsed = LLMResponseUtil.extract_predictions_from_response(predictions,
                                                                    response_prompt_ids=task_prompt.id)
-        a_reasonings = [ArtifactReasoning(parsed_dict[tag_id][0], require_id=False) for parsed_dict in parsed]
+        a_reasonings = [ArtifactReasoning(parsed_dict, require_id=False) for parsed_dict in parsed]
         return a_reasonings
 
     @staticmethod
@@ -67,13 +68,13 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The current state of the ranking pipeline
         """
         artifact_df = args.dataset.artifact_df
-        selected_ids, source_layers, target_layers = [], [], []
-        for entry in state.selected_entries:
+        selected_ids, layers = [], set()
+        for entry in state.get_current_entries():
             selected_ids.append(TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET]))
             source, target = artifact_df.get_artifacts_from_trace(entry)
-            source_layers.append(source[ArtifactKeys.LAYER_ID])
-            target_layers.append(target[ArtifactKeys.LAYER_ID])
-        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: source_layers, LayerKeys.TARGET_TYPE: target_layers})
+            layers.add((source[ArtifactKeys.LAYER_ID], target[ArtifactKeys.LAYER_ID]))
+        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [source for source, _ in layers],
+                                   LayerKeys.TARGET_TYPE: [target for _, target in layers]})
         trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=layer_df, artifact_df=artifact_df)
         trace_df = trace_df.filter_by_index(selected_ids)
         filter_dataset = TraceDataset(artifact_df=artifact_df, trace_df=trace_df,
@@ -96,11 +97,10 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
 
         prompt_builder.add_prompt(MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                                       data_type=MultiArtifactPrompt.DataType.TRACES,
-                                                      include_ids=False,
+                                                      include_ids=True,
                                                       prompt_prefix=PromptUtil.as_markdown_header("ARTIFACTS")
                                                       ))
-        task_prompt: QuestionnairePrompt = SupportedPrompts.RANKING_QUESTION2.value
-        task_prompt.set_instructions("Use the steps below to determine if the two artifacts are traced.")
+        task_prompt: QuestionnairePrompt = SupportedPrompts.EXPLANATION_TASK.value
         prompt_builder.add_prompt(task_prompt)
 
         return prompt_builder

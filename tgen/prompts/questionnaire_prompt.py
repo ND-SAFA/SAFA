@@ -139,7 +139,7 @@ class QuestionnairePrompt(Prompt):
         if child:
             question_format = PromptUtil.indent_for_markdown(question_format)
         formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i % len(self.enumeration_chars)],
-                                                                    question.build(child=True))
+                                                                    question.build(child=True, **kwargs))
                                              for i, question in enumerate(self.question_prompts)])
         instructions = f"{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         final = f"{instructions}{formatted_questions}{NEW_LINE}"

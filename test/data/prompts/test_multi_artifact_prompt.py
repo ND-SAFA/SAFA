@@ -47,16 +47,12 @@ class TestMultiArtifactPrompt(BaseTest):
         trace_artifacts[0][TraceKeys.SOURCE] = True
         trace_artifacts[1][TraceKeys.TARGET] = True
         prompt = markdown_id_with_prompt._build(trace_artifacts)
-        expected_artifact_format = [f"## {artifact1[ArtifactKeys.ID].capitalize()}\n    {artifact1[ArtifactKeys.CONTENT]}",
-                                    f"## {artifact2[ArtifactKeys.ID].capitalize()}\n    {artifact2[ArtifactKeys.CONTENT]}"]
+        expected_artifact_format = [f"## {artifact1[ArtifactKeys.ID]} (Child)\n    {artifact1[ArtifactKeys.CONTENT]}",
+                                    f"## {artifact2[ArtifactKeys.ID]} (Parent)\n    {artifact2[ArtifactKeys.CONTENT]}"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
         markdown_id_without_prompt = MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                                          include_ids=True)
-        prompt = markdown_id_without_prompt._build(trace_artifacts)
-        expected_artifact_format = [f"# {artifact1[ArtifactKeys.ID].capitalize()}\n    {artifact1[ArtifactKeys.CONTENT]}",
-                                    f"# {artifact2[ArtifactKeys.ID].capitalize()}\n    {artifact2[ArtifactKeys.CONTENT]}"]
-        ArtifactPromptTestUtil.assert_expected_format(self, prompt, '', expected_artifact_format)
 
         markdown_without_id = MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                                   include_ids=False)

@@ -77,7 +77,7 @@ class TesCompleteRankingResponsesStep(TestCase):
 
     def _get_scores_for_parent(self, children_ids, parent_id):
         p_index = DEFAULT_PARENT_IDS.index(parent_id)
-        scores = [abs(p_index - i) for i in range(len(children_ids))]
+        scores = [abs(p_index - i) + 1 for i in range(len(children_ids))]
         return scores
 
     @staticmethod

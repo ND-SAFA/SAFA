@@ -14,7 +14,7 @@ ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 
 class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState]):
 
-    def _run(self, args: ArgType, state: State) -> None:
+    def _run(self, args: RankingArgs, state: RankingState) -> None:
         """
         Process the responses from the model in the previous step
         :param args: The args for ranking
@@ -62,7 +62,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
             # Step - Store results
             child_entries = ProcessRankingResponsesStep._create_trace_prediction_entries(parsed_entries, parent_name)
             all_entries.extend(child_entries)
-        state.children_entries = all_entries
+        state.candidate_entries = all_entries
         return all_entries
 
     @staticmethod

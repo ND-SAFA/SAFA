@@ -7,6 +7,7 @@ from sklearn.preprocessing._data import minmax_scale
 from tqdm import tqdm
 
 from tgen.common.constants.environment_constants import IS_TEST
+from tgen.common.util.list_util import ListUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
 from tgen.common.constants.tracing.ranking_constants import DEFAULT_EMBEDDING_MODEL
 
@@ -44,6 +45,7 @@ class EmbeddingSorter(iSorter):
 
             if return_scores:
                 sorted_artifact_scores = minmax_scale(sorted_artifact_scores)
+                sorted_artifact_scores = ListUtil.convert_numpy_array_to_native_types(sorted_artifact_scores)
                 parent2rankings[parent_id] = (sorted_artifact_ids, sorted_artifact_scores)
             else:
                 parent2rankings[parent_id] = sorted_artifact_ids

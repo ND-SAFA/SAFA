@@ -7,7 +7,7 @@ from tgen.common.constants.tracing.ranking_constants import DEFAULT_LINK_THRESHO
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
-    DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL
+    DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -83,6 +83,10 @@ class RankingArgs(PipelineArgs):
     - selection_method: The method to use to select top predictions
     """
     selection_method: SupportedSelectionMethod = SupportedSelectionMethod.FILTER_BY_THRESHOLD
+    """
+    - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
+    """
+    weight_of_explanation_scores: float = DEFAULT_EXPLANATION_SCORE_WEIGHT
 
     def save(self, obj: Any, file_name: str) -> str:
         """

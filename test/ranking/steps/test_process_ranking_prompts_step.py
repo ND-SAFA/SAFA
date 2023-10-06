@@ -2,7 +2,8 @@ from copy import deepcopy
 from unittest import TestCase
 
 from test.ranking.steps.ranking_pipeline_test import EXPLANATION_TAG, DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS
-from tgen.common.constants.tracing.ranking_constants import RANKING_MAX_SCORE
+from tgen.common.constants.tracing.ranking_constants import RANKING_MAX_SCORE, RANKING_MIN_SCORE
+from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -34,16 +35,16 @@ class TestProcessRankingResponsesStep(TestCase):
         expected = {p_id: deepcopy(children_ids) for p_id in parent_ids}
         expected[missing[0]].remove(missing[1])
         found = {p_id: [] for p_id in parent_ids}
-        for entry in state.children_entries:
+        for entry in state.candidate_entries:
             c_id = entry[TraceKeys.SOURCE.value]
             c_index = children_ids.index(c_id)
             p_id = entry[TraceKeys.TARGET.value]
             p_index = parent_ids.index(p_id)
             score = entry[TraceKeys.SCORE.value]
-            self.assertEqual(score, scores[p_index][c_index]/RANKING_MAX_SCORE)
+            self.assertEqual(score, MathUtil.normalize_val(scores[p_index][c_index],
+                                                           max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE))
             found[p_id].append(c_id)
         for p_id in found.keys():
             self.assertEqual(len(found[p_id]), len(expected[p_id]))
             for c_id in expected[p_id]:
                 self.assertIn(c_id, found[p_id])
-

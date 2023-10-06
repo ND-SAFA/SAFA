@@ -3,7 +3,8 @@ from typing import Dict, List, Union
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.common.objects.trace import Trace
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -65,10 +66,11 @@ class TracingJob(AbstractJob):
         entries = prediction_output.prediction_entries
         entries = [entry for entry in entries if entry[StructuredKeys.SCORE] >= self.prediction_threshold]
 
-        parent2entries: Dict[str, List[TracePredictionEntry]] = self.create_artifact_predictions_map(entries, TraceKeys.TARGET.value)
+        parent2entries: Dict[str, List[Trace]] = self.create_artifact_predictions_map(entries,
+                                                                                      TraceKeys.parent_label().value)
         parent_ids = list(parent2entries.keys())
-        parent2children: Dict[str, List[str]] = {target: [t[StructuredKeys.SOURCE] for t in entries] for target, entries in
-                                                 parent2entries.items()}
+        parent2children: Dict[str, List[str]] = {target: [t[StructuredKeys.Trace.child_label().value] for t in entries]
+                                                 for target, entries in parent2entries.items()}
 
         pipeline_args = RankingArgs(parent_ids=parent_ids,
                                     pre_sorted_parent2children=parent2children,
@@ -90,7 +92,7 @@ class TracingJob(AbstractJob):
         return TracePredictionOutput(prediction_entries=predicted_entries)
 
     @staticmethod
-    def create_artifact_predictions_map(predictions: List[TracePredictionEntry], artifact_key: str):
+    def create_artifact_predictions_map(predictions: List[Trace], artifact_key: str):
         """
         Groups entries by key given.
         :param predictions: The entries to group.

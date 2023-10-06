@@ -1,8 +1,11 @@
 from typing import Dict, List
 
+from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 
@@ -17,20 +20,24 @@ class TestEmbeddingPipeline(BaseTest):
         "c3": "Represents a slider that when clicked will turn to the opposite of the current state, either on or off."
     }
 
-    def test_create_predictions(self):
+    @mock_anthropic
+    def test_create_predictions(self, anthropic_ai_manager: TestAIManager):
         """
         Tests that embeddings are able to create trace entries using the similarity scores.
         """
+        anthropic_ai_manager.mock_summarization()
+        anthropic_ai_manager.set_responses([RankingPipelineTest.get_response() for _ in range(len(self.children_ids))])
         artifact_entries = self.create_artifacts_entries(self.parent_ids, "parent")
         artifact_entries.extend(self.create_artifacts_entries(self.children_ids, "children"))
         artifact_df = ArtifactDataFrame(artifact_entries)
         ranking_args = RankingArgs(run_name="children2parent",
-                                   dataset=PromptDataset(artifact_df=artifact_df),
+                                   dataset=PromptDataset(artifact_df=artifact_df, project_summary="This is a project summary"),
                                    parent_ids=self.parent_ids,
-                                   children_ids=self.children_ids)
+                                   children_ids=self.children_ids,
+                                   selection_method=None)
         pipeline = EmbeddingRankingPipeline(ranking_args)
         pipeline.run()
-        trace_entries = pipeline.state.children_entries
+        trace_entries = pipeline.state.selected_entries
         self.assertGreater(trace_entries[0]["score"], trace_entries[1]["score"])
         self.assertGreater(trace_entries[0]["score"], trace_entries[2]["score"])
 

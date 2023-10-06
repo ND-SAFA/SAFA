@@ -1,25 +1,14 @@
-from typing import Dict, List, Optional, Tuple, TypedDict, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.common.objects.trace import Trace
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.uncased_dict import UncasedDict
 from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
-
-
-class TracePredictionEntry(TypedDict):
-    """
-    A trace prediction for a pair of artifacts.
-    """
-    id: Optional[int]
-    source: str
-    target: str
-    score: Optional[float]
-    label: Optional[int]
-    explanation: Optional[str]
 
 
 class TracePredictionOutput(AbstractTraceOutput):
@@ -29,7 +18,7 @@ class TracePredictionOutput(AbstractTraceOutput):
 
     def __init__(self, predictions: TracePredictions = None, label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray], List]] = None,
                  metrics: Optional[Metrics] = None, source_target_pairs: List[Tuple[str, str]] = None,
-                 prediction_entries: List[TracePredictionEntry] = None,
+                 prediction_entries: List[Trace] = None,
                  prediction_output: PredictionOutput = None,
                  original_response: List[str] = None,
                  additional_output: Dict = None):
@@ -61,7 +50,7 @@ class TracePredictionOutput(AbstractTraceOutput):
         if self.predictions is None or self.source_target_pairs is None:
             return
 
-        self.prediction_entries = [TracePredictionEntry(source=pred_ids[0], target=pred_ids[1], score=float(pred_scores))
+        self.prediction_entries = [Trace(source=pred_ids[0], target=pred_ids[1], score=float(pred_scores))
                                    for pred_ids, pred_scores in zip(self.source_target_pairs, self.predictions)]
 
     def is_better_than(self, other: "TracePredictionOutput", comparison_criterion: ComparisonCriterion = None) -> bool:

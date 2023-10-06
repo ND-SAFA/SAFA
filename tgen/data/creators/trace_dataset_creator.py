@@ -168,7 +168,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
 
     @staticmethod
     def generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
-                                trace_df: TraceDataFrame, n_threads=10) -> TraceDataFrame:
+                                trace_df: TraceDataFrame = None, n_threads: int =10) -> TraceDataFrame:
         """
         Compares source and target artifacts for each entry in layer mapping and generates negative links between them.
         :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.
@@ -177,6 +177,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param n_threads: The maximum number of threads to use for pre-processing.
         :return: None
         """
+        if trace_df is None:
+            trace_df = TraceDataFrame()
+
         negative_links: Dict[int, Dict[TraceKeys, Any]] = {}
 
         for _, row in layer_mapping_df.itertuples():

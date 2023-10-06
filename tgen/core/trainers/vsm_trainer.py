@@ -13,7 +13,8 @@ from tgen.common.constants.tracing.ranking_constants import DEFAULT_VSM_SELECT_P
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.core.trace_output.stage_eval import Metrics
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.common.objects.trace import Trace
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -137,7 +138,7 @@ class VSMTrainer(AbstractTrainer):
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
                 link = eval_dataset.trace_df.get_link(link_id)
                 label = link[TraceKeys.LABEL] if link else 0
-                prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score, label=label)
+                prediction_entry = Trace(source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
 
         if self.select_predictions:
@@ -218,7 +219,7 @@ class VSMTrainer(AbstractTrainer):
         pass
 
     @staticmethod
-    def convert_to_percentiles(predictions: List[TracePredictionEntry]) -> None:
+    def convert_to_percentiles(predictions: List[Trace]) -> None:
         """
         Converts the scores into percentiles.
         :param predictions: The trace predictions containing scores.

@@ -194,6 +194,8 @@ class PromptDataset(iDataset):
             if i % self.__SAVE_AFTER_N == 0:
                 PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
+            source[TraceKeys.SOURCE] = True
+            target[TraceKeys.TARGET] = True
             entry = self._create_prompt(prompt_args=prompt_args,
                                         prompt_builder=prompt_builder,
                                         artifacts=[source, target],

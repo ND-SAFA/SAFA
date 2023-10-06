@@ -381,8 +381,8 @@ class TraceDataset(iDataset):
         """
         tracing_types = []
         for _, layer_row in self.layer_df.iterrows():
-            parent_type = layer_row[LayerKeys.TARGET_TYPE.value]
-            child_type = layer_row[LayerKeys.SOURCE_TYPE.value]
+            parent_type = layer_row[LayerKeys.parent_label().value]
+            child_type = layer_row[LayerKeys.child_label().value]
             tracing_types.append((parent_type, child_type))
         return tracing_types
 

@@ -9,7 +9,7 @@ from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 
-DEFAULT_RANKING_GOAL = Prompt(
+RANKING_GOAL = Prompt(
     f"\n{PromptUtil.as_markdown_header('Goal')}\n"
     "You are an expert on the software project below. "
     f"This software project is described under `{PromptUtil.as_markdown_header(PROJECT_SUMMARY_HEADER)}`. "
@@ -20,6 +20,15 @@ DEFAULT_RANKING_GOAL = Prompt(
     "You're job is to distinguish the artifacts that are truly relevant to the parent's functionality by "
     "focusing on understanding the children artifacts in the context of the system to help achieve this goal."
 )
+
+EXPLANATION_GOAL = Prompt(
+    f"\n{PromptUtil.as_markdown_header('Goal')}\n"
+    "You are an expert on the software project below. "
+    f"This software project is described under `{PromptUtil.as_markdown_header(PROJECT_SUMMARY_HEADER)}`. "
+    f"You are tasked with performing software traceability for a parent artifact "
+    f"and a candidate children artifact`. "
+)
+
 QUESTION1 = QuestionnairePrompt(
     instructions="FIRST, Write the detailed paragraph about the parent artifact including:",
     enumeration_chars=["-"],

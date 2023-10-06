@@ -26,7 +26,7 @@ class TestLLMRankingPipeline(BaseTest):
         args = self.create_args()
         pipeline = LLMRankingPipeline(args)
         pipeline.run()
-        prediction_entries = pipeline.state.children_entries
+        prediction_entries = pipeline.state.selected_entries
         self.assertEqual(1, len(prediction_entries))
         entry = prediction_entries[0]
         self.assertEqual(CHILD_ID, entry[TraceKeys.SOURCE.value])

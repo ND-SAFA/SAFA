@@ -1,3 +1,7 @@
+from unittest import mock
+from unittest.mock import MagicMock
+
+from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.common.util.status import Status
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -5,7 +9,10 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
@@ -34,7 +41,13 @@ class TestRankingJob(BaseTest):
             self.assertEqual(f"source_{i + 1}", child_type)
             self.assertEqual(f"target_{i + 1}", parent_type)
 
-    def test_non_default_ranking_pipeline(self):
+    @mock.patch.object(ProjectSummarizer, "summarize")
+    @mock_anthropic
+    def test_non_default_ranking_pipeline(self, anthropic_ai_manager: TestAIManager, project_summarizer_mock: MagicMock):
+        project_summarizer_mock.return_value = "project summary"
+        anthropic_ai_manager.mock_summarization()
+        anthropic_ai_manager.set_responses([RankingPipelineTest.get_response()
+                                            for _ in range(TestDataManager.get_n_candidates())])
         job = self.create_job_using_embeddings(select_top_predictions=False)
         job_result = job.run()
         self.assertEqual(Status.SUCCESS, job_result.status)

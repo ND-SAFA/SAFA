@@ -5,7 +5,7 @@ from tgen.common.constants.tracing.ranking_constants import TIER_ONE_THRESHOLD, 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.metrics.metrics_manager import MetricsManager
@@ -61,7 +61,7 @@ class RankingUtil:
         return metrics
 
     @staticmethod
-    def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]] = None) -> List[TracePredictionEntry]:
+    def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]] = None) -> List[Trace]:
         """
         Converts ranking to prediction entries.
         :param parent2rankings: Mapping of parent name to ranked children.
@@ -83,8 +83,8 @@ class RankingUtil:
 
     @staticmethod
     def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str],
-                                   scores: List[float] = None, original_entries: List[TracePredictionEntry] = None,
-                                   explanations: List[str] = None) -> List[TracePredictionEntry]:
+                                   scores: List[float] = None, original_entries: List[Trace] = None,
+                                   explanations: List[str] = None) -> List[Trace]:
         """
         Creates ranking predictions by assigning scores to ranking in linear fashion.
         :param parent_id: The parent artifact id.
@@ -132,13 +132,13 @@ class RankingUtil:
             logger.info(f"{group_key}:{group_items}")
 
     @staticmethod
-    def select_predictions(trace_predictions: List[TracePredictionEntry]) -> List[TracePredictionEntry]:
+    def select_predictions(trace_predictions: List[Trace]) -> List[Trace]:
         """
         Selects the top parents per child.
         :param trace_predictions: The trace predictions.
         :return: List of selected predictions.
         """
-        children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
+        children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label().value)
         predictions = []
 
         for child, child_predictions in children2entry.items():
@@ -160,7 +160,7 @@ class RankingUtil:
         return predictions
 
     @staticmethod
-    def group_trace_predictions(predictions: List[TracePredictionEntry], key_id: str):
+    def group_trace_predictions(predictions: List[Trace], key_id: str):
         """
         Groups the predictions by the property given.
         :param predictions: The predictions to group.
@@ -216,8 +216,8 @@ class RankingUtil:
         :return: a prediction entry
         """
         return EnumDict({
-            TraceKeys.TARGET: parent,
-            TraceKeys.SOURCE: child,
+            TraceKeys.parent_label(): parent,
+            TraceKeys.child_label(): child,
             TraceKeys.SCORE: score
         })
 

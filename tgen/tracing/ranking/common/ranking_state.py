@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.trace import Trace
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.state.state import State

@@ -83,6 +83,9 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Runs steps with store.
         :return: None
         """
+        if self.args.export_dir:
+            os.makedirs(self.args.export_dir, exist_ok=True)
+            self.state.export_dir = self.args.export_dir
         for step in self.steps:
             self.run_step(step)
 

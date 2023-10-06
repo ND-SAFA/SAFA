@@ -1,6 +1,9 @@
+from copy import deepcopy
+
 from test.data.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
@@ -37,3 +40,27 @@ class TestMultiArtifactPrompt(BaseTest):
         expected_artifact_format = [f"<artifact>\n\t{artifact1[ArtifactKeys.CONTENT]}\n</artifact>",
                                     f"<artifact>\n\t{artifact2[ArtifactKeys.CONTENT]}\n</artifact>"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
+
+        markdown_id_with_prompt = MultiArtifactPrompt(self.PROMPT, build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
+                                                      include_ids=True)
+        trace_artifacts = [deepcopy(self.ARTIFACTS[0]), deepcopy(self.ARTIFACTS[1])]
+        trace_artifacts[0][TraceKeys.SOURCE] = True
+        trace_artifacts[1][TraceKeys.TARGET] = True
+        prompt = markdown_id_with_prompt._build(trace_artifacts)
+        expected_artifact_format = [f"## {artifact1[ArtifactKeys.ID].capitalize()}\n    {artifact1[ArtifactKeys.CONTENT]}",
+                                    f"## {artifact2[ArtifactKeys.ID].capitalize()}\n    {artifact2[ArtifactKeys.CONTENT]}"]
+        ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
+
+        markdown_id_without_prompt = MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
+                                                         include_ids=True)
+        prompt = markdown_id_without_prompt._build(trace_artifacts)
+        expected_artifact_format = [f"# {artifact1[ArtifactKeys.ID].capitalize()}\n    {artifact1[ArtifactKeys.CONTENT]}",
+                                    f"# {artifact2[ArtifactKeys.ID].capitalize()}\n    {artifact2[ArtifactKeys.CONTENT]}"]
+        ArtifactPromptTestUtil.assert_expected_format(self, prompt, '', expected_artifact_format)
+
+        markdown_without_id = MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
+                                                  include_ids=False)
+        prompt = markdown_without_id._build(trace_artifacts)
+        expected_artifact_format = [f"# Child\n    {artifact1[ArtifactKeys.CONTENT]}",
+                                    f"# Parent\n    {artifact2[ArtifactKeys.CONTENT]}"]
+        ArtifactPromptTestUtil.assert_expected_format(self, prompt, '', expected_artifact_format)

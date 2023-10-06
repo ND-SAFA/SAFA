@@ -11,6 +11,7 @@ from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
+TASK_HEADER = 'TASKS:'
 
 class QuestionnairePrompt(Prompt):
     """
@@ -36,8 +37,7 @@ class QuestionnairePrompt(Prompt):
         self.use_bullets_for_enumeration = len(self.enumeration_chars) == 1
         if self.use_bullets_for_enumeration:
             self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
-        if use_multi_step_task_instructions:
-            instructions = self._create_multi_step_task_instructions(enumeration_chars, question_prompts, instructions)
+        self.use_multi_step_task_instructions = use_multi_step_task_instructions
         if response_manager and not isinstance(response_manager.response_tag, dict):
             all_tags = self.get_all_response_tags()
             if len(all_tags) > 0:
@@ -130,6 +130,8 @@ class QuestionnairePrompt(Prompt):
         :param child: If True, adds additional indents
         :return: The formatted prompt
         """
+        if self.use_multi_step_task_instructions and TASK_HEADER not in self.value:
+            self.value = self._create_multi_step_task_instructions(self.enumeration_chars, self.question_prompts, self.value)
         update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
         if update_value:
             self.format_value(**kwargs)
@@ -158,7 +160,7 @@ class QuestionnairePrompt(Prompt):
         enumerations_for_task = f'{COMMA}{SPACE}'.join(enumeration_chars[:n_questions - 1])
         base_instructions = f"Below are {len(question_prompts)} steps to complete. " \
                             f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions - 1]}"
-        instructions = [PromptUtil.as_markdown_header('TASKS:'), PromptUtil.as_markdown_italics(base_instructions)]
+        instructions = [PromptUtil.as_markdown_header(TASK_HEADER), PromptUtil.as_markdown_italics(base_instructions)]
         if special_instructions:
             instructions.append(special_instructions)
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'

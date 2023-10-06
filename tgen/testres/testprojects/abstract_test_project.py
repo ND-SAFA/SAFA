@@ -3,13 +3,13 @@ from typing import List
 
 import numpy as np
 
-from tgen.common.artifact import Artifact
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace_layer import TraceLayer
 
 
 class AbstractTestProject:
@@ -46,7 +46,7 @@ class AbstractTestProject:
         return cls._get_artifacts_in_layer(StructuredKeys.LayerMapping.TARGET_TYPE)
 
     @classmethod
-    def get_trace_entries(cls) -> List[TracePredictionEntry]:
+    def get_trace_entries(cls) -> List[Trace]:
         """
         :return: Returns trace entries in project.
         """
@@ -59,7 +59,7 @@ class AbstractTestProject:
 
             score = None if np.isnan(score) else score
             label = None if np.isnan(label) else label
-            entry = TracePredictionEntry(
+            entry = Trace(
                 source=row[TraceKeys.SOURCE.value],
                 target=row[TraceKeys.TARGET.value],
                 label=label,

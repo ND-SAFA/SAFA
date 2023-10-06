@@ -52,7 +52,7 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         for p, sorted_children in sorted_parent_map.items():
             defined_children = args.pre_sorted_parent2children.get(p, [])
             defined_children_set = set(defined_children)
-            missing_children = [c for c in sorted_children if c[TraceKeys.SOURCE] not in defined_children_set]
+            missing_children = [c for c in sorted_children if c[TraceKeys.child_label()] not in defined_children_set]
             final_parent_map[p] = defined_children + missing_children
         args.max_context_artifacts = original_max_content
         return final_parent_map

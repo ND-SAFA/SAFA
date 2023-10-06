@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Union
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys

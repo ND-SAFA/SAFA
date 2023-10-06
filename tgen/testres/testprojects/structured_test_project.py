@@ -5,7 +5,7 @@ from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.paths.project_paths import STRUCTURE_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.entry_creator import EntryCreator
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace_layer import TraceLayer
 
 
 class StructuredTestProject(AbstractTestProject):

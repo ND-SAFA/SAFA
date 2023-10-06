@@ -12,12 +12,12 @@ from tgen.prompts.prompt_config import PromptConfig
 
 class PromptBuilder:
 
-    def __init__(self, prompts: List[Prompt]):
+    def __init__(self, prompts: List[Prompt] = None):
         """
         Constructs prompt creator with prompt arguments as configuration.
         :param prompts: The list of prompts to use to build the final prompt
         """
-        self.prompts = prompts
+        self.prompts = prompts if prompts else []
         self._create_config()
 
     def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs, ) -> EnumDict[str, str]:

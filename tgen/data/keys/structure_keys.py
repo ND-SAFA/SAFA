@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import List
 
+from tgen.common.util.enum_util import EnumUtil
+
 
 class StructuredKeys:
     """
@@ -25,6 +27,22 @@ class StructuredKeys:
         EXPLANATION = "explanation"
 
         @classmethod
+        def parent_label(cls) -> "Trace":
+            """
+            Gets the label representing the parent artifact
+            :return: The parent artifact label (target)
+            """
+            return cls.TARGET
+
+        @classmethod
+        def child_label(cls) -> "Trace":
+            """
+            Gets the label representing the child artifact
+            :return: The child artifact label (source)
+            """
+            return cls.SOURCE
+
+        @classmethod
         def get_cols(cls) -> List["Trace"]:
             """
             :return: Returns the list of columns in trace dataframe.
@@ -41,3 +59,19 @@ class StructuredKeys:
     class LayerMapping(Enum):
         SOURCE_TYPE = "source_type"
         TARGET_TYPE = "target_type"
+
+        @classmethod
+        def parent_label(cls) -> "LayerMapping":
+            """
+            Gets the label representing the parent artifact
+            :return: The parent artifact label (target)
+            """
+            return cls.TARGET_TYPE
+
+        @classmethod
+        def child_label(cls) -> "LayerMapping":
+            """
+            Gets the label representing the child artifact
+            :return: The child artifact label (source)
+            """
+            return cls.SOURCE_TYPE

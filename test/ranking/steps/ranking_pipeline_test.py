@@ -21,7 +21,7 @@ EXPLANATION_TAG = [tag for tag in TASK_PROMPT.response_manager.get_all_tag_ids()
                                                                                                 RANKING_ARTIFACT_TAG,
                                                                                                 RANKING_ID_TAG,
                                                                                                 RANKING_SCORE_TAG}]
-EXPLANTION_RESPONSE = NEW_LINE.join([PromptUtil.create_xml(tag, tag.upper()) for tag in EXPLANATION_TAG])
+EXPLANTION_RESPONSE = NEW_LINE.join([PromptUtil.create_xml(tag, tag.upper() + '{child_id_exp}') for tag in EXPLANATION_TAG])
 PARENT_SUMMARY = f"<{RANKING_PARENT_SUMMARY_TAG}>Parent Summary.</{RANKING_PARENT_SUMMARY_TAG}>\n"
 TEST_RESPONSE = (
     f"<{RANKING_ARTIFACT_TAG}>"
@@ -58,6 +58,7 @@ class RankingPipelineTest:
         return args, state
 
     @staticmethod
-    def get_response(score=SCORE, child_id=0, include_parent_summary: bool = True):
+    def get_response(score=SCORE, child_id=0, include_parent_summary: bool = True, include_child_id_in_explanation: bool = False):
         response = PARENT_SUMMARY if include_parent_summary else ''
-        return response + TEST_RESPONSE.format(score=score, child_id=child_id)
+        child_id_exp = child_id if include_child_id_in_explanation else ''
+        return response + TEST_RESPONSE.format(score=score, child_id=child_id, child_id_exp=child_id_exp)

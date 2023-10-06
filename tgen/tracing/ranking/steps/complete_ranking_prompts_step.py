@@ -74,7 +74,7 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
         max_children = args.max_children_per_query
         entries = state.sorted_parent2children[parent_id][:max_children]
         source_body = artifact_map[parent_id]
-        artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[entry[TraceKeys.SOURCE]]})
+        artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[entry[TraceKeys.child_label()]]})
                      for i, entry in enumerate(entries)]
 
         prompt_dict = prompt_builder.build(model_format_args=AnthropicManager.prompt_args,

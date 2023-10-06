@@ -13,7 +13,7 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace_layer import TraceLayer
 
 
 class TestAssertions:

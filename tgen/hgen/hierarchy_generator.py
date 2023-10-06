@@ -46,8 +46,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         :return: Path to exported dataset of generated artifacts
         """
 
-        self.state.export_dir = self.args.export_dir
-
         super().run()
 
         dataset = self.state.final_dataset

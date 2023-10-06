@@ -7,7 +7,7 @@ from scipy.special import softmax
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
@@ -74,7 +74,7 @@ class MetricsManager:
         """
         return self.trace_matrix.scores
 
-    def get_trace_predictions(self) -> List[TracePredictionEntry]:
+    def get_trace_predictions(self) -> List[Trace]:
         """
         Constructs trace predictions for trace matrix.
         :return: Trace predictions used in evaluation.

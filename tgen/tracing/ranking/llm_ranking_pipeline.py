@@ -6,7 +6,7 @@ from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
 from tgen.tracing.ranking.steps.create_project_summary_step import CreateProjectSummaryStep
-from tgen.tracing.ranking.steps.filter_links_below_threshold_step import FilterLinksBelowThresholdStep
+from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
 from tgen.tracing.ranking.steps.process_ranking_responses_step import ProcessRankingResponsesStep
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
@@ -17,7 +17,7 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         SortChildrenStep,
         CompleteRankingPromptsStep,
         ProcessRankingResponsesStep,
-        FilterLinksBelowThresholdStep]
+        SelectCandidateLinksStep]
 
     def __init__(self, args: RankingArgs):
         """
@@ -38,7 +38,4 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :return: a dictionary mapping the parent to its child rankings
         and a dictionary mapping parent to the explanations for its links
         """
-        if self.args.export_dir:
-            os.makedirs(self.args.export_dir, exist_ok=True)
-            self.state.export_dir = self.args.export_dir
         super().run()

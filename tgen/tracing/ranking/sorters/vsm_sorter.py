@@ -27,8 +27,8 @@ class VSMSorter(iSorter):
         :return: Map of parent to list of sorted children.
         """
 
-        parent_tag_name = TraceKeys.TARGET.value
-        child_tag_name = TraceKeys.SOURCE.value
+        parent_tag_name = TraceKeys.parent_label().value
+        child_tag_name = TraceKeys.child_label().value
         artifact_names = parent_ids + child_ids
         artifact_map = [artifact_map[a_name] for a_name in artifact_names]
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_names,

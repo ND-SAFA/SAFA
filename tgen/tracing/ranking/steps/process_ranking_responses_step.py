@@ -1,62 +1,15 @@
-from typing import Dict, List, Set, Any
+from typing import List, Set
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.tracing.ranking_constants import RANKING_ID_TAG, \
-    RANKING_MAX_SCORE, RANKING_SCORE_TAG
-from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.state.state import State
+from tgen.tracing.ranking.common.artifact_reasoning import ArtifactReasoning
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
-
-
-class ArtifactReasoning:
-
-    def __init__(self, artifact_dict: Dict):
-        """
-        Stores the reasoning of the LLM for each artifact
-        :param artifact_dict: Contains the reasoning of the LLM for each artifact
-        """
-        JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value])
-        self.index = self.get_attr(RANKING_ID_TAG, artifact_dict, pop=True)
-        self.score = self.get_attr(RANKING_SCORE_TAG, artifact_dict, 0.0, pop=True) / RANKING_MAX_SCORE
-        self.explanation = self.construct_explanation(artifact_dict)
-        self.artifact_id = None
-
-    @staticmethod
-    def construct_explanation(explanation_parts: Dict) -> str:
-        """
-        Constructs the explanation from its parts
-        :param explanation_parts: Dictionary mapping explanation part name and content
-        :return: The explanation as a str
-        """
-        explanation_values = [ArtifactReasoning.get_attr(name, explanation_parts) for name in explanation_parts.keys()]
-        return NEW_LINE.join([v for v in explanation_values if v])
-
-    @staticmethod
-    def get_attr(attr_name: str, artifact_dict: Dict, default: Any = None, expected_list: bool = False, pop: bool = False) -> Any:
-        """
-        Gets an attributes from the artifact dict
-        :param attr_name: The key to retrieve
-        :param artifact_dict: The artifact dict to retrieve it from
-        :param default: Default value if it doesnt exist
-        :param expected_list: If True, the value of the attr is expected to be a list
-        :param pop: If True, pops the value during retrieval
-        :return: The value of the attr
-        """
-        if pop:
-            val = artifact_dict.pop(attr_name) if attr_name in attr_name else default
-        else:
-            val = artifact_dict.get(attr_name, default)
-        if isinstance(val, list) and not expected_list:
-            val = val[0] if val else default
-        return val
 
 
 class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -71,7 +24,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         self.process_ranking_prompts(args, state)
 
     @staticmethod
-    def process_ranking_prompts(args: RankingArgs, state: RankingState) -> List[TracePredictionEntry]:
+    def process_ranking_prompts(args: RankingArgs, state: RankingState) -> List[Trace]:
         """
         Reads the ranking responses and performs post-processing.
         :param args: The ranking pipeline arguments.
@@ -83,7 +36,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         sorted_parent2children = state.sorted_parent2children
         all_entries = []
         for parent_name, prompt_response in zip(parent_ids, ranking_responses):
-            related_children = [entry[TraceKeys.SOURCE] for entry in sorted_parent2children[parent_name]]
+            related_children = [entry[TraceKeys.child_label()] for entry in sorted_parent2children[parent_name]]
             parsed_entries, unidentified_entries, parsed_artifact_ids = [], [], set()
             for i, artifact_res in enumerate(prompt_response):
                 try:
@@ -132,7 +85,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         return n_unidentified
 
     @staticmethod
-    def _create_trace_prediction_entries(parsed_entries: List[ArtifactReasoning], parent_name: str) -> List[TracePredictionEntry]:
+    def _create_trace_prediction_entries(parsed_entries: List[ArtifactReasoning], parent_name: str) -> List[Trace]:
         """
         Creates the trace prediction entries from the artifact reasoning (parsed from response)
         :param parsed_entries: The artifact reasoning parsed from the LLM response
@@ -143,7 +96,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         for e in parsed_entries:
             child_name = e.artifact_id
             trace_id = TraceDataFrame.generate_link_id(source_id=child_name, target_id=parent_name)
-            child_entry = TracePredictionEntry(
+            child_entry = Trace(
                 id=trace_id,
                 source=child_name,
                 target=parent_name,

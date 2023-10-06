@@ -3,10 +3,10 @@ from typing import List
 
 import pandas as pd
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.trace import Trace
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -16,7 +16,7 @@ from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace_layer import TraceLayer
 
 
 class TestSafaExporter(BaseTest):
@@ -57,7 +57,7 @@ class TestSafaExporter(BaseTest):
 
         artifacts = source_artifacts + target_artifacts
         layers: List[TraceLayer] = [TraceLayer(child=source_type, parent=target_type)]
-        links: List[TracePredictionEntry] = [TracePredictionEntry(source=source, target=target, score=score, explanation=explanation)]
+        links: List[Trace] = [Trace(source=source, target=target, score=score, explanation=explanation)]
         api_definition = ApiDefinition(artifacts=artifacts, layers=layers, links=links)
         api_project_reader = ApiProjectReader(api_definition=api_definition)
         trace_dataset_creator = TraceDatasetCreator(project_reader=api_project_reader)

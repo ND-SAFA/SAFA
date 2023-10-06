@@ -1,13 +1,13 @@
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
-import pandas as pd
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 import pandas as pd
@@ -69,6 +69,14 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: The artifact if one is found with the specified params, else None
         """
         return self.get_row(artifact_id)
+
+    def get_artifacts_from_trace(self, trace: EnumDict) -> Tuple[EnumDict, EnumDict]:
+        """
+        Gets the source and target artifacts from a trace dict
+        :param trace: The trace link represented as a dict
+        :return: The source and target artifacts
+        """
+        return self.get_artifact(trace[TraceKeys.SOURCE]), self.get_artifact(trace[TraceKeys.TARGET])
 
     def get_type(self, type_name: str) -> pd.DataFrame:
         """

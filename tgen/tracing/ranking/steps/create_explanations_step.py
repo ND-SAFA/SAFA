@@ -1,7 +1,9 @@
-from typing import List
+from typing import List, Dict
 
-from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
+from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_SCORE_TAG, RANKING_MIN_SCORE, \
+    RANKING_MAX_SCORE
 from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.math_util import MathUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
@@ -33,13 +35,14 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The current state of the ranking pipeline
         """
         weight = args.weight_of_explanation_scores
-        a_reasonings = self._get_artifact_reasoning(args, state)
+        parsed_predictions = self._generate_predictions(args, state)
+        a_reasonings = CreateExplanationsStep._create_a_reasonings(parsed_predictions)
         for a_reasoning, entry in zip(a_reasonings, state.get_current_entries()):
             entry[TraceKeys.EXPLANATION.value] = a_reasoning.explanation
             entry[TraceKeys.SCORE.value] = a_reasoning.score * weight + entry[TraceKeys.SCORE.value] * (1-weight)
 
     @staticmethod
-    def _get_artifact_reasoning(args: RankingArgs, state: RankingState) -> List[ArtifactReasoning]:
+    def _generate_predictions(args: RankingArgs, state: RankingState) -> List[Dict]:
         """
         Creates post-hoc explanations for trace-links
         :param args: The arguments to the ranking pipeline
@@ -57,7 +60,26 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         task_prompt: QuestionnairePrompt = prompt_builder.prompts[-1]
         parsed = LLMResponseUtil.extract_predictions_from_response(predictions,
                                                                    response_prompt_ids=task_prompt.id)
-        a_reasonings = [ArtifactReasoning(parsed_dict, require_id=False) for parsed_dict in parsed]
+
+        return parsed
+
+    @staticmethod
+    def _create_a_reasonings(parsed_predictions: List[Dict]) -> List[ArtifactReasoning]:
+        """
+        Creates artifact reasoning from the predicted explanations
+        :param parsed_predictions: The parsed predictions
+        :return: A list of artifact reasoning created from the predictions
+        """
+        scores_given = [parsed_dict[RANKING_SCORE_TAG][0] for parsed_dict in parsed_predictions if RANKING_SCORE_TAG in parsed_dict]
+        min_score_given, max_score_given = min(scores_given), max(scores_given)
+        a_reasonings = []
+        for parsed_dict in parsed_predictions:
+            if RANKING_SCORE_TAG in parsed_dict and parsed_dict[RANKING_SCORE_TAG]:
+                parsed_dict[RANKING_SCORE_TAG] = MathUtil.convert_to_new_range(parsed_dict[RANKING_SCORE_TAG][0],
+                                                                               (min_score_given, max_score_given),
+                                                                               (RANKING_MIN_SCORE, RANKING_MAX_SCORE))
+            a_reasoning = ArtifactReasoning(parsed_dict, require_id=False)
+            a_reasonings.append(a_reasoning)
         return a_reasonings
 
     @staticmethod

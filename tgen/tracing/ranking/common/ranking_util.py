@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List, Optional, Tuple
 
-from tgen.common.constants.tracing.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
+from tgen.common.constants.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -216,6 +216,7 @@ class RankingUtil:
         :return: a prediction entry
         """
         return EnumDict({
+            TraceKeys.LINK_ID: TraceDataFrame.generate_link_id(child, parent),
             TraceKeys.parent_label(): parent,
             TraceKeys.child_label(): child,
             TraceKeys.SCORE: score

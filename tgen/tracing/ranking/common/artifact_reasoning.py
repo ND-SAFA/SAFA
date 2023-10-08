@@ -1,7 +1,7 @@
 from typing import Dict, Any, Optional
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
-from tgen.common.constants.tracing.ranking_constants import RANKING_ID_TAG, RANKING_SCORE_TAG, RANKING_MAX_SCORE, RANKING_ARTIFACT_TAG, \
+from tgen.common.constants.ranking_constants import RANKING_ID_TAG, RANKING_SCORE_TAG, RANKING_MAX_SCORE, RANKING_ARTIFACT_TAG, \
     JUSTIFICATION_TAG, RANKING_MIN_SCORE
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.math_util import MathUtil

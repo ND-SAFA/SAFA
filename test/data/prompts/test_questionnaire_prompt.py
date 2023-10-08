@@ -28,6 +28,15 @@ class TestQuestionnairePrompt(BaseTest):
         res = test_with_not_enough_enumeration.split(NEW_LINE)
         self.assertTrue(res[3].startswith(f"1) {self.STEPS[3].value}"))
 
+    def test_get_prompt_by_primary_tag(self):
+        questionnaire = self.get_questionnaire()
+        prompt = questionnaire.get_prompt_by_primary_tag("question2")
+        self.assertEqual(questionnaire.question_prompts[1].id, prompt.id)
+
+        questionnaire = self.get_questionnaire()
+        prompt = questionnaire.get_prompt_by_primary_tag("unknown")
+        self.assertIsNone(prompt)
+
     def test_parse_response(self):
         questionnaire = self.get_questionnaire()
         response = "<question2>Okay</question2><choice>no</choice>"

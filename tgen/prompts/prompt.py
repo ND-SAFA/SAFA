@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.str_util import StrUtil
@@ -57,6 +57,13 @@ class Prompt:
         :return: The formatted response
         """
         return self.response_manager.parse_response(response)
+
+    def get_all_response_tags(self) -> List[str]:
+        """
+        Gets all response tags used in the response manager
+        :return: All response tags used in the response manager
+        """
+        return self.response_manager.get_all_tag_ids()
 
     def _build(self, **kwargs) -> str:
         """

@@ -27,4 +27,5 @@ class MathUtil:
         new_min, new_max = new_min_max
         orig_range = orig_max - orig_min
         new_range = new_max - new_min
-        return (((val - orig_min) * new_range) / orig_range) + new_min
+        conversion = (((val - orig_min) * new_range) / orig_range) if orig_range > 0 else 0
+        return conversion + new_min

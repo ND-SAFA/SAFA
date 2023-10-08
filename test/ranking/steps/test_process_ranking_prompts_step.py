@@ -1,8 +1,8 @@
 from copy import deepcopy
 from unittest import TestCase
 
-from test.ranking.steps.ranking_pipeline_test import EXPLANATION_TAG, DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS
-from tgen.common.constants.tracing.ranking_constants import RANKING_MAX_SCORE, RANKING_MIN_SCORE
+from test.ranking.steps.ranking_pipeline_test import DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS, RankingPipelineTest
+from tgen.common.constants.ranking_constants import RANKING_MAX_SCORE, RANKING_MIN_SCORE
 from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -26,7 +26,7 @@ class TestProcessRankingResponsesStep(TestCase):
         missing = (parent_ids[1], children_ids[0])
         for res in ranking_responses:
             for r in res:
-                r.update({tag: tag.upper() for tag in EXPLANATION_TAG})
+                r.update({tag: tag.upper() for tag in RankingPipelineTest.get_explanation_tags()})
         state = RankingState(sorted_parent2children={p_id: [RankingUtil.create_entry(p_id, c_id) for c_id in children_ids]
                                                      for p_id in parent_ids},
                              ranking_responses=ranking_responses)

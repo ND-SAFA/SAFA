@@ -5,7 +5,6 @@ from typing import Any, Callable, List, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
-from tgen.common.util.date_time_util import DateTimeUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.core.trainers.trainer_task import TrainerTask

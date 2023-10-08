@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from tgen.common.constants.tracing.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
+from tgen.common.constants.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
     DEFAULT_PACKAGE_ARTIFACT_TYPE, DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
 from tgen.common.util.file_util import FileUtil
 from tgen.common.objects.trace import Trace

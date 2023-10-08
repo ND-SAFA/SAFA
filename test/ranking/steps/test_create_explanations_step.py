@@ -1,7 +1,9 @@
+import re
 from unittest import TestCase
 
 from test.ranking.steps.ranking_pipeline_test import DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS, RankingPipelineTest
 from tgen.common.util.enum_util import EnumDict
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
@@ -15,10 +17,34 @@ class TestCreateExplanationsStep(TestCase):
                         EnumDict({'id': 4, 'source': 't1', 'target': 's5', 'score': 0.7})
                         ]
 
+    def assert_prompt(self, prompt):
+        source_id = self.find_artifact_id_in_prompt(prompt, is_child=True)
+        target_id = self.find_artifact_id_in_prompt(prompt, is_child=False)
+        i, entry = [(i, entry) for i, entry in enumerate(self.SELECTED_ENTRIES)
+                    if entry['source'] == source_id and entry['target'] == target_id][0]
+        expected_score = CreateExplanationsStep._convert_normalized_score_to_ranking_range(entry['score'])
+        self.assertIn(str(expected_score), prompt)
+        response = RankingPipelineTest.get_response(child_id=entry['source'], include_child_id_in_explanation=True,
+                                                    task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
+        return response
+
+    @staticmethod
+    def find_artifact_id_in_prompt(prompt: str, is_child: bool):
+        if is_child:
+            relation = "Child"
+            key = 'source'
+        else:
+            relation = "Parent"
+            key = 'target'
+        prefix = TestCreateExplanationsStep.SELECTED_ENTRIES[0][key][0]
+        pattern = fr"# {prefix}[1-6] \({relation}\)"
+        matches = re.findall(pattern, prompt)
+        matches = re.findall(fr"{prefix}[1-6]", matches[0])
+        return matches[0]
+
     @mock_anthropic
     def test_run(self, anthropic_mock: TestAIManager):
-        anthropic_mock.set_responses([RankingPipelineTest.get_response(child_id=entry['source'], include_child_id_in_explanation=True)
-                                      for entry in self.SELECTED_ENTRIES])
+        anthropic_mock.set_responses([self.assert_prompt for _ in self.SELECTED_ENTRIES])
         parent_ids = DEFAULT_PARENT_IDS
         children_ids = DEFAULT_CHILDREN_IDS
         args, state = self.get_args_and_state(children_ids, parent_ids)

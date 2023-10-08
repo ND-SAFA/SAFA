@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest, DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER
+from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.test_data_manager import TestDataManager

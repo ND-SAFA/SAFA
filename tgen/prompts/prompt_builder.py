@@ -12,25 +12,31 @@ from tgen.prompts.prompt_config import PromptConfig
 
 class PromptBuilder:
 
-    def __init__(self, prompts: List[Prompt] = None):
+    def __init__(self, prompts: List[Prompt] = None, **format_variables):
         """
         Constructs prompt creator with prompt arguments as configuration.
         :param prompts: The list of prompts to use to build the final prompt
+        :param format_variables: A dictionary mapping format key to a list of values corresponding to each prompt that will be built
         """
         self.prompts = prompts if prompts else []
+        self.format_variables = format_variables if format_variables else {}
+        self._n_built = 0
         self._create_config()
 
-    def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs, ) -> EnumDict[str, str]:
+    def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :param model_format_args: Defines the formatting specific to the model
         :param correct_completion: The correct completion that the model should produce
         :return: Dictionary containing the prompt and completion
         """
+        format_vars = {key: val[self._n_built] for key, val in self.format_variables.items() if len(val) > self._n_built}
+        prompt_kwargs.update(format_vars)
         built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts]
         base_prompt = NEW_LINE.join(built_prompts)
         prompt = self._format_prompt_for_model(base_prompt, prompt_args=model_format_args)
         completion = self._format_completion(correct_completion, prompt_args=model_format_args)
+        self._n_built += 1
         return EnumDict({
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion

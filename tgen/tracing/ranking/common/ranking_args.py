@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_LINK_THRESHOLD, \
+from tgen.common.constants.ranking_constants import DEFAULT_LINK_THRESHOLD, \
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \

@@ -1,6 +1,6 @@
 from math import floor
 
-from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
+from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
     RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
     RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, JUSTIFICATION_TAG
 from tgen.common.util.prompt_util import PromptUtil
@@ -37,12 +37,16 @@ QUESTION1 = QuestionnairePrompt(
                       ], response_manager=PromptResponseManager(response_tag=RANKING_PARENT_SUMMARY_TAG))
 RANKING_CATEGORIES = ["Artifacts have an direct 1:1 mapping based on closely-tied functionality "
                       "or a direct design or inheritance relationship (definite trace-link)",
-                      "Artifacts have a clear primary-secondary relationship where one supports key functions of the other "
+                      "Artifacts support key functions of the other "
+                      "or share significant similarities with only minor inconsistencies (likely trace-link)"
                       "(likely trace-link)",
-                      "Artifacts have indirect relationships through secondary "
-                      "functions or peripheral impacts on each other (unsure if trace-link)",
-                      "Artifacts have minimal overlap or impact on each other (weak trace-link)",
-                      "No discernible relationship between artifacts can be identified (unlikely trace-link)"]
+                      "Portions of the artifacts have clear and direct linkage but other portions are unrelated (possible trace-link)",
+                      "Partial topical overlap. The artifacts have some loosely related content "
+                      "but differences outweigh the similarities (unsure if trace-link)",
+                      "Vague or abstract similarity. "
+                      "The artifacts share only very high-level topics or broad concepts but no specifics (weak trace-link)",
+                      "No discernible relationship between artifacts can be identified."
+                      "The artifacts contain different content and context with no overlaps (no trace-link)"]
 RANKING_RANGE = range(RANKING_MAX_SCORE, RANKING_MIN_SCORE - 1,
                                  -round(((RANKING_MAX_SCORE - RANKING_MIN_SCORE) / len(RANKING_CATEGORIES))))
 SCORE_INSTRUCTIONS = SelectQuestionPrompt(

@@ -1,4 +1,6 @@
-from test.ranking.steps.ranking_pipeline_test import PARENT_ID, CHILD_ID, EXPLANATION_TAG, RankingPipelineTest
+from test.ranking.steps.ranking_pipeline_test import PARENT_ID, CHILD_ID, RankingPipelineTest
+from tgen.common.constants.ranking_constants import RANKING_MAX_SCORE, RANKING_MIN_SCORE
+from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -31,9 +33,10 @@ class TestLLMRankingPipeline(BaseTest):
         entry = prediction_entries[0]
         self.assertEqual(CHILD_ID, entry[TraceKeys.SOURCE.value])
         self.assertEqual(PARENT_ID, entry[TraceKeys.TARGET.value])
-        for tag in EXPLANATION_TAG:
+        for tag in RankingPipelineTest.get_explanation_tags():
             self.assertIn(tag, entry[TraceKeys.EXPLANATION.value].lower())
-        self.assertEqual(.75, entry[TraceKeys.SCORE.value])
+        expected_score = MathUtil.normalize_val(4.0, max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
+        self.assertEqual(expected_score, entry[TraceKeys.SCORE.value])
 
     @staticmethod
     def create_args() -> RankingArgs:

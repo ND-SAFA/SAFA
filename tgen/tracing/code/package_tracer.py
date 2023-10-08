@@ -2,7 +2,7 @@ import os
 from typing import Dict, Iterable, List, Tuple
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.tracing.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
+from tgen.common.constants.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_SUMMARY_TOKENS
+from tgen.common.constants.ranking_constants import DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.dict_util import DictUtil
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.jobs.components.args.job_args import JobArgs

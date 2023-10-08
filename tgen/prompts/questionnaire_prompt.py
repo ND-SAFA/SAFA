@@ -13,6 +13,7 @@ from tgen.prompts.prompt_response_manager import PromptResponseManager
 
 TASK_HEADER = 'TASKS:'
 
+
 class QuestionnairePrompt(Prompt):
     """
     Contains a list of questions for the model to answer
@@ -56,6 +57,17 @@ class QuestionnairePrompt(Prompt):
         if len(tag_ids) == 1:
             return tag_ids[0]
         return tag_ids
+
+    def get_prompt_by_primary_tag(self, tag_id: str) -> Prompt:
+        """
+        Finds a prompt by its primary response tag
+        :param tag_id: The id of the prompt's primary response tag
+        :return: The prompt if it exists, else None
+        """
+        for prompt in self.question_prompts:
+            tag_ids = prompt.get_all_response_tags()
+            if len(tag_ids) > 0 and tag_ids[0] == tag_id:
+                return prompt
 
     def get_all_response_tags(self) -> List[str]:
         """

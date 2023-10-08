@@ -1,6 +1,6 @@
 from typing import Dict, List, Tuple, Union
 
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
+from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict

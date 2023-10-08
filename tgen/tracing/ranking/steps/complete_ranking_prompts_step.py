@@ -1,7 +1,7 @@
 from typing import Dict
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, ARTIFACT_HEADER, RANKING_PARENT_TAG
+from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, ARTIFACT_HEADER, RANKING_PARENT_TAG
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil

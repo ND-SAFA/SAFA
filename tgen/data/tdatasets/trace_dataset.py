@@ -55,7 +55,8 @@ class TraceDataset(iDataset):
             pos_link_ids, neg_link_ids = self.__create_pos_neg_links(trace_df)
         self._pos_link_ids, self._neg_link_ids = pos_link_ids, neg_link_ids
         trace_df.drop_duplicates()
-        trace_df = TraceDataFrame(trace_df.sample(frac=1))
+        if randomize:
+            trace_df = TraceDataFrame(trace_df.sample(frac=1))
         self.__trace_matrix = None
         self.randomize = randomize
         self.trace_df = trace_df

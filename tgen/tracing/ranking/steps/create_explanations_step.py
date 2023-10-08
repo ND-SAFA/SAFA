@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-from tgen.common.constants.tracing.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_SCORE_TAG, RANKING_MIN_SCORE, \
+from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_SCORE_TAG, RANKING_MIN_SCORE, \
     RANKING_MAX_SCORE
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.math_util import MathUtil
@@ -39,7 +39,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         a_reasonings = CreateExplanationsStep._create_a_reasonings(parsed_predictions)
         for a_reasoning, entry in zip(a_reasonings, state.get_current_entries()):
             entry[TraceKeys.EXPLANATION.value] = a_reasoning.explanation
-            entry[TraceKeys.SCORE.value] = a_reasoning.score * weight + entry[TraceKeys.SCORE.value] * (1-weight)
+            entry[TraceKeys.SCORE.value] = a_reasoning.score * weight + entry[TraceKeys.SCORE.value] * (1 - weight)
 
     @staticmethod
     def _generate_predictions(args: RankingArgs, state: RankingState) -> List[Dict]:
@@ -48,8 +48,10 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param args: The arguments to the ranking pipeline
         :param state: The current state of the ranking pipeline
         """
-        prompt_builder = CreateExplanationsStep._create_prompt_builder(state)
+
         filter_dataset = CreateExplanationsStep._get_dataset_with_selected_links_only(args, state)
+        prompt_builder = CreateExplanationsStep._create_prompt_builder(state)
+
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
                                                                                   PromptDataset(trace_dataset=filter_dataset)})
         save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
@@ -99,18 +101,24 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
                                    LayerKeys.TARGET_TYPE: [target for _, target in layers]})
         trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=layer_df, artifact_df=artifact_df)
         trace_df = trace_df.filter_by_index(selected_ids)
+        expected_order = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
+                          for entry in state.get_current_entries()]
+        trace_df = TraceDataFrame(trace_df.reindex(expected_order))
         filter_dataset = TraceDataset(artifact_df=artifact_df, trace_df=trace_df,
-                                      layer_df=layer_df)
+                                      layer_df=layer_df, randomize=False)
         return filter_dataset
 
     @staticmethod
     def _create_prompt_builder(state: RankingState) -> PromptBuilder:
         """
         Creates prompt builder for ranking artifacts.
+        :param dataset: The dataset containing the trace links to be used in the prompts
         :param state: The state of the ranking pipeline.
         :return: The prompt builder used to rank candidate children artifacts.
         """
-        prompt_builder = PromptBuilder([SupportedPrompts.EXPLANATIONS_GOAL_INSTRUCTIONS.value])
+        scores = [entry[TraceKeys.SCORE] for entry in state.get_current_entries()]
+        converted_scores = [CreateExplanationsStep._convert_normalized_score_to_ranking_range(score) for score in scores]
+        prompt_builder = PromptBuilder([SupportedPrompts.EXPLANATIONS_GOAL_INSTRUCTIONS.value], orig_score=converted_scores)
 
         if state.project_summary is not None and len(state.project_summary) > 0:
             uses_specification = PROJECT_SUMMARY_HEADER in state.project_summary
@@ -123,6 +131,19 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
                                                       prompt_prefix=PromptUtil.as_markdown_header("ARTIFACTS")
                                                       ))
         task_prompt: QuestionnairePrompt = SupportedPrompts.EXPLANATION_TASK.value
+        score_prompt = task_prompt.get_prompt_by_primary_tag(RANKING_SCORE_TAG)
+        score_prompt.value += "Remember the original score for the relationship was {orig_score}. " \
+                              "Use this to guide your decision but you may adjust it if you do not believe it accurately reflects " \
+                              "the strength of the relationship."
         prompt_builder.add_prompt(task_prompt)
 
         return prompt_builder
+
+    @staticmethod
+    def _convert_normalized_score_to_ranking_range(score: float) -> float:
+        """
+        Converts a score between 0-1 to the range used in ranking
+        :param score: The score to convert
+        :return: The converted score
+        """
+        return MathUtil.convert_to_new_range(score, (0, 1), (RANKING_MIN_SCORE, RANKING_MAX_SCORE))

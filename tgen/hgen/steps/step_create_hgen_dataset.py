@@ -2,7 +2,7 @@ import os
 import uuid
 from typing import List, Dict
 
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_HGEN_LINK_THRESHOLD
+from tgen.common.constants.ranking_constants import DEFAULT_HGEN_LINK_THRESHOLD
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger

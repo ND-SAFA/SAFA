@@ -1,8 +1,8 @@
 from copy import copy
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG
-from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
+from tgen.common.constants.project_summary_constants import PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG
+from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trainers.llm_trainer import LLMTrainer

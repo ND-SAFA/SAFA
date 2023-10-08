@@ -9,7 +9,7 @@ from tqdm import tqdm
 from tgen.common.constants.environment_constants import IS_TEST
 from tgen.common.util.list_util import ListUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 
 
 class EmbeddingSorter(iSorter):

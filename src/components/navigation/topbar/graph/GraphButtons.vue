@@ -1,6 +1,6 @@
 <template>
-  <flex-box>
-    <separator vertical inset nav x="1" />
+  <flex-box v-if="!layoutStore.isTableMode">
+    <separator v-if="layoutStore.isTreeMode" vertical inset nav x="1" />
     <icon-button
       v-for="definition in viewButtons"
       :key="definition.label"
@@ -28,7 +28,12 @@ export default {
 import { computed } from "vue";
 import { IconVariant } from "@/types";
 import { cyStore, layoutApiStore, layoutStore, permissionStore } from "@/hooks";
-import { IconButton, FlexBox, Separator } from "@/components/common";
+import {
+  IconButton,
+  FlexBox,
+  Separator,
+  TypeButtons,
+} from "@/components/common";
 
 const viewButtons = computed(() => [
   {

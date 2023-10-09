@@ -80,26 +80,17 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                 question_prompts=[QuestionPrompt("Provide the ID of the artifact being processed ",
                                                                  PromptResponseManager(response_tag=RANKING_ID_TAG,
                                                                                        expected_response_type=int)),
-                                                  QuestionPrompt("What components do each of the artifacts belong to? "
-                                                                 "Do the components have directly related "
-                                                                 "or supporting functionality? ",
-                                                                 PromptResponseManager(response_tag="components")),
-                                                  QuestionPrompt("What are the primary functions or purposes "
-                                                                 "of each artifact? Are they closely aligned "
-                                                                 "or more distantly related?",
-                                                                 PromptResponseManager(response_tag="functionality")),
-                                                  QuestionPrompt("Do the artifacts perform any unrelated functionalities or "
-                                                                 "rely on different components/features "
-                                                                 "that might weaken the trace?",
-                                                                 PromptResponseManager(response_tag="weaken")),
-                                                  QuestionPrompt("Do the artifacts rely on common inputs, "
-                                                                 "produce common outputs, or share common data flows? ",
-                                                                 PromptResponseManager(response_tag="data-flow")),
-                                                  QuestionPrompt("Do the names or descriptions of the artifacts contain "
-                                                                 "overlapping terms or concepts? ",
-                                                                 PromptResponseManager(response_tag="terms")),
+                                                  QuestionPrompt("What is this functionality of the child artifact? "
+                                                                 "What module is the artifact a part of? "
+                                                                 "Use the {PROJECT_SUMMARY_HEADER} to understand the system modules.",
+                                                                 PromptResponseManager(response_tag="module")),
+                                                  QuestionPrompt("How does the artifact's functionality "
+                                                                 "help the module it is a part of?",
+                                                                 PromptResponseManager(response_tag="purpose")),
+                                                  QuestionPrompt("How does the child artifact functionality "
+                                                                 "affect the primary goal of the parent artifact?"
+                                                                 "How does the child artifact functionality affect "
+                                                                 "the primary goal of the parent artifact?",
+                                                                 PromptResponseManager(response_tag="relationship")),
                                                   SCORE_INSTRUCTIONS,
-                                                  QuestionPrompt("Write a brief explanation of why this score reflects the "
-                                                                 "relationship between the two artifacts",
-                                                                 PromptResponseManager(response_tag=JUSTIFICATION_TAG))
                                                   ])

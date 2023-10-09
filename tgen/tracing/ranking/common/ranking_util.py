@@ -1,15 +1,18 @@
 import json
 from typing import Dict, List, Optional, Tuple
 
-from tgen.common.constants.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
+from tgen.common.constants.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD, PROJECT_SUMMARY_HEADER
+from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.tracing_request import TracingRequest
 
 
@@ -17,6 +20,7 @@ class RankingUtil:
     """
     Contains utility methods for dealing with artifact layers.
     """
+
     @staticmethod
     def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[EnumDict]) -> Optional[Dict]:
         """
@@ -188,15 +192,17 @@ class RankingUtil:
         return f"{a_id}: ({a_score})"
 
     @staticmethod
-    def extract_tracing_requests(artifact_df: ArtifactDataFrame, layers: List[Tuple[str, str]]) -> List[TracingRequest]:
+    def extract_tracing_requests(artifact_df: ArtifactDataFrame, layers: List[Tuple[str, str]],
+                                 artifact_map: Dict = None) -> List[TracingRequest]:
         """
         Extracts source and target artifact names for each layer
         :param artifact_df: Artifact data frame containing ids, bodies, and types.
         :param layers: The layers being traced, containing list of (child, parent) tuples.
-        :return:
+        :param artifact_map: Dictionary mapping artifact id to content
+        :return: THe tracing requests
         """
         requests = []
-        artifact_map = artifact_df.to_map()
+        artifact_map = artifact_df.to_map() if not artifact_map else artifact_map
         for child_type, parent_type in layers:
             parent_df = artifact_df.get_type(parent_type)
             child_df = artifact_df.get_type(child_type)
@@ -236,3 +242,17 @@ class RankingUtil:
                 entry = RankingUtil.create_entry(parent, child, score)
                 prediction_entries[parent].append(entry)
         return prediction_entries
+
+    @staticmethod
+    def add_project_summary_prompt(prompt_builder: PromptBuilder, state: RankingState) -> None:
+        """
+        Creates a prompt for the project summary
+        :param prompt_builder: The prompt builder to add the promtp to
+        :param state: The current ranking state
+        :return: A prompt containing the project summary
+        """
+        if state.project_summary is not None and len(state.project_summary) > 0:
+            uses_specification = PROJECT_SUMMARY_HEADER in state.project_summary
+            context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
+            prompt = Prompt(context_formatted, allow_formatting=False)
+            prompt_builder.add_prompt(prompt)

@@ -1,7 +1,7 @@
 from typing import Dict
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, ARTIFACT_HEADER, RANKING_PARENT_TAG
+from tgen.common.constants.ranking_constants import ARTIFACT_HEADER, RANKING_PARENT_TAG
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -18,6 +18,7 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 
 class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -41,8 +42,7 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
         :return: None
         """
         prompt_builder = CompleteRankingPromptsStep.create_ranking_prompt_builder(state)
-        artifact_map = args.dataset.artifact_df.to_map()
-        prompts = [CompleteRankingPromptsStep.create_prompts(p_name, artifact_map, prompt_builder, args, state)
+        prompts = [CompleteRankingPromptsStep.create_prompts(p_name, state.artifact_map, prompt_builder, args, state)
                    for p_name in args.parent_ids]
         save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
             state.get_path_to_state_checkpoint(args.export_dir), "ranking_response") if args.export_dir else args.export_dir
@@ -69,12 +69,12 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
         """
         max_children = args.max_children_per_query
         entries = state.sorted_parent2children[parent_id][:max_children]
-        source_body = artifact_map[parent_id]
+        parent_body = artifact_map[parent_id]
         artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[entry[TraceKeys.child_label()]]})
                      for i, entry in enumerate(entries)]
 
         prompt_dict = prompt_builder.build(model_format_args=AnthropicManager.prompt_args,
-                                           parent_body=source_body,
+                                           parent_body=parent_body,
                                            artifacts=artifacts)
         prompt = prompt_dict[PromptKeys.PROMPT]
 
@@ -92,10 +92,7 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
             Prompt(PromptUtil.create_xml(RANKING_PARENT_TAG, '{parent_body}', prefix=NEW_LINE, suffix=NEW_LINE)),
         ])
 
-        if state.project_summary is not None and len(state.project_summary) > 0:
-            uses_specification = PROJECT_SUMMARY_HEADER in state.project_summary
-            context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
-            prompt_builder.add_prompt(Prompt(context_formatted))
+        RankingUtil.add_project_summary_prompt(prompt_builder, state)
 
         prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(ARTIFACT_HEADER),
                                                       build_method=MultiArtifactPrompt.BuildMethod.XML,
@@ -105,3 +102,5 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
             prompt_builder.add_prompt(q)
 
         return prompt_builder
+
+

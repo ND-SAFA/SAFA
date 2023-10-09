@@ -81,10 +81,10 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                                                  PromptResponseManager(response_tag=RANKING_ID_TAG,
                                                                                        expected_response_type=int)),
                                                   QuestionPrompt("What is this functionality of the child artifact? "
-                                                                 "What module is the artifact a part of? "
+                                                                 "What module is the child a part of? "
                                                                  "Use the {PROJECT_SUMMARY_HEADER} to understand the system modules.",
                                                                  PromptResponseManager(response_tag="module")),
-                                                  QuestionPrompt("How does the artifact's functionality "
+                                                  QuestionPrompt("How does the child's functionality "
                                                                  "help the module it is a part of?",
                                                                  PromptResponseManager(response_tag="purpose")),
                                                   QuestionPrompt("How does the child artifact functionality "

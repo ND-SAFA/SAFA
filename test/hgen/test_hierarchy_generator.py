@@ -5,7 +5,7 @@ import mock
 import pandas as pd
 
 from test.hgen.hgen_test_utils import get_test_hgen_args, get_name_responses, get_generated_artifacts_response, HGenTestConstants, \
-    get_ranking_job_result
+    get_predictions
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import PipelineUtil
@@ -24,13 +24,13 @@ from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactConte
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
-from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
 
 
 class TestHierarchyGenerator(BaseTest):
@@ -135,12 +135,11 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(self.HGEN_STATE.refined_content[us], HGenTestConstants.code_files[i])
 
     @mock_anthropic
-    @mock.patch.object(RankingJob, "run")
+    @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
     def assert_create_dataset_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock):
         names, expected_names, responses = get_name_responses(self.HGEN_STATE.generation_predictions)
         anthropic_ai_manager.set_responses(responses)
-        job_result = get_ranking_job_result(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
-        ranking_mock.return_value = job_result
+        ranking_mock.return_value = get_predictions(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
         step = CreateHGenDatasetStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         for id_, link in self.HGEN_STATE.original_dataset.trace_dataset.trace_df.itertuples():

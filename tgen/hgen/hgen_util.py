@@ -70,8 +70,6 @@ class HGenUtil:
                                                  completion_type=LLMCompletionType.GENERATION))
             predictions = trainer.perform_prediction(save_and_load_path=load_path).predictions
 
-        PipelineUtil.save_dataset_checkpoint(predictions, export_path=base_name, filename=file_name)
-
         predictions = LLMResponseUtil.extract_predictions_from_response(predictions=predictions,
                                                                         response_prompt_ids=response_prompt_ids,
                                                                         return_first=return_first,
@@ -166,7 +164,8 @@ class HGenUtil:
                     dataset = PromptDataset(artifact_df=new_artifact_df)
                     names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=PredictionStep.NAME,
                                                      dataset=dataset, response_prompt_ids=name_prompt.id,
-                                                     tags_for_response=name_prompt.response_manager.response_tag, return_first=True)
+                                                     tags_for_response=name_prompt.response_manager.response_tag, return_first=True,
+                                                     export_path=os.path.join(hgen_args.export_dir, "artifact_names.json"))
                     assert len(set(names)) == len(names), f"Found duplicates names: {names}"
                     assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
                 new_artifact_df.index = names

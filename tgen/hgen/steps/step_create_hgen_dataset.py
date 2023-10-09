@@ -69,7 +69,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
 
             dataset = PromptDataset(trace_dataset=TraceDataset(combined_artifact_df, final_trace_df, final_layer_df),
-                                    project_summary=state.summary)
+                                    project_summary=state.project_summary)
         state.final_dataset = dataset
 
     @staticmethod
@@ -112,12 +112,12 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             return TraceDataFrame()
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
-        tracing_job = RankingJob(dataset=PromptDataset(artifact_df=artifact_df),
+        tracing_job = RankingJob(dataset=PromptDataset(artifact_df=artifact_df, project_summary=hgen_state.project_summary),
                                  layer_ids=tracing_layers,
                                  export_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_state.export_dir),
                                  load_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_args.load_dir),
                                  link_threshold=DEFAULT_HGEN_LINK_THRESHOLD,
-                                 parent2children=artifact_id_to_link_predictions)
+                                 pre_sorted_parent2children=artifact_id_to_link_predictions)
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")

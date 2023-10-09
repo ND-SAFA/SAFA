@@ -33,3 +33,4 @@ class CreateProjectSummaryStep(AbstractPipelineStep[RankingArgs, RankingState]):
                                                           export_dir=args.export_dir))
             summary = summarizer.summarize()
         state.project_summary = summary
+        state.artifact_map = args.dataset.artifact_df.to_map()

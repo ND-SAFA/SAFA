@@ -97,7 +97,9 @@ class VSMTrainer(AbstractTrainer):
         :param train_dataset: The dataset to use for training
         :return: None
         """
-        tracing_requests = RankingUtil.extract_tracing_requests(train_dataset.artifact_df, train_dataset.layer_df.as_list())
+        tracing_requests = RankingUtil.extract_tracing_requests(train_dataset.artifact_df,
+                                                                train_dataset.layer_df.as_list(),
+                                                                train_dataset.artifact_df.to_map())
         artifacts = []
         for tracing_request in tracing_requests:
             artifacts = artifacts + self.get_artifacts(tracing_request.parent_ids)
@@ -120,7 +122,9 @@ class VSMTrainer(AbstractTrainer):
         :param threshold: All similarity scores above this threshold will be considered traced, otherwise they are untraced
         :return: The output from the prediction
         """
-        tracing_requests = RankingUtil.extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
+        tracing_requests = RankingUtil.extract_tracing_requests(eval_dataset.artifact_df,
+                                                                eval_dataset.layer_df.as_list(),
+                                                                eval_dataset.artifact_df.to_map())
         prediction_entries = []
 
         for tracing_request in tracing_requests:

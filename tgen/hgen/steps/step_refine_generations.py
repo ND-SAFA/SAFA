@@ -41,7 +41,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             all_generation_predictions.update(state.generation_predictions)
             refined_content = self.perform_refinement(args, state.generation_predictions,
                                                       refined_content,
-                                                      state.summary, state.export_dir)
+                                                      state.project_summary, state.export_dir)
         state.refined_content = refined_content
         state.all_generated_content = all_generation_predictions
 

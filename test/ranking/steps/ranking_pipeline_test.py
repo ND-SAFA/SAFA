@@ -40,7 +40,7 @@ class RankingPipelineTest:
 
         args = RankingArgs(dataset=PromptDataset(artifact_df=artifact_df, project_summary=project_summary),
                            parent_ids=parent_ids, children_ids=children_ids, **kwargs)
-        state = RankingState(**state_kwargs)
+        state = RankingState(**state_kwargs, artifact_map=artifact_df.to_map())
         return args, state
 
     @staticmethod

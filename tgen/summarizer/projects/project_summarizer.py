@@ -61,7 +61,7 @@ class ProjectSummarizer(BaseObject):
 
             if project_summary.has_summary():
                 current_summary = project_summary.get_summary()
-                prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}"), 1)
+                prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
 
             task_prompt.set_instructions(PS_QUESTIONS_HEADER)
 

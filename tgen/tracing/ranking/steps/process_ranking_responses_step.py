@@ -1,5 +1,6 @@
 from typing import List, Set
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -96,13 +97,13 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         for e in parsed_entries:
             child_name = e.artifact_id
             trace_id = TraceDataFrame.generate_link_id(source_id=child_name, target_id=parent_name)
-            child_entry = Trace(
+            child_entry = EnumDict(Trace(
                 id=trace_id,
                 source=child_name,
                 target=parent_name,
                 score=e.score,
                 explanation=e.explanation
-            )
+            ))
             child_entries.append(child_entry)
         return child_entries
 

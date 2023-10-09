@@ -1,5 +1,7 @@
+import os
 from typing import Dict, List, Tuple, Union
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
@@ -74,33 +76,38 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(dataset.artifact_df.get_type(parent_type).index)
         children_ids = list(dataset.artifact_df.get_type(child_type).index)
-        run_name = f"{child_type}({len(parent_ids)}) --> {parent_type} ({len(children_ids)})"
+        run_name = f"{child_type}({len(children_ids)}) --> {parent_type}({len(parent_ids)})"
         logger.info(f"Starting to trace: {run_name}")
 
         if not self.select_top_predictions:
             DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
+        export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
+        if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
+            export_dir = os.path.join(export_dir, RankingJob._get_run_dir(child_type, parent_type))
         pipeline_args = RankingArgs(run_name=run_name,
                                     dataset=dataset,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
+                                    export_dir=export_dir,
                                     **self.ranking_kwargs)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         pipeline.run()
         predicted_entries = pipeline.state.candidate_entries
         selected_trace_ids = {self.get_trace_id_from_entry(entry) for entry in pipeline.state.selected_entries}
         selected_entries = []
-        has_positive_links = self.dataset is not None and self.dataset.trace_df is not None and len(
-            self.dataset.trace_df.get_links_with_label(1)) > 1
-        for entry in predicted_entries:
-            trace_id = self.get_trace_id_from_entry(entry)
-            if trace_id in selected_trace_ids and has_positive_links and trace_id in self.dataset.trace_df:
-                trace_entry = self.dataset.trace_df.loc[trace_id]
-                label = trace_entry[TraceKeys.LABEL.value]
-                entry[TraceKeys.LABEL] = label
-                selected_entries.append(entry)
-            self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
-            if TraceKeys.EXPLANATION in entry:
-                self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+        has_positive_links = self.dataset and self.dataset.trace_dataset and len(self.dataset.trace_df.get_links_with_label(1)) > 1
+        if has_positive_links:
+            for entry in predicted_entries:
+                trace_id = self.get_trace_id_from_entry(entry)
+                if trace_id in self.dataset.trace_df:
+                    if trace_id in selected_trace_ids:
+                        trace_entry = self.dataset.trace_df.loc[trace_id]
+                        label = trace_entry[TraceKeys.LABEL.value]
+                        entry[TraceKeys.LABEL] = label
+                        selected_entries.append(entry)
+                    self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
+                    if TraceKeys.EXPLANATION in entry:
+                        self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
         return selected_entries
 
     @staticmethod
@@ -110,8 +117,6 @@ class RankingJob(AbstractJob):
         :param entry: The prediction entry
         :return: The trace id for the entry
         """
-        if TraceKeys.LINK_ID in entry:
-            return entry[TraceKeys.LINK_ID]
         return TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
 
     @staticmethod
@@ -125,3 +130,13 @@ class RankingJob(AbstractJob):
         if dataset is None or dataset.trace_df is None or len(dataset.trace_df.get_links_with_label(1)) == 0:
             return
         RankingUtil.evaluate_trace_predictions(dataset.trace_df, predictions)
+
+    @staticmethod
+    def _get_run_dir(child_type: str, parent_type: str) -> str:
+        """
+        Get the name of this run's directory
+        :param child_type: The name of the child type
+        :param parent_type: The name of the parent type
+        :return: The name of the run's directory
+        """
+        return f"{child_type}_{parent_type}"

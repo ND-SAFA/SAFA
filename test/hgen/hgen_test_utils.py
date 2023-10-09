@@ -1,17 +1,12 @@
-import uuid
 from copy import deepcopy
 
 from tgen.common.constants.deliminator_constants import COMMA
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.status import Status
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_util import HGenUtil
-from tgen.jobs.components.job_result import JobResult
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 
 
@@ -68,14 +63,10 @@ def get_name_responses(generated_artifact_content=None, target_type="User Story"
     return names, expected_names, [PromptUtil.create_xml("title", name) for name in names]
 
 
-def get_ranking_job_result(expected_names, source_artifact_names):
-    prediction_entries = [EnumDict({"source": source, "target": target, "score": 0.8, "label": 1, "explanation": "explanation"})
-                          for target in expected_names
-                          for source in source_artifact_names]
-    job_result = JobResult(status=Status.SUCCESS,
-                           body=TracePredictionOutput(prediction_entries=prediction_entries),
-                           job_id=uuid.uuid4())
-    return job_result
+def get_predictions(expected_names, source_artifact_names):
+    predictions = [[{"id": i, "score": 0.8, "explanation": "explanation"}
+                          for i, source in enumerate(source_artifact_names)] for name in expected_names]
+    return predictions
 
 
 def get_all_responses(content=None, target_type="User Story", sources=None, source_type="code"):

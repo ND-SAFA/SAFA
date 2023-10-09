@@ -43,7 +43,7 @@ class ArtifactPrompt(Prompt):
             self.BuildMethod.MARKDOWN: self._build_as_markdown
         }
         self.include_id = include_id
-        super().__init__(value=prompt_start)
+        super().__init__(value=prompt_start, allow_formatting=False)
 
     @overrides(Prompt)
     def _build(self, artifact: EnumDict, **kwargs) -> str:

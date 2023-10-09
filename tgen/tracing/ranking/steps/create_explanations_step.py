@@ -24,6 +24,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.artifact_reasoning import ArtifactReasoning
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 
 class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -120,11 +121,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         converted_scores = [CreateExplanationsStep._convert_normalized_score_to_ranking_range(score) for score in scores]
         prompt_builder = PromptBuilder([SupportedPrompts.EXPLANATIONS_GOAL_INSTRUCTIONS.value], orig_score=converted_scores)
 
-        if state.project_summary is not None and len(state.project_summary) > 0:
-            uses_specification = PROJECT_SUMMARY_HEADER in state.project_summary
-            context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
-            prompt_builder.add_prompt(Prompt(context_formatted))
-
+        RankingUtil.add_project_summary_prompt(prompt_builder, state)
         prompt_builder.add_prompt(MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                                       data_type=MultiArtifactPrompt.DataType.TRACES,
                                                       include_ids=True,

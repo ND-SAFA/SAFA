@@ -12,11 +12,14 @@ DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings
 class RankingState(State):
     # Summarizing
     project_summary: str = None
+
+    artifact_map: Dict[str, str] = None
+
     # sorting
     sorted_parent2children: Optional[Dict[str, List[EnumDict]]] = None
 
     # Ranking
-    ranking_responses: List[Dict] = field(default=None, repr=False)
+    ranking_responses: List[List[Dict]] = field(default=None, repr=False)
 
     # Entries
     candidate_entries: List[Dict] = field(default=None, repr=False)

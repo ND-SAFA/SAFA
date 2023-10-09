@@ -73,4 +73,4 @@ source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prompt
     summarizer: null
   summarizer: null
   trace_dataset_creator: null
-summary: "Here is a summary of the key technical details and design aspects of the system based on the provided code"
+project_summary: "Here is a summary of the key technical details and design aspects of the system based on the provided code"

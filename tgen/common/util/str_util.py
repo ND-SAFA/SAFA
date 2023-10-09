@@ -33,7 +33,10 @@ class StrUtil:
                     updated_kwargs[field] = replacement
             if not field and i >= len(updated_args):
                 updated_args.append(replacement)
-        string = string.format(*updated_args, **updated_kwargs)
+        try:
+            string = string.format(*updated_args, **updated_kwargs)
+        except Exception:
+            logger.exception(f"Unable to format {string} with args={updated_args} and kwargs={updated_kwargs}")
         return string
 
     @staticmethod

@@ -13,7 +13,8 @@ class Prompt:
     """
     SEED = 1
 
-    def __init__(self, value: str, response_manager: PromptResponseManager = None, prompt_id: str = None):
+    def __init__(self, value: str, response_manager: PromptResponseManager = None, prompt_id: str = None,
+                 allow_formatting: bool = True):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
@@ -23,6 +24,7 @@ class Prompt:
         self.value = value
         self.id = prompt_id if prompt_id is not None else str(uuid.uuid5(uuid.NAMESPACE_DNS, str(Prompt.SEED)))
         self.response_manager = response_manager if response_manager else PromptResponseManager(include_response_instructions=False)
+        self.allow_formatting = allow_formatting
         Prompt.SEED += 1
 
     def build(self, **kwargs) -> str:
@@ -45,6 +47,8 @@ class Prompt:
         :param kwargs: Key, value pairs to format the prompt with
         :return: The formatted value
         """
+        if not self.allow_formatting:
+            return self.value
         value = StrUtil.format_selective(self.value, *args, **kwargs)
         if update_value:
             self.value = value

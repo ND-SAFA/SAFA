@@ -72,11 +72,13 @@ class LLMTrainer(AbstractTrainer):
         return res
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
-                           dataset: iDataset = None, save_and_load_path: str = EMPTY_STRING) -> TracePredictionOutput:
+                           dataset: iDataset = None, prompts: List[str] = None,
+                           save_and_load_path: str = EMPTY_STRING) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :param dataset: The dataset to use instead of from the dataset manager
+        :param prompts: The list of prompts to use instead of making from the dataset
         :param save_and_load_path: The path to load or save response
         :return: THe prediction response
         """
@@ -84,19 +86,13 @@ class LLMTrainer(AbstractTrainer):
 
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompt_df = dataset.get_prompt_dataframe(prompt_builder=self.prompt_builder,
-                                                 prompt_args=self.llm_manager.prompt_args)
-        if self.llm_manager.llm_args.output_dir:
-            dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
-        first_prompt = prompt_df[PromptKeys.PROMPT][0]
-
-        logger.debug(first_prompt)
+        prompts = self._get_prompts_for_prediction(dataset) if not prompts else prompts
         if os.path.exists(save_and_load_path):
             logger.info(f"Loading previous LLM responses from {save_and_load_path}")
             res = YamlUtil.read(save_and_load_path)
         else:
             res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
-                                                           prompt=list(prompt_df[PromptKeys.PROMPT]))
+                                                           prompt=prompts)
             if save_and_load_path:
                 logger.info(f"Saved LLM responses to {save_and_load_path}")
                 FileUtil.create_dir_safely(save_and_load_path)
@@ -109,6 +105,19 @@ class LLMTrainer(AbstractTrainer):
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
+
+    def _get_prompts_for_prediction(self, dataset: PromptDataset) -> List[str]:
+        """
+        Gets the prompts used for the prediction
+        :param dataset: The dataset to use when creating the prompts
+        :return: The prompts
+        """
+        prompt_df = dataset.get_prompt_dataframe(prompt_builder=self.prompt_builder,
+                                                 prompt_args=self.llm_manager.prompt_args)
+        prompts = list(prompt_df[PromptKeys.PROMPT])
+        first_prompt = prompts[0]
+        logger.debug(first_prompt)
+        return prompts
 
     @staticmethod
     def predict_from_prompts(llm_manager: AbstractLLMManager,
@@ -132,7 +141,7 @@ class LLMTrainer(AbstractTrainer):
         initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builder=prompt_builder,
                                         trainer_dataset_manager=trainer_dataset_manager)
         trainer = LLMTrainer(initial_state)
-        return trainer.perform_prediction(save_and_load_path=save_and_load_path)
+        return trainer.perform_prediction(save_and_load_path=save_and_load_path, prompts=list(prompt_df[PromptKeys.PROMPT]))
 
     def cleanup(self) -> None:
         """

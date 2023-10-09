@@ -122,7 +122,7 @@ class PromptDataset(iDataset):
         :param prompt_builder: The generator of prompts for the dataset
         :return: The prompt dataframe containing prompts and completions
         """
-        if self._has_trace_data() and (self.prompt_df is None or (prompt_builder and prompt_args)):
+        if self.prompt_df is None or (prompt_builder and prompt_args):
             generation_method = self._get_generation_method(prompt_args, prompt_builder)
             prompt_entries = generation_method(prompt_builder=prompt_builder, prompt_args=prompt_args)
             self.prompt_df = PromptDataFrame(prompt_entries)

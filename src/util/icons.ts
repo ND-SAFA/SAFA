@@ -151,7 +151,7 @@ export function getIcon(variant?: IconVariant): string {
     case "graph-zoom-out":
       return "mdi-magnify-minus-outline";
     case "graph-center":
-      return "mdi-graphql";
+      return "mdi-image-filter-center-focus-strong";
     case "graph-refresh":
       return "mdi-refresh";
     case "graph-add":

@@ -27,36 +27,24 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { IconVariant } from "@/types";
-import {
-  cyStore,
-  layoutApiStore,
-  layoutStore,
-  permissionStore,
-  useScreen,
-} from "@/hooks";
+import { cyStore, layoutApiStore, layoutStore, permissionStore } from "@/hooks";
 import { IconButton, FlexBox, Separator } from "@/components/common";
 
-const { smallWindow } = useScreen();
-
 const viewButtons = computed(() => [
-  ...(smallWindow
-    ? []
-    : [
-        {
-          handler: () => cyStore.zoom("in"),
-          label: "Zoom In",
-          icon: "graph-zoom-in" as IconVariant,
-          disabled: layoutStore.isTableMode,
-          dataCy: "button-nav-graph-zoom-in",
-        },
-        {
-          handler: () => cyStore.zoom("out"),
-          label: "Zoom Out",
-          icon: "graph-zoom-out" as IconVariant,
-          disabled: layoutStore.isTableMode,
-          dataCy: "button-nav-graph-zoom-out",
-        },
-      ]),
+  {
+    handler: () => cyStore.zoom("in"),
+    label: "Zoom In",
+    icon: "graph-zoom-in" as IconVariant,
+    disabled: layoutStore.isTableMode,
+    dataCy: "button-nav-graph-zoom-in",
+  },
+  {
+    handler: () => cyStore.zoom("out"),
+    label: "Zoom Out",
+    icon: "graph-zoom-out" as IconVariant,
+    disabled: layoutStore.isTableMode,
+    dataCy: "button-nav-graph-zoom-out",
+  },
   {
     handler: () => cyStore.centerNodes(true),
     label: "Center Graph",

@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.test.features.layout.base.AbstractCorrectnessTest;
@@ -27,7 +26,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
         // Step - Create project
         ProjectCommitDefinition commit = createProject();
         Document document = this.dbEntityBuilder
-            .newDocument(projectName, documentName, "", DocumentType.ARTIFACT_TREE)
+            .newDocument(projectName, documentName, "")
             .getDocument(projectName, documentName);
 
         // Step - Add artifacts to layout
@@ -49,7 +48,6 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
     @Test
     void testDocumentLayoutOnCreation() throws Exception {
         String docName = "doc-name";
-        DocumentType docType = DocumentType.ARTIFACT_TREE;
         String docDescription = "";
 
         // Step - Create project
@@ -65,7 +63,6 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
         JSONObject documentJson = jsonBuilder.createDocument(
             docName,
             docDescription,
-            docType,
             artifactIds);
 
         // Step - Create project with document

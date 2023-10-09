@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
@@ -42,31 +41,23 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
      */
     private String artifactType;
 
-    private DocumentType documentType;
-
     public CsvArtifactFile(String artifactType,
-                           DocumentType documentType,
                            List<ArtifactAppEntity> artifacts) {
         super(artifacts);
         setPossibleNullArgument(this::setArtifactType, artifactType, "artifactType");
-        setPossibleNullArgument(this::setDocumentType, documentType, "documentType");
     }
 
     public CsvArtifactFile(String artifactType,
-                           DocumentType documentType,
                            String pathToFile) throws IOException {
         super(pathToFile, false);
         setPossibleNullArgument(this::setArtifactType, artifactType, "artifactType");
-        setPossibleNullArgument(this::setDocumentType, documentType, "documentType");
         this.parseEntities();
     }
 
     public CsvArtifactFile(String artifactType,
-                           DocumentType documentType,
                            MultipartFile file) throws IOException {
         super(file, false);
         setPossibleNullArgument(this::setArtifactType, artifactType, "artifactType");
-        setPossibleNullArgument(this::setDocumentType, documentType, "documentType");
         this.parseEntities();
     }
 
@@ -160,7 +151,6 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 artifactName,
                 artifactSummary,
                 artifactContent,
-                DocumentType.ARTIFACT_TREE,
                 recordAttributes
             );
 

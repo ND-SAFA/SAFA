@@ -9,7 +9,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -67,16 +66,15 @@ public class ProjectBuilder {
     public ProjectBuilder withArtifact(String typeName) {
         getOrCreateType(typeName);
         String artifactName = this.getNextArtifactName(typeName);
-        this.withArtifact(artifactName, typeName, DocumentType.ARTIFACT_TREE);
+        this.withArtifact(artifactName, typeName);
         return this;
     }
 
     public ProjectBuilder withArtifact(String artifactName,
-                                       String typeName,
-                                       DocumentType documentType) {
+                                       String typeName) {
         getOrCreateType(typeName);
         this.dbEntityBuilder
-            .newArtifact(projectName, typeName, artifactName, documentType)
+            .newArtifact(projectName, typeName, artifactName)
             .newArtifactBodyWithReturn(
                 this.projectName,
                 this.currentVersion.getVersionIndex(),

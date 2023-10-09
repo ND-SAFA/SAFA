@@ -15,7 +15,6 @@ import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -156,7 +155,6 @@ public class ArtifactVersionRepositoryImpl
             artifactVersion.getName(),
             artifactVersion.getSummary(),
             artifactVersion.getContent(),
-            artifactVersion.getArtifact().getDocumentType(),
             artifactVersion.getCustomAttributeValues());
 
         // Step 2 - Attach document links
@@ -249,11 +247,10 @@ public class ArtifactVersionRepositoryImpl
         String typeName = artifactAppEntity.getType();
         String artifactName = artifactAppEntity.getName();
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName, user);
-        DocumentType documentType = artifactAppEntity.getDocumentType();
         if (artifactId == null) {
             Artifact newArtifact = this.artifactRepository
                 .findByProjectAndName(project, artifactName)
-                .orElseGet(() -> new Artifact(project, artifactType, artifactName, documentType));
+                .orElseGet(() -> new Artifact(project, artifactType, artifactName));
             this.artifactRepository.save(newArtifact);
             return newArtifact;
         } else {
@@ -265,7 +262,6 @@ public class ArtifactVersionRepositoryImpl
             Artifact artifact = artifactOptional.get();
             artifact.setType(artifactType);
             artifact.setName(artifactName);
-            artifact.setDocumentType(documentType);
             this.artifactRepository.save(artifact);
             return artifact;
         }

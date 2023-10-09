@@ -11,7 +11,6 @@ import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.Type2TraceMap;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimArtifactDefinition;
@@ -90,10 +89,8 @@ public class FileDownloadService {
 
             File artifactFileOutput = new File(pathToFile);
             List<ArtifactAppEntity> artifacts = projectEntityMaps.getArtifactsInType(artifactType);
-            DocumentType documentType = DocumentType.ARTIFACT_TREE;
             AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType,
                 pathToFile,
-                documentType,
                 artifacts);
             TimArtifactDefinition artifactFileIdentifier = new TimArtifactDefinition(artifactType, fileName);
             artifactFiles.add(artifactFileIdentifier);

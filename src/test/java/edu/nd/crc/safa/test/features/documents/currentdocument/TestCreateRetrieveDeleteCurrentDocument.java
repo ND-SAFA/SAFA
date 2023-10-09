@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.RouteBuilder;
@@ -23,12 +22,11 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
         String projectName = "test-project";
         String docName = "test-doc";
         String docDescription = "test-doc-description";
-        DocumentType docType = DocumentType.ARTIFACT_TREE;
 
         // Step - Create project, document, and version
         ProjectVersion projectVersion = this.dbEntityBuilder
             .newProject(projectName)
-            .newDocument(projectName, docName, docDescription, docType)
+            .newDocument(projectName, docName, docDescription)
             .newVersionWithReturn(projectName);
         Document document = this.dbEntityBuilder.getDocument(projectName, docName);
 

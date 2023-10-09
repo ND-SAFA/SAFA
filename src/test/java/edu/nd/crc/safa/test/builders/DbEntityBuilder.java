@@ -18,7 +18,6 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -158,10 +157,9 @@ public class DbEntityBuilder extends AbstractBuilder {
 
     public DbEntityBuilder newDocument(String projectName,
                                        String docName,
-                                       String docDescription,
-                                       DocumentType docType) {
+                                       String docDescription) {
         Project project = this.getProject(projectName);
-        Document document = new Document(null, project, docType, docName, docDescription);
+        Document document = new Document(null, project, docName, docDescription);
         this.documentRepository.save(document);
         addEntry(this.documents, projectName, docName, document);
         return this;
@@ -238,16 +236,9 @@ public class DbEntityBuilder extends AbstractBuilder {
     public DbEntityBuilder newArtifact(String projectName,
                                        String typeName,
                                        String artifactName) {
-        return newArtifact(projectName, typeName, artifactName, DocumentType.ARTIFACT_TREE);
-    }
-
-    public DbEntityBuilder newArtifact(String projectName,
-                                       String typeName,
-                                       String artifactName,
-                                       DocumentType documentType) {
         Project project = getProject(projectName);
         ArtifactType artifactType = getType(projectName, typeName);
-        Artifact artifact = new Artifact(project, artifactType, artifactName, documentType);
+        Artifact artifact = new Artifact(project, artifactType, artifactName);
         this.artifactRepository.save(artifact);
         this.addEntry(this.artifacts, projectName, artifactName, artifact);
         return this;

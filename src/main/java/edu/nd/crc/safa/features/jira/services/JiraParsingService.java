@@ -7,7 +7,6 @@ import java.util.Objects;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.ProjectEntities;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
@@ -75,7 +74,6 @@ public class JiraParsingService {
             name,
             summary,
             description,
-            DocumentType.ARTIFACT_TREE,
             new Hashtable<>()
         );
 

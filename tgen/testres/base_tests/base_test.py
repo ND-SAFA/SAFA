@@ -12,8 +12,9 @@ from tgen.common.constants import anthropic_constants, environment_constants, op
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.logger_manager import LoggerManager
 from tgen.common.util.random_util import RandomUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE

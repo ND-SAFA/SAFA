@@ -8,7 +8,8 @@ from tqdm import tqdm
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.objects.trace import Trace
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys
 
 Query = namedtuple('Query', ['links', 'preds'])
 

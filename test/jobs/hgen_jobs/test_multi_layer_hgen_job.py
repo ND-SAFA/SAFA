@@ -6,8 +6,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.status import Status
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs

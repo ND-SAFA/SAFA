@@ -8,7 +8,8 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.objects.trace import Trace
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition

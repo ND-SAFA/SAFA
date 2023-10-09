@@ -1,8 +1,9 @@
 from abc import ABC
 from typing import List
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 

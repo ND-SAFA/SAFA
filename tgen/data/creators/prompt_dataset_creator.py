@@ -7,7 +7,8 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader

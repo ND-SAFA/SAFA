@@ -1,5 +1,6 @@
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.metrics.lag_metric import LagMetric
 from tgen.metrics.map_metric import MapMetric
 from tgen.testres.base_tests.base_test import BaseTest

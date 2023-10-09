@@ -2,7 +2,8 @@ import os
 
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.projects.project_summarizer import ProjectSummarizer

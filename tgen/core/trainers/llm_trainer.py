@@ -14,9 +14,8 @@ from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.prompt import Prompt

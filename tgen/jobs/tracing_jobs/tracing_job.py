@@ -7,8 +7,7 @@ from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.common.objects.trace import Trace
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.dataframes.trace_dataframe import TraceKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset

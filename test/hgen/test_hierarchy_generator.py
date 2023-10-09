@@ -11,9 +11,8 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader

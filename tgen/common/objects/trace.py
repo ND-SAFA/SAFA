@@ -1,7 +1,10 @@
 from typing import Optional, TypedDict
 
+from tgen.common.util.TypedEnumDict import TypedEnumDict
+from tgen.data.keys.structure_keys import TraceKeys
 
-class Trace(TypedDict):
+
+class Trace(TypedEnumDict, keys=TraceKeys):
     """
     A trace prediction for a pair of artifacts.
     """

@@ -4,9 +4,10 @@ import uuid
 from typing import List
 
 from tgen.common.util.file_util import FileUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 
 

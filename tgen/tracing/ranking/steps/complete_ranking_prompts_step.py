@@ -6,8 +6,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import GenerationResponse

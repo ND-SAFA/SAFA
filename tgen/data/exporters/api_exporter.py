@@ -8,8 +8,7 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.objects.trace import Trace
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.data.tdatasets.trace_dataset import TraceDataset

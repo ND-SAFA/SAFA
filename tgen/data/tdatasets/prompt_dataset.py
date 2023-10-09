@@ -11,7 +11,7 @@ from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader

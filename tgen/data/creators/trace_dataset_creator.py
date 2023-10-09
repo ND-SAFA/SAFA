@@ -13,10 +13,10 @@ from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFA
     NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset

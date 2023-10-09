@@ -5,7 +5,7 @@ from tgen.common.constants.ranking_constants import RANKING_ID_TAG, RANKING_SCOR
     JUSTIFICATION_TAG, RANKING_MIN_SCORE
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.math_util import MathUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 
 
 class ArtifactReasoning:

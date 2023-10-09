@@ -3,9 +3,7 @@ from unittest import TestCase
 
 from test.tracing.code_tracer.code_tracer_test_util import CodeTracerTestUtil
 from tgen.common.constants.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions

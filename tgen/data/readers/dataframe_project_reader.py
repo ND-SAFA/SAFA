@@ -3,7 +3,8 @@ from typing import Dict
 
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.common.util.dict_util import DictUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, ProjectData, TraceDataFramesTypes

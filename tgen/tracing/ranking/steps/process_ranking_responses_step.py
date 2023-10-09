@@ -3,7 +3,8 @@ from typing import List, Set
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.state.state import State
 from tgen.tracing.ranking.common.artifact_reasoning import ArtifactReasoning

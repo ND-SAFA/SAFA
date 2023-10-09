@@ -18,9 +18,10 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter

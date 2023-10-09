@@ -6,9 +6,7 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys
-
-TraceKeys = StructuredKeys.Trace
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 
 
 class TraceDataFrame(AbstractProjectDataFrame):

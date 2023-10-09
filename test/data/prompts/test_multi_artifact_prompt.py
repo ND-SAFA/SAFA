@@ -2,8 +2,7 @@ from copy import deepcopy
 
 from test.data.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 

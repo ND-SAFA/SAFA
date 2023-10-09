@@ -75,3 +75,8 @@ class StructuredKeys:
             :return: The child artifact label (source)
             """
             return cls.SOURCE_TYPE
+
+
+TraceKeys = StructuredKeys.Trace
+ArtifactKeys = StructuredKeys.Artifact
+LayerKeys = StructuredKeys.LayerMapping

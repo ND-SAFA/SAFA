@@ -6,8 +6,7 @@ from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.trace_dataframe import TraceKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.prompts.prompt import Prompt
 
 

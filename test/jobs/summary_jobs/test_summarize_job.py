@@ -4,7 +4,7 @@ from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMM
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.summary_jobs.summarize_artifacts_job import SummarizeArtifactsJob

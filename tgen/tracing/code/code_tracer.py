@@ -4,7 +4,7 @@ from tgen.common.constants.code_tracer_constants import C_IMPLEMENTATION_EXTENSI
     DEFAULT_PACKAGE_ARTIFACT_TYPE, DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
 from tgen.common.util.file_util import FileUtil
 from tgen.common.objects.trace import Trace
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.tracing.code.package_tracer import PackageTracer
 

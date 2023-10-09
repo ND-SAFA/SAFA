@@ -1,5 +1,5 @@
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, LayerKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_data_manager import TestDataManager

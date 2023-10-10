@@ -4,7 +4,7 @@
       v-if="!store.isFTA"
       v-model="store.editedArtifact.name"
       label="Artifact Name"
-      hint="Please select an identifier for the artifact"
+      hint="Enter a unique name for the artifact"
       :error-message="artifactApiStore.nameError"
       :loading="artifactApiStore.nameLoading"
       class="q-mb-md"
@@ -23,7 +23,7 @@
       v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
       v-model="store.editedArtifact.type"
       label="Artifact Type"
-      hint="Required"
+      hint="Press enter to save a new artifact type"
       class="q-mb-md"
       data-cy="input-artifact-type"
     />

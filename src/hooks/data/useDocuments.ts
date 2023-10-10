@@ -14,6 +14,7 @@ import {
   projectStore,
   traceStore,
   artifactStore,
+  selectionStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -189,13 +190,19 @@ export const useDocuments = defineStore("documents", {
     async addDocumentOfNeighborhood(
       artifact: Pick<ArtifactSchema, "name" | "id">
     ): Promise<void> {
+      const { neighbors } = subtreeStore.subtreeMap[artifact.id];
+      const artifactIds = artifactStore.allArtifacts
+        .filter(
+          ({ id, type }) =>
+            (artifact.id === id || neighbors.includes(id)) &&
+            !selectionStore.ignoreTypes.includes(type)
+        )
+        .map(({ id }) => id);
+
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,
-        artifactIds: [
-          artifact.id,
-          ...subtreeStore.subtreeMap[artifact.id].neighbors,
-        ],
+        artifactIds,
       });
 
       await this.removeDocument("");

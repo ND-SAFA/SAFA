@@ -36,7 +36,8 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="In order to d
                                                                         "depend on the same entities or features?  ",
                                                                         PromptResponseManager(response_tag="dependencies")),
                                                          QuestionPrompt("What are the primary functions or purposes "
-                                                                        "of each artifact and are they closely aligned?",
+                                                                        "of each artifact. How might the functionality of one "
+                                                                        "artifact impact the other?",
                                                                         PromptResponseManager(response_tag="functionality")),
                                                          QuestionPrompt("Do the artifacts rely on common inputs, "
                                                                         "produce common outputs, or share common data flows? ",

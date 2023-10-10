@@ -49,6 +49,17 @@ class PromptUtil:
         """
         return f"*{original_string}*"
 
+
+    @staticmethod
+    def as_markdown_bold(original_string: str) -> str:
+        """
+        Formats the string as markdown bold
+        :param original_string: The string to format
+        :return: The string formatted as markdown
+        """
+        return f"__{original_string}__"
+
+
     @staticmethod
     def as_markdown_header(original_string: str, level: int = 1) -> str:
         """

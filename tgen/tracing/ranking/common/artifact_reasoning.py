@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Dict, Any, Optional, Tuple
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
@@ -5,6 +6,7 @@ from tgen.common.constants.ranking_constants import RANKING_ID_TAG, RANKING_SCOR
     JUSTIFICATION_TAG, RANKING_MIN_SCORE
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.math_util import MathUtil
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 
 
@@ -54,8 +56,14 @@ class ArtifactReasoning:
         """
         explanation_values = {name: ArtifactReasoning.get_attr(name, explanation_parts)
                               for name in explanation_parts.keys() if name != RANKING_ARTIFACT_TAG}
-        formatted_values = [self.format_for_explanation(val, score, remove_score=name == JUSTIFICATION_TAG and score is not None)
-                            for name, val in explanation_values.items() if val]
+        explanation_values = {name: val for name, val in explanation_values.items() if val}  # remove empty
+
+        summary = self.format_for_explanation(explanation_values.pop(JUSTIFICATION_TAG), score,
+                                              remove_score=True, bold=True) if JUSTIFICATION_TAG in explanation_values else None
+
+        formatted_values = [self.format_for_explanation(val) for i, val in enumerate(explanation_values.values())]
+        if summary:
+            formatted_values.append(summary)
         return NEW_LINE.join(formatted_values)
 
     @staticmethod
@@ -78,12 +86,15 @@ class ArtifactReasoning:
         return val
 
     @staticmethod
-    def format_for_explanation(explanation_part: str, score: float, remove_score: bool) -> Optional[str]:
+    def format_for_explanation(explanation_part: str, score: float = None, remove_score: bool = False,
+                               header: str = EMPTY_STRING, bold: bool = False) -> Optional[str]:
         """
         Formats the explanation portion of the reasoning
         :param explanation_part: The part of the explanation to format
         :param score: The score given to the artifact
         :param remove_score: If True, removes the score from the explanation (in the case the model mistakenly printed it)
+        :param header: If provided, the header will be added to the explantion in markdown
+        :param bold: If True, bolds the explanation part
         :return: The formatted explanation part
         """
         if not explanation_part:
@@ -91,4 +102,21 @@ class ArtifactReasoning:
         lines = explanation_part.strip().split(NEW_LINE)
         if remove_score:
             lines = [line for line in lines if str(score) not in line]
-        return EMPTY_STRING.join(lines)
+        output = EMPTY_STRING.join(lines)
+        if bold:
+            output = PromptUtil.as_markdown_bold(output)
+        output = PromptUtil.as_bullet_point(output)
+        if header:
+            output = ArtifactReasoning._add_header_to_explanation(header, output)
+        return output
+
+    @staticmethod
+    def _add_header_to_explanation(header: str, explanation: str) -> str:
+        """
+        Adds a header to the explanations
+        :param header: The header for the explanations
+        :param explanation: The explanation
+        :return: The full string with header prepended
+        """
+        formatted = f"{PromptUtil.as_markdown_header(header, level=4)}{NEW_LINE}{explanation}"
+        return formatted

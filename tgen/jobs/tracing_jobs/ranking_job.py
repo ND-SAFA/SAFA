@@ -7,6 +7,8 @@ from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
+from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
+from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -109,6 +111,9 @@ class RankingJob(AbstractJob):
                     self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
                     if TraceKeys.EXPLANATION in entry:
                         self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+        if export_dir:
+            PromptDatasetExporter(export_path=os.path.join(export_dir, "final_dataset"),
+                                  dataset=self.dataset, trace_dataset_exporter_type=SafaExporter).export()
         return selected_entries
 
     @staticmethod

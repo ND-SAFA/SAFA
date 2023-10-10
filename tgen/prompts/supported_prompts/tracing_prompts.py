@@ -35,11 +35,10 @@ QUESTION1 = QuestionnairePrompt(
                           f"Use the information in `{PROJECT_SUMMARY_HEADER}` "
                           f"to understand the system the parent artifact is operating in.")
                       ], response_manager=PromptResponseManager(response_tag=RANKING_PARENT_SUMMARY_TAG))
-RANKING_CATEGORIES = ["Artifacts have an direct 1:1 mapping based on closely-tied functionality "
-                      "or a direct design or inheritance relationship (definite trace-link)",
+RANKING_CATEGORIES = ["Artifacts have closely-tied functionality "
+                      "or a direct design/inheritance relationship (definite trace-link)",
                       "Artifacts support key functions of the other "
-                      "or share significant similarities with only minor inconsistencies (likely trace-link)"
-                      "(likely trace-link)",
+                      "or share significant similarities with only minor inconsistencies (likely trace-link)",
                       "Portions of the artifacts have clear and direct linkage but other portions are unrelated (possible trace-link)",
                       "Partial topical overlap. The artifacts have some loosely related content "
                       "but differences outweigh the similarities (unsure if trace-link)",
@@ -94,10 +93,7 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                                                                          "help the module it is a part of?"),
                                                                           QuestionPrompt("How does the child artifact functionality "
                                                                                          "affect the primary goal "
-                                                                                         "of the parent artifact?"
-                                                                                         "How does the child artifact "
-                                                                                         "functionality affect "
-                                                                                         "the primary goal of the parent artifact?")],
+                                                                                         "of the parent artifact?")],
                                                                       enumeration_chars=["i", "ii", "iii", "iv", "v"],
                                                                       response_manager=PromptResponseManager(
                                                                           response_tag=RANKING_EXPLANATION_TAG)),

@@ -234,7 +234,7 @@ export const useDocuments = defineStore("documents", {
 
       await this.removeDocument("");
       await this.addDocument(document);
-      layoutStore.mode = "tree";
+      layoutStore.mode = types.length > 1 ? "tree" : "table";
     },
     /**
      * Adds artifacts to the current document.

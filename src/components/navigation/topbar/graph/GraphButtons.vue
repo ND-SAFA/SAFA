@@ -28,12 +28,7 @@ export default {
 import { computed } from "vue";
 import { IconVariant } from "@/types";
 import { cyStore, layoutApiStore, layoutStore, permissionStore } from "@/hooks";
-import {
-  IconButton,
-  FlexBox,
-  Separator,
-  TypeButtons,
-} from "@/components/common";
+import { IconButton, FlexBox, Separator } from "@/components/common";
 
 const viewButtons = computed(() => [
   {

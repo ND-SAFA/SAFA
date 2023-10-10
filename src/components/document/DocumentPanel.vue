@@ -7,16 +7,7 @@
         :error-message="nameError"
         data-cy="input-document-name"
       />
-      <select-input
-        v-model="editedDocument.type"
-        label="Type"
-        :options="typeOptions"
-        option-label="name"
-        option-value="id"
-        option-to-value
-        class="q-mb-md"
-        data-cy="input-document-type"
-      />
+
       <artifact-type-input
         v-model="store.includedTypes"
         multiple
@@ -32,6 +23,7 @@
         class="q-mb-md"
         data-cy="input-document-artifacts"
       />
+
       <switch-input
         v-model="store.includeChildren"
         label="Include artifact children"
@@ -91,7 +83,6 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { documentTypeOptions } from "@/util";
 import { appStore, documentApiStore, documentSaveStore } from "@/hooks";
 import {
   ArtifactInput,
@@ -101,11 +92,8 @@ import {
   TextButton,
   PanelCard,
   TextInput,
-  SelectInput,
   DetailsPanel,
 } from "@/components/common";
-
-const typeOptions = documentTypeOptions();
 
 const store = computed(() => documentSaveStore);
 const isUpdate = computed(() => documentSaveStore.isUpdate);

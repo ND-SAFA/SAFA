@@ -1,7 +1,6 @@
 <template>
   <div>
     <text-input
-      v-if="!store.isFTA"
       v-model="store.editedArtifact.name"
       label="Artifact Name"
       hint="Enter a unique name for the artifact"
@@ -19,8 +18,8 @@
         />
       </template>
     </text-input>
+
     <artifact-type-input
-      v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
       v-model="store.editedArtifact.type"
       label="Artifact Type"
       hint="Press enter to save a new artifact type"
@@ -29,7 +28,6 @@
     />
 
     <text-input
-      v-if="!store.isFTA"
       v-model="store.editedArtifact.body"
       label="Artifact Body"
       type="textarea"
@@ -48,7 +46,7 @@
     </text-input>
 
     <text-input
-      v-if="!store.isFTA && store.hasSummary"
+      v-if="store.hasSummary"
       v-model="store.editedArtifact.summary"
       label="Artifact Summary"
       type="textarea"
@@ -56,40 +54,6 @@
       data-cy="input-artifact-summary"
     />
 
-    <select-input
-      v-if="showDocumentType"
-      v-model="store.editedArtifact.documentType"
-      label="Document Type"
-      :options="documentTypes"
-      option-label="name"
-      option-value="id"
-      option-to-value
-      hint="Which type of document this artifact belongs to"
-      class="q-mb-md"
-      data-cy="input-artifact-document"
-    />
-    <select-input
-      v-if="store.isSafetyCase"
-      v-model="store.editedArtifact.safetyCaseType"
-      label="Safety Case Type"
-      :options="safetyCaseTypes"
-      option-label="name"
-      option-value="id"
-      option-to-value
-      class="q-mb-md"
-      data-cy="input-artifact-sc"
-    />
-    <select-input
-      v-if="store.isFTA"
-      v-model="store.editedArtifact.logicType"
-      label="Logic Type"
-      :options="logicTypes"
-      option-label="name"
-      option-value="id"
-      option-to-value
-      class="q-mb-md"
-      data-cy="input-artifact-logic"
-    />
     <artifact-input
       v-if="!store.isUpdate"
       v-model="store.parentId"
@@ -114,11 +78,9 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import {
   artifactGenerationApiStore,
   artifactSaveStore,
-  documentStore,
   artifactApiStore,
 } from "@/hooks";
 import {
@@ -126,20 +88,10 @@ import {
   ArtifactTypeInput,
   AttributeListInput,
   TextInput,
-  SelectInput,
   IconButton,
 } from "@/components/common";
 
-const safetyCaseTypes = safetyCaseOptions();
-const logicTypes = logicTypeOptions();
-
 const store = computed(() => artifactSaveStore);
-
-const documentTypes = computed(
-  () => documentTypeMap()[documentStore.currentType]
-);
-
-const showDocumentType = computed(() => documentTypes.value.length > 1);
 
 /**
  * Generates the name of the artifact based on the body.

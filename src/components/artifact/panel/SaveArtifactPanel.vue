@@ -36,6 +36,6 @@ import {
 
 watch(
   () => selectionStore.selectedArtifact,
-  () => artifactSaveStore.resetArtifact(true)
+  () => artifactSaveStore.resetArtifact()
 );
 </script>

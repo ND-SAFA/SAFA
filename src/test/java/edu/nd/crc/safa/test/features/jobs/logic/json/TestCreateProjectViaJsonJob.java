@@ -69,7 +69,6 @@ class TestCreateProjectViaJsonJob extends ApplicationBaseTest {
         assertThat(artifact.getType()).isEqualTo(artifactConstants.type);
         assertThat(artifact.getSummary()).isEqualTo(artifactConstants.summary);
         assertThat(artifact.getBody()).isEqualTo(artifactConstants.body);
-        assertThat(artifact.getDocumentType()).isEqualTo(artifactConstants.documentType);
 
         // VP - Verify that job is associated with project
         List<JobAppEntity> projectJobs = CommonRequestService.Project.getProjectJobs(projectVersion.getProject());

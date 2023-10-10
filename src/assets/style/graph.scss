@@ -46,6 +46,8 @@ $graph-border-radius: 8px;
   overflow: hidden;
   background-color: $color-background;
   cursor: pointer;
+  // Helps the graph not get fuzzy when adding a shadow on hover.
+  box-shadow: 1px 3px 8px rgba(0,0,0,0) !important;
 
   &:hover, &.cy-node-selected {
     background-color: $color-neutral;

@@ -58,12 +58,12 @@ class ArtifactReasoning:
                               for name in explanation_parts.keys() if name != RANKING_ARTIFACT_TAG}
         explanation_values = {name: val for name, val in explanation_values.items() if val}  # remove empty
 
-        summary = self.format_for_explanation(explanation_values.pop(JUSTIFICATION_TAG), score,
-                                              remove_score=True, bold=True) if JUSTIFICATION_TAG in explanation_values else None
+        summary = self.format_for_explanation(explanation_values.pop(JUSTIFICATION_TAG), score, remove_score=True,
+                                              bold=True, as_bullet=False) if JUSTIFICATION_TAG in explanation_values else None
 
         formatted_values = [self.format_for_explanation(val) for i, val in enumerate(explanation_values.values())]
         if summary:
-            formatted_values.append(summary)
+            formatted_values = [PromptUtil.as_blockquote(summary), PromptUtil.markdown_divider()] + formatted_values
         return NEW_LINE.join(formatted_values)
 
     @staticmethod
@@ -87,7 +87,7 @@ class ArtifactReasoning:
 
     @staticmethod
     def format_for_explanation(explanation_part: str, score: float = None, remove_score: bool = False,
-                               header: str = EMPTY_STRING, bold: bool = False) -> Optional[str]:
+                               header: str = EMPTY_STRING, bold: bool = False, as_bullet: bool = True) -> Optional[str]:
         """
         Formats the explanation portion of the reasoning
         :param explanation_part: The part of the explanation to format
@@ -95,6 +95,7 @@ class ArtifactReasoning:
         :param remove_score: If True, removes the score from the explanation (in the case the model mistakenly printed it)
         :param header: If provided, the header will be added to the explantion in markdown
         :param bold: If True, bolds the explanation part
+        :param as_bullet: If True, creates a bullet for the explanation part
         :return: The formatted explanation part
         """
         if not explanation_part:
@@ -105,7 +106,8 @@ class ArtifactReasoning:
         output = EMPTY_STRING.join(lines)
         if bold:
             output = PromptUtil.as_markdown_bold(output)
-        output = PromptUtil.as_bullet_point(output)
+        if as_bullet:
+            output = PromptUtil.as_bullet_point(output)
         if header:
             output = ArtifactReasoning._add_header_to_explanation(header, output)
         return output

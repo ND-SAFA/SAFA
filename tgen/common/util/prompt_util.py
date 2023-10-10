@@ -49,7 +49,6 @@ class PromptUtil:
         """
         return f"*{original_string}*"
 
-
     @staticmethod
     def as_markdown_bold(original_string: str) -> str:
         """
@@ -57,8 +56,16 @@ class PromptUtil:
         :param original_string: The string to format
         :return: The string formatted as markdown
         """
-        return f"__{original_string}__"
+        return f"**{original_string}**"
 
+    @staticmethod
+    def as_blockquote(original_string: str) -> str:
+        """
+        Formats the string as markdown blockquote
+        :param original_string: The string to format
+        :return: The string formatted as markdown
+        """
+        return f">{original_string}"
 
     @staticmethod
     def as_markdown_header(original_string: str, level: int = 1) -> str:
@@ -90,6 +97,14 @@ class PromptUtil:
         :return: The string indented as markdown
         """
         return f"    {original_string}"
+
+    @staticmethod
+    def markdown_divider() -> str:
+        """
+        Creates a markdown divider
+        :return: The markdown divider
+        """
+        return "---------------"
 
     @staticmethod
     def strip_new_lines_and_extra_space(original_string) -> str:

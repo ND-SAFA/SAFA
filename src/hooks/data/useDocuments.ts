@@ -7,12 +7,7 @@ import {
   ProjectSchema,
   ArtifactSchema,
 } from "@/types";
-import {
-  buildDocument,
-  DEFAULT_VIEW_NAME,
-  isTableDocument,
-  removeMatches,
-} from "@/util";
+import { buildDocument, DEFAULT_VIEW_NAME, removeMatches } from "@/util";
 import {
   subtreeStore,
   layoutStore,
@@ -74,12 +69,6 @@ export const useDocuments = defineStore("documents", {
      */
     isBaseDocument(): boolean {
       return this.currentId === "";
-    },
-    /**
-     * @return Whether the current document type is for editing a table.
-     */
-    isTableOnlyDocument(): boolean {
-      return isTableDocument(this.currentDocument.type);
     },
   },
   actions: {
@@ -181,10 +170,6 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
-
-      if (isTableDocument(document.type)) {
-        layoutStore.mode = "table";
-      }
     },
     /**
      * Adds a new document.
@@ -234,7 +219,7 @@ export const useDocuments = defineStore("documents", {
 
       await this.removeDocument("");
       await this.addDocument(document);
-      layoutStore.mode = "tree";
+      layoutStore.mode = types.length > 1 ? "tree" : "table";
     },
     /**
      * Adds artifacts to the current document.

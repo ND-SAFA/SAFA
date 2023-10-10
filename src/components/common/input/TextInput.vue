@@ -64,7 +64,7 @@ const showError = computed(() =>
     ? // If the hint is hidden, don't show the error. Undefined will remove the bottom margin for the message.
       undefined
     : // If there is an error message, show it. Either way, the input will have a bottom margin.
-      props.errorMessage && props.errorMessage.length > 0
+      (props.errorMessage && props.errorMessage.length > 0) || false
 );
 
 /**

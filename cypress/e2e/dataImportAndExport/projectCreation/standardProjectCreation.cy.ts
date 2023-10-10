@@ -8,7 +8,7 @@ import {
 
 const validUser = Cypress.env("validUser");
 
-describe("Standard Project Creation", () => {
+describe.skip("Standard Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();
 

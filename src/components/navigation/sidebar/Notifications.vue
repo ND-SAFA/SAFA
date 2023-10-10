@@ -55,12 +55,10 @@
           </list-item>
         </list>
 
-        <div v-if="notifications.length === 0" class="q-pa-md">
-          <typography
-            value="There are no notifications in the current session."
-          />
-        </div>
-        <list v-else class="nav-notifications q-pa-sm q-mb-sm">
+        <list
+          v-if="notifications.length > 0"
+          class="nav-notifications q-pa-sm q-mb-sm"
+        >
           <typography variant="caption" value="Notifications" />
 
           <list-item
@@ -93,6 +91,15 @@
             </template>
           </list-item>
         </list>
+
+        <div
+          v-if="notifications.length === 0 && !displayRecentJobs"
+          class="q-pa-md"
+        >
+          <typography
+            value="There are no notifications in the current session."
+          />
+        </div>
       </q-menu>
     </template>
   </list-item>

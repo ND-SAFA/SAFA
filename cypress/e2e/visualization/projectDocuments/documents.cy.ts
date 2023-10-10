@@ -81,21 +81,6 @@ describe("Documents", () => {
     });
   });
 
-  describe("I can create a table document", () => {
-    it("Creates a document and shows the table", () => {
-      cy.createDocument(
-        {
-          type: "FMEA",
-          includeTypes: "Req{downArrow}{enter}",
-        },
-        true
-      );
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.artifactTable).should("be.visible");
-    });
-  });
-
   describe("I can edit a document", () => {
     it("Adds new artifacts to a document", () => {
       const name = `New ${Math.random()}`;

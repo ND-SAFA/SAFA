@@ -10,7 +10,7 @@
     :loading="props.loading"
     :expanded="props.expandable ? expandedRows : undefined"
     :sort="handleSort"
-    separator="cell"
+    separator="horizontal"
   >
     <template
       #top="scope: { inFullscreen: boolean; toggleFullscreen: () => void }"

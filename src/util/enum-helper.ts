@@ -3,14 +3,11 @@ import {
   ArtifactDeltaState,
   AttributeType,
   CreatorTab,
-  DocumentType,
-  FTANodeType,
   LoaderTab,
   MemberRole,
   MembershipType,
   OrganizationTabTypes,
   ProjectTableTab,
-  SafetyCaseType,
   SearchSelectOption,
   SelectOption,
   SettingsTab,
@@ -31,38 +28,6 @@ export function createOption<T extends string>(
   name?: string
 ): SelectOption<T> {
   return { id: enumValue, name: name || enumToDisplay(enumValue) };
-}
-
-/**
- * @return display names for each document type.
- */
-export function documentTypeOptions(): SelectOption<DocumentType>[] {
-  return [
-    createOption("ARTIFACT_TREE", "Default"),
-    createOption("FTA", "FTA"),
-    createOption("SAFETY_CASE"),
-    createOption("FMEA", "FMEA"),
-    createOption("FMECA", "FMECA"),
-  ];
-}
-
-/**
- * @return display names for each safety case type.
- */
-export function safetyCaseOptions(): SelectOption<SafetyCaseType>[] {
-  return [
-    createOption("CONTEXT"),
-    createOption("GOAL"),
-    createOption("STRATEGY"),
-    createOption("SOLUTION"),
-  ];
-}
-
-/**
- * @return display names for each logic type.
- */
-export function logicTypeOptions(): SelectOption<FTANodeType>[] {
-  return [createOption("AND"), createOption("OR")];
 }
 
 /**

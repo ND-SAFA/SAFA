@@ -147,11 +147,11 @@ export function getIcon(variant?: IconVariant): string {
     case "view-delta":
       return "mdi-compare";
     case "graph-zoom-in":
-      return "mdi-magnify-plus-outline";
+      return "mdi-magnify-plus";
     case "graph-zoom-out":
-      return "mdi-magnify-minus-outline";
+      return "mdi-magnify-minus";
     case "graph-center":
-      return "mdi-graphql";
+      return "mdi-image-filter-center-focus-strong";
     case "graph-refresh":
       return "mdi-refresh";
     case "graph-add":
@@ -173,9 +173,9 @@ export function getIcon(variant?: IconVariant): string {
     case "nav-settings":
       return "mdi-cog-box";
     case "filter-open":
-      return "mdi-filter-menu-outline";
+      return "mdi-filter-menu";
     case "filter-close":
-      return "mdi-filter-minus-outline";
+      return "mdi-filter-minus";
     case "group-open":
       return "mdi-chevron-up";
     case "group-open-all":

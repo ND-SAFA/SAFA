@@ -7,7 +7,6 @@
         clickable
         tooltip
         :title="doc.name"
-        :subtitle="documentTypeName(doc.type)"
         @click="handleSwitch(doc)"
       />
     </list>
@@ -26,7 +25,6 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { DocumentSchema } from "@/types";
-import { documentTypeOptions } from "@/util";
 import { documentApiStore, documentStore, selectionStore } from "@/hooks";
 import { List, ListItem, PanelCard } from "@/components/common";
 
@@ -48,14 +46,5 @@ const doDisplay = computed(() => documents.value.length > 0);
  */
 function handleSwitch(document: DocumentSchema): void {
   documentApiStore.handleSwitch(document);
-}
-
-/**
- * Converts the document type into a display name.
- * @param typeId - The document type id.
- * @return The document type name.
- */
-function documentTypeName(typeId: string): string {
-  return documentTypeOptions().find(({ id }) => id === typeId)?.name || typeId;
 }
 </script>

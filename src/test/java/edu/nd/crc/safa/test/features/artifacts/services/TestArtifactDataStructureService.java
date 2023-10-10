@@ -13,7 +13,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
@@ -154,7 +153,6 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
             artifactName,
             artifactSummary,
             newContent,
-            DocumentType.ARTIFACT_TREE,
             new Hashtable<>());
 
         // VP - Verify that artifact body is detected to be modified

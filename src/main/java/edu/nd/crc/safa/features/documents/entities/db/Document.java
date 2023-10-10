@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -47,10 +45,6 @@ public class Document implements Serializable {
     @JsonIgnore
     private Project project;
 
-    @Column(name = "document_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private DocumentType type;
-
     @Column(name = "name")
     private String name;
 
@@ -60,7 +54,6 @@ public class Document implements Serializable {
     public Document(Document document) {
         this(document.documentId,
             document.project,
-            document.type,
             document.name,
             document.description
         );

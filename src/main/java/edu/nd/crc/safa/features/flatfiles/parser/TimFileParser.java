@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IDataFile;
@@ -58,12 +57,11 @@ public class TimFileParser implements IProjectDefinitionParser {
             // Step - Get required params
             String fileName = artifact.getFileName();
             String artifactType = artifact.getType();
-            DocumentType documentType = DocumentType.ARTIFACT_TREE; //TODO do we ever set this to anything else?
 
             // Step - Create artifact file parser
             String pathToFile = FileUtilities.buildPath(this.pathToFiles, fileName);
             AbstractArtifactFile<?> artifactFile
-                = DataFileBuilder.createArtifactFileParser(artifactType, documentType, pathToFile);
+                = DataFileBuilder.createArtifactFileParser(artifactType, pathToFile);
             artifactFiles.add(artifactFile);
         }
 

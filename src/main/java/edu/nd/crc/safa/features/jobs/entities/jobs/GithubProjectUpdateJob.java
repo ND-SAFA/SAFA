@@ -7,7 +7,6 @@ import java.util.Map;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
@@ -95,7 +94,6 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
                 path,
                 summary,
                 body,
-                DocumentType.ARTIFACT_TREE,
                 attributes
             );
 

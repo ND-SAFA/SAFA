@@ -10,17 +10,12 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentColumn;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
-import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -39,8 +34,6 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
     private final DocumentRepository documentRepository;
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
-    private final DocumentColumnRepository documentColumnRepository;
-    private final NotificationService notificationService;
     private final ArtifactPositionService artifactPositionService;
 
     /**
@@ -92,44 +85,6 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
         return nUpdated;
     }
 
-    /**
-     * If type if FMEA, creates or updates columns
-     *
-     * @param documentAppEntity The app entity whose columns are persisted.
-     * @param document          The document db entity associated with document app entity.
-     */
-    public void updateFMEAColumns(DocumentAppEntity documentAppEntity, Document document) {
-        // Step - Remove columns no longer present in payload
-        List<UUID> originalColumnIds = this.documentColumnRepository
-            .findByDocument(document)
-            .stream()
-            .map(DocumentColumn::getDocumentColumnId)
-            .collect(Collectors.toList());
-
-        // Step - Add or update column database entities
-        if (document.getType() == DocumentType.FMEA) {
-            List<DocumentColumnAppEntity> documentColumns = documentAppEntity.getColumns();
-            for (int columnIndex = 0; columnIndex < documentColumns.size(); columnIndex++) {
-                DocumentColumnAppEntity documentColumnAppEntity = documentColumns.get(columnIndex);
-                DocumentColumn documentColumn = new DocumentColumn(
-                    documentColumnAppEntity,
-                    document,
-                    columnIndex);
-                this.documentColumnRepository.save(documentColumn);
-                documentAppEntity.getColumns().get(columnIndex).setId(documentColumn.getDocumentColumnId());
-
-                // Mark as processed
-                UUID currentColumnId = documentColumn.getDocumentColumnId();
-                originalColumnIds.remove(currentColumnId);
-            }
-        }
-
-        // Step - Remove columns not included in payload
-        for (UUID removedColumnId : originalColumnIds) {
-            this.documentColumnRepository.deleteById(removedColumnId);
-        }
-    }
-
     private int removeDeletedDocumentArtifactLinks(Document document,
                                                    List<UUID> artifactIds,
                                                    List<UUID> artifactIdsLinkedToDocument) {
@@ -177,7 +132,7 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
 
     /**
      * Creates {@link DocumentAppEntity} from its database entity {@link Document}.
-     * This includes retrieving linked artifacts, their positions, and any FMEA columns
+     * This includes retrieving linked artifacts and their positions
      *
      * @param document       Persisted document base entity.
      * @param projectVersion The version of the document's artifact to generate layout with.
@@ -195,18 +150,8 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
             this.artifactPositionService.retrieveDocumentLayout(projectVersion, document.getDocumentId());
 
         // Step - Create document app entity
-        DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds, documentLayout);
 
-        // Step - Add FMEA columns
-        if (document.getType() == DocumentType.FMEA) {
-            List<DocumentColumnAppEntity> documentColumns = this.documentColumnRepository
-                .findByDocumentOrderByTableColumnIndexAsc(document)
-                .stream()
-                .map(DocumentColumnAppEntity::new)
-                .collect(Collectors.toList());
-            documentAppEntity.setColumns(documentColumns);
-        }
-        return documentAppEntity;
+        return new DocumentAppEntity(document, artifactIds, documentLayout);
     }
 
     public Document getDocumentById(UUID documentId) {

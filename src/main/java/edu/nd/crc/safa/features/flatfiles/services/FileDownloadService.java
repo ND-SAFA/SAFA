@@ -3,18 +3,14 @@ package edu.nd.crc.safa.features.flatfiles.services;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.FTAType;
-import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.Type2TraceMap;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimArtifactDefinition;
@@ -27,7 +23,6 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
-import org.javatuples.Pair;
 import org.springframework.stereotype.Service;
 
 /**
@@ -94,10 +89,8 @@ public class FileDownloadService {
 
             File artifactFileOutput = new File(pathToFile);
             List<ArtifactAppEntity> artifacts = projectEntityMaps.getArtifactsInType(artifactType);
-            DocumentType documentType = getDocumentTypeFromType(artifactType);
             AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType,
                 pathToFile,
-                documentType,
                 artifacts);
             TimArtifactDefinition artifactFileIdentifier = new TimArtifactDefinition(artifactType, fileName);
             artifactFiles.add(artifactFileIdentifier);
@@ -105,24 +98,6 @@ public class FileDownloadService {
             projectFiles.add(artifactFileOutput);
         }
         return artifactFiles;
-    }
-
-    private DocumentType getDocumentTypeFromType(String artifactType) {
-        List<Pair<DocumentType, Class<? extends Enum<?>>>> documentValues = new ArrayList<>();
-        documentValues.add(new Pair<>(DocumentType.SAFETY_CASE, SafetyCaseType.class));
-        documentValues.add(new Pair<>(DocumentType.FTA, FTAType.class));
-
-        for (Pair<DocumentType, Class<? extends Enum<?>>> documentTypeClassPair : documentValues) {
-            Class<? extends Enum<?>> enumClass = documentTypeClassPair.getValue1();
-            boolean hasMatch = Arrays
-                .stream(enumClass.getEnumConstants())
-                .anyMatch(enumValue -> enumValue.toString()
-                    .equals(artifactType));
-            if (hasMatch) {
-                return documentTypeClassPair.getValue0();
-            }
-        }
-        return DocumentType.ARTIFACT_TREE;
     }
 
     private File writeTimFile(Project project, TimSchema timData) throws IOException {

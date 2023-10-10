@@ -22,6 +22,7 @@ from tgen.testres.paths.paths import TEST_HGEN_PATH
 from tgen.testres.mocking.mock_libraries import mock_libraries
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
+from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 
 
 class TestMultiLayerHGenJob(BaseJobTest):
@@ -35,8 +36,10 @@ class TestMultiLayerHGenJob(BaseJobTest):
         return get_predictions(expected_name, source_artifact_name)
 
     @mock_libraries
+    @mock.patch.object(CreateExplanationsStep, "run")
     @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
-    def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager, ranking_mock: MagicMock):
+    def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager,
+                         ranking_mock: MagicMock, explanation_mock: MagicMock):
         """
         Tests that job is completed succesfully.
         """

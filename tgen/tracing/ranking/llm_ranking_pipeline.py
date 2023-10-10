@@ -5,6 +5,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
+from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 from tgen.tracing.ranking.steps.create_project_summary_step import CreateProjectSummaryStep
 from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
 from tgen.tracing.ranking.steps.process_ranking_responses_step import ProcessRankingResponsesStep
@@ -17,6 +18,7 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         SortChildrenStep,
         CompleteRankingPromptsStep,
         ProcessRankingResponsesStep,
+        CreateExplanationsStep,
         SelectCandidateLinksStep]
 
     def __init__(self, args: RankingArgs):

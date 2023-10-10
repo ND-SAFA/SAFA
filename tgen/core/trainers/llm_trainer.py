@@ -87,7 +87,7 @@ class LLMTrainer(AbstractTrainer):
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
         prompts = self._get_prompts_for_prediction(dataset) if not prompts else prompts
         if os.path.exists(save_and_load_path):
-            logger.info(f"Loading previous LLM responses from {save_and_load_path}")
+            logger.info(f"IMPORTANT!!! Loading previous LLM responses from {save_and_load_path}")
             res = YamlUtil.read(save_and_load_path)
         else:
             res = self.llm_manager.make_completion_request(completion_type=self.completion_type,

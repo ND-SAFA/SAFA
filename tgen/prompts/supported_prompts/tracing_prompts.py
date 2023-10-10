@@ -2,7 +2,7 @@ from math import floor
 
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
     RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
-    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, JUSTIFICATION_TAG
+    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, JUSTIFICATION_TAG, RANKING_EXPLANATION_TAG, DEFAULT_SCORE
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
@@ -48,7 +48,7 @@ RANKING_CATEGORIES = ["Artifacts have an direct 1:1 mapping based on closely-tie
                       "No discernible relationship between artifacts can be identified."
                       "The artifacts contain different content and context with no overlaps (no trace-link)"]
 RANKING_RANGE = range(RANKING_MAX_SCORE, RANKING_MIN_SCORE - 1,
-                                 -round(((RANKING_MAX_SCORE - RANKING_MIN_SCORE) / len(RANKING_CATEGORIES))))
+                      -round(((RANKING_MAX_SCORE - RANKING_MIN_SCORE) / len(RANKING_CATEGORIES))))
 SCORE_INSTRUCTIONS = SelectQuestionPrompt(
     categories_are_continuous=True,
     categories=RANKING_CATEGORIES,
@@ -59,38 +59,49 @@ SCORE_INSTRUCTIONS = SelectQuestionPrompt(
                  "the parent and child. The following can help guide your decision. "
                  f"Often, the relationship might fall somewhere between two categories. "
                  f"Since the score is continuous, you may select a score in between the categories to reflect this (e.g. 2.8). "
-                 f"Rather than give a score of exactly {list(RANKING_RANGE)[floor(len(RANKING_CATEGORIES)/2)]} "
+                 f"Rather than give a score of exactly {list(RANKING_RANGE)[floor(len(RANKING_CATEGORIES) / 2)]} "
                  f"indicating you are unsure, provide a score slightly above or below (e.g. 2.8)"
                  f"to indicate whether it is more likely a trace-link does (> 3) or does not exist (< 2). "
                  f"Note, generally if a relationship is truly unclear, no trace-link exists.",
     response_tag=RANKING_SCORE_TAG,
     response_format="Enclose the score in {}",
-    default_factory=lambda tag, val: RANKING_MIN_SCORE)
+    default_factory=lambda tag, val: DEFAULT_SCORE)
 
 QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps used to determine "
                                              "if each artifact is a child of the parent artifact. "
                                              "Starting with artifact ID 0, "
                                              "answer the following questions for each artifact. "
-                                             f"Enclose ALL of the answers for EACH child artifact "
+                                             f"Each set of answers for a single artifact should be enclosed in "
                                              f"inside of {PromptUtil.create_xml(RANKING_ARTIFACT_TAG)}",
                                 response_manager=PromptResponseManager(response_tag=RANKING_ARTIFACT_TAG,
-                                                                       response_instructions_format="Enclose ALL of your answers "
-                                                                                                    "for each artifact inside of {}"),
+                                                                       response_instructions_format="Enclose the set of answers "
+                                                                                                    "for EACH artifact inside of {}"),
                                 use_multi_step_task_instructions=True,
                                 question_prompts=[QuestionPrompt("Provide the ID of the artifact being processed ",
                                                                  PromptResponseManager(response_tag=RANKING_ID_TAG,
                                                                                        expected_response_type=int)),
-                                                  QuestionPrompt("What is this functionality of the child artifact? "
-                                                                 "What module is the child a part of? "
-                                                                 "Use the {PROJECT_SUMMARY_HEADER} to understand the system modules.",
-                                                                 PromptResponseManager(response_tag="module")),
-                                                  QuestionPrompt("How does the child's functionality "
-                                                                 "help the module it is a part of?",
-                                                                 PromptResponseManager(response_tag="purpose")),
-                                                  QuestionPrompt("How does the child artifact functionality "
-                                                                 "affect the primary goal of the parent artifact?"
-                                                                 "How does the child artifact functionality affect "
-                                                                 "the primary goal of the parent artifact?",
-                                                                 PromptResponseManager(response_tag="relationship")),
+                                                  QuestionnairePrompt(instructions=f"Within "
+                                                                                   f"{PromptUtil.create_xml(RANKING_EXPLANATION_TAG)} "
+                                                                                   f"provide three complete sentences "
+                                                                                   f"answering the questions in the order below:",
+                                                                      question_prompts=[
+                                                                          QuestionPrompt(
+                                                                              "What is this functionality of the child artifact? "
+                                                                              "What module is the child a part of? "
+                                                                              "Use the {PROJECT_SUMMARY_HEADER} "
+                                                                              "to understand the system modules."),
+                                                                          QuestionPrompt("How does the child's functionality "
+                                                                                         "help the module it is a part of?"),
+                                                                          QuestionPrompt("How does the child artifact functionality "
+                                                                                         "affect the primary goal "
+                                                                                         "of the parent artifact?"
+                                                                                         "How does the child artifact "
+                                                                                         "functionality affect "
+                                                                                         "the primary goal of the parent artifact?")],
+                                                                      enumeration_chars=["i", "ii", "iii", "iv", "v"],
+                                                                      response_manager=PromptResponseManager(
+                                                                          response_tag=RANKING_EXPLANATION_TAG)),
                                                   SCORE_INSTRUCTIONS,
+                                                  Prompt(f"Make sure to enclose each set of answers "
+                                                         f"for EACH individual artifact inside of {RANKING_ARTIFACT_TAG}")
                                                   ])

@@ -71,7 +71,9 @@ class TestState(BaseTest):
             return val
 
         state_name = GenerateArtifactContentStep.get_step_name()
-        attrs = YamlUtil.read(State.get_path_to_state_checkpoint(TEST_STATE_PATH, state_name))
+        step_num = HierarchyGenerator.steps.index(GenerateArtifactContentStep) + 1
+        orig_path = State.get_path_to_state_checkpoint(TEST_STATE_PATH, state_name, step_num=step_num)
+        attrs = YamlUtil.read(orig_path)
         param_specs = ParamSpecs.create_from_method(HGenState.__init__)
         checked_attrs = {}
         for name, val in attrs.items():
@@ -79,8 +81,8 @@ class TestState(BaseTest):
         orig_state = HGenState(**checked_attrs)
         orig_state.export_dir = TEST_OUTPUT_DIR
         orig_state.save(state_name)
-        path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name)
-        reloaded_attrs = YamlUtil.read(path)
+        save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num)
+        reloaded_attrs = YamlUtil.read(save_path)
         self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/testres/output')
         self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])
         self.assertEqual(orig_state.description_of_artifact, reloaded_attrs["description_of_artifact"])
@@ -95,10 +97,10 @@ class TestState(BaseTest):
         self.assertEqual(orig_state.final_dataset, reloaded_attrs["final_dataset"])
 
         orig_state.save(state_name, attrs2ignore={"final_dataset"})
-        reloaded_attrs = YamlUtil.read(path)
+        reloaded_attrs = YamlUtil.read(save_path)
         self.assertNotIn("final_dataset", reloaded_attrs)
         try:
-            orig_state.load_state_from_path(path, raise_exception=True)
+            orig_state.load_state_from_path(save_path, raise_exception=True)
         except Exception as e:
             self.fail(e)
 

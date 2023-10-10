@@ -7,7 +7,8 @@ from tgen.common.constants.ranking_constants import DEFAULT_LINK_THRESHOLD, \
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
-    DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT
+    DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, \
+    GENERATE_EXPLANATIONS_DEFAULT, DEFAULT_EMBEDDINGS_SCORE_WEIGHT
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -52,6 +53,10 @@ class RankingArgs(PipelineArgs):
     """
     generate_summary: bool = GENERATE_SUMMARY_DEFAULT
     """
+    - generate_explanations: Whether to generate explanations for links.
+    """
+    generate_explanations: bool = GENERATE_EXPLANATIONS_DEFAULT
+    """
     - ranking_llm_model: The model used to rank
     """
     ranking_llm_model_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
@@ -87,6 +92,11 @@ class RankingArgs(PipelineArgs):
     - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
     """
     weight_of_explanation_scores: float = DEFAULT_EXPLANATION_SCORE_WEIGHT
+    """
+     - weight_of_embedding_scores: If greater than 0, will weight the scores from the embeddings in the final score 
+     *applicable only for LLMPipeline*
+     """
+    weight_of_embedding_scores: float = DEFAULT_EMBEDDINGS_SCORE_WEIGHT
 
     def save(self, obj: Any, file_name: str) -> str:
         """

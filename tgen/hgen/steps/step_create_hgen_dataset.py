@@ -2,6 +2,7 @@ import os
 import uuid
 from typing import List, Dict
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.ranking_constants import DEFAULT_HGEN_LINK_THRESHOLD
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
@@ -141,4 +142,4 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param directory: The main directory used by hgen
         :return: The full path
         """
-        return os.path.join(directory, "ranking") if directory else None
+        return os.path.join(directory, "ranking") if directory else EMPTY_STRING

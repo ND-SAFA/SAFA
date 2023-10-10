@@ -30,6 +30,7 @@ from tgen.testres.mocking.mock_libraries import mock_libraries
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
+from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 
 
 class TestHierarchyGenerator(BaseTest):
@@ -134,8 +135,9 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(self.HGEN_STATE.refined_content[us], HGenTestConstants.code_files[i])
 
     @mock_anthropic
+    @mock.patch.object(CreateExplanationsStep, "run")
     @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
-    def assert_create_dataset_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock):
+    def assert_create_dataset_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock, explanation_mock: MagicMock):
         names, expected_names, responses = get_name_responses(self.HGEN_STATE.generation_predictions)
         anthropic_ai_manager.set_responses(responses)
         ranking_mock.return_value = get_predictions(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)

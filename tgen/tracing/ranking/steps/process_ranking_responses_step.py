@@ -1,12 +1,13 @@
-from typing import List, Set
+from typing import List, Set, Dict, Tuple
 
+from tgen.common.constants.ranking_constants import DEFAULT_SCORE
+from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.objects.trace import Trace
+from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
-from tgen.state.state import State
+from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.artifact_reasoning import ArtifactReasoning
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
@@ -39,52 +40,88 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         all_entries = []
         for parent_name, prompt_response in zip(parent_ids, ranking_responses):
             related_children = [entry[TraceKeys.child_label()] for entry in sorted_parent2children[parent_name]]
-            parsed_entries, unidentified_entries, parsed_artifact_ids = [], [], set()
-            for i, artifact_res in enumerate(prompt_response):
-                try:
-                    a_reasoning = ArtifactReasoning(artifact_res)
-                    if a_reasoning.index is None:
-                        a_reasoning.index = i
-                        a_reasoning.artifact_id = related_children[a_reasoning.index]
-                        unidentified_entries.append(a_reasoning)
-                    elif a_reasoning.index not in parsed_artifact_ids:
-                        a_reasoning.artifact_id = related_children[a_reasoning.index]
-                        parsed_entries.append(a_reasoning)
-                        parsed_artifact_ids.add(a_reasoning.artifact_id)
-                except Exception as e:
-                    logger.exception(e)
-                    logger.info(f"Unable to parse: {artifact_res}")
-            n_unidentified = ProcessRankingResponsesStep._identify_unknown_a_reasoning(unidentified_entries, parsed_entries,
-                                                                                       parsed_artifact_ids)
-            ProcessRankingResponsesStep._log_processing_warning(n_unidentified, parent_name, "unidentified")
-            n_missing = len(related_children) - len(parsed_artifact_ids)
-            ProcessRankingResponsesStep._log_processing_warning(n_missing, parent_name, "missing")
-            parsed_entries: List[ArtifactReasoning] = sorted(parsed_entries, key=lambda a: (a.score, -a.index), reverse=True)
-
-            # Step - Store results
-            child_entries = ProcessRankingResponsesStep._create_trace_prediction_entries(parsed_entries, parent_name)
+            parsed_id_to_reasoning = ProcessRankingResponsesStep._create_artifact_reasonings(prompt_response,
+                                                                                             parent_name,
+                                                                                             related_children)
+            ProcessRankingResponsesStep._add_missing_a_reasonings(parsed_id_to_reasoning, sorted_parent2children[parent_name],
+                                                                  args.weight_of_embedding_scores)
+            child_entries = ProcessRankingResponsesStep._create_trace_prediction_entries(list(parsed_id_to_reasoning.values()),
+                                                                                         parent_name)
             all_entries.extend(child_entries)
         state.candidate_entries = all_entries
         return all_entries
 
     @staticmethod
-    def _identify_unknown_a_reasoning(unidentified_entries: List[ArtifactReasoning], parsed_entries: List[ArtifactReasoning],
-                                      parsed_artifact_ids: Set) -> int:
+    def _create_artifact_reasonings(prompt_response: List[Dict],
+                                    parent_name: str,
+                                    related_children: List) -> Dict[str, ArtifactReasoning]:
         """
-        Tries to add any unidentified artifact reasoning to the parsed entries
-        :param unidentified_entries: The list of unidentified entries
-        :param parsed_entries: The list of already identified entries
-        :param parsed_artifact_ids: The list of artifact ids that were identified
+        Creates artifact reasoning objects from the prompt response
+        :param prompt_response: The response from the model
+        :param parent_name: The name of the parent artifact
+        :param related_children: A list of related children ids
+        :return: A list of parsed artifact reasoning and unidentified artifact reasoning, and the set of successful parsed artifact ids
+        """
+        parsed_id_to_reasoning, unidentified_reasonings = {}, []
+        for i, artifact_res in enumerate(prompt_response):
+            try:
+                a_reasoning = ArtifactReasoning(artifact_res)
+                if a_reasoning.index is None:
+                    a_reasoning.index = i
+                    a_reasoning.artifact_id = related_children[a_reasoning.index]
+                    unidentified_reasonings.append(a_reasoning)
+                elif a_reasoning.index not in parsed_id_to_reasoning:
+                    a_reasoning.artifact_id = related_children[a_reasoning.index]
+                    parsed_id_to_reasoning[a_reasoning.artifact_id] = a_reasoning
+            except Exception as e:
+                logger.exception(e)
+                logger.info(f"Unable to parse: {artifact_res}")
+
+        n_unidentified = ProcessRankingResponsesStep._identify_unknown_a_reasoning(unidentified_reasonings, parsed_id_to_reasoning)
+        ProcessRankingResponsesStep._log_processing_warning(n_unidentified, parent_name, "unidentified")
+        n_missing = len(related_children) - len(parsed_id_to_reasoning)
+        ProcessRankingResponsesStep._log_processing_warning(n_missing, parent_name, "missing")
+        return parsed_id_to_reasoning
+
+    @staticmethod
+    def _identify_unknown_a_reasoning(unidentified_reasonings: List[ArtifactReasoning],
+                                      parsed_id_to_reasoning: Dict[str, ArtifactReasoning]) -> int:
+        """
+        Tries to add any unidentified artifact reasoning to the parsed artifact reasoning
+        :param unidentified_reasonings: The list of unidentified artifact reasoning
+        :param parsed_id_to_reasoning: Dictionary mapping identified artifact id to its artifact reasoning
         :return: The number of remaining unidentified artifact reasoning
         """
         n_unidentified = 0
-        for a_reasoning in unidentified_entries:
-            if a_reasoning.artifact_id not in parsed_artifact_ids:
-                parsed_entries.append(a_reasoning)
-                parsed_artifact_ids.add(a_reasoning.artifact_id)
+        for a_reasoning in unidentified_reasonings:
+            if a_reasoning.artifact_id not in parsed_id_to_reasoning:
+                parsed_id_to_reasoning[a_reasoning.artifact_id] = a_reasoning
             else:
                 n_unidentified += 1
         return n_unidentified
+
+    @staticmethod
+    def _add_missing_a_reasonings(parsed_id_to_reasoning: Dict[str, ArtifactReasoning],
+                                  sorted_children: List[EnumDict],
+                                  weight_of_embedding_scores: float) -> None:
+        """
+        Fills in missing a reasonings using the sorted children
+        :param parsed_id_to_reasoning: A dictionary mapping artifact id to its parsed a reasoning
+        :param sorted_children: The list of original sorted children (likely by embedding)
+        :param weight_of_embedding_scores: The weight of the embeddings score on the overall score
+        :return: None
+        """
+        for entry in sorted_children:
+            child_id = entry[TraceKeys.SOURCE]
+            if child_id not in parsed_id_to_reasoning:
+                parsed_id_to_reasoning[child_id] = ArtifactReasoning(artifact_id=child_id, score=entry[TraceKeys.SCORE])
+            a_reasoning = parsed_id_to_reasoning[child_id]
+            if a_reasoning.score is None or a_reasoning.score == DEFAULT_SCORE:
+                a_reasoning.score = entry[TraceKeys.SCORE]
+            else:
+                a_reasoning.score = MathUtil.calculate_weighted_score(scoreA=entry[TraceKeys.SCORE],
+                                                                      scoreB=a_reasoning.score,
+                                                                      weight_of_scoreA=weight_of_embedding_scores)
 
     @staticmethod
     def _create_trace_prediction_entries(parsed_entries: List[ArtifactReasoning], parent_name: str) -> List[Trace]:

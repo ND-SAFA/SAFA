@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_SCORE_TAG, RANKING_MIN_SCORE, \
+from tgen.common.constants.ranking_constants import RANKING_SCORE_TAG, RANKING_MIN_SCORE, \
     RANKING_MAX_SCORE
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.math_util import MathUtil
@@ -16,7 +16,6 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -35,12 +34,15 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param args: The arguments to the ranking pipeline
         :param state: The current state of the ranking pipeline
         """
-        weight = args.weight_of_explanation_scores
+        if not args.generate_explanations:
+            return
         parsed_predictions = self._generate_predictions(args, state)
         a_reasonings = CreateExplanationsStep._create_a_reasonings(parsed_predictions)
         for a_reasoning, entry in zip(a_reasonings, state.get_current_entries()):
-            entry[TraceKeys.EXPLANATION.value] = a_reasoning.explanation
-            entry[TraceKeys.SCORE.value] = a_reasoning.score * weight + entry[TraceKeys.SCORE.value] * (1 - weight)
+            entry[TraceKeys.EXPLANATION] = a_reasoning.explanation
+            entry[TraceKeys.SCORE] = MathUtil.calculate_weighted_score(scoreA=a_reasoning.score,
+                                                                             scoreB=entry[TraceKeys.SCORE],
+                                                                             weight_of_scoreA=args.weight_of_explanation_scores)
 
     @staticmethod
     def _generate_predictions(args: RankingArgs, state: RankingState) -> List[Dict]:

@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
 from tgen.common.constants.ranking_constants import RANKING_ID_TAG, RANKING_SCORE_TAG, RANKING_MAX_SCORE, RANKING_ARTIFACT_TAG, \
@@ -10,28 +10,51 @@ from tgen.data.keys.structure_keys import ArtifactKeys
 
 class ArtifactReasoning:
 
-    def __init__(self, artifact_dict: Dict, require_id: bool = True):
+    def __init__(self, artifact_dict: Dict = None,
+                 index: int = None,
+                 artifact_id: str = None,
+                 score: float = None,
+                 explanation: str = EMPTY_STRING,
+                 require_id: bool = True):
         """
         Stores the reasoning of the LLM for each artifact
         :param artifact_dict: Contains the reasoning of the LLM for each artifact
+        :param artifact_id: The id of the artifact
+        :param score: The score given to the artifact evaluating relationship to parent
+        :param explanation: The explanation of why that score was given
         """
-        if require_id:
-            JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value])
-        self.index = self.get_attr(RANKING_ID_TAG, artifact_dict, pop=True)
-        self.score = MathUtil.normalize_val(self.get_attr(RANKING_SCORE_TAG, artifact_dict, 0.0, pop=True),
-                                            max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
-        self.explanation = self.construct_explanation(artifact_dict)
-        self.artifact_id = None
+        self.artifact_id = artifact_id
+        if artifact_dict:
+            if require_id:
+                JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value])
+            index, score, explanation = self._extract_properties_from_artifact_dict(artifact_dict)
+        self.index = index
+        self.score = score
+        self.explanation = explanation
 
-    def construct_explanation(self, explanation_parts: Dict) -> str:
+    def _extract_properties_from_artifact_dict(self, artifact_dict: Dict) -> Tuple[int, float, str]:
+        """
+        Extracts the necessary attributes from the dictionary containing parsed artifct from LLM
+        :param artifact_dict:
+        :return:
+        """
+        index = self.get_attr(RANKING_ID_TAG, artifact_dict, pop=True)
+        score = self.get_attr(RANKING_SCORE_TAG, artifact_dict, pop=True)
+        if score:
+            score = MathUtil.normalize_val(score, max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
+        explanation = self.construct_explanation(artifact_dict, score=score)
+        return index, score, explanation
+
+    def construct_explanation(self, explanation_parts: Dict, score: float = None) -> str:
         """
         Constructs the explanation from its parts
         :param explanation_parts: Dictionary mapping explanation part name and content
+        :param score: The score assigned to the artifact
         :return: The explanation as a str
         """
         explanation_values = {name: ArtifactReasoning.get_attr(name, explanation_parts)
                               for name in explanation_parts.keys() if name != RANKING_ARTIFACT_TAG}
-        formatted_values = [self.format_for_explanation(val, self.score, remove_score=name == JUSTIFICATION_TAG)
+        formatted_values = [self.format_for_explanation(val, score, remove_score=name == JUSTIFICATION_TAG and score is not None)
                             for name, val in explanation_values.items() if val]
         return NEW_LINE.join(formatted_values)
 
@@ -60,7 +83,7 @@ class ArtifactReasoning:
         Formats the explanation portion of the reasoning
         :param explanation_part: The part of the explanation to format
         :param score: The score given to the artifact
-        :param remove_score: If True, removes the score from the explanation
+        :param remove_score: If True, removes the score from the explanation (in the case the model mistakenly printed it)
         :return: The formatted explanation part
         """
         if not explanation_part:

@@ -88,7 +88,8 @@ class State(BaseObject):
             return False
 
         try:
-            save_path = self.get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
+            step_num = len(self.completed_steps)
+            save_path = self.get_path_to_state_checkpoint(self.export_dir, step_name, run_num, step_num)
             as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self.get_path_to_state_checkpoint(self.export_dir)), k)
                            if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()
                        if not attrs2ignore or k not in attrs2ignore}
@@ -126,8 +127,8 @@ class State(BaseObject):
         steps = deepcopy(step_names)
         steps.reverse()
         try:
-            for step in steps:
-                path = cls.get_path_to_state_checkpoint(load_dir, step)
+            for i, step in enumerate(steps):
+                path = cls.get_path_to_state_checkpoint(load_dir, step, step_num=len(step_names)-i)
                 if os.path.exists(path):
                     state = cls.load_state_from_path(path, raise_exception=True)
                     return state
@@ -188,12 +189,13 @@ class State(BaseObject):
         return val
 
     @staticmethod
-    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1) -> str:
+    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1, step_num: int = None) -> str:
         """
         Gets the path to the checkpoint for the state corresponding to the given step name
         :param directory: The directory that the checkpoints live in
         :param step_name: The name of the step that corresponds with the desired state
         :param run_num: The number of times the step has been run
+        :param step_num: The number of the step being run
         :return: The path to the checkpoint for the state corresponding to the given step name
         """
         if os.path.split(directory)[-1] != State._CHECKPOINT_DIRNAME:
@@ -201,17 +203,21 @@ class State(BaseObject):
         FileUtil.create_dir_safely(directory)
         if not step_name:
             return directory
-        return os.path.join(directory, State._get_filename(step_name, run_num))
+        return os.path.join(directory, State._get_filename(step_name, run_num, step_num))
 
     @staticmethod
-    def _get_filename(step: Any, run_num: int = 1) -> str:
+    def _get_filename(step: Any, run_num: int = 1, step_num: int = None) -> str:
         """
         Returns the filename for the given step
         :param step: The name of the step
         :param run_num: The number of times the step has been run
+        :param step_num: The number of the step being run
         :return: The filename for the given step
         """
         step = DASH.join(SeparateJoinedWordsStep.separate_camel_case_word(step)).lower()
         if run_num > 1:
             step = f"{step}-{run_num}"
-        return f"state-{step}.yaml"
+        filename = f"state-{step}"
+        if step_num:
+            filename = f"{step_num}-{filename}"
+        return FileUtil.add_ext(filename, FileUtil.YAML_EXT)

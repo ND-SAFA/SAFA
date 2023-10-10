@@ -4,6 +4,7 @@ from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MockResponses
@@ -24,7 +25,8 @@ class TestLLMRankingPipeline(BaseTest):
         """
         ai_manager.mock_summarization()
         ai_manager.set_responses(MockResponses.project_summary_responses +
-                                 [RankingPipelineTest.get_response()])
+                                 [RankingPipelineTest.get_response()] +
+                                 [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)])
         args = self.create_args()
         pipeline = LLMRankingPipeline(args)
         pipeline.run()
@@ -33,7 +35,7 @@ class TestLLMRankingPipeline(BaseTest):
         entry = prediction_entries[0]
         self.assertEqual(CHILD_ID, entry[TraceKeys.SOURCE.value])
         self.assertEqual(PARENT_ID, entry[TraceKeys.TARGET.value])
-        for tag in RankingPipelineTest.get_explanation_tags():
+        for tag in RankingPipelineTest.get_explanation_tags(task_prompt=SupportedPrompts.EXPLANATION_TASK.value):
             self.assertIn(tag, entry[TraceKeys.EXPLANATION.value].lower())
         expected_score = MathUtil.normalize_val(4.0, max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
         self.assertEqual(expected_score, entry[TraceKeys.SCORE.value])
@@ -52,5 +54,5 @@ class TestLLMRankingPipeline(BaseTest):
         artifact_df = ArtifactDataFrame([parent_artifact, child_artifact])
         args = RankingArgs(run_name=f"{child_type}2{parent_type}", dataset=PromptDataset(artifact_df=artifact_df),
                            parent_ids=parent_ids,
-                           children_ids=children_ids)
+                           children_ids=children_ids, weight_of_embedding_scores=0, weight_of_explanation_scores=0)
         return args

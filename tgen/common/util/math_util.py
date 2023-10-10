@@ -29,3 +29,14 @@ class MathUtil:
         new_range = new_max - new_min
         conversion = (((val - orig_min) * new_range) / orig_range) if orig_range > 0 else 0
         return conversion + new_min
+
+    @staticmethod
+    def calculate_weighted_score(scoreA: float, scoreB: float, weight_of_scoreA: float) -> float:
+        """
+        Calculates a weighted score
+        :param scoreA: The original score
+        :param scoreB: The new score to combine with the original
+        :param weight_of_scoreA: The amount to weight the new score
+        :return: The weighted score of the combined scores
+        """
+        return scoreA * weight_of_scoreA + scoreB * (1 - weight_of_scoreA)

@@ -11,6 +11,7 @@
     >
       <template #append>
         <icon-button
+          v-if="ENABLED_FEATURES.ARTIFACT_PROMPTS"
           :loading="artifactGenerationApiStore.nameGenLoading"
           tooltip="Generate the name based on the body"
           icon="generate"
@@ -37,6 +38,7 @@
     >
       <template #append>
         <icon-button
+          v-if="ENABLED_FEATURES.ARTIFACT_PROMPTS"
           :loading="artifactGenerationApiStore.bodyGenLoading"
           tooltip="Generate the body based on a prompt"
           icon="generate"
@@ -78,6 +80,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import {
   artifactGenerationApiStore,
   artifactSaveStore,

@@ -12,15 +12,23 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TeamRole {
     NONE(Set.of()),
-    VIEWER(Set.of(ProjectPermission.VIEW,
-                  TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS)),
-    EDITOR(Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT,
-                  TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS)),
-    ADMIN(Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.SHARE, ProjectPermission.DELETE,
-                 TeamPermission.VIEW, TeamPermission.EDIT, TeamPermission.EDIT_MEMBERS, TeamPermission.DELETE,
-                 TeamPermission.VIEW_PROJECTS, TeamPermission.CREATE_PROJECTS, TeamPermission.DELETE_PROJECTS)),
-
-    GENERATOR(Set.of(ProjectPermission.GENERATE));
+    VIEWER(Set.of(
+        ProjectPermission.VIEW, TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS
+    )),
+    EDITOR(Set.of(
+        ProjectPermission.VIEW, ProjectPermission.EDIT, TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS,
+        ProjectPermission.EDIT_DATA, ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS
+    )),
+    ADMIN(Set.of(
+        ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_MEMBERS, ProjectPermission.DELETE,
+        TeamPermission.VIEW, TeamPermission.EDIT, TeamPermission.EDIT_MEMBERS, TeamPermission.DELETE,
+        TeamPermission.VIEW_PROJECTS, TeamPermission.CREATE_PROJECTS, TeamPermission.DELETE_PROJECTS,
+        ProjectPermission.EDIT_DATA, ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS
+    )),
+    GENERATOR(Set.of(
+        ProjectPermission.GENERATE, ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_DATA,
+        TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS
+    ));
 
     @Getter
     private final Set<Permission> grants;

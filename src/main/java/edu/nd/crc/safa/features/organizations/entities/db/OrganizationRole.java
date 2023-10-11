@@ -13,15 +13,20 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum OrganizationRole {
     NONE(Set.of()),
-    MEMBER(Set.of(OrganizationPermission.VIEW, OrganizationPermission.VIEW_TEAMS, OrganizationPermission.CREATE_TEAMS)),
-
-    BILLING_MANAGER(Set.of(OrganizationPermission.VIEW_BILLING)),
-
-    ADMIN(Set.of(OrganizationPermission.VIEW, OrganizationPermission.VIEW_BILLING, OrganizationPermission.EDIT,
-                 OrganizationPermission.VIEW_TEAMS, OrganizationPermission.CREATE_TEAMS,
-                 OrganizationPermission.DELETE_TEAMS, TeamPermission.EDIT_MEMBERS)),
-
-    GENERATOR(Set.of(ProjectPermission.GENERATE));
+    MEMBER(Set.of(
+        OrganizationPermission.VIEW, OrganizationPermission.VIEW_TEAMS
+    )),
+    BILLING_MANAGER(Set.of(
+        OrganizationPermission.VIEW_BILLING, OrganizationPermission.VIEW
+    )),
+    ADMIN(Set.of(
+        OrganizationPermission.VIEW, OrganizationPermission.VIEW_BILLING, OrganizationPermission.EDIT,
+        OrganizationPermission.VIEW_TEAMS, OrganizationPermission.CREATE_TEAMS, OrganizationPermission.DELETE_TEAMS,
+        TeamPermission.EDIT_MEMBERS, OrganizationPermission.EDIT_MEMBERS
+    )),
+    GENERATOR(Set.of(
+        ProjectPermission.GENERATE, OrganizationPermission.VIEW, OrganizationPermission.VIEW_TEAMS
+    ));
 
     @Getter
     private final Set<Permission> grants;

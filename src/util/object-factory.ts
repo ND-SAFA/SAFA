@@ -59,6 +59,7 @@ export function buildProjectIdentifier(
     name: identifier?.name || "",
     projectId: identifier?.projectId || "",
     description: identifier?.description || "",
+    specification: identifier?.specification,
     owner: identifier?.owner || "",
     members: identifier?.members || [],
   };

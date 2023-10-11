@@ -1,6 +1,6 @@
 from typing import Optional, TypedDict
 
-from tgen.common.util.TypedEnumDict import TypedEnumDict
+from tgen.common.util.typed_enum_dict import TypedEnumDict
 from tgen.data.keys.structure_keys import TraceKeys
 
 

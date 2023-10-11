@@ -2,12 +2,13 @@ import re
 from collections import OrderedDict
 from typing import Dict, Any, Optional, Tuple
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, PERIOD, SPACE, COMMA
 from tgen.common.constants.ranking_constants import RANKING_ID_TAG, RANKING_SCORE_TAG, RANKING_MAX_SCORE, RANKING_ARTIFACT_TAG, \
     JUSTIFICATION_TAG, RANKING_MIN_SCORE
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 
 
@@ -43,29 +44,26 @@ class ArtifactReasoning:
         """
         index = self.get_attr(RANKING_ID_TAG, artifact_dict, pop=True)
         score = self.get_attr(RANKING_SCORE_TAG, artifact_dict, pop=True)
-        explanation = self.construct_explanation(artifact_dict, score=score)
+        explanation = self.construct_explanation(artifact_dict)
         if score:
             score = MathUtil.normalize_val(score, max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
         return index, score, explanation
 
-    def construct_explanation(self, explanation_parts: Dict, score: float = None) -> str:
+    def construct_explanation(self, explanation_parts: Dict) -> str:
         """
         Constructs the explanation from its parts
         :param explanation_parts: Dictionary mapping explanation part name and content
-        :param score: The score assigned to the artifact
         :return: The explanation as a str
         """
         explanation_values = {name: ArtifactReasoning.get_attr(name, explanation_parts)
                               for name in explanation_parts.keys() if name != RANKING_ARTIFACT_TAG}
         explanation_values = {name: val for name, val in explanation_values.items() if val}  # remove empty
 
-        summary = self.format_for_explanation(explanation_values.pop(JUSTIFICATION_TAG), score, remove_score=True,
+        summary = self.format_for_explanation(explanation_values.pop(JUSTIFICATION_TAG), remove_score=True,
                                               bold=True, as_bullet=False) if JUSTIFICATION_TAG in explanation_values else None
 
         formatted_values = [self.format_for_explanation(val) for i, val in enumerate(explanation_values.values())]
-        if summary:
-            if len(summary.strip()) < 5:
-                print("hi")
+        if summary and len(summary.strip()) > 5:
             formatted_values = [PromptUtil.as_blockquote(summary), PromptUtil.markdown_divider()] + formatted_values
         return NEW_LINE.join(formatted_values)
 
@@ -89,31 +87,45 @@ class ArtifactReasoning:
         return val
 
     @staticmethod
-    def format_for_explanation(explanation_part: str, score: float = None, remove_score: bool = False,
+    def format_for_explanation(explanation_part: str, remove_score: bool = False,
                                header: str = EMPTY_STRING, bold: bool = False, as_bullet: bool = True) -> Optional[str]:
         """
         Formats the explanation portion of the reasoning
         :param explanation_part: The part of the explanation to format
-        :param score: The score given to the artifact
         :param remove_score: If True, removes the score from the explanation (in the case the model mistakenly printed it)
-        :param header: If provided, the header will be added to the explantion in markdown
+        :param header: If provided, the header will be added to the explanation in markdown
         :param bold: If True, bolds the explanation part
         :param as_bullet: If True, creates a bullet for the explanation part
         :return: The formatted explanation part
         """
         if not explanation_part:
             return
-        lines = re.split(r'(?<!\d)\.(?!\d)', explanation_part.strip())
+        explanation_part = explanation_part.strip()
         if remove_score:
-            lines = [line for line in lines if str(score) not in line and len(line.strip()) > 1]
-        output = EMPTY_STRING.join(lines)
+            lines = StrUtil.split_sentences_by_punctuation(explanation_part, PERIOD)
+            lines[0] = StrUtil.remove_floats_and_ints(lines[0])  # just remove the score if its the first sentence
+            # remove the whole sentence if it is later in the paragraph
+            lines = [line for line in lines if not ArtifactReasoning._contains_possible_score(line) and len(line.strip()) > 1]
+            explanation_part = f"{PERIOD}{SPACE}".join(lines)
         if bold:
-            output = PromptUtil.as_markdown_bold(output)
+            explanation_part = PromptUtil.as_markdown_bold(explanation_part)
         if as_bullet:
-            output = PromptUtil.as_bullet_point(output)
+            explanation_part = PromptUtil.as_bullet_point(explanation_part)
         if header:
-            output = ArtifactReasoning._add_header_to_explanation(header, output)
-        return output
+            explanation_part = ArtifactReasoning._add_header_to_explanation(header, explanation_part)
+        return explanation_part
+
+    @staticmethod
+    def _contains_possible_score(line: str) -> bool:
+        """
+        Checks if the line possible contains a score
+        :param line: The line to check
+        :return: True if it likely contains a score else False
+        """
+        line_parts = StrUtil.split_sentences_by_punctuation(line, COMMA)
+        contains_score = [l for l in line_parts if len(StrUtil.find_floats_and_ints(l)) > 0]
+        return len(contains_score) > 0
+
 
     @staticmethod
     def _add_header_to_explanation(header: str, explanation: str) -> str:

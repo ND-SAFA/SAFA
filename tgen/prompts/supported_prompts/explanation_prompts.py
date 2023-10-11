@@ -18,8 +18,9 @@ EXPLANATION_GOAL = Prompt(
 EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts are considered to be traced if they have related "
                                                                   "functionality, depend on the same features/data, "
                                                                   "or directly impact each other through inputs, outputs or changes. "
-                                                                  "The tracing focuses on the nature of the relationship itself, "
-                                                                  "not the scope or abstraction level of the artifacts. "
+                                                                  "IGNORE and do NOT mention scope or level of details "
+                                                                  "in your responses since a higher-level {target_type} "
+                                                                  "could be traced to a low-level level {source_type} "
                                                                   "To help you determine if the artifacts are traced, "
                                                                   "you must complete the reasoning steps below. "
                                                                   "More yeses to the questions indicate a stronger relationship "
@@ -45,8 +46,8 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                          QuestionPrompt("Do the artifacts rely on common inputs, "
                                                                         "produce common outputs, or share common data flows? ",
                                                                         PromptResponseManager(response_tag="data-flow")),
-                                                         QuestionPrompt("Could one artifact be derived from "
-                                                                        "or decomposed from the other, meaning "
+                                                         QuestionPrompt("Could one artifact be derived from, "
+                                                                        "decomposed from, or an implementation of the other, meaning "
                                                                         "that is was created by extracting or breaking down the "
                                                                         "other artifact into a smaller, more detailed components? ",
                                                                         PromptResponseManager(response_tag="decomposition")),
@@ -59,8 +60,8 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                                         "write a brief explanation that accesses the strength of the "
                                                                         "relationship between the two artifacts and why you "
                                                                         "believe they are mostly likely traced or un-traced. "
-                                                                        "You need not consider scope or abstraction "
-                                                                        "level in your decision. "
+                                                                        "Do NOT mention differences in abstraction level "
+                                                                        "or scope in your justification. "
                                                                         "Importantly, do NOT reference the specific score "
                                                                         "in the justification. ",
                                                                         PromptResponseManager(

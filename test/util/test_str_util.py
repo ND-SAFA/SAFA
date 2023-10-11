@@ -29,3 +29,14 @@ class TestStrUtil(BaseTest):
 
     def test_snake_case_to_pascal_case(self):
         self.assertEqual("SnakeCase", StrUtil.snake_case_to_pascal_case("snake_case"))
+
+    def test_split_sentences_by_period(self):
+        sentences = ["This is a sentence with 2.3 in it and K.R.D but it should on be split", "Here", "And Here"]
+        self.assertEqual(StrUtil.split_sentences_by_punctuation(". ".join(sentences)), sentences)
+
+        self.assertEqual(StrUtil.split_sentences_by_punctuation(", ".join(sentences), ","), sentences)
+
+    def test_remove_floats_and_ints(self):
+        sentence = "This is a sentence with 2.3 in it and 2 which should be removed but RE.2.3 should not 3.0"
+        self.assertEqual(StrUtil.remove_floats_and_ints(sentence),
+                         "This is a sentence with  in it and  which should be removed but RE.2.3 should not")

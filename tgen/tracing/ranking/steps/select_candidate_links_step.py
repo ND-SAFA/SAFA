@@ -1,10 +1,8 @@
 from tgen.common.util.logging.logger_manager import logger
-from tgen.data.keys.structure_keys import TraceKeys
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
-from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.common.selection_methods import SupportedSelectionMethod
+from tgen.tracing.ranking.selectors.i_selection_method import iSelector
 
 
 class SelectCandidateLinksStep(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -16,14 +14,9 @@ class SelectCandidateLinksStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The current state of the ranking pipeline
         """
         candidate_entries = state.get_current_entries()
-        if args.selection_method == SupportedSelectionMethod.FILTER_BY_THRESHOLD:
-            logger.info(f"Selecting links with scores above {args.link_threshold}.")
-            state.selected_entries = [c for c in candidate_entries if TraceKeys.SCORE in c and
-                                      c[TraceKeys.SCORE] >= args.link_threshold]
-        elif args.selection_method == SupportedSelectionMethod.SELECT_TOP_PARENTS:
-            logger.info(f"Selecting top parents for each child artifact.")
-            state.selected_entries = RankingUtil.select_predictions(candidate_entries)
         if args.selection_method is not None:
+            selection_method: iSelector = args.selection_method.value
+            state.selected_entries = selection_method.select(candidate_entries, threshold=args.link_threshold)
             logger.info(f"Found {len(state.selected_entries)} links matching criteria.")
         if not state.selected_entries:
             logger.info(f"Keeping all links.")

@@ -15,7 +15,7 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
-from tgen.tracing.ranking.common.selection_methods import SupportedSelectionMethod
+from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 
 
 @dataclass
@@ -91,7 +91,7 @@ class RankingArgs(PipelineArgs):
     """
     - selection_method: The method to use to select top predictions
     """
-    selection_method: SupportedSelectionMethod = SupportedSelectionMethod.FILTER_BY_THRESHOLD
+    selection_method: SupportedSelectionMethod = SupportedSelectionMethod.SELECT_BY_THRESHOLD_NORMALIZED_CHILDREN
     """
     - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
     """

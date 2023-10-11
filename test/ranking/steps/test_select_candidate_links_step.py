@@ -7,7 +7,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.common.selection_methods import SupportedSelectionMethod
+from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
 
 
@@ -21,16 +21,22 @@ class TestSelectCandidateLinksStep(TestCase):
 
         expected_links_by_threshold = [2, 4]
         state = self.get_state(children_ids, parent_ids)
-        args.selection_method = SupportedSelectionMethod.FILTER_BY_THRESHOLD
+        args.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD
         SelectCandidateLinksStep().run(args, state)
         self.assertEqual(len(state.selected_entries), len(expected_links_by_threshold))
         self.assert_links(expected_links_by_threshold, state)
 
-        expected_links_by_children = [2, 4, 3]
+        expected_links_by_parent = [2, 4, 3]
         state = self.get_state(children_ids, parent_ids)
         args.selection_method = SupportedSelectionMethod.SELECT_TOP_PARENTS
         SelectCandidateLinksStep().run(args, state)
-        self.assert_links(expected_links_by_children, state)
+        self.assert_links(expected_links_by_parent, state)
+
+        expected_links_by_normalized_children = [2, 4]
+        state = self.get_state(children_ids, parent_ids)
+        args.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD_NORMALIZED_CHILDREN
+        SelectCandidateLinksStep().run(args, state)
+        self.assert_links(expected_links_by_normalized_children, state)
 
         expected_links_none = [1, 2, 3, 4]
         state = self.get_state(children_ids, parent_ids)
@@ -42,7 +48,7 @@ class TestSelectCandidateLinksStep(TestCase):
         state = self.get_state(children_ids, parent_ids)
         for entry in state.candidate_entries:
             entry["score"] = 0
-        args.selection_method = SupportedSelectionMethod.FILTER_BY_THRESHOLD
+        args.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD
         SelectCandidateLinksStep().run(args, state)
         self.assert_links(expected_links_missing, state)
 

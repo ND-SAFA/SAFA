@@ -11,6 +11,7 @@ from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
+from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 
 
 class TestLLMRankingPipeline(BaseTest):
@@ -55,5 +56,5 @@ class TestLLMRankingPipeline(BaseTest):
         args = RankingArgs(run_name=f"{child_type}2{parent_type}", dataset=PromptDataset(artifact_df=artifact_df),
                            parent_ids=parent_ids,
                            children_ids=children_ids, weight_of_embedding_scores=0, weight_of_explanation_scores=0,
-                           types_to_trace=("target", "source"))
+                           types_to_trace=("target", "source"), selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD)
         return args

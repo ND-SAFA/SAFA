@@ -92,6 +92,7 @@ class RankingJob(AbstractJob):
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
                                     export_dir=export_dir,
+                                    types_to_trace=types_to_trace,
                                     **self.ranking_kwargs)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         pipeline.run()
@@ -102,12 +103,11 @@ class RankingJob(AbstractJob):
         if has_positive_links:
             for entry in predicted_entries:
                 trace_id = self.get_trace_id_from_entry(entry)
-                if trace_id in self.dataset.trace_df:
-                    if trace_id in selected_trace_ids:
-                        trace_entry = self.dataset.trace_df.loc[trace_id]
-                        label = trace_entry[TraceKeys.LABEL.value]
-                        entry[TraceKeys.LABEL] = label
-                        selected_entries.append(entry)
+                if trace_id in self.dataset.trace_df and trace_id in selected_trace_ids:
+                    trace_entry = self.dataset.trace_df.loc[trace_id]
+                    label = trace_entry[TraceKeys.LABEL.value]
+                    entry[TraceKeys.LABEL] = label
+                    selected_entries.append(entry)
                     self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
                     if TraceKeys.EXPLANATION in entry:
                         self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])

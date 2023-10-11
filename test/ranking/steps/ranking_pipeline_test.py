@@ -39,7 +39,7 @@ class RankingPipelineTest:
         project_summary = kwargs.pop("project_summary") if "project_summary" in kwargs else None
 
         args = RankingArgs(dataset=PromptDataset(artifact_df=artifact_df, project_summary=project_summary),
-                           parent_ids=parent_ids, children_ids=children_ids, **kwargs)
+                           parent_ids=parent_ids, children_ids=children_ids, types_to_trace=("target", "source"), **kwargs)
         state = RankingState(**state_kwargs, artifact_map=artifact_df.to_map())
         return args, state
 

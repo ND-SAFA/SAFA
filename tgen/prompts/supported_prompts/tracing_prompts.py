@@ -36,15 +36,15 @@ QUESTION1 = QuestionnairePrompt(
                           f"to understand the system the parent artifact is operating in.")
                       ], response_manager=PromptResponseManager(response_tag=RANKING_PARENT_SUMMARY_TAG))
 RANKING_CATEGORIES = ["Artifacts have closely-tied functionality "
-                      "or a direct design/inheritance relationship (definite trace-link)",
+                      "or a direct design/inheritance relationship (definite trace-link) ",
                       "Artifacts support key functions of the other "
-                      "or share significant similarities with only minor inconsistencies (likely trace-link)",
+                      "or share significant similarities with only minor inconsistencies (likely trace-link) ",
                       "Portions of the artifacts have clear and direct linkage but other portions are unrelated (possible trace-link)",
                       "Partial topical overlap. The artifacts have some loosely related content "
-                      "but differences outweigh the similarities (unsure if trace-link)",
+                      "but differences outweigh the similarities (unsure if trace-link) ",
                       "Vague or abstract similarity. "
-                      "The artifacts share only very high-level topics or broad concepts but no specifics (weak trace-link)",
-                      "No discernible relationship between artifacts can be identified."
+                      "The artifacts share only very high-level topics or broad concepts but no specifics (weak trace-link) ",
+                      "No discernible relationship between artifacts can be identified. "
                       "The artifacts contain different content and context with no overlaps (no trace-link)"]
 RANKING_RANGE = range(RANKING_MAX_SCORE, RANKING_MIN_SCORE - 1,
                       -round(((RANKING_MAX_SCORE - RANKING_MIN_SCORE) / len(RANKING_CATEGORIES))))
@@ -59,9 +59,9 @@ SCORE_INSTRUCTIONS = SelectQuestionPrompt(
                  f"Often, the relationship might fall somewhere between two categories. "
                  f"Since the score is continuous, you may select a score in between the categories to reflect this (e.g. 2.8). "
                  f"Rather than give a score of exactly {list(RANKING_RANGE)[floor(len(RANKING_CATEGORIES) / 2)]} "
-                 f"indicating you are unsure, provide a score slightly above or below (e.g. 2.8)"
+                 f"indicating you are unsure, provide a score slightly above or below (e.g. 2.8) "
                  f"to indicate whether it is more likely a trace-link does (> 3) or does not exist (< 2). "
-                 f"Note, generally if a relationship is truly unclear, no trace-link exists.",
+                 f"Note, generally if a relationship is truly unclear, no trace-link exists. ",
     response_tag=RANKING_SCORE_TAG,
     response_format="Enclose the score in {}",
     default_factory=lambda tag, val: DEFAULT_SCORE)

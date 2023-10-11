@@ -54,5 +54,6 @@ class TestLLMRankingPipeline(BaseTest):
         artifact_df = ArtifactDataFrame([parent_artifact, child_artifact])
         args = RankingArgs(run_name=f"{child_type}2{parent_type}", dataset=PromptDataset(artifact_df=artifact_df),
                            parent_ids=parent_ids,
-                           children_ids=children_ids, weight_of_embedding_scores=0, weight_of_explanation_scores=0)
+                           children_ids=children_ids, weight_of_embedding_scores=0, weight_of_explanation_scores=0,
+                           types_to_trace=("target", "source"))
         return args

@@ -37,10 +37,10 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         if not args.generate_explanations:
             return
         parsed_predictions = self._generate_predictions(args, state)
-        a_reasonings = CreateExplanationsStep._create_a_reasonings(parsed_predictions)
-        for a_reasoning, entry in zip(a_reasonings, state.get_current_entries()):
-            entry[TraceKeys.EXPLANATION] = a_reasoning.explanation
-            entry[TraceKeys.SCORE] = MathUtil.calculate_weighted_score(scoreA=a_reasoning.score,
+        artifact_reasonings = CreateExplanationsStep._create_artifact_reasonings(parsed_predictions)
+        for artifact_reasoning, entry in zip(artifact_reasonings, state.get_current_entries()):
+            entry[TraceKeys.EXPLANATION] = artifact_reasoning.explanation
+            entry[TraceKeys.SCORE] = MathUtil.calculate_weighted_score(scoreA=artifact_reasoning.score,
                                                                              scoreB=entry[TraceKeys.SCORE],
                                                                              weight_of_scoreA=args.weight_of_explanation_scores)
 
@@ -54,6 +54,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
 
         filter_dataset = CreateExplanationsStep._get_dataset_with_selected_links_only(args, state)
         prompt_builder = CreateExplanationsStep._create_prompt_builder(state)
+        prompt_builder.format_prompts_with_var(target_type=args.types_to_trace[0], source_type=args.types_to_trace[1])
 
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
                                                                                   PromptDataset(trace_dataset=filter_dataset)})
@@ -69,23 +70,17 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         return parsed
 
     @staticmethod
-    def _create_a_reasonings(parsed_predictions: List[Dict]) -> List[ArtifactReasoning]:
+    def _create_artifact_reasonings(parsed_predictions: List[Dict]) -> List[ArtifactReasoning]:
         """
         Creates artifact reasoning from the predicted explanations
         :param parsed_predictions: The parsed predictions
         :return: A list of artifact reasoning created from the predictions
         """
-        scores_given = [parsed_dict[RANKING_SCORE_TAG][0] for parsed_dict in parsed_predictions if RANKING_SCORE_TAG in parsed_dict]
-        min_score_given, max_score_given = min(scores_given), max(scores_given)
-        a_reasonings = []
+        artifact_reasonings = []
         for parsed_dict in parsed_predictions:
-            if RANKING_SCORE_TAG in parsed_dict and parsed_dict[RANKING_SCORE_TAG]:
-                parsed_dict[RANKING_SCORE_TAG] = MathUtil.convert_to_new_range(parsed_dict[RANKING_SCORE_TAG][0],
-                                                                               (min_score_given, max_score_given),
-                                                                               (RANKING_MIN_SCORE, RANKING_MAX_SCORE))
-            a_reasoning = ArtifactReasoning(parsed_dict, require_id=False)
-            a_reasonings.append(a_reasoning)
-        return a_reasonings
+            artifact_reasoning = ArtifactReasoning(parsed_dict, require_id=False)
+            artifact_reasonings.append(artifact_reasoning)
+        return artifact_reasonings
 
     @staticmethod
     def _get_dataset_with_selected_links_only(args: RankingArgs, state: RankingState) -> TraceDataset:

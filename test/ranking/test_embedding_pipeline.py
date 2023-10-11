@@ -35,7 +35,7 @@ class TestEmbeddingPipeline(BaseTest):
                                    dataset=PromptDataset(artifact_df=artifact_df, project_summary="This is a project summary"),
                                    parent_ids=self.parent_ids,
                                    children_ids=self.children_ids,
-                                   selection_method=None)
+                                   selection_method=None, types_to_trace=("target", "source"))
         pipeline = EmbeddingRankingPipeline(ranking_args)
         pipeline.run()
         trace_entries = pipeline.state.selected_entries

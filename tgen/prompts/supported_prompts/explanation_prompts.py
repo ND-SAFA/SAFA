@@ -11,21 +11,24 @@ EXPLANATION_GOAL = Prompt(
     f"\n{PromptUtil.as_markdown_header('Goal')}\n"
     "You are an expert on the software project below. "
     f"This software project is described under `{PromptUtil.as_markdown_header(PROJECT_SUMMARY_HEADER)}`. "
-    f"You are tasked with performing software traceability for a parent artifact "
-    f"and a candidate children artifact`. "
+    "You are tasked with performing software traceability for a {target_type} (parent) "
+    "and a candidate {source_type} artifact (child). "
 )
 
-EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="In order to determine if the artifacts are traced, "
+EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts are considered to be traced if they have related "
+                                                                  "functionality, depend on the same features/data, "
+                                                                  "or directly impact each other through inputs, outputs or changes. "
+                                                                  "The tracing focuses on the nature of the relationship itself, "
+                                                                  "not the scope or abstraction level of the artifacts. "
+                                                                  "To help you determine if the artifacts are traced, "
                                                                   "you must complete the reasoning steps below. "
-                                                                  "The steps will help you determine if the child and parent "
-                                                                  "are actually related or whether there is no link between them. "
                                                                   "More yeses to the questions indicate a stronger relationship "
                                                                   "while more nos indicate a weaker one. "
-                                                                  "The strength of the relationship was originally scored to be "
-                                                                  "{orig_score} on a scale from "
+                                                                  "The strength of the relationship (likelihood of being linked) "
+                                                                  "was originally scored to be {orig_score} on a scale from "
                                                                   f"{RANKING_MIN_SCORE}-{RANKING_MAX_SCORE} "
                                                                   "where a higher score represents a stronger relationship. "
-                                                                  "Use this to guide your answers."                                             
+                                                                  "Use this to guide your answers. " 
                                                                   "Importantly, provide all answers as complete sentences "
                                                                   "that would be able to "
                                                                   "be understood without seeing the question. "
@@ -43,18 +46,21 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="In order to d
                                                                         "produce common outputs, or share common data flows? ",
                                                                         PromptResponseManager(response_tag="data-flow")),
                                                          QuestionPrompt("Could one artifact be derived from "
-                                                                        "or decomposed from the other?",
+                                                                        "or decomposed from the other, meaning "
+                                                                        "that is was created by extracting or breaking down the "
+                                                                        "other artifact into a smaller, more detailed components? ",
                                                                         PromptResponseManager(response_tag="decomposition")),
                                                          QuestionPrompt("If one artifact changed, "
-                                                                        "would it impact or necessitate changes in the other?",
+                                                                        "would it impact or necessitate changes in the other "
+                                                                        "at the level of implementation?",
                                                                         PromptResponseManager(response_tag="impact")),
-                                                         QuestionPrompt("Are key terms, concepts, or components referenced "
-                                                                        "in one artifact also present in the other? ",
-                                                                        PromptResponseManager(response_tag="terms")),
                                                          SCORE_INSTRUCTIONS,
-                                                         QuestionPrompt("Using your previous responses and the scores given, "
+                                                         QuestionPrompt("Using your previous responses and both scores given, "
                                                                         "write a brief explanation that accesses the strength of the "
-                                                                        "relationship between the two artifacts. "
+                                                                        "relationship between the two artifacts and why you "
+                                                                        "believe they are mostly likely traced or un-traced. "
+                                                                        "You need not consider scope or abstraction "
+                                                                        "level in your decision. "
                                                                         "Importantly, do NOT reference the specific score "
                                                                         "in the justification. ",
                                                                         PromptResponseManager(

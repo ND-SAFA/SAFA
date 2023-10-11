@@ -16,7 +16,8 @@ class TestSelectCandidateLinksStep(TestCase):
     def test_run(self):
         parent_ids = DEFAULT_PARENT_IDS
         children_ids = DEFAULT_CHILDREN_IDS
-        args = RankingArgs(parent_ids=parent_ids, children_ids=children_ids, dataset=PromptDataset(artifact_df=ArtifactDataFrame()))
+        args = RankingArgs(parent_ids=parent_ids, children_ids=children_ids, dataset=PromptDataset(artifact_df=ArtifactDataFrame()),
+                           types_to_trace=("target", "source"))
 
         expected_links_by_threshold = [2, 4]
         state = self.get_state(children_ids, parent_ids)

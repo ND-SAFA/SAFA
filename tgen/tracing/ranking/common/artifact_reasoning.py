@@ -1,3 +1,4 @@
+import re
 from collections import OrderedDict
 from typing import Dict, Any, Optional, Tuple
 
@@ -42,9 +43,9 @@ class ArtifactReasoning:
         """
         index = self.get_attr(RANKING_ID_TAG, artifact_dict, pop=True)
         score = self.get_attr(RANKING_SCORE_TAG, artifact_dict, pop=True)
+        explanation = self.construct_explanation(artifact_dict, score=score)
         if score:
             score = MathUtil.normalize_val(score, max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
-        explanation = self.construct_explanation(artifact_dict, score=score)
         return index, score, explanation
 
     def construct_explanation(self, explanation_parts: Dict, score: float = None) -> str:
@@ -63,6 +64,8 @@ class ArtifactReasoning:
 
         formatted_values = [self.format_for_explanation(val) for i, val in enumerate(explanation_values.values())]
         if summary:
+            if len(summary.strip()) < 5:
+                print("hi")
             formatted_values = [PromptUtil.as_blockquote(summary), PromptUtil.markdown_divider()] + formatted_values
         return NEW_LINE.join(formatted_values)
 
@@ -100,9 +103,9 @@ class ArtifactReasoning:
         """
         if not explanation_part:
             return
-        lines = explanation_part.strip().split(NEW_LINE)
+        lines = re.split(r'(?<!\d)\.(?!\d)', explanation_part.strip())
         if remove_score:
-            lines = [line for line in lines if str(score) not in line]
+            lines = [line for line in lines if str(score) not in line and len(line.strip()) > 1]
         output = EMPTY_STRING.join(lines)
         if bold:
             output = PromptUtil.as_markdown_bold(output)

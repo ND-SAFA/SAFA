@@ -21,7 +21,7 @@ class TestProcessRankingResponsesStep(TestCase):
         children_ids = DEFAULT_CHILDREN_IDS
         scores = [[1.0, 2.0], [2.0, 1.0]]
         args = RankingArgs(parent_ids=parent_ids, children_ids=children_ids, dataset=PromptDataset(artifact_df=ArtifactDataFrame()),
-                           weight_of_embedding_scores=0, weight_of_explanation_scores=0)
+                           weight_of_embedding_scores=0, weight_of_explanation_scores=0, types_to_trace=("target", "source"))
         ranking_responses = [[{'id': [0], 'score': [scores[0][0]]},
                               {'id': [], 'score':  [scores[0][1]]}], [
                                  {'id': [1], 'score':  [scores[1][1]]}]]

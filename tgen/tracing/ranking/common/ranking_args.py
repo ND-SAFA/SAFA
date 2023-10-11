@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.ranking_constants import DEFAULT_LINK_THRESHOLD, \
@@ -31,7 +31,11 @@ class RankingArgs(PipelineArgs):
     """
     children_ids: List of children ids to compare to each parent.
     """
-    children_ids: Optional[List[str]] = required_field(field_name="children_ids")
+    children_ids: List[str] = required_field(field_name="children_ids")
+    """
+    types_to_trace: Contains the parent_type, child_type
+    """
+    types_to_trace: Tuple[str, str] = required_field(field_name="types2trace")
     """
     - pre_sorted_parent2children: Maps parent ids to their children ids if there are already some sorted children ids
     """

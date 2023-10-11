@@ -30,6 +30,10 @@ export interface IdentifierSchema {
    * The description of the project.
    */
   description: string;
+  /**
+   * The AI generated summary of the most recent project version.
+   */
+  specification?: string;
 
   /**
    * List of members and their roles in the project.

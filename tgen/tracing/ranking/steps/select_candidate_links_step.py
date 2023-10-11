@@ -1,3 +1,5 @@
+
+
 from tgen.common.util.logging.logger_manager import logger
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
@@ -16,7 +18,9 @@ class SelectCandidateLinksStep(AbstractPipelineStep[RankingArgs, RankingState]):
         candidate_entries = state.get_current_entries()
         if args.selection_method is not None:
             selection_method: iSelector = args.selection_method.value
-            state.selected_entries = selection_method.select(candidate_entries, threshold=args.link_threshold)
+            state.selected_entries = selection_method.select(candidate_entries,
+                                                             threshold=args.link_threshold,
+                                                             parent_thresholds=args.parent_thresholds)
             logger.info(f"Found {len(state.selected_entries)} links matching criteria.")
         if not state.selected_entries:
             logger.info(f"Keeping all links.")

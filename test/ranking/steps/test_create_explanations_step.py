@@ -11,7 +11,7 @@ from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanatio
 
 
 class TestCreateExplanationsStep(TestCase):
-    SELECTED_ENTRIES = [EnumDict({'id': 1, 'source': 't6', 'target': 's4', 'score': 0.4}),
+    SELECTED_ENTRIES = [EnumDict({'id': 1, 'source': 't6', 'target': 's4', 'score': 0.35}),
                         EnumDict({'id': 2, 'source': 't1', 'target': 's4', 'score': 0.7}),
                         EnumDict({'id': 3, 'source': 't6', 'target': 's5', 'score': 0.5}),
                         EnumDict({'id': 4, 'source': 't1', 'target': 's5', 'score': 0.7})
@@ -44,14 +44,15 @@ class TestCreateExplanationsStep(TestCase):
 
     @mock_anthropic
     def test_run(self, anthropic_mock: TestAIManager):
-        anthropic_mock.set_responses([self.assert_prompt for _ in self.SELECTED_ENTRIES])
+        first_filter_entries = [e for e in self.SELECTED_ENTRIES if e["score"] >= 0.4]
+        anthropic_mock.set_responses([self.assert_prompt for _ in first_filter_entries])
         parent_ids = DEFAULT_PARENT_IDS
         children_ids = DEFAULT_CHILDREN_IDS
         args, state = self.get_args_and_state(children_ids, parent_ids)
         CreateExplanationsStep().run(args, state)
         for i, entry in enumerate(state.selected_entries):
             self.assertIn('explanation', entry)
-            self.assertIn(self.SELECTED_ENTRIES[i]['source'], entry['explanation'])
+            self.assertIn(first_filter_entries[i]['source'], entry['explanation'])
 
     @staticmethod
     def get_args_and_state(children_ids, parent_ids):

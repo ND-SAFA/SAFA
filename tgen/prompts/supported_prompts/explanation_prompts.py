@@ -47,9 +47,12 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                                         "produce common outputs, or share common data flows? ",
                                                                         PromptResponseManager(response_tag="data-flow")),
                                                          QuestionPrompt("Could one artifact be derived from, "
-                                                                        "decomposed from, or an implementation of the other, meaning "
-                                                                        "that is was created by extracting or breaking down the "
-                                                                        "other artifact into a smaller, more detailed components? ",
+                                                                        "decomposed from, or be an implementation of the other? "
+                                                                        "This means that it was created by extracting, "
+                                                                        "breaking down, implementing a portion of the "
+                                                                        "other artifact, generally resulting in "
+                                                                        "a smaller, more detailed components, at a different level of"
+                                                                        "abstraction? If so, they are likely linked. ",
                                                                         PromptResponseManager(response_tag="decomposition")),
                                                          QuestionPrompt("If one artifact changed, "
                                                                         "would it impact or necessitate changes in the other "
@@ -60,8 +63,6 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                                         "write a brief explanation that accesses the strength of the "
                                                                         "relationship between the two artifacts and why you "
                                                                         "believe they are mostly likely traced or un-traced. "
-                                                                        "Do NOT mention differences in abstraction level "
-                                                                        "or scope in your justification. "
                                                                         "Importantly, do NOT reference the specific score "
                                                                         "in the justification. ",
                                                                         PromptResponseManager(

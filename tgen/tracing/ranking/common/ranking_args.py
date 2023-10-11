@@ -6,7 +6,7 @@ from tgen.common.constants.model_constants import get_best_default_llm_manager, 
 from tgen.common.constants.ranking_constants import DEFAULT_LINK_THRESHOLD, \
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
-    DEFAULT_PARENT_THRESHOLD, \
+    DEFAULT_PARENT_PRIMARY_THRESHOLD, \
     DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, \
     GENERATE_EXPLANATIONS_DEFAULT, DEFAULT_EMBEDDINGS_SCORE_WEIGHT
 from tgen.common.util.dataclass_util import required_field
@@ -73,13 +73,9 @@ class RankingArgs(PipelineArgs):
     """
     embedding_model_name: str = DEFAULT_EMBEDDING_MODEL
     """
-    - parent_primary_threshold: The threshold to establish primary parents from.
+    - parent_thresholds: The threshold used to establish parents from (primary, secondary and min)
     """
-    parent_primary_threshold = DEFAULT_PARENT_THRESHOLD
-    """
-    - parent_min_threshold: The minimum threshold to establish a parent if no primary.
-    """
-    parent_min_threshold = DEFAULT_PARENT_MIN_THRESHOLD
+    parent_thresholds: Tuple[float, float, float] = (DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD)
     """
     - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
     """

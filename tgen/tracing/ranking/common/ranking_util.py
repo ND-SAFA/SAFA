@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List, Optional, Tuple
 
-from tgen.common.constants.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD, PROJECT_SUMMARY_HEADER
+from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
@@ -137,25 +137,30 @@ class RankingUtil:
             logger.info(f"{group_key}:{group_items}")
 
     @staticmethod
-    def select_predictions(trace_predictions: List[Trace]) -> List[Trace]:
+    def select_predictions(trace_predictions: List[Trace], parent_primary_threshold: float,
+                           parent_secondary_threshold: float, parent_min_threshold: float) -> List[Trace]:
         """
         Selects the top parents per child.
         :param trace_predictions: The trace predictions.
+        :param parent_primary_threshold: The threshold to establish first tier parents from.
+        :param parent_secondary_threshold: The threshold to establish second tier parents from.
+        :param parent_min_threshold: The minimum threshold to establish a parent from
         :return: List of selected predictions.
         """
         children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label().value)
         predictions = []
 
         for child, child_predictions in children2entry.items():
-            sorted_entries = sorted(child_predictions, key=lambda e: e[TraceKeys.SCORE.value], reverse=True)
-            t1_preds, t2_preds, t3_preds = [], [], []
+            sorted_entries = sorted(child_predictions, key=lambda e: e[TraceKeys.SCORE], reverse=True)
+            if not sorted_entries:
+                continue
 
-            t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE.value] >= TIER_ONE_THRESHOLD]
-            t2_preds = [s for s in sorted_entries if TIER_TWO_THRESHOLD <= s[TraceKeys.SCORE.value] < TIER_ONE_THRESHOLD]
-            t3_preds = t3_preds if len(t1_preds) + len(t2_preds) > 0 else sorted_entries[:1]
+            t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE] >= parent_primary_threshold]
+            t2_preds = [s for s in sorted_entries if parent_secondary_threshold <= s[TraceKeys.SCORE] < parent_min_threshold]
+            t3_preds = sorted_entries[:1] if sorted_entries[0][TraceKeys.SCORE] >= parent_min_threshold else []
             if len(t1_preds) > 0:
                 selected_entries = t1_preds
-            elif len(t2_preds):
+            elif len(t2_preds) > 0:
                 selected_entries = t2_preds
             else:
                 selected_entries = t3_preds

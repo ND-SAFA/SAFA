@@ -1,7 +1,7 @@
 from typing import List, Dict
 
 from tgen.common.constants.ranking_constants import RANKING_SCORE_TAG, RANKING_MIN_SCORE, \
-    RANKING_MAX_SCORE
+    RANKING_MAX_SCORE, FIRST_PASS_THRESHOLD_DELTA
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -41,8 +41,8 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         for artifact_reasoning, entry in zip(artifact_reasonings, state.get_current_entries()):
             entry[TraceKeys.EXPLANATION] = artifact_reasoning.explanation
             entry[TraceKeys.SCORE] = MathUtil.calculate_weighted_score(scoreA=artifact_reasoning.score,
-                                                                             scoreB=entry[TraceKeys.SCORE],
-                                                                             weight_of_scoreA=args.weight_of_explanation_scores)
+                                                                       scoreB=entry[TraceKeys.SCORE],
+                                                                       weight_of_scoreA=args.weight_of_explanation_scores)
 
     @staticmethod
     def _generate_predictions(args: RankingArgs, state: RankingState) -> List[Dict]:
@@ -91,6 +91,12 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         artifact_df = args.dataset.artifact_df
         selected_ids, layers = [], set()
+        if args.selection_method:
+            state.selected_entries = args.selection_method.value.select(state.get_current_entries(),
+                                                                        threshold=args.link_threshold - FIRST_PASS_THRESHOLD_DELTA,
+                                                                        parent_thresholds=tuple([t - FIRST_PASS_THRESHOLD_DELTA
+                                                                                                 for t in args.parent_thresholds]))
+
         for entry in state.get_current_entries():
             selected_ids.append(TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET]))
             source, target = artifact_df.get_artifacts_from_trace(entry)

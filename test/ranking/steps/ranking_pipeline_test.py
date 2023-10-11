@@ -10,6 +10,7 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 
 DEFAULT_PARENT_IDS = ["s4", "s5"]
 DEFAULT_CHILDREN_IDS = ["t1", "t6"]
@@ -39,6 +40,7 @@ class RankingPipelineTest:
         project_summary = kwargs.pop("project_summary") if "project_summary" in kwargs else None
 
         args = RankingArgs(dataset=PromptDataset(artifact_df=artifact_df, project_summary=project_summary),
+                           selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD,
                            parent_ids=parent_ids, children_ids=children_ids, types_to_trace=("target", "source"), **kwargs)
         state = RankingState(**state_kwargs, artifact_map=artifact_df.to_map())
         return args, state

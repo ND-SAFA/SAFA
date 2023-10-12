@@ -41,9 +41,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { withDefaults } from "vue";
 import { ProjectIdentifierProps } from "@/types";
-import { ENABLED_FEATURES } from "@/util";
 import { getOrgApiStore, orgStore, teamStore, useVModel } from "@/hooks";
 import { FlexBox, SelectInput, TextInput } from "@/components/common";
 

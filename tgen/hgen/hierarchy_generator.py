@@ -1,16 +1,12 @@
-import os
-import uuid
-
 from typing import Type
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import save_dataset_checkpoint, SAVE_DATASET_DIRNAME
+from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
@@ -50,12 +46,10 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         :return: Path to exported dataset of generated artifacts
         """
 
-        self.state.export_dir = self.args.export_dir
-
         super().run()
 
         dataset = self.state.final_dataset
         assert dataset is not None, f"Final dataset is not set."
-        save_path = save_dataset_checkpoint(dataset, self.args.export_dir, filename=SAVE_DATASET_DIRNAME)
-        save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
+        save_path = PipelineUtil.save_dataset_checkpoint(dataset, self.args.export_dir, filename=SAVE_DATASET_DIRNAME)
+        PipelineUtil.save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         return dataset

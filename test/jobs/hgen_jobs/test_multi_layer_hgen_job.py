@@ -1,13 +1,12 @@
 from unittest import mock
 from unittest.mock import MagicMock
 
-from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_ranking_job_result
+from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.status import Status
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
@@ -22,6 +21,8 @@ from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 from tgen.testres.mocking.mock_libraries import mock_libraries
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
+from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 
 
 class TestMultiLayerHGenJob(BaseJobTest):
@@ -32,11 +33,13 @@ class TestMultiLayerHGenJob(BaseJobTest):
         expected_name = expected_names[self.ranking_calls]
         source_artifact_name = source_artifact_names[self.ranking_calls]
         self.ranking_calls += 1
-        return get_ranking_job_result(expected_name, source_artifact_name)
+        return get_predictions(expected_name, source_artifact_name)
 
     @mock_libraries
-    @mock.patch.object(RankingJob, "run")
-    def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager, ranking_mock: MagicMock):
+    @mock.patch.object(CreateExplanationsStep, "run")
+    @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
+    def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager,
+                         ranking_mock: MagicMock, explanation_mock: MagicMock):
         """
         Tests that job is completed succesfully.
         """
@@ -65,11 +68,11 @@ class TestMultiLayerHGenJob(BaseJobTest):
         anthropic_ai_manager.set_responses(anthropic_responses)
         open_ai_responses = HGenTestConstants.open_ai_responses * 3
         openai_ai_manager.set_responses(open_ai_responses)
-        ranking_mock.side_effect = lambda: self.fake_ranking_job_run([expected_user_story_names,
-                                                                      expected_requirements_names,
-                                                                      expected_design_doc_name],
-                                                                     [source_arts.index, expected_user_story_names,
-                                                                      expected_requirements_names])
+        ranking_mock.side_effect = lambda _, __: self.fake_ranking_job_run([expected_user_story_names,
+                                                                                  expected_requirements_names,
+                                                                                  expected_design_doc_name],
+                                                                                 [source_arts.index, expected_user_story_names,
+                                                                                  expected_requirements_names])
 
         self._test_run_success()
 

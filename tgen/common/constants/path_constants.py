@@ -7,6 +7,7 @@ OUTPUT_PATH_PARAM = "OUTPUT_PATH"
 CURRENT_PROJECT_PARAM = "CURRENT_PROJECT"
 WANDB_DIR_PARAM = "WANDB_DIR"
 WANDB_PROJECT_PARAM = "WANDB_PROJECT"
+RESPONSES_DIRNAME = "responses"
 PROJ_PATH = dirname(dirname(dirname(abspath(__file__))))
 RES_PATH = os.path.join(PROJ_PATH, "res")
 JAVA_KEYWORDS_PATH = os.path.join(RES_PATH, "JavaReservedKeywords.txt")

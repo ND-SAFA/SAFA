@@ -102,3 +102,12 @@ class ListUtil:
         s = pd.Series(scores)
         percentiles = s.apply(lambda x: percentileofscore(scores_sorted, x)) / 100
         return list(percentiles)
+
+    @staticmethod
+    def convert_numpy_array_to_native_types(numpy_array: np.ndarray) -> List:
+        """
+        Converts all items in a numpy array into native python objects
+        :param numpy_array: The numpy array to convert
+        :return:
+        """
+        return [i.item() for i in numpy_array]

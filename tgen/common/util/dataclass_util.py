@@ -2,6 +2,7 @@ import inspect
 from dataclasses import dataclass, field, MISSING, Field
 from typing import Dict
 
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
 
@@ -41,7 +42,8 @@ class DataclassUtil:
         :param val2replace: Dictionary mapping attr to the new value for it
         :return: the dataclass as a dictionary
         """
-        args = {k: v for k, v in vars(dataclass_).items() if k not in val2replace.keys()}
+        args = {k: v for k, v in vars(dataclass_).items() if k not in val2replace.keys()
+                and not ReflectionUtil.is_function(v) and not k.startswith("__")}
         args.update(val2replace)
         return args
 
@@ -75,4 +77,6 @@ class DataclassUtil:
         if not dataset:
             assert dataset_creator, "Must supply either a dataset or a creator to make one."
             dataset = dataset_creator.create()
+        else:
+            assert not dataset_creator, "Must provide only a dataset OR a dataset creator"
         return dataset

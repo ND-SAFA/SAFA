@@ -219,7 +219,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
             return self.remove_duplicate_indices().to_dict(orient, into, index)
         return super().to_dict(orient, into, index)
 
-    def update_value(self, column2update: Union[str, Enum], id2update: str, new_value: Any) -> None:
+    def update_value(self, column2update: Union[str, Enum], id2update: Union[str, int], new_value: Any) -> None:
         """
         Updates a value in a column
         :param column2update: The name of the column to update

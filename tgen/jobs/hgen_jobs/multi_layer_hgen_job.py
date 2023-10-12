@@ -59,6 +59,7 @@ class MultiLayerHGenJob(AbstractJob):
                                                    source_type=current_args.target_type,
                                                    target_type=next_target_type,
                                                    dataset_for_sources=generated_dataset,
+                                                   dataset_creator_for_sources=None,
                                                    optimize_with_reruns=False,
                                                    load_dir=EMPTY_STRING)
         init_params = ParamSpecs.create_from_method(HGenArgs.__init__).param_names

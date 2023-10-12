@@ -2,6 +2,8 @@ import ast
 from dataclasses import dataclass, field
 from typing import List, Union, Any
 
+from tgen.common.util.dict_util import DictUtil
+
 
 @dataclass
 class ChunkedNode:
@@ -28,7 +30,7 @@ class ChunkedNode:
         params = {}
         for attr_name in ChunkedNode.__annotations__.keys():
             params[attr_name] = getattr(ast_node, attr_name, None)
-        params["type"] = ChunkedNode.get_type_name(ast_node)
+        DictUtil.update_kwarg_values(params, type=ChunkedNode.get_type_name(ast_node))
         return ChunkedNode(**params)
 
     @staticmethod

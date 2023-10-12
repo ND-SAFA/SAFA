@@ -3,8 +3,7 @@ from typing import List
 
 from tgen.common.util.file_util import FileUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer

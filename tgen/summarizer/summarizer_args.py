@@ -76,3 +76,4 @@ class SummarizerArgs(PipelineArgs):
         if self.export_dir:
             if not self.export_dir.endswith(self.summary_dirname):
                 self.export_dir = os.path.join(self.export_dir, self.summary_dirname)
+        super().__post_init__()

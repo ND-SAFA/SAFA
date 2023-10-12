@@ -1,10 +1,10 @@
 from typing import Dict, List
 
-from tgen.common.constants.tracing.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
+from tgen.common.constants.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
     DEFAULT_PACKAGE_ARTIFACT_TYPE, DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
 from tgen.common.util.file_util import FileUtil
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.common.objects.trace import Trace
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.tracing.code.package_tracer import PackageTracer
 
@@ -79,7 +79,7 @@ class CodeTracer:
             self.trace_dataset.layer_df.add_layer(source_type=child_layer_id, target_type=p_layer_id)
 
     @staticmethod
-    def trace_by_base_names(child_paths: List[str], parent_paths: List[str]) -> List[TracePredictionEntry]:
+    def trace_by_base_names(child_paths: List[str], parent_paths: List[str]) -> List[Trace]:
         """
         Traces the child files to the parent files based on their file base names.
         :param child_paths: List of children file paths.
@@ -89,15 +89,15 @@ class CodeTracer:
         child_map = CodeTracer.create_base_name_map(child_paths)
         parent_map = CodeTracer.create_base_name_map(parent_paths)
 
-        links: List[TracePredictionEntry] = []
+        links: List[Trace] = []
         for child_base, child_paths in child_map.items():
             if child_base in parent_map:
                 for child_path in child_paths:
                     for parent_path in parent_map[child_base]:
-                        t_link = TracePredictionEntry(source=child_path,
-                                                      target=parent_path,
-                                                      label=1,
-                                                      explanation=HEADER_FILE_EXPLANATION)
+                        t_link = Trace(source=child_path,
+                                       target=parent_path,
+                                       label=1,
+                                       explanation=HEADER_FILE_EXPLANATION)
                         links.append(t_link)
         return links
 

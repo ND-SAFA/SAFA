@@ -33,7 +33,7 @@ class ScriptDefinition:
 
         script_name = ScriptDefinition.get_script_name(definition_path)
         job_definition = ScriptDefinition.set_output_paths(job_definition, script_name)
-        result = FileUtil.expand_paths(job_definition, env_replacements)
+        result = FileUtil.expand_paths(job_definition, env_replacements, use_abs_paths=False)
         return result
 
     @staticmethod

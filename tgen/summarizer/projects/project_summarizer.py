@@ -1,8 +1,8 @@
 from copy import copy
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG
-from tgen.common.constants.tracing.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
+from tgen.common.constants.project_summary_constants import PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG
+from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trainers.llm_trainer import LLMTrainer
@@ -61,7 +61,7 @@ class ProjectSummarizer(BaseObject):
 
             if project_summary.has_summary():
                 current_summary = project_summary.get_summary()
-                prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}"), 1)
+                prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
 
             task_prompt.set_instructions(PS_QUESTIONS_HEADER)
 

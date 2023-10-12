@@ -60,3 +60,23 @@ class TestDictUtil(TestCase):
         self.assertEqual(joined["1"], "hello world")
         self.assertIn("2", joined)
         self.assertEqual(joined["2"], "what's up")
+
+    def test_get_kwarg_values(self):
+        kwargs = {"one": 1, "two": 2, "three": 3}
+        values = DictUtil.get_kwarg_values(kwargs, pop=False, one=None, four=4)
+        self.assertEqual(values[0], 1)
+        self.assertEqual(values[1], 4)
+
+        value = DictUtil.get_kwarg_values(kwargs, pop=True, one=None)
+        self.assertEqual(value, 1)
+        self.assertNotIn("one", kwargs)
+
+    def test_update_kwarg_values(self):
+        kwargs = {"one": 1, "two": 2, "three": 3}
+        DictUtil.update_kwarg_values(kwargs, replace_existing=True, one="uno", four=4)
+        self.assertEqual(kwargs["one"], "uno")
+        self.assertIn("four", kwargs)
+        DictUtil.update_kwarg_values(kwargs, replace_existing=False, four="cuatro", five=5)
+        self.assertNotEqual(kwargs["four"], "cuatro")
+        self.assertIn("five", kwargs)
+

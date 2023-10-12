@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from dotenv.main import load_dotenv
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 
 load_dotenv()

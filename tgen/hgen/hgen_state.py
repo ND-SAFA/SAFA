@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Union, List, Dict
 
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.state.state import State
@@ -26,7 +27,7 @@ class HGenState(State):
     """
     generation_predictions: Dict[str, List[str]] = None  # dictionary mapping generated content to a list of related source ids
     n_generations: int = 0  # number of runs of artifact generation
-    summary: str = None  # The summary of all the source artifacts.
+    project_summary: str = None  # The summary of all the source artifacts.
 
     """
     Optional Step - Refine content on rerun of hgen
@@ -37,4 +38,5 @@ class HGenState(State):
     """
     Step 4 - Dataset Construction
     """
+    new_artifact_df: ArtifactDataFrame = None # Contains the new generated artifacts
     final_dataset: PromptDataset = None  # The final dataset with generated artifacts.

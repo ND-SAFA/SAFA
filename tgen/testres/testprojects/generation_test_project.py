@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 
 
 class GenerationTestProject:

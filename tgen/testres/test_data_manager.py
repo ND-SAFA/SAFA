@@ -3,13 +3,14 @@ from typing import Dict, List, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
-from tgen.common.artifact import Artifact
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace_layer import TraceLayer
 
 
 class TestDataManager:
@@ -136,7 +137,7 @@ class TestDataManager:
     @staticmethod
     def get_project_reader() -> ApiProjectReader:
         layers = [TraceLayer(**params) for params in TestDataManager.get_path(TestDataManager.Keys.LAYERS)]
-        links = [TracePredictionEntry(**params) for params in TestDataManager.get_path(TestDataManager.Keys.TRACES)]
+        links = [Trace(**params) for params in TestDataManager.get_path(TestDataManager.Keys.TRACES)]
         api_definition = ApiDefinition(
             artifacts=TestDataManager.get_artifacts(),
             layers=layers,

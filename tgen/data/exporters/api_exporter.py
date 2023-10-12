@@ -3,17 +3,16 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.json_util import JsonUtil
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.trace import Trace
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace_layer import TraceLayer
 
 
 class ApiExporter(AbstractDatasetExporter):
@@ -27,7 +26,7 @@ class ApiExporter(AbstractDatasetExporter):
         """
         super().__init__(dataset_creator=dataset_creator, dataset=dataset, export_path=export_path)
         self.artifacts: List[Artifact] = []
-        self.true_links: List[TracePredictionEntry] = []
+        self.true_links: List[Trace] = []
 
     def export(self, **kwargs) -> ApiDefinition:
         """

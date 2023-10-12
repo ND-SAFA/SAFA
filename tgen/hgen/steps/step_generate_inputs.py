@@ -1,21 +1,21 @@
 import os
-
 from typing import Dict, Tuple, List
+
+import bs4
 from yaml.constructor import SafeConstructor
 
+from tgen.common.constants.path_constants import INPUTS_FOR_GENERATION_PATH
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.constants.path_constants import INPUTS_FOR_GENERATION_PATH
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.hgen.hgen_args import HGenArgs, PredictionStep
+from tgen.hgen.hgen_state import HGenState
+from tgen.hgen.hgen_util import HGenUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.hgen.hgen_args import HGenArgs, PredictionStep
-from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import parse_generated_artifacts, get_predictions, convert_spaces_to_dashes
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-import bs4
 
 
 class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -37,7 +37,7 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The inputs that is used to generate the new artifacts (questions, format, description)
         """
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
-        instructions_prompt.response_manager.formatter = lambda tag, val: parse_generated_artifacts(val)
+        instructions_prompt.response_manager.formatter = lambda tag, val: HGenUtil.parse_generated_artifacts(val)
         format_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_FORMAT_QUESTIONNAIRE.value
 
         inputs_response = GenerateInputsStep._get_inputs_response(hgen_args, format_questionnaire, instructions_prompt)
@@ -90,11 +90,8 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         for prompt, step in [(format_questionnaire, PredictionStep.FORMAT), (summary_questions_prompt, PredictionStep.INSTRUCTIONS)]:
             prompt_builder = PromptBuilder(prompts=[prompt])
             prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
-            predictions = get_predictions(prompt_builder,
-                                          PromptDataset(),
-                                          hgen_args=hgen_args,
-                                          prediction_step=step,
-                                          response_prompt_ids=prompt.id)[0]
+            predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=step,
+                                                   response_prompt_ids=prompt.id)[0]
             inputs.update(predictions)
         return inputs
 
@@ -105,5 +102,5 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param target_type: The target type being generated
         :return: The path to the save the inputs for generation for a given target type
         """
-        file_name = f"{convert_spaces_to_dashes(source_type)}-to-{convert_spaces_to_dashes(target_type)}"
+        file_name = f"{HGenUtil.convert_spaces_to_dashes(source_type)}-to-{HGenUtil.convert_spaces_to_dashes(target_type)}"
         return os.path.join(INPUTS_FOR_GENERATION_PATH, f"{file_name}.yaml")

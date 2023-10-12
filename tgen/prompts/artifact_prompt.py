@@ -1,12 +1,12 @@
 from enum import Enum, auto
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Optional
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.prompts.prompt import Prompt
 
 
@@ -22,6 +22,7 @@ class ArtifactPrompt(Prompt):
         """
         The method to build the prompt (determines prompt format)
         """
+        MARKDOWN = auto()
         XML = auto()
         BASE = auto()
 
@@ -37,9 +38,11 @@ class ArtifactPrompt(Prompt):
         self.build_method = build_method
         self.build_methods = {
             self.BuildMethod.XML: self._build_as_xml,
-            self.BuildMethod.BASE: self._build_as_base}
+            self.BuildMethod.BASE: self._build_as_base,
+            self.BuildMethod.MARKDOWN: self._build_as_markdown
+        }
         self.include_id = include_id
-        super().__init__(value=prompt_start)
+        super().__init__(value=prompt_start, allow_formatting=False)
 
     @overrides(Prompt)
     def _build(self, artifact: EnumDict, **kwargs) -> str:
@@ -55,14 +58,29 @@ class ArtifactPrompt(Prompt):
         build_method = self.build_methods[self.build_method]
         artifact_id = artifact.get(StructuredKeys.Artifact.ID.value, EMPTY_STRING)
         content = DataFrameUtil.get_optional_value(artifact.get(StructuredKeys.Artifact.SUMMARY, None))
+        relation = self.get_relationship(artifact)
         if not content:
             content = artifact[StructuredKeys.Artifact.CONTENT]
         artifact = build_method(artifact_id=artifact_id, artifact_body=content, xml_tags=self.xml_tags,
-                                include_id=self.include_id)
+                                include_id=self.include_id, relation=relation, **kwargs)
         return f"{prompt}{artifact}"
 
     @staticmethod
-    def _build_as_xml(artifact_id: Union[int, str], artifact_body: str, xml_tags: Dict, include_id: bool = True) -> str:
+    def get_relationship(artifact: Dict) -> Optional[str]:
+        """
+        Gets the relationship of the artifact (parent or child) if provided
+        :param artifact: Dictionary containing artifact attributes
+        :return: The relationship of the artifact (parent or child) if provided
+        """
+        relation = None
+        if artifact.get(TraceKeys.child_label().value, False):
+            relation = "Child"
+        elif artifact.get(TraceKeys.parent_label().value, False):
+            relation = "Parent"
+        return relation
+
+    @staticmethod
+    def _build_as_xml(artifact_id: Union[int, str], artifact_body: str, xml_tags: Dict, include_id: bool = True, **kwargs) -> str:
         """
         Formats the artifact as follows:
         <artifact>
@@ -82,6 +100,29 @@ class ArtifactPrompt(Prompt):
         formatted_artifact = PromptUtil.create_xml(tag_name=outer_tag,
                                                    tag_content=f"{NEW_LINE}{TAB}{content_for_prompt}{NEW_LINE}")
         return formatted_artifact
+
+    @staticmethod
+    def _build_as_markdown(artifact_id: Union[int, str], artifact_body: str, relation: str,
+                           include_id: bool = True, header_level: int = 1, **kwargs) -> str:
+        """
+        Formats the artifact as follows:
+        # id
+            body
+        :param artifact_id: The id of the artifact
+        :param artifact_body: The body of the artifact
+        :param relation: The relationship of the artifact (parent or child) if provided
+        :param include_id: Whether to include id or not
+        :return: The formatted prompt
+        """
+        assert artifact_id or relation, \
+            f"Building artifact as {ArtifactPrompt.BuildMethod.MARKDOWN.name} requires an artifact id to be given."
+        if artifact_id and relation and include_id:
+            artifact_id = f"{artifact_id} ({relation})"
+        elif relation:
+            artifact_id = relation
+        header = PromptUtil.as_markdown_header(original_string=artifact_id, level=header_level)
+        content = PromptUtil.indent_for_markdown(artifact_body)
+        return f"{header}{NEW_LINE}{content}"
 
     @staticmethod
     def _build_as_base(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True, **kwargs) -> str:

@@ -74,23 +74,26 @@ class State(BaseObject):
         :return: None
         """
         self.mark_step_as_complete(step_name)
-        self.save(step_name, run_num=self.completed_steps[step_name])
+        self.save(step_name=step_name, run_num=self.completed_steps[step_name])
 
-    def save(self, step_name: str, run_num: int = 1) -> bool:
+    def save(self, step_name: str, run_num: int = 1, attrs2ignore: Set = None) -> bool:
         """
         Saves the current state
         :param step_name: The step name that the pipeline is currently at
         :param run_num: The number of times the step has been run
+        :param attrs2ignore: The attributes to ignore when saving
         :return: True if saved successfully else False
         """
         if not self.export_dir:
             return False
 
         try:
-            save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name, run_num)
-            as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self._get_path_to_state_checkpoint(self.export_dir)), k)
-                           if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()}
-            collapsed_paths = self.collapse_paths(as_dict)
+            step_num = len(self.completed_steps)
+            save_path = self.get_path_to_state_checkpoint(self.export_dir, step_name, run_num, step_num)
+            as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self.get_path_to_state_checkpoint(self.export_dir)), k)
+                           if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()
+                       if not attrs2ignore or k not in attrs2ignore}
+            collapsed_paths = self.collapse_or_expand_paths(as_dict)
             YamlUtil.write(collapsed_paths, save_path)
             logger.info(f"Saved state to {save_path}")
             return True
@@ -99,16 +102,18 @@ class State(BaseObject):
             return False
 
     @classmethod
-    def collapse_paths(cls, as_dict: Dict) -> Dict:
+    def collapse_or_expand_paths(cls, as_dict: Dict, collapse: bool = True) -> Dict:
         """
-        Collapses all path variables in the dictionary of vars
+        Collapses or expands all path variables in the dictionary of vars
         :param as_dict: The vars dictionary
-        :return: The dictionary with collapsed paths
+        :param collapse: If True, collapses the path
+        :return: The dictionary with collapsed or expanded paths
         """
+        method = FileUtil.collapse_paths if collapse else FileUtil.expand_paths
         output = {}
         for k, v in as_dict.items():
-            should_collapse = not ReflectionUtil.is_function(v) and cls._is_a_path_variable(k)
-            output[k] = FileUtil.collapse_paths(v) if should_collapse else v
+            is_path = not ReflectionUtil.is_function(v) and cls._is_a_path_variable(k)
+            output[k] = method(v) if is_path else v
         return output
 
     @classmethod
@@ -122,8 +127,8 @@ class State(BaseObject):
         steps = deepcopy(step_names)
         steps.reverse()
         try:
-            for step in steps:
-                path = cls._get_path_to_state_checkpoint(load_dir, step)
+            for i, step in enumerate(steps):
+                path = cls.get_path_to_state_checkpoint(load_dir, step, step_num=len(step_names)-i)
                 if os.path.exists(path):
                     state = cls.load_state_from_path(path, raise_exception=True)
                     return state
@@ -144,7 +149,8 @@ class State(BaseObject):
             logger.info(f"Reading step state: {path}")
             param_specs = ParamSpecs.create_from_method(cls.__init__)
             attrs = {name: cls._check_type(name, val, param_specs) for name, val in YamlUtil.read(path).items()}
-            obj = cls(**attrs)
+            expanded_paths = cls.collapse_or_expand_paths(attrs, collapse=False)
+            obj = cls(**expanded_paths)
             logger.info(f"Loaded previous state from {path}")
             return obj
         except Exception as e:
@@ -183,12 +189,13 @@ class State(BaseObject):
         return val
 
     @staticmethod
-    def _get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1) -> str:
+    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1, step_num: int = None) -> str:
         """
         Gets the path to the checkpoint for the state corresponding to the given step name
         :param directory: The directory that the checkpoints live in
         :param step_name: The name of the step that corresponds with the desired state
         :param run_num: The number of times the step has been run
+        :param step_num: The number of the step being run
         :return: The path to the checkpoint for the state corresponding to the given step name
         """
         if os.path.split(directory)[-1] != State._CHECKPOINT_DIRNAME:
@@ -196,17 +203,21 @@ class State(BaseObject):
         FileUtil.create_dir_safely(directory)
         if not step_name:
             return directory
-        return os.path.join(directory, State._get_filename(step_name, run_num))
+        return os.path.join(directory, State._get_filename(step_name, run_num, step_num))
 
     @staticmethod
-    def _get_filename(step: Any, run_num: int = 1) -> str:
+    def _get_filename(step: Any, run_num: int = 1, step_num: int = None) -> str:
         """
         Returns the filename for the given step
         :param step: The name of the step
         :param run_num: The number of times the step has been run
+        :param step_num: The number of the step being run
         :return: The filename for the given step
         """
         step = DASH.join(SeparateJoinedWordsStep.separate_camel_case_word(step)).lower()
         if run_num > 1:
             step = f"{step}-{run_num}"
-        return f"state-{step}.yaml"
+        filename = f"state-{step}"
+        if step_num:
+            filename = f"{step_num}-{filename}"
+        return FileUtil.add_ext(filename, FileUtil.YAML_EXT)

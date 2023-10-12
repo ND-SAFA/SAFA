@@ -3,6 +3,7 @@ from typing import Dict
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.constants.anthropic_constants import ANTHROPIC_MODEL_DEFAULT
 from tgen.common.constants.open_ai_constants import MAX_TOKENS_DEFAULT
+from tgen.common.util.dict_util import DictUtil
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
 
@@ -37,8 +38,7 @@ class AnthropicArgs(AbstractLLMArgs):
         :param kwargs: Contains all necessary arg name to value mappings
         """
         super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
-        if "model" not in super_args:
-            super_args["model"] = ANTHROPIC_MODEL_DEFAULT
+        DictUtil.update_kwarg_values(super_args, replace_existing=False, model=ANTHROPIC_MODEL_DEFAULT)
         super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, **super_args)
 
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:

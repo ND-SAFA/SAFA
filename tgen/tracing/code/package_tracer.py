@@ -2,11 +2,11 @@ import os
 from typing import Dict, Iterable, List, Tuple
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.tracing.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
+from tgen.common.constants.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.common.objects.trace import Trace
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
@@ -56,7 +56,7 @@ class PackageTracer:
                 # Adds trace link if not added
                 trace_id = TraceDataFrame.generate_link_id(source_id=child_node, target_id=parent_node)
                 if trace_id not in trace_ids:
-                    trace_entry = TracePredictionEntry(
+                    trace_entry = Trace(
                         source=child_node,
                         target=parent_node,
                         label=1,

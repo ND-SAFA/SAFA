@@ -5,11 +5,14 @@
         {
           "object_type": "RANKING",
           "ranking_pipeline": "EMBEDDING",
+          "export_dir": "[OUTPUT_PATH]/embedding/[CURRENT_PROJECT]",
           "dataset_creator": {
-            "object_type": "TRACE",
-            "project_reader": {
-              "object_type": "STRUCTURE",
-              "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+            "object_type": "PROMPT",
+            "trace_dataset_creator": {
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
             }
           }
         }

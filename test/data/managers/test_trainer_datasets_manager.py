@@ -25,7 +25,8 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         pre_train_creator = dataset_container_manager._dataset_creators.pop(DatasetRole.PRE_TRAIN)
         dataset_container_manager._dataset_creators[DatasetRole.TRAIN] = pre_train_creator
         dataset_container_manager._dataset_creators[DatasetRole.VAL].split_strategy = SupportedSplitStrategy.PRE_TRAIN
-        dataset_container_manager._prepare_datasets(None)
+        dataset_container_manager.augmenter = None
+        dataset_container_manager.get_datasets()
         self.assertTrue(isinstance(dataset_container_manager[DatasetRole.VAL], PreTrainDataset))
         for role in [DatasetRole.TRAIN, DatasetRole.VAL]:
             dataset = dataset_container_manager[role]
@@ -36,7 +37,8 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         dataset_container_manager: TrainerDatasetManager = self.create_dataset_manager(
             [DatasetRole.PRE_TRAIN, DatasetRole.EVAL, DatasetRole.VAL])
         augmenter = DataAugmenter(steps=[ResampleStep()])
-        dataset_container_manager._prepare_datasets(augmenter)
+        dataset_container_manager.augmenter = augmenter
+        dataset_container_manager.get_datasets()
         self.assert_final_datasets_are_as_expected(dataset_container_manager)
 
     @patch.object(MLMPreTrainDatasetCreator, "create")

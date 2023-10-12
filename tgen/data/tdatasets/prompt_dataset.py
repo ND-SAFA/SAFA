@@ -5,14 +5,13 @@ from typing import Any, Callable, List, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
-from tgen.common.util.date_time_util import DateTimeUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
@@ -78,6 +77,8 @@ class PromptDataset(iDataset):
             return self.artifact_df
         elif self.get_prompt_dataframe() is not None:
             return self.get_prompt_dataframe()
+        else:
+            raise NotImplementedError("Cannot convert to dataframe without trace data or prompt dataframe")
 
     def export_prompt_dataframe(self, prompt_df: pd.DataFrame, export_path: str = None) -> Tuple[str, bool]:
         """
@@ -192,6 +193,8 @@ class PromptDataset(iDataset):
             if i % self.__SAVE_AFTER_N == 0:
                 PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
+            source[TraceKeys.SOURCE] = True
+            target[TraceKeys.TARGET] = True
             entry = self._create_prompt(prompt_args=prompt_args,
                                         prompt_builder=prompt_builder,
                                         artifacts=[source, target],

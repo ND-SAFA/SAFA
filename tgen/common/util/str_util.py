@@ -1,10 +1,16 @@
 import re
 import uuid
+from copy import deepcopy
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE
+from typing import List
+
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, SPACE, PERIOD
+from tgen.common.util.logging.logger_manager import logger
 
 
 class StrUtil:
+
+    FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
 
     @staticmethod
     def format_selective(string, *args: object, **kwargs: object) -> str:
@@ -21,12 +27,21 @@ class StrUtil:
         if not formatting_fields:
             return string
         updated_args = [arg for arg in args]
+        updated_kwargs = {}
         for i, field in enumerate(formatting_fields):
-            if kwargs and field not in kwargs:
-                kwargs[field] = '{%s}' % field
-            if args and i >= len(args):
-                updated_args.append('{%s}' % field)
-        return string.format(*updated_args, **kwargs)
+            replacement = '{%s}' % field
+            if field:
+                if field in kwargs:
+                    updated_kwargs[field] = kwargs[field]
+                else:
+                    updated_kwargs[field] = replacement
+            if not field and i >= len(updated_args):
+                updated_args.append(replacement)
+        try:
+            string = string.format(*updated_args, **updated_kwargs)
+        except Exception:
+            logger.exception(f"Unable to format {string} with args={updated_args} and kwargs={updated_kwargs}")
+        return string
 
     @staticmethod
     def is_uuid(input_string: str) -> bool:
@@ -49,3 +64,34 @@ class StrUtil:
         :return: The string as pascal case
         """
         return EMPTY_STRING.join([word.capitalize() for word in snake_case.split(UNDERSCORE)])
+
+    @staticmethod
+    def split_sentences_by_punctuation(string: str, punctuation: str = PERIOD) -> List[str]:
+        """
+        Splits sentences by punctuation
+        :param string: The string to split
+        :param punctuation: The type of punctuation to split on
+        :return: The string split into sentences
+        """
+        regex = fr"(?<={re.escape(punctuation)}) "
+        sentences = re.split(regex, string)
+        return [sentence.strip(punctuation) for sentence in sentences]
+
+    @staticmethod
+    def remove_floats(string: str) -> str:
+        """
+        Remove all floats in a string if they are by themselves (not inside of a substring)
+        :param string: The string to find floats
+        :return: The string without floats that were found
+        """
+        return re.compile(StrUtil.FIND_FLOAT_PATTERN).sub(EMPTY_STRING, string)
+
+    @staticmethod
+    def find_floats(string: str) -> List[str]:
+        """
+        Finds all floats in a string if they are by themselves (not inside of a substring)
+        :param string: The string to find floats
+        :return: The floats that were found
+        """
+        return re.findall(StrUtil.FIND_FLOAT_PATTERN, string)
+

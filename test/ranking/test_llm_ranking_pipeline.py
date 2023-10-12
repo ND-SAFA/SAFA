@@ -1,27 +1,17 @@
-from tgen.common.constants.tracing.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
-    RANKING_PARENT_SUMMARY_TAG, \
-    RANKING_SCORE_TAG
+from test.ranking.steps.ranking_pipeline_test import PARENT_ID, CHILD_ID, RankingPipelineTest
+from tgen.common.constants.ranking_constants import RANKING_MAX_SCORE, RANKING_MIN_SCORE
+from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
-
-PARENT_ID = "parent_1"
-CHILD_ID = "child_1"
-EXPLANATION = "EXPLANATION"
-SCORE = 4
-TEST_RESPONSE = (
-    f"<{RANKING_PARENT_SUMMARY_TAG}>Parent Summary.</{RANKING_PARENT_SUMMARY_TAG}>\n"
-    f"<{RANKING_ARTIFACT_TAG}>"
-    f"<{RANKING_ID_TAG}>0</{RANKING_ID_TAG}>"
-    f"<{RANKING_EXPLANATION_TAG}>{EXPLANATION}</{RANKING_EXPLANATION_TAG}>"
-    f"<{RANKING_SCORE_TAG}>{SCORE}</{RANKING_SCORE_TAG}>"
-    f"</{RANKING_ARTIFACT_TAG}>"
-)
+from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 
 
 class TestLLMRankingPipeline(BaseTest):
@@ -36,16 +26,20 @@ class TestLLMRankingPipeline(BaseTest):
         """
         ai_manager.mock_summarization()
         ai_manager.set_responses(MockResponses.project_summary_responses +
-                                 [TEST_RESPONSE])
+                                 [RankingPipelineTest.get_response()] +
+                                 [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)])
         args = self.create_args()
         pipeline = LLMRankingPipeline(args)
-        prediction_entries = pipeline.run()
+        pipeline.run()
+        prediction_entries = pipeline.state.selected_entries
         self.assertEqual(1, len(prediction_entries))
         entry = prediction_entries[0]
         self.assertEqual(CHILD_ID, entry[TraceKeys.SOURCE.value])
         self.assertEqual(PARENT_ID, entry[TraceKeys.TARGET.value])
-        self.assertEqual(EXPLANATION, entry[TraceKeys.EXPLANATION.value])
-        self.assertEqual(.4, entry[TraceKeys.SCORE.value])
+        for tag in RankingPipelineTest.get_explanation_tags(task_prompt=SupportedPrompts.EXPLANATION_TASK.value):
+            self.assertIn(tag, entry[TraceKeys.EXPLANATION.value].lower())
+        expected_score = MathUtil.normalize_val(4.0, max_val=RANKING_MAX_SCORE, min_val=RANKING_MIN_SCORE)
+        self.assertEqual(expected_score, entry[TraceKeys.SCORE.value])
 
     @staticmethod
     def create_args() -> RankingArgs:
@@ -59,6 +53,8 @@ class TestLLMRankingPipeline(BaseTest):
         parent_ids = [PARENT_ID]
         children_ids = [CHILD_ID]
         artifact_df = ArtifactDataFrame([parent_artifact, child_artifact])
-        args = RankingArgs(run_name=f"{child_type}2{parent_type}", artifact_df=artifact_df, parent_ids=parent_ids,
-                           children_ids=children_ids)
+        args = RankingArgs(run_name=f"{child_type}2{parent_type}", dataset=PromptDataset(artifact_df=artifact_df),
+                           parent_ids=parent_ids,
+                           children_ids=children_ids, weight_of_embedding_scores=0, weight_of_explanation_scores=0,
+                           types_to_trace=("target", "source"), selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD)
         return args

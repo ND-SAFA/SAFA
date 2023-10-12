@@ -4,7 +4,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE, TAB
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer

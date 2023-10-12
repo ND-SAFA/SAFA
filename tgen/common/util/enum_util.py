@@ -28,6 +28,18 @@ class EnumUtil:
             raise ValueError("%s does not have value: %s" % (enum_class, enum_name))
 
     @staticmethod
+    def get_enum_from_value(enum_class: Type, enum_val: Any) -> Enum:
+        """
+        Gets the enum with the corresponding value
+        :param enum_class: The enum class to get the enum from
+        :param enum_val: The value to get the enum for
+        :return: The enum with the corresponding value
+        """
+        for e in enum_class:
+            if e.value == enum_val:
+                return e
+
+    @staticmethod
     def to_string(item: Union[Enum, str]) -> str:
         """
         Converts enum to string if item is an enum
@@ -63,13 +75,14 @@ class FunctionalWrapper:
 
 class EnumDict(OrderedDict):
 
-    def __init__(self, dict_: Dict[Union[str, Enum], Any] = None):
+    def __init__(self, dict_: Dict[Union[str, Enum], Any] = None, **kwargs):
         """
         Dictionary that accepts enum or enum value as key
         :param dict_: A dictionary containing enum or enum value as key
         """
         dict_ = [(EnumUtil.to_string(key), val) for key, val in dict_.items()] if dict_ is not None else []
-        super().__init__(dict_)
+        kwargs = {EnumUtil.to_string(key): val for key, val in kwargs.items()}
+        super().__init__(dict_, **kwargs)
 
     def get(self, key: Union[str, Enum], default: Any = None) -> Any:
         """

@@ -7,8 +7,9 @@ import numpy as np
 from tqdm import tqdm
 
 from tgen.common.util.enum_util import EnumDict
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.common.objects.trace import Trace
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys
 
 Query = namedtuple('Query', ['links', 'preds'])
 
@@ -109,7 +110,7 @@ class TraceMatrix:
             self.parent_ids.append(parent_id)
         self.query_matrix[parent_id].links.append(link)
         self.labels.append(label)
-        self.entries.append(TracePredictionEntry(source=child_id, target=parent_id, score=pred, label=label))
+        self.entries.append(Trace(source=child_id, target=parent_id, score=pred, label=label))
         if pred is not None:
             self.query_matrix[parent_id].preds.append(pred)
 

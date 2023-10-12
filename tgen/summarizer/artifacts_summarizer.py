@@ -42,9 +42,9 @@ class ArtifactsSummarizer(BaseObject):
         nl_prompts = nl_summary_type.value
         if self.project_summary:
             nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            nl_prompts.insert(1, Prompt(self.project_summary))
+            nl_prompts.insert(1, Prompt(self.project_summary, allow_formatting=False))
             code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            code_prompts.insert(1, Prompt(self.project_summary))
+            code_prompts.insert(1, Prompt(self.project_summary, allow_formatting=False))
         self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
         self.nl_prompt_builder = PromptBuilder(nl_prompts)
 

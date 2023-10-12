@@ -10,9 +10,25 @@ class TestSelectQuestionPrompt(BaseTest):
     DEFAULT = 1
 
     def test_build(self):
-        prompt = self.get_prompt()
-        output = prompt._build()
-        self.eval_format(output)
+        prompt1 = self.get_prompt()
+        output1 = prompt1._build()
+        self.eval_format(output1)
+
+        prompt2 = self.get_prompt(categories=list(self.CATEGORIES.values()), numeric_category_range=range(1, 4))
+        output2 = prompt2._build()
+        self.assertEqual(output1, output2)
+        bad_res = prompt2.parse_response("<selection>2.2</selection>")
+        self.assertEqual(bad_res['selection'][0], self.DEFAULT)
+
+        prompt3 = self.get_prompt(categories=list(self.CATEGORIES.values()), numeric_category_range=range(1, 4),
+                                  categories_are_continuous=True)
+        output3 = prompt3._build()
+        expected_output = output1
+        for i in self.CATEGORIES.keys():
+            expected_output = expected_output.replace(str(i), str(float(i)))
+        self.assertEqual(expected_output, output3)
+        good_res = prompt3.parse_response("<selection>1.2</selection>")
+        self.assertEqual(good_res['selection'][0], 1.2)
 
     def test_parse_response(self):
         prompt = self.get_prompt()
@@ -45,10 +61,11 @@ class TestSelectQuestionPrompt(BaseTest):
         self.assertEqual(prompt_single.response_format, "Enclose the category inside of {}")
         self.assertEqual(prompt_single.instructions, "Select one of the following categories:")
 
-    def get_prompt(self, allow_multiple: bool = False):
-        return SelectQuestionPrompt(self.CATEGORIES, instructions=self.PROMPT,
+    def get_prompt(self, categories=CATEGORIES, allow_multiple: bool = False, **params):
+        return SelectQuestionPrompt(categories, instructions=self.PROMPT,
                                     multiple_responses_allowed=allow_multiple,
-                                    response_tag=self.TAG, default_factory=lambda v, t: self.DEFAULT)
+                                    response_tag=self.TAG, default_factory=lambda v, t: self.DEFAULT,
+                                    **params)
 
     def eval_format(self, output: str):
         res = output.split(NEW_LINE)

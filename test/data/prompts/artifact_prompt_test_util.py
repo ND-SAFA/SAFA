@@ -18,8 +18,11 @@ class ArtifactPromptTestUtil:
         """
         if isinstance(expected_artifact_format, list):
             expected_artifact_format = NEW_LINE.join(expected_artifact_format)
-        split_by_newline = [p for p in prompt.split(NEW_LINE) if p]
-        prompt, *artifacts = split_by_newline
-        artifacts = NEW_LINE.join(artifacts)
-        test_case.assertEqual(expected_prompt, prompt)
+        if expected_prompt:
+            split_by_newline = [p for p in prompt.split(NEW_LINE) if p]
+            prompt, *artifacts = split_by_newline
+            artifacts = NEW_LINE.join(artifacts)
+            test_case.assertEqual(expected_prompt, prompt)
+        else:
+            artifacts = prompt
         test_case.assertEqual(expected_artifact_format, artifacts)

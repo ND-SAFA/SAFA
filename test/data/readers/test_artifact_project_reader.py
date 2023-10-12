@@ -1,5 +1,5 @@
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer

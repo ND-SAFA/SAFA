@@ -30,11 +30,12 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
         authorizationService.loginUser(Sharee.email, Sharee.password, true);
 
         // Step - Perform violating action
-        String message = performViolatingAction().getString("message");
+        JSONObject error = performViolatingAction();
 
         // VP - Verify that message contains
-        assertThat(message)
-            .containsIgnoringCase(getExpectedPermission().getName())
-            .containsIgnoringCase("permission");
+        assertThat(error.getString("message"))
+            .containsIgnoringCase("missing permission");
+        assertThat(error.getString("permission"))
+            .isEqualTo(getExpectedPermission().getName());
     }
 }

@@ -47,6 +47,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
             "owner",
             "orgId",
             "teamId",
+            "permissions",
           ]),
           artifactIds,
           name,

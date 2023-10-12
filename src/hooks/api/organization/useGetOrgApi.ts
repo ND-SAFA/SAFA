@@ -4,7 +4,6 @@ import { computed } from "vue";
 import { GetOrgApiHook, OrganizationSchema } from "@/types";
 import { orgStore, sessionStore, teamStore, useApi } from "@/hooks";
 import {
-  getOrganization,
   getOrganizations,
   getPersonalOrganization,
   saveDefaultOrg,

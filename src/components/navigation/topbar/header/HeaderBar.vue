@@ -10,6 +10,7 @@
       <flex-box align="center" :b="smallWindow ? '1' : ''">
         <project-selector />
         <version-selector />
+        <!--        <nav-breadcrumbs />-->
       </flex-box>
       <q-space />
       <update-button />
@@ -36,6 +37,7 @@ import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { VersionSelector, ProjectSelector } from "@/components/project";
 import { ProjectSearchbar } from "@/components/search";
+// import NavBreadcrumbs from "./NavBreadcrumbs.vue";
 import UpdateButton from "./UpdateButton.vue";
 
 const currentRoute = useRoute();

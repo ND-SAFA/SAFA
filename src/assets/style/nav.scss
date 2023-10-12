@@ -86,6 +86,15 @@
   }
 }
 
+.nav-breadcrumb-list {
+  font-size: 20px;
+}
+
+.nav-breadcrumb {
+  min-width: 100px !important;
+  background-color: $color-neutral !important;
+}
+
 // Navigation - Topbar
 
 .nav-topbar {

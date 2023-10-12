@@ -12,8 +12,8 @@ import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -23,8 +23,6 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class PermissionService {
-
-    private final String PERMISSION_ERROR = "User does not have %s permission";
 
     private final OrganizationMembershipService orgMembershipService;
     private final ProjectMembershipService projectMembershipService;
@@ -87,7 +85,7 @@ public class PermissionService {
      */
     public void requirePermission(Permission permission, Project project, SafaUser user) {
         if (!hasPermission(permission, project, user)) {
-            throwPermissionException(permission);
+            throw new MissingPermissionException(permission);
         }
     }
 
@@ -100,7 +98,7 @@ public class PermissionService {
      */
     public void requirePermission(Permission permission, Team team, SafaUser user) {
         if (!hasPermission(permission, team, user)) {
-            throwPermissionException(permission);
+            throw new MissingPermissionException(permission);
         }
     }
 
@@ -113,17 +111,8 @@ public class PermissionService {
      */
     public void requirePermission(Permission permission, Organization organization, SafaUser user) {
         if (!hasPermission(permission, organization, user)) {
-            throwPermissionException(permission);
+            throw new MissingPermissionException(permission);
         }
-    }
-
-    /**
-     * Throws an exception indicating that the permission is missing.
-     *
-     * @param permission The permission that's missing
-     */
-    private void throwPermissionException(Permission permission) {
-        throw new SafaError(String.format(PERMISSION_ERROR, permission.getName()));
     }
 
     /**

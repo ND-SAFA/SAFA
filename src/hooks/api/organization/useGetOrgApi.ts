@@ -3,7 +3,12 @@ import { computed } from "vue";
 
 import { GetOrgApiHook, OrganizationSchema } from "@/types";
 import { orgStore, sessionStore, teamStore, useApi } from "@/hooks";
-import { getOrganization, getOrganizations, saveDefaultOrg } from "@/api";
+import {
+  getOrganization,
+  getOrganizations,
+  getPersonalOrganization,
+  saveDefaultOrg,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -40,7 +45,10 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
     await getOrgApi.handleRequest(
       async () => {
-        orgStore.allOrgs = await getOrganizations();
+        orgStore.allOrgs = [
+          await getPersonalOrganization(),
+          ...(await getOrganizations()),
+        ];
 
         const orgId = sessionStore.user.defaultOrgId || orgStore.allOrgs[0]?.id;
 

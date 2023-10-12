@@ -7,6 +7,15 @@ import {
 import { buildRequest } from "@/api";
 
 /**
+ * Returns the user's personal organization.
+ *
+ * @return The user's organization.
+ */
+export async function getPersonalOrganization(): Promise<OrganizationSchema> {
+  return buildRequest<OrganizationSchema>("getPersonalOrg").get();
+}
+
+/**
  * Returns all organizations for the current user.
  *
  * @return All organizations.

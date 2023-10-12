@@ -160,6 +160,7 @@ export enum Endpoint {
 
   getAllOrgs = "organizations",
   createOrg = "organizations",
+  getPersonalOrg = "organizations/self",
   getOrg = "organizations/:orgId",
   editOrg = "organizations/:orgId",
   deleteOrg = "organizations/:orgId",

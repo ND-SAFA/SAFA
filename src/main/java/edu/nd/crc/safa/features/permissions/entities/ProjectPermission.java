@@ -5,11 +5,14 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum ProjectPermission implements Permission {
-    VIEW("project.view"),
+    DELETE("project.delete"),
     EDIT("project.edit"),
-    SHARE("project.share"),
+    EDIT_DATA("project.edit_data"),
+    EDIT_INTEGRATIONS("project.edit_integrations"),
+    EDIT_MEMBERS("project.edit_members"),
+    EDIT_VERSIONS("project.edit_versions"),
     GENERATE("project.generate"),
-    DELETE("project.delete");
+    VIEW("project.view");
 
     @Getter
     private final String name;

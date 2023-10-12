@@ -1,6 +1,6 @@
 <template>
   <div class="q-mx-auto long-input">
-    <flex-box v-if="!props.isUpdate && ENABLED_FEATURES.ORGS" b="4">
+    <flex-box v-if="!props.isUpdate" b="4">
       <select-input
         v-model="getOrgApiStore.currentOrg"
         label="Organization"

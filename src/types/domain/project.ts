@@ -11,6 +11,7 @@ import {
   AttributeLayoutSchema,
   SubtreeMapSchema,
   TraceMatrixSchema,
+  PermissionType,
 } from "@/types";
 
 /**
@@ -48,6 +49,10 @@ export interface IdentifierSchema {
    * The primary owner of this project.
    */
   owner: string;
+  /**
+   * The permissions of the current user on this project.
+   */
+  permissions: PermissionType[];
 }
 
 /**

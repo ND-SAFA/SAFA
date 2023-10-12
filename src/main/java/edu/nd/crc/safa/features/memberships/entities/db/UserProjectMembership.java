@@ -61,8 +61,9 @@ public class UserProjectMembership implements Serializable {
         nullable = false)
     private SafaUser member;
 
-    @Column(name = "project_role")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Enumerated(EnumType.STRING)
+    @Column(name = "project_role")
     private ProjectRole role;
 
     public UserProjectMembership(Project project, SafaUser member, ProjectRole role) {

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AcknowledgeMessage {
-    private final String type = "ack";
-    private String message = "ok";
+public class ErrorMessage {
+    private final String type = "error";
+    String message;
 }

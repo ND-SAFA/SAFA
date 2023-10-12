@@ -36,34 +36,30 @@ public class ProjectMembershipService {
      * Applies a role to a user within a project. If the user already has this
      * role in this project, this function does nothing.
      *
-     * @param user The user to get the new role
+     * @param user    The user to get the new role
      * @param project The project the role applies to
-     * @param role The role
+     * @param role    The role
      * @return The new membership representing the role, or the old one if it already existed
      */
     public UserProjectMembership addUserRole(SafaUser user, Project project, ProjectRole role) {
         Optional<UserProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
-
-        if (membershipOptional.isEmpty()) {
-            UserProjectMembership newMembership = new UserProjectMembership(project, user, role);
-            return userProjectMembershipRepo.save(newMembership);
-        } else {
-            return membershipOptional.get();
-        }
+            userProjectMembershipRepo.findByMemberAndProject(user, project);
+        UserProjectMembership newMembership = membershipOptional.orElseGet(() -> new UserProjectMembership(project, user, role));
+        newMembership.setRole(role);
+        return userProjectMembershipRepo.save(newMembership);
     }
 
     /**
      * Removes a role from a user within a project. If the user didn't already have this
      * role in this project, this function does nothing.
      *
-     * @param user The user to remove the role from
+     * @param user    The user to remove the role from
      * @param project The project the role applies to
-     * @param role The role
+     * @param role    The role
      */
-    public void removeUserRole(SafaUser user, Project project, ProjectRole role) {
+    public void removeUserRole(SafaUser user, Project project) {
         Optional<UserProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
+            userProjectMembershipRepo.findByMemberAndProject(user, project);
 
         membershipOptional.ifPresent(userProjectMembershipRepo::delete);
     }
@@ -71,26 +67,26 @@ public class ProjectMembershipService {
     /**
      * Get the list of roles the user has within the project.
      *
-     * @param user The user in question
+     * @param user    The user in question
      * @param project The project to check within
      * @return The roles the user has in that project
      */
     public List<ProjectRole> getUserRoles(SafaUser user, Project project) {
         return userProjectMembershipRepo.findByProjectAndMember(project, user).stream()
-                .map(UserProjectMembership::getRole)
-                .collect(Collectors.toUnmodifiableList());
+            .map(UserProjectMembership::getRole)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
      * Share a project with a team. The new team with be able to view the project in read-only mode.
      *
-     * @param team The team to share the project with.
+     * @param team    The team to share the project with.
      * @param project The project to share.
      * @return The new membership, or the old one if it already existed
      */
     public TeamProjectMembership addTeamToProject(Team team, Project project) {
         Optional<TeamProjectMembership> membershipOptional =
-                teamProjectMembershipRepo.findByTeamAndProject(team, project);
+            teamProjectMembershipRepo.findByTeamAndProject(team, project);
 
         if (membershipOptional.isEmpty()) {
             TeamProjectMembership newMembership = new TeamProjectMembership(project, team);
@@ -104,7 +100,7 @@ public class ProjectMembershipService {
      * Remove a team from a project. Members of the team won't be able to see the project anymore
      * unless they are associated with the project via another team.
      *
-     * @param team The team to remove from the project.
+     * @param team    The team to remove from the project.
      * @param project The project to remove the team from.
      */
     public void removeTeamFromProject(Team team, Project project) {
@@ -113,7 +109,7 @@ public class ProjectMembershipService {
         }
 
         Optional<TeamProjectMembership> membershipOptional =
-                teamProjectMembershipRepo.findByTeamAndProject(team, project);
+            teamProjectMembershipRepo.findByTeamAndProject(team, project);
 
         membershipOptional.ifPresent(teamProjectMembershipRepo::delete);
     }
@@ -126,19 +122,19 @@ public class ProjectMembershipService {
      */
     public List<ProjectIdAppEntity> getProjectIdAppEntitiesForUser(SafaUser user) {
         return getProjectsForUser(user).stream()
-                .map(project -> {
-                    List<ProjectMemberAppEntity> members = this.userProjectMembershipRepo.findByProject(project)
-                            .stream()
-                            .map(ProjectMemberAppEntity::new)
-                            .collect(Collectors.toList());
-                    this.teamMembershipService.getTeamMemberships(project.getOwningTeam())
-                            .stream()
-                            .map(ProjectMemberAppEntity::new)
-                            .forEach(members::add);
-                    return new ProjectIdAppEntity(project, members);
-                })
-                .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
-                .collect(Collectors.toList());
+            .map(project -> {
+                List<ProjectMemberAppEntity> members = this.userProjectMembershipRepo.findByProject(project)
+                    .stream()
+                    .map(ProjectMemberAppEntity::new)
+                    .collect(Collectors.toList());
+                this.teamMembershipService.getTeamMemberships(project.getOwningTeam())
+                    .stream()
+                    .map(ProjectMemberAppEntity::new)
+                    .forEach(members::add);
+                return new ProjectIdAppEntity(project, members);
+            })
+            .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -151,14 +147,14 @@ public class ProjectMembershipService {
         List<Project> projects = new ArrayList<>();
 
         this.userProjectMembershipRepo.findByMember(user)
-                .stream()
-                .map(UserProjectMembership::getProject)
-                .forEach(projects::add);
+            .stream()
+            .map(UserProjectMembership::getProject)
+            .forEach(projects::add);
 
         teamMembershipService.getUserTeams(user)
-                .stream()
-                .flatMap(team -> this.getProjectsForTeam(team).stream())
-                .forEach(projects::add);
+            .stream()
+            .flatMap(team -> this.getProjectsForTeam(team).stream())
+            .forEach(projects::add);
 
         return projects;
     }
@@ -173,9 +169,9 @@ public class ProjectMembershipService {
         List<Project> projects = new ArrayList<>();
 
         this.teamProjectMembershipRepo.findByTeam(team)
-                .stream()
-                .map(TeamProjectMembership::getProject)
-                .forEach(projects::add);
+            .stream()
+            .map(TeamProjectMembership::getProject)
+            .forEach(projects::add);
 
         projects.addAll(this.projectService.getProjectsOwnedByTeam(team));
 
@@ -218,18 +214,18 @@ public class ProjectMembershipService {
 
         Set<SafaUser> seenUsers = new HashSet<>();
         users.stream()
-                .map(UserProjectMembership::getMember)
-                .forEach(seenUsers::add);
+            .map(UserProjectMembership::getMember)
+            .forEach(seenUsers::add);
 
         teams.stream()
-                .map(TeamProjectMembership::getTeam)
-                .flatMap(team -> teamMembershipService.getUsersInTeam(team).stream())
-                .forEach(user -> {
-                    if (!seenUsers.contains(user)) {
-                        users.add(new UserProjectMembership(project, user, ProjectRole.NONE));
-                        seenUsers.add(user);
-                    }
-                });
+            .map(TeamProjectMembership::getTeam)
+            .flatMap(team -> teamMembershipService.getUsersInTeam(team).stream())
+            .forEach(user -> {
+                if (!seenUsers.contains(user)) {
+                    users.add(new UserProjectMembership(project, user, ProjectRole.NONE));
+                    seenUsers.add(user);
+                }
+            });
 
         return users;
     }

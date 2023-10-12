@@ -13,6 +13,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,9 +25,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  * Intercepts request to resources and checks if a valid JWT is given to them.
  */
 public class AuthorizationFilter extends BasicAuthenticationFilter {
-
+    private static final Logger log = LoggerFactory.getLogger(AuthorizationFilter.class);
     private final AuthorizationService authorizationService;
-
 
     public AuthorizationFilter(AuthenticationManager authManager,
                                AuthorizationService authorizationService) {
@@ -39,6 +40,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                                     FilterChain chain) throws IOException, ServletException {
         try {
             if (request.getCookies() == null) {
+                log.info("Request contained no cookies.");
                 return;
             }
 
@@ -48,17 +50,22 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 .map(Cookie::getValue);
 
             if (token.isEmpty()) {
+                log.info("Authorization token was empty.");
                 return;
             }
 
             UsernamePasswordAuthenticationToken authenticationToken = authorizationService.authenticate(token.get());
+            System.out.println("End of authorization. Token received." + authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            System.out.println("Context set with authentication.");
         } catch (UsernameNotFoundException ignored) {
             // This happens if the user has a token for a deleted account. We have code that is supposed
             // to delete the cookie, so I don't know why it sticks around, but by catching the exception
             // we can at least keep the chain from dying
+            log.info("Authorization token referenced deleted account.");
         } catch (ExpiredJwtException ignored) {
             // If your JWT expired, just move on and force the user to log in again
+            log.info("Authorization token has expired.");
         } catch (SafaError e) {
             e.printStackTrace();
         } finally {

@@ -24,8 +24,4 @@ public class TopicCreator {
     public static String getJobTopic(UUID jobId) {
         return String.format("/topic/jobs/%s", jobId);
     }
-
-    public static String getAuthenticationTopic() {
-        return "/app/auth";
-    }
 }

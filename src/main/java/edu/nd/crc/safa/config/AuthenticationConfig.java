@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import edu.nd.crc.safa.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.authentication.AuthorizationFilter;
 import edu.nd.crc.safa.authentication.AuthorizationService;
@@ -10,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,6 +22,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Creates the authentication solution for our app including:
@@ -26,17 +33,22 @@ import org.springframework.security.web.SecurityFilterChain;
  * 3. Enabled app-wide authentication except for login and create account routes. TODO: Add forgot password route.
  */
 @AllArgsConstructor
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class AuthenticationConfig {
+
 
     private final AuthorizationService authorizationService;
     private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   AuthenticationManager authenticationManager)
+        throws Exception {
+        System.out.println("SERVER: CONFIGURING!");
         http
+            .cors(Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(requests -> requests.requestMatchers(
                     AppRoutes.Accounts.LOGIN,
@@ -53,9 +65,8 @@ public class AuthenticationConfig {
             // Authentication Filters
             .addFilter(new AuthenticationFilter(authenticationManager, tokenService))
             .addFilter(new AuthorizationFilter(authenticationManager, authorizationService))
-            .sessionManagement((sessionManager) -> {
-                sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-            });
+            .sessionManagement((sessionManager) -> sessionManager
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
@@ -65,6 +76,33 @@ public class AuthenticationConfig {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        System.out.println("CORS CONFIGURATION!");
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("https://localhost.safa.ai:8080");
+        config.addAllowedOriginPattern("https://localhost:8080");
+        config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept",
+            "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods",
+            "Access-Control-Allow-Origin", "Access-Control-Expose-Headers", "Access-Control-Max-Age",
+            "Access-Control-Request-Headers", "Access-Control-Request-Method", "Age", "Allow", "Alternates",
+            "Content-Range", "Content-Disposition", "Content-Description"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setExposedHeaders(List.of(
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Methods",
+            "Access-Control-Allow-Headers",
+            "Access-Control-Allow-Credentials",
+            "Access-Control-Max-Age"
+        ));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("*", config);
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean

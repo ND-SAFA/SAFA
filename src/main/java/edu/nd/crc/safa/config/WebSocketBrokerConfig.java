@@ -1,10 +1,9 @@
 package edu.nd.crc.safa.config;
 
-import edu.nd.crc.safa.authentication.AuthorizationService;
 import edu.nd.crc.safa.features.notifications.services.MessageInterceptor;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -18,20 +17,15 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
  * - setting message size
  * - setting the topic and individual message endpoints.
  */
+@AllArgsConstructor
 @Configuration
 public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
-
     public static final int MESSAGE_SIZE_LIMIT = 50 * 1024 * 1024;
-
-    @Autowired
-    SafaUserService safaUserService;
-
-    @Autowired
-    AuthorizationService authorizationService;
+    private final SafaUserRepository userRepository;
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        MessageInterceptor messageInterceptor = new MessageInterceptor();
+        MessageInterceptor messageInterceptor = new MessageInterceptor(userRepository);
         registration.interceptors(messageInterceptor);
     }
 

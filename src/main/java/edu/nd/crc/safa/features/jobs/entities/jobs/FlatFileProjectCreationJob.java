@@ -116,7 +116,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
         projectCommitDefinition.getArtifacts().setAdded(artifactCreationResponse.getEntities());
         logger.log("%d artifacts created.", projectCommitDefinition.getArtifacts().getSize());
 
-        List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(), ProjectEntityType.ARTIFACTS);
+        List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(),
+            ProjectEntityType.ARTIFACTS);
         projectCommitDefinition.getErrors().addAll(artifactErrors);
         logger.log("%d errors found.", projectCommitDefinition.getErrors().size());
     }

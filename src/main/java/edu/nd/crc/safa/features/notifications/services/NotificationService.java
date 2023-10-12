@@ -60,6 +60,7 @@ public class NotificationService {
      * @param payload Object to be sent to topic
      */
     private void broadcastObject(String topic, Object payload) {
+        System.out.printf("%s -> %s%n", topic, payload);
         messagingTemplate.convertAndSend(topic, payload);
     }
 }

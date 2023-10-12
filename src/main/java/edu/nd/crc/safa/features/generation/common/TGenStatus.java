@@ -3,11 +3,10 @@ package edu.nd.crc.safa.features.generation.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.Nullable;
-
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.annotation.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

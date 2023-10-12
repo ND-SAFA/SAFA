@@ -118,7 +118,8 @@ public abstract class GenericVersionRepository<
             });
         Set<UUID> registeredIds = entityHashTable.keySet();
         if (!registeredIds.containsAll(baseEntityIds)) {
-            List<UUID> missingIds = baseEntityIds.stream().filter(id -> !registeredIds.contains(id)).collect(Collectors.toList());
+            List<UUID> missingIds = baseEntityIds.stream().filter(id -> !registeredIds.contains(id))
+                .collect(Collectors.toList());
             throw new SafaError(String.format("Unable to find find all : %s", missingIds));
         }
 

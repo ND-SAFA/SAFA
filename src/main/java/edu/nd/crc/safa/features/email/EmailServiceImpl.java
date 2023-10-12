@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.email;
 
-
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import jakarta.mail.internet.MimeMessage;

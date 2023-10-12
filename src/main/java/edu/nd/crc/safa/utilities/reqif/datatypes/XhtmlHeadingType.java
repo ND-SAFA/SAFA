@@ -16,7 +16,6 @@ import jakarta.xml.bind.annotation.XmlElementRef;
 import jakarta.xml.bind.annotation.XmlElementRefs;
 import jakarta.xml.bind.annotation.XmlMixed;
 import jakarta.xml.bind.annotation.XmlType;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

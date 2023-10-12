@@ -46,8 +46,8 @@ public class TestPasswordReset extends ApplicationBaseTest {
 
     @BeforeEach
     @Override
-    public void testSetup() throws Exception {
-        super.testSetup();
+    public void initTestResources() throws Exception {
+        super.initTestResources();
         Mockito.doNothing().when(emailService).send(
             Mockito.anyString(),
             Mockito.anyString(),

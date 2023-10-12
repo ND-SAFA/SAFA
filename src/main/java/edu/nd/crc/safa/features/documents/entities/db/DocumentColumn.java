@@ -39,6 +39,7 @@ public class DocumentColumn {
      * The type of data this columns contains.
      */
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(nullable = false)
     private DocumentColumnDataType dataType;
     /**

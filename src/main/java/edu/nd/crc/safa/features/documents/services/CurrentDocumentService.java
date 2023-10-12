@@ -2,14 +2,13 @@ package edu.nd.crc.safa.features.documents.services;
 
 import java.util.Optional;
 
-import jakarta.annotation.Nullable;
-
 import edu.nd.crc.safa.features.documents.entities.db.CurrentDocument;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.CurrentDocumentRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

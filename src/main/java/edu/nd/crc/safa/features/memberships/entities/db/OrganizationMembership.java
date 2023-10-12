@@ -47,8 +47,9 @@ public class OrganizationMembership {
     @ManyToOne
     private Organization organization;
 
-    @Column
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column
     private OrganizationRole role;
 
     public OrganizationMembership(SafaUser user, Organization organization, OrganizationRole role) {

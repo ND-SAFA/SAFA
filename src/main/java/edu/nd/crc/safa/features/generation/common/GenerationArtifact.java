@@ -1,11 +1,10 @@
 package edu.nd.crc.safa.features.generation.common;
 
-import jakarta.annotation.Nullable;
-
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

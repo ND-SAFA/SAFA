@@ -2,29 +2,39 @@ package edu.nd.crc.safa.features.notifications.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.notifications.AcknowledgeMessage;
 import edu.nd.crc.safa.features.notifications.WebSocketMessageService;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 
-
 @AllArgsConstructor
 public class MessageInterceptor implements ChannelInterceptor {
 
-    private final ConcurrentHashMap<UUID, List<UserAppEntity>> userProjectMap = new ConcurrentHashMap<>();
+    private final SafaUserRepository userRepository;
+
+    private final ConcurrentHashMap<UUID, List<IUser>> userProjectMap = new ConcurrentHashMap<>();
 
     @Override
     public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
@@ -40,60 +50,97 @@ public class MessageInterceptor implements ChannelInterceptor {
 
         if (command.equals(StompCommand.SUBSCRIBE)) {
             String destination = WebSocketMessageService.getDestination(message);
-            if (destination.startsWith("/user")) {
-                return;
+            DestinationPath path = new DestinationPath(destination);
+
+            if (path.isChannel("user")) {
+                authenticateUser(path, channel, accessor);
+            } else {
+                IUser user = WebSocketMessageService.getUserFromAuthenticatedMessage(message);
+                onSubscribe(user, channel, path);
             }
-            UserAppEntity user = WebSocketMessageService.getUser(message);
-            onSubscribe(user, channel, destination);
         } else {
-            UserAppEntity user = WebSocketMessageService.getUser(message);
+            System.out.println("OTHER MESSAGE:" + message);
+            IUser user = WebSocketMessageService.getUserFromAuthenticatedMessage(message);
             removeUser(user, channel);
         }
     }
 
-    private void onSubscribe(UserAppEntity user, MessageChannel channel, String destination) {
-        String[] parts = destination.split("/");
-        if (parts[1].equals("user")) {
-            return;
-        }
-        String channelName = parts[2];
-        String channelId = parts[3];
-        if (channelName.equals("project")) {
-            UUID projectId = UUID.fromString(channelId);
-            addUser(user, projectId);
+    private void authenticateUser(DestinationPath path, MessageChannel channel, StompHeaderAccessor accessor) {
+        UUID userId = path.getChannelId();
+        Optional<SafaUser> userOptional = this.userRepository.findById(userId);
 
-            List<UserAppEntity> activeProjectUsers = this.userProjectMap.get(projectId);
-            Change change = createChange(activeProjectUsers);
-            EntityChangeMessage message = new EntityChangeMessage(user, change);
-            WebSocketMessageService.sendToProject(projectId, channel, message);
+        if (userOptional.isEmpty()) {
+            String error = String.format("Unable to find user with id {%s}.", userId);
+            throw new SafaError(error);
         }
+        UserAppEntity user = new UserAppEntity(userOptional.get());
+        Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
+        sessionAttributes.put(SimpMessageHeaderAccessor.USER_HEADER, user);
+        System.out.println("AUTHENTICATED USER: " + user.getEmail());
+        WebSocketMessageService.sendToUser(user, channel, new AcknowledgeMessage("Authenticated."));
     }
 
-    private void addUser(UserAppEntity user, UUID project) {
+    private void onSubscribe(IUser user, MessageChannel channel, DestinationPath path) {
+        if (path.isChannel("project")) {
+            UUID channelId = path.getChannelId();
+            addUser(user, channelId);
+            List<IUser> activeProjectUsers = this.userProjectMap.get(channelId);
+            Change change = createChange(activeProjectUsers);
+            EntityChangeMessage message = new EntityChangeMessage(user, change);
+            WebSocketMessageService.sendToProject(channelId, channel, message);
+        }
+        String msg = String.format("%s @ %s", user.getEmail(), path.getChannelName());
+        WebSocketMessageService.sendToUser(user, channel, new AcknowledgeMessage(msg));
+    }
+
+    private void addUser(IUser user, UUID project) {
         this.userProjectMap.computeIfAbsent(project, projectId -> new ArrayList<>());
-        List<UserAppEntity> projectUsers = this.userProjectMap.get(project);
+        List<IUser> projectUsers = this.userProjectMap.get(project);
         if (!projectUsers.contains(user)) {
             projectUsers.add(user);
         }
     }
 
-    private void removeUser(UserAppEntity user, MessageChannel channel) {
+    private void removeUser(IUser user, MessageChannel channel) {
         this.userProjectMap.forEach((k, v) -> {
-            List<UserAppEntity> users =
+            List<IUser> users =
                 v.stream().filter(u -> u.getUserId().equals(user.getUserId())).collect(Collectors.toList());
 
             if (v.removeAll(users)) {
                 String projectTopic = String.format("/topic/project/%s", k);
-                WebSocketMessageService.send(projectTopic, channel, v);
+                Change newActiveMembers = createChange(v);
+                EntityChangeMessage message = new EntityChangeMessage(user, newActiveMembers);
+                WebSocketMessageService.send(projectTopic, channel, message);
             }
         });
     }
 
-    private Change createChange(List<UserAppEntity> activeUsers) {
+    private Change createChange(List<IUser> activeUsers) {
         Change change = new Change();
         change.setAction(NotificationAction.UPDATE);
         change.setEntities(activeUsers);
         change.setEntity(NotificationEntity.ACTIVE_MEMBERS);
         return change;
+    }
+}
+
+@Data
+class DestinationPath {
+    private final String channelName;
+    private final UUID channelId;
+
+    public DestinationPath(String path) {
+        String[] parts = path.split("/");
+        if (parts[1].equals("topic")) {
+            this.channelName = parts[2];
+            this.channelId = UUID.fromString(parts[3]);
+        } else {
+            this.channelName = parts[1];
+            this.channelId = UUID.fromString(parts[2]);
+        }
+    }
+
+    public boolean isChannel(String channelName) {
+        return this.channelName.equals(channelName);
     }
 }

@@ -29,8 +29,12 @@ public class GenerateLinksStep implements IFlatFileBuilderStep {
             generatedLinks);
 
         for (TraceAppEntity traceAppEntity : generatedLinks) {
-            serviceProvider.getTraceLinkRepository().getByProjectAndSourceAndTarget(projectVersion.getProject(),
-                traceAppEntity.getSourceName(), traceAppEntity.getTargetName()).ifPresent(t -> traceAppEntity.setId(t.getTraceLinkId()));
+            serviceProvider
+                .getTraceLinkRepository()
+                .getByProjectAndSourceAndTarget(
+                    projectVersion.getProject(),
+                    traceAppEntity.getSourceName(), traceAppEntity.getTargetName())
+                .ifPresent(t -> traceAppEntity.setId(t.getTraceLinkId()));
         }
     }
 }

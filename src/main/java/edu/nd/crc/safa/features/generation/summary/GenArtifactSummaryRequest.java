@@ -2,10 +2,9 @@ package edu.nd.crc.safa.features.generation.summary;
 
 import java.util.List;
 
-import jakarta.annotation.Nullable;
-
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

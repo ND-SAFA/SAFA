@@ -11,6 +11,7 @@ public interface IFlatFileBuilderStep {
     /**
      * Performs step on flat file builder.
      *
+     * @param state           The state of the flat file project builder.
      * @param serviceProvider Provide access to their services.
      */
     void perform(FlatFileBuilderArgs state, ServiceProvider serviceProvider) throws Exception;

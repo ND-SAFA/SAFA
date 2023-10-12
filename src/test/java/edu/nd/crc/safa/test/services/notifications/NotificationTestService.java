@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.test.services.notifications;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,8 +11,6 @@ import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.notifications.AcknowledgeMessage;
-import edu.nd.crc.safa.features.notifications.AuthenticationMessage;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
@@ -93,7 +89,6 @@ public class NotificationTestService {
     public NotificationTestService initializeUser(IUser user, String token) {
         try {
             this.startSession(user);
-            this.authenticate(user, token);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -110,11 +105,7 @@ public class NotificationTestService {
      */
     public void authenticate(IUser user, String token) throws JsonProcessingException, InterruptedException {
         assert token != null && !token.isEmpty();
-        AuthenticationMessage authMessage = new AuthenticationMessage(token);
-        UUID clientId = getClientId(user);
-        this.send(clientId, TopicCreator.getAuthenticationTopic(), authMessage);
-        AcknowledgeMessage ack = getNextMessage(clientId, AcknowledgeMessage.class);
-        assertEquals("OK", ack.getMessage());
+        this.subscribeToUser(user);
     }
 
     /**
@@ -160,8 +151,8 @@ public class NotificationTestService {
      * @param user The user subscribing to topic.
      */
     public void subscribeToUser(IUser user) {
-        String projectVersionSubscriptionDestination = TopicCreator.getUserTopic(user);
-        this.server.subscribe(getClientId(user), projectVersionSubscriptionDestination);
+        String userTopic = TopicCreator.getUserTopic(user);
+        this.server.subscribe(getClientId(user), userTopic);
     }
 
     /**

@@ -273,6 +273,7 @@ public class AttributeService {
      * Saves a front-end attribute entity into the database. This function assumes the user
      * has permission to modify project attributes and does not check to ensure this is true.
      *
+     * @param user      The user saving the entity.
      * @param appEntity The attribute object from the front-end.
      * @param project   The project the attribute is a part of.
      * @param isNew     Whether this is a new attribute being created or an existing attribute being updated.

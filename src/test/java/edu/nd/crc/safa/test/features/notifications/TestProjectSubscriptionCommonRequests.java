@@ -18,7 +18,9 @@ class TestProjectSubscriptionCommonRequests extends ApplicationBaseTest {
         List<String> expectedEmails = List.of(currentUserName, otherUserName);
         this.rootBuilder
             .log("Creating base project.")
-            .build((s, v) -> v.project(currentUser).save("project"))
+            .build((s, v) -> v
+                .project(currentUser)
+                .save("project"))
             .and("Root User: Subscribing to project.")
             .notifications((s, n) -> n
                 .initializeUser(currentUser, this.token)

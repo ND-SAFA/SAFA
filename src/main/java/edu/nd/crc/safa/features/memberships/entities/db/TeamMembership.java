@@ -46,9 +46,10 @@ public class TeamMembership {
     @JdbcTypeCode(SqlTypes.BINARY)
     @JoinColumn(name = "team_id")
     private Team team;
-
-    @Column
+    
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Enumerated(EnumType.STRING)
+    @Column
     private TeamRole role;
 
     public TeamMembership(SafaUser user, Team team, TeamRole role) {

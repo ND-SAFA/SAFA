@@ -48,8 +48,9 @@ public class Document implements Serializable {
     @JsonIgnore
     private Project project;
 
-    @Column(name = "document_type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "document_type", nullable = false)
     private DocumentType type;
 
     @Column(name = "name")

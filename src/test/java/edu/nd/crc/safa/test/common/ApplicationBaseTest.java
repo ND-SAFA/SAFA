@@ -71,19 +71,42 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         return String.format("%s-%s", userName, TOKEN);
     }
 
+    /**
+     * Initializes test environment.
+     */
     @PostConstruct
-    public void init() throws Exception {
+    public void initTestEnvironment() throws Exception {
         initJobLauncher();
         setLegacyModeInH2Database();
     }
 
+    /**
+     * Initializes the resources needed for each individual test.
+     */
     @BeforeEach
-    public void testSetup() throws Exception {
+    public void initTestResources() throws Exception {
         initServices();
         initDefaultAccount();
         ReflectionTestUtils.setField(ServiceProvider.class, "instance", this.serviceProvider);
     }
 
+    /**
+     * Clears data in database.
+     *
+     * @throws IOException If error occurs while deleting data.
+     */
+    @AfterEach
+    protected void clearData() throws IOException {
+        this.serviceProvider.getJobRepository().deleteAll();
+        this.safaUserRepository.deleteAll();
+        this.dbEntityBuilder.initializeData();
+        this.jsonBuilder.initializeData();
+        this.rootBuilder.clear();
+    }
+
+    /**
+     * Creates default account and sets the current authorization to it.
+     */
     private void initDefaultAccount() throws Exception {
         this.currentUser = this.rootBuilder
             .authorize(a -> a
@@ -142,20 +165,6 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
             statement.execute(query);
         }
         connection.close();
-    }
-
-    /**
-     * Clears data in database.
-     *
-     * @throws IOException If error occurs while deleting data.
-     */
-    @AfterEach
-    protected void clearData() throws IOException {
-        this.serviceProvider.getJobRepository().deleteAll();
-        this.safaUserRepository.deleteAll();
-        this.dbEntityBuilder.initializeData();
-        this.jsonBuilder.initializeData();
-        this.rootBuilder.clear();
     }
 
     /**

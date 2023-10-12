@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
+import edu.nd.crc.safa.features.users.entities.IUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -27,13 +27,14 @@ public class WebSocketMessageService {
         return destination;
     }
 
-    public static UserAppEntity getUser(Message message) {
+    public static IUser getUserFromAuthenticatedMessage(Message message) {
         MessageHeaders messageHeaders = message.getHeaders();
-        ConcurrentHashMap attributes = messageHeaders.get(SimpMessageHeaderAccessor.SESSION_ATTRIBUTES, ConcurrentHashMap.class);
+        ConcurrentHashMap attributes = messageHeaders.get(SimpMessageHeaderAccessor.SESSION_ATTRIBUTES,
+            ConcurrentHashMap.class);
         if (attributes == null) {
             throw new SafaError("Session attributes are empty. Has the user authenticated?");
         }
-        UserAppEntity user = (UserAppEntity) attributes.get(SimpMessageHeaderAccessor.USER_HEADER);
+        IUser user = (IUser) attributes.get(SimpMessageHeaderAccessor.USER_HEADER);
         if (user == null) {
             throw new SafaError("Session has no user. Has the user authenticated?");
         }
@@ -45,13 +46,17 @@ public class WebSocketMessageService {
         send(topic, channel, object);
     }
 
+    public static void sendToUser(IUser user, MessageChannel channel, Object object) {
+        String topic = TopicCreator.getUserTopic(user);
+        send(topic, channel, object);
+    }
+
     public static void send(String topic, MessageChannel channel, Object object) {
         try {
             SimpMessagingTemplate simp = new SimpMessagingTemplate(channel);
             ObjectMapper mapper = ObjectMapperConfig.create();
 
             simp.convertAndSend(topic, mapper.writeValueAsBytes(object));
-            System.out.printf("%s -> %s%n", topic, object);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

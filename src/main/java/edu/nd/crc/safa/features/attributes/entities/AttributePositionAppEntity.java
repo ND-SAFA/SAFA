@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.attributes.entities;
 
-
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

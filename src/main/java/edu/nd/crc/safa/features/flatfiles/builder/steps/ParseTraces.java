@@ -30,7 +30,8 @@ public class ParseTraces implements IFlatFileBuilderStep {
         for (TraceAppEntity traceAppEntity : tracesAdded) {
             serviceProvider
                 .getTraceLinkRepository()
-                .getByProjectAndSourceAndTarget(projectVersion.getProject(), traceAppEntity.getSourceName(), traceAppEntity.getTargetName())
+                .getByProjectAndSourceAndTarget(projectVersion.getProject(), traceAppEntity.getSourceName(),
+                    traceAppEntity.getTargetName())
                 .ifPresent(t -> traceAppEntity.setId(t.getTraceLinkId()));
         }
         projectCommitDefinition.getTraces().setAdded(traceCreationResponse.getEntities());

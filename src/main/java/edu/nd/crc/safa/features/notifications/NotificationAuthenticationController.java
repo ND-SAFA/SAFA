@@ -19,23 +19,30 @@ public class NotificationAuthenticationController {
     private final NotificationService notificationService;
 
     @MessageMapping("/auth")
-    public void authenticateUser(AuthenticationMessage message, SimpMessageHeaderAccessor accessor) {
-        String token = message.getToken();
+    public void authenticateUser(AuthenticationMessage incomingMessage, SimpMessageHeaderAccessor accessor) {
+        System.out.println("ATTENTION:" + incomingMessage);
+        String token = incomingMessage.getToken();
+        Object outgoingMessage;
         if (token == null || token.isEmpty()) {
-            throw new SafaError("Token is null or empty, invalid token.");
+            ErrorMessage errorMessage = new ErrorMessage();
+            errorMessage.setMessage("Token is null or empty, invalid token.");
+            outgoingMessage = errorMessage;
         }
-        UserAppEntity user = authorizationService.getUser(token);
-        Map<String, Object> sessionAttributes = getSessionAttributes(accessor);
-        sessionAttributes.put(SimpMessageHeaderAccessor.USER_HEADER, user);
-        notificationService.sendToUser(user, new AcknowledgeMessage("OK"));
+        try {
+            UserAppEntity user = authorizationService.getUser(token);
+            outgoingMessage = new AcknowledgeMessage("OK");
+            Map<String, Object> sessionAttributes = getSessionAttributes(accessor);
+            sessionAttributes.put(SimpMessageHeaderAccessor.USER_HEADER, user);
+            notificationService.sendToUser(user, outgoingMessage);
+        } catch (Exception e) {
+            outgoingMessage = new ErrorMessage(e.getMessage());
+        }
     }
 
     @MessageMapping("/chat")
     public void chat(ChatMessage message, SimpMessageHeaderAccessor accessor) {
         UserAppEntity user = getUser(accessor);
-        System.out.println(message.getMessage() + ":" + user.getEmail());
     }
-
 
     public Map<String, Object> getSessionAttributes(SimpMessageHeaderAccessor accessor) {
         Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
@@ -47,8 +54,6 @@ public class NotificationAuthenticationController {
 
     public UserAppEntity getUser(SimpMessageHeaderAccessor accessor) {
         Map<String, Object> sessionAttributes = getSessionAttributes(accessor);
-        UserAppEntity user =
-            (UserAppEntity) sessionAttributes.get(SimpMessageHeaderAccessor.USER_HEADER);
-        return user;
+        return (UserAppEntity) sessionAttributes.get(SimpMessageHeaderAccessor.USER_HEADER);
     }
 }

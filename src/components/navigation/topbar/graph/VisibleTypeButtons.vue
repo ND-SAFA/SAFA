@@ -1,5 +1,10 @@
 <template>
-  <type-buttons :hidden-types="hiddenTypes" @click="handleClick" />
+  <type-buttons
+    v-if="layoutStore.isTreeMode"
+    :default-visible="!smallWindow"
+    :hidden-types="hiddenTypes"
+    @click="handleClick"
+  />
 </template>
 
 <script lang="ts">
@@ -14,8 +19,10 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactTypeSchema } from "@/types";
-import { selectionStore } from "@/hooks";
+import { layoutStore, selectionStore, useScreen } from "@/hooks";
 import { TypeButtons } from "@/components/common";
+
+const { smallWindow } = useScreen();
 
 const hiddenTypes = computed(() => selectionStore.ignoreTypes);
 

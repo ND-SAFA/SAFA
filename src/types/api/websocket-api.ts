@@ -59,6 +59,7 @@ export const notifyUserEntities: EntityType[] = [
   "VERSION",
   "WARNINGS",
   "LAYOUT",
+  "TYPES",
 ];
 
 /**

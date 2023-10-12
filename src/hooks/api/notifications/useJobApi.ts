@@ -66,7 +66,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
             logItems[logItems.length - 1]?.timestamp || ""
           ),
           entry,
-          error: entry.includes("rror"),
+          error: entry.includes("Error executing job"),
         };
       });
     });
@@ -114,8 +114,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
     await jobApi.handleRequest(
       async () => {
         if (projectStore.projectId) {
-          const projectJobs = await getProjectJobs(projectStore.projectId);
-          jobStore.projectJobs = projectJobs;
+          jobStore.projectJobs = await getProjectJobs(projectStore.projectId);
         }
 
         const userJobs = await getUserJobs();

@@ -6,6 +6,14 @@
       </template>
     </list-item>
 
+    <list-item
+      to=""
+      title="Send Feedback"
+      icon="feedback"
+      clickable
+      @click="handleFeedback"
+    />
+
     <notifications />
 
     <list-item
@@ -34,7 +42,7 @@ export default {
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { NavOption } from "@/types";
-import { ENABLED_FEATURES } from "@/util";
+import { ENABLED_FEATURES, FEEDBACK_LINK } from "@/util";
 import { sessionStore } from "@/hooks";
 import { Routes } from "@/router";
 import { ListItem } from "@/components/common";
@@ -63,4 +71,11 @@ const options = computed<NavOption[]>(() => [
     tooltip: sessionStore.userEmail,
   },
 ]);
+
+/**
+ * Routes the user to the feedback page.
+ */
+function handleFeedback(): void {
+  window.open(FEEDBACK_LINK);
+}
 </script>

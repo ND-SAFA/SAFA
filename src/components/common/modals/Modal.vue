@@ -22,7 +22,7 @@
           />
         </flex-box>
         <separator />
-        <q-linear-progress v-if="!!props.loading" indeterminate />
+        <q-linear-progress v-if="props.loading" indeterminate />
         <typography
           v-if="!!props.subtitle"
           t="2"

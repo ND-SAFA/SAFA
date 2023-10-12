@@ -10,7 +10,7 @@
     :loading="props.loading"
     :expanded="props.expandable ? expandedRows : undefined"
     :sort="handleSort"
-    separator="cell"
+    separator="horizontal"
   >
     <template
       #top="scope: { inFullscreen: boolean; toggleFullscreen: () => void }"
@@ -114,7 +114,10 @@ const groupedRows = computed(() => {
 
   let sortIdx = 0;
 
-  return Object.entries<TableGroupRow[]>(rowsByGroup).flatMap(
+  return Object.entries<TableGroupRow[]>(rowsByGroup).flatMap<
+    TableGroupRow[],
+    TableRow[]
+  >(
     ([$groupValue, groupRows]) => [
       {
         id: `${groupBy.value}::${$groupValue}`,
@@ -125,7 +128,8 @@ const groupedRows = computed(() => {
         $sortIdx: sortIdx++,
       },
       ...groupRows.map((row) => ({ ...row, $sortIdx: sortIdx++ })),
-    ]
+    ],
+    []
   );
 });
 

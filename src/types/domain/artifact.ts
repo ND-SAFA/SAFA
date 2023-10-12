@@ -1,5 +1,4 @@
-import { AttributeCollectionSchema } from "./attribute";
-import { DocumentType } from "./document";
+import { AttributeCollectionSchema } from "@/types";
 
 /**
  * Enumerates the types of FTA nodes.
@@ -47,18 +46,6 @@ export interface ArtifactSchema {
    * The ids of documents that display this artifact.
    */
   documentIds: string[];
-  /**
-   * The type of document this artifact is displayed in.
-   */
-  documentType?: DocumentType;
-  /**
-   * For FTA logic nodes,  the logical operator of this node.
-   */
-  logicType?: FTANodeType;
-  /**
-   * For safety case nodes, the type of safety case node.
-   */
-  safetyCaseType?: SafetyCaseType;
   /**
    * Represents a collection of custom attributes on an artifact.
    */

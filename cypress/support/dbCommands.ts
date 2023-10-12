@@ -1,5 +1,3 @@
-import { Routes } from "@/fixtures";
-
 const apiUrl = "https://dev-api.safa.ai";
 
 Cypress.on("window:before:load", (window) => {
@@ -12,7 +10,7 @@ Cypress.Commands.add(
   {
     prevSubject: true,
   },
-  (subject: Cypress.Response<any>, cb) => {
+  (subject: Cypress.Response<unknown>, cb) => {
     return cy.request(cb(subject));
   }
 );
@@ -28,7 +26,7 @@ Cypress.Commands.add("dbResetJobs", () => {
     .then(() => {
       cy.request<{ id: string }[]>({
         method: "GET",
-        url: `${apiUrl}/jobs`,
+        url: `${apiUrl}/jobs/user`,
       }).then(({ body: jobs }) =>
         jobs.forEach((job) =>
           cy.request({

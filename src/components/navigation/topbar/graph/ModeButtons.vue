@@ -10,7 +10,6 @@
     />
     <text-button
       v-bind="buttonProps(options.tree)"
-      :disabled="isTreeDisabled"
       :hide-label="smallWindow"
       label="Tree"
       data-cy="button-nav-tree"
@@ -43,15 +42,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { GraphMode } from "@/types";
-import {
-  appStore,
-  deltaStore,
-  documentStore,
-  layoutStore,
-  useScreen,
-} from "@/hooks";
+import { appStore, deltaStore, layoutStore, useScreen } from "@/hooks";
 import { TextButton } from "@/components/common";
 import DeltaModeButton from "./DeltaModeButton.vue";
 
@@ -65,8 +58,6 @@ const options: Record<GraphMode, GraphMode> = {
 const { smallWindow } = useScreen();
 
 const value = ref<GraphMode[]>([]);
-
-const isTreeDisabled = computed(() => documentStore.isTableOnlyDocument);
 
 /**
  * Returns props for a mode button.
@@ -140,11 +131,6 @@ watch(
 
 watch(
   () => deltaStore.inDeltaView,
-  () => updateValue()
-);
-
-watch(
-  () => isTreeDisabled.value,
   () => updateValue()
 );
 </script>

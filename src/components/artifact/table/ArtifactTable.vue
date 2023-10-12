@@ -68,7 +68,7 @@
         <artifact-name-display :artifact="row" display-tooltip />
       </template>
 
-      <template #body-cell-type="{ row }">
+      <template #body-cell-type="{ row }: { row: FlatArtifact }">
         <attribute-chip :value="row.type" artifact-type />
       </template>
 

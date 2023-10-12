@@ -1,6 +1,6 @@
 <template>
   <q-tr v-if="groupBy" data-cy="artifact-table-group">
-    <q-td colspan="100%" class="bg-background">
+    <q-td colspan="100%">
       <div>
         <flex-box align="center" justify="between">
           <flex-box align="center">
@@ -75,7 +75,7 @@
     </q-td>
   </q-tr>
   <q-tr v-if="!groupBy" v-show="props.expand" :props="props.quasarProps">
-    <q-td colspan="100%">
+    <q-td colspan="100%" class="bg-background">
       <slot name="body-expanded" :row="props.row" />
     </q-td>
   </q-tr>

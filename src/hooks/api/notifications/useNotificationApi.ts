@@ -212,6 +212,8 @@ export const useNotificationApi = defineStore(
      */
     async function handleEntityChangeMessage(frame: Frame): Promise<void> {
       const message: ChangeMessageSchema = JSON.parse(frame.body);
+      const project = await getChanges(versionId, message);
+      let hasLayoutChange = false; // Layout changes are currently disabled.
       console.log("HANDLING MESSAGE:", message);
 
       // Step - Iterate through message and delete entities.

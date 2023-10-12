@@ -37,6 +37,7 @@ export type IconVariant =
   | "generate-summaries"
   | "generate-traces"
   | "notification"
+  | "feedback"
   | "share"
   | "logs"
   | "more"

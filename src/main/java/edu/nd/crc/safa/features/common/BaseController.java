@@ -9,6 +9,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -124,6 +125,12 @@ public abstract class BaseController {
     public SafaError handleGenericError(Exception ex) {
         ex.printStackTrace();
         return new SafaError("An unexpected server error occurred.", ex);
+    }
+
+    @ExceptionHandler(MissingPermissionException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public MissingPermissionException handleMissingPermission(MissingPermissionException ex) {
+        return ex;
     }
 
     private String createValidationMessage(ObjectError error) {

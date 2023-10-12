@@ -2,18 +2,18 @@ import { defineStore } from "pinia";
 
 import { ArtifactSchema, DocumentArtifacts, FlatArtifact } from "@/types";
 import {
-  standardizeValueArray,
+  collectByField,
   flattenArtifact,
   preserveMatches,
   removeMatches,
-  collectByField,
+  standardizeValueArray,
 } from "@/util";
 import {
-  timStore,
   documentStore,
-  projectStore,
   layoutStore,
+  projectStore,
   selectionStore,
+  timStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -61,10 +61,13 @@ export const useArtifacts = defineStore("artifacts", {
      */
     addOrUpdateArtifacts(newArtifacts: ArtifactSchema[]): void {
       const newIds = newArtifacts.map(({ id }) => id);
+      console.log("BEFORE ARTIFACTS:", this.allArtifacts);
       const updatedArtifacts = [
         ...removeMatches(this.allArtifacts, "id", newIds),
         ...newArtifacts,
       ];
+
+      console.log("UPDATED ARTIFACTS:", updatedArtifacts);
 
       documentStore.addDocumentArtifacts(newIds);
       this.initializeArtifacts({

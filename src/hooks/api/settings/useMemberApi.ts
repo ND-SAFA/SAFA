@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
+import { Message } from "webstomp-client";
 import {
   IdentifierSchema,
   IOHandlerCallback,
@@ -12,14 +13,21 @@ import {
 } from "@/types";
 import { removeMatches } from "@/util";
 import {
-  useApi,
   getProjectApiStore,
   logStore,
   membersStore,
-  sessionStore,
   projectStore,
+  sessionStore,
+  stompApiStore,
+  useApi,
 } from "@/hooks";
-import { deleteMember, editMember, createMember, getMembers } from "@/api";
+import {
+  createMember,
+  deleteMember,
+  editMember,
+  fillEndpoint,
+  getMembers,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -149,12 +157,22 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
     );
   }
 
+  async function subscribeToUser(): Promise<void> {
+    const userId = sessionStore.userId;
+    const topic = fillEndpoint("userTopic", { userId });
+    console.log("USER TOPIC:" + topic);
+    await stompApiStore.subscribeToStomp(topic, (message: Message) => {
+      console.log("USER MESSAGE:" + message.body);
+    });
+  }
+
   return {
     loading,
     handleReload,
     handleInvite,
     handleDelete,
     handleSaveRole,
+    subscribeToUser,
   };
 });
 

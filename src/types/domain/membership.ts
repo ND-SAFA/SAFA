@@ -89,6 +89,10 @@ export interface MembershipSchema extends MemberEntitySchema {
    * The role(s) of the member.
    */
   role: MemberRole;
+  /**
+   * Whether the user is currently logged in.
+   */
+  active?: boolean;
 }
 
 /**

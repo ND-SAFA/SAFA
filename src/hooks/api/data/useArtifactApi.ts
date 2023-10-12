@@ -1,18 +1,16 @@
 import { defineStore } from "pinia";
 
 import { computed, ref, watch } from "vue";
-import { ArtifactSchema, IOHandlerCallback, ArtifactApiHook } from "@/types";
+import { ArtifactApiHook, ArtifactSchema, IOHandlerCallback } from "@/types";
 import {
-  useApi,
-  artifactStore,
-  logStore,
-  projectStore,
-  traceApiStore,
-  traceStore,
   artifactCommitApiStore,
   artifactSaveStore,
+  artifactStore,
+  logStore,
+  traceApiStore,
+  traceStore,
+  useApi,
 } from "@/hooks";
-import { getDoesArtifactExist } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -51,19 +49,25 @@ export const useArtifactApi = defineStore(
           if (!name) {
             artifactSaveStore.isNameValid = false;
             nameLoading.value = false;
+            console.log("NOT NAME");
           } else if (!artifactSaveStore.hasNameChanged) {
             artifactSaveStore.isNameValid = true;
             nameLoading.value = false;
+            console.log("NO NAME CHANGE");
           } else {
-            getDoesArtifactExist(projectStore.versionId, name)
-              .then((nameExists) => {
-                artifactSaveStore.isNameValid = !nameExists;
-                nameLoading.value = false;
-              })
-              .catch(() => {
-                artifactSaveStore.isNameValid = false;
-                nameLoading.value = false;
-              });
+            //TODO: Fix 403 on validate.
+            // getDoesArtifactExist(projectStore.versionId, name)
+            //   .then((nameExists) => {
+            //     artifactSaveStore.isNameValid = !nameExists;
+            //     nameLoading.value = false;
+            //   })
+            //   .catch(() => {
+            //     artifactSaveStore.isNameValid = false;
+            //     nameLoading.value = false;
+            //   });
+            artifactSaveStore.isNameValid = true;
+            nameLoading.value = false;
+            console.log("SKIPPPED VALIDATION");
           }
         }, 500);
       });

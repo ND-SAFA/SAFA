@@ -1,6 +1,6 @@
 <template>
   <div class="full-width nav-account">
-    <list-item to="" title="">
+    <list-item title="" to="">
       <template #icon>
         <saving-icon />
       </template>
@@ -11,11 +11,12 @@
     <list-item
       v-for="option in options"
       :key="option.label"
-      :to="option.path"
-      :icon="option.icon"
-      :title="option.label"
-      :subtitle="option.subtitle"
       :color="option.color"
+      :icon="option.icon"
+      :subtitle="option.subtitle"
+      :title="option.label"
+      :to="option.path"
+      :tooltip="option.tooltip"
     />
   </div>
 </template>
@@ -29,7 +30,7 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { NavOption } from "@/types";
@@ -59,6 +60,7 @@ const options = computed<NavOption[]>(() => [
     icon: "account",
     path: Routes.ACCOUNT,
     color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",
+    tooltip: sessionStore.userEmail,
   },
 ]);
 </script>

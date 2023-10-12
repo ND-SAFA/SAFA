@@ -1,9 +1,13 @@
-import { Message, Subscription } from "webstomp-client";
+import { Message, Subscription, SubscriptionsMap } from "webstomp-client";
+import { Ref } from "vue";
 
 /**
  * A hook for using stomp websocket messages.
  */
 export interface StompApiHook {
+  isAuthenticated: Ref<boolean>;
+  isConnected: Ref<boolean>;
+
   /**
    * Connects to BEND websocket server and tries to reconnect if
    * the connection fails.
@@ -17,6 +21,7 @@ export interface StompApiHook {
     reconnectWaitTime?: number,
     isReconnect?: boolean
   ): Promise<void>;
+
   /**
    * Subscribes to a websocket destination and returns the subscription.
    *
@@ -27,8 +32,11 @@ export interface StompApiHook {
     destination: string,
     callback?: (message: Message) => void
   ): Promise<Subscription | undefined>;
+
   /**
    * Clears all subscriptions of the current user.
    */
   clearStompSubscriptions(): void;
+
+  getSubscriptions(): SubscriptionsMap | undefined;
 }

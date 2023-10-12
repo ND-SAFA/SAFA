@@ -1,13 +1,13 @@
 <template>
   <div class="full-width">
     <flex-box
-      full-width
       :wrap="smallWindow"
-      justify="between"
       align="center"
+      full-width
+      justify="between"
       y="2"
     >
-      <flex-box align="center" :b="smallWindow ? '1' : ''">
+      <flex-box :b="smallWindow ? '1' : ''" align="center">
         <project-selector />
         <version-selector />
       </flex-box>
@@ -30,7 +30,7 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 import { useScreen } from "@/hooks";

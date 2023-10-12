@@ -1,19 +1,19 @@
 import { defineStore } from "pinia";
 import {
+  GenerationModelSchema,
   IdentifierSchema,
   ProjectSchema,
-  GenerationModelSchema,
   VersionSchema,
 } from "@/types";
 import { buildProject, buildProjectIdentifier, removeMatches } from "@/util";
 import {
-  selectionStore,
-  logStore,
-  warningStore,
-  documentStore,
-  subtreeStore,
   attributesStore,
+  documentStore,
+  logStore,
+  selectionStore,
+  subtreeStore,
   timStore,
+  warningStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 

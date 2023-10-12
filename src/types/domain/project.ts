@@ -1,16 +1,16 @@
 import {
   ArtifactSchema,
   ArtifactTypeSchema,
+  AttributeLayoutSchema,
+  AttributeSchema,
   DocumentSchema,
+  GenerationModelSchema,
   LayoutPositionsSchema,
   MembershipSchema,
-  TraceLinkSchema,
-  GenerationModelSchema,
-  WarningSchema,
-  AttributeSchema,
-  AttributeLayoutSchema,
   SubtreeMapSchema,
+  TraceLinkSchema,
   TraceMatrixSchema,
+  WarningSchema,
 } from "@/types";
 
 /**
@@ -93,7 +93,6 @@ export interface ProjectSchema extends IdentifierSchema {
    * The trace matrices in the project.
    */
   traceMatrices: TraceMatrixSchema[];
-
   /**
    * The current document id.
    */
@@ -107,7 +106,6 @@ export interface ProjectSchema extends IdentifierSchema {
    * A collection of warnings on project artifacts.
    */
   warnings: Record<string, WarningSchema[]>;
-
   /**
    * Map of artifact ids to their position in the default graph.
    */
@@ -116,12 +114,10 @@ export interface ProjectSchema extends IdentifierSchema {
    * Map of artifact ids to their subtree information.
    */
   subtrees: SubtreeMapSchema;
-
   /**
    * List of trained project models.
    */
   models: GenerationModelSchema[];
-
   /**
    * A list of custom attributes used on this project.
    */

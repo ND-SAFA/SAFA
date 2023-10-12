@@ -38,7 +38,8 @@ export type EntityType =
   | "SUBTREES"
   | "MODELS"
   | "ATTRIBUTES"
-  | "ATTRIBUTE_LAYOUTS";
+  | "ATTRIBUTE_LAYOUTS"
+  | "ACTIVE_MEMBERS";
 
 /**
  * Represents list of changed entities.
@@ -47,6 +48,7 @@ export interface ChangeSchema {
   entity: EntityType;
   action: ActionType;
   entityIds: string[];
+  entities: object[];
 }
 
 /**

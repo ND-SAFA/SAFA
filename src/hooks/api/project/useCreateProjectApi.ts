@@ -74,7 +74,7 @@ export const useCreateProjectApi = defineStore(
           });
 
           const job = await createProjectUploadJob(formData);
-
+          console.log("Job Created:", job);
           await jobApiStore.handleCreate(job);
         },
         {

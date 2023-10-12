@@ -1,11 +1,16 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import SockJS from "sockjs-client";
-import Stomp, { Client, Message, Subscription } from "webstomp-client";
-
+import Stomp, {
+  Client,
+  Message,
+  Subscription,
+  SubscriptionsMap,
+} from "webstomp-client";
 import { StompApiHook } from "@/types";
-import { logStore } from "@/hooks";
+import { logStore, sessionStore } from "@/hooks";
 import {
+  fillEndpoint,
   MAX_RECONNECT_ATTEMPTS,
   RECONNECT_WAIT_TIME,
   WEBSOCKET_URL,
@@ -20,6 +25,8 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   const socket = ref<WebSocket>();
   const reconnectInterval = ref<NodeJS.Timeout>();
   const reconnectAttempts = ref(0);
+  const isConnected = ref(false);
+  const isAuthenticated = ref(false);
 
   /**
    * Returns the current stomp client, creating one if none exists.
@@ -36,7 +43,7 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
       reconnect
     ) {
       try {
-        socket.value = new SockJS(WEBSOCKET_URL(), { DEBUG: false });
+        socket.value = new SockJS(WEBSOCKET_URL());
         socket.value.onclose = () => {
           logStore.onDevInfo("Closing WebSocket.");
           connectStomp().then();
@@ -65,6 +72,7 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
       if (stomp.connected) {
         logStore.onDevInfo("Client is connected to WebSocket.");
         clearInterval(reconnectInterval.value);
+        isConnected.value = true;
         return resolve();
       }
 
@@ -87,11 +95,12 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
           clearInterval(reconnectInterval.value);
 
           reconnectAttempts.value = 0;
+          isConnected.value = true;
           resolve();
         },
         () => {
           logStore.onDevInfo("Re-connecting with WebSocket.");
-
+          isConnected.value = false;
           clearInterval(reconnectInterval.value);
 
           reconnectInterval.value = setInterval(function () {
@@ -117,16 +126,25 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     destination: string,
     callback?: (message: Message) => void
   ): Promise<Subscription | undefined> {
+    console.log("subscribing to stomp.");
     await connectStomp();
 
     const stomp = getStomp();
 
     if (!stomp) return;
 
+    const userId = sessionStore.userId;
+    const userTopic = fillEndpoint("userTopic", { userId });
+    console.log("SUB:", destination);
+    stomp.subscribe(userTopic, (m) => {
+      isAuthenticated.value = true;
+      console.log("USER MSG:", m);
+    });
     return stomp.subscribe(destination, callback);
   }
 
   function clearStompSubscriptions(): void {
+    console.log("clearing stomp");
     const stomp = getStomp();
 
     if (!stomp) return;
@@ -136,10 +154,18 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     subscriptionIds.forEach((subId) => stomp.unsubscribe(subId));
   }
 
+  function getSubscriptions(): SubscriptionsMap | undefined {
+    const stomp = getStomp();
+    return stomp?.subscriptions;
+  }
+
   return {
     connectStomp,
     subscribeToStomp,
     clearStompSubscriptions,
+    getSubscriptions,
+    isConnected,
+    isAuthenticated,
   };
 });
 

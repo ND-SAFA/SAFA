@@ -11,7 +11,7 @@ if (!process.env.VUE_APP_API_ENDPOINT) {
  * The number of times to attempt to reconnect to server
  * if connection is lost.
  */
-export const MAX_RECONNECT_ATTEMPTS = 20;
+export const MAX_RECONNECT_ATTEMPTS = 1;
 /**
  * The amount of time to
  */
@@ -46,9 +46,10 @@ export enum Endpoint {
   getProjectJobs = "jobs/project/:projectId",
   deleteJobById = "jobs/:jobId",
   getJobLog = "jobs/:jobId/logs",
-  jobTopic = "/topic/:jobId",
-  projectTopic = "/topic/:projectId",
-  versionTopic = "/topic/:versionId",
+  jobTopic = "/topic/jobs/:jobId",
+  userTopic = "/user/:userId/updates",
+  projectTopic = "/topic/project/:projectId",
+  versionTopic = "/topic/version/:versionId",
 
   // Projects
   project = "projects",
@@ -168,7 +169,7 @@ export function fillEndpoint(
   endpoint: keyof typeof Endpoint,
   pathVariables: Record<string, string> = {}
 ): string {
-  let filledPath: string = endpoint;
+  let filledPath: string = Endpoint[endpoint];
 
   Object.entries(pathVariables).forEach(([id, value]) => {
     filledPath = filledPath.replace(`:${id}`, value);

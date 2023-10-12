@@ -1,48 +1,49 @@
 <template>
   <q-drawer
-    persistent
-    model-value
-    elevated
     :breakpoint="0"
-    :width="260"
-    :mini-width="65"
     :mini="!sidebarOpen"
+    :mini-width="65"
+    :width="260"
+    elevated
+    model-value
+    persistent
   >
     <flex-box
       v-if="sidebarOpen"
+      align="center"
+      class="nav-sidebar-header-open"
       full-width
       justify="between"
-      align="center"
       y="2"
-      class="nav-sidebar-header-open"
     >
-      <safa-icon clickable :hidden="!sidebarOpen" @click="handleLogoClick" />
+      <safa-icon :hidden="!sidebarOpen" clickable @click="handleLogoClick" />
       <icon-button
-        icon="nav-toggle"
-        tooltip="Close sidebar"
         color="primary"
         data-cy="button-sidebar-close"
+        icon="nav-toggle"
+        tooltip="Close sidebar"
         @click="sidebarOpen = false"
       />
     </flex-box>
     <flex-box
       v-else
-      justify="center"
       align="center"
-      full-width
-      y="3"
       class="nav-sidebar-header"
+      full-width
+      justify="center"
+      y="3"
     >
       <icon-button
+        data-cy="button-sidebar-open"
         icon="safa"
         tooltip="Open sidebar"
-        data-cy="button-sidebar-open"
         @click="sidebarOpen = true"
       />
     </flex-box>
 
     <nav-options />
     <nav-account />
+    <project-members />
   </q-drawer>
 </template>
 
@@ -55,13 +56,14 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, onMounted } from "vue";
 import { appStore, useScreen } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
+import ProjectMembers from "./ProjectMembers.vue";
 
 const { smallWindow } = useScreen();
 

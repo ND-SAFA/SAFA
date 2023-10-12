@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { MemberEntitySchema, MembershipSchema, MembershipType } from "@/types";
 import { removeMatches } from "@/util";
-import { orgStore, teamStore, projectStore } from "@/hooks";
+import { orgStore, projectStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -10,6 +10,12 @@ import { pinia } from "@/plugins";
  */
 export const useMembers = defineStore("members", {
   getters: {
+    /**
+     * @return Active members of the project.
+     */
+    activeMembers(): MembershipSchema[] {
+      return projectStore.project.members.filter((m) => m.active);
+    },
     /**
      * @return The list of members and their roles in the current project.
      */
@@ -43,6 +49,14 @@ export const useMembers = defineStore("members", {
       }
 
       return this.members;
+    },
+    setActiveMembers(members: MembershipSchema[]): void {
+      const activeMemberIds = new Set(members.map((m) => m.email));
+      const currentMembers: MembershipSchema[] = projectStore.project.members;
+      projectStore.project.members = currentMembers.map((m) => {
+        m.active = activeMemberIds.has(m.email);
+        return m;
+      });
     },
     /**
      * Updates the current project members.

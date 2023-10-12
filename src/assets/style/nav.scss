@@ -62,7 +62,7 @@
   &.nav-search-prompt {
     width: 600px;
     min-width: 130px !important;
-    max-width: 40vw;
+    max-width: 35vw;
   }
 }
 
@@ -87,12 +87,32 @@
 }
 
 .nav-breadcrumb-list {
-  font-size: 20px;
+  font-size: 32px;
 }
 
 .nav-breadcrumb {
-  min-width: 100px !important;
-  background-color: $color-neutral !important;
+  min-width: 70px !important;
+  max-width: 300px;
+  border: 1px solid transparent;
+  transition: border 0.3s;
+  border-radius: 4px;
+
+  .q-field__label {
+    font-size: 18px;
+  }
+
+  .q-field__native {
+    font-size: 20px;
+    color: $color-text !important;
+  }
+
+  &:hover, &:focus {
+    border: 1px solid $color-primary !important;
+
+    .q-field__control:before {
+      border-color: $color-primary !important;
+    }
+  }
 }
 
 // Navigation - Topbar

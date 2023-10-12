@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -26,7 +27,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrganizationMembership {
+public class OrganizationMembership implements EntityMembership {
 
     @Id
     @GeneratedValue
@@ -51,5 +52,25 @@ public class OrganizationMembership {
         this.user = user;
         this.organization = organization;
         this.role = role;
+    }
+
+    @Override
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    @Override
+    public String getRoleAsString() {
+        return role.name();
+    }
+
+    @Override
+    public MembershipType getMembershipType() {
+        return MembershipType.ORGANIZATION;
+    }
+
+    @Override
+    public UUID getEntityId() {
+        return organization.getId();
     }
 }

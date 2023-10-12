@@ -7,7 +7,7 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
@@ -82,7 +82,7 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
-    public T withProjectMembership(UserProjectMembership projectMembership) {
+    public T withProjectMembership(ProjectMembership projectMembership) {
         this.path = this.path.replace("{projectMembershipId}", projectMembership.getMembershipId().toString());
         return (T) this;
     }
@@ -137,10 +137,31 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withOrgId(UUID orgId) {
+        this.path = this.path.replace("{orgId}", orgId.toString());
+        return (T) this;
+    }
+
+    public T withTeamId(UUID teamId) {
+        this.path = this.path.replace("{teamId}", teamId.toString());
+        return (T) this;
+    }
+
+    public T withEntityId(UUID entityId) {
+        this.path = this.path.replace("{entityId}", entityId.toString());
+        return (T) this;
+    }
+
+    public T withMembershipId(UUID membershipId) {
+        this.path = this.path.replace("{membershipId}", membershipId.toString());
+        return (T) this;
+    }
+
     public String buildEndpoint() {
         if (this.path.contains("{")) {
             throw new SafaError("Path is not fully configured: %s", this.path);
         }
         return this.path;
     }
+
 }

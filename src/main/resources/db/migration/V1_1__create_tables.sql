@@ -183,8 +183,8 @@ create table if not exists project_membership
     project_id    varchar(255) not null,
     primary key (membership_id),
     constraint SINGLE_ROLE_PER_PROJECT unique (project_id, user_id),
-    foreign key (user_id) references safa_user (user_id) on delete cascade,
-    foreign key (project_id) references project (project_id) on delete cascade
+    constraint user_project_membership_ibfk_1 foreign key (user_id) references safa_user (user_id) on delete cascade,
+    constraint user_project_membership_ibfk_2 foreign key (project_id) references project (project_id) on delete cascade
 );
 create table if not exists project_rule
 (

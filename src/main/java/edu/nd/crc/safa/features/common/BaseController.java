@@ -23,6 +23,7 @@ import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededExceptio
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestController
@@ -77,6 +79,12 @@ public abstract class BaseController {
         return new SafaError(errorMessage.toString());
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public SafaError handleArgumentTypeError(MethodArgumentTypeMismatchException exception) {
+        return new SafaError("Failed to dispatch request: " + exception.getMostSpecificCause().getMessage());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public SafaError handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
@@ -103,6 +111,12 @@ public abstract class BaseController {
         return ResponseEntity
             .status(ex.getStatus())
             .body(new SafaError(ex.getMessage()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public SafaError handleBadRequest(HttpMessageNotReadableException ex) {
+        return new SafaError(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
@@ -180,5 +194,9 @@ public abstract class BaseController {
         });
 
         return output;
+    }
+
+    protected SafaUser getCurrentUser() {
+        return getServiceProvider().getSafaUserService().getCurrentUser();
     }
 }

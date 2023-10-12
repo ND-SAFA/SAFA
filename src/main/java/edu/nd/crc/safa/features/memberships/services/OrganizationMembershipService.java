@@ -2,12 +2,14 @@ package edu.nd.crc.safa.features.memberships.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
 import edu.nd.crc.safa.features.memberships.repositories.OrganizationMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -23,18 +25,19 @@ public class OrganizationMembershipService {
      * Applies a role to a user within an organization. If the user already has this
      * role in this organization, this function does nothing.
      *
-     * @param user The user to get the new role
+     * @param user         The user to get the new role
      * @param organization The organization the role applies to
-     * @param role The role
+     * @param role         The role
+     * @return The new membership, or the existing membership if the user already had that role
      */
-    public void addUserRole(SafaUser user, Organization organization, OrganizationRole role) {
+    public OrganizationMembership addUserRole(SafaUser user, Organization organization, OrganizationRole role) {
         Optional<OrganizationMembership> membershipOptional =
                 orgMembershipRepo.findByUserAndOrganizationAndRole(user, organization, role);
 
-        if (membershipOptional.isEmpty()) {
+        return membershipOptional.orElseGet(() -> {
             OrganizationMembership newMembership = new OrganizationMembership(user, organization, role);
-            orgMembershipRepo.save(newMembership);
-        }
+            return orgMembershipRepo.save(newMembership);
+        });
     }
 
     /**
@@ -63,5 +66,50 @@ public class OrganizationMembershipService {
         return orgMembershipRepo.findByUserAndOrganization(user, organization).stream()
                 .map(OrganizationMembership::getRole)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Search for an organization membership by its ID.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     */
+    public Optional<OrganizationMembership> getMembershipOptionalById(UUID membershipId) {
+        return orgMembershipRepo.findById(membershipId);
+    }
+
+    /**
+     * Search for an organization membership by its ID. Throw an exception
+     * if it's not found.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     * @throws SafaItemNotFoundError If the membership could not be found
+     */
+    public OrganizationMembership getMembershipById(UUID membershipId) {
+        return getMembershipOptionalById(membershipId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No membership found with the specified ID"));
+    }
+
+    /**
+     * Get all organization memberships for a given user.
+     *
+     * @param user The user
+     * @return A list of memberships for that user. Note that the same organization may appear
+     *         multiple times in this list if the user has multiple roles within that organization.
+     */
+    public List<OrganizationMembership> getAllMembershipsByUser(SafaUser user) {
+        return orgMembershipRepo.findByUser(user);
+    }
+
+    /**
+     * Get all user memberships for a given organization.
+     *
+     * @param organization The organization
+     * @return A list of memberships for that organization. Note that the same user may
+     *         appear multiple times in this list if they have multiple roles within this organization.
+     */
+    public List<OrganizationMembership> getAllMembershipsByOrganization(Organization organization) {
+        return orgMembershipRepo.findByOrganization(organization);
     }
 }

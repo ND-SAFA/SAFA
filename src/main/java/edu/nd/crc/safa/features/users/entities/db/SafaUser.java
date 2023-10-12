@@ -41,6 +41,9 @@ public class SafaUser implements Serializable {
     private UUID personalOrgId;
 
     @Column
+    private UUID defaultOrgId;
+
+    @Column
     private boolean superuser;
 
     public SafaUser(String email, String password) {

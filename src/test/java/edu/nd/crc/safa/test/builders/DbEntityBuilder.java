@@ -20,6 +20,10 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.organizations.services.OrganizationService;
+import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -63,6 +67,8 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final CustomAttributeRepository customAttributeRepository;
     private final AttributeSystemServiceProvider attributeSystemServiceProvider;
     private final VersionService versionService;
+    private final TeamService teamService;
+    private final OrganizationService organizationService;
 
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
@@ -90,6 +96,8 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.customAttributeRepository = customAttributeRepository;
         this.attributeSystemServiceProvider = attributeSystemServiceProvider;
         this.versionService = serviceProvider.getVersionService();
+        this.teamService = serviceProvider.getTeamService();
+        this.organizationService = serviceProvider.getOrganizationService();
         DbEntityBuilder.instance = this;
     }
 
@@ -412,6 +420,14 @@ public class DbEntityBuilder extends AbstractBuilder {
     public List<TraceLinkVersion> getTraceLinks(String projectName) {
         Project project = getProject(projectName);
         return this.traceLinkVersionRepository.getProjectLinks(project);
+    }
+
+    public Organization newOrganization(String name, String description) {
+        return organizationService.createNewOrganization(new Organization(name, description, currentUser, "free", false));
+    }
+
+    public Team newTeam(String name, Organization organization) {
+        return teamService.createNewTeam(name, organization, false, currentUser);
     }
 
     private <T> void assertProjectExists(Map<String, T> table, String projectName) {

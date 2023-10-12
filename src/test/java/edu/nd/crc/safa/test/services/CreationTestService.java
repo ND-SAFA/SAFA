@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
-import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -135,10 +135,11 @@ public class CreationTestService {
                                    String email,
                                    ProjectRole role,
                                    ResultMatcher resultMatcher) throws Exception {
-        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
+        MembershipAppEntity request = new MembershipAppEntity(email, role.name());
+
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-            .withProject(project)
+            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            .withEntityId(project.getProjectId())
             .postWithJsonObject(request, resultMatcher);
     }
 }

@@ -18,7 +18,7 @@ import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -58,7 +58,7 @@ public class ProjectAppEntity implements IAppEntity {
     private List<@Valid @NotNull TraceAppEntity> traces;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<ProjectMemberAppEntity> members;
+    private List<MembershipAppEntity> members;
 
     @Nullable
     private String currentDocumentId;
@@ -82,6 +82,12 @@ public class ProjectAppEntity implements IAppEntity {
 
     private List<TraceMatrixAppEntity> traceMatrices;
 
+    private List<String> permissions;
+
+    private UUID orgId;
+
+    private UUID teamId;
+
     public ProjectAppEntity() {
         this.name = "";
         this.description = "";
@@ -98,12 +104,13 @@ public class ProjectAppEntity implements IAppEntity {
         this.subtrees = new HashMap<>();
         this.traceMatrices = new ArrayList<>();
         this.lastEdited = LocalDateTime.now();
+        this.permissions = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
                             List<ArtifactAppEntity> artifacts,
                             List<TraceAppEntity> traces,
-                            List<ProjectMemberAppEntity> members,
+                            List<MembershipAppEntity> members,
                             List<DocumentAppEntity> documents,
                             @Nullable String currentDocumentId,
                             List<TypeAppEntity> artifactTypes,
@@ -113,7 +120,8 @@ public class ProjectAppEntity implements IAppEntity {
                             List<CustomAttributeAppEntity> attributes,
                             List<AttributeLayoutAppEntity> attributeLayouts,
                             Map<UUID, SubtreeAppEntity> subtrees,
-                            List<TraceMatrixAppEntity> traceMatrices) {
+                            List<TraceMatrixAppEntity> traceMatrices,
+                            List<String> permissions) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
         this.lastEdited = project.getLastEdited();
@@ -134,6 +142,9 @@ public class ProjectAppEntity implements IAppEntity {
         this.attributeLayouts = attributeLayouts;
         this.subtrees = subtrees;
         this.traceMatrices = traceMatrices;
+        this.permissions = permissions;
+        this.teamId = project.getOwningTeam().getId();
+        this.orgId = project.getOwningTeam().getOrganization().getId();
     }
 
     public ProjectAppEntity(ProjectCommitDefinition projectCommitDefinition) {

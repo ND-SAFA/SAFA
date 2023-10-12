@@ -41,6 +41,17 @@ public abstract class AbstractProjectJsonTest extends ApplicationBaseTest {
             .postWithJsonObject(projectJson, expectedStatus);
     }
 
+    protected JSONObject putProjectJson(JSONObject projectJson) throws Exception {
+        return putProjectJson(projectJson, status().is2xxSuccessful());
+    }
+
+    protected JSONObject putProjectJson(JSONObject projectJson,
+                                        ResultMatcher expectedStatus) throws Exception {
+        return SafaRequest
+            .withRoute(AppRoutes.Projects.CREATE_OR_UPDATE_PROJECT_META)
+            .putWithJsonObject(projectJson, expectedStatus);
+    }
+
     /**
      * Creates a project containing two artifacts and a trace link between them.
      * The artifacts are of type requirement and design.

@@ -11,9 +11,9 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -71,7 +71,7 @@ public class SyncController extends BaseController {
                 projectAppEntity.setDescription(project.getDescription());
                 break;
             case MEMBERS:
-                List<ProjectMemberAppEntity> projectMemberAppEntities =
+                List<MembershipAppEntity> projectMemberAppEntities =
                     getServiceProvider().getMemberService().getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setMembers(projectMemberAppEntities);
                 break;

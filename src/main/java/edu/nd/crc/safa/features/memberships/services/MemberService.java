@@ -6,9 +6,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
-import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -17,14 +17,13 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Responsible for CRUD operations related to project memberships
  */
 @Service
 @AllArgsConstructor
-public class MemberService implements IAppEntityService<ProjectMemberAppEntity> {
+public class MemberService implements IAppEntityService<MembershipAppEntity> {
 
     private UserProjectMembershipRepository userProjectMembershipRepository;
 
@@ -34,8 +33,8 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectMembershipId ID of membership being retrieved.
      * @return The project membership.
      */
-    public UserProjectMembership getMembershipById(UUID projectMembershipId) {
-        Optional<UserProjectMembership> projectMembershipQuery =
+    public ProjectMembership getMembershipById(UUID projectMembershipId) {
+        Optional<ProjectMembership> projectMembershipQuery =
             this.userProjectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isEmpty()) {
             throw new SafaError("Could not find membership with id: %s.", projectMembershipId);
@@ -44,36 +43,23 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
     }
 
     @Override
-    public List<ProjectMemberAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
+    public List<MembershipAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         Project project = projectVersion.getProject();
 
-        List<ProjectMemberAppEntity> members = this.userProjectMembershipRepository.findByProject(project)
+        return this.userProjectMembershipRepository.findByProject(project)
             .stream()
-            .map(ProjectMemberAppEntity::new)
+            .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
-
-        // TODO pull members the right way
-        addOwnerMember(projectVersion, members);
-
-        return members;
-    }
-
-    private void addOwnerMember(ProjectVersion projectVersion, List<ProjectMemberAppEntity> members) {
-        SafaUser owner = projectVersion.getProject().getOwningTeam().getOrganization().getOwner();
-        members.add(new ProjectMemberAppEntity(
-            new UserProjectMembership(projectVersion.getProject(), owner, ProjectRole.OWNER)));
     }
 
     @Override
-    public List<ProjectMemberAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+    public List<MembershipAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
                                                             List<UUID> appEntityIds) {
-        List<ProjectMemberAppEntity> members = this.userProjectMembershipRepository
+        return this.userProjectMembershipRepository
             .findByProjectAndMembershipIdIn(projectVersion.getProject(), appEntityIds)
             .stream()
-            .map(ProjectMemberAppEntity::new)
+            .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
-        addOwnerMember(projectVersion, members);
-        return members;
     }
 
     /**
@@ -83,7 +69,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectRoles The project roles to match.
      * @return List of project memberships relating members to projects.
      */
-    public List<UserProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
+    public List<ProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
         return this.userProjectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
     }
 
@@ -94,7 +80,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectRole The project role to match.
      * @return List of project memberships relating members to projects.
      */
-    public List<UserProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
+    public List<ProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
         return getProjectMembersWithRoles(project, List.of(projectRole));
     }
 
@@ -105,11 +91,11 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectMembershipId ID of the membership linking user and project.
      * @return ProjectMembers The membership object identified by given id, or null if none found.
      */
-    public UserProjectMembership deleteProjectMembershipById(@PathVariable UUID projectMembershipId) {
-        Optional<UserProjectMembership> projectMembershipQuery =
+    public ProjectMembership deleteProjectMembershipById(UUID projectMembershipId) {
+        Optional<ProjectMembership> projectMembershipQuery =
             this.userProjectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isPresent()) {
-            UserProjectMembership projectMembership = projectMembershipQuery.get();
+            ProjectMembership projectMembership = projectMembershipQuery.get();
             this.userProjectMembershipRepository.delete(projectMembership);
             return projectMembership;
         }

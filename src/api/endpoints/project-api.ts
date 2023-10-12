@@ -7,12 +7,12 @@ import {
 import { buildRequest } from "@/api";
 
 /**
- * Creates or updates the given project.
+ * Creates the given project.
  *
  * @param project - The project to save.
  * @return The saved project.
  */
-export async function saveProject(
+export async function createProject(
   project: Pick<ProjectSchema, "projectId" | "name" | "description">
 ): Promise<ProjectSchema> {
   return buildRequest<
@@ -20,6 +20,22 @@ export async function saveProject(
     string,
     Pick<ProjectSchema, "projectId" | "name" | "description">
   >("project").post(project);
+}
+
+/**
+ * Updates project metadata.
+ *
+ * @param project - The project to edit.
+ * @return The edited project.
+ */
+export async function editProject(
+  project: Pick<ProjectSchema, "projectId" | "name" | "description">
+): Promise<ProjectSchema> {
+  return buildRequest<
+    ProjectSchema,
+    string,
+    Pick<ProjectSchema, "projectId" | "name" | "description">
+  >("project").put(project);
 }
 
 export async function createProjectCreationJob(

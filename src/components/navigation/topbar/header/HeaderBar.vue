@@ -12,10 +12,8 @@
         <version-selector />
       </flex-box>
       <q-space />
-      <project-searchbar v-if="graphVisible" />
-      <q-space />
-      <q-space />
       <update-button />
+      <project-searchbar v-if="graphVisible" />
     </flex-box>
     <separator v-if="graphVisible" nav />
   </div>

@@ -37,6 +37,6 @@ class TestStrUtil(BaseTest):
         self.assertEqual(StrUtil.split_sentences_by_punctuation(", ".join(sentences), ","), sentences)
 
     def test_remove_floats_and_ints(self):
-        sentence = "This is a sentence with 2.3 in it and 2 which should be removed but RE.2.3 should not 3.0"
-        self.assertEqual(StrUtil.remove_floats_and_ints(sentence),
-                         "This is a sentence with  in it and  which should be removed but RE.2.3 should not")
+        sentence = "This is a sentence with 2.3 in it which should be removed but RE.2.3 and 2 should not 3.0"
+        self.assertEqual(StrUtil.remove_floats(sentence),
+                         "This is a sentence with  in it which should be removed but RE.2.3 and 2 should not")

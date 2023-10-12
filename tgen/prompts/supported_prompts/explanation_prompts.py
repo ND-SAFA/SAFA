@@ -36,28 +36,31 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                                   "Be as a specific as possible.",
                                                      use_multi_step_task_instructions=True,
                                                      question_prompts=[
-                                                         QuestionPrompt("Do the artifacts belong to the same sub-system or "
-                                                                        "depend on the same entities or features?  ",
-                                                                        PromptResponseManager(response_tag="dependencies")),
+                                                         QuestionPrompt("What sub-systems and components do the artifacts belong to, "
+                                                                        "impact or reference? Are any of the sub-systems/components "
+                                                                        "shared between the two artifacts?",
+                                                                        PromptResponseManager(response_tag="sub-systems")),
+                                                         QuestionPrompt("What inputs, outputs, entities or technical details "
+                                                                        "are specified in each artifact? Do the artifacts "
+                                                                        "reference any of the same ones?",
+                                                                        PromptResponseManager(response_tag="entities")),
                                                          QuestionPrompt("What are the primary functions or purposes "
-                                                                        "of each artifact. How might the functionality of one "
-                                                                        "artifact impact the other?",
+                                                                        "of each artifact? Could the functionality of one "
+                                                                        "artifact impact the other? Does one artifact reference "
+                                                                        "functionality that is fulfilled in the other?",
                                                                         PromptResponseManager(response_tag="functionality")),
-                                                         QuestionPrompt("Do the artifacts rely on common inputs, "
-                                                                        "produce common outputs, or share common data flows? ",
-                                                                        PromptResponseManager(response_tag="data-flow")),
                                                          QuestionPrompt("Could one artifact be derived from, "
                                                                         "decomposed from, or be an implementation of the other? "
                                                                         "This means that it was created by extracting, "
-                                                                        "breaking down, implementing a portion of the "
+                                                                        "breaking down, or implementing a portion of the "
                                                                         "other artifact, generally resulting in "
-                                                                        "a smaller, more detailed components, at a different level of"
-                                                                        "abstraction? If so, they are likely linked. ",
-                                                                        PromptResponseManager(response_tag="decomposition")),
+                                                                        "a smaller, more detailed component at a lower-level. ",
+                                                                        PromptResponseManager(response_tag="derivation")),
                                                          QuestionPrompt("If one artifact changed, "
-                                                                        "would it impact or necessitate changes in the other "
-                                                                        "at the level of implementation?",
-                                                                        PromptResponseManager(response_tag="impact")),
+                                                                        "would it impact or necessitate changes in the other? "
+                                                                        "Could a change in one create a misalignment with the "
+                                                                        "capabilities/functionality described in the other?",
+                                                                        PromptResponseManager(response_tag="change-impact")),
                                                          SCORE_INSTRUCTIONS,
                                                          QuestionPrompt("Using your previous responses and both scores given, "
                                                                         "write a brief explanation that accesses the strength of the "

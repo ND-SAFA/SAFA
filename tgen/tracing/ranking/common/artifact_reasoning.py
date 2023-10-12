@@ -103,7 +103,7 @@ class ArtifactReasoning:
         explanation_part = explanation_part.strip()
         if remove_score:
             lines = StrUtil.split_sentences_by_punctuation(explanation_part, PERIOD)
-            lines[0] = StrUtil.remove_floats_and_ints(lines[0])  # just remove the score if its the first sentence
+            lines[0] = StrUtil.remove_floats(lines[0])  # just remove the score if its the first sentence
             # remove the whole sentence if it is later in the paragraph
             lines = [line for line in lines if not ArtifactReasoning._contains_possible_score(line) and len(line.strip()) > 1]
             explanation_part = f"{PERIOD}{SPACE}".join(lines)
@@ -123,7 +123,7 @@ class ArtifactReasoning:
         :return: True if it likely contains a score else False
         """
         line_parts = StrUtil.split_sentences_by_punctuation(line, COMMA)
-        contains_score = [l for l in line_parts if len(StrUtil.find_floats_and_ints(l)) > 0]
+        contains_score = [l for l in line_parts if len(StrUtil.find_floats(l)) > 0]
         return len(contains_score) > 0
 
 

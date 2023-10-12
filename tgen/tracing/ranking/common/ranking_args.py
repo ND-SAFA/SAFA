@@ -75,7 +75,8 @@ class RankingArgs(PipelineArgs):
     """
     - parent_thresholds: The threshold used to establish parents from (primary, secondary and min)
     """
-    parent_thresholds: Tuple[float, float, float] = (DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD)
+    parent_thresholds: Tuple[float, float, float] = (DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD,
+                                                     DEFAULT_PARENT_MIN_THRESHOLD)
     """
     - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
     """
@@ -87,7 +88,7 @@ class RankingArgs(PipelineArgs):
     """
     - selection_method: The method to use to select top predictions
     """
-    selection_method: SupportedSelectionMethod = SupportedSelectionMethod.SELECT_BY_THRESHOLD_NORMALIZED_CHILDREN
+    selection_method: SupportedSelectionMethod = SupportedSelectionMethod.SELECT_BY_THRESHOLD
     """
     - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
     """

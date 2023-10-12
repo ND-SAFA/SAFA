@@ -10,7 +10,7 @@ from tgen.common.util.logging.logger_manager import logger
 
 class StrUtil:
 
-    FIND_INT_FLOAT_PATTERN = r"\s+\d+(?:\.\d+)?\s*$|^\s+\d+(?:\.\d+)?\s+|(?<=\s)\d+(?:\.\d+)?(?=\s)"
+    FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
 
     @staticmethod
     def format_selective(string, *args: object, **kwargs: object) -> str:
@@ -78,20 +78,20 @@ class StrUtil:
         return [sentence.strip(punctuation) for sentence in sentences]
 
     @staticmethod
-    def remove_floats_and_ints(string: str) -> str:
+    def remove_floats(string: str) -> str:
         """
-        Remove all floats and integers in a string if they are by themselves (not inside of a substring)
-        :param string: The string to find floats and ints
-        :return: The string without floats nad ints that were found
+        Remove all floats in a string if they are by themselves (not inside of a substring)
+        :param string: The string to find floats
+        :return: The string without floats that were found
         """
-        return re.compile(StrUtil.FIND_INT_FLOAT_PATTERN).sub(EMPTY_STRING, string)
+        return re.compile(StrUtil.FIND_FLOAT_PATTERN).sub(EMPTY_STRING, string)
 
     @staticmethod
-    def find_floats_and_ints(string: str) -> List[str]:
+    def find_floats(string: str) -> List[str]:
         """
-        Finds all floats and integers in a string if they are by themselves (not inside of a substring)
-        :param string: The string to find floats and ints
-        :return: The floats nad ints that were found
+        Finds all floats in a string if they are by themselves (not inside of a substring)
+        :param string: The string to find floats
+        :return: The floats that were found
         """
-        return re.findall(StrUtil.FIND_INT_FLOAT_PATTERN, string)
+        return re.findall(StrUtil.FIND_FLOAT_PATTERN, string)
 

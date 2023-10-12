@@ -4,4 +4,6 @@
 export const ENABLED_FEATURES = {
   ORGS: false,
   ORGS_ADMIN: false,
+
+  ARTIFACT_PROMPTS: false,
 };

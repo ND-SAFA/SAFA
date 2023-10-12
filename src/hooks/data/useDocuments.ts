@@ -7,18 +7,14 @@ import {
   ProjectSchema,
   ArtifactSchema,
 } from "@/types";
-import {
-  buildDocument,
-  DEFAULT_VIEW_NAME,
-  isTableDocument,
-  removeMatches,
-} from "@/util";
+import { buildDocument, DEFAULT_VIEW_NAME, removeMatches } from "@/util";
 import {
   subtreeStore,
   layoutStore,
   projectStore,
   traceStore,
   artifactStore,
+  selectionStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -74,12 +70,6 @@ export const useDocuments = defineStore("documents", {
      */
     isBaseDocument(): boolean {
       return this.currentId === "";
-    },
-    /**
-     * @return Whether the current document type is for editing a table.
-     */
-    isTableOnlyDocument(): boolean {
-      return isTableDocument(this.currentDocument.type);
     },
   },
   actions: {
@@ -181,10 +171,6 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
-
-      if (isTableDocument(document.type)) {
-        layoutStore.mode = "table";
-      }
     },
     /**
      * Adds a new document.
@@ -204,13 +190,19 @@ export const useDocuments = defineStore("documents", {
     async addDocumentOfNeighborhood(
       artifact: Pick<ArtifactSchema, "name" | "id">
     ): Promise<void> {
+      const { neighbors } = subtreeStore.subtreeMap[artifact.id];
+      const artifactIds = artifactStore.allArtifacts
+        .filter(
+          ({ id, type }) =>
+            (artifact.id === id || neighbors.includes(id)) &&
+            !selectionStore.ignoreTypes.includes(type)
+        )
+        .map(({ id }) => id);
+
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,
-        artifactIds: [
-          artifact.id,
-          ...subtreeStore.subtreeMap[artifact.id].neighbors,
-        ],
+        artifactIds,
       });
 
       await this.removeDocument("");
@@ -234,7 +226,7 @@ export const useDocuments = defineStore("documents", {
 
       await this.removeDocument("");
       await this.addDocument(document);
-      layoutStore.mode = "tree";
+      layoutStore.mode = types.length > 1 ? "tree" : "table";
     },
     /**
      * Adds artifacts to the current document.

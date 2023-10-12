@@ -190,7 +190,7 @@ export const useNotificationApi = defineStore(
       );
       const message: ChangeMessageSchema = JSON.parse(frame.body);
       const project = await getChanges(versionId, message);
-      let hasLayoutChange = false;
+      let hasLayoutChange = false; // Layout changes are currently disabled.
 
       // Step - Iterate through message and delete entities.
       for (const change of message.changes) {

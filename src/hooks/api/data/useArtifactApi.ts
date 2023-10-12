@@ -149,12 +149,6 @@ export const useArtifactApi = defineStore(
       () => handleCheckName()
     );
 
-    // Update the artifact type when the artifact type is edited.
-    watch(
-      () => artifactSaveStore.editedArtifact.type,
-      () => artifactSaveStore.updateArtifactType()
-    );
-
     return {
       saveLoading,
       deleteLoading,

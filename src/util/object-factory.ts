@@ -3,12 +3,10 @@ import {
   CommitSchema,
   ConfirmDialogueMessage,
   DocumentSchema,
-  FTANodeType,
   IdentifierSchema,
   ModelType,
   VersionDeltaSchema,
   ProjectSchema,
-  SafetyCaseType,
   SessionSchema,
   SnackbarMessage,
   GenerationModelSchema,
@@ -131,57 +129,9 @@ export function buildArtifact(
     body: artifact?.body || "",
     type: artifact?.type || "",
     isCode: artifact?.isCode || false,
-    documentType: artifact?.documentType || "ARTIFACT_TREE",
     documentIds: artifact?.documentIds || [],
-    safetyCaseType: artifact?.safetyCaseType || "GOAL",
-    logicType: artifact?.logicType || "AND",
     attributes: artifact?.attributes || {},
   };
-}
-
-/**
- * Creates an artifact that may be initialized to a specific document type.
- *
- * @param artifact - The base artifact to create from.
- * @param type - If true or matching no values, a normal artifact will be created.
- *               If equal to an `FTANodeType`, an FTA node will be created.
- *               If equal to a `SafetyCaseType`, a safety case node will be created.
- *               If equal to a `DocumentType.FMEA`, an FMEA node will be created.
- * @return An artifact initialized to the given props.
- */
-export function buildArtifactOfType(
-  artifact: Partial<ArtifactSchema> | undefined,
-  type?: true | string
-): ArtifactSchema {
-  if (typeof type === "string") {
-    const isFTA = type in (["AND", "OR"] as FTANodeType[]);
-    const isSC =
-      type in (["GOAL", "SOLUTION", "STRATEGY", "CONTEXT"] as SafetyCaseType[]);
-
-    if (isFTA || type === "FTA") {
-      return buildArtifact({
-        ...artifact,
-        documentType: "FTA",
-        logicType: isFTA ? (type as FTANodeType) : "AND",
-        type: "FTA",
-      });
-    } else if (isSC) {
-      return buildArtifact({
-        ...artifact,
-        documentType: "SAFETY_CASE",
-        safetyCaseType: isSC ? (type as SafetyCaseType) : "CONTEXT",
-        type: "SAFETY_CASE",
-      });
-    } else if (type === "FMEA") {
-      return buildArtifact({
-        ...artifact,
-        documentType: "FMEA",
-        type: "FMEA",
-      });
-    }
-  }
-
-  return buildArtifact(artifact);
 }
 
 export function buildCommit(version: VersionSchema): CommitSchema {

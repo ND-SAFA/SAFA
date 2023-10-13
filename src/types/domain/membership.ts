@@ -62,15 +62,13 @@ export type PermissionType =
  */
 export interface MemberEntitySchema {
   /**
-   * TODO: required
    * The type of entity that this member is a part of.
    */
-  entityType?: MembershipType;
+  entityType: MembershipType;
   /**
-   * TODO: required
    * The id of the entity that this member is a part of.
    */
-  entityId?: string;
+  entityId: string;
 }
 
 /**
@@ -80,7 +78,7 @@ export interface MembershipSchema extends MemberEntitySchema {
   /**
    * The id of this membership.
    */
-  projectMembershipId: string;
+  id: string;
   /**
    * The email of the member.
    */
@@ -89,12 +87,4 @@ export interface MembershipSchema extends MemberEntitySchema {
    * The role(s) of the member.
    */
   role: MemberRole;
-}
-
-/**
- * Represents a request for adding a member to a project.
- */
-export interface MemberRequestSchema {
-  memberEmail: string;
-  projectRole: MemberRole;
 }

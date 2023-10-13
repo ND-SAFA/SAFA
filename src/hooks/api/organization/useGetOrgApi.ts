@@ -3,7 +3,11 @@ import { computed } from "vue";
 
 import { GetOrgApiHook, OrganizationSchema } from "@/types";
 import { orgStore, sessionStore, teamStore, useApi } from "@/hooks";
-import { getOrganization, getOrganizations, saveDefaultOrg } from "@/api";
+import {
+  getOrganizations,
+  getPersonalOrganization,
+  saveDefaultOrg,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -42,11 +46,8 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
       async () => {
         orgStore.allOrgs = await getOrganizations();
 
-        const orgId = sessionStore.user.defaultOrgId || orgStore.allOrgs[0]?.id;
-
-        if (!orgId) return;
-
-        currentOrg.value = await getOrganization(orgId);
+        currentOrg.value =
+          (await getPersonalOrganization()) || orgStore.allOrgs[0];
       },
       {
         error: "Unable to load your current organization.",

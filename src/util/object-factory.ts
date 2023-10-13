@@ -42,6 +42,9 @@ export function buildUser(): UserSchema {
   return {
     userId: "",
     email: "",
+    personalOrgId: "",
+    defaultOrgId: "",
+    superuser: false,
   };
 }
 
@@ -58,9 +61,12 @@ export function buildProjectIdentifier(
   return {
     name: identifier?.name || "",
     projectId: identifier?.projectId || "",
+    orgId: identifier?.orgId || "",
+    teamId: identifier?.teamId || "",
     description: identifier?.description || "",
     owner: identifier?.owner || "",
     members: identifier?.members || [],
+    permissions: identifier?.permissions || [],
   };
 }
 
@@ -79,6 +85,7 @@ export function buildProject(project?: Partial<ProjectSchema>): ProjectSchema {
     models: project?.models || [],
     attributes: project?.attributes || [],
     attributeLayouts: project?.attributeLayouts || [],
+    permissions: project?.permissions || [],
   };
 }
 
@@ -150,13 +157,7 @@ export function buildDocument(
 ): DocumentSchema {
   return {
     documentId: document?.documentId || "",
-    project: document?.project || {
-      projectId: "",
-      name: "",
-      description: "",
-      owner: "",
-      members: [],
-    },
+    project: document?.project || buildProjectIdentifier(),
     name: document?.name || "",
     type: document?.type || "ARTIFACT_TREE",
     artifactIds: document?.artifactIds || [],
@@ -222,6 +223,7 @@ export function buildOrg(
     paymentTier: org.paymentTier || "",
     members: org.members || [],
     teams: org.teams || [],
+    permissions: org?.permissions || [],
   };
 }
 
@@ -231,5 +233,6 @@ export function buildTeam(team: Partial<TeamSchema> = {}): TeamSchema {
     name: team.name || "",
     members: team.members || [],
     projects: team.projects || [],
+    permissions: team?.permissions || [],
   };
 }

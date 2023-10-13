@@ -7,15 +7,14 @@ import {
 import { buildRequest } from "@/api";
 
 /**
- * Creates or updates the given project.
+ * Creates the given project.
  *
  * @param project - The project to save.
  * @return The saved project.
  */
-export async function saveProject(
+export async function createProject(
   project: Pick<ProjectSchema, "projectId" | "name" | "description">
 ): Promise<ProjectSchema> {
-  //TODO: include org, team
   return buildRequest<
     ProjectSchema,
     string,
@@ -23,13 +22,63 @@ export async function saveProject(
   >("project").post(project);
 }
 
+/**
+ * Updates project metadata.
+ *
+ * @param project - The project to edit.
+ * @return The edited project.
+ */
+export async function editProject(
+  project: Pick<ProjectSchema, "projectId" | "name" | "description">
+): Promise<ProjectSchema> {
+  return buildRequest<
+    ProjectSchema,
+    string,
+    Pick<ProjectSchema, "projectId" | "name" | "description">
+  >("project").put(project);
+}
+
 export async function createProjectCreationJob(
   payload: CreateProjectByJsonSchema
 ): Promise<JobSchema> {
-  //TODO: include org, team
   return buildRequest<JobSchema, string, CreateProjectByJsonSchema>(
     "createProjectJob"
   ).post(payload);
+}
+
+/**
+ * Creates a project from the given flat files.
+ *
+ * @param formData - Form data containing the project files.
+ * @return The created project.
+ */
+export async function createProjectUploadJob(
+  formData: FormData
+): Promise<JobSchema> {
+  return buildRequest<JobSchema, string, FormData>(
+    "createProjectThroughFlatFiles"
+  )
+    .withFormData()
+    .post(formData);
+}
+
+/**
+ * Updates an existing project from the given flat files.
+ *
+ * @param versionId - The project version to update.
+ * @param formData - Form data containing the project files.
+ * @return The updated project.
+ */
+export async function createFlatFileUploadJob(
+  versionId: string,
+  formData: FormData
+): Promise<JobSchema> {
+  return buildRequest<JobSchema, "versionId", FormData>(
+    "updateProjectThroughFlatFiles",
+    { versionId }
+  )
+    .withFormData()
+    .post(formData);
 }
 
 /**
@@ -38,7 +87,6 @@ export async function createProjectCreationJob(
  * @return All project identifiers.
  */
 export async function getProjects(): Promise<IdentifierSchema[]> {
-  //TODO: include org, team?
   return buildRequest<IdentifierSchema[]>("project").get();
 }
 
@@ -48,7 +96,6 @@ export async function getProjects(): Promise<IdentifierSchema[]> {
  * @param projectId - The project ID to delete.
  */
 export async function deleteProject(projectId: string): Promise<void> {
-  //TODO: include org, team
   return buildRequest<void, "projectId">("updateProject", {
     projectId,
   }).delete();

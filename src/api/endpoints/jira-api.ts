@@ -1,4 +1,9 @@
-import { JiraOrganizationSchema, JiraProjectSchema, JobSchema } from "@/types";
+import {
+  JiraImportSchema,
+  JiraOrganizationSchema,
+  JiraProjectSchema,
+  JobSchema,
+} from "@/types";
 import { buildRequest } from "@/api";
 
 /**
@@ -130,18 +135,20 @@ export async function getJiraProjects(
  *
  * @param cloudId - The Jira installation to import projects from.
  * @param id - The Jira project id to import.
+ * @param configuration - The configuration for the import.
  * @return The created import job.
  */
 export async function createJiraProject(
   cloudId: string,
-  id: string
+  id: string,
+  configuration: JiraImportSchema
 ): Promise<JobSchema> {
-  // TODO: add org, team
   return (
-    await buildRequest<{ payload: JobSchema }, "cloudId" | "id">(
-      "jiraCreateProject",
-      { id, cloudId }
-    ).post()
+    await buildRequest<
+      { payload: JobSchema },
+      "cloudId" | "id",
+      JiraImportSchema
+    >("jiraCreateProject", { id, cloudId }).post(configuration)
   ).payload;
 }
 

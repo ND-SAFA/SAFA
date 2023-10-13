@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.builders;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -10,6 +11,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.CommitJobUtility;
 import edu.nd.crc.safa.utilities.FlatFileUtility;
+import edu.nd.crc.safa.utilities.ProjectOwner;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,20 +29,27 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     private final String projectDescription;
 
     private final boolean shouldSummarize;
+    private final UUID teamId;
+    private final UUID orgId;
 
     public CreateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider, MultipartFile[] files, SafaUser user,
-                                             String projectName, String projectDescription, boolean shouldSummarize) {
+                                             String projectName, String projectDescription, boolean shouldSummarize,
+                                             UUID teamId, UUID orgId) {
         super(user, serviceProvider);
         this.files = files;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
         this.shouldSummarize = shouldSummarize;
+        this.teamId = teamId;
+        this.orgId = orgId;
     }
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
         SafaUser user = getUser();
-        ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), user, this.projectName,
+        ProjectOwner owner =
+            ProjectOwner.fromUUIDs(getServiceProvider(), teamId, orgId, user);
+        ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), owner, this.projectName,
             this.projectDescription);
         Project project = commit.getCommitVersion().getProject();
         String uploadLocation = FlatFileUtility.uploadFlatFiles(this.getServiceProvider(), project, this.files);

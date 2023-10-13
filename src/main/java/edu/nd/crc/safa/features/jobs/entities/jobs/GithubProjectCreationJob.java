@@ -36,6 +36,7 @@ import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectOwner;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -182,7 +183,10 @@ public class GithubProjectCreationJob extends CommitJob {
         if (projectDescription == null) {
             projectDescription = projectName;
         }
-        createProjectAndCommit(this.user, projectName, projectDescription);
+        ProjectOwner owner =
+            ProjectOwner.fromUUIDs(getServiceProvider(), importSettings.getTeamId(),
+                importSettings.getOrgId(), getUser());
+        createProjectAndCommit(owner, projectName, projectDescription);
         ProjectVersion projectVersion = getProjectVersion();
         this.githubIdentifier.setProjectVersion(projectVersion);
         linkProjectToJob(projectVersion.getProject());

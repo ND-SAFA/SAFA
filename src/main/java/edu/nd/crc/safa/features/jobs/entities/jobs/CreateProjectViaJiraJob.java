@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
+import edu.nd.crc.safa.features.jira.entities.api.JiraImportSettings;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
@@ -24,6 +25,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectOwner;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -65,12 +67,16 @@ public class CreateProjectViaJiraJob extends CommitJob {
     @Getter(AccessLevel.PROTECTED)
     private JiraProject jiraProject;
 
+    @Getter(AccessLevel.PROTECTED)
+    private final JiraImportSettings importSettings;
+
     public CreateProjectViaJiraJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
-                                   JiraIdentifier jiraIdentifier, SafaUser user) {
+                                   JiraIdentifier jiraIdentifier, SafaUser user, JiraImportSettings importSettings) {
         super(user, jobDbEntity, serviceProvider, new ProjectCommitDefinition(), true);
         this.jiraIdentifier = jiraIdentifier;
         this.issues = new ArrayList<>();
         this.user = user;
+        this.importSettings = importSettings;
     }
 
     public static String createJobName(JiraIdentifier jiraIdentifier) {
@@ -113,7 +119,10 @@ public class CreateProjectViaJiraJob extends CommitJob {
         String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
 
-        createProjectAndCommit(this.user, projectName, projectDescription);
+        ProjectOwner owner =
+            ProjectOwner.fromUUIDs(getServiceProvider(), importSettings.getTeamId(),
+                importSettings.getOrgId(), getUser());
+        createProjectAndCommit(owner, projectName, projectDescription);
         ProjectVersion projectVersion = getProjectVersion();
         linkProjectToJob(projectVersion.getProject());
 

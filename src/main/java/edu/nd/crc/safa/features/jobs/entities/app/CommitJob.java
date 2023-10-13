@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.CommitJobUtility;
+import edu.nd.crc.safa.utilities.ProjectOwner;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -121,8 +122,8 @@ public abstract class CommitJob extends AbstractJob {
      * @param name        The name of the project.
      * @param description The description of project.
      */
-    protected void createProjectAndCommit(SafaUser user, String name, String description) {
-        ProjectCommitDefinition commit = CommitJobUtility.createProject(this.getServiceProvider(), user, name,
+    protected void createProjectAndCommit(ProjectOwner owner, String name, String description) {
+        ProjectCommitDefinition commit = CommitJobUtility.createProject(this.getServiceProvider(), owner, name,
             description);
         setProjectCommitDefinition(commit);
         setCreatedProjectVersion(commit.getCommitVersion());

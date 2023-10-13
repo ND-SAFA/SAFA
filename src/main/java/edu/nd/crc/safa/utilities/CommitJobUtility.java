@@ -7,8 +7,6 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.services.VersionService;
 
@@ -23,20 +21,27 @@ public class CommitJobUtility {
      * @param description     The description of the project.
      * @return A newly created project version.
      */
-    public static ProjectCommitDefinition createProject(ServiceProvider serviceProvider, SafaUser owner,
+    public static ProjectCommitDefinition createProject(ServiceProvider serviceProvider, ProjectOwner owner,
                                                         String name, String description) {
         ProjectService projectService = serviceProvider.getProjectService();
         VersionService versionService = serviceProvider.getVersionService();
-        SafaUserService userService = serviceProvider.getSafaUserService();
 
-        Project project = projectService.createProject(name, description, owner);
+        Project project;
+        if (owner.getTeam() != null) {
+            project = projectService.createProject(name, description, owner.getTeam());
+        } else if (owner.getOrganization() != null) {
+            project = projectService.createProject(name, description, owner.getOrganization());
+        } else {
+            project = projectService.createProject(name, description, owner.getUser());
+        }
+
         ProjectVersion projectVersion = versionService.createInitialProjectVersion(project);
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, false);
-        return projectCommitDefinition;
+        return new ProjectCommitDefinition(projectVersion, false);
     }
 
     public static void deleteCommitProject(CommitJob commitJob) throws IOException {
         ProjectService projectService = commitJob.getServiceProvider().getProjectService();
         projectService.deleteProject(commitJob.getProjectVersion().getProject());
     }
+
 }

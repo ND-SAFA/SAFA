@@ -4,6 +4,7 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertEqual;
 import static edu.nd.crc.safa.utilities.AssertUtils.assertNotNull;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -16,6 +17,8 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,12 +34,15 @@ public class TeamController extends BaseController {
 
     private final OrganizationService organizationService;
     private final TeamService teamService;
+    private final PermissionService permissionService;
 
     public TeamController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
-                          OrganizationService organizationService, TeamService teamService) {
+                          OrganizationService organizationService, TeamService teamService,
+                          PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
         this.organizationService = organizationService;
         this.teamService = teamService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -129,6 +135,13 @@ public class TeamController extends BaseController {
     public void deleteTeam(@PathVariable UUID orgId, @PathVariable UUID teamId) {
         Team team = teamService.getTeamById(teamId);
         assertEqual(team.getOrganization().getId(), orgId, "No team with the specified ID found under this org");
+
+        permissionService.requireAnyPermission(
+            Set.of(OrganizationPermission.DELETE_TEAMS, TeamPermission.DELETE),
+            team,
+            getCurrentUser()
+        );
+
         teamService.deleteTeam(team);
     }
 }

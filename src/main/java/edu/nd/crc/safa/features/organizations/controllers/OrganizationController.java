@@ -108,7 +108,10 @@ public class OrganizationController extends BaseController {
     public OrganizationAppEntity updateOrganization(@PathVariable UUID orgId,
                                                     @RequestBody OrganizationAppEntity orgEntity) {
         SafaUser user = getCurrentUser();
-        Organization currentOrg = organizationService.getOrganizationById(orgId);
+        Organization currentOrg = getResourceBuilder()
+            .fetchOrganization(orgId)
+            .withPermission(OrganizationPermission.EDIT, user)
+            .get();
         currentOrg.setFromAppEntity(orgEntity);
         return organizationService.getAppEntity(organizationService.updateOrganization(currentOrg), user);
     }

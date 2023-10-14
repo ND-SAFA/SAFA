@@ -43,7 +43,8 @@ public class SummarizeController extends BaseController {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user)
+            .withPermission(ProjectPermission.GENERATE, user)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
             .get();
         request.setProjectVersion(projectVersion);
         request.setProjectSummary(projectVersion.getProject().getSpecification());
@@ -57,7 +58,8 @@ public class SummarizeController extends BaseController {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user)
+            .withPermission(ProjectPermission.GENERATE, user)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
             .get();
         return new ProjectSummaryJobBuilder(user, this.getServiceProvider(), projectVersion).perform();
     }

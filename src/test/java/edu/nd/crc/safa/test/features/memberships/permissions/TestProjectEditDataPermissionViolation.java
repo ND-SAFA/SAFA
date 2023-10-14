@@ -14,7 +14,7 @@ import org.json.JSONObject;
 /**
  * Responsible for verifying that violating a permission returns a 403 response.
  */
-public class TestViewPermissionViolation extends AbstractPermissionViolationTest {
+public class TestProjectEditDataPermissionViolation extends AbstractPermissionViolationTest {
 
     @Override
     protected JSONObject performViolatingAction() throws Exception {
@@ -26,7 +26,7 @@ public class TestViewPermissionViolation extends AbstractPermissionViolationTest
 
     @Override
     protected Permission getExpectedPermission() {
-        return ProjectPermission.EDIT;
+        return ProjectPermission.EDIT_DATA;
     }
 
     static class Constants {

@@ -127,8 +127,10 @@ public class JobController extends BaseController {
         @RequestParam(required = false, defaultValue = "false") boolean summarize)
         throws Exception {
         SafaUser user = safaUserService.getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
         UpdateProjectByFlatFileJobBuilder jobBuilder =
             new UpdateProjectByFlatFileJobBuilder(
                 user,
@@ -209,8 +211,11 @@ public class JobController extends BaseController {
         // Step - Check permissions and retrieve persistent properties
         UUID versionId = request.getProjectVersion().getVersionId();
         SafaUser user = safaUserService.getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .withPermission(ProjectPermission.GENERATE, user)
+            .get();
         request.setProjectVersion(projectVersion);
 
         // Step - Create and start job.

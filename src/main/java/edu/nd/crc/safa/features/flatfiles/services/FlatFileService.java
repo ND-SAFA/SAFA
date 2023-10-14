@@ -112,7 +112,7 @@ public class FlatFileService {
         throws SafaError, IOException {
 
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(projectVersionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT_DATA, user).get();
         return updateProjectFromFlatFiles(projectVersion, files, user, asCompleteSet);
     }
 

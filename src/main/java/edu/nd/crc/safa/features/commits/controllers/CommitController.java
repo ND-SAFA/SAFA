@@ -47,7 +47,7 @@ public class CommitController extends BaseController {
         ServiceProvider serviceProvider = this.getServiceProvider();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = this.getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT_DATA, user).get();
 
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectCommitAppEntity);
         projectCommitDefinition.setCommitVersion(projectVersion);

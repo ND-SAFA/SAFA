@@ -80,7 +80,7 @@ public class VersionController extends BaseController {
     public ProjectVersion createNewMajorVersion(@PathVariable UUID projectId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_VERSIONS, user).get();
         return versionService.createNewMajorVersion(project);
     }
 
@@ -96,7 +96,7 @@ public class VersionController extends BaseController {
     public ProjectVersion createNewMinorVersion(@PathVariable UUID projectId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_VERSIONS, user).get();
         return versionService.createNewMinorVersion(project);
     }
 
@@ -112,7 +112,7 @@ public class VersionController extends BaseController {
     public ProjectVersion createNewRevisionVersion(@PathVariable UUID projectId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_VERSIONS, user).get();
         return versionService.createNextRevision(project);
     }
 
@@ -126,7 +126,7 @@ public class VersionController extends BaseController {
     public void deleteVersion(@PathVariable UUID versionId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_VERSIONS, user).get();
         getServiceProvider().getProjectVersionRepository().delete(projectVersion);
     }
 }

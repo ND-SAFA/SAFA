@@ -66,8 +66,10 @@ public class DocumentArtifactController extends BaseDocumentController {
                                                           @RequestBody List<ArtifactAppEntity> artifacts
     ) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
         Document document = getDocumentById(getDocumentRepository(), documentId);
         for (ArtifactAppEntity a : artifacts) {
             UUID artifactId = a.getId();
@@ -99,8 +101,10 @@ public class DocumentArtifactController extends BaseDocumentController {
                                            @PathVariable UUID documentId,
                                            @PathVariable UUID artifactId) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
         Document document = getDocumentById(getDocumentRepository(), documentId);
         Artifact artifact = getArtifactById(artifactId);
         Optional<DocumentArtifact> documentArtifactQuery =

@@ -38,7 +38,10 @@ public class SearchController extends BaseController {
         throws InvalidAttributeValueException {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion =
-            getResourceBuilder().fetchVersion(versionId).withPermission(ProjectPermission.EDIT, user).get();
+            getResourceBuilder()
+                .fetchVersion(versionId)
+                .withPermission(ProjectPermission.VIEW, user)
+                .get();
         ProjectAppEntity projectAppEntity = getServiceProvider()
             .getProjectRetrievalService()
             .getProjectAppEntity(projectVersion);

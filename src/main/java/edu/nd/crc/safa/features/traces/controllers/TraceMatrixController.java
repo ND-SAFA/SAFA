@@ -43,7 +43,7 @@ public class TraceMatrixController extends BaseController {
                                                           @PathVariable String targetTypeName) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(projectVersionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_DATA, user).get();
         ArtifactType sourceType = typeService.getArtifactType(projectVersion.getProject(), sourceTypeName);
         ArtifactType targetType = typeService.getArtifactType(projectVersion.getProject(), targetTypeName);
         TraceMatrixEntry newEntry = traceMatrixService.createEntry(projectVersion, sourceType, targetType);
@@ -56,7 +56,7 @@ public class TraceMatrixController extends BaseController {
                                                        @PathVariable String targetTypeName) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(projectVersionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_DATA, user).get();
         ArtifactType sourceType = typeService.getArtifactType(projectVersion.getProject(), sourceTypeName);
         ArtifactType targetType = typeService.getArtifactType(projectVersion.getProject(), targetTypeName);
         Optional<TraceMatrixEntry> entryOptional = traceMatrixService.getEntry(projectVersion, sourceType, targetType);
@@ -68,7 +68,7 @@ public class TraceMatrixController extends BaseController {
     public void deleteTraceMatrixEntry(@PathVariable UUID projectVersionId, @PathVariable UUID traceMatrixId) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(projectVersionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_DATA, user).get();
         Optional<TraceMatrixEntry> entryOptional = traceMatrixService.getEntry(traceMatrixId);
         TraceMatrixEntry entry = entryOptional.orElseThrow(this::createMissingEntryException);
 

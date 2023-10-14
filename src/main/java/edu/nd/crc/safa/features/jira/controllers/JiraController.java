@@ -126,8 +126,11 @@ public class JiraController extends BaseController {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, principal).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, principal)
+            .withPermission(ProjectPermission.EDIT_INTEGRATIONS, principal)
+            .get();
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, orgId);
         UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
             getServiceProvider(),
@@ -159,8 +162,11 @@ public class JiraController extends BaseController {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, principal).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, principal)
+            .withPermission(ProjectPermission.EDIT_INTEGRATIONS, principal)
+            .get();
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, orgId);
         ImportIntoProjectViaJiraBuilder updateProjectViaJira = new ImportIntoProjectViaJiraBuilder(
             getServiceProvider(),

@@ -49,7 +49,7 @@ public class ArtifactTypeController extends BaseController {
 
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_DATA, user).get();
         TypeService typeService = getServiceProvider().getTypeService();
         artifactType = typeService.createArtifactType(project, artifactType.getName(), artifactType.getColor(), user);
         return new TypeAppEntity(artifactType);
@@ -69,7 +69,7 @@ public class ArtifactTypeController extends BaseController {
                                             @RequestBody ArtifactType artifactTypeObj) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_DATA, user).get();
         TypeService typeService = getServiceProvider().getTypeService();
         artifactTypeObj = typeService.updateArtifactType(project, artifactTypeObj, user);
         return new TypeAppEntity(artifactTypeObj);
@@ -92,7 +92,7 @@ public class ArtifactTypeController extends BaseController {
 
         Project project = type.getProject();
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        getResourceBuilder().setProject(project).withPermission(ProjectPermission.EDIT, user);
+        getResourceBuilder().setProject(project).withPermission(ProjectPermission.EDIT_DATA, user);
 
         typeService.deleteArtifactType(type, user);
     }

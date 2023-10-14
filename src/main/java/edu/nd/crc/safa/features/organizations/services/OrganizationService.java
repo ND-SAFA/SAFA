@@ -171,11 +171,11 @@ public class OrganizationService {
     }
 
     /**
-     * Delete an organization based on its id.
+     * Delete an organization.
      *
-     * @param id The id of the org to delete.
+     * @param organization The org to delete.
      */
-    public void deleteOrganizationById(UUID id) {
-        organizationRepo.deleteById(id);
+    public void deleteOrganization(Organization organization) {
+        organizationRepo.delete(organization);
     }
 }

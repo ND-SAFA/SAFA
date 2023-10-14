@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipServi
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
+import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -119,6 +120,11 @@ public class OrganizationController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Organizations.BY_ID)
     public void deleteOrganization(@PathVariable UUID orgId) {
-        organizationService.deleteOrganizationById(orgId);
+        SafaUser user = getCurrentUser();
+        Organization org = getResourceBuilder()
+            .fetchOrganization(orgId)
+            .withPermission(OrganizationPermission.DELETE, user)
+            .get();
+        organizationService.deleteOrganization(org);
     }
 }

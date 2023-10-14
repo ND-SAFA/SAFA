@@ -28,6 +28,11 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
+import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
+import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -54,11 +59,13 @@ public class MembershipController extends BaseController {
     private final ProjectMembershipService projectMembershipService;
     private final TeamMembershipService teamMembershipService;
 
+    private final PermissionService permissionService;
+
     public MembershipController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
                                 OrganizationService organizationService, ProjectService projectService,
                                 TeamService teamService, OrganizationMembershipService orgMembershipService,
                                 ProjectMembershipService projectMembershipService,
-                                TeamMembershipService teamMembershipService) {
+                                TeamMembershipService teamMembershipService, PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
         this.organizationService = organizationService;
         this.projectService = projectService;
@@ -66,6 +73,7 @@ public class MembershipController extends BaseController {
         this.orgMembershipService = orgMembershipService;
         this.projectMembershipService = projectMembershipService;
         this.teamMembershipService = teamMembershipService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -82,7 +90,10 @@ public class MembershipController extends BaseController {
                 entityId,
                 orgMembershipService::getAllMembershipsByOrganization,
                 teamMembershipService::getTeamMemberships,
-                projectMembershipService::getProjectMembers
+                projectMembershipService::getProjectMembers,
+                OrganizationPermission.VIEW,
+                TeamPermission.VIEW,
+                ProjectPermission.VIEW
             )
         );
     }
@@ -107,7 +118,10 @@ public class MembershipController extends BaseController {
                 team ->
                     teamMembershipService.addUserRole(newMember, team, TeamRole.valueOf(newMembership.getRole())),
                 proj ->
-                    projectMembershipService.addUserRole(newMember, proj, ProjectRole.valueOf(newMembership.getRole()))
+                    projectMembershipService.addUserRole(newMember, proj, ProjectRole.valueOf(newMembership.getRole())),
+                OrganizationPermission.EDIT_MEMBERS,
+                TeamPermission.EDIT_MEMBERS,
+                ProjectPermission.EDIT_MEMBERS
             )
         );
     }
@@ -130,7 +144,10 @@ public class MembershipController extends BaseController {
                 entityId,
                 org -> modifyOrgMembership(membershipId, org, membership.getRole()),
                 team -> modifyTeamMembership(membershipId, team, membership.getRole()),
-                project -> modifyProjectMembership(membershipId, project, membership.getRole())
+                project -> modifyProjectMembership(membershipId, project, membership.getRole()),
+                OrganizationPermission.EDIT_MEMBERS,
+                TeamPermission.EDIT_MEMBERS,
+                ProjectPermission.EDIT_MEMBERS
             )
         );
     }
@@ -148,7 +165,10 @@ public class MembershipController extends BaseController {
             entityId,
             org -> modifyOrgMembership(membershipId, org, null),
             team -> modifyTeamMembership(membershipId, team, null),
-            project -> modifyProjectMembership(membershipId, project, null)
+            project -> modifyProjectMembership(membershipId, project, null),
+            OrganizationPermission.EDIT_MEMBERS,
+            TeamPermission.EDIT_MEMBERS,
+            ProjectPermission.EDIT_MEMBERS
         );
     }
 
@@ -180,24 +200,31 @@ public class MembershipController extends BaseController {
             team -> teamMembershipService.getUserRoles(member, team)
                 .forEach(role -> teamMembershipService.removeUserRole(member, team, role)),
             project -> projectMembershipService.getUserRoles(member, project)
-                .forEach(role -> projectMembershipService.removeUserRole(member, project, role))
+                .forEach(role -> projectMembershipService.removeUserRole(member, project, role)),
+            OrganizationPermission.EDIT_MEMBERS,
+            TeamPermission.EDIT_MEMBERS,
+            ProjectPermission.EDIT_MEMBERS
         );
     }
 
     /**
-     * This is the same as {@link #transformEntity(UUID, Function, Function, Function)} except that
-     * it supports functions without a return type.
-     * This is the same as {@link #transformEntity(UUID, Function, Function, Function)} except that
+     * This is the same as
+     * {@link #transformEntity(UUID, Function, Function, Function, Permission, Permission, Permission)} except that
      * it supports functions without a return type.
      *
      * @param entityId The ID of the entity to process.
      * @param organizationConsumer The function to apply if the entity is an organization
      * @param teamConsumer The function to apply if the entity is a team
      * @param projectConsumer The function to apply if the entity is a project
+     * @param organizationPermission The permission required for the organization entity
+     * @param teamPermission The permission required for the team entity
+     * @param projectPermission The permission required for the project entity
      * @throws SafaItemNotFoundError If the specified ID did not map to an organization, a team, or a project
      */
     private void consumeEntity(UUID entityId, Consumer<Organization> organizationConsumer,
-                               Consumer<Team> teamConsumer, Consumer<Project> projectConsumer) {
+                               Consumer<Team> teamConsumer, Consumer<Project> projectConsumer,
+                               Permission organizationPermission, Permission teamPermission,
+                               Permission projectPermission) {
         transformEntity(
             entityId,
             org -> {
@@ -211,7 +238,11 @@ public class MembershipController extends BaseController {
             project -> {
                 projectConsumer.accept(project);
                 return null;
-            });
+            },
+            organizationPermission,
+            teamPermission,
+            projectPermission
+        );
     }
 
     /**
@@ -296,24 +327,32 @@ public class MembershipController extends BaseController {
      * @param organizationFunction The function to apply if the entity is an organization
      * @param teamFunction The function to apply if the entity is a team
      * @param projectFunction The function to apply if the entity is a project
+     * @param organizationPermission The permission required for the organization entity
+     * @param teamPermission The permission required for the team entity
+     * @param projectPermission The permission required for the project entity
      * @param <T> The return type of the functions
      * @return The result of whichever function gets called
      * @throws SafaItemNotFoundError If the specified ID did not map to an organization, a team, or a project
      */
     private <T> T transformEntity(UUID entityId, Function<Organization, T> organizationFunction,
-                                  Function<Team, T> teamFunction, Function<Project, T> projectFunction) {
+                                  Function<Team, T> teamFunction, Function<Project, T> projectFunction,
+                                  Permission organizationPermission, Permission teamPermission,
+                                  Permission projectPermission) {
         Optional<Organization> optionalOrganization = organizationService.getOrganizationOptionalById(entityId);
         if (optionalOrganization.isPresent()) {
+            permissionService.requirePermission(organizationPermission, optionalOrganization.get(), getCurrentUser());
             return organizationFunction.apply(optionalOrganization.get());
         }
 
         Optional<Team> optionalTeam = teamService.getTeamOptionalById(entityId);
         if (optionalTeam.isPresent()) {
+            permissionService.requirePermission(teamPermission, optionalTeam.get(), getCurrentUser());
             return teamFunction.apply(optionalTeam.get());
         }
 
         Optional<Project> optionalProject = projectService.getProjectOptionalById(entityId);
         if (optionalProject.isPresent()) {
+            permissionService.requirePermission(projectPermission, optionalProject.get(), getCurrentUser());
             return projectFunction.apply(optionalProject.get());
         }
 

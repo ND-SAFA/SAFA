@@ -137,6 +137,16 @@ public class PermissionService {
     }
 
     /**
+     * Returns whether the given user is a superuser.
+     *
+     * @param user The user in question
+     * @return Whether the user is a superuser
+     */
+    public boolean isSuperuser(SafaUser user) {
+        return user.isSuperuser();
+    }
+
+    /**
      * Throws an exception if the user does not have the given permission within the given project.
      *
      * @param permission The permission to check
@@ -254,6 +264,17 @@ public class PermissionService {
     }
 
     /**
+     * Throws an exception if the given user is not a superuser.
+     *
+     * @param user The user in question
+     */
+    public void requireSuperuser(SafaUser user) {
+        if (!isSuperuser(user)) {
+            throw new MissingPermissionException(() -> "safa.superuser");
+        }
+    }
+
+    /**
      * Get the set of permissions the given user has associated with the given project.
      * This function will use the project role, team role, and organization role together
      * to determine what actions the user can perform.
@@ -352,7 +373,7 @@ public class PermissionService {
      */
     private boolean checkPermissionsAllMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
                                              SafaUser user) {
-        if (user.isSuperuser()) {
+        if (isSuperuser(user)) {
             return true;
         }
         return userPermissions.containsAll(requiredPermissions);
@@ -368,7 +389,7 @@ public class PermissionService {
      */
     private boolean checkPermissionsAnyMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
                                              SafaUser user) {
-        if (user.isSuperuser()) {
+        if (isSuperuser(user)) {
             return true;
         }
         return requiredPermissions.stream().anyMatch(userPermissions::contains);
@@ -383,7 +404,7 @@ public class PermissionService {
      * @return Whether the user has the required permission
      */
     private boolean checkPermission(Permission requiredPermission, Set<Permission> userPermissions, SafaUser user) {
-        if (user.isSuperuser()) {
+        if (isSuperuser(user)) {
             return true;
         }
         return userPermissions.contains(requiredPermission);

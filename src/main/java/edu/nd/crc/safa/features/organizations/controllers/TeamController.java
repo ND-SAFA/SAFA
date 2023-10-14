@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
+import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -91,7 +92,10 @@ public class TeamController extends BaseController {
     @PostMapping(AppRoutes.Organizations.Teams.ROOT)
     public TeamAppEntity createTeam(@PathVariable UUID orgId, @RequestBody TeamAppEntity teamAppEntity) {
         SafaUser user = getCurrentUser();
-        Organization organization = organizationService.getOrganizationById(orgId);
+        Organization organization = getResourceBuilder()
+            .fetchOrganization(orgId)
+            .withPermission(OrganizationPermission.CREATE_TEAMS, user)
+            .get();
         assertNotNull(teamAppEntity.getName(), "Missing team name.");
         Team newTeam = teamService.createNewTeam(teamAppEntity.getName(), organization, false, user);
         return teamService.getAppEntity(newTeam, user);

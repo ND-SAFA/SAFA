@@ -37,7 +37,7 @@ public class PermissionService {
      * @return Whether the user has the given permission
      */
     public boolean hasPermission(Permission permission, Project project, SafaUser user) {
-        return hasPermissions(Set.of(permission), project, user);
+        return checkPermission(permission, getUserPermissions(user, project), user);
     }
 
     /**
@@ -49,7 +49,7 @@ public class PermissionService {
      * @return Whether the user has the given permission
      */
     public boolean hasPermission(Permission permission, Team team, SafaUser user) {
-        return hasPermissions(Set.of(permission), team, user);
+        return checkPermission(permission, getUserPermissions(user, team), user);
     }
 
     /**
@@ -61,7 +61,7 @@ public class PermissionService {
      * @return Whether the user has the given permission
      */
     public boolean hasPermission(Permission permission, Organization organization, SafaUser user) {
-        return hasPermissions(Set.of(permission), organization, user);
+        return checkPermission(permission, getUserPermissions(user, organization), user);
     }
 
     /**
@@ -73,11 +73,7 @@ public class PermissionService {
      * @return Whether the user has the given permissions
      */
     public boolean hasPermissions(Set<Permission> permissions, Project project, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        return getUserPermissions(user, project).containsAll(permissions);
+        return checkPermissionsAllMatch(permissions, getUserPermissions(user, project), user);
     }
 
     /**
@@ -89,11 +85,7 @@ public class PermissionService {
      * @return Whether the user has the given permissions
      */
     public boolean hasPermissions(Set<Permission> permissions, Team team, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        return getUserPermissions(user, team).containsAll(permissions);
+        return checkPermissionsAllMatch(permissions, getUserPermissions(user, team), user);
     }
 
     /**
@@ -105,11 +97,7 @@ public class PermissionService {
      * @return Whether the user has the given permissions
      */
     public boolean hasPermissions(Set<Permission> permissions, Organization organization, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        return getUserPermissions(user, organization).containsAll(permissions);
+        return checkPermissionsAllMatch(permissions, getUserPermissions(user, organization), user);
     }
 
     /**
@@ -121,12 +109,7 @@ public class PermissionService {
      * @return Whether the user has any of the given permissions
      */
     public boolean hasAnyPermission(Set<Permission> permissions, Project project, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        Set<Permission> userPermissions = getUserPermissions(user, project);
-        return permissions.stream().anyMatch(userPermissions::contains);
+        return checkPermissionsAnyMatch(permissions, getUserPermissions(user, project), user);
     }
 
     /**
@@ -138,12 +121,7 @@ public class PermissionService {
      * @return Whether the user has any of the given permissions
      */
     public boolean hasAnyPermission(Set<Permission> permissions, Team team, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        Set<Permission> userPermissions = getUserPermissions(user, team);
-        return permissions.stream().anyMatch(userPermissions::contains);
+        return checkPermissionsAnyMatch(permissions, getUserPermissions(user, team), user);
     }
 
     /**
@@ -155,12 +133,7 @@ public class PermissionService {
      * @return Whether the user has any of the given permissions
      */
     public boolean hasAnyPermission(Set<Permission> permissions, Organization organization, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        Set<Permission> userPermissions = getUserPermissions(user, organization);
-        return permissions.stream().anyMatch(userPermissions::contains);
+        return checkPermissionsAnyMatch(permissions, getUserPermissions(user, organization), user);
     }
 
     /**
@@ -367,6 +340,53 @@ public class PermissionService {
      */
     public List<OrganizationRole> getUserRoles(SafaUser user, Organization organization) {
         return orgMembershipService.getUserRoles(user, organization);
+    }
+
+    /**
+     * Checks that all required permissions are in the user permission set.
+     *
+     * @param requiredPermissions All permissions that are required
+     * @param userPermissions All permissions that the user has
+     * @param user The user to check. If the user is a superuser, the function always returns true
+     * @return Whether the user has all required permissions
+     */
+    private boolean checkPermissionsAllMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
+                                             SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+        return userPermissions.containsAll(requiredPermissions);
+    }
+
+    /**
+     * Checks that any required permission is in the user permission set.
+     *
+     * @param requiredPermissions Set of permissions to check
+     * @param userPermissions All permissions that the user has
+     * @param user The user to check. If the user is a superuser, the function always returns true
+     * @return Whether the user has any of the required permissions
+     */
+    private boolean checkPermissionsAnyMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
+                                             SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+        return requiredPermissions.stream().anyMatch(userPermissions::contains);
+    }
+
+    /**
+     * Checks that the required permissions is in the user permission set.
+     *
+     * @param requiredPermission The required permission
+     * @param userPermissions All permissions that the user has
+     * @param user The user to check. If the user is a superuser, the function always returns true
+     * @return Whether the user has the required permission
+     */
+    private boolean checkPermission(Permission requiredPermission, Set<Permission> userPermissions, SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+        return userPermissions.contains(requiredPermission);
     }
 
 }

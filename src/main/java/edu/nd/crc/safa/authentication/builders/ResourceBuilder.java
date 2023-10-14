@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -112,7 +113,7 @@ public class ResourceBuilder {
      */
     public abstract static class ObjectHolder<T> {
 
-        @Getter
+        @Getter(AccessLevel.PROTECTED)
         private final T value;
 
         private Permission missingPermission;

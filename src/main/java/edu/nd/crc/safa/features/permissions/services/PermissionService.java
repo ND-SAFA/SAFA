@@ -37,11 +37,7 @@ public class PermissionService {
      * @return Whether the user has the given permission
      */
     public boolean hasPermission(Permission permission, Project project, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        return getUserPermissions(user, project).contains(permission);
+        return hasPermissions(Set.of(permission), project, user);
     }
 
     /**
@@ -53,11 +49,7 @@ public class PermissionService {
      * @return Whether the user has the given permission
      */
     public boolean hasPermission(Permission permission, Team team, SafaUser user) {
-        if (user.isSuperuser()) {
-            return true;
-        }
-
-        return getUserPermissions(user, team).contains(permission);
+        return hasPermissions(Set.of(permission), team, user);
     }
 
     /**
@@ -69,11 +61,106 @@ public class PermissionService {
      * @return Whether the user has the given permission
      */
     public boolean hasPermission(Permission permission, Organization organization, SafaUser user) {
+        return hasPermissions(Set.of(permission), organization, user);
+    }
+
+    /**
+     * Returns whether the user has the given permissions within the given project.
+     *
+     * @param permissions The permissions to check
+     * @param project The project we're considering
+     * @param user The user in question
+     * @return Whether the user has the given permissions
+     */
+    public boolean hasPermissions(Set<Permission> permissions, Project project, SafaUser user) {
         if (user.isSuperuser()) {
             return true;
         }
 
-        return getUserPermissions(user, organization).contains(permission);
+        return getUserPermissions(user, project).containsAll(permissions);
+    }
+
+    /**
+     * Returns whether the user has the given permissions within the given team.
+     *
+     * @param permissions The permissions to check
+     * @param team The team we're considering
+     * @param user The user in question
+     * @return Whether the user has the given permissions
+     */
+    public boolean hasPermissions(Set<Permission> permissions, Team team, SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+
+        return getUserPermissions(user, team).containsAll(permissions);
+    }
+
+    /**
+     * Returns whether the user has the given permissions within the given organization.
+     *
+     * @param permissions The permissions to check
+     * @param organization The organization we're considering
+     * @param user The user in question
+     * @return Whether the user has the given permissions
+     */
+    public boolean hasPermissions(Set<Permission> permissions, Organization organization, SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+
+        return getUserPermissions(user, organization).containsAll(permissions);
+    }
+
+    /**
+     * Returns whether the user has any of the given permissions within the given project.
+     *
+     * @param permissions The permissions to check
+     * @param project The project we're considering
+     * @param user The user in question
+     * @return Whether the user has any of the given permissions
+     */
+    public boolean hasAnyPermission(Set<Permission> permissions, Project project, SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+
+        Set<Permission> userPermissions = getUserPermissions(user, project);
+        return permissions.stream().anyMatch(userPermissions::contains);
+    }
+
+    /**
+     * Returns whether the user has any of the given permissions within the given team.
+     *
+     * @param permissions The permissions to check
+     * @param team The team we're considering
+     * @param user The user in question
+     * @return Whether the user has any of the given permissions
+     */
+    public boolean hasAnyPermission(Set<Permission> permissions, Team team, SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+
+        Set<Permission> userPermissions = getUserPermissions(user, team);
+        return permissions.stream().anyMatch(userPermissions::contains);
+    }
+
+    /**
+     * Returns whether the user has any of the given permissions within the given organization.
+     *
+     * @param permissions The permissions to check
+     * @param organization The organization we're considering
+     * @param user The user in question
+     * @return Whether the user has any of the given permissions
+     */
+    public boolean hasAnyPermission(Set<Permission> permissions, Organization organization, SafaUser user) {
+        if (user.isSuperuser()) {
+            return true;
+        }
+
+        Set<Permission> userPermissions = getUserPermissions(user, organization);
+        return permissions.stream().anyMatch(userPermissions::contains);
     }
 
     /**
@@ -112,6 +199,84 @@ public class PermissionService {
     public void requirePermission(Permission permission, Organization organization, SafaUser user) {
         if (!hasPermission(permission, organization, user)) {
             throw new MissingPermissionException(permission);
+        }
+    }
+
+    /**
+     * Throws an exception if the user does not have the given permissions within the given project.
+     *
+     * @param permissions The permissions to check
+     * @param project The project we're considering
+     * @param user The user in question
+     */
+    public void requirePermissions(Set<Permission> permissions, Project project, SafaUser user) {
+        if (!hasPermissions(permissions, project, user)) {
+            throw new MissingPermissionException(permissions, true);
+        }
+    }
+
+    /**
+     * Throws an exception if the user does not have the given permissions within the given team.
+     *
+     * @param permissions The permissions to check
+     * @param team The team we're considering
+     * @param user The user in question
+     */
+    public void requirePermissions(Set<Permission> permissions, Team team, SafaUser user) {
+        if (!hasPermissions(permissions, team, user)) {
+            throw new MissingPermissionException(permissions, true);
+        }
+    }
+
+    /**
+     * Throws an exception if the user does not have the given permissions within the given organization.
+     *
+     * @param permissions The permissions to check
+     * @param organization The organization we're considering
+     * @param user The user in question
+     */
+    public void requirePermissions(Set<Permission> permissions, Organization organization, SafaUser user) {
+        if (!hasPermissions(permissions, organization, user)) {
+            throw new MissingPermissionException(permissions, true);
+        }
+    }
+
+    /**
+     * Throws an exception if the user does not have any of the given permissions within the given project.
+     *
+     * @param permissions The permissions to check
+     * @param project The project we're considering
+     * @param user The user in question
+     */
+    public void requireAnyPermission(Set<Permission> permissions, Project project, SafaUser user) {
+        if (!hasAnyPermission(permissions, project, user)) {
+            throw new MissingPermissionException(permissions, false);
+        }
+    }
+
+    /**
+     * Throws an exception if the user does not have any of the given permissions within the given team.
+     *
+     * @param permissions The permissions to check
+     * @param team The team we're considering
+     * @param user The user in question
+     */
+    public void requireAnyPermission(Set<Permission> permissions, Team team, SafaUser user) {
+        if (!hasAnyPermission(permissions, team, user)) {
+            throw new MissingPermissionException(permissions, false);
+        }
+    }
+
+    /**
+     * Throws an exception if the user does not have any of the given permissions within the given organization.
+     *
+     * @param permissions The permissions to check
+     * @param organization The organization we're considering
+     * @param user The user in question
+     */
+    public void requireAnyPermission(Set<Permission> permissions, Organization organization, SafaUser user) {
+        if (!hasAnyPermission(permissions, organization, user)) {
+            throw new MissingPermissionException(permissions, false);
         }
     }
 

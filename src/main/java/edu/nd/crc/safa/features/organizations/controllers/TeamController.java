@@ -6,6 +6,7 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertNotNull;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -53,8 +54,19 @@ public class TeamController extends BaseController {
      */
     @GetMapping(AppRoutes.Organizations.Teams.ROOT)
     public List<TeamAppEntity> getOrganizationTeams(@PathVariable UUID orgId) {
+        SafaUser user = getCurrentUser();
         Organization organization = organizationService.getOrganizationById(orgId);
-        List<Team> orgTeams = teamService.getAllTeamsByOrganization(organization);
+        List<Team> orgTeams = teamService.getAllTeamsByOrganization(organization)
+            .stream()
+            .filter(team ->
+                permissionService.hasAnyPermission(
+                    Set.of(OrganizationPermission.VIEW_TEAMS, TeamPermission.VIEW),
+                    team,
+                    user
+                )
+            )
+            .collect(Collectors.toUnmodifiableList());
+
         return teamService.getAppEntities(orgTeams, getCurrentUser());
     }
 
@@ -69,9 +81,12 @@ public class TeamController extends BaseController {
      */
     @GetMapping(AppRoutes.Organizations.Teams.SELF)
     public TeamAppEntity getFullOrgTeam(@PathVariable UUID orgId) {
+        SafaUser user = getCurrentUser();
         Organization organization = organizationService.getOrganizationById(orgId);
         Team orgTeam = teamService.getFullOrganizationTeam(organization);
-        return teamService.getAppEntity(orgTeam, getCurrentUser());
+        permissionService.requireAnyPermission(
+            Set.of(OrganizationPermission.VIEW_TEAMS, TeamPermission.VIEW), orgTeam, user);
+        return teamService.getAppEntity(orgTeam, user);
     }
 
     /**
@@ -83,8 +98,11 @@ public class TeamController extends BaseController {
      */
     @GetMapping(AppRoutes.Organizations.Teams.BY_ID)
     public TeamAppEntity getTeam(@PathVariable UUID orgId, @PathVariable UUID teamId) {
+        SafaUser user = getCurrentUser();
         Team team = teamService.getTeamById(teamId);
         assertEqual(team.getOrganization().getId(), orgId, "No team with the specified ID found under this org");
+        permissionService.requireAnyPermission(
+            Set.of(OrganizationPermission.VIEW_TEAMS, TeamPermission.VIEW), team, user);
         return teamService.getAppEntity(team, getCurrentUser());
     }
 

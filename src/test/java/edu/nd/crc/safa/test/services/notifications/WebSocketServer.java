@@ -18,6 +18,8 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.Nullable;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -70,6 +72,11 @@ public class WebSocketServer {
         StompSession session = getStompClient()
             .connect(String.format(WEBSOCKET_URI, port), connectionHeaders, messageHeaders,
                 new StompSessionHandlerAdapter() {
+                    @Override
+                    public void handleException(StompSession session, @Nullable StompCommand command,
+                                                StompHeaders headers, byte[] payload, Throwable exception) {
+                        exception.printStackTrace();
+                    }
                 })
             .get(30, SECONDS);
         if (idToSession.containsKey(clientId)) {

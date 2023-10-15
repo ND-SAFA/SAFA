@@ -26,26 +26,17 @@ class TestProjectSubscriptionMessageCommonRequests extends ApplicationBaseTest {
                 .initializeUser(getCurrentUser(), getToken(getCurrentUser()))
                 .subscribeToProject(getCurrentUser(), s.getProject("project")))
             .and("Root User: Save project message.")
-            .notifications(n -> n
-                .getEntityMessage(getCurrentUser()))
-            .save("root-project-message")
-            .and("Verify project message has root as active user.")
-            .verify((s, v) -> v
-                .notifications(n -> n
-                    .verifyMemberNotification(s.getMessage("root-project-message"), List.of(currentUserName))))
+            .actions(a -> a.verifyActiveMembers(getCurrentUser(), List.of(currentUserName)))
             .and("Creating new user.")
             .actions(a -> a
-                .createNewUser(otherUserName, otherUserName, this))
-            .and("New User: Authenticating.")
-            .authorize(a -> a
-                .loginUser(otherUserName, otherUserName, this)
-                .save("token"))
+                .createNewUser(otherUserName, otherUserName, false, this))
             .and("New User: Subscribing to new project and saving project message.")
             .notifications((s, n) -> n
                 .subscribeToProject(s.getIUser(otherUserName), s.getProject("project"))
                 .getEntityMessage(s.getIUser(otherUserName))).save("otherUserMessage")
             .and("Root User: Saving project message/")
-            .notifications((s, n) -> n.getEntityMessage(getCurrentUser())).save("currentUserMessage")
+            .notifications((s, n) -> n
+                .getEntityMessage(getCurrentUser())).save("currentUserMessage")
             .and("Verifying that project messages contain two active users.")
             .verify((s, v) -> v
                 .notifications(n -> n

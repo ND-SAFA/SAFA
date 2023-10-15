@@ -49,7 +49,8 @@ public class ActionBuilder {
                 .save(userName)
                 .and()
                 .loginUser(userName, password, setToken, test)
-                .get()).get();
+                .get())
+            .get();
         if (setToken) {
             this.rootBuilder.store(s -> s.save(getTokenName(userName), token));
         }

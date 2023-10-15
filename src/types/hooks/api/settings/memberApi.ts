@@ -56,9 +56,4 @@ export interface MemberApiHook {
     member: MembershipSchema,
     context?: IdentifierSchema | TeamSchema | OrganizationSchema
   ): void;
-
-  /**
-   * Subscribes to server to enable 1-1 messages.
-   */
-  subscribeToUser(): Promise<void>;
 }

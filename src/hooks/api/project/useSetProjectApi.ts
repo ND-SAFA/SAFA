@@ -7,7 +7,6 @@ import {
   documentStore,
   getVersionApiStore,
   integrationsApiStore,
-  notificationApiStore,
   projectStore,
   subtreeStore,
   useApi,
@@ -47,12 +46,10 @@ export const useSetProjectApi = defineStore(
 
     async function handleSet(project: ProjectSchema): Promise<void> {
       await setProjectApi.handleRequest(async () => {
-        const projectId = project.projectId;
         const versionId = project.projectVersion?.versionId || "";
 
-        projectStore.initializeProject(project);
+        projectStore.initializeProject(project); // automatically subscribes
 
-        await notificationApiStore.handleSubscribeVersion(projectId, versionId);
         await integrationsApiStore.handleReload();
         await handleSetCurrentDocument(project);
         await updateParam(QueryParams.VERSION, versionId);

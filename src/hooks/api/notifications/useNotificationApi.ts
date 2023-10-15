@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore, MutationType } from "pinia";
 import { Frame } from "webstomp-client";
 
 import {
@@ -20,6 +20,7 @@ import {
   getVersionApiStore,
   jobApiStore,
   jobStore,
+  logStore,
   membersStore,
   projectStore,
   setProjectApiStore,
@@ -120,17 +121,18 @@ export const useNotificationApi = defineStore(
           project.traces = <TraceLinkSchema[]>change.entities;
           break;
         case "ACTIVE_MEMBERS":
-          console.log("ACTIVE MEMBERS:", change.entities);
           membersStore.setActiveMembers(<MembershipSchema[]>change.entities);
           break;
         case "WARNINGS":
-          console.log("IGNORING WARNING MESSAGE");
           break;
         case "TRACE_MATRICES":
           project.traceMatrices = <TraceMatrixSchema[]>change.entities;
           break;
         case "TYPES":
           project.artifactTypes = <ArtifactTypeSchema[]>change.entities;
+          break;
+        case "MEMBERS":
+          project.members = <MembershipSchema[]>change.entities;
           break;
         default:
           throw Error("Unhandled entity: " + change.entity);
@@ -147,7 +149,6 @@ export const useNotificationApi = defineStore(
       change: ChangeSchema,
       project: ProjectSchema
     ) {
-      console.log("UPDATING: ", change);
       const versionId = projectStore.versionId;
 
       switch (change.entity) {
@@ -162,6 +163,8 @@ export const useNotificationApi = defineStore(
             entityType: "PROJECT",
             entityId: project.projectId,
           });
+          //TODO: Non-trivial to retrieve the current `active` status of members.
+          // Currently, active members are cleared when a new member is added.
           break;
         case "VERSION":
           return getVersionApiStore.handleLoad(versionId);
@@ -175,7 +178,6 @@ export const useNotificationApi = defineStore(
           await documentStore.updateDocuments(project.documents);
           break;
         case "ARTIFACTS":
-          console.log("ADDING OR UPDATING:", project.artifacts);
           artifactStore.addOrUpdateArtifacts(project.artifacts);
           break;
         case "TRACES":
@@ -212,48 +214,77 @@ export const useNotificationApi = defineStore(
      */
     async function handleEntityChangeMessage(frame: Frame): Promise<void> {
       const message: ChangeMessageSchema = JSON.parse(frame.body);
-      const project = await getChanges(versionId, message);
-      let hasLayoutChange = false; // Layout changes are currently disabled.
-      console.log("HANDLING MESSAGE:", message);
 
       // Step - Iterate through message and delete entities.
       for (const change of message.changes) {
-        console.log("CURR CHANGE:", change);
         const project = createProjectSchema(change);
         if (change.action === ActionType.DELETE) {
-          console.log("Handling DELETE>");
           await handleDeleteChange(change);
         } else if (change.action === ActionType.UPDATE) {
-          console.log("STARTING CHANGE", project);
           await handleUpdateChange(change, project);
         } else {
           throw Error("Unable to handle action:" + change.action);
         }
-        console.log("Done with change.");
       }
+    }
+
+    function isProjectSet(project: ProjectSchema): boolean {
+      const projectId = project.projectId;
+      const versionId = project.projectVersion?.versionId;
+      return versionId !== undefined && versionId !== "" && projectId !== "";
+    }
+
+    function getProjectVersion(project: ProjectSchema): string {
+      const versionId = project.projectVersion?.versionId;
+      if (versionId === undefined || versionId === "") {
+        throw Error("Undefined project version!");
+      }
+      return versionId;
     }
 
     async function handleSubscribeVersion(
       projectId: string,
       versionId: string
     ): Promise<void> {
-      if (!projectId || !versionId) return;
+      if (!projectId || !versionId) {
+        logStore.onDevError(
+          "Received invalid project " + projectId + "or version id " + versionId
+        );
+        return;
+      }
+      await stompApiStore.clearSubscriptions();
 
-      await stompApiStore.connectStomp();
-
-      stompApiStore.clearStompSubscriptions();
-
-      await stompApiStore.subscribeToStomp(
+      await stompApiStore.subscribeTo(
         fillEndpoint("projectTopic", { projectId }),
         handleEntityChangeMessage
       );
 
-      await stompApiStore.subscribeToStomp(
+      await stompApiStore.subscribeTo(
         fillEndpoint("versionTopic", { versionId }),
         handleEntityChangeMessage
       );
     }
 
+    projectStore.$subscribe((mutation, state) => {
+      if (mutation.type === MutationType.direct) {
+        if (mutation.events.key === "project") {
+          const oldProject: ProjectSchema = mutation.events.oldValue;
+          const newProject: ProjectSchema = mutation.events.newValue;
+          const oldProjectSet = isProjectSet(oldProject);
+          const newProjectSet = isProjectSet(newProject);
+          if (
+            oldProject.projectVersion?.versionId !==
+            newProject.projectVersion?.versionId
+          ) {
+            const versionId = getProjectVersion(newProject);
+            handleSubscribeVersion(newProject.projectId, versionId).then();
+          } else if (!newProjectSet && oldProjectSet) {
+            // no project selected, clear subscriptions
+            stompApiStore.clearSubscriptions().then();
+          }
+        }
+      }
+    });
     return { handleSubscribeVersion };
   }
 );

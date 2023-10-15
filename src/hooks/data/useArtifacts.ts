@@ -61,13 +61,10 @@ export const useArtifacts = defineStore("artifacts", {
      */
     addOrUpdateArtifacts(newArtifacts: ArtifactSchema[]): void {
       const newIds = newArtifacts.map(({ id }) => id);
-      console.log("BEFORE ARTIFACTS:", this.allArtifacts);
       const updatedArtifacts = [
         ...removeMatches(this.allArtifacts, "id", newIds),
         ...newArtifacts,
       ];
-
-      console.log("UPDATED ARTIFACTS:", updatedArtifacts);
 
       documentStore.addDocumentArtifacts(newIds);
       this.initializeArtifacts({

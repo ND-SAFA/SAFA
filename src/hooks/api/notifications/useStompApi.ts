@@ -1,21 +1,17 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import SockJS from "sockjs-client";
-import Stomp, {
-  Client,
-  Message,
-  Subscription,
-  SubscriptionsMap,
-} from "webstomp-client";
+import Stomp, { Client, Frame, Message, Subscription } from "webstomp-client";
 import { StompApiHook } from "@/types";
-import { logStore, sessionStore } from "@/hooks";
-import {
-  fillEndpoint,
-  MAX_RECONNECT_ATTEMPTS,
-  RECONNECT_WAIT_TIME,
-  WEBSOCKET_URL,
-} from "@/api";
+import { logStore } from "@/hooks";
+import { WEBSOCKET_URL } from "@/api";
 import { pinia } from "@/plugins";
+
+interface Channel {
+  subscription: Subscription;
+  topic: string;
+  handler: (message: Message) => void;
+}
 
 /**
  * The hook with a client for connecting to the backend websocket server.
@@ -23,10 +19,8 @@ import { pinia } from "@/plugins";
 export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   const stompClient = ref<Client>();
   const socket = ref<WebSocket>();
-  const reconnectInterval = ref<NodeJS.Timeout>();
-  const reconnectAttempts = ref(0);
   const isConnected = ref(false);
-  const isAuthenticated = ref(false);
+  const channels = ref<Channel[]>([]);
 
   /**
    * Returns the current stomp client, creating one if none exists.
@@ -59,113 +53,103 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     return stompClient.value;
   }
 
-  function connectStomp(
-    maxReconnectAttempts: number = MAX_RECONNECT_ATTEMPTS,
-    reconnectWaitTime: number = RECONNECT_WAIT_TIME,
-    isReconnect = false
-  ): Promise<void> {
+  /**
+   * Setup up connection to back-end.
+   * @param isReconnect Whether this is a reconnection attempt.
+   */
+  function connectStomp(isReconnect = false): Promise<void> {
     return new Promise((resolve, reject) => {
       const stomp = getStomp(isReconnect);
 
-      if (!stomp) return;
+      if (!stomp) {
+        const error = "Stomp returned null value:" + stomp;
+        logStore.onDevError(error);
+        return reject(error);
+      }
 
       if (stomp.connected) {
-        logStore.onDevInfo("Client is connected to WebSocket.");
-        clearInterval(reconnectInterval.value);
         isConnected.value = true;
         return resolve();
       }
 
-      if (reconnectAttempts.value > 0) {
-        logStore.onDevInfo(
-          `Websocket reconnect attempt:${reconnectAttempts.value}`
-        );
-      }
-
-      reconnectAttempts.value++;
-
       stomp.connect(
         { host: WEBSOCKET_URL() },
         () => {
-          logStore.onDevInfo(
-            "Websocket connection successful. " +
-              `Subscriptions: ${JSON.stringify(stomp.subscriptions)}`
-          );
-
-          clearInterval(reconnectInterval.value);
-
-          reconnectAttempts.value = 0;
+          logStore.onDevInfo("Websocket connection successful.");
           isConnected.value = true;
-          resolve();
+          if (isReconnect) {
+            subscribeToTopics()
+              .then(() => resolve())
+              .catch(reject);
+          }
+          return resolve();
         },
-        () => {
-          logStore.onDevInfo("Re-connecting with WebSocket.");
+        (error: CloseEvent | Frame) => {
+          logStore.onDevError("Stomp has lost connection to server." + error);
           isConnected.value = false;
-          clearInterval(reconnectInterval.value);
-
-          reconnectInterval.value = setInterval(function () {
-            if (reconnectAttempts.value < maxReconnectAttempts) {
-              connectStomp(maxReconnectAttempts, reconnectWaitTime, true)
-                .then(resolve)
-                .catch(reject);
-            } else {
-              clearInterval(reconnectInterval.value);
-
-              const error =
-                "Web Socket lost connection to server, please reload page.";
-              logStore.onDevError(error);
-              reject(error);
-            }
-          }, reconnectWaitTime);
         }
       );
     });
   }
 
-  async function subscribeToStomp(
-    destination: string,
-    callback?: (message: Message) => void
-  ): Promise<Subscription | undefined> {
-    console.log("subscribing to stomp.");
+  /**
+   * Subscribes user to current stored topics. Useful on case of reconnection.
+   */
+  function subscribeToTopics(): Promise<void[]> {
+    const subscriptionPromises: Promise<void>[] = channels.value.map((c) => {
+      return subscribeTo(c.topic, c.handler);
+    });
+    return Promise.all(subscriptionPromises);
+  }
+
+  /**
+   * Subscribes to topic.
+   * @param topic The topic to subscribe to.
+   * @param handler Handles messages to topic.
+   */
+  async function subscribeTo(
+    topic: string,
+    handler: (message: Message) => void
+  ): Promise<void> {
     await connectStomp();
 
     const stomp = getStomp();
 
-    if (!stomp) return;
+    if (!stomp) {
+      throw Error("Unable to get stomp client.");
+    }
 
-    const userId = sessionStore.userId;
-    const userTopic = fillEndpoint("userTopic", { userId });
-    console.log("SUB:", destination);
-    stomp.subscribe(userTopic, (m) => {
-      isAuthenticated.value = true;
-      console.log("USER MSG:", m);
-    });
-    return stomp.subscribe(destination, callback);
+    if (topic.trim() === "") {
+      throw Error("Expected destination to be non-empty.");
+    }
+
+    const subscription = stomp.subscribe(topic, handler);
+    const channel: Channel = { subscription, topic, handler };
+    channels.value.push(channel);
   }
 
-  function clearStompSubscriptions(): void {
-    console.log("clearing stomp");
+  /**
+   * Unsubscribes user from all subscriptions.
+   */
+  async function clearSubscriptions(): Promise<void> {
+    if (!isConnected.value) {
+      return;
+    }
     const stomp = getStomp();
 
-    if (!stomp) return;
-
-    const subscriptionIds = Object.keys(stomp.subscriptions);
-
-    subscriptionIds.forEach((subId) => stomp.unsubscribe(subId));
-  }
-
-  function getSubscriptions(): SubscriptionsMap | undefined {
-    const stomp = getStomp();
-    return stomp?.subscriptions;
+    if (!stomp) {
+      logStore.onDevError("Stomp client is null on clearing subscriptions.");
+      return;
+    }
+    channels.value.forEach((c) => c.subscription.unsubscribe());
+    channels.value = [];
   }
 
   return {
     connectStomp,
-    subscribeToStomp,
-    clearStompSubscriptions,
-    getSubscriptions,
+    subscribeTo,
+    clearSubscriptions,
     isConnected,
-    isAuthenticated,
   };
 });
 

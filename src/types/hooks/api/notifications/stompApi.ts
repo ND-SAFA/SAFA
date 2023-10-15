@@ -1,26 +1,19 @@
-import { Message, Subscription, SubscriptionsMap } from "webstomp-client";
+import { Message } from "webstomp-client";
 import { Ref } from "vue";
 
 /**
  * A hook for using stomp websocket messages.
  */
 export interface StompApiHook {
-  isAuthenticated: Ref<boolean>;
   isConnected: Ref<boolean>;
 
   /**
    * Connects to BEND websocket server and tries to reconnect if
    * the connection fails.
    *
-   * @param maxReconnectAttempts - The number of times to reconnect before failing.
-   * @param reconnectWaitTime - The number of milliseconds to wait before reconnecting.
    * @param isReconnect - Whether this is a reconnect attempt.
    */
-  connectStomp(
-    maxReconnectAttempts?: number,
-    reconnectWaitTime?: number,
-    isReconnect?: boolean
-  ): Promise<void>;
+  connectStomp(isReconnect?: boolean): Promise<void>;
 
   /**
    * Subscribes to a websocket destination and returns the subscription.
@@ -28,15 +21,13 @@ export interface StompApiHook {
    * @param destination - The destination url to subscribe to.
    * @param callback - The callback to run when a message is received.
    */
-  subscribeToStomp(
+  subscribeTo(
     destination: string,
     callback?: (message: Message) => void
-  ): Promise<Subscription | undefined>;
+  ): Promise<void>;
 
   /**
    * Clears all subscriptions of the current user.
    */
-  clearStompSubscriptions(): void;
-
-  getSubscriptions(): SubscriptionsMap | undefined;
+  clearSubscriptions(): Promise<void>;
 }

@@ -49,25 +49,16 @@ export const useArtifactApi = defineStore(
           if (!name) {
             artifactSaveStore.isNameValid = false;
             nameLoading.value = false;
-            console.log("NOT NAME");
           } else if (!artifactSaveStore.hasNameChanged) {
             artifactSaveStore.isNameValid = true;
             nameLoading.value = false;
-            console.log("NO NAME CHANGE");
           } else {
             //TODO: Fix 403 on validate.
-            // getDoesArtifactExist(projectStore.versionId, name)
-            //   .then((nameExists) => {
-            //     artifactSaveStore.isNameValid = !nameExists;
-            //     nameLoading.value = false;
-            //   })
-            //   .catch(() => {
-            //     artifactSaveStore.isNameValid = false;
-            //     nameLoading.value = false;
-            //   });
+            logStore.onDevInfo(
+              "Skipping artifact name validation, under construction."
+            );
             artifactSaveStore.isNameValid = true;
             nameLoading.value = false;
-            console.log("SKIPPPED VALIDATION");
           }
         }, 500);
       });

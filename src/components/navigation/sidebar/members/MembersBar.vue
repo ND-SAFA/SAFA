@@ -27,8 +27,7 @@ import { List, ListItem, IconButton, Separator } from "@/components/common";
 import MemberSymbol from "./MemberSymbol.vue";
 
 const members = computed(() => membersStore.activeMembers);
-console.log("User ID:", sessionStore.userId);
-console.log("members:", membersStore.activeMembers);
+
 const options = computed(() => {
   return members.value
     .filter((m) => m.email !== sessionStore.userEmail)

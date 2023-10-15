@@ -33,12 +33,12 @@ class TestUpdateAndDeleteMemberships extends AbstractSharingTest {
 
         // VP - Verify that member email is correct
         String memberEmail = members.getJSONObject(0).getString("email");
-        assertThat(memberEmail).isEqualTo(currentUser.getEmail());
+        assertThat(memberEmail).isEqualTo(getCurrentUser().getEmail());
     }
 
     @Test
     void testRemoveSelfWithoutEditPermission() throws Exception {
-        authorizationService.loginUser(Sharee.email, Sharee.password);
+        authorizationService.loginUser(Sharee.email, Sharee.password, this);
         authorizationService.removeMemberFromProject(project, Sharee.email);
     }
 }

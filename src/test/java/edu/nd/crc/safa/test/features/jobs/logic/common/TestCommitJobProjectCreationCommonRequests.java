@@ -30,11 +30,11 @@ class TestCommitJobProjectCreationCommonRequests extends ApplicationBaseTest {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
 
         DummyCommitJobBuilder jobBuilder =
-            new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, currentUser, false, false);
+            new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, getCurrentUser(), false, false);
         JobAppEntity result = jobBuilder.perform();
 
         // No new project should be created
-        assertEquals(1, projectMemberService.getProjectsForUser(currentUser).size());
+        assertEquals(1, projectMemberService.getProjectsForUser(getCurrentUser()).size());
 
         // Job should be successful
         assertEquals(100, result.getCurrentProgress());
@@ -46,11 +46,11 @@ class TestCommitJobProjectCreationCommonRequests extends ApplicationBaseTest {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
 
         DummyCommitJobBuilder jobBuilder =
-            new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, currentUser, false, true);
+            new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, getCurrentUser(), false, true);
         JobAppEntity result = jobBuilder.perform();
 
         // No new project should be created
-        assertEquals(1, projectMemberService.getProjectsForUser(currentUser).size());
+        assertEquals(1, projectMemberService.getProjectsForUser(getCurrentUser()).size());
 
         // Job should not be successful
         assertEquals(-1, result.getCurrentProgress());
@@ -59,11 +59,11 @@ class TestCommitJobProjectCreationCommonRequests extends ApplicationBaseTest {
     @Test
     void testCommitIntoNewProject() throws Exception {
         DummyCommitJobBuilder jobBuilder =
-            new DummyCommitJobBuilder(serviceProvider, null, currentUser, true, false);
+            new DummyCommitJobBuilder(serviceProvider, null, getCurrentUser(), true, false);
         JobAppEntity result = jobBuilder.perform();
 
         // New project should be created
-        assertEquals(1, projectMemberService.getProjectsForUser(currentUser).size());
+        assertEquals(1, projectMemberService.getProjectsForUser(getCurrentUser()).size());
 
         // Job should be successful
         assertEquals(100, result.getCurrentProgress());
@@ -71,14 +71,14 @@ class TestCommitJobProjectCreationCommonRequests extends ApplicationBaseTest {
 
     @Test
     void testFailedCommitIntoNewProject() throws Exception {
-        assertEquals(0, projectMemberService.getProjectsForUser(currentUser).size());
+        assertEquals(0, projectMemberService.getProjectsForUser(getCurrentUser()).size());
 
         DummyCommitJobBuilder jobBuilder =
-            new DummyCommitJobBuilder(serviceProvider, null, currentUser, true, true);
+            new DummyCommitJobBuilder(serviceProvider, null, getCurrentUser(), true, true);
         JobAppEntity result = jobBuilder.perform();
 
         // New project should be deleted
-        assertEquals(0, projectMemberService.getProjectsForUser(currentUser).size());
+        assertEquals(0, projectMemberService.getProjectsForUser(getCurrentUser()).size());
 
         // Job should not be successful
         assertEquals(-1, result.getCurrentProgress());

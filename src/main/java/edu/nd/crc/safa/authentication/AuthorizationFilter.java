@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
+import edu.nd.crc.safa.config.AuthenticationConfig;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
@@ -44,6 +45,11 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 return;
             }
 
+            if (AuthenticationConfig.OPEN_ENDPOINTS.contains(request.getRequestURI())) {
+                log.info("Skipping authorization filter for open endpoints.");
+                return;
+            }
+
             Optional<String> token = Arrays.stream(request.getCookies())
                 .filter(c -> c.getName().equals(SecurityConstants.JWT_COOKIE_NAME))
                 .findFirst()
@@ -55,13 +61,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             }
 
             UsernamePasswordAuthenticationToken authenticationToken = authorizationService.authenticate(token.get());
-            System.out.println("End of authorization. Token received." + authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            System.out.println("Context set with authentication.");
         } catch (UsernameNotFoundException ignored) {
             // This happens if the user has a token for a deleted account. We have code that is supposed
             // to delete the cookie, so I don't know why it sticks around, but by catching the exception
             // we can at least keep the chain from dying
+            ignored.printStackTrace();
             log.info("Authorization token referenced deleted account.");
         } catch (ExpiredJwtException ignored) {
             // If your JWT expired, just move on and force the user to log in again

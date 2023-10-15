@@ -68,8 +68,8 @@ class TestRetrieveProjectVersionWarningsCommonRequests extends ApplicationBaseTe
         // Step - Subscribe to project version
         this.rootBuilder
             .notifications(n -> n.
-                initializeUser(currentUser, this.token)
-                .subscribeToVersion(currentUser, projectVersion));
+                initializeUser(getCurrentUser(), getToken(getCurrentUser()))
+                .subscribeToVersion(getCurrentUser(), projectVersion));
 
         // Step - Create Design artifact and link
         JSONObject designJson =

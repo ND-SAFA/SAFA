@@ -123,7 +123,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
 
         ProjectEntities projectEntities = new ProjectEntities(Collections.singletonList(artifactApp));
         ProjectChanger projectChanger = new ProjectChanger(newVersion, serviceProvider);
-        projectChanger.setEntitiesAsCompleteSet(projectEntities, currentUser);
+        projectChanger.setEntitiesAsCompleteSet(projectEntities, getCurrentUser());
 
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies).hasSize(1);
@@ -163,7 +163,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
         // be logged in
         ProjectEntities projectEntities = new ProjectEntities(List.of(appEntity));
         ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
-        projectChanger.setEntitiesAsCompleteSet(projectEntities, currentUser);
+        projectChanger.setEntitiesAsCompleteSet(projectEntities, getCurrentUser());
 
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,

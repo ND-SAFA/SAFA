@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.test.requests.SafaRequest;
@@ -26,6 +30,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -40,12 +46,12 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      */
     public static final String currentUserName = "root-test-user@gmail.com";
     public static final String defaultUserPassword = "r{QjR3<Ec2eZV@?";
+    private static final String TOKEN = "TOKEN";
     /**
      * Constants
      */
-    private static final String TOKEN = "TOKEN";
-    public static SafaUser currentUser;
-    public String token;
+    private final Logger log = LoggerFactory.getLogger(ApplicationBaseTest.class);
+    private final Map<UUID, String> usertokenMap = new HashMap<>();
     /**
      * Services
      */
@@ -66,10 +72,13 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      */
     protected DbEntityBuilder dbEntityBuilder;
     protected JsonBuilder jsonBuilder;
+    @Getter
+    private SafaUser currentUser;
 
     public static String getTokenName(String userName) {
         return String.format("%s-%s", userName, TOKEN);
     }
+
 
     /**
      * Initializes test environment.
@@ -137,7 +146,6 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         SafaRequest.setMockMvc(mockMvc);
     }
 
-
     /**
      * Sets the current job launcher to run job synchronously so that
      *
@@ -174,9 +182,34 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      */
     private void setAuthorization(SafaUser user) throws Exception {
         SafaRequest.clearAuthorizationToken();
-        token = null;
-        token = this.rootBuilder.authorize(a -> a.loginUser(user.getEmail(), user.getPassword()).get()).get();
+        clearToken(user);
+        String token =
+            this.rootBuilder.authorize(a -> a.loginUser(user.getEmail(), user.getPassword(), this).get()).get();
+        this.setToken(user, token);
         this.dbEntityBuilder.setCurrentUser(user);
         ReflectionTestUtils.setField(SafaUserService.class, "CHECK_USER_THREAD", false);
+    }
+
+    public String getToken(IUser user) {
+        if (!this.usertokenMap.containsKey(user.getUserId())) {
+            throw new SafaError(String.format("User %s does not contain token.", user.getEmail()));
+        }
+        return this.usertokenMap.get(user.getUserId());
+    }
+
+    private void setToken(IUser user, String token) {
+        if (this.usertokenMap.containsKey(user.getUserId())) {
+            log.info("Overriding user token:" + user.getEmail());
+        }
+        this.usertokenMap.put(user.getUserId(), token);
+    }
+
+    private void clearToken(IUser user) {
+        this.usertokenMap.remove(user.getUserId());
+    }
+
+    public void setCurrentUser(SafaUser user, String token) {
+        setToken(user, token);
+        this.currentUser = user;
     }
 }

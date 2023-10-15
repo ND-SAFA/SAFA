@@ -55,7 +55,6 @@ public class ProjectMembershipService {
      *
      * @param user    The user to remove the role from
      * @param project The project the role applies to
-     * @param role    The role
      */
     public void removeUserRole(SafaUser user, Project project) {
         Optional<UserProjectMembership> membershipOptional =

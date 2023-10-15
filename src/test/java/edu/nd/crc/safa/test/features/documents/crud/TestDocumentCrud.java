@@ -35,7 +35,7 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     @Override
     protected void onPostSubscribe() throws Exception {
         this.rootBuilder
-            .notifications(n -> n.getEntityMessage(currentUser))
+            .notifications(n -> n.getEntityMessage(getCurrentUser()))
             .consume(m -> this.rootBuilder
                 .verify(v -> v
                     .notifications(n -> n.verifyMemberNotification(m, List.of(currentUserName)))));

@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.features.notifications.documentartifact.IDocumentArtifactTest;
 import edu.nd.crc.safa.test.services.CommitTestService;
 
@@ -37,17 +38,17 @@ public class ActionBuilder {
         return this;
     }
 
-    public ActionBuilder createNewUser(String userName, String password) {
-        return createNewUser(userName, password, true);
+    public ActionBuilder createNewUser(String userName, String password, ApplicationBaseTest test) {
+        return createNewUser(userName, password, true, test);
     }
 
-    public ActionBuilder createNewUser(String userName, String password, boolean setToken) {
+    public ActionBuilder createNewUser(String userName, String password, boolean setToken, ApplicationBaseTest test) {
         String token = rootBuilder
             .authorize(a -> a
                 .createUser(userName, password)
                 .save(userName)
                 .and()
-                .loginUser(userName, password, setToken)
+                .loginUser(userName, password, setToken, test)
                 .get()).get();
         if (setToken) {
             this.rootBuilder.store(s -> s.save(getTokenName(userName), token));

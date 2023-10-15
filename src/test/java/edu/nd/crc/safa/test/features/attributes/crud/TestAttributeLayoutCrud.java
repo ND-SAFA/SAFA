@@ -47,14 +47,14 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
     @Test
     void testGetAllLayouts() throws Exception {
         this.projectVersion = this.rootBuilder
-            .actions(a -> a.createProjectWithVersion(currentUser)).get();
+            .actions(a -> a.createProjectWithVersion(getCurrentUser())).get();
         this.project = this.projectVersion.getProject();
 
         this.rootBuilder
             .notifications((s, n) -> n
-                .initializeUser(currentUser, this.token)
-                .subscribeToProject(currentUser, this.project)
-                .getEntityMessage(currentUser)).save("root-project-message")
+                .initializeUser(getCurrentUser(), getToken(getCurrentUser()))
+                .subscribeToProject(getCurrentUser(), this.project)
+                .getEntityMessage(getCurrentUser())).save("root-project-message")
             .and()
             .verify((s, v) -> v
                 .notifications(n -> n
@@ -75,7 +75,7 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
     @Override
     protected void onPostSubscribe() throws Exception {
         this.rootBuilder
-            .notifications(n -> n.getEntityMessage(currentUser)).save("root-project-message")
+            .notifications(n -> n.getEntityMessage(getCurrentUser())).save("root-project-message")
             .and()
             .verify((s, v) -> v
                 .notifications(n -> n
@@ -189,15 +189,15 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
     @Test
     void testGetLayout() throws Exception {
         this.projectVersion = this.rootBuilder
-            .build((s, b) -> b.project(currentUser).save("project"))
+            .build((s, b) -> b.project(getCurrentUser()).save("project"))
             .and()
             .build((s, b) -> b.version(v -> v.newVersion(s.getProject("project")))).get().get();
         this.project = this.projectVersion.getProject();
         this.rootBuilder
             .notifications((s, n) -> n
-                .initializeUser(currentUser, this.token)
-                .subscribeToProject(currentUser, s.getProject("project"))
-                .getEntityMessage(currentUser))
+                .initializeUser(getCurrentUser(), getToken(getCurrentUser()))
+                .subscribeToProject(getCurrentUser(), s.getProject("project"))
+                .getEntityMessage(getCurrentUser()))
             .consume(m -> this.rootBuilder
                 .verify(v -> v.notifications(n -> n.verifyMemberNotification(m, List.of(currentUserName)))));
 

@@ -40,7 +40,7 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();
-        credentials.setUser(currentUser);
+        credentials.setUser(getCurrentUser());
         serviceProvider.getJiraAccessCredentialsRepository().save(credentials);
 
         originalJraProjectCreationSteps = Arrays.stream(JobSteps.jiraProjectCreationSteps).toArray(String[]::new);

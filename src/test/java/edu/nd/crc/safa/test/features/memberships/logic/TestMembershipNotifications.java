@@ -27,30 +27,30 @@ class TestMembershipNotifications extends ApplicationBaseTest {
 
         // Step - Create project version to collaborate on
         this.rootBuilder
-            .build((s, b) -> b.project(currentUser).save("project"))
+            .build((s, b) -> b.project(getCurrentUser()).save("project"))
             .and()
             .notifications((s, n) -> n
-                .initializeUser(currentUser, this.token)
-                .subscribeToProject(currentUser, s.getProject("project")))
+                .initializeUser(getCurrentUser(), getToken(getCurrentUser()))
+                .subscribeToProject(getCurrentUser(), s.getProject("project")))
             .and()
-            .actions(a -> a.verifyActiveMembers(currentUser, List.of(currentUserName)))
+            .actions(a -> a.verifyActiveMembers(getCurrentUser(), List.of(currentUserName)))
             .and()
             .actions(a -> a
-                .createNewUser(newMemberEmail, newMemberPassword, false))
+                .createNewUser(newMemberEmail, newMemberPassword, false, this))
             .and()
             .request((s, r) -> r
                 .project()
                 .shareProject(s.getProject("project"), newMemberEmail, ProjectRole.VIEWER))
             .and()
             .notifications((s, n) -> n
-                .getEntityMessage(currentUser))
+                .getEntityMessage(getCurrentUser()))
             .map(m -> verifyMessageContent(m, NotificationAction.UPDATE))
             .and()
             .authorize((s, a) -> a
                 .removeMemberFromProject(s.getProject("project"), newMemberEmail))
             .and()
             .notifications((s, n) -> n
-                .getEntityMessage(currentUser))
+                .getEntityMessage(getCurrentUser()))
             .map(m -> verifyMessageContent(m, NotificationAction.DELETE));
     }
 

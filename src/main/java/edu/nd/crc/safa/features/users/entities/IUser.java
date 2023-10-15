@@ -6,4 +6,8 @@ public interface IUser {
     UUID getUserId();
 
     String getEmail();
+
+    boolean equals(Object user);
+
+    int hashCode();
 }

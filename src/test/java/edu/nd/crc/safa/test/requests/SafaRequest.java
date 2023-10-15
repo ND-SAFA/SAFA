@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import lombok.Getter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -37,6 +38,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 public class SafaRequest extends RouteBuilder<SafaRequest> {
     private static final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private static MockMvc mockMvc;
+    @Getter
     private static Cookie authorizationToken = null;
 
     public SafaRequest(String path) {
@@ -50,11 +52,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     public static void setMockMvc(MockMvc mockMvc) {
         SafaRequest.mockMvc = mockMvc;
     }
-
-    public static Cookie getAuthorizationToken() {
-        return authorizationToken;
-    }
-
+    
     public static void setAuthorizationToken(Cookie authorizationToken) {
         SafaRequest.authorizationToken = authorizationToken;
     }

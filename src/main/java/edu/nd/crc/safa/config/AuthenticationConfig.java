@@ -36,7 +36,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class AuthenticationConfig {
-
+    public static final List<String> OPEN_ENDPOINTS = List.of(AppRoutes.Accounts.LOGIN,
+        AppRoutes.Accounts.CREATE_ACCOUNT,
+        AppRoutes.Accounts.FORGOT_PASSWORD,
+        AppRoutes.Accounts.RESET_PASSWORD);
 
     private final AuthorizationService authorizationService;
     private final TokenService tokenService;
@@ -46,11 +49,11 @@ public class AuthenticationConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    AuthenticationManager authenticationManager)
         throws Exception {
-        System.out.println("SERVER: CONFIGURING!");
         http
             .cors(Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(requests -> requests.requestMatchers(
+            .authorizeHttpRequests(requests -> requests
+                .requestMatchers(
                     AppRoutes.Accounts.LOGIN,
                     AppRoutes.Accounts.CREATE_ACCOUNT,
                     AppRoutes.Accounts.FORGOT_PASSWORD,
@@ -80,12 +83,11 @@ public class AuthenticationConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("CORS CONFIGURATION!");
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("https://localhost.safa.ai:8080");
-        config.addAllowedOriginPattern("https://localhost:8080");
+        config.addAllowedOriginPattern("http://localhost:8080");
         config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept",
             "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods",
             "Access-Control-Allow-Origin", "Access-Control-Expose-Headers", "Access-Control-Max-Age",

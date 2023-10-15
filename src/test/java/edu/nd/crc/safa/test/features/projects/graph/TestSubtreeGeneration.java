@@ -65,7 +65,7 @@ class TestSubtreeGeneration extends ApplicationBaseTest {
         hiddenLink2.setApprovalStatus(ApprovalStatus.DECLINED);
         traceLinkVersionRepository.saveAll(List.of(hiddenLink1, hiddenLink2));
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         Map<UUID, SubtreeAppEntity> subtrees = project.getSubtrees();
 
         assertEquals(5, subtrees.size());

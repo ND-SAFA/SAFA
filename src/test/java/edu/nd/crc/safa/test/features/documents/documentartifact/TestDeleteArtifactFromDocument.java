@@ -49,16 +49,16 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         // Step - Subscribe to version updates as other member
         this.rootBuilder
             .store(s -> s
-                .save("token", this.token))
+                .save("token", getToken(getCurrentUser())))
             .and("Subscribe user to project and version.")
             .notifications((s, n) -> n
-                .initializeUser(currentUser, s.getString("token"))
-                .subscribeToProject(currentUser, projectVersion.getProject())
-                .subscribeToVersion(currentUser, projectVersion)
+                .initializeUser(getCurrentUser(), s.getString("token"))
+                .subscribeToProject(getCurrentUser(), projectVersion.getProject())
+                .subscribeToVersion(getCurrentUser(), projectVersion)
             )
             .and("Retrieve active members on project.")
             .notifications(n -> n
-                .getEntityMessage(currentUser)).save("root-project-message")
+                .getEntityMessage(getCurrentUser())).save("root-project-message")
             .and("Verify that root is single active user.")
             .verify((s, v) -> v
                 .notifications(n -> n
@@ -81,7 +81,7 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
 
         // VP - Verify that 2 changes are detected (document + artifacts).
         this.rootBuilder
-            .notifications(n -> n.getEntityMessage(currentUser))
+            .notifications(n -> n.getEntityMessage(getCurrentUser()))
             .consume(m -> {
                 // VP - Verify that 2 changes made
                 assertThat(m.getChanges()).hasSize(2);

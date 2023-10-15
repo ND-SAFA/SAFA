@@ -49,7 +49,7 @@ class TestJobRetrieval extends ApplicationBaseTest {
             .and("Sharing project with new user")
             .request(r -> r.project().shareProject(project, otherUserName, ProjectRole.VIEWER))
             .and("Setting current user as the new user.")
-            .authorize(a -> a.loginUser(otherUserName, otherPassword));
+            .authorize(a -> a.loginUser(otherUserName, otherPassword, this));
 
         assertJobs(project, 0, 1);
     }

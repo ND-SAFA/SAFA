@@ -28,21 +28,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestTim extends ApplicationBaseTest {
 
-    @Autowired
-    private ProjectRetrievalService projectRetrievalService;
-
     private final String type1Name = "type1";
     private final String type2Name = "type2";
     private final String artifact1Name = "type1Artifact";
     private final String artifact2Name = "type2Artifact1";
     private final String artifact3Name = "type2Artifact2";
     private final Map<String, Integer> typeCounts = Map.of(type1Name, 1, type2Name, 2);
+    @Autowired
+    private ProjectRetrievalService projectRetrievalService;
 
     @Test
     public void testTypesNoArtifacts() {
         ProjectVersion version = initialSetup();
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TypeAppEntity> types = project.getArtifactTypes();
 
         assertNoTypes(types);
@@ -53,7 +52,7 @@ public class TestTim extends ApplicationBaseTest {
         ProjectVersion version = initialSetup();
         createArtifacts(version);
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TypeAppEntity> types = project.getArtifactTypes();
 
         assertTypes(types);
@@ -63,7 +62,7 @@ public class TestTim extends ApplicationBaseTest {
     public void testTracesNoArtifacts() {
         ProjectVersion version = initialSetup();
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
 
         assertEquals(0, traces.size());
@@ -74,7 +73,7 @@ public class TestTim extends ApplicationBaseTest {
         ProjectVersion version = initialSetup();
         createArtifacts(version);
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
 
         assertEquals(0, traces.size());
@@ -86,7 +85,7 @@ public class TestTim extends ApplicationBaseTest {
         createArtifacts(version);
         createLinks(version);
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
 
         assertTraces(traces);
@@ -99,7 +98,7 @@ public class TestTim extends ApplicationBaseTest {
         createLinks(version);
         version = createProjectVersion();
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
         List<TypeAppEntity> types = project.getArtifactTypes();
 
@@ -113,13 +112,13 @@ public class TestTim extends ApplicationBaseTest {
         createArtifacts(version);
         createLinks(version);
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
 
         version = createProjectVersion();
         deleteLinks(version, project.getTraces());
         deleteArtifacts(version, project.getArtifacts());
 
-        project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
         List<TypeAppEntity> types = project.getArtifactTypes();
 
@@ -133,12 +132,12 @@ public class TestTim extends ApplicationBaseTest {
         createArtifacts(version);
         createLinks(version);
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
 
         version = createProjectVersion();
         approveLinks(version, project.getTraces());
 
-        project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
 
         assertApprovedTraces(traces);
@@ -242,13 +241,13 @@ public class TestTim extends ApplicationBaseTest {
         projectCommitDefinition.addArtifact(ModificationType.ADDED, createArtifact(type1Name, artifact1Name));
         projectCommitDefinition.addArtifact(ModificationType.ADDED, createArtifact(type2Name, artifact2Name));
         projectCommitDefinition.addArtifact(ModificationType.ADDED, createArtifact(type2Name, artifact3Name));
-        serviceProvider.getCommitService().performCommit(projectCommitDefinition, currentUser);
+        serviceProvider.getCommitService().performCommit(projectCommitDefinition, getCurrentUser());
     }
 
     private void deleteArtifacts(ProjectVersion version, List<ArtifactAppEntity> artifacts) {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(version, true);
         projectCommitDefinition.addArtifacts(ModificationType.REMOVED, artifacts);
-        serviceProvider.getCommitService().performCommit(projectCommitDefinition, currentUser);
+        serviceProvider.getCommitService().performCommit(projectCommitDefinition, getCurrentUser());
     }
 
     private TraceAppEntity createTrace(String sourceName, String targetName, ApprovalStatus status, TraceType type) {
@@ -263,13 +262,13 @@ public class TestTim extends ApplicationBaseTest {
             createTrace(artifact1Name, artifact3Name, ApprovalStatus.UNREVIEWED, TraceType.GENERATED));
         projectCommitDefinition.addTrace(ModificationType.ADDED,
             createTrace(artifact2Name, artifact3Name, ApprovalStatus.APPROVED, TraceType.GENERATED));
-        serviceProvider.getCommitService().performCommit(projectCommitDefinition, currentUser);
+        serviceProvider.getCommitService().performCommit(projectCommitDefinition, getCurrentUser());
     }
 
     private void deleteLinks(ProjectVersion version, List<TraceAppEntity> links) {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(version, true);
         projectCommitDefinition.addTraces(ModificationType.REMOVED, links);
-        serviceProvider.getCommitService().performCommit(projectCommitDefinition, currentUser);
+        serviceProvider.getCommitService().performCommit(projectCommitDefinition, getCurrentUser());
     }
 
     private void approveLinks(ProjectVersion version, List<TraceAppEntity> links) {
@@ -278,6 +277,6 @@ public class TestTim extends ApplicationBaseTest {
             link.setApprovalStatus(ApprovalStatus.APPROVED);
             projectCommitDefinition.addTrace(ModificationType.MODIFIED, link);
         }
-        serviceProvider.getCommitService().performCommit(projectCommitDefinition, currentUser);
+        serviceProvider.getCommitService().performCommit(projectCommitDefinition, getCurrentUser());
     }
 }

@@ -53,7 +53,7 @@ class TestCreateProjectViaJiraJobCommonRequests extends JiraBaseFlatFileTest {
             jobDbEntity,
             serviceProvider,
             jiraIdentifier,
-            currentUser
+            getCurrentUser()
         );
 
         job.setJiraProjectResponse(createMockJiraProject());

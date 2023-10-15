@@ -24,7 +24,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     protected ProjectVersion setupProject() throws Exception {
         return this.rootBuilder
             .log("Creating project and initial version under root user.")
-            .actions(a -> a.createProjectWithVersion(currentUser)).get();
+            .actions(a -> a.createProjectWithVersion(getCurrentUser())).get();
     }
 
     @Test
@@ -36,7 +36,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
 
         this.rootBuilder
             .log("Root User: Subscribing to entity topic.")
-            .notifications(n -> n.initializeUser(currentUser, this.token).subscribe(currentUser, getTopic()));
+            .notifications(n -> n.initializeUser(getCurrentUser(), getToken(getCurrentUser())).subscribe(getCurrentUser(), getTopic()));
 
         // Verifies any messages related to subscribing to topic (e.g. active members).
         onPostSubscribe();
@@ -46,21 +46,21 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         assertThat(entityId).isNotNull();
 
         // VP - Verify created entity
-        T entity = getEntity(projectVersion, currentUser, entityId);
+        T entity = getEntity(projectVersion, getCurrentUser(), entityId);
         verifyCreatedEntity(entity);
 
-        List<EntityChangeMessage> creationMessages = this.rootBuilder.notifications(n -> n.getMessages(currentUser)).get();
+        List<EntityChangeMessage> creationMessages = this.rootBuilder.notifications(n -> n.getMessages(getCurrentUser())).get();
         this.verifyCreationMessages(creationMessages);
 
         // Step - Update entity and retrieve message
         updateEntity();
 
         List<EntityChangeMessage> updateMessages =
-            this.rootBuilder.notifications(n -> n.getMessages(currentUser)).get();
+            this.rootBuilder.notifications(n -> n.getMessages(getCurrentUser())).get();
 
 
         // Step - Verify updated entity
-        T updatedEntity = getEntity(projectVersion, currentUser, entityId);
+        T updatedEntity = getEntity(projectVersion, getCurrentUser(), entityId);
         verifyUpdatedEntity(updatedEntity);
 
         // VP - Verify update message
@@ -70,11 +70,11 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         deleteEntity(updatedEntity);
 
         List<EntityChangeMessage> deletedMessages =
-            this.rootBuilder.notifications(n -> n.getMessages(currentUser)).get();
+            this.rootBuilder.notifications(n -> n.getMessages(getCurrentUser())).get();
 
 
         // VP - Verify entity deleted
-        List<T> entitiesWithId = getEntities(projectVersion, currentUser, entityId);
+        List<T> entitiesWithId = getEntities(projectVersion, getCurrentUser(), entityId);
         assertThat(entitiesWithId).isEmpty();
 
         // VP - Verify deletion message

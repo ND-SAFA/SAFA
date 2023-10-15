@@ -52,4 +52,17 @@ public class SafaUser implements Serializable, IUser {
         this.password = password;
         this.superuser = false;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof SafaUser user) {
+            return user.getUserId().equals(this.userId);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.userId.hashCode();
+    }
 }

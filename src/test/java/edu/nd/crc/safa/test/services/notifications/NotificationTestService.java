@@ -88,24 +88,11 @@ public class NotificationTestService {
      */
     public NotificationTestService initializeUser(IUser user, String token) {
         try {
-            this.startSession(user);
+            this.startSession(user, token);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return this;
-    }
-
-    /**
-     * Authenticates user, storing credentials in web socket session.
-     *
-     * @param user  The user to authenticate.
-     * @param token The JWT token to authenticate user with.
-     * @throws JsonProcessingException If error occurs while serializing authentication message.
-     * @throws InterruptedException    If interrupted during network calls.
-     */
-    public void authenticate(IUser user, String token) throws JsonProcessingException, InterruptedException {
-        assert token != null && !token.isEmpty();
-        this.subscribeToUser(user);
     }
 
     /**
@@ -145,27 +132,6 @@ public class NotificationTestService {
         return this;
     }
 
-    /**
-     * Subscribes to user topic. Enables receiving private messages.
-     *
-     * @param user The user subscribing to topic.
-     */
-    public void subscribeToUser(IUser user) {
-        String userTopic = TopicCreator.getUserTopic(user);
-        this.server.subscribe(getClientId(user), userTopic);
-    }
-
-    /**
-     * Subscribes user to given topic.
-     *
-     * @param user  The user receiving topic messages.
-     * @param topic The topic to subscribe to.
-     */
-    public NotificationTestService subscribe(IUser user, String topic) {
-        this.server.subscribe(getClientId(user), topic);
-        return this;
-    }
-
     public NotificationTestService subscribe(IUser user, List<String> topics) {
         UUID clientId = getClientId(user);
         topics.forEach(t -> this.server.subscribe(clientId, t));
@@ -195,9 +161,8 @@ public class NotificationTestService {
         this.server.send(clientId, destination, object);
     }
 
-    private void startSession(IUser user) throws Exception {
-        this.server.connect(getClientId(user));
-        this.subscribeToUser(user);
+    private void startSession(IUser user, String token) throws Exception {
+        this.server.connect(getClientId(user), token);
     }
 
     private <T> T getNextMessage(UUID clientId, Class<T> classType) throws JsonProcessingException,

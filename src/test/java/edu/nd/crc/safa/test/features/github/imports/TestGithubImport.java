@@ -34,7 +34,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
     @BeforeEach
     public void setup() {
         GithubAccessCredentials credentials = new GithubAccessCredentials();
-        credentials.setUser(currentUser);
+        credentials.setUser(getCurrentUser());
         String accessToken = "testAccessToken";
         credentials.setAccessToken(accessToken);
         serviceProvider.getGithubAccessCredentialsRepository().save(credentials);
@@ -93,7 +93,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
     private void assertLayout(Project project, String typeName) {
         AttributeLayoutService layoutService = serviceProvider.getAttributeLayoutService();
         ProjectVersion version = serviceProvider.getVersionService().getProjectVersions(project).get(0);
-        List<AttributeLayoutAppEntity> layouts = layoutService.getAppEntities(version, currentUser);
+        List<AttributeLayoutAppEntity> layouts = layoutService.getAppEntities(version, getCurrentUser());
         Assertions.assertEquals(1, layouts.size());
 
         AttributeLayoutAppEntity layout = layouts.get(0);

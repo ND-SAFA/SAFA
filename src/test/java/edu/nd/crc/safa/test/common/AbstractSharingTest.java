@@ -45,15 +45,15 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
 
         // Step
         this.rootBuilder
-            .store(s -> s.save("project", this.project).save("user", currentUser))
+            .store(s -> s.save("project", this.project).save("user", getCurrentUser()))
             .and("Login root user.")
-            .authorize((s, a) -> a.loginDefaultUser())
+            .authorize((s, a) -> a.loginDefaultUser(this))
             .and("Root User: Subscribe to project")
             .notifications((s, n) -> n
-                .initializeUser(currentUser, this.token)
-                .subscribeToProject(currentUser, s.getProject("project")))
+                .initializeUser(getCurrentUser(), getToken(getCurrentUser()))
+                .subscribeToProject(getCurrentUser(), s.getProject("project")))
             .and()
-            .actions(a -> a.verifyActiveMembers(currentUser, List.of(currentUserName)));
+            .actions(a -> a.verifyActiveMembers(getCurrentUser(), List.of(currentUserName)));
 
         this.sharee = this.rootBuilder
             .authorize((s, a) -> a
@@ -61,11 +61,11 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
                 .save("sharee-user").get()).get();
 
         this.rootBuilder.authorize(a -> a
-                .loginUser(Sharee.email, Sharee.password)
+                .loginUser(Sharee.email, Sharee.password, this)
                 .save("shareeToken"))
             .and()
             .authorize((s, a) -> a
-                .loginDefaultUser())
+                .loginDefaultUser(this))
             .and()
             .request((s, r) -> r.project().shareProject(s.getProject("project"), Sharee.email,
                 this.otherUserProjectRole))

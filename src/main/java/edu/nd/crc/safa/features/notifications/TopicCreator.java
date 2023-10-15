@@ -2,8 +2,6 @@ package edu.nd.crc.safa.features.notifications;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.users.entities.IUser;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -15,10 +13,6 @@ public class TopicCreator {
 
     public static String getVersionTopic(UUID id) {
         return String.format("/topic/version/%s", id);
-    }
-
-    public static String getUserTopic(IUser user) {
-        return String.format("/user/%s/updates", user.getUserId());
     }
 
     public static String getJobTopic(UUID jobId) {

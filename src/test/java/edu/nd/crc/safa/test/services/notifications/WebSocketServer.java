@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
+import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
@@ -58,11 +59,16 @@ public class WebSocketServer {
      * @param clientId User specified unique identifier for a client.
      * @throws Exception Throws error if a problem occurs connecting to stomp endpoint.
      */
-    public void connect(UUID clientId) throws Exception {
-        WebSocketHttpHeaders wsHeaders = new WebSocketHttpHeaders();
-        StompHeaders connectHeaders = new StompHeaders();
+    public void connect(UUID clientId, String token) throws Exception {
+        String cookieValue = String.format("%s=%s", SecurityConstants.JWT_COOKIE_NAME, token);
+
+        WebSocketHttpHeaders connectionHeaders = new WebSocketHttpHeaders();
+        connectionHeaders.put(SecurityConstants.COOKIE_NAME, List.of(cookieValue));
+
+        StompHeaders messageHeaders = new StompHeaders();
+
         StompSession session = getStompClient()
-            .connect(String.format(WEBSOCKET_URI, port), wsHeaders, connectHeaders,
+            .connect(String.format(WEBSOCKET_URI, port), connectionHeaders, messageHeaders,
                 new StompSessionHandlerAdapter() {
                 })
             .get(30, SECONDS);
@@ -138,16 +144,6 @@ public class WebSocketServer {
         return this.idToQueue.get(clientId);
     }
 
-    private void assertClientExists(UUID clientId) {
-        String errorMessage = "%s does not have a %s. Has session been initialized?";
-        if (!this.idToQueue.containsKey(clientId)) {
-            throw new SafaError(String.format(errorMessage, clientId, "queue"));
-        }
-        if (!this.idToSession.containsKey(clientId)) {
-            throw new SafaError(String.format(errorMessage, clientId, "session"));
-        }
-    }
-
     /**
      * Clears the current messages for given client.
      *
@@ -176,5 +172,15 @@ public class WebSocketServer {
                 idToQueue.get(clientId).offer(new String((byte[]) o));
             }
         });
+    }
+
+    private void assertClientExists(UUID clientId) {
+        String errorMessage = "%s does not have a %s. Has session been initialized?";
+        if (!this.idToQueue.containsKey(clientId)) {
+            throw new SafaError(String.format(errorMessage, clientId, "queue"));
+        }
+        if (!this.idToSession.containsKey(clientId)) {
+            throw new SafaError(String.format(errorMessage, clientId, "session"));
+        }
     }
 }

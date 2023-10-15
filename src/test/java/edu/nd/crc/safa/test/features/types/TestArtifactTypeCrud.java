@@ -81,7 +81,7 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
     @Override
     protected void onPostSubscribe() throws Exception {
         this.rootBuilder
-            .notifications(n -> n.getEntityMessage(currentUser)).save("root-project-members")
+            .notifications(n -> n.getEntityMessage(getCurrentUser())).save("root-project-members")
             .and()
             .verify((s, v) -> v.notifications(n -> n.verifyMemberNotification(s.getMessage("root-project-members"),
                 List.of(currentUserName))));

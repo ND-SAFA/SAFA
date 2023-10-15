@@ -37,7 +37,7 @@ class TestCreateAndLogin extends ApplicationBaseTest {
     @Test
     void testLogin() throws Exception {
         authorizationService.createUser(testEmail, testPassword);
-        authorizationService.loginUser(testEmail, testPassword, status().isOk());
+        authorizationService.loginUser(testEmail, testPassword, status().isOk(), this);
 
         // VP - Verify that user is able to be authenticated and no projects are assigned to it.
         JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
@@ -47,7 +47,7 @@ class TestCreateAndLogin extends ApplicationBaseTest {
     @Test
     void testSelfEndpoint() throws Exception {
         authorizationService.createUser(testEmail, testPassword);
-        authorizationService.loginUser(testEmail, testPassword, status().isOk());
+        authorizationService.loginUser(testEmail, testPassword, this);
 
         JSONObject response = new SafaRequest(AppRoutes.Accounts.SELF).getWithJsonObject(status().isOk());
 

@@ -33,4 +33,17 @@ public class UserAppEntity implements IUser {
         this.userId = safaUser.getUserId();
         this.email = safaUser.getEmail();
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof UserAppEntity otherUser) {
+            return otherUser.getUserId().equals(this.userId);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.userId.hashCode();
+    }
 }

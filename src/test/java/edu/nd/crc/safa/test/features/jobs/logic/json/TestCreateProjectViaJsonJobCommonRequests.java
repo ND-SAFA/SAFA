@@ -48,7 +48,7 @@ class TestCreateProjectViaJsonJobCommonRequests extends ApplicationBaseTest {
         // Step - Get Job and subscribe for updates
         this.rootBuilder
             .notifications(n -> n
-                .initializeUser(currentUser, this.token).subscribeToJob(currentUser, jobService.getJobById(jobId)));
+                .initializeUser(getCurrentUser(), getToken(getCurrentUser())).subscribeToJob(getCurrentUser(), jobService.getJobById(jobId)));
         // VP - Verify that job has finished.
         JobTestService.verifyJobWasCompleted(serviceProvider, jobId, N_STEPS);
 

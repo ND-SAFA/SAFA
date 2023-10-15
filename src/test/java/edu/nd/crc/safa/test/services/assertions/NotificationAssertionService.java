@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -31,7 +32,8 @@ public class NotificationAssertionService {
             .map(a -> (UserAppEntity) a)
             .map(UserAppEntity::getEmail)
             .collect(Collectors.toList());
-        assertEquals(emails, projectMembers);
+
+        assertEquals(new HashSet<>(emails), new HashSet<>(projectMembers));
         return this;
     }
 

@@ -26,12 +26,9 @@ public class AuthorizationService {
      * @return Successful authorization token if successful otherwise null.
      */
     public UsernamePasswordAuthenticationToken authenticate(String token) throws SafaError {
-        System.out.println("starting authorization...");
         Claims userClaims = this.tokenService.getTokenClaims(token);
-        System.out.println("user claims..." + userClaims);
         String username = userClaims.getSubject();
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-        System.out.println("user details..." + userDetails);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 

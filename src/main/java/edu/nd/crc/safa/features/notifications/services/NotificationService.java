@@ -4,7 +4,6 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.builders.AbstractEntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.features.users.entities.IUser;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -20,17 +19,6 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
-
-    /**
-     * Sends message to user.
-     *
-     * @param user   The user to send the message to.
-     * @param object The object to send to the user.
-     */
-    public void sendToUser(IUser user, Object object) {
-        String userTopic = TopicCreator.getUserTopic(user);
-        broadcastObject(userTopic, object);
-    }
 
     /**
      * Broadcasts change in given builder to a given user.
@@ -60,7 +48,6 @@ public class NotificationService {
      * @param payload Object to be sent to topic
      */
     private void broadcastObject(String topic, Object payload) {
-        System.out.printf("%s -> %s%n", topic, payload);
         messagingTemplate.convertAndSend(topic, payload);
     }
 }

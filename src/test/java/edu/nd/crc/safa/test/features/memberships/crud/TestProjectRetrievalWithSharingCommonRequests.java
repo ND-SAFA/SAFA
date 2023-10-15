@@ -23,7 +23,7 @@ class TestProjectRetrievalWithSharingCommonRequests extends AbstractSharingTest 
     void sharedProjectAppearsInGetProjects() throws Exception {
         // Step - Login as other user
         this.rootBuilder
-            .authorize(a -> a.loginUser(Sharee.email, Sharee.password, true));
+            .authorize(a -> a.loginUser(Sharee.email, Sharee.password, true, this));
 
         // Step - Get projects for user who got shared with
         JSONArray projects = SafaRequest

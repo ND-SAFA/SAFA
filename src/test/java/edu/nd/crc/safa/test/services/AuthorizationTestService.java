@@ -27,24 +27,16 @@ public class AuthorizationTestService {
     ServiceProvider serviceProvider;
     BuilderState state;
 
-    public String createDefaultAccount() {
-        String defaultUser = ApplicationBaseTest.currentUserName;
-        String defaultUserPassword = ApplicationBaseTest.defaultUserPassword;
-        createUser(defaultUser, defaultUserPassword);
-        ApplicationBaseTest.currentUser = serviceProvider
-            .getAccountLookupService()
-            .getUserFromUsername(defaultUser);
-        return loginDefaultUser();
-    }
-
-    public String loginDefaultUser() {
-        String authorizationCode = loginUser(
+    public String loginDefaultUser(ApplicationBaseTest test) {
+        String token = loginUser(
             ApplicationBaseTest.currentUserName,
-            ApplicationBaseTest.defaultUserPassword).get();
-        ApplicationBaseTest.currentUser = serviceProvider
+            ApplicationBaseTest.defaultUserPassword,
+            test).get();
+        SafaUser currentUser = serviceProvider
             .getAccountLookupService()
             .getUserFromUsername(ApplicationBaseTest.currentUserName);
-        return authorizationCode;
+        test.setCurrentUser(currentUser, token);
+        return token;
     }
 
     public AndBuilder<AuthorizationTestService, UserAppEntity> createUser(String email, String password) {
@@ -62,17 +54,19 @@ public class AuthorizationTestService {
             .postWithJsonObject(user, test);
     }
 
-    public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password) {
-        return this.loginUser(email, password, true);
+    public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password,
+                                                                  ApplicationBaseTest test) {
+        return this.loginUser(email, password, true, test);
     }
 
-    public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password, boolean setToken) {
-        String token = this.loginUser(email, password, status().is2xxSuccessful(), setToken);
+    public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password, boolean setToken,
+                                                                  ApplicationBaseTest test) {
+        String token = this.loginUser(email, password, status().is2xxSuccessful(), setToken, test);
         return new AndBuilder<>(this, token, this.state);
     }
 
-    public String loginUser(String email, String password, ResultMatcher test) throws Exception {
-        return this.loginUser(email, password, test, true);
+    public String loginUser(String email, String password, ResultMatcher resultMatcher, ApplicationBaseTest test) throws Exception {
+        return this.loginUser(email, password, resultMatcher, true, test);
     }
 
     /**
@@ -88,7 +82,8 @@ public class AuthorizationTestService {
     public String loginUser(String email,
                             String password,
                             ResultMatcher resultMatcher,
-                            boolean setToken) {
+                            boolean setToken,
+                            ApplicationBaseTest test) {
         // Step - Clear token if setting new one
         if (setToken) {
             SafaRequest.clearAuthorizationToken();
@@ -102,11 +97,12 @@ public class AuthorizationTestService {
 
         if (token.isPresent()) { // Result matcher may have failing reques
             Cookie authorizationCookie = token.orElseThrow();
-            String authorizationCode = authorizationCookie.getValue();
+            String userToken = authorizationCookie.getValue();
             if (setToken) {
                 SafaRequest.setAuthorizationToken(authorizationCookie);
+                test.setCurrentUser(serviceProvider.getAccountLookupService().getUserFromUsername(email), userToken);
             }
-            return authorizationCode;
+            return userToken;
         }
         return null;
     }

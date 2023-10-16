@@ -169,7 +169,7 @@ export const useNotificationApi = defineStore(
           // Currently, active members are cleared when a new member is added.
           return membersStore.updateMembers(project.members, {
             entityType: "PROJECT",
-            entityId: project.projectId,
+            entityId: projectStore.projectId,
           });
         case "ACTIVE_MEMBERS":
           membersStore.setActiveMembers(project.members);

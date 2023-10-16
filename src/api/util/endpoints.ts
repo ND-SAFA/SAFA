@@ -8,15 +8,6 @@ if (!process.env.VUE_APP_API_ENDPOINT) {
 }
 
 /**
- * The number of times to attempt to reconnect to server
- * if connection is lost.
- */
-export const MAX_RECONNECT_ATTEMPTS = 1;
-/**
- * The amount of time to
- */
-export const RECONNECT_WAIT_TIME = 5000;
-/**
  * Returns a WebSocket url resolving function. Use only after all modules
  * have been loaded.
  * @constructor

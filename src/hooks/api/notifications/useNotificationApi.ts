@@ -237,7 +237,7 @@ export const useNotificationApi = defineStore(
     function getProjectVersion(project: ProjectSchema): string {
       const versionId = project.projectVersion?.versionId;
       if (versionId === undefined || versionId === "") {
-        throw Error("Undefined project version!");
+        throw Error("Project has undefined project version:" + project);
       }
       return versionId;
     }

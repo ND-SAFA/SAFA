@@ -33,9 +33,8 @@ const options = computed(() => {
     .filter((m) => m.email !== sessionStore.userEmail)
     .map((m) => {
       return {
-        title: "TITLE",
+        title: m.email,
         iconId: "mdi-math-compass",
-        iconTitle: "ICON TITLE",
         toolTip: m.email,
         color: "primary",
       };

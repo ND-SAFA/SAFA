@@ -1,21 +1,14 @@
 <template>
   <div class="full-width">
-    <flex-box
-      :wrap="smallWindow"
-      align="center"
-      full-width
-      justify="between"
-      y="2"
-    >
-      <flex-box :b="smallWindow ? '1' : ''" align="center">
+    <flex-box full-width justify="between" align="center" y="1">
+      <nav-breadcrumbs v-if="ENABLED_FEATURES.NAV_BREADCRUMBS" />
+      <flex-box v-else align="center">
         <project-selector />
         <version-selector />
       </flex-box>
       <q-space />
-      <project-searchbar v-if="graphVisible" />
-      <q-space />
-      <q-space />
       <update-button />
+      <project-searchbar v-if="graphVisible" />
     </flex-box>
     <separator v-if="graphVisible" nav />
   </div>
@@ -33,16 +26,15 @@ export default {
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
-import { useScreen } from "@/hooks";
+import { ENABLED_FEATURES } from "@/util";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { VersionSelector, ProjectSelector } from "@/components/project";
 import { ProjectSearchbar } from "@/components/search";
+import NavBreadcrumbs from "./NavBreadcrumbs.vue";
 import UpdateButton from "./UpdateButton.vue";
 
 const currentRoute = useRoute();
-
-const { smallWindow } = useScreen();
 
 const graphVisible = computed(() => currentRoute.path === Routes.ARTIFACT);
 </script>

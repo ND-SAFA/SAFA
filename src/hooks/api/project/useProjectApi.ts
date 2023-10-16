@@ -19,8 +19,9 @@ import {
 import {
   deleteProject,
   deleteProjectVersion,
-  saveProject,
   getProjectFiles,
+  createProject,
+  editProject,
 } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -40,12 +41,15 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
     callbacks: IOHandlerCallback<ProjectSchema> = {}
   ): Promise<void> {
     const identifier = identifierSaveStore.editedIdentifier;
+    const isUpdate = identifierSaveStore.isUpdate;
 
     await saveProjectApi.handleRequest(
       async () => {
-        const project = await saveProject(identifier);
+        const project = isUpdate
+          ? await editProject(identifier)
+          : await createProject(identifier);
 
-        projectStore.addProject(identifier.projectId ? identifier : project);
+        projectStore.addProject(isUpdate ? identifier : project);
 
         if (project.projectId === projectStore.projectId) {
           projectStore.project.name = project.name;

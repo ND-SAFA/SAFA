@@ -42,7 +42,7 @@ export default {
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { NavOption } from "@/types";
-import { ENABLED_FEATURES, FEEDBACK_LINK } from "@/util";
+import { FEEDBACK_LINK } from "@/util";
 import { sessionStore } from "@/hooks";
 import { Routes } from "@/router";
 import { ListItem } from "@/components/common";
@@ -52,16 +52,12 @@ import Notifications from "./Notifications.vue";
 const currentRoute = useRoute();
 
 const options = computed<NavOption[]>(() => [
-  ...(ENABLED_FEATURES.ORGS
-    ? [
-        {
-          label: "My Organization",
-          icon: "organization",
-          path: Routes.ORG,
-          color: Routes.ORG === currentRoute.path ? "primary" : "text",
-        },
-      ]
-    : []),
+  {
+    label: "My Organization",
+    icon: "organization",
+    path: Routes.ORG,
+    color: Routes.ORG === currentRoute.path ? "primary" : "text",
+  },
   {
     label: "My Account",
     subtitle: sessionStore.user?.email,

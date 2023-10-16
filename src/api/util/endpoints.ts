@@ -37,6 +37,7 @@ export enum Endpoint {
   updatePassword = "accounts/change",
   deleteAccount = "accounts/delete",
   getAccount = "accounts/self",
+  editAccountOrg = "accounts/organization",
 
   // Jobs
   createProjectJob = "jobs/projects",
@@ -155,6 +156,24 @@ export enum Endpoint {
   summarize = "projects/versions/:versionId/artifacts/summarize",
   prompt = "prompt",
   generateArtifacts = "hgen/:versionId",
+
+  // Orgs
+
+  getAllOrgs = "organizations",
+  createOrg = "organizations",
+  getPersonalOrg = "organizations/self",
+  getOrg = "organizations/:orgId",
+  editOrg = "organizations/:orgId",
+  deleteOrg = "organizations/:orgId",
+
+  createTeam = "organizations/:orgId/teams",
+  editTeam = "organizations/:orgId/teams/:teamId",
+  deleteTeam = "organizations/:orgId/teams/:teamId",
+
+  getMembers = "members/:entityId",
+  createMember = "members/:entityId",
+  editMember = "members/:entityId/:memberId",
+  deleteMember = "members/:entityId/:memberId",
 }
 
 /**

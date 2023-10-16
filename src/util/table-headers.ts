@@ -189,14 +189,6 @@ export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
     classes: "data-table-cell-200",
     field: (row) => row.description,
   },
-  {
-    name: "owner",
-    label: "Owner",
-    sortable: false,
-    align: "right",
-    classes: "data-table-cell-200",
-    field: (row) => row.owner,
-  },
   actionsColumn,
 ];
 

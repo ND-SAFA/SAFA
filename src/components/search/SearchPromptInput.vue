@@ -173,4 +173,18 @@ watch(
     }
   }
 );
+
+watch(
+  () => selectionStore.selectedArtifact,
+  (artifact) => {
+    if (
+      !searchStore.basicSearchMode ||
+      !artifact ||
+      searchStore.searchItems?.[0] === artifact
+    )
+      return;
+
+    searchStore.searchItems = [artifact];
+  }
+);
 </script>

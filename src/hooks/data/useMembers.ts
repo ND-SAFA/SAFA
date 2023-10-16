@@ -68,23 +68,23 @@ export const useMembers = defineStore("members", {
       updatedMembers: MembershipSchema[],
       entity: MemberEntitySchema
     ): void {
-      const ids = updatedMembers.map((member) => member.projectMembershipId);
+      const ids = updatedMembers.map((member) => member.id);
 
       if (entity.entityType === "PROJECT") {
         projectStore.project.members = [
-          ...removeMatches(this.members, "projectMembershipId", ids),
+          ...removeMatches(this.members, "id", ids),
           ...updatedMembers,
         ];
 
         projectStore.project.members = this.members;
       } else if (entity.entityType === "ORGANIZATION") {
         orgStore.org.members = [
-          ...removeMatches(this.orgMembers, "projectMembershipId", ids),
+          ...removeMatches(this.orgMembers, "id", ids),
           ...updatedMembers,
         ];
       } else if (entity.entityType === "TEAM") {
         teamStore.team.members = [
-          ...removeMatches(this.teamMembers, "projectMembershipId", ids),
+          ...removeMatches(this.teamMembers, "id", ids),
           ...updatedMembers,
         ];
       }
@@ -99,7 +99,7 @@ export const useMembers = defineStore("members", {
       if (entity.entityType === "PROJECT") {
         projectStore.project.members = removeMatches(
           this.members,
-          "projectMembershipId",
+          "id",
           deletedMembers
         );
 
@@ -107,13 +107,13 @@ export const useMembers = defineStore("members", {
       } else if (entity.entityType === "ORGANIZATION") {
         orgStore.org.members = removeMatches(
           this.orgMembers,
-          "projectMembershipId",
+          "id",
           deletedMembers
         );
       } else if (entity.entityType === "TEAM") {
         teamStore.team.members = removeMatches(
           this.teamMembers,
-          "projectMembershipId",
+          "id",
           deletedMembers
         );
       }

@@ -16,7 +16,7 @@
       addable
       deletable
       :columns="teamColumns"
-      :rows="rows"
+      :rows="teamStore.allTeams"
       :loading="loading"
       row-key="id"
       item-name="team"
@@ -50,14 +50,7 @@ export default {
 import { computed, ref } from "vue";
 import { TeamSchema } from "@/types";
 import { teamColumns } from "@/util";
-import {
-  memberApiStore,
-  membersStore,
-  projectStore,
-  sessionStore,
-  teamApiStore,
-  teamStore,
-} from "@/hooks";
+import { memberApiStore, sessionStore, teamApiStore, teamStore } from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   PanelCard,
@@ -71,21 +64,6 @@ const selectedTeam = ref<TeamSchema>();
 
 const loading = ref(false);
 const addMode = ref(false);
-
-const rows: TeamSchema[] = [
-  {
-    id: "1",
-    name: "Team 1",
-    members: membersStore.getMembers("TEAM"),
-    projects: [projectStore.projectIdentifier],
-  },
-  {
-    id: "2",
-    name: "Team 2",
-    members: membersStore.getMembers("TEAM"),
-    projects: [projectStore.projectIdentifier],
-  },
-];
 
 const selectedTeams = computed({
   get() {

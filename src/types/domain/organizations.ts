@@ -1,4 +1,4 @@
-import { IdentifierSchema, MembershipSchema } from "@/types";
+import { IdentifierSchema, MembershipSchema, PermissionType } from "@/types";
 
 /**
  * Represents a team with members and projects.
@@ -20,6 +20,10 @@ export interface TeamSchema {
    * List of projects this team has access to.
    */
   projects: IdentifierSchema[];
+  /**
+   * The permissions of the current user on this team.
+   */
+  permissions: PermissionType[];
 }
 
 /**
@@ -54,4 +58,8 @@ export interface OrganizationSchema {
    * List of teams within the organization.
    */
   teams: TeamSchema[];
+  /**
+   * The permissions of the current user on this organization.
+   */
+  permissions: PermissionType[];
 }

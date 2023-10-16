@@ -7,8 +7,7 @@ import {
   OrganizationSchema,
   MembershipType,
 } from "@/types";
-import { ENABLED_FEATURES, roleMap } from "@/util";
-import { orgStore, projectStore, sessionStore, teamStore } from "@/hooks";
+import { projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -53,29 +52,15 @@ export const usePermission = defineStore("permissionStore", {
         | TeamSchema
         | OrganizationSchema = projectStore.project
     ): boolean {
-      // TODO: use a project's team and organization instead of the current team and organization.
-      const member = sessionStore.getCurrentMember(context);
-      const teamMember = sessionStore.getCurrentMember(teamStore.team);
-      const orgMember = sessionStore.getCurrentMember(orgStore.org);
-      const type = member?.entityType || "PROJECT";
-
-      if (ENABLED_FEATURES.ORGS_ADMIN) {
+      if (permission === "safa.view") {
         return true;
       } else if (this.isDemo) {
         return false;
-      } else if (permission === "safa.view") {
-        return true;
       } else if (permission.startsWith("safa.")) {
         return !!sessionStore.user.superuser;
+      } else {
+        return context.permissions.includes(permission);
       }
-
-      return (
-        (member && roleMap[type][member.role].includes(permission)) ||
-        (teamMember && roleMap.TEAM[teamMember.role].includes(permission)) ||
-        (orgMember &&
-          roleMap.ORGANIZATION[orgMember.role].includes(permission)) ||
-        false
-      );
     },
   },
 });

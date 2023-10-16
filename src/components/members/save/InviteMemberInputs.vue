@@ -109,7 +109,7 @@ function handleSave() {
 
     memberApiStore.handleInvite(
       {
-        projectMembershipId: "",
+        id: "",
         email: userEmail.value,
         role: userRole.value,
         entityType: props.entity.entityType,

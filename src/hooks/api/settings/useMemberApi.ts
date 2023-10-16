@@ -87,11 +87,9 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
         membersStore.updateMembers(
           [
             updatedMember,
-            ...removeMatches(
-              membersStore.getMembers(entityType),
-              "projectMembershipId",
-              [updatedMember.projectMembershipId]
-            ),
+            ...removeMatches(membersStore.getMembers(entityType), "id", [
+              updatedMember.id,
+            ]),
           ],
           member
         );
@@ -137,7 +135,7 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
         await memberApi.handleRequest(
           async () => {
             await deleteMember(member);
-            membersStore.deleteMembers([member.projectMembershipId], member);
+            membersStore.deleteMembers([member.id], member);
             await getProjectApiStore.handleReload();
           },
           {

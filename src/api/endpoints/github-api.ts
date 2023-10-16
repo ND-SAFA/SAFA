@@ -89,9 +89,8 @@ export async function getGitHubProjects(): Promise<GitHubProjectSchema[]> {
 export async function createGitHubProject(
   owner: string,
   repositoryName: string,
-  configuration?: GitHubImportSchema
+  configuration: GitHubImportSchema
 ): Promise<JobSchema> {
-  // TODO: add org, team
   return buildRequest<
     JobSchema,
     "owner" | "repositoryName",

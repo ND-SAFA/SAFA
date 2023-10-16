@@ -3,6 +3,14 @@
  */
 export interface GitHubImportSchema {
   /**
+   * The organization to import to.
+   */
+  orgId?: string;
+  /**
+   * The team to import to.
+   */
+  teamId?: string;
+  /**
    * The branch to import.
    */
   branch?: string;

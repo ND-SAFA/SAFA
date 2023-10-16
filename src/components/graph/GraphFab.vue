@@ -21,7 +21,7 @@
         outline
         label="Generate Trace Links"
         :icon="getIcon('generate-traces')"
-        class="bg-neutral"
+        class="bg-background"
         color="primary"
         data-cy="button-fab-generate-trace"
         @click="appStore.openDetailsPanel('generateTrace')"
@@ -31,7 +31,7 @@
         outline
         label="Generate Artifacts"
         :icon="getIcon('generate-artifacts')"
-        class="bg-neutral"
+        class="bg-background"
         color="primary"
         data-cy="button-fab-generate-artifact"
         @click="appStore.openDetailsPanel('generateArtifact')"
@@ -41,7 +41,7 @@
         outline
         label="Summarize Artifacts"
         :icon="getIcon('generate-summaries')"
-        class="bg-neutral"
+        class="bg-background"
         color="primary"
         data-cy="button-fab-summarize-artifact"
         @click="appStore.openDetailsPanel('summarizeArtifact')"
@@ -50,7 +50,7 @@
         outline
         :label="drawMode ? 'Cancel Draw Mode' : 'Draw Links'"
         :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
-        class="bg-neutral"
+        class="bg-background"
         data-cy="button-fab-draw-trace"
         @click="cyStore.drawMode('toggle')"
       />
@@ -59,7 +59,7 @@
         outline
         label="Create Trace Link"
         :icon="getIcon('create-trace')"
-        class="bg-neutral"
+        class="bg-background"
         data-cy="button-fab-create-trace"
         @click="appStore.openDetailsPanel('saveTrace')"
       />
@@ -68,7 +68,7 @@
         outline
         label="Create Artifact"
         :icon="getIcon('create-artifact')"
-        class="bg-neutral"
+        class="bg-background"
         data-cy="button-fab-create-artifact"
         @click="artifactSaveStore.openPanel({ isNewArtifact: true })"
       />

@@ -7,7 +7,7 @@ import {
   MembershipSchema,
 } from "@/types";
 import { buildProject } from "@/util";
-import { sessionStore } from "@/hooks";
+import { orgStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({
@@ -63,9 +63,11 @@ export const useSaveProject = defineStore("saveProject", {
           method: generateMethod,
         }));
       const user: MembershipSchema = {
-        projectMembershipId: "",
+        id: "",
         email: sessionStore.userEmail,
         role: "OWNER",
+        entityType: "PROJECT",
+        entityId: "",
       };
       const project = buildProject({
         name: this.name,
@@ -76,7 +78,12 @@ export const useSaveProject = defineStore("saveProject", {
         traces,
       });
 
-      return { project, requests };
+      return {
+        orgId: orgStore.orgId,
+        teamId: teamStore.teamId,
+        project,
+        requests,
+      };
     },
   },
   actions: {

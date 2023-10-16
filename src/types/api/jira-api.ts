@@ -37,3 +37,17 @@ export interface JiraProjectSchema {
    */
   mediumAvatarUrl: string;
 }
+
+/**
+ * Defines a Jira project import.
+ */
+export interface JiraImportSchema {
+  /**
+   * The organization to import to.
+   */
+  orgId: string;
+  /**
+   * The team to import to.
+   */
+  teamId: string;
+}

@@ -60,6 +60,14 @@ export interface ParseTraceFileSchema extends ParseFileSchema {
  */
 export interface CreateProjectByJsonSchema {
   /**
+   * The organization to create the project for.
+   */
+  orgId: string;
+  /**
+   * The team to create the project for.
+   */
+  teamId: string;
+  /**
    * The project entities to commit.
    */
   project: ProjectSchema;

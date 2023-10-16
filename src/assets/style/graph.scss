@@ -7,6 +7,15 @@ $graph-border-radius: 8px;
   min-height: inherit !important;
 }
 
+.cy-popup {
+  position: absolute;
+  z-index: 10;
+
+  & > div {
+    margin-top: 30vh;
+  }
+}
+
 .cy-container {
   overflow: hidden;
   position: relative;

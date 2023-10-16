@@ -1,4 +1,20 @@
 <template>
+  <div v-if="displayPopup" class="cy-popup full-height full-width">
+    <div class="q-mx-auto width-fit q-pa-md text-center">
+      <panel-card
+        title="Welcome to SAFA!"
+        subtitle="Create an artifact to get started."
+      >
+        <text-button
+          text
+          icon="add"
+          label="Create Artifact"
+          @click="appStore.openDetailsPanel('saveArtifact')"
+        />
+      </panel-card>
+    </div>
+  </div>
+
   <cytoscape
     id="cytoscape-artifact"
     :graph="graph"
@@ -73,6 +89,9 @@ import {
   cyStore,
 } from "@/hooks";
 import { Routes } from "@/router";
+import Typography from "@/components/common/display/content/Typography.vue";
+import PanelCard from "@/components/common/layout/PanelCard.vue";
+import TextButton from "@/components/common/button/TextButton.vue";
 import { Cytoscape } from "./base";
 import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
 import { TimNode, TimLink, TimMenu } from "./tim";
@@ -93,6 +112,10 @@ const traceLinks = computed(() =>
 
 const artifactTypes = computed(() => timStore.artifactTypes);
 const traceMatrices = computed(() => timStore.traceMatrices);
+
+const displayPopup = computed(
+  () => !appStore.isLoading && artifactTypes.value.length === 0
+);
 
 const className = computed(() => {
   if (!isInView.value) {

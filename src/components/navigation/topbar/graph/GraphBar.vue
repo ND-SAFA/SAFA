@@ -5,9 +5,9 @@
       <mode-buttons />
     </flex-box>
     <flex-box align="center">
-      <visible-type-buttons />
-      <graph-buttons />
       <commit-buttons />
+      <graph-buttons />
+      <visible-type-buttons />
     </flex-box>
   </flex-box>
 </template>

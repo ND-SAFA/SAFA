@@ -3,7 +3,6 @@
     v-if="isProjectDefined"
     v-model="getVersionApiStore.currentVersion"
     standout
-    label-color="primary"
     bg-color="transparent"
     class="nav-breadcrumb"
     options-selected-class="primary"

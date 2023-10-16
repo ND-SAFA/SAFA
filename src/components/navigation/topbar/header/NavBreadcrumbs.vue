@@ -1,14 +1,7 @@
 <template>
   <q-breadcrumbs gutter="xs" class="nav-breadcrumb-list" separator-color="grey">
     <q-breadcrumbs-el v-if="displayOrgOptions">
-      <q-select
-        standout
-        label="Organization"
-        label-color="primary"
-        bg-color="transparent"
-        :model-value="orgName"
-        class="nav-breadcrumb"
-      />
+      <organization-selector />
     </q-breadcrumbs-el>
 
     <q-breadcrumbs-el>
@@ -42,12 +35,11 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { orgStore, projectStore, useScreen } from "@/hooks";
+import { projectStore, useScreen } from "@/hooks";
 import { ProjectSelector, VersionSelector } from "@/components/project";
 import { DocumentSelector } from "@/components/document";
 import { IconButton } from "@/components/common";
-
-const orgName = computed(() => orgStore.org.name);
+import { OrganizationSelector } from "@/components/organization";
 
 const { smallWindow } = useScreen();
 

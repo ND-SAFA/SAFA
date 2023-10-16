@@ -2,7 +2,6 @@
   <q-select
     v-model="document"
     standout
-    label-color="primary"
     bg-color="transparent"
     class="nav-breadcrumb"
     options-selected-class="primary"

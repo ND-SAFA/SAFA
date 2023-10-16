@@ -2,7 +2,6 @@
   <q-select
     v-model="getProjectApiStore.currentProject"
     standout
-    label-color="primary"
     bg-color="transparent"
     class="nav-breadcrumb"
     label="Project"

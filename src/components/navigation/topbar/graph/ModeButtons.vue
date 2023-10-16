@@ -75,7 +75,7 @@ function buttonProps(option: GraphMode) {
   return {
     text: !selected,
     outlined: selected,
-    color: "primary",
+    color: selected ? "primary" : "text",
     class: selected ? "nav-mode-selected" : "",
   };
 }

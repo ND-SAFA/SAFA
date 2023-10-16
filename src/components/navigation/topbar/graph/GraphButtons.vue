@@ -1,10 +1,10 @@
 <template>
   <flex-box v-if="!layoutStore.isTableMode">
-    <separator v-if="layoutStore.isTreeMode" vertical inset nav x="1" />
+    <separator vertical inset nav x="1" />
     <icon-button
       v-for="definition in viewButtons"
       :key="definition.label"
-      color="primary"
+      color="text"
       :tooltip="definition.label"
       :icon="definition.icon"
       :disabled="definition.disabled"

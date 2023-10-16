@@ -18,8 +18,8 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepositor
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
-import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -40,6 +40,7 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
     private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactPositionService artifactPositionService;
     private final ArtifactService artifactService;
+    private final NotificationService notificationService;
 
     /**
      * Returns list of documents in given project

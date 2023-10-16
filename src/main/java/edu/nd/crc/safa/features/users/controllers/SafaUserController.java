@@ -2,8 +2,6 @@ package edu.nd.crc.safa.features.users.controllers;
 
 import java.util.Date;
 import java.util.UUID;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -26,6 +24,8 @@ import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import io.jsonwebtoken.Claims;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,11 +203,6 @@ public class SafaUserController extends BaseController {
         return new UserAppEntity(safaUserService.getCurrentUser());
     }
 
-    @Data
-    private static class DefaultOrgDTO {
-        private UUID defaultOrgId;
-    }
-
     @PutMapping(AppRoutes.Accounts.DEFAULT_ORG)
     public void updateDefaultOrg(@RequestBody DefaultOrgDTO newOrgDto) {
         SafaUser currentUser = getCurrentUser();
@@ -216,5 +211,10 @@ public class SafaUserController extends BaseController {
 
     private String buildResetURL(String token) {
         return String.format(fendBase + fendPath, token);
+    }
+
+    @Data
+    private static class DefaultOrgDTO {
+        private UUID defaultOrgId;
     }
 }

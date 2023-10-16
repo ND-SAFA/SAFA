@@ -54,7 +54,7 @@ class TestCreateProjectViaJiraJobCommonRequests extends JiraBaseFlatFileTest {
             jobDbEntity,
             serviceProvider,
             jiraIdentifier,
-            getCurrentUser()
+            getCurrentUser(),
             new JiraImportSettings()
         );
 

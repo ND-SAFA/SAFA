@@ -41,15 +41,14 @@ public class ProjectMembershipService {
      */
     public ProjectMembership addUserRole(SafaUser user, Project project, ProjectRole role) {
         Optional<ProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
+            userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        ProjectMembership membership = membershipOptional.orElseGet(() -> {
-            ProjectMembership newMembership = new ProjectMembership(project, user, role);
-            return userProjectMembershipRepo.save(newMembership);
-        });
+        ProjectMembership membership = membershipOptional.orElseGet(() -> new ProjectMembership(project, user, role));
+
+        userProjectMembershipRepo.save(membership);
 
         notificationService.broadcastChange(
-            EntityChangeBuilder.create(project.getProjectId())
+            EntityChangeBuilder.create(user, project)
                 .withMembersUpdate(membership.getId())
         );
 
@@ -62,16 +61,17 @@ public class ProjectMembershipService {
      *
      * @param user    The user to remove the role from
      * @param project The project the role applies to
+     * @param role    The user's role in the project.
      */
     public void removeUserRole(SafaUser user, Project project, ProjectRole role) {
         Optional<ProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
+            userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
         if (membershipOptional.isPresent()) {
             userProjectMembershipRepo.delete(membershipOptional.get());
 
             notificationService.broadcastChange(
-                EntityChangeBuilder.create(project.getProjectId())
+                EntityChangeBuilder.create(user, project)
                     .withMembersDelete(membershipOptional.get().getId())
             );
         }
@@ -86,8 +86,8 @@ public class ProjectMembershipService {
      */
     public List<ProjectRole> getUserRoles(SafaUser user, Project project) {
         return userProjectMembershipRepo.findByProjectAndMember(project, user).stream()
-                .map(ProjectMembership::getRole)
-                .collect(Collectors.toUnmodifiableList());
+            .map(ProjectMembership::getRole)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -98,9 +98,9 @@ public class ProjectMembershipService {
      */
     public List<ProjectIdAppEntity> getProjectIdAppEntitiesForUser(SafaUser user) {
         return getProjectsForUser(user).stream()
-                .map(project -> projectService.getIdAppEntity(project, user))
-                .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
-                .collect(Collectors.toList());
+            .map(project -> projectService.getIdAppEntity(project, user))
+            .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -113,14 +113,14 @@ public class ProjectMembershipService {
         List<Project> projects = new ArrayList<>();
 
         this.userProjectMembershipRepo.findByMember(user)
-                .stream()
-                .map(ProjectMembership::getProject)
-                .forEach(projects::add);
+            .stream()
+            .map(ProjectMembership::getProject)
+            .forEach(projects::add);
 
         teamMembershipService.getUserTeams(user)
-                .stream()
-                .flatMap(team -> projectService.getProjectsOwnedByTeam(team).stream())
-                .forEach(projects::add);
+            .stream()
+            .flatMap(team -> projectService.getProjectsOwnedByTeam(team).stream())
+            .forEach(projects::add);
 
         return projects;
     }

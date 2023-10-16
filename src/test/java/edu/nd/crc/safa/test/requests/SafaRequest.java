@@ -55,7 +55,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     public static void setMockMvc(MockMvc mockMvc) {
         SafaRequest.mockMvc = mockMvc;
     }
-    
+
     public static void setAuthorizationToken(Cookie authorizationToken) {
         SafaRequest.authorizationToken = authorizationToken;
     }
@@ -303,11 +303,32 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
         request.queryParams(queryParams);
 
-        MvcResult requestResult = mockMvc
-            .perform(request)
-            .andDo(result -> {
-                if (!result.getRequest().isAsyncStarted()) {
-                    test.match(result);
+        try {
+//            MvcResult requestResult = mockMvc
+//                .perform(request)
+//                .andDo(result -> {
+//                    if (!result.getRequest().isAsyncStarted()) {
+//                        test.match(result);
+//                    }
+//                    mockMvc.perform(asyncDispatch(requestResult))
+//                        .andExpect(test);
+//                });
+//
+//            MockHttpServletResponse response = requestResult.getResponse();
+//            String content = response.getContentAsString();
+//            return stringCreator.apply(content);
+            MvcResult requestResult = mockMvc
+                .perform(request)
+                .andDo(result -> {
+                    if (!result.getRequest().isAsyncStarted()) {
+                        test.match(result);
+                    }
+                })
+                .andReturn();
+
+            if (requestResult.getRequest().isAsyncStarted()) {
+                if (requestResult.getRequest().getAsyncContext() != null) {
+                    requestResult.getRequest().getAsyncContext().setTimeout(30000L);
                 }
                 mockMvc.perform(asyncDispatch(requestResult))
                     .andExpect(test);

@@ -31,14 +31,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TeamService {
-
     private TeamRepository teamRepo;
     private OrganizationService orgService;
-
-    @Setter(onMethod = @__({@Autowired}))
     private TeamMembershipService teamMembershipService;
-
-    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ProjectService projectService;
 
     /**
@@ -46,8 +41,8 @@ public class TeamService {
      *
      * @param name         The name of the team
      * @param organization The organization the team belongs to
-     * @param fullOrgTeam Whether the team is a full organization team
-     * @param user The user creating the team. This user will be given the admin role initially
+     * @param fullOrgTeam  Whether the team is a full organization team
+     * @param user         The user creating the team. This user will be given the admin role initially
      * @return The newly created team
      */
     public Team createNewTeam(String name, Organization organization, boolean fullOrgTeam, SafaUser user) {
@@ -92,7 +87,7 @@ public class TeamService {
     /**
      * Convert a team to its front-end representation
      *
-     * @param team The team
+     * @param team        The team
      * @param currentUser The user making the request (so that we can properly show permissions)
      * @return The team front-end object
      */
@@ -120,7 +115,7 @@ public class TeamService {
     /**
      * Converts a collection of teams to front-end objects
      *
-     * @param teams The teams
+     * @param teams       The teams
      * @param currentUser The user making the request (so that we can properly show permissions)
      * @return The front-end representations of the teams
      */
@@ -133,9 +128,10 @@ public class TeamService {
     /**
      * Get all permissions granted to the user via their membership(s) within the given team.
      *
-     * @param team The team the user is a part of. If the user is not actually a member of this team, the
-     *             function may still return some permissions based on if the user is a member of the organization
-     *             the team is a part of, but it will not grant the user any permissions they should not have.
+     * @param team        The team the user is a part of. If the user is not actually a member of this team, the
+     *                    function may still return some permissions based on if the user is a member of the
+     *                    organization the team is a part of, but it will not grant the user any permissions they
+     *                    should not have.
      * @param currentUser The user in question
      * @return A list of permissions the user has from the team
      */
@@ -193,5 +189,49 @@ public class TeamService {
      */
     public void deleteTeam(Team team) {
         teamRepo.delete(team);
+    }
+
+    /**
+     * Sets the autowired team membership server lazily.
+     *
+     * @param teamMembershipService The auto-constructed team membership service.
+     */
+    @Lazy
+    @Autowired
+    public void setTeamMembershipService(TeamMembershipService teamMembershipService) {
+        this.teamMembershipService = teamMembershipService;
+    }
+
+    /**
+     * Sets the autowired project service lazily.
+     *
+     * @param projectService The auto-constructed project service.
+     */
+    @Lazy
+    @Autowired
+    public void setProjectService(ProjectService projectService) {
+        this.projectService = projectService;
+    }
+
+    /**
+     * Sets the autowired project service lazily.
+     *
+     * @param organizationService The auto-constructed organization service.
+     */
+    @Lazy
+    @Autowired
+    public void setOrganizationService(OrganizationService organizationService) {
+        this.orgService = organizationService;
+    }
+
+    /**
+     * Sets the autowired project service lazily.
+     *
+     * @param teamRepository The auto-constructed team repository.
+     */
+    @Lazy
+    @Autowired
+    public void setTeamRepository(TeamRepository teamRepository) {
+        this.teamRepo = teamRepository;
     }
 }

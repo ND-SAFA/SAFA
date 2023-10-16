@@ -44,6 +44,7 @@ public class SafaUser implements Serializable, IUser {
     @Column
     private UUID personalOrgId;
 
+    @JdbcTypeCode(SqlTypes.BINARY)
     @Column
     private UUID defaultOrgId;
 

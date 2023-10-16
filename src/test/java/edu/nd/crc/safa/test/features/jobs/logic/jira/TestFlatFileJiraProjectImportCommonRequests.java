@@ -53,7 +53,7 @@ class TestFlatFileJiraProjectImportCommonRequests extends JiraBaseFlatFileTest {
             jobDbEntity,
             serviceProvider,
             jiraIdentifier,
-            getCurrentUser()
+            getCurrentUser(),
             new JiraImportSettings()
         );
 

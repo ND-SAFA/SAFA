@@ -38,5 +38,4 @@ class TestProjectRetrievalCommonRequests extends ApplicationBaseTest {
         JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
         assertThat(response.length()).isEqualTo(2); // firstProject, secondProject, and default sample project.
     }
-
 }

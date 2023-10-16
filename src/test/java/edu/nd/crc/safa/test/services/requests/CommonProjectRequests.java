@@ -8,6 +8,7 @@ import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -48,11 +49,11 @@ public class CommonProjectRequests {
     public static JSONObject shareProject(Project project,
                                           String email,
                                           ProjectRole role) {
-        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
+        MembershipAppEntity membershipAppEntity = new MembershipAppEntity(email, role.toString());
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-            .withProject(project)
-            .postWithJsonObject(request);
+            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            .withEntityId(project.getProjectId())
+            .postWithJsonObject(membershipAppEntity);
     }
 
     public static JSONObject shareProject(Project project,
@@ -61,8 +62,8 @@ public class CommonProjectRequests {
                                           ResultMatcher resultMatcher) {
         ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-            .withProject(project)
+            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            .withEntityId(project.getProjectId())
             .postWithJsonObject(request, resultMatcher);
     }
 

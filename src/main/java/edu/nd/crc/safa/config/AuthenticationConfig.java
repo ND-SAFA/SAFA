@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.config;
 
-import java.util.Arrays;
 import java.util.List;
 
 import edu.nd.crc.safa.authentication.AuthenticationFilter;
@@ -22,8 +21,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -71,9 +70,8 @@ public class AuthenticationConfig {
             .addFilter(new AuthenticationFilter(authenticationManager, tokenService))
             .addFilter(new AuthorizationFilter(authenticationManager, authorizationService))
             .sessionManagement((sessionManager) -> sessionManager
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-            .exceptionHandling()
-            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(h -> h.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
         return http.build();
     }
 
@@ -92,11 +90,7 @@ public class AuthenticationConfig {
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("https://localhost.safa.ai:8080");
         config.addAllowedOriginPattern("http://localhost:8080");
-        config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept",
-            "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods",
-            "Access-Control-Allow-Origin", "Access-Control-Expose-Headers", "Access-Control-Max-Age",
-            "Access-Control-Request-Headers", "Access-Control-Request-Method", "Age", "Allow", "Alternates",
-            "Content-Range", "Content-Disposition", "Content-Description"));
+        config.setAllowedHeaders(SecurityConstants.allowedCorsHeaders);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setExposedHeaders(List.of(
             "Access-Control-Allow-Origin",

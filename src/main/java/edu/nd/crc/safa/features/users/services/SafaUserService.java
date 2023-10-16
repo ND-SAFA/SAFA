@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
-import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
@@ -64,7 +63,7 @@ public class SafaUserService {
      *
      * @param email    User's email. Must be unique.
      * @param password Account password
-     * @return {@link UserAppEntity} representing created user
+     * @return {@link SafaUser} representing created user
      */
     public SafaUser createUser(String email, String password) {
         String encodedPassword = this.passwordEncoder.encode(password);
@@ -113,7 +112,7 @@ public class SafaUserService {
     public SafaUser getUserByEmail(String email) {
         return this.safaUserRepository
             .findByEmail(email)
-            .orElseThrow(() ->  new SafaItemNotFoundError("No user exists with given email: %s.", email));
+            .orElseThrow(() -> new SafaItemNotFoundError("No user exists with given email: %s.", email));
     }
 
     /**
@@ -131,7 +130,7 @@ public class SafaUserService {
     /**
      * Update a user's default org
      *
-     * @param user The user
+     * @param user            The user
      * @param newDefaultOrgId The new default org ID
      */
     public void updateDefaultOrg(SafaUser user, UUID newDefaultOrgId) {

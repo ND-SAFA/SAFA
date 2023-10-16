@@ -89,9 +89,7 @@ import {
   cyStore,
 } from "@/hooks";
 import { Routes } from "@/router";
-import Typography from "@/components/common/display/content/Typography.vue";
-import PanelCard from "@/components/common/layout/PanelCard.vue";
-import TextButton from "@/components/common/button/TextButton.vue";
+import { PanelCard, TextButton } from "@/components/common";
 import { Cytoscape } from "./base";
 import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
 import { TimNode, TimLink, TimMenu } from "./tim";

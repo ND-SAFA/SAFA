@@ -3,5 +3,4 @@
  */
 export const ENABLED_FEATURES = {
   ARTIFACT_PROMPTS: false,
-  NAV_BREADCRUMBS: true,
 };

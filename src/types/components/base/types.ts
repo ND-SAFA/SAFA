@@ -16,4 +16,9 @@ export type ThemeColor =
   | "negative"
   | "nodeDefault"
   | "nodeGenerated"
+  | "nodeGradient1"
+  | "nodeGradient2"
+  | "nodeGradient3"
+  | "nodeGradient4"
+  | "nodeGradient5"
   | string;

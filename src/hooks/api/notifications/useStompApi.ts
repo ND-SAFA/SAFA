@@ -3,6 +3,7 @@ import { ref } from "vue";
 import SockJS from "sockjs-client";
 import Stomp, { Client, Frame, Message } from "webstomp-client";
 import { StompApiHook, StompChannel } from "@/types";
+import { formatTopic } from "@/util";
 import { logStore } from "@/hooks";
 import { WEBSOCKET_URL } from "@/api";
 import { pinia } from "@/plugins";
@@ -118,16 +119,22 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
       throw Error("Expected destination to be non-empty.");
     }
 
+    if (isSubscribedToTopic(topic)) {
+      logStore.onDevDebug(formatTopic(topic) + " is already subscribed to.");
+      return;
+    }
+
     const subscription = stomp.subscribe(topic, handler);
     const channel: StompChannel = { subscription, topic, handler };
 
     channels.value.push(channel);
+    logStore.onDevDebug("Subscribed to " + formatTopic(topic));
   }
 
   /**
    * Unsubscribes user from all subscriptions.
    */
-  async function clearSubscriptions(): Promise<void> {
+  async function unsubscribe(targets: StompChannel[]): Promise<void> {
     if (!isConnected.value) {
       return;
     }
@@ -137,15 +144,35 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
       logStore.onDevError("Stomp client is null on clearing subscriptions.");
       return;
     }
-    channels.value.forEach((c) => c.subscription.unsubscribe());
-    channels.value = [];
+    const channelTopics = targets.map((c) => c.topic);
+    const persistentSubscriptions: StompChannel[] = [];
+    channels.value.forEach((c) => {
+      if (channelTopics.includes(c.topic)) {
+        c.subscription.unsubscribe();
+        logStore.onDevDebug("Unsubscribed from " + formatTopic(c.topic));
+      } else {
+        persistentSubscriptions.push(c);
+      }
+    });
+    channels.value = persistentSubscriptions;
+  }
+
+  /**
+   * Evaluates if topic is already subscribed to.
+   * @param topic The topic to check.
+   */
+  function isSubscribedToTopic(topic: string): boolean {
+    return channels.value
+      .map((c) => c.topic === topic)
+      .reduce((p, c) => p || c, false);
   }
 
   return {
+    isConnected,
+    channels,
     connectStomp,
     subscribeTo,
-    clearSubscriptions,
-    isConnected,
+    unsubscribe,
   };
 });
 

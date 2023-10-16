@@ -10,10 +10,11 @@ import {
   MembershipSchema,
   NotificationApiHook,
   ProjectSchema,
+  StompChannel,
   TraceLinkSchema,
   TraceMatrixSchema,
 } from "@/types";
-import { buildProject } from "@/util";
+import { buildProject, isProjectTopic } from "@/util";
 import {
   artifactStore,
   attributesStore,
@@ -237,7 +238,7 @@ export const useNotificationApi = defineStore(
         );
         return;
       }
-      await stompApiStore.clearSubscriptions();
+      await clearProjectSubscriptions();
       await stompApiStore.subscribeTo(
         fillEndpoint("projectTopic", { projectId }),
         handleEntityChangeMessage
@@ -256,7 +257,7 @@ export const useNotificationApi = defineStore(
         if (mutation.events.key === "project") {
           const oldProject: ProjectSchema = mutation.events.oldValue;
           const newProject: ProjectSchema = mutation.events.newValue;
-          const oldProjectVersion = oldProject.projectVersion?.versionId;
+          const oldProjectVersion = oldProject.projectVersion?.versionId || "";
           const newProjectVersion = newProject.projectVersion?.versionId || "";
 
           if (newProjectVersion && oldProjectVersion !== newProjectVersion) {
@@ -266,11 +267,22 @@ export const useNotificationApi = defineStore(
             ).then();
           } else if (!newProjectVersion && oldProjectVersion) {
             // no project selected, clear subscriptions
-            stompApiStore.clearSubscriptions().then();
+            clearProjectSubscriptions().then();
           }
         }
       }
     });
+
+    /**
+     * Clears subscriptions to project and related versions.
+     */
+    async function clearProjectSubscriptions() {
+      const channels: StompChannel[] = stompApiStore.channels;
+      const projectSubscriptions = channels.filter((c) =>
+        isProjectTopic(c.topic)
+      );
+      await stompApiStore.unsubscribe(projectSubscriptions);
+    }
 
     return { handleSubscribeVersion };
   }

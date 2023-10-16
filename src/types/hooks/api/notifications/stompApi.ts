@@ -24,6 +24,7 @@ export interface StompChannel {
  */
 export interface StompApiHook {
   isConnected: Ref<boolean>;
+  channels: Ref<StompChannel[]>;
 
   /**
    * Connects to BEND websocket server and tries to reconnect if
@@ -45,7 +46,7 @@ export interface StompApiHook {
   ): Promise<void>;
 
   /**
-   * Clears all subscriptions of the current user.
+   * Unsubscribes from channels.
    */
-  clearSubscriptions(): Promise<void>;
+  unsubscribe(channels: StompChannel[]): Promise<void>;
 }

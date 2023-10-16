@@ -13,6 +13,7 @@ import {
   TraceLinkSchema,
   TraceMatrixSchema,
 } from "@/types";
+import { buildProject } from "@/util";
 import {
   artifactStore,
   attributesStore,
@@ -39,6 +40,40 @@ import { pinia } from "@/plugins";
 export const useNotificationApi = defineStore(
   "notificationApi",
   (): NotificationApiHook => {
+    /**
+     * Converts a change into updated project data.
+     *
+     * @param change - The change.
+     */
+    function createProjectSchema(change: ChangeSchema): ProjectSchema {
+      const project = buildProject();
+
+      switch (change.entity) {
+        case "ARTIFACTS":
+          project.artifacts = <ArtifactSchema[]>change.entities;
+          break;
+        case "TRACES":
+          project.traces = <TraceLinkSchema[]>change.entities;
+          break;
+        case "WARNINGS":
+          break;
+        case "TRACE_MATRICES":
+          project.traceMatrices = <TraceMatrixSchema[]>change.entities;
+          break;
+        case "TYPES":
+          project.artifactTypes = <ArtifactTypeSchema[]>change.entities;
+          break;
+        case "MEMBERS":
+          project.members = <MembershipSchema[]>change.entities;
+          break;
+        case "ACTIVE_MEMBERS":
+          project.members = <MembershipSchema[]>change.entities;
+          break;
+      }
+
+      return project;
+    }
+
     /**
      * Deletes stored project information.
      *
@@ -111,39 +146,11 @@ export const useNotificationApi = defineStore(
       }
     }
 
-    function createProjectSchema(change: ChangeSchema): ProjectSchema {
-      const project: ProjectSchema = projectStore.project;
-      switch (change.entity) {
-        case "ARTIFACTS":
-          project.artifacts = <ArtifactSchema[]>change.entities;
-          break;
-        case "TRACES":
-          project.traces = <TraceLinkSchema[]>change.entities;
-          break;
-        case "ACTIVE_MEMBERS":
-          membersStore.setActiveMembers(<MembershipSchema[]>change.entities);
-          break;
-        case "WARNINGS":
-          break;
-        case "TRACE_MATRICES":
-          project.traceMatrices = <TraceMatrixSchema[]>change.entities;
-          break;
-        case "TYPES":
-          project.artifactTypes = <ArtifactTypeSchema[]>change.entities;
-          break;
-        case "MEMBERS":
-          project.members = <MembershipSchema[]>change.entities;
-          break;
-        default:
-          throw Error("Unhandled entity: " + change.entity);
-      }
-      return project;
-    }
-
     /**
      * Updates stored project information.
      *
      * @param change - The update change.
+     * @param project - The project to update.
      */
     async function handleUpdateChange(
       change: ChangeSchema,
@@ -153,57 +160,48 @@ export const useNotificationApi = defineStore(
 
       switch (change.entity) {
         case "PROJECT":
-          projectStore.updateProject({
+          return projectStore.updateProject({
             name: project.name,
             description: project.description,
           });
-          break;
         case "MEMBERS":
-          membersStore.updateMembers(project.members, {
+          //TODO: Non-trivial to retrieve the current `active` status of members.
+          // Currently, active members are cleared when a new member is added.
+          return membersStore.updateMembers(project.members, {
             entityType: "PROJECT",
             entityId: project.projectId,
           });
-          //TODO: Non-trivial to retrieve the current `active` status of members.
-          // Currently, active members are cleared when a new member is added.
+        case "ACTIVE_MEMBERS":
+          membersStore.setActiveMembers(project.members);
           break;
         case "VERSION":
           return getVersionApiStore.handleLoad(versionId);
         case "TYPES":
-          timStore.addOrUpdateArtifactTypes(project.artifactTypes);
-          break;
+          return timStore.addOrUpdateArtifactTypes(project.artifactTypes);
         case "TRACE_MATRICES":
-          timStore.addOrUpdateTraceMatrices(project.traceMatrices);
-          break;
+          return timStore.addOrUpdateTraceMatrices(project.traceMatrices);
         case "DOCUMENT":
-          await documentStore.updateDocuments(project.documents);
-          break;
+          return await documentStore.updateDocuments(project.documents);
         case "ARTIFACTS":
-          artifactStore.addOrUpdateArtifacts(project.artifacts);
-          break;
+          return artifactStore.addOrUpdateArtifacts(project.artifacts);
         case "TRACES":
-          traceStore.addOrUpdateTraceLinks(project.traces);
-          break;
+          return traceStore.addOrUpdateTraceLinks(project.traces);
         case "WARNINGS":
           return warningApiStore.handleReload(versionId);
         case "JOBS":
           return jobApiStore.handleReload();
         case "LAYOUT":
-          documentStore.updateBaseLayout(project.layout);
-          break;
+          return documentStore.updateBaseLayout(project.layout);
         case "SUBTREES":
-          subtreeStore.initializeProject(project);
-          break;
+          return subtreeStore.initializeProject(project);
         case "MODELS":
-          projectStore.updateProject({ models: project.models });
-          break;
+          return projectStore.updateProject({ models: project.models });
         case "ATTRIBUTES":
-          attributesStore.updateAttributes(project.attributes || []);
-          break;
+          return attributesStore.updateAttributes(project.attributes || []);
         case "ATTRIBUTE_LAYOUTS":
-          attributesStore.updateAttributeLayouts(
+          return attributesStore.updateAttributeLayouts(
             project.attributeLayouts || []
           );
-          break;
       }
     }
 
@@ -217,29 +215,16 @@ export const useNotificationApi = defineStore(
 
       // Step - Iterate through message and delete entities.
       for (const change of message.changes) {
-        const project = createProjectSchema(change);
         if (change.action === ActionType.DELETE) {
           await handleDeleteChange(change);
         } else if (change.action === ActionType.UPDATE) {
+          const project = createProjectSchema(change);
+
           await handleUpdateChange(change, project);
         } else {
           throw Error("Unable to handle action:" + change.action);
         }
       }
-    }
-
-    function isProjectSet(project: ProjectSchema): boolean {
-      const projectId = project.projectId;
-      const versionId = project.projectVersion?.versionId;
-      return versionId !== undefined && versionId !== "" && projectId !== "";
-    }
-
-    function getProjectVersion(project: ProjectSchema): string {
-      const versionId = project.projectVersion?.versionId;
-      if (versionId === undefined || versionId === "") {
-        throw Error("Undefined project version!");
-      }
-      return versionId;
     }
 
     async function handleSubscribeVersion(
@@ -253,38 +238,40 @@ export const useNotificationApi = defineStore(
         return;
       }
       await stompApiStore.clearSubscriptions();
-
       await stompApiStore.subscribeTo(
         fillEndpoint("projectTopic", { projectId }),
         handleEntityChangeMessage
       );
-
       await stompApiStore.subscribeTo(
         fillEndpoint("versionTopic", { versionId }),
         handleEntityChangeMessage
       );
     }
 
-    projectStore.$subscribe((mutation, state) => {
+    /**
+     * Change the current project subscribed to when the project changes.
+     */
+    projectStore.$subscribe((mutation) => {
       if (mutation.type === MutationType.direct) {
         if (mutation.events.key === "project") {
           const oldProject: ProjectSchema = mutation.events.oldValue;
           const newProject: ProjectSchema = mutation.events.newValue;
-          const oldProjectSet = isProjectSet(oldProject);
-          const newProjectSet = isProjectSet(newProject);
-          if (
-            oldProject.projectVersion?.versionId !==
-            newProject.projectVersion?.versionId
-          ) {
-            const versionId = getProjectVersion(newProject);
-            handleSubscribeVersion(newProject.projectId, versionId).then();
-          } else if (!newProjectSet && oldProjectSet) {
+          const oldProjectVersion = oldProject.projectVersion?.versionId;
+          const newProjectVersion = newProject.projectVersion?.versionId || "";
+
+          if (newProjectVersion && oldProjectVersion !== newProjectVersion) {
+            handleSubscribeVersion(
+              newProject.projectId,
+              newProjectVersion
+            ).then();
+          } else if (!newProjectVersion && oldProjectVersion) {
             // no project selected, clear subscriptions
             stompApiStore.clearSubscriptions().then();
           }
         }
       }
     });
+
     return { handleSubscribeVersion };
   }
 );

@@ -45,9 +45,21 @@ export type EntityType =
  * Represents list of changed entities.
  */
 export interface ChangeSchema {
+  /**
+   * The entity being changed.
+   */
   entity: EntityType;
+  /**
+   * The action performed on the entity.
+   */
   action: ActionType;
+  /**
+   * The ids of the entities being changed.
+   */
   entityIds: string[];
+  /**
+   * The entities being changed themselves.
+   */
   entities: object[];
 }
 

@@ -1,3 +1,0 @@
-interface ActiveMemberSymbolProps {}
-
-export { ActiveMemberSymbolProps };

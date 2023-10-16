@@ -48,7 +48,8 @@ export const useSetProjectApi = defineStore(
       await setProjectApi.handleRequest(async () => {
         const versionId = project.projectVersion?.versionId || "";
 
-        projectStore.initializeProject(project); // automatically subscribes
+        // Automatic update subscription set by `useNotificationApi`
+        projectStore.initializeProject(project);
 
         await integrationsApiStore.handleReload();
         await handleSetCurrentDocument(project);

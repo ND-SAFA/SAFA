@@ -1,5 +1,23 @@
-import { Message } from "webstomp-client";
+import { Message, Subscription } from "webstomp-client";
 import { Ref } from "vue";
+
+/**
+ * A channel for stomp messages.
+ */
+export interface StompChannel {
+  /**
+   * The subscription to the channel.
+   */
+  subscription: Subscription;
+  /**
+   * The topic of the channel.
+   */
+  topic: string;
+  /**
+   * A callback for handling messages to the channel.
+   */
+  handler: (message: Message) => void;
+}
 
 /**
  * A hook for using stomp websocket messages.

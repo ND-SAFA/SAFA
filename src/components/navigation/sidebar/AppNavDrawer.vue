@@ -63,7 +63,7 @@ import { navigateTo, Routes } from "@/router";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
-import MembersBar from "./members/MembersBar.vue";
+import MembersBar from "./MembersBar.vue";
 
 const { smallWindow } = useScreen();
 

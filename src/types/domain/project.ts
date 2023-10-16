@@ -116,10 +116,6 @@ export interface ProjectSchema extends IdentifierSchema {
   documents: DocumentSchema[];
 
   /**
-   * A collection of warnings on project artifacts.
-   */
-  warnings: Record<string, WarningSchema[]>;
-  /**
    * Map of artifact ids to their position in the default graph.
    */
   layout: LayoutPositionsSchema;

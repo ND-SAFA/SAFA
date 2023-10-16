@@ -13,7 +13,6 @@ import {
   selectionStore,
   subtreeStore,
   timStore,
-  warningStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -135,7 +134,6 @@ export const useProject = defineStore("project", {
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);
       attributesStore.initializeProject(project);
-      warningStore.artifactWarnings = project.warnings;
     },
   },
 });

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed, ref, watch } from "vue";
 import { ArtifactApiHook, ArtifactSchema, IOHandlerCallback } from "@/types";
+import { ENABLED_FEATURES } from "@/util";
 import {
   artifactCommitApiStore,
   artifactSaveStore,
@@ -52,12 +53,11 @@ export const useArtifactApi = defineStore(
           } else if (!artifactSaveStore.hasNameChanged) {
             artifactSaveStore.isNameValid = true;
             nameLoading.value = false;
-          } else {
-            //TODO: Fix 403 on validate.
-            logStore.onDevInfo(
-              "Skipping artifact name validation, under construction."
-            );
+          } else if (!ENABLED_FEATURES.ARTIFACT_NAME_CHECK) {
             artifactSaveStore.isNameValid = true;
+            nameLoading.value = false;
+          } else {
+            artifactSaveStore.isNameValid = false;
             nameLoading.value = false;
           }
         }, 500);

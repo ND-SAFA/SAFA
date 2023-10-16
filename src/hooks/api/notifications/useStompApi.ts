@@ -1,17 +1,11 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import SockJS from "sockjs-client";
-import Stomp, { Client, Frame, Message, Subscription } from "webstomp-client";
-import { StompApiHook } from "@/types";
+import Stomp, { Client, Frame, Message } from "webstomp-client";
+import { StompApiHook, StompChannel } from "@/types";
 import { logStore } from "@/hooks";
 import { WEBSOCKET_URL } from "@/api";
 import { pinia } from "@/plugins";
-
-interface Channel {
-  subscription: Subscription;
-  topic: string;
-  handler: (message: Message) => void;
-}
 
 /**
  * The hook with a client for connecting to the backend websocket server.
@@ -20,7 +14,7 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   const stompClient = ref<Client>();
   const socket = ref<WebSocket>();
   const isConnected = ref(false);
-  const channels = ref<Channel[]>([]);
+  const channels = ref<StompChannel[]>([]);
 
   /**
    * Returns the current stomp client, creating one if none exists.
@@ -96,9 +90,10 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
    * Subscribes user to current stored topics. Useful on case of reconnection.
    */
   function subscribeToTopics(): Promise<void[]> {
-    const subscriptionPromises: Promise<void>[] = channels.value.map((c) => {
-      return subscribeTo(c.topic, c.handler);
-    });
+    const subscriptionPromises = channels.value.map((channel) =>
+      subscribeTo(channel.topic, channel.handler)
+    );
+
     return Promise.all(subscriptionPromises);
   }
 
@@ -124,7 +119,8 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     }
 
     const subscription = stomp.subscribe(topic, handler);
-    const channel: Channel = { subscription, topic, handler };
+    const channel: StompChannel = { subscription, topic, handler };
+
     channels.value.push(channel);
   }
 

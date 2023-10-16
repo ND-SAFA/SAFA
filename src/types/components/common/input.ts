@@ -53,6 +53,10 @@ export interface TextInputProps
     | "url"
     | "time"
     | "date";
+  /**
+   * The number of rows to display when the type is `textarea`.
+   */
+  rows?: number;
 }
 
 /**

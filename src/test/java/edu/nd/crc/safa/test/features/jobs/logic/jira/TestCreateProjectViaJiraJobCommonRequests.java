@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
+import edu.nd.crc.safa.features.jira.entities.api.JiraImportSettings;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
@@ -54,6 +55,7 @@ class TestCreateProjectViaJiraJobCommonRequests extends JiraBaseFlatFileTest {
             serviceProvider,
             jiraIdentifier,
             getCurrentUser()
+            new JiraImportSettings()
         );
 
         job.setJiraProjectResponse(createMockJiraProject());

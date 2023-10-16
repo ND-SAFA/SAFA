@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
@@ -22,27 +21,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DocumentAppEntity implements IAppEntity {
     private UUID documentId = null;
-    @NotNull
-    private DocumentType type;
     @NotEmpty
     private String name;
     @NotNull
     private String description;
     @NotNull
     private List<UUID> artifactIds = new ArrayList<>();
-    @NotNull
-    private List<DocumentColumnAppEntity> columns = new ArrayList<>();
     private Map<UUID, LayoutPosition> layout = new HashMap<>();
 
     public DocumentAppEntity(Document document,
                              List<UUID> artifactIds,
                              Map<UUID, LayoutPosition> layout) {
         this.documentId = document.getDocumentId();
-        this.type = document.getType();
         this.name = document.getName();
         this.description = document.getDescription();
         this.artifactIds = artifactIds;
-        this.columns = new ArrayList<>();
         this.layout = layout;
     }
 
@@ -50,7 +43,6 @@ public class DocumentAppEntity implements IAppEntity {
         return new Document(
             this.documentId,
             null,
-            this.type,
             this.name,
             this.description);
     }

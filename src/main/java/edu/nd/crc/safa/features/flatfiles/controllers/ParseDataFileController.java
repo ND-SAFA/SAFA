@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
@@ -64,10 +63,7 @@ public class ParseDataFileController extends BaseController {
                                                                             @RequestParam MultipartFile file) {
         EntityParsingResult<ArtifactAppEntity, String> response = new EntityParsingResult<>();
         tryParseFile(response, () -> {
-            AbstractArtifactFile<?> artifactFile =
-                DataFileBuilder.createArtifactFileParser(artifactType,
-                    DocumentType.ARTIFACT_TREE,
-                    file);
+            AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType, file);
             response.setEntities(artifactFile.getEntities());
             response.setErrors(artifactFile.getErrors());
         });

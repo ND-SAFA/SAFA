@@ -115,8 +115,7 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
                 artifactConstants.body)
             .newDocument(projectName,
                 documentConstants.name,
-                documentConstants.description,
-                documentConstants.type)
+                documentConstants.description)
             .newDocumentArtifact(projectName, 0, documentConstants.name, artifactConstants.name)
             .getProjectVersion(projectName, 0);
     }

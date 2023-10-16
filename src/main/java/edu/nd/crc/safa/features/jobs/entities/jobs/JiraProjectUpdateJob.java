@@ -7,6 +7,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
+import edu.nd.crc.safa.features.jira.entities.api.JiraImportSettings;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
@@ -24,8 +25,9 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
     public JiraProjectUpdateJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
                                 JiraIdentifier jiraIdentifier,
-                                SafaUser user) {
-        super(jobDbEntity, serviceProvider, jiraIdentifier, user);
+                                SafaUser user,
+                                JiraImportSettings importSettings) {
+        super(jobDbEntity, serviceProvider, jiraIdentifier, user, importSettings);
         this.jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
         setProjectCommitDefinition(new ProjectCommitDefinition(jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);

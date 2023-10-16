@@ -44,8 +44,8 @@ public class RetrievalTestService {
 
     public JSONArray getProjectMembers(Project project) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
-            .withProject(project)
+            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            .withEntityId(project.getProjectId())
             .getWithJsonArray();
     }
 

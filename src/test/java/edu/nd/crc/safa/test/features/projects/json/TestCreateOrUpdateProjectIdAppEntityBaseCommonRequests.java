@@ -49,7 +49,7 @@ class TestCreateOrUpdateProjectIdAppEntityBaseCommonRequests extends AbstractPro
         // Step - POST to update project
         responseContent.put("name", newName);
         responseContent.put("description", newDescription);
-        postProjectJson(responseContent);
+        putProjectJson(responseContent);
 
         // VP - Verify that information was saved.
         verifyProjectInformation(UUID.fromString(projectId), newName, newDescription);

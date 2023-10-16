@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
+import edu.nd.crc.safa.utilities.ProjectOwner;
 
 import lombok.Setter;
 import org.junit.jupiter.api.Test;
@@ -106,7 +107,7 @@ class TestCommitJobProjectCreationCommonRequests extends ApplicationBaseTest {
         @IJobStep(value = "Creation Optional Project", position = 1)
         public void makeProject() {
             if (allowProjectCreation) {
-                createProjectAndCommit(this.user, "test project name", "test project desc");
+                createProjectAndCommit(new ProjectOwner(this.user), "test project name", "test project desc");
             }
         }
 

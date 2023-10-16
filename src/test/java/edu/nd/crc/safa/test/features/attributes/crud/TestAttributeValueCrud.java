@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvid
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
@@ -66,7 +66,6 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
             "RE-20",
             "summary",
             "body",
-            DocumentType.ARTIFACT_TREE,
             Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).value)
         );
 
@@ -102,7 +101,6 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
             "RE-20",
             "summary",
             "body",
-            DocumentType.ARTIFACT_TREE,
             Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
         );
 
@@ -133,7 +131,6 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
             "RE-20",
             "summary",
             "body",
-            DocumentType.ARTIFACT_TREE,
             Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
         );
 

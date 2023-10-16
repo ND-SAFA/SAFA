@@ -18,6 +18,8 @@ public class TestLinkVersioning extends AbstractVersionedEntityTest<TraceAppEnti
     static String FLAT_FILES_PATH = ProjectPaths.Resources.Tests.MINI;
     static double ORIGINAL_SCORE = 1;
     static double MODIFIED_SCORE = 3.14;
+    static String ORIGINAL_EXPLANATION = "initial explanation";
+    static String MODIFIED_EXPLANATION = "new explanation";
 
     @Override
     protected void loadDataIntoProjectVersion(ProjectVersion projectVersion) throws Exception {
@@ -39,6 +41,7 @@ public class TestLinkVersioning extends AbstractVersionedEntityTest<TraceAppEnti
     @Override
     protected void modifyEntityInCommit(CommitBuilder commitBuilder, TraceLinkVersion entity) {
         entity.setScore(MODIFIED_SCORE);
+        entity.setExplanation(MODIFIED_EXPLANATION);
         TraceAppEntity linkAppEntity = this.traceLinkVersionRepository.retrieveAppEntityFromVersionEntity(entity);
         commitBuilder.withModifiedTrace(linkAppEntity);
     }
@@ -52,10 +55,12 @@ public class TestLinkVersioning extends AbstractVersionedEntityTest<TraceAppEnti
     @Override
     protected void verifyChangeToEntity(TraceLinkVersion entity) {
         assertThat(entity.getScore()).isEqualTo(MODIFIED_SCORE);
+        assertThat(entity.getExplanation()).isEqualTo(MODIFIED_EXPLANATION);
     }
 
     @Override
     protected void verifyNoChangeToEntity(TraceLinkVersion entity) {
         assertThat(entity.getScore()).isEqualTo(ORIGINAL_SCORE);
+        assertThat(entity.getExplanation()).isEqualTo(ORIGINAL_EXPLANATION);
     }
 }

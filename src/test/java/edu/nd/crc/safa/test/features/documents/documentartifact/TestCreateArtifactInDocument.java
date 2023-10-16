@@ -7,7 +7,6 @@ import java.util.List;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
@@ -35,7 +34,6 @@ class TestCreateArtifactInDocument extends ApplicationBaseTest {
         String projectName = "test-project";
         String docName = "test-document";
         String docDescription = "this is a description";
-        DocumentType docType = DocumentType.ARTIFACT_TREE;
 
         String artifactType = "requirement";
         String artifactName = "RE-10";
@@ -49,7 +47,7 @@ class TestCreateArtifactInDocument extends ApplicationBaseTest {
             .newType(projectName, artifactType)
             .newArtifactAndBody(projectName,
                 artifactType, artifactName, artifactSummary, artifactContent)
-            .newDocument(projectName, docName, docDescription, docType)
+            .newDocument(projectName, docName, docDescription)
             .getProjectVersion(projectName, 0);
         Document document = dbEntityBuilder.getDocument(projectName, docName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);

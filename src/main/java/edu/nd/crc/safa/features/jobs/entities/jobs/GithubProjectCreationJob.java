@@ -17,7 +17,6 @@ import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
@@ -37,6 +36,7 @@ import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectOwner;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -183,7 +183,10 @@ public class GithubProjectCreationJob extends CommitJob {
         if (projectDescription == null) {
             projectDescription = projectName;
         }
-        createProjectAndCommit(this.user, projectName, projectDescription);
+        ProjectOwner owner =
+            ProjectOwner.fromUUIDs(getServiceProvider(), importSettings.getTeamId(),
+                importSettings.getOrgId(), getUser());
+        createProjectAndCommit(owner, projectName, projectDescription);
         ProjectVersion projectVersion = getProjectVersion();
         this.githubIdentifier.setProjectVersion(projectVersion);
         linkProjectToJob(projectVersion.getProject());
@@ -404,7 +407,6 @@ public class GithubProjectCreationJob extends CommitJob {
                 path,
                 summary,
                 body,
-                DocumentType.ARTIFACT_TREE,
                 attributes
             );
 

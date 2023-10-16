@@ -6,14 +6,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.FTAType;
-import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
@@ -22,9 +18,12 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.organizations.services.OrganizationService;
+import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -64,11 +63,12 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     private final ProjectService projectService;
     private final CustomAttributeRepository customAttributeRepository;
     private final AttributeSystemServiceProvider attributeSystemServiceProvider;
     private final VersionService versionService;
+    private final TeamService teamService;
+    private final OrganizationService organizationService;
 
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
@@ -95,10 +95,11 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactVersionRepository = serviceProvider.getArtifactVersionRepository();
         this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
-        this.artifactVersionRepositoryImpl = artifactVersionRepositoryImpl;
         this.customAttributeRepository = customAttributeRepository;
         this.attributeSystemServiceProvider = attributeSystemServiceProvider;
         this.versionService = serviceProvider.getVersionService();
+        this.teamService = serviceProvider.getTeamService();
+        this.organizationService = serviceProvider.getOrganizationService();
         DbEntityBuilder.instance = this;
         this.initializeData();
     }
@@ -176,10 +177,9 @@ public class DbEntityBuilder extends AbstractBuilder {
 
     public DbEntityBuilder newDocument(String projectName,
                                        String docName,
-                                       String docDescription,
-                                       DocumentType docType) {
+                                       String docDescription) {
         Project project = this.getProject(projectName);
-        Document document = new Document(null, project, docType, docName, docDescription);
+        Document document = new Document(null, project, docName, docDescription);
         this.documentRepository.save(document);
         addEntry(this.documents, projectName, docName, document);
         return this;
@@ -256,16 +256,9 @@ public class DbEntityBuilder extends AbstractBuilder {
     public DbEntityBuilder newArtifact(String projectName,
                                        String typeName,
                                        String artifactName) {
-        return newArtifact(projectName, typeName, artifactName, DocumentType.ARTIFACT_TREE);
-    }
-
-    public DbEntityBuilder newArtifact(String projectName,
-                                       String typeName,
-                                       String artifactName,
-                                       DocumentType documentType) {
         Project project = getProject(projectName);
         ArtifactType artifactType = getType(projectName, typeName);
-        Artifact artifact = new Artifact(project, artifactType, artifactName, documentType);
+        Artifact artifact = new Artifact(project, artifactType, artifactName);
         this.artifactRepository.save(artifact);
         this.addEntry(this.artifacts, projectName, artifactName, artifact);
         return this;
@@ -379,34 +372,6 @@ public class DbEntityBuilder extends AbstractBuilder {
         return this;
     }
 
-    public DbEntityBuilder newFtaArtifact(Artifact artifact,
-                                          DocumentType documentType,
-                                          FTAType ftaType
-    ) {
-        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
-        artifactAppEntity.setDocumentType(documentType);
-        artifactAppEntity.setLogicType(ftaType);
-        artifactVersionRepositoryImpl.createOrUpdateDocumentNodeInformation(
-            artifactAppEntity,
-            artifact
-        );
-        return this;
-    }
-
-    public DbEntityBuilder newSafetyArtifact(Artifact artifact,
-                                             DocumentType documentType,
-                                             SafetyCaseType safetyCaseType
-    ) {
-        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
-        artifactAppEntity.setDocumentType(documentType);
-        artifactAppEntity.setSafetyCaseType(safetyCaseType);
-        artifactVersionRepositoryImpl.createOrUpdateDocumentNodeInformation(
-            artifactAppEntity,
-            artifact
-        );
-        return this;
-    }
-
     public Project getProject(String projectName) {
         assertProjectExists(this.projects, projectName);
         return this.projects.get(projectName);
@@ -467,6 +432,14 @@ public class DbEntityBuilder extends AbstractBuilder {
     public List<TraceLinkVersion> getTraceLinks(String projectName) {
         Project project = getProject(projectName);
         return this.traceLinkVersionRepository.getProjectLinks(project);
+    }
+
+    public Organization newOrganization(String name, String description) {
+        return organizationService.createNewOrganization(new Organization(name, description, currentUser, "free", false));
+    }
+
+    public Team newTeam(String name, Organization organization) {
+        return teamService.createNewTeam(name, organization, false, currentUser);
     }
 
     private <T> void assertProjectExists(Map<String, T> table, String projectName) {

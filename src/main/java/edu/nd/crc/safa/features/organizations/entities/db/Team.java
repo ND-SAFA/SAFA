@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.organizations.entities.db;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,6 +47,19 @@ public class Team {
         this.name = name;
         this.organization = organization;
         this.fullOrgTeam = fullOrgTeam;
+    }
+
+    /**
+     * Set values using an {@link TeamAppEntity} as a template. This allows us to control
+     * which values the front end can tell us to update. We also check each value to see if its null
+     * so that the front end doesn't have to send every value every time.
+     *
+     * @param teamAppEntity The values that need to be updated
+     */
+    public void setFromAppEntity(TeamAppEntity teamAppEntity) {
+        if (teamAppEntity.getName() != null) {
+            setName(teamAppEntity.getName());
+        }
     }
 
 }

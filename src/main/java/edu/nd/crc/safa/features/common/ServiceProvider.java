@@ -40,6 +40,8 @@ import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.organizations.services.OrganizationService;
+import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
@@ -93,6 +95,9 @@ public class ServiceProvider {
     // Members
     private final UserProjectMembershipRepository userProjectMembershipRepository;
     private final MemberService memberService;
+    // Orgs
+    private final TeamService teamService;
+    private final OrganizationService organizationService;
     // Versions
     private final VersionService versionService;
     // Types
@@ -177,4 +182,5 @@ public class ServiceProvider {
     public void postInit() {
         ServiceProvider.instance = this;
     }
+
 }

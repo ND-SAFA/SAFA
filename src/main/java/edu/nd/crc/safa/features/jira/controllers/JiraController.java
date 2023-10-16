@@ -9,6 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
+import edu.nd.crc.safa.features.jira.entities.api.JiraImportSettings;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
 
@@ -79,7 +81,9 @@ public class JiraController extends BaseController {
 
     @PostMapping(AppRoutes.Jira.Import.BY_ID)
     public JiraResponseDTO<JobAppEntity> createJiraProject(@PathVariable("id") Long jiraProjectId,
-        @PathVariable UUID orgId) throws Exception {
+                                                           @PathVariable UUID orgId,
+                                                           @RequestBody JiraImportSettings importSettings)
+        throws Exception {
 
         SafaUser principal = safaUserService.getCurrentUser();
         Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
@@ -98,7 +102,8 @@ public class JiraController extends BaseController {
         CreateProjectViaJiraBuilder createProjectViaJira = new CreateProjectViaJiraBuilder(
             getServiceProvider(),
             new JiraIdentifier(null, jiraProjectId, orgId),
-            principal);
+            principal,
+            importSettings);
 
         return new JiraResponseDTO<>(createProjectViaJira.perform(), JiraResponseMessage.OK);
     }
@@ -127,7 +132,8 @@ public class JiraController extends BaseController {
         UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
             getServiceProvider(),
             jiraIdentifier,
-            principal
+            principal,
+            new JiraImportSettings()
         );
 
         return new JiraResponseDTO<>(updateProjectViaJira.perform(), JiraResponseMessage.OK);
@@ -159,7 +165,8 @@ public class JiraController extends BaseController {
         ImportIntoProjectViaJiraBuilder updateProjectViaJira = new ImportIntoProjectViaJiraBuilder(
             getServiceProvider(),
             jiraIdentifier,
-            principal
+            principal,
+            new JiraImportSettings()
         );
 
         return new JiraResponseDTO<>(updateProjectViaJira.perform(), JiraResponseMessage.OK);

@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnDataType;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AccessLevel;
@@ -105,7 +103,6 @@ public class JsonBuilder extends AbstractBuilder {
         artifact.put("body", body);
         artifact.put("summary", "");
         artifact.put("documentIds", new ArrayList<>());
-        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.ARTIFACT_TREE.toString());
         artifact.put("attributes", customFields);
         project.getJSONArray(Constants.ARTIFACTS).put(artifact);
         return this;
@@ -137,39 +134,21 @@ public class JsonBuilder extends AbstractBuilder {
     }
 
     public JSONObject createDocument(String docName,
-                                     String description,
-                                     DocumentType documentType) {
+                                     String description) {
         return createDocument(docName,
             description,
-            documentType,
             new ArrayList<>());
     }
 
     public JSONObject createDocument(String docName,
                                      String description,
-                                     DocumentType documentType,
                                      List<UUID> artifactIds) {
         JSONObject docJson = new JSONObject();
         docJson.put(Constants.NAME, docName);
         docJson.put("description", description);
-        docJson.put("type", documentType.toString());
         docJson.put("artifactIds", artifactIds);
 
         return docJson;
-    }
-
-    public JSONObject createFMEADocument(String name, String description) {
-        JSONObject fmeaJson = this.createDocument(name, description, DocumentType.FMEA);
-        fmeaJson.put("columns", new ArrayList<>());
-        return fmeaJson;
-    }
-
-    public JSONObject createDocumentColumn(UUID id, String name, DocumentColumnDataType dataType) {
-        JSONObject columnJson = new JSONObject();
-        columnJson.put("id", id);
-        columnJson.put("name", name);
-        columnJson.put("dataType", dataType);
-        return columnJson;
     }
 
     public JSONObject getArtifact(String projectName, String artifactName) {
@@ -188,6 +167,5 @@ public class JsonBuilder extends AbstractBuilder {
         private static final String ARTIFACTS = "artifacts";
         private static final String TRACES = "traces";
         private static final String NAME = "name";
-        private static final String DOCUMENT_TYPE = "documentType";
     }
 }

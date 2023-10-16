@@ -5,6 +5,7 @@ import java.util.stream.IntStream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
+import edu.nd.crc.safa.features.jira.entities.api.JiraImportSettings;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -53,6 +54,7 @@ class TestFlatFileJiraProjectImportCommonRequests extends JiraBaseFlatFileTest {
             serviceProvider,
             jiraIdentifier,
             getCurrentUser()
+            new JiraImportSettings()
         );
 
         job.setJiraProjectResponse(createMockJiraProject());

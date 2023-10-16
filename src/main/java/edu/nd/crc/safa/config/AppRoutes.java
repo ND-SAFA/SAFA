@@ -14,7 +14,7 @@ public class AppRoutes {
         return String.join("/", args);
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Accounts {
         public static final String LOGIN = "/login";
         public static final String LOGOUT = "/logout";
@@ -25,9 +25,10 @@ public class AppRoutes {
         public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
         public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
         public static final String SELF = Accounts.PREFIX + "/self";
+        public static final String DEFAULT_ORG = Accounts.PREFIX + "/organization";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class ArtifactType {
         public static final String GET_PROJECT_ARTIFACT_TYPES = Projects.ROOT + "/{projectId}/artifactTypes";
         public static final String CREATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
@@ -35,30 +36,30 @@ public class AppRoutes {
         public static final String DELETE_ARTIFACT_TYPE = Projects.ROOT + "/artifactTypes/{typeId}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Attribute {
         public static final String ROOT = Projects.BY_ID + "/attributes";
         public static final String BY_KEY = ROOT + "/{key}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class AttributeLayout {
         public static final String ROOT = Projects.BY_ID + "/attribute-layouts";
         public static final String BY_ID = ROOT + "/{id}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Commits {
         public static final String COMMIT_CHANGE = Projects.ROOT + "/versions/{versionId}/commit";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Delta {
         public static final String CALCULATE_PROJECT_DELTA = Projects.ROOT
             + "/delta/{baselineVersionId}/{targetVersionId}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Documents {
         public static final String GET_PROJECT_DOCUMENTS = Versions.BY_ID + "/documents";
         protected static final String ROOT = "/documents";
@@ -70,14 +71,14 @@ public class AppRoutes {
         public static final String DELETE_DOCUMENT_BY_ID = Projects.ROOT + Documents.BY_ID;
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class DocumentArtifact {
         public static final String ADD_ARTIFACTS_TO_DOCUMENT = Projects.ROOT + "/versions/{versionId}/documents"
             + "/{documentId}/artifacts";
         public static final String REMOVE_ARTIFACT_FROM_DOCUMENT = ADD_ARTIFACTS_TO_DOCUMENT + "/{artifactId}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class FlatFiles {
         public static final String UPDATE_PROJECT_VERSION_FROM_FLAT_FILES = Projects.ROOT
             + "/versions/{versionId}/flat-files";
@@ -87,12 +88,12 @@ public class AppRoutes {
 
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class HGen {
         public static final String GENERATE = "/hgen/{versionId}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Models {
         public static final String MODEL_ROOT = "/models";
         public static final String MODEL_ROOT_BY_ID = Projects.BY_ID + MODEL_ROOT;
@@ -101,7 +102,7 @@ public class AppRoutes {
         public static final String SHARE_MODEL = Projects.ROOT + "/models/share";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Links {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";
@@ -109,16 +110,16 @@ public class AppRoutes {
         public static final String ADD_BATCH = GET_GENERATED_LINKS_IN_PROJECT_VERSION + "/add-batch";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Jobs {
         protected static final String JOBS_PREFIX = "/jobs";
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Traces {
             public static final String GENERATE = JOBS_PREFIX + Links.GENERATE_LINKS;
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Projects {
             public static final String PROJECT_JOBS_ROOT = JOBS_PREFIX + AppRoutes.Projects.ROOT;
             public static final String CREATE_PROJECT_VIA_JSON = PROJECT_JOBS_ROOT;
@@ -126,7 +127,7 @@ public class AppRoutes {
             public static final String UPDATE_PROJECT_VIA_FLAT_FILES = PROJECT_JOBS_ROOT + "/versions/{versionId}";
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Meta {
             public static final String GET_USER_JOBS = JOBS_PREFIX + "/user";
             public static final String GET_PROJECT_JOBS = JOBS_PREFIX + "/project/{projectId}";
@@ -134,24 +135,24 @@ public class AppRoutes {
             public static final String DELETE_JOB = JOB_ID;
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Models {
             public static final String TRAIN = JOBS_PREFIX + AppRoutes.Projects.BY_ID + "/models/train";
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Logs {
             public static final String BY_JOB_ID = Meta.JOB_ID + "/logs";
             public static final String BY_JOB_ID_AND_STEP_NUM = BY_JOB_ID + "/{stepNum}";
         }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Prompts {
         public static final String COMPLETE = "/prompt";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Projects {
         protected static final String ROOT = "/projects";
         public static final String BY_ID = ROOT + "/{projectId}";
@@ -159,44 +160,41 @@ public class AppRoutes {
         public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {
-            public static final String ADD_PROJECT_MEMBER = ROOT + "/{projectId}/members";
-            public static final String GET_PROJECT_MEMBERS = ROOT + "/{projectId}/members";
-            public static final String DELETE_PROJECT_MEMBERSHIP = ROOT + "/members/{projectMembershipId}";
             public static final String GET_USER_PROJECTS = ROOT;
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Entities {
             public static final String CHECK_IF_ARTIFACT_EXISTS = ROOT
                 + "/versions/{versionId}/artifacts/validate";
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Installations {
             public static final String BY_PROJECT = Projects.ROOT + "/installations/by-project/{id}";
         }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Rules {
         public static final String CREATE_WARNING_IN_PROJECT = "/project/{projectId}/rules";
         public static final String GET_WARNINGS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/warnings";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class TraceMatrix {
         public static final String BASE = Projects.ROOT + "/{projectVersionId}/matrices";
         public static final String BY_SOURCE_AND_TARGET_TYPES = BASE + "/{sourceTypeName}/{targetTypeName}";
         public static final String BY_ID = BASE + "/{traceMatrixId}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Jira {
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Credentials {
             public static final String ROOT = Accounts.PREFIX + "/jira/credentials";
             public static final String REGISTER = Credentials.ROOT + "/{accessCode}";
@@ -205,13 +203,13 @@ public class AppRoutes {
             public static final String VALIDATE = Credentials.ROOT + "/validate";
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Installations {
             public static final String ROOT = Accounts.PREFIX + "/jira/installations";
             public static final String RETRIEVE_AVAILABLE = Installations.ROOT;
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Import {
             public static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_ID = Import.ROOT + "/jira/{orgId}/{id}";
@@ -221,17 +219,17 @@ public class AppRoutes {
         }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Github {
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Credentials {
             public static final String REGISTER = Accounts.PREFIX + "/github/credentials/{accessCode}";
             public static final String DELETE = Accounts.PREFIX + "/github/credentials";
             public static final String VALID = Accounts.PREFIX + "/github/credentials/check";
         }
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Import {
             public static final String UPDATE = Versions.BY_ID + "/import/github/{owner}/{repositoryName}";
             public static final String IMPORT_INTO_EXISTING = UPDATE;
@@ -240,7 +238,7 @@ public class AppRoutes {
         }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Versions {
         public static final String GET_VERSIONS = Projects.ROOT + "/{projectId}/versions";
         public static final String BY_ID = Projects.ROOT + "/versions/{versionId}";
@@ -251,7 +249,7 @@ public class AppRoutes {
         public static final String DELETE_VERSION_BY_ID = Versions.BY_ID;
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Retrieval {
         public static final String GET_PROJECT_IN_VERSION = Versions.BY_ID;
         public static final String GET_TRACES_IN_VERSION = Versions.BY_ID + "/traces";
@@ -260,40 +258,61 @@ public class AppRoutes {
 
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Sync {
         public static final String GET_CHANGES = Versions.BY_ID + "/changes";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Search {
         public static final String SEARCH = "/search/{versionId}";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Summarize {
         public static final String SUMMARIZE_ARTIFACTS = Projects.ROOT + "/versions/{versionId}/artifacts/summarize";
         public static final String SUMMARIZE_PROJECT = Projects.ROOT + "/versions/{versionId}/summarize";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Layout {
         public static final String REGENERATE_LAYOUT = Versions.BY_ID + "/layout";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Integrations {
         public static final String ROOT = "/integrations";
 
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Github {
             public static final String ROOT = Integrations.ROOT + "/github";
 
-            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            @NoArgsConstructor(access = AccessLevel.NONE)
             public static class Repos {
                 public static final String ROOT = Github.ROOT + "/repos";
                 public static final String BY_OWNER_AND_NAME = ROOT + "/{owner}/{repositoryName}";
             }
         }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Organizations {
+        public static final String ROOT = "/organizations";
+        public static final String BY_ID = ROOT + "/{orgId}";
+        public static final String SELF = ROOT + "/self";
+
+        @NoArgsConstructor(access = AccessLevel.NONE)
+        public static class Teams {
+            public static final String ROOT = Organizations.BY_ID + "/teams";
+            public static final String BY_ID = ROOT + "/{teamId}";
+            public static final String SELF = ROOT + "/self";
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Memberships {
+        public static final String ROOT = "/members";
+        public static final String BY_ENTITY_ID = ROOT + "/{entityId}";
+        public static final String BY_ENTITY_ID_AND_MEMBERSHIP_ID = BY_ENTITY_ID + "/{membershipId}";
     }
 }

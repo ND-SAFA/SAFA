@@ -12,7 +12,6 @@ import java.util.Map;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -221,8 +220,7 @@ public class TestTim extends ApplicationBaseTest {
     }
 
     private ArtifactAppEntity createArtifact(String typeName, String name) {
-        return new ArtifactAppEntity(null, typeName, name,
-            "", "", DocumentType.ARTIFACT_TREE, new HashMap<>());
+        return new ArtifactAppEntity(null, typeName, name, "", "", new HashMap<>());
     }
 
     private ProjectVersion createProjectVersion() {

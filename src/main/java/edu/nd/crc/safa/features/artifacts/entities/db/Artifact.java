@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.common.IBaseEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 
@@ -65,21 +64,14 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
     @Column(name = "name")
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "document_type")
-    private DocumentType documentType;
-
     public Artifact() {
-        this.documentType = DocumentType.ARTIFACT_TREE;
     }
 
-    public Artifact(Project project, ArtifactType type, String name, DocumentType documentType) {
+    public Artifact(Project project, ArtifactType type, String name) {
         this();
         this.project = project;
         this.type = type;
         this.name = name;
-        this.documentType = documentType;
     }
 
     @Override

@@ -3,7 +3,6 @@ package edu.nd.crc.safa.test.features.artifacts.crud;
 import java.util.HashMap;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.test.features.artifacts.base.AbstractArtifactCrudTest;
 
 public class TestArtifactCrud extends AbstractArtifactCrudTest {
@@ -14,7 +13,6 @@ public class TestArtifactCrud extends AbstractArtifactCrudTest {
             "RE-20",
             "summary",
             "body",
-            DocumentType.ARTIFACT_TREE,
             new HashMap<>()
         );
     }

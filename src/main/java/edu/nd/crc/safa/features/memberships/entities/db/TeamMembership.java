@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.memberships.entities.db;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -28,7 +29,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TeamMembership {
+public class TeamMembership implements EntityMembership {
 
     @Id
     @GeneratedValue
@@ -56,5 +57,25 @@ public class TeamMembership {
         this.user = user;
         this.team = team;
         this.role = role;
+    }
+
+    @Override
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    @Override
+    public String getRoleAsString() {
+        return role.name();
+    }
+
+    @Override
+    public MembershipType getMembershipType() {
+        return MembershipType.TEAM;
+    }
+
+    @Override
+    public UUID getEntityId() {
+        return team.getId();
     }
 }

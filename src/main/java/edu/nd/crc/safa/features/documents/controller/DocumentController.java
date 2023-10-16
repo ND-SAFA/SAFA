@@ -83,9 +83,6 @@ public class DocumentController extends BaseDocumentController {
             document,
             documentAppEntity.getArtifactIds());
 
-        // Create or update: columns
-        documentService.updateFMEAColumns(documentAppEntity, document);
-
         // Generate layout
         Map<UUID, LayoutPosition> documentLayout = createDocumentLayout(projectVersion, documentAppEntity);
         documentAppEntity.setLayout(documentLayout);

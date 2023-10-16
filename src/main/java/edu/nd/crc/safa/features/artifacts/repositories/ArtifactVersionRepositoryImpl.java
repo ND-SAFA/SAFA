@@ -10,14 +10,11 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.artifacts.entities.db.FTAArtifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -51,10 +48,6 @@ public class ArtifactVersionRepositoryImpl
     private DocumentArtifactRepository documentArtifactRepository;
     @Autowired
     private DocumentRepository documentRepository;
-    @Autowired
-    private FTAArtifactRepository ftaArtifactRepository;
-    @Autowired
-    private SafetyCaseArtifactRepository safetyCaseArtifactRepository;
     @Autowired
     private AttributeValueService attributeValueService;
     @Autowired
@@ -114,7 +107,6 @@ public class ArtifactVersionRepositoryImpl
         artifactAppEntity.setId(artifactAppEntity.getId());
 
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
-        createOrUpdateDocumentNodeInformation(artifactAppEntity, artifact);
         return artifact;
     }
 
@@ -164,14 +156,11 @@ public class ArtifactVersionRepositoryImpl
             artifactVersion.getName(),
             artifactVersion.getSummary(),
             artifactVersion.getContent(),
-            artifactVersion.getArtifact().getDocumentType(),
             artifactVersion.getCustomAttributeValues());
 
         // Step 2 - Attach document links
         attachDocumentLinks(artifactVersion, artifactAppEntity);
 
-        // Step 3 - Attach Safety Case or FTA information
-        attachDocumentNodeInformation(artifactAppEntity, artifactVersion.getArtifact());
         return artifactAppEntity;
     }
 
@@ -214,63 +203,6 @@ public class ArtifactVersionRepositoryImpl
         }
 
         artifactAppEntity.setDocumentIds(documentIds);
-    }
-
-    private void attachDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
-        switch (artifact.getDocumentType()) {
-            case SAFETY_CASE:
-                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
-                if (safetyCaseArtifactOptional.isPresent()) {
-                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-                }
-                //TODO: Throw error if not found?
-                break;
-            case FTA:
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                if (ftaArtifactOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.FTA);
-                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
-        switch (artifactAppEntity.getDocumentType()) {
-            case FTA:
-                FTAArtifact ftaArtifact;
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-
-                if (ftaArtifactOptional.isPresent()) {
-                    ftaArtifact = ftaArtifactOptional.get();
-                    ftaArtifact.setLogicType(artifactAppEntity.getLogicType());
-                } else {
-                    ftaArtifact = new FTAArtifact(artifact, artifactAppEntity.getLogicType());
-                }
-
-                this.ftaArtifactRepository.save(ftaArtifact);
-                break;
-            case SAFETY_CASE:
-                SafetyCaseArtifact safetyCaseArtifact;
-                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
-                if (safetyCaseArtifactOptional.isPresent()) {
-                    safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                    safetyCaseArtifact.setSafetyCaseType(artifactAppEntity.getSafetyCaseType());
-                } else {
-                    safetyCaseArtifact = new SafetyCaseArtifact(artifact, artifactAppEntity.getSafetyCaseType());
-                }
-                this.safetyCaseArtifactRepository.save(safetyCaseArtifact);
-                break;
-            default:
-                break;
-        }
     }
 
     private void createOrUpdateDocumentIds(ProjectVersion projectVersion,
@@ -316,11 +248,10 @@ public class ArtifactVersionRepositoryImpl
         String typeName = artifactAppEntity.getType();
         String artifactName = artifactAppEntity.getName();
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName, user);
-        DocumentType documentType = artifactAppEntity.getDocumentType();
         if (artifactId == null) {
             Artifact newArtifact = this.artifactRepository
                 .findByProjectAndName(project, artifactName)
-                .orElseGet(() -> new Artifact(project, artifactType, artifactName, documentType));
+                .orElseGet(() -> new Artifact(project, artifactType, artifactName));
             this.artifactRepository.save(newArtifact);
             return newArtifact;
         } else {
@@ -332,7 +263,6 @@ public class ArtifactVersionRepositoryImpl
             Artifact artifact = artifactOptional.get();
             artifact.setType(artifactType);
             artifact.setName(artifactName);
-            artifact.setDocumentType(documentType);
             this.artifactRepository.save(artifact);
             return artifact;
         }

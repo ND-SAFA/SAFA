@@ -14,7 +14,7 @@ class TestAuthenticationErrors extends ApplicationBaseTest {
         SafaRequest.clearAuthorizationToken();
         SafaRequest
             .withRoute(AppRoutes.Projects.GET_PROJECTS)
-            .getWithJsonObject(status().isForbidden());
+            .getWithJsonObject(status().isUnauthorized());
     }
 
     @Test

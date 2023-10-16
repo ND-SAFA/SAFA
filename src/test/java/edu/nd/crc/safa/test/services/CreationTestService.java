@@ -10,6 +10,8 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.requests.FlatFileRequest;
@@ -120,4 +122,21 @@ public class CreationTestService {
             .postWithJsonArray(artifactsJson);
     }
 
+    public JSONObject shareProject(Project project,
+                                   String email,
+                                   ProjectRole role) throws Exception {
+        return shareProject(project, email, role, status().is2xxSuccessful());
+    }
+
+    public JSONObject shareProject(Project project,
+                                   String email,
+                                   ProjectRole role,
+                                   ResultMatcher resultMatcher) throws Exception {
+        MembershipAppEntity request = new MembershipAppEntity(email, role.name());
+
+        return SafaRequest
+            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            .withEntityId(project.getProjectId())
+            .postWithJsonObject(request, resultMatcher);
+    }
 }

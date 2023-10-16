@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -63,21 +62,6 @@ public class ArtifactAppEntity implements IAppEntity {
     private Map<String, JsonNode> attributes = new HashMap<>();
 
     /**
-     * The type of document this artifact is displayed in.
-     */
-    private DocumentType documentType = DocumentType.ARTIFACT_TREE;
-
-    /**
-     * For safety case nodes, the type of safety case node.
-     */
-    private SafetyCaseType safetyCaseType;
-
-    /**
-     * For FTA logic nodes,  the logical operator of this node.
-     */
-    private FTAType logicType;
-
-    /**
      * List of document Ids this artifact belongs to.
      */
     private List<UUID> documentIds = new ArrayList<>();
@@ -93,7 +77,6 @@ public class ArtifactAppEntity implements IAppEntity {
                              String name,
                              String summary,
                              String body,
-                             DocumentType documentType,
                              Map<String, JsonNode> attributes) {
         this();
         this.id = artifactId;
@@ -101,7 +84,6 @@ public class ArtifactAppEntity implements IAppEntity {
         this.name = name;
         this.summary = summary;
         this.body = body;
-        this.documentType = documentType;
         this.attributes = attributes;
     }
 

@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.HashMap;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.test.services.builders.CommitBuilder;
@@ -35,14 +34,12 @@ public class TestViewPermissionViolation extends AbstractPermissionViolationTest
         private static final String name = "R0";
         private static final String summary = "summary";
         private static final String body = "body";
-        private static final DocumentType documentType = DocumentType.ARTIFACT_TREE;
         static final ArtifactAppEntity artifact = new ArtifactAppEntity(
             null,
             type,
             name,
             summary,
             body,
-            documentType,
             new HashMap<>()
         );
     }

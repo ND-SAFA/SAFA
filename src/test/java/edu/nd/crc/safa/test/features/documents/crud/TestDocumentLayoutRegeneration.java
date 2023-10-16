@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -109,14 +108,12 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
         static final String a3name = "R2";
         static final String summary = "this is a summary";
         static final String body = "this is a body";
-        static final DocumentType documentType = DocumentType.ARTIFACT_TREE;
         static ArtifactAppEntity artifact1 = new ArtifactAppEntity(
             null,
             type,
             a1name,
             summary,
             body,
-            documentType,
             new HashMap<>()
         );
         static ArtifactAppEntity artifact2 = new ArtifactAppEntity(
@@ -125,7 +122,6 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
             a2name,
             summary,
             body,
-            documentType,
             new HashMap<>()
         );
         static ArtifactAppEntity artifact3 = new ArtifactAppEntity(
@@ -134,7 +130,6 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
             a3name,
             summary,
             body,
-            documentType,
             new HashMap<>()
         );
         static TraceAppEntity traceAppEntity = new TraceAppEntity(
@@ -151,10 +146,8 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
         );
         static DocumentAppEntity document = new DocumentAppEntity(
             null,
-            DocumentType.ARTIFACT_TREE,
             "document-name",
             "document-description",
-            new ArrayList<>(),
             new ArrayList<>(),
             new HashMap<>()
         );

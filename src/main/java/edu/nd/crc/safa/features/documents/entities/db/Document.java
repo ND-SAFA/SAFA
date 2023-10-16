@@ -48,11 +48,6 @@ public class Document implements Serializable {
     @JsonIgnore
     private Project project;
 
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "document_type", nullable = false)
-    private DocumentType type;
-
     @Column(name = "name")
     private String name;
 
@@ -62,7 +57,6 @@ public class Document implements Serializable {
     public Document(Document document) {
         this(document.documentId,
             document.project,
-            document.type,
             document.name,
             document.description
         );

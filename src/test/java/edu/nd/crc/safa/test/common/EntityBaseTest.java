@@ -2,9 +2,6 @@ package edu.nd.crc.safa.test.common;
 
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
-import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -13,14 +10,12 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
-import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
@@ -63,9 +58,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected SafaUserRepository safaUserRepository;
 
     @Autowired
-    protected UserProjectMembershipRepository userProjectMembershipRepository;
-
-    @Autowired
     protected DocumentRepository documentRepository;
 
     @Autowired
@@ -76,15 +68,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected SafaUserService safaUserService;
-
-    @Autowired
-    protected AccountLookupService accountLookupService;
-
-    @Autowired
-    protected SafetyCaseArtifactRepository safetyCaseArtifactRepository;
-
-    @Autowired
-    protected FTAArtifactRepository ftaArtifactRepository;
 
     @Autowired
     protected JobService jobService;

@@ -5,13 +5,14 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum OrganizationPermission implements Permission {
+    CREATE_TEAMS("org.create_teams"),
+    DELETE("org.delete"),
+    DELETE_TEAMS("org.delete_teams"),
+    EDIT("org.edit"),
+    EDIT_MEMBERS("org.edit_members"),
     VIEW("org.view"),
     VIEW_BILLING("org.view_billing"),
-    EDIT("org.edit"),
-    DELETE("org.delete"),
-    VIEW_TEAMS("org.view_teams"),
-    CREATE_TEAMS("org.create_teams"),
-    DELETE_TEAMS("org.delete_teams");
+    VIEW_TEAMS("org.view_teams");
 
     @Getter
     private final String name;

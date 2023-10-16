@@ -11,11 +11,24 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ProjectRole {
     NONE(Set.of()),
-    VIEWER(Set.of(ProjectPermission.VIEW)),
-    EDITOR(Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT)),
-    ADMIN(Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.SHARE)),
-    OWNER(Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.SHARE, ProjectPermission.DELETE)),
-    GENERATOR(Set.of(ProjectPermission.GENERATE));
+    VIEWER(Set.of(
+        ProjectPermission.VIEW
+    )),
+    EDITOR(Set.of(
+        ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_DATA
+    )),
+    ADMIN(Set.of(
+        ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_MEMBERS, ProjectPermission.EDIT_DATA,
+        ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS, ProjectPermission.GENERATE
+    )),
+    OWNER(Set.of(
+        ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_MEMBERS, ProjectPermission.EDIT_DATA,
+        ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS, ProjectPermission.GENERATE,
+        ProjectPermission.DELETE
+    )),
+    GENERATOR(Set.of(
+        ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE
+    ));
 
     @Getter
     private final Set<Permission> grants;

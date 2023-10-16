@@ -2,12 +2,14 @@ package edu.nd.crc.safa.features.memberships.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
 import edu.nd.crc.safa.features.memberships.repositories.TeamMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -26,15 +28,16 @@ public class TeamMembershipService {
      * @param user The user to get the new role
      * @param team The team the role applies to
      * @param role The role
+     * @return The new team membership, or the old one if it already existed
      */
-    public void addUserRole(SafaUser user, Team team, TeamRole role) {
+    public TeamMembership addUserRole(SafaUser user, Team team, TeamRole role) {
         Optional<TeamMembership> membershipOptional =
                 teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
 
-        if (membershipOptional.isEmpty()) {
+        return membershipOptional.orElseGet(() -> {
             TeamMembership newMembership = new TeamMembership(user, team, role);
-            teamMembershipRepo.save(newMembership);
-        }
+            return teamMembershipRepo.save(newMembership);
+        });
     }
 
     /**
@@ -100,5 +103,28 @@ public class TeamMembershipService {
                 .map(TeamMembership::getUser)
                 .distinct()
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Search for a team membership by its ID.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     */
+    public Optional<TeamMembership> getMembershipOptionalById(UUID membershipId) {
+        return teamMembershipRepo.findById(membershipId);
+    }
+
+    /**
+     * Search for a team membership by its ID. Throw an exception
+     * if it's not found.
+     *
+     * @param membershipId The ID of the membership
+     * @return The membership, if it exists
+     * @throws SafaItemNotFoundError If the membership could not be found
+     */
+    public TeamMembership getMembershipById(UUID membershipId) {
+        return getMembershipOptionalById(membershipId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No membership found with the specified ID"));
     }
 }

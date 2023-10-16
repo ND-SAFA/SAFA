@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.memberships.entities.db;
 import java.io.Serializable;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -29,17 +29,10 @@ import org.hibernate.type.SqlTypes;
  * Joins each user to the project they are members in.
  */
 @Entity
-@Table(name = "user_project_membership",
-    uniqueConstraints = {
-        @UniqueConstraint(
-            columnNames = {
-                "project_id",
-                "user_id"
-            }, name = AppConstraints.SINGLE_ROLE_PER_PROJECT)
-    })
+@Table(name = "user_project_membership")
 @Data
 @NoArgsConstructor
-public class UserProjectMembership implements Serializable {
+public class ProjectMembership implements Serializable, EntityMembership {
 
     @Id
     @GeneratedValue
@@ -66,9 +59,34 @@ public class UserProjectMembership implements Serializable {
     @Column(name = "project_role")
     private ProjectRole role;
 
-    public UserProjectMembership(Project project, SafaUser member, ProjectRole role) {
+    public ProjectMembership(Project project, SafaUser member, ProjectRole role) {
         this.project = project;
         this.member = member;
         this.role = role;
+    }
+
+    @Override
+    public UUID getId() {
+        return membershipId;
+    }
+
+    @Override
+    public String getEmail() {
+        return member.getEmail();
+    }
+
+    @Override
+    public String getRoleAsString() {
+        return role.name();
+    }
+
+    @Override
+    public MembershipType getMembershipType() {
+        return MembershipType.PROJECT;
+    }
+
+    @Override
+    public UUID getEntityId() {
+        return project.getProjectId();
     }
 }

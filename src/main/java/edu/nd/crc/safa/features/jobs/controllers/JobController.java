@@ -148,6 +148,8 @@ public class JobController extends BaseController {
      * @param name        The name of the new project
      * @param description The description for the new project
      * @param summarize   Whether to summarize code artifacts on upload.
+     * @param teamId      Optional ID of the team to own the project.
+     * @param orgId       Optional ID of the org to own the project
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
@@ -157,7 +159,9 @@ public class JobController extends BaseController {
         @RequestParam Optional<MultipartFile[]> files,
         @RequestParam String name,
         @RequestParam String description,
-        @RequestParam(required = false, defaultValue = "false") boolean summarize)
+        @RequestParam(required = false, defaultValue = "false") boolean summarize,
+        @RequestParam(required = false) UUID teamId,
+        @RequestParam(required = false) UUID orgId)
         throws Exception {
 
         CreateProjectByFlatFileJobBuilder jobBuilder =
@@ -167,7 +171,9 @@ public class JobController extends BaseController {
                 safaUserService.getCurrentUser(),
                 name,
                 description,
-                summarize);
+                summarize,
+                teamId,
+                orgId);
 
         return jobBuilder.perform();
     }

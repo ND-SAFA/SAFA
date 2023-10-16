@@ -28,12 +28,8 @@ class TestUpdateAndDeleteMemberships extends AbstractSharingTest {
         // Step - Get members
         JSONArray members = retrievalService.getProjectMembers(project);
 
-        // VP - Verify that single member on project
-        assertThat(members.length()).isEqualTo(1);
-
-        // VP - Verify that member email is correct
-        String memberEmail = members.getJSONObject(0).getString("email");
-        assertThat(memberEmail).isEqualTo(getCurrentUser().getEmail());
+        // VP - Verify no users on project
+        assertThat(members.length()).isEqualTo(0);
     }
 
     @Test

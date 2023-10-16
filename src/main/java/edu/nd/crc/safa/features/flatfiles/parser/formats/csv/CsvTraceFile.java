@@ -34,7 +34,7 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
     @Override
     protected void exportAsFileContent(File file) throws IOException {
         CsvFileUtilities.writeEntitiesAsCsvFile(file,
-            CsvTraceFile.Constants.REQUIRED_COLUMNS,
+            Constants.ALL_COLUMNS,
             this.getEntities(),
             this::getTraceRow);
     }
@@ -42,7 +42,8 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
     private String[] getTraceRow(TraceAppEntity traceAppEntity) {
         return new String[]{
             traceAppEntity.getSourceName(),
-            traceAppEntity.getTargetName()
+            traceAppEntity.getTargetName(),
+            traceAppEntity.getExplanation()
         };
     }
 
@@ -63,6 +64,11 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
         TraceAppEntity traceAppEntity = new TraceAppEntity()
             .asManualTrace()
             .betweenArtifacts(sourceName, targetName);
+
+        if (entityRecord.isSet(Constants.EXPLANATION_PARAM)) {
+            traceAppEntity.setExplanation(entityRecord.get(Constants.EXPLANATION_PARAM));
+        }
+
         return new Pair<>(traceAppEntity, null);
     }
 
@@ -70,6 +76,8 @@ public class CsvTraceFile extends AbstractTraceFile<CSVRecord> {
     public static class Constants {
         public static final String SOURCE_PARAM = "source";
         public static final String TARGET_PARAM = "target";
+        public static final String EXPLANATION_PARAM = "explanation";
         public static final String[] REQUIRED_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM};
+        public static final String[] ALL_COLUMNS = new String[]{SOURCE_PARAM, TARGET_PARAM, EXPLANATION_PARAM};
     }
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
@@ -24,10 +24,8 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     String newName = "new-name";
     DocumentAppEntity document = new DocumentAppEntity(
         null,
-        DocumentType.ARTIFACT_TREE,
         "document-name",
         "document-description",
-        new ArrayList<>(),
         new ArrayList<>(),
         new HashMap<>()
     );

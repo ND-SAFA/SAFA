@@ -30,6 +30,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * Responsible for sending request and parsing responses
@@ -40,6 +42,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     private static MockMvc mockMvc;
     @Getter
     private static Cookie authorizationToken = null;
+    private MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
 
     public SafaRequest(String path) {
         super(path);
@@ -130,7 +133,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
     }
 
-    public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) {
+    public <T> T postAndParseResponse(Object body, TypeReference<T> type) throws Exception {
+        return postWithResponseParser(body, resp -> this.jacksonParse(resp, type));
+    }
+
+    public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
         return sendAuthenticatedRequest(
             put(this.buildEndpoint())
                 .content(stringify(body))
@@ -143,6 +150,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject putWithJsonObject(Object body) throws Exception {
         return putWithJsonObject(body, status().is2xxSuccessful());
+    }
+
+    public <T> T putAndParseResponse(Object body, TypeReference<T> type) throws Exception {
+        JSONObject result = putWithJsonObject(body);
+        return jacksonParse(result.toString(), type);
     }
 
     public <T> T postWithResponseParser(Object body,
@@ -289,19 +301,13 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
                                                 ResultMatcher test,
                                                 Function<String, T> stringCreator) {
 
-        try {
-            MvcResult requestResult = mockMvc
-                .perform(request)
-                .andDo(result -> {
-                    if (!result.getRequest().isAsyncStarted()) {
-                        test.match(result);
-                    }
-                })
-                .andReturn();
+        request.queryParams(queryParams);
 
-            if (requestResult.getRequest().isAsyncStarted()) {
-                if (requestResult.getRequest().getAsyncContext() != null) {
-                    requestResult.getRequest().getAsyncContext().setTimeout(30000L);
+        MvcResult requestResult = mockMvc
+            .perform(request)
+            .andDo(result -> {
+                if (!result.getRequest().isAsyncStarted()) {
+                    test.match(result);
                 }
                 mockMvc.perform(asyncDispatch(requestResult))
                     .andExpect(test);
@@ -338,5 +344,10 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public SafaRequest withQueryParam(String paramName, String paramValue) {
+        queryParams.add(paramName, paramValue);
+        return this;
     }
 }

@@ -3,11 +3,13 @@
     <text-button
       v-bind="buttonProps(options.tim)"
       :hide-label="smallWindow"
-      label="TIM"
+      label="Types"
       data-cy="button-nav-tim"
       icon="view-tim"
       @click="handleTimView"
-    />
+    >
+      <q-tooltip> The types of artifacts and how they relate </q-tooltip>
+    </text-button>
     <text-button
       v-bind="buttonProps(options.tree)"
       :hide-label="smallWindow"
@@ -15,7 +17,9 @@
       data-cy="button-nav-tree"
       icon="view-tree"
       @click="handleTreeView"
-    />
+    >
+      <q-tooltip> A graph of related artifacts </q-tooltip>
+    </text-button>
     <text-button
       v-bind="buttonProps(options.table)"
       :hide-label="smallWindow"
@@ -23,7 +27,9 @@
       data-cy="button-nav-table"
       icon="view-table"
       @click="handleTableView"
-    />
+    >
+      <q-tooltip> Tables of artifacts and trace links </q-tooltip>
+    </text-button>
     <delta-mode-button
       v-bind="buttonProps(options.delta)"
       :hide-label="smallWindow"

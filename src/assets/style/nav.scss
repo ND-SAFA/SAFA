@@ -106,16 +106,20 @@
     color: $color-text !important;
   }
 
-  .q-icon {
-    color: $color-primary !important;
-  }
-
-  &:hover, &:focus {
+  &:hover, &:focus, &:active, &.q-field--highlighted {
     border: 1px solid $color-primary !important;
 
     .q-field__control:before {
       border-color: $color-primary !important;
     }
+
+    .q-icon {
+      color: $color-primary !important;
+    }
+  }
+
+  &.q-field--highlighted {
+    background-color: $color-background !important;
   }
 }
 

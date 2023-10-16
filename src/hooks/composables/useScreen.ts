@@ -10,7 +10,7 @@ export function useScreen(): ScreenHook {
 
   const screen = computed(() => $q.screen);
 
-  const smallWindow = computed(() => $q.screen.lt.lg);
+  const smallWindow = computed(() => $q.screen.lt.md);
 
   return {
     screen,

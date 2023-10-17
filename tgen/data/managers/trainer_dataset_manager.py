@@ -135,7 +135,8 @@ class TrainerDatasetManager(BaseObject):
         """
         if not self._datasets:
             self._datasets = self._create_datasets_from_creators(self._dataset_creators)
-            self._prepare_datasets(self.augmenter)
+            if DatasetRole.TRAIN in self._datasets:
+                self._datasets[DatasetRole.TRAIN] = self._prepare_datasets(self._datasets[DatasetRole.TRAIN], self.augmenter)
         return self._datasets
 
     def replace_dataset(self, new_dataset: iDataset, dataset_role: DatasetRole) -> None:
@@ -181,18 +182,17 @@ class TrainerDatasetManager(BaseObject):
                 else type(self.get_datasets()[dataset_role])
         return f"{dataset_name}_{dataset_role.name.lower()}{CSVKeys.EXT}"
 
-    def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
+    def _prepare_datasets(self, train_dataset: iDataset, data_augmenter: DataAugmenter) -> iDataset:
         """
         Performs any necessary additional steps necessary to prepare each dataset
         :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: None
         """
-        train_dataset = self._datasets[DatasetRole.TRAIN] if DatasetRole.TRAIN in self else None
-        if train_dataset:
-            dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
-            self._datasets.update(dataset_splits_map)
-            if isinstance(train_dataset, TraceDataset):
-                self._datasets[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
+        dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
+        self._datasets.update(dataset_splits_map)
+        if isinstance(train_dataset, TraceDataset):
+            train_dataset.prepare_for_training(data_augmenter)
+        return train_dataset
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,
@@ -273,7 +273,7 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_role: The role to check a data for.
         :return: Boolean representing whether data exist for role
         """
-        return self[dataset_role] is not None
+        return self._dataset_creators.get(dataset_role, None) or self._datasets.get(dataset_role, None)
 
     def __repr__(self) -> str:
         """

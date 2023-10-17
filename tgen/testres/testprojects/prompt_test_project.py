@@ -1,12 +1,13 @@
 import os
 from typing import Any, Dict, List, Union
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.readers.prompt_project_reader import PromptProjectReader

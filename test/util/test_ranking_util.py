@@ -1,5 +1,6 @@
-from tgen.common.util.ranking_util import RankingUtil
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.metrics.lag_metric import LagMetric
 from tgen.metrics.map_metric import MapMetric
 from tgen.testres.base_tests.base_test import BaseTest
@@ -27,7 +28,7 @@ class TestRankingUtil(BaseTest):
         Be able to select the top predictions for each child
         """
         predictions = EntryCreator.create_trace_predictions(3, 1, [0.75, 0.8, 0.95])
-        selected_predictions = RankingUtil.select_predictions(predictions)
+        selected_predictions = RankingUtil.select_predictions(predictions, 0.9, 0.7, 0.4)
         self.assertEqual(1, len(selected_predictions))
         prediction = selected_predictions[0]
         self.assertEqual("p2", prediction[TraceKeys.TARGET.value])

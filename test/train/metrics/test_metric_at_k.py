@@ -3,7 +3,7 @@ from typing import List, Type
 
 import numpy as np
 
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.testres.base_tests.base_test import BaseTest

@@ -214,7 +214,14 @@ class PromptResponseManager:
         checked_values = []
         for v in vals2check:
             val = v
-            if v not in self.expected_responses[tag]:
+            success = False
+            if isinstance(self.expected_responses[tag], range):
+                expected_range = sorted(list(self.expected_responses[tag]))
+                if expected_range[0] <= v <= expected_range[-1]:
+                    success = True
+            elif v in self.expected_responses[tag]:
+                success = True
+            if not success:
                 val = self._format_on_failure(tag, v, AssertionError(f"Unexpected value for {tag}"),
                                               no_exception=is_list, return_none_on_fail=is_list)
             if val is not None:

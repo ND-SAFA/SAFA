@@ -2,12 +2,11 @@ from typing import Any, Dict, List, Type
 
 import numpy as np
 
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys
-
-TraceKeys = StructuredKeys.Trace
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 
 
 class TraceDataFrame(AbstractProjectDataFrame):
@@ -24,8 +23,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param args: The positional arguments to constructor trace dataframe with.
         :param kwargs: The keyword arguments to construct trace dataframe with.
         """
-        if "columns" not in kwargs:
-            kwargs["columns"] = StructuredKeys.Trace.get_cols()
+        DictUtil.update_kwarg_values(kwargs, replace_existing=False, columns=StructuredKeys.Trace.get_cols())
         super().__init__(*args, **kwargs)
 
     @classmethod
@@ -65,7 +63,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
                 link_ids.append(TraceDataFrame.generate_link_id(row[TraceKeys.SOURCE], row[TraceKeys.TARGET]))
             self[TraceKeys.LINK_ID] = link_ids
 
-    def add_links(self, links: List[TracePredictionEntry]) -> None:
+    def add_links(self, links: List[Trace]) -> None:
         """
         Adds links to data frame.
         :param links: The trace predictions to add.

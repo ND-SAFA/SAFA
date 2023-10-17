@@ -6,8 +6,9 @@ import pandas as pd
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.file_util import FileUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.components.args.job_args import JobArgs

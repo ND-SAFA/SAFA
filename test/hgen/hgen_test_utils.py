@@ -1,16 +1,12 @@
-import uuid
 from copy import deepcopy
 
 from tgen.common.constants.deliminator_constants import COMMA
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.status import Status
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.hgen.hgen_args import HGenArgs
-from tgen.hgen.hgen_util import get_initials
-from tgen.jobs.components.job_result import JobResult
+from tgen.hgen.hgen_util import HGenUtil
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 
 
@@ -40,6 +36,7 @@ class HGenTestConstants:
     code_files = [["/Player.cpp"], ["/Rendering/RenderEngine.cpp"], ["/Rendering/Image.cpp", "/Rendering/stb_image.cpp"]]
     n_reruns = 2
 
+
 def get_generated_artifacts_response(contents=None, sources=None, target_type="user-story", source_type="code"):
     if contents is None:
         contents = HGenTestConstants.user_stories
@@ -62,18 +59,14 @@ def get_name_responses(generated_artifact_content=None, target_type="User Story"
     if isinstance(generated_artifact_content, dict):
         generated_artifact_content = generated_artifact_content.keys()
     names = [f"{i}" for i, _ in enumerate(generated_artifact_content)]
-    expected_names = [f"{name} {get_initials(target_type)}" for name in names]
+    expected_names = [f"{name} {HGenUtil.get_initials(target_type)}" for name in names]
     return names, expected_names, [PromptUtil.create_xml("title", name) for name in names]
 
 
-def get_ranking_job_result(expected_names, source_artifact_names):
-    prediction_entries = [{"source": source, "target": target, "score": 0.8, "label": 1, "explanation": "explanation"}
-                          for target in expected_names
-                          for source in source_artifact_names]
-    job_result = JobResult(status=Status.SUCCESS,
-                           body=TracePredictionOutput(prediction_entries=prediction_entries),
-                           job_id=uuid.uuid4())
-    return job_result
+def get_predictions(expected_names, source_artifact_names):
+    predictions = [[{"id": i, "score": 0.8, "explanation": "explanation"}
+                          for i, source in enumerate(source_artifact_names)] for name in expected_names]
+    return predictions
 
 
 def get_all_responses(content=None, target_type="User Story", sources=None, source_type="code"):

@@ -1,10 +1,10 @@
 from typing import Any, Dict, List, Tuple
 
-from tgen.common.artifact import Artifact
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace_layer import TraceLayer
 
 ArtifactInstruction = Tuple[Any, str]
 LayerInstruction = List[ArtifactInstruction]
@@ -63,7 +63,7 @@ class EntryCreator:
 
     @staticmethod
     def create_trace_predictions(n_parents: int, n_children: int, scores: List[float] = None, labels: List[float] = None) -> List[
-        TracePredictionEntry]:
+        Trace]:
         """
         Creates trace
         :param n_parents: The number of parents to create.
@@ -76,7 +76,7 @@ class EntryCreator:
         entries = []
         for p_id in range(n_parents):
             for c_id in range(n_children):
-                entry = TracePredictionEntry(
+                entry = Trace(
                     source=f"c{c_id}",
                     target=f"p{p_id}",
                     score=None,

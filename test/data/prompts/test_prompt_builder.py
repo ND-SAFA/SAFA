@@ -1,5 +1,5 @@
 from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
@@ -14,16 +14,35 @@ from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestPromptBuilder(BaseTest):
+    ARTIFACTS = [EnumDict({ArtifactKeys.ID: "id2",
+                           ArtifactKeys.CONTENT: "content2"}),
+                 EnumDict({ArtifactKeys.ID: "id3",
+                           ArtifactKeys.CONTENT: "content3"})
+                 ]
+    ARTIFACT = EnumDict({ArtifactKeys.ID: "id1",
+                         ArtifactKeys.CONTENT: "content1"})
+
+    def test_format_vars(self):
+        prompt_builder = self.get_prompt_builder()
+        fill_ins = ["animal", "sport", "book"]
+        prompt_builder.format_variables = {"blank": fill_ins}
+        prompt1 = prompt_builder.build(AnthropicManager.prompt_args, artifacts=self.ARTIFACTS, artifact=self.ARTIFACT)
+        prompt2 = prompt_builder.build(AnthropicManager.prompt_args, artifacts=self.ARTIFACTS, artifact=self.ARTIFACT)
+        prompt3 = prompt_builder.build(AnthropicManager.prompt_args, artifacts=self.ARTIFACTS, artifact=self.ARTIFACT)
+        for i, prompt_dict in enumerate([prompt1, prompt2, prompt3]):
+            prompt = prompt_dict[PromptKeys.PROMPT]
+            for j, fill_in in enumerate(fill_ins):
+                if i == j:
+                    self.assertIn(fill_in, prompt)
+                else:
+                    self.assertNotIn(fill_in, prompt)
+        prompt4 = prompt_builder.build(AnthropicManager.prompt_args, artifacts=self.ARTIFACTS, artifact=self.ARTIFACT)
+        self.assertIn("{blank}", prompt4[PromptKeys.PROMPT])
 
     def test_build(self):
         prompt_builder = self.get_prompt_builder()
-        prompt_dict = prompt_builder.build(AnthropicManager.prompt_args, artifact=EnumDict({ArtifactKeys.ID: "id1",
-                                                                                            ArtifactKeys.CONTENT: "content1"}),
-                                           artifacts=[EnumDict({ArtifactKeys.ID: "id2",
-                                                                ArtifactKeys.CONTENT: "content2"}),
-                                                      EnumDict({ArtifactKeys.ID: "id3",
-                                                                ArtifactKeys.CONTENT: "content3"})
-                                                      ],
+        prompt_dict = prompt_builder.build(AnthropicManager.prompt_args, artifact=self.ARTIFACT,
+                                           artifacts=self.ARTIFACTS,
                                            correct_completion="yes", blank="cat")
         self.assertIn("answer with the following", prompt_dict[PromptKeys.PROMPT])
         self.assertIn("Think about your favorite", prompt_dict[PromptKeys.PROMPT])

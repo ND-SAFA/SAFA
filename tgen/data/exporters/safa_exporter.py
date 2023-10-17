@@ -7,11 +7,11 @@ from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.keys.safa_keys import SafaKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 

@@ -31,4 +31,4 @@ class BinaryChoiceQuestionPrompt(QuestionPrompt):
                                                  expected_response_type={response_tag: type(choices[0])},
                                                  required_tag_ids=REQUIRE_ALL_TAGS if required else set(),
                                                  default_factory=default_factory)
-        super().__init__(question=question, response_manager=response_manager)
+        super().__init__(value=question, response_manager=response_manager)

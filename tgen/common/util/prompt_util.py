@@ -16,6 +16,15 @@ class PromptUtil:
         return f"<{tag_name}>"
 
     @staticmethod
+    def create_xml_closing(tag_name: str):
+        """
+        Creates an opening xml tag.
+        :param tag_name: The name of the tag.
+        :return: The opening tag.
+        """
+        return f"</{tag_name}>"
+
+    @staticmethod
     def create_xml(tag_name: str, tag_content: str = EMPTY_STRING, prefix: str = None, suffix: str = None) -> str:
         """
         Creates xml as follows: <[tag_name]>tag_content</[tag_name]>
@@ -28,7 +37,8 @@ class PromptUtil:
         prefix = prefix if prefix else EMPTY_STRING
         suffix = suffix if suffix else EMPTY_STRING
         opening_tag = PromptUtil.create_xml_opening(tag_name)
-        return f"{prefix}{opening_tag}{tag_content}</{tag_name}>{suffix}"
+        closing_tag = PromptUtil.create_xml_closing(tag_name)
+        return f"{prefix}{opening_tag}{tag_content}{closing_tag}{suffix}"
 
     @staticmethod
     def as_markdown_italics(original_string: str) -> str:
@@ -38,6 +48,24 @@ class PromptUtil:
         :return: The string formatted as markdown
         """
         return f"*{original_string}*"
+
+    @staticmethod
+    def as_markdown_bold(original_string: str) -> str:
+        """
+        Formats the string as markdown bold
+        :param original_string: The string to format
+        :return: The string formatted as markdown
+        """
+        return f"**{original_string}**"
+
+    @staticmethod
+    def as_blockquote(original_string: str) -> str:
+        """
+        Formats the string as markdown blockquote
+        :param original_string: The string to format
+        :return: The string formatted as markdown
+        """
+        return f">{original_string}"
 
     @staticmethod
     def as_markdown_header(original_string: str, level: int = 1) -> str:
@@ -69,6 +97,14 @@ class PromptUtil:
         :return: The string indented as markdown
         """
         return f"    {original_string}"
+
+    @staticmethod
+    def markdown_divider() -> str:
+        """
+        Creates a markdown divider
+        :return: The markdown divider
+        """
+        return "---------------"
 
     @staticmethod
     def strip_new_lines_and_extra_space(original_string) -> str:

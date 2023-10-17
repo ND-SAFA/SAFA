@@ -1,23 +1,25 @@
 import os
-from typing import Dict, Tuple, Type
+from typing import Type
 
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
-from tgen.tracing.ranking.ranking_state import RankingState
-from tgen.tracing.ranking.steps.sort_children_step import SortChildren
-from tgen.tracing.ranking.steps.step_complete_prompts import CompleteRankingPrompts
-from tgen.tracing.ranking.steps.step_create_project_summary import CreateProjectSummary
-from tgen.tracing.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
-from tgen.tracing.ranking.steps.step_process_ranking_responses import ProcessRankingResponses
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
+from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
+from tgen.tracing.ranking.steps.create_project_summary_step import CreateProjectSummaryStep
+from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
+from tgen.tracing.ranking.steps.process_ranking_responses_step import ProcessRankingResponsesStep
+from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
 class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     steps = [
-        CreateProjectSummary,
-        SortChildren,
-        CreateRankingPrompts,
-        CompleteRankingPrompts,
-        ProcessRankingResponses]
+        CreateProjectSummaryStep,
+        SortChildrenStep,
+        CompleteRankingPromptsStep,
+        ProcessRankingResponsesStep,
+        CreateExplanationsStep,
+        SelectCandidateLinksStep]
 
     def __init__(self, args: RankingArgs):
         """
@@ -32,15 +34,10 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         return RankingState
 
-    def run(self) -> Tuple[Dict, Dict]:
+    def run(self) -> None:
         """
         Runs the pipeline to rank the artifacts
         :return: a dictionary mapping the parent to its child rankings
         and a dictionary mapping parent to the explanations for its links
         """
-        if self.args.export_dir is not None:
-            os.makedirs(self.args.export_dir, exist_ok=True)
-            self.state.export_dir = self.args.export_dir
         super().run()
-        prediction_entries = self.state.children_entries
-        return prediction_entries

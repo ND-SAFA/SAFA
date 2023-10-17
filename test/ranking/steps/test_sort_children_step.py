@@ -1,7 +1,8 @@
-from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
+from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.tracing.ranking.steps.sort_children_step import SortChildren
+from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
 class TestSortChildrenStep(BaseTest):
@@ -17,10 +18,12 @@ class TestSortChildrenStep(BaseTest):
         expected = {"s1": ["t1", "t3", "t2"]}
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=["s1"],
                                                                     children_ids=["t1", "t2", "t3"],
-                                                                    parent2children=pre_ranked)
-        step = SortChildren()
+                                                                    pre_sorted_parent2children=pre_ranked)
+        step = SortChildrenStep()
         step.run(args, state)
-        self.assertDictEqual(expected, state.sorted_parent2children)
+        parent2entries = state.sorted_parent2children
+        result = {p: [entry[TraceKeys.SOURCE] for entry in entries] for p, entries in parent2entries.items()}
+        self.assertDictEqual(expected, result)
 
     def test_rank_according_to_supported_algorithm(self):
         """
@@ -32,7 +35,7 @@ class TestSortChildrenStep(BaseTest):
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=[parent_id],
                                                                     children_ids=before,
                                                                     sorter="embedding",
-                                                                    embedding_model=SMALL_EMBEDDING_MODEL)
-        step = SortChildren()
+                                                                    embedding_model_name=SMALL_EMBEDDING_MODEL)
+        step = SortChildrenStep()
         step.run(args, state)
-        self.assertEqual(state.sorted_parent2children[parent_id], after)
+        self.assertEqual([entry[TraceKeys.SOURCE] for entry in state.sorted_parent2children[parent_id]], after)

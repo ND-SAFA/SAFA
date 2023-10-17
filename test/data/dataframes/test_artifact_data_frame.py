@@ -1,5 +1,6 @@
 from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
 
 

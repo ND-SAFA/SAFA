@@ -9,16 +9,16 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 
 from tgen.common.constants.other_constants import VSM_THRESHOLD_DEFAULT
-from tgen.common.constants.tracing.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
+from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
-from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.trace_output.stage_eval import Metrics
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.common.objects.trace import Trace
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
@@ -30,7 +30,7 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.tracing.ranking.common.utils import extract_tracing_requests
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 
@@ -97,7 +97,9 @@ class VSMTrainer(AbstractTrainer):
         :param train_dataset: The dataset to use for training
         :return: None
         """
-        tracing_requests = extract_tracing_requests(train_dataset.artifact_df, train_dataset.layer_df.as_list())
+        tracing_requests = RankingUtil.extract_tracing_requests(train_dataset.artifact_df,
+                                                                train_dataset.layer_df.as_list(),
+                                                                train_dataset.artifact_df.to_map())
         artifacts = []
         for tracing_request in tracing_requests:
             artifacts = artifacts + self.get_artifacts(tracing_request.parent_ids)
@@ -106,6 +108,11 @@ class VSMTrainer(AbstractTrainer):
         self.model.fit(combined)
 
     def get_artifacts(self, artifact_ids: List[str]) -> List[str]:
+        """
+        Gets artifact content for each artifact id
+        :param artifact_ids: The list of artifact ids to retrieve
+        :return: A list of artifacts
+        """
         return [self.artifact_map[a_id] for a_id in artifact_ids]
 
     def predict(self, eval_dataset: TraceDataset, threshold: float) -> TracePredictionOutput:
@@ -115,7 +122,9 @@ class VSMTrainer(AbstractTrainer):
         :param threshold: All similarity scores above this threshold will be considered traced, otherwise they are untraced
         :return: The output from the prediction
         """
-        tracing_requests = extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
+        tracing_requests = RankingUtil.extract_tracing_requests(eval_dataset.artifact_df,
+                                                                eval_dataset.layer_df.as_list(),
+                                                                eval_dataset.artifact_df.to_map())
         prediction_entries = []
 
         for tracing_request in tracing_requests:
@@ -133,7 +142,7 @@ class VSMTrainer(AbstractTrainer):
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
                 link = eval_dataset.trace_df.get_link(link_id)
                 label = link[TraceKeys.LABEL] if link else 0
-                prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score, label=label)
+                prediction_entry = Trace(source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
 
         if self.select_predictions:
@@ -214,7 +223,7 @@ class VSMTrainer(AbstractTrainer):
         pass
 
     @staticmethod
-    def convert_to_percentiles(predictions: List[TracePredictionEntry]) -> None:
+    def convert_to_percentiles(predictions: List[Trace]) -> None:
         """
         Converts the scores into percentiles.
         :param predictions: The trace predictions containing scores.

@@ -1,15 +1,16 @@
 from typing import Dict, List, Union
 
-from tgen.common.util.ranking_util import RankingUtil
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.common.objects.trace import Trace
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.dataframes.trace_dataframe import TraceKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
@@ -18,7 +19,7 @@ from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
-from tgen.tracing.ranking.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
 
 
 class TracingJob(AbstractJob):
@@ -52,7 +53,7 @@ class TracingJob(AbstractJob):
         """
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
         dataset: TraceDataset = trainer_dataset_manager[DatasetRole.EVAL]
-        artifact_map = dataset.artifact_df.to_map()
+        prompt_dataset = PromptDataset(trace_dataset=dataset)
 
         prompt_builder = PromptBuilder(prompts=[SupportedPrompts.TGEN_CLASSIFICATION.value])
         base_tracing_job = LLMJob(trainer_dataset_manager,
@@ -64,16 +65,18 @@ class TracingJob(AbstractJob):
         entries = prediction_output.prediction_entries
         entries = [entry for entry in entries if entry[StructuredKeys.SCORE] >= self.prediction_threshold]
 
-        parent2entries: Dict[str, List[TracePredictionEntry]] = self.create_artifact_predictions_map(entries, TraceKeys.TARGET.value)
+        parent2entries: Dict[str, List[Trace]] = self.create_artifact_predictions_map(entries,
+                                                                                      TraceKeys.parent_label().value)
         parent_ids = list(parent2entries.keys())
-        parent2children: Dict[str, List[str]] = {target: [t[StructuredKeys.SCORE] for t in entries] for target, entries in
-                                                 parent2entries.items()}
+        parent2children: Dict[str, List[str]] = {target: [t[StructuredKeys.Trace.child_label().value] for t in entries]
+                                                 for target, entries in parent2entries.items()}
 
         pipeline_args = RankingArgs(parent_ids=parent_ids,
-                                    parent2children=parent2children,
-                                    artifact_map=artifact_map)
+                                    pre_sorted_parent2children=parent2children,
+                                    dataset=prompt_dataset)
         pipeline = LLMRankingPipeline(pipeline_args)
-        parent2rankings = pipeline.run()
+        pipeline.run()
+        parent2rankings = pipeline.state.candidate_entries
         predicted_entries = []
 
         for parent_id, ranked_sources in parent2rankings.items():
@@ -88,7 +91,7 @@ class TracingJob(AbstractJob):
         return TracePredictionOutput(prediction_entries=predicted_entries)
 
     @staticmethod
-    def create_artifact_predictions_map(predictions: List[TracePredictionEntry], artifact_key: str):
+    def create_artifact_predictions_map(predictions: List[Trace], artifact_key: str):
         """
         Groups entries by key given.
         :param predictions: The entries to group.

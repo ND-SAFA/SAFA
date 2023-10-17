@@ -169,6 +169,5 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         :param dataset_role: The role of the dataset to return.
         :return: Dataset at dataset role if it exists.
         """
-
-        return self.trainer_dataset_manager.get_hf_datasets(self.model_manager)[dataset_role] \
-            if dataset_role in self.trainer_dataset_manager else None
+        datasets = self.trainer_dataset_manager.get_hf_datasets(self.model_manager)
+        return datasets[dataset_role] if dataset_role in datasets else None

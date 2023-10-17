@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Dict
 
 from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
 from tgen.common.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, \
     LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
@@ -48,8 +49,7 @@ class OpenAIArgs(AbstractLLMArgs):
         :param kwargs: Contains all necessary arg name to value mappings
         """
         super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
-        if "model" not in super_args:
-            super_args["model"] = OPEN_AI_MODEL_DEFAULT
+        DictUtil.update_kwarg_values(super_args, replace_existing=False, model=OPEN_AI_MODEL_DEFAULT)
         super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, **super_args)
 
     @overrides(AbstractLLMArgs)
@@ -65,7 +65,7 @@ class OpenAIArgs(AbstractLLMArgs):
             assert "prompt_builder" in instructions, "Expected prompt_creator to be defined when including classification metrics."
             prompt_creator = instructions["prompt_builder"]
             pos_class = None
-            for prompt in prompt_creator._prompts:
+            for prompt in prompt_creator.prompts:
                 choices = getattr(prompt, "choices", None)
                 if choices is not None:
                     pos_class = choices[0]

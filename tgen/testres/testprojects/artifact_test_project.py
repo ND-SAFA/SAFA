@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader

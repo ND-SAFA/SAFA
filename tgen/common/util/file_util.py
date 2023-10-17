@@ -65,6 +65,7 @@ class FileUtil:
         """
         if additional_path_parts:
             output_path = os.path.join(output_path, *additional_path_parts)
+        output_path = FileUtil.get_directory_path(output_path)  # ensure is a directory
         os.makedirs(output_path, exist_ok=True)
         return output_path
 
@@ -136,19 +137,24 @@ class FileUtil:
         return files
 
     @staticmethod
-    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
+    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None,
+                     use_abs_paths: bool = True):
         """
         For every string found in value, if its a path its expanded completed path
         :param paths: List, Dict, or String containing one or more paths.
         :param replacements: Dictionary from source to target string replacements in paths.
+        :param use_abs_paths: If True, returns the absolute path
         :return: Same type as value, but with its content processed.
         """
-        def expand(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
+
+        def expand(path: str, replacements: Dict[str, str] = None):
             if replacements:
                 for k, v in replacements.items():
-                    paths = paths.replace(k, v)
-            paths = os.path.expanduser(paths)
-            return FileUtil.get_path_relative_to_proj_path(paths)
+                    path = path.replace(k, v)
+            path = os.path.expanduser(path)
+            if use_abs_paths:
+                path = FileUtil.get_path_relative_to_proj_path(path)
+            return path
 
         return FileUtil.perform_function_on_paths(paths, expand, replacements=replacements)
 
@@ -160,15 +166,16 @@ class FileUtil:
         :param replacements: Dictionary from source to target string replacements in paths.
         :return: Same type as value, but with its content processed.
         """
-        def collapse(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
+
+        def collapse(path: str, replacements: Dict[str, str] = None):
             if replacements:
                 path2var = {v: k for k, v in replacements.items()}
                 ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
-                for path in ordered_paths:
-                    paths = paths.replace(path, path2var[path])
-            if os.path.isabs(paths):
-                paths = os.path.relpath(paths, PROJ_PATH)
-            return paths
+                for path2replace in ordered_paths:
+                    path = path.replace(path2replace, path2var[path2replace])
+            if os.path.isabs(path):
+                path = os.path.relpath(path, PROJ_PATH)
+            return path
 
         return FileUtil.perform_function_on_paths(paths, collapse, replacements=replacements)
 

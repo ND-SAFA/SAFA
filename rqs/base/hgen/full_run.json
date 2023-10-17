@@ -6,13 +6,10 @@
           "object_type": "MULTI_LAYER_HGEN",
           "starting_hgen_job": {
             "hgen_args": {
-              "load_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]/11d3f05f-d4ee-40b0-9813-44f3ab9dd2ad",
               "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
               "source_layer_id": "Code",
               "target_type": "User Story",
-              "optimize_with_reruns": true,
-              "n_reruns": 2,
-              "generate_trace_links": false,
+              "generate_trace_links": true,
               "dataset_creator_for_sources": {
                 "object_type": "PROMPT",
                 "project_reader": {

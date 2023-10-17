@@ -50,3 +50,4 @@ class DeltaArgs(PipelineArgs):
         if isinstance(self.change_type_to_diffs, str):
             self.change_type_to_diffs = JsonUtil.read_json_file(self.change_type_to_diffs)
         self.change_type_to_diffs = EnumDict(self.change_type_to_diffs)
+        super().__post_init__()

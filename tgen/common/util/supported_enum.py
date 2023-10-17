@@ -17,9 +17,12 @@ class SupportedEnum(Enum):
         :return: Enum value.
         """
         key_name = key_name.upper()
-        for k in cls._value2member_map_.values():
-            if k.name == key_name:
-                return k.value
+        try:
+            return SupportedEnum[key_name].value
+        except KeyError:
+            for k in cls._value2member_map_.values():
+                if k.name == key_name:
+                    return k.value
         raise ValueError(f"{key_name} is not one of {cls.get_keys()}")
 
     @classmethod

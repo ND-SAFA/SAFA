@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import List, Dict
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.common.util.base_object import BaseObject
-from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
-from tgen.tracing.ranking.common.trace_layer import TraceLayer
+from tgen.common.objects.trace import Trace
+from tgen.common.objects.trace_layer import TraceLayer
 
 
 @dataclass
@@ -14,10 +14,10 @@ class ApiDefinition(BaseObject):
     """
     artifacts: List[Artifact]
     layers: List[TraceLayer]
-    links: List[TracePredictionEntry] = None
+    links: List[Trace] = None
     summary: str = None
 
-    def get_links(self) -> List[TracePredictionEntry]:
+    def get_links(self) -> List[Trace]:
         """
         :return: Returns the trace links defined in API dataset.
         """
@@ -37,7 +37,7 @@ class ApiDefinition(BaseObject):
         for artifact in artifacts:
             artifacts_param.append(Artifact(**artifact))
         for link in links:
-            links_param.append(TracePredictionEntry(**link))
+            links_param.append(Trace(**link))
         for layer in layers:
             layers_param.append(TraceLayer(**layer))
         return ApiDefinition(artifacts=artifacts_param, links=links_param, layers=layers_param, **additional_params)

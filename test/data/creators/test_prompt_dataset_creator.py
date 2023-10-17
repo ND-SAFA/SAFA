@@ -8,7 +8,8 @@ from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager

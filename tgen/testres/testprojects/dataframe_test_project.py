@@ -1,13 +1,10 @@
 from typing import List
 
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.testres.paths.project_paths import DATAFRAME_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.testprojects.api_test_project import ApiTestProject
-from tgen.testres.testprojects.csv_test_project import CsvTestProject
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
-from tgen.testres.testprojects.structured_test_project import StructuredTestProject
 
 
 class DataFrameTestProject(AbstractTestProject):

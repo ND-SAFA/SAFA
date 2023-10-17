@@ -8,14 +8,15 @@ from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
+from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
+    ALLOWED_ORPHANS_DEFAULT, \
     NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -168,7 +169,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
 
     @staticmethod
     def generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
-                                trace_df: TraceDataFrame, n_threads=10) -> TraceDataFrame:
+                                trace_df: TraceDataFrame = None, n_threads: int = 10) -> TraceDataFrame:
         """
         Compares source and target artifacts for each entry in layer mapping and generates negative links between them.
         :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.
@@ -177,6 +178,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param n_threads: The maximum number of threads to use for pre-processing.
         :return: None
         """
+        if trace_df is None:
+            trace_df = TraceDataFrame()
+
         negative_links: Dict[int, Dict[TraceKeys, Any]] = {}
 
         for _, row in layer_mapping_df.itertuples():
@@ -298,6 +302,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
 
         n_total = len(trace_dataset)
-        n_positive = trace_dataset.trace_df.get_label_count(1)
-        n_negative = trace_dataset.trace_df.get_label_count(0)
+        n_positive = len(trace_dataset.get_pos_link_ids())
+        n_negative = len(trace_dataset.get_neg_link_ids())
         logger.info(f"Trace dataset(+{n_positive}, -({n_negative}) = {n_total})")

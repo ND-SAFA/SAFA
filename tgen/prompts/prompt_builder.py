@@ -12,25 +12,31 @@ from tgen.prompts.prompt_config import PromptConfig
 
 class PromptBuilder:
 
-    def __init__(self, prompts: List[Prompt]):
+    def __init__(self, prompts: List[Prompt] = None, **format_variables):
         """
         Constructs prompt creator with prompt arguments as configuration.
         :param prompts: The list of prompts to use to build the final prompt
+        :param format_variables: A dictionary mapping format key to a list of values corresponding to each prompt that will be built
         """
-        self._prompts = prompts
+        self.prompts = prompts if prompts else []
+        self.format_variables = format_variables if format_variables else {}
+        self._n_built = 0
         self._create_config()
 
-    def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs, ) -> EnumDict[str, str]:
+    def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :param model_format_args: Defines the formatting specific to the model
         :param correct_completion: The correct completion that the model should produce
         :return: Dictionary containing the prompt and completion
         """
-        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self._prompts]
+        format_vars = {key: val[self._n_built] for key, val in self.format_variables.items() if len(val) > self._n_built}
+        prompt_kwargs.update(format_vars)
+        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts]
         base_prompt = NEW_LINE.join(built_prompts)
         prompt = self._format_prompt_for_model(base_prompt, prompt_args=model_format_args)
         completion = self._format_completion(correct_completion, prompt_args=model_format_args)
+        self._n_built += 1
         return EnumDict({
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion
@@ -43,10 +49,10 @@ class PromptBuilder:
         :param i: The index to insert the prompt
         :return: None
         """
-        if i is None or i == len(self._prompts):
-            self._prompts.append(prompt)
+        if i is None or i == len(self.prompts):
+            self.prompts.append(prompt)
         else:
-            self._prompts.insert(i, prompt)
+            self.prompts.insert(i, prompt)
         self._create_config()
 
     def format_prompts_with_var(self, **kwargs) -> None:
@@ -55,7 +61,7 @@ class PromptBuilder:
         :param kwargs: Contains var_name to value mappings to format the prompts with
         :return: None
         """
-        for prompt in self._prompts:
+        for prompt in self.prompts:
             prompt.format_value(**kwargs)
 
     def remove_prompt(self, i: int = None, prompt_id: str = None) -> None:
@@ -70,7 +76,7 @@ class PromptBuilder:
             if i < 0:
                 i = None
         if i is not None:
-            self._prompts.pop(i)
+            self.prompts.pop(i)
             self._create_config()
 
     def find_prompt_by_id(self, prompt_id: str) -> int:
@@ -79,7 +85,7 @@ class PromptBuilder:
         :param prompt_id: The id of the prompt to find
         :return: The index of the prompt if it exists, else -1
         """
-        for i, prompt in enumerate(self._prompts):
+        for i, prompt in enumerate(self.prompts):
             if prompt.id == prompt_id:
                 return i
         return -1
@@ -90,7 +96,7 @@ class PromptBuilder:
         :param index: The index
         :return: The prompt at the given index
         """
-        return self._prompts[index]
+        return self.prompts[index]
 
     def get_prompt_by_id(self, prompt_id: str) -> Prompt:
         """
@@ -99,14 +105,14 @@ class PromptBuilder:
         :return: The prompt if it exists, else None
         """
         i = self.find_prompt_by_id(prompt_id)
-        return self._prompts[i] if i >= 0 else None
+        return self.prompts[i] if i >= 0 else None
 
     def get_all_prompts(self) -> List[Prompt]:
         """
         Gets all prompts
         :return: The list of prompts
         """
-        return self._prompts
+        return self.prompts
 
     def parse_responses(self, res: str) -> Dict[str, Any]:
         """
@@ -114,7 +120,7 @@ class PromptBuilder:
         :param res: The model response
         :return: A dictionary mapping prompt id to its answers
         """
-        return {prompt.id: prompt.parse_response(res) for prompt in self._prompts}
+        return {prompt.id: prompt.parse_response(res) for prompt in self.prompts}
 
     def _create_config(self) -> PromptConfig:
         """
@@ -124,7 +130,7 @@ class PromptBuilder:
         self.config = PromptConfig(requires_trace_per_prompt=False,
                                    requires_artifact_per_prompt=False,
                                    requires_all_artifacts=False)
-        for prompt in self._prompts:
+        for prompt in self.prompts:
             if isinstance(prompt, MultiArtifactPrompt):
                 if prompt.data_type == MultiArtifactPrompt.DataType.TRACES:
                     self.config.requires_trace_per_prompt = True
@@ -161,4 +167,4 @@ class PromptBuilder:
         Returns the number of prompts in the builder
         :return: The number of prompts in the builder
         """
-        return len(self._prompts)
+        return len(self.prompts)

@@ -3,8 +3,8 @@ from typing import Dict, List
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType

@@ -18,9 +18,10 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
@@ -55,7 +56,8 @@ class TraceDataset(iDataset):
             pos_link_ids, neg_link_ids = self.__create_pos_neg_links(trace_df)
         self._pos_link_ids, self._neg_link_ids = pos_link_ids, neg_link_ids
         trace_df.drop_duplicates()
-        trace_df = TraceDataFrame(trace_df.sample(frac=1))
+        if randomize:
+            trace_df = TraceDataFrame(trace_df.sample(frac=1))
         self.__trace_matrix = None
         self.randomize = randomize
         self.trace_df = trace_df
@@ -381,8 +383,8 @@ class TraceDataset(iDataset):
         """
         tracing_types = []
         for _, layer_row in self.layer_df.iterrows():
-            parent_type = layer_row[LayerKeys.TARGET_TYPE.value]
-            child_type = layer_row[LayerKeys.SOURCE_TYPE.value]
+            parent_type = layer_row[LayerKeys.parent_label().value]
+            child_type = layer_row[LayerKeys.child_label().value]
             tracing_types.append((parent_type, child_type))
         return tracing_types
 

@@ -30,8 +30,8 @@ class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
             logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
             self._run(args, state)
             step_ran = True
-        state.on_step_complete(step_name=self.get_step_name())
         if step_ran:
+            state.on_step_complete(step_name=self.get_step_name())
             logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
         return step_ran
 
@@ -83,6 +83,9 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Runs steps with store.
         :return: None
         """
+        if self.args.export_dir:
+            os.makedirs(self.args.export_dir, exist_ok=True)
+            self.state.export_dir = self.args.export_dir
         for step in self.steps:
             self.run_step(step)
 

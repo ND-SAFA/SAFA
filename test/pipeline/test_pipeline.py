@@ -24,7 +24,7 @@ class TestPipeline(BaseTest):
     def fake_load_state_from_path(self, test_summary: str, path: str, raise_exception: bool = False):
         if path == TEST_OUTPUT_DIR:
             return Exception()
-        return HGenState(summary=test_summary)
+        return HGenState(project_summary=test_summary)
 
     def fake_print(self, str2print, *args, sep=' ', end='\n', file=None):
         if self.menu_options[0].value in str2print:
@@ -41,8 +41,8 @@ class TestPipeline(BaseTest):
                                   load_new_state_mock: mock.MagicMock):
         input_mock.side_effect = ["1", "2", "4", "3"]
         test_summary = "this worked"
-        load_new_state_mock.return_value = HGenState(summary=test_summary, completed_steps={step.get_step_name(): 1
-                                                                                            for step in HierarchyGenerator.steps})
+        load_new_state_mock.return_value = HGenState(project_summary=test_summary, completed_steps={step.get_step_name(): 1
+                                                                                                    for step in HierarchyGenerator.steps})
 
         pipeline = self.get_pipeline()
         pipeline._run_interactive_mode(pipeline.steps[self.curr_step_index])
@@ -55,7 +55,7 @@ class TestPipeline(BaseTest):
 
         pipeline = self.get_pipeline()
         pipeline._run_interactive_mode(pipeline.steps[self.curr_step_index])
-        self.assertEqual(pipeline.state.summary, test_summary)
+        self.assertEqual(pipeline.state.project_summary, test_summary)
         self.assertTrue(pipeline.state.step_is_complete(pipeline.steps[self.curr_step_index].get_step_name()))
         self.assertFalse(pipeline.state.step_is_complete(pipeline.steps[len(HierarchyGenerator.steps)-1].get_step_name()))
 
@@ -70,7 +70,7 @@ class TestPipeline(BaseTest):
 
         state: HGenState = pipeline._load_new_state_from_user(HGenState())
         self.assertEqual(input_mock.call_count, 3)
-        self.assertEqual(state.summary, test_summary)
+        self.assertEqual(state.project_summary, test_summary)
 
         state: None = pipeline._load_new_state_from_user(HGenState())
         self.assertIsNone(state)

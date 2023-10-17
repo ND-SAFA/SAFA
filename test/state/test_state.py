@@ -9,7 +9,6 @@ from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.delta.delta_state import DeltaState
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
@@ -19,19 +18,18 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_STATE_PATH
-from tgen.tracing.ranking.ranking_state import RankingState
 
 
 class TestState(BaseTest):
 
     def test_get_path_to_state_checkpoint(self):
         with_checkpoint = os.path.join(TEST_OUTPUT_DIR, "state_checkpoints")
-        self.assertEqual(State._get_path_to_state_checkpoint(with_checkpoint), with_checkpoint)
+        self.assertEqual(State.get_path_to_state_checkpoint(with_checkpoint), with_checkpoint)
 
         without_checkpoint = TEST_OUTPUT_DIR
-        self.assertEqual(State._get_path_to_state_checkpoint(without_checkpoint), with_checkpoint)
+        self.assertEqual(State.get_path_to_state_checkpoint(without_checkpoint), with_checkpoint)
 
-        self.assertEqual(State._get_path_to_state_checkpoint(without_checkpoint, "StepName"),
+        self.assertEqual(State.get_path_to_state_checkpoint(without_checkpoint, "StepName"),
                          os.path.join(with_checkpoint, "state-step-name.yaml"))
 
     @mock.patch.object(ProjectSummarizer, "summarize")
@@ -41,9 +39,10 @@ class TestState(BaseTest):
         anthropic_manager.mock_summarization()
         steps = [step.get_step_name() for step in HierarchyGenerator.steps if step.get_step_name()]
         state = HGenState.load_latest(TEST_STATE_PATH, steps)
+        self.assertEqual(state.export_dir, TEST_OUTPUT_DIR)
         self.assertSetEqual(set(steps), set(state.completed_steps.keys()))
         self.assertEqual(state.description_of_artifact, HGenTestConstants.description)
-        self.assertEqual(state.summary, HGenTestConstants.summary)
+        self.assertEqual(state.project_summary, HGenTestConstants.summary)
         self.assertListEqual(state.questions, HGenTestConstants.questions.splitlines())
         self.assertSetEqual(set(state.generation_predictions.keys()), set(HGenTestConstants.user_stories))
         self.assertListEqual(list(state.generation_predictions.values()), HGenTestConstants.code_files)
@@ -72,7 +71,9 @@ class TestState(BaseTest):
             return val
 
         state_name = GenerateArtifactContentStep.get_step_name()
-        attrs = YamlUtil.read(State._get_path_to_state_checkpoint(TEST_STATE_PATH, state_name))
+        step_num = HierarchyGenerator.steps.index(GenerateArtifactContentStep) + 1
+        orig_path = State.get_path_to_state_checkpoint(TEST_STATE_PATH, state_name, step_num=step_num)
+        attrs = YamlUtil.read(orig_path)
         param_specs = ParamSpecs.create_from_method(HGenState.__init__)
         checked_attrs = {}
         for name, val in attrs.items():
@@ -80,11 +81,12 @@ class TestState(BaseTest):
         orig_state = HGenState(**checked_attrs)
         orig_state.export_dir = TEST_OUTPUT_DIR
         orig_state.save(state_name)
-        reloaded_attrs = YamlUtil.read(State._get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name))
+        save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num)
+        reloaded_attrs = YamlUtil.read(save_path)
         self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/testres/output')
         self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])
         self.assertEqual(orig_state.description_of_artifact, reloaded_attrs["description_of_artifact"])
-        self.assertEqual(orig_state.summary, reloaded_attrs["summary"])
+        self.assertEqual(orig_state.project_summary, reloaded_attrs["project_summary"])
         self.assertListEqual(orig_state.questions, reloaded_attrs["questions"])
         self.assertDictEqual(orig_state.generation_predictions, reloaded_attrs["generation_predictions"])
         self.assertEqual(orig_state.format_of_artifacts, reloaded_attrs["format_of_artifacts"])
@@ -93,6 +95,14 @@ class TestState(BaseTest):
         reloaded_dataset_source = assert_check_type("source_dataset", reloaded_attrs["source_dataset"])
         self.assertSetEqual(set(orig_state.source_dataset.artifact_df.index), set(reloaded_dataset_source.artifact_df.index))
         self.assertEqual(orig_state.final_dataset, reloaded_attrs["final_dataset"])
+
+        orig_state.save(state_name, attrs2ignore={"final_dataset"})
+        reloaded_attrs = YamlUtil.read(save_path)
+        self.assertNotIn("final_dataset", reloaded_attrs)
+        try:
+            orig_state.load_state_from_path(save_path, raise_exception=True)
+        except Exception as e:
+            self.fail(e)
 
     def test_mark_as_complete(self):
         state = HGenState()

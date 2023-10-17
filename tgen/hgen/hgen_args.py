@@ -97,12 +97,13 @@ class HGenArgs(PipelineArgs, BaseObject):
                                                                                          self.dataset_creator_for_sources)
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
+        self.export_dir = os.path.join(self.export_dir, self.target_type) \
+            if self.export_dir and not self.export_dir.endswith(self.target_type) else self.export_dir
         self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-4-0314'))
-        self.export_dir = os.path.join(self.export_dir, str(uuid.uuid4())) \
-            if self.export_dir and not StrUtil.is_uuid(os.path.split(self.export_dir)[-1]) else self.export_dir
         for e in PredictionStep:
             if e.value not in self.max_tokens:
                 if e in [PredictionStep.NAME, PredictionStep.FORMAT]:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
+        super().__post_init__()

@@ -2,6 +2,7 @@
   <flex-box full-width justify="between" align="center" y="1">
     <mode-buttons />
     <flex-box align="center">
+      <update-button />
       <commit-buttons />
       <graph-buttons />
       <visible-type-buttons />
@@ -23,4 +24,5 @@ import { FlexBox, CommitButtons } from "@/components/common";
 import GraphButtons from "./GraphButtons.vue";
 import ModeButtons from "./ModeButtons.vue";
 import VisibleTypeButtons from "./VisibleTypeButtons.vue";
+import UpdateButton from "./UpdateButton.vue";
 </script>

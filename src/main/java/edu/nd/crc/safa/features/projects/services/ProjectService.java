@@ -60,6 +60,7 @@ public class ProjectService {
     /**
      * Deletes given project and all related entities through cascade property.
      *
+     * @param user    The user initiating the deletion of the project.
      * @param project The project to delete.
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */

@@ -70,12 +70,11 @@ public class ActionBuilder {
                                                         IDocumentArtifactTest test) {
         // Step - Create artifact
         ArtifactAppEntity artifact = test.getArtifact();
-        ArtifactAppEntity artifactAdded = this.rootBuilder
-            .actions(a -> a
-                .commit(CommitBuilder
+        ArtifactAppEntity artifactAdded = this.rootBuilder.actions(a -> a.commit(
+                CommitBuilder
                     .withVersion(projectVersion)
-                    .withAddedArtifact(artifact))
-                .getArtifact(ModificationType.ADDED, 0))
+                    .withAddedArtifact(artifact)
+            ).getArtifact(ModificationType.ADDED, 0))
             .get();
 
         // VP - Verify commit message
@@ -87,10 +86,9 @@ public class ActionBuilder {
         this.rootBuilder
             .verify(v -> v
                 .notifications(n -> n
-                    .verifyArtifactTypeMessage(commitMessages.get(0), artifact.getType())
-                    .verifySingleEntityChanges(commitMessages.get(1),
-                        List.of(NotificationEntity.ARTIFACTS,
-                            NotificationEntity.WARNINGS), List.of(1, 0))));
+                    .verifyArtifactTypeMessage(commitMessages.get(1), artifact.getType())
+                    .verifySingleEntityChanges(commitMessages.get(2),
+                        List.of(NotificationEntity.ARTIFACTS, NotificationEntity.WARNINGS), List.of(1, 0))));
 
         // Step - Set current artifact with created id
         test.setArtifact(artifactAdded);

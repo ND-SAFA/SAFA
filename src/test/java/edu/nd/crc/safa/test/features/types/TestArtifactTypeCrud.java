@@ -55,10 +55,10 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
     protected void verifyUpdateMessages(List<EntityChangeMessage> messages) {
         EntityChangeMessage message = messages.get(0);
         assertThat(message.getChanges()).hasSize(1);
-        this.changeMessageVerifies.verifyTypeChange(message,
+        this.messageVerificationService.verifyTypeChange(message,
             entityId,
             NotificationAction.UPDATE);
-        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+        this.messageVerificationService.verifyUpdateLayout(message, false);
     }
 
     protected void deleteEntity(TypeAppEntity entity) throws Exception {
@@ -72,10 +72,10 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
         assertThat(messages).hasSize(1);
         EntityChangeMessage message = messages.get(0);
         assertThat(message.getChanges()).hasSize(1);
-        this.changeMessageVerifies.verifyTypeChange(message,
+        this.messageVerificationService.verifyTypeChange(message,
             entityId,
             NotificationAction.DELETE);
-        this.changeMessageVerifies.verifyUpdateLayout(message, true);
+        this.messageVerificationService.verifyUpdateLayout(message, true);
     }
 
     @Override

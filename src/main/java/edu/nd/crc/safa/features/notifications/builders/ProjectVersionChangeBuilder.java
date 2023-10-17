@@ -26,31 +26,31 @@ public class ProjectVersionChangeBuilder extends AbstractEntityChangeBuilder<Pro
     }
 
     public ProjectVersionChangeBuilder withVersionDelete(UUID versionId) {
-        return (ProjectVersionChangeBuilder) withEntityDelete(NotificationEntity.VERSION, List.of(versionId));
+        return withEntityDelete(NotificationEntity.VERSION, List.of(versionId));
     }
 
     public ProjectVersionChangeBuilder withArtifactsUpdate(List<ArtifactAppEntity> artifacts) {
-        return (ProjectVersionChangeBuilder) withEntitiesUpdate(NotificationEntity.ARTIFACTS, artifacts);
+        return withEntitiesUpdate(NotificationEntity.ARTIFACTS, artifacts);
     }
 
     public ProjectVersionChangeBuilder withArtifactsDelete(List<UUID> artifactIds) {
-        return (ProjectVersionChangeBuilder) withEntityDelete(NotificationEntity.ARTIFACTS, artifactIds);
+        return withEntityDelete(NotificationEntity.ARTIFACTS, artifactIds);
     }
 
     public ProjectVersionChangeBuilder withWarningsUpdate() {
-        return (ProjectVersionChangeBuilder) withEntityUpdate(NotificationEntity.WARNINGS, new ArrayList<>(), false);
+        return withEntityUpdate(NotificationEntity.WARNINGS, new ArrayList<>(), false);
     }
 
     public ProjectVersionChangeBuilder withTracesUpdate(List<TraceAppEntity> traces) {
-        return (ProjectVersionChangeBuilder) withEntitiesUpdate(NotificationEntity.TRACES, traces);
+        return withEntitiesUpdate(NotificationEntity.TRACES, traces);
     }
 
     public ProjectVersionChangeBuilder withTracesDelete(List<UUID> traceLinkIds) {
-        return (ProjectVersionChangeBuilder) withEntityDelete(NotificationEntity.TRACES, traceLinkIds);
+        return withEntityDelete(NotificationEntity.TRACES, traceLinkIds);
     }
 
     public ProjectVersionChangeBuilder withTypeUpdate(TypeAppEntity typeAppEntity) {
-        return (ProjectVersionChangeBuilder) withEntitiesUpdate(NotificationEntity.TYPES, List.of(typeAppEntity));
+        return withEntitiesUpdate(NotificationEntity.TYPES, List.of(typeAppEntity));
     }
 
     @Override

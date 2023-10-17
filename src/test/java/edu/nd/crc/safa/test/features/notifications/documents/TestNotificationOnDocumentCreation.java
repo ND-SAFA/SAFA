@@ -25,11 +25,11 @@ public class TestNotificationOnDocumentCreation extends AbstractDocumentNotifica
     protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
         assertEquals(1, messages.size());
         EntityChangeMessage message = messages.get(0);
-        this.changeMessageVerifies.verifyDocumentChange(
+        this.messageVerificationService.verifyDocumentChange(
             message,
             this.documentId,
             NotificationAction.UPDATE
         );
-        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+        this.messageVerificationService.verifyUpdateLayout(message, false);
     }
 }

@@ -17,7 +17,7 @@ import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
-import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -193,7 +193,7 @@ public class NotificationTestService {
             case PROJECT -> Project.class;
             case MEMBERS -> UserAppEntity.class;
             case VERSION -> ProjectVersion.class;
-            case TYPES -> ArtifactType.class;
+            case TYPES -> TypeAppEntity.class;
             case DOCUMENT -> DocumentAppEntity.class;
             case ARTIFACTS -> ArtifactAppEntity.class;
             case TRACES -> TraceAppEntity.class;

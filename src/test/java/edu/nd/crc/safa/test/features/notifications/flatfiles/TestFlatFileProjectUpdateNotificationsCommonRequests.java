@@ -29,13 +29,15 @@ public class TestFlatFileProjectUpdateNotificationsCommonRequests extends Abstra
 
     @Override
     protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
-        assertThat(messages).hasSize(4);
+        assertThat(messages).hasSize(6);
 
         this.rootBuilder
             .verify(v -> v.notifications(n -> n
                 .verifyArtifactTypeMessage(messages.get(0), parentType)
-                .verifyArtifactTypeMessage(messages.get(1), childType)
-                .verifyTraceMatrixMessage(messages.get(2), List.of(childType, parentType))
-                .verifyProjectEntitiesMessage(messages.get(3), 2, 1)));
+                .verifyArtifactTypeMessage(messages.get(1), parentType)
+                .verifyArtifactTypeMessage(messages.get(2), childType)
+                .verifyArtifactTypeMessage(messages.get(3), childType)
+                .verifyTraceMatrixMessage(messages.get(4), List.of(childType, parentType))
+                .verifyProjectEntitiesMessage(messages.get(5), 2, 1)));
     }
 }

@@ -10,7 +10,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
@@ -67,11 +66,11 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
         assertThat(creationMessages).hasSize(1);
         EntityChangeMessage creationMessage = creationMessages.get(0);
-        changeMessageVerifies.verifyDocumentChange(
+        messageVerificationService.verifyDocumentChange(
             creationMessage,
             entityId,
             NotificationAction.UPDATE);
-        changeMessageVerifies.verifyUpdateLayout(creationMessage, false);
+        messageVerificationService.verifyUpdateLayout(creationMessage, false);
     }
 
     @Override
@@ -94,11 +93,11 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
         assertThat(updateMessages).hasSize(1);
         EntityChangeMessage updateMessage = updateMessages.get(0);
-        changeMessageVerifies.verifyDocumentChange(
+        messageVerificationService.verifyDocumentChange(
             updateMessage,
             entityId,
             NotificationAction.UPDATE);
-        changeMessageVerifies.verifyUpdateLayout(updateMessage, false);
+        messageVerificationService.verifyUpdateLayout(updateMessage, false);
     }
 
     @Override
@@ -113,11 +112,11 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
         assertThat(deletionMessages).hasSize(1);
         EntityChangeMessage deletionMessage = deletionMessages.get(0);
-        changeMessageVerifies.verifyDocumentChange(
+        messageVerificationService.verifyDocumentChange(
             deletionMessage,
             entityId,
             NotificationAction.DELETE);
-        changeMessageVerifies.verifyUpdateLayout(deletionMessage, false);
+        messageVerificationService.verifyUpdateLayout(deletionMessage, false);
 
     }
 }

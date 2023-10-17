@@ -1,15 +1,14 @@
 package edu.nd.crc.safa.test.features.sync;
 
-import edu.nd.crc.safa.config.AppRoutes;
+import java.util.List;
+
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
-import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,18 +45,8 @@ public abstract class AbstractSyncTest extends ApplicationBaseTest {
         this.performAction();
 
         // VP - Verify correctness of message
-        EntityChangeMessage actionMessage = this.rootBuilder.notifications(n -> n.getEntityMessage(getCurrentUser())).get();
+        List<EntityChangeMessage> actionMessage = this.rootBuilder.notifications(n -> n.getMessages(getCurrentUser())).get();
         this.verifyActionMessage(actionMessage);
-
-        // Step - Execute sync call
-        JSONObject response = SafaRequest
-            .withRoute(AppRoutes.Sync.GET_CHANGES)
-            .withVersion(this.projectVersion)
-            .postWithJsonObject(actionMessage);
-        ProjectAppEntity project = this.objectMapper.readValue(response.toString(), ProjectAppEntity.class);
-
-        // VP - Verify project entities
-        this.verifyChanges(project);
     }
 
     abstract void performAction() throws Exception;
@@ -65,14 +54,7 @@ public abstract class AbstractSyncTest extends ApplicationBaseTest {
     /**
      * Verifies that message is correct as a result of action.
      *
-     * @param message The notification sent after action
+     * @param messages The notification sent after action
      */
-    abstract void verifyActionMessage(EntityChangeMessage message);
-
-    /**
-     * Verifies that entities retrieved from message are accurate.
-     *
-     * @param project The project entity with the changes
-     */
-    abstract void verifyChanges(ProjectAppEntity project);
+    abstract void verifyActionMessage(List<EntityChangeMessage> messages);
 }

@@ -56,6 +56,7 @@ public class ProjectSummaryService {
             }
         } else {
             Map<String, Boolean> kwargs = new HashMap<>();
+            // TODO: Set do_resummarize_project = true && do_resummarize_artifacts = true;
             kwargs.put("do_resummarize_project", !hasCodeSummaries);
             kwargs.put("summarize_artifacts", !hasCodeSummaries);
             logger.log(String.format("Kwargs: %s", kwargs));

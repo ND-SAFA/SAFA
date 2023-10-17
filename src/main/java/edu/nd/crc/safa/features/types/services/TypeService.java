@@ -215,18 +215,16 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
     private void notifyTypeUpdate(ArtifactType artifactType, IUser user) {
         Project project = artifactType.getProject();
 
-        // Step - Calculate affected artifact ids
-        List<UUID> artifactIds = artifactRepository
+        List<UUID> affectedArtifactIds = artifactRepository
             .findByProjectAndType(project, artifactType)
             .stream()
             .map(Artifact::getArtifactId)
             .collect(Collectors.toList());
 
-        // Step - broadcast change to artifact type and affected artifacts
         notificationService.broadcastChange(
             EntityChangeBuilder.create(user, project)
                 .withTypeUpdate(new TypeAppEntity(artifactType))
-                .withArtifactsUpdate(artifactIds));
+                .withArtifactsUpdate(affectedArtifactIds));
     }
 
     private void notifyTypeDeleted(ArtifactType artifactType, SafaUser user) {

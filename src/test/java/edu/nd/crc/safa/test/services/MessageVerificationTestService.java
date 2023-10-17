@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 
 public class MessageVerificationTestService {
 
@@ -30,7 +30,7 @@ public class MessageVerificationTestService {
             message,
             entityId,
             NotificationEntity.TYPES,
-            o -> ((ArtifactType) o).getId(),
+            o -> ((TypeAppEntity) o).getId(),
             action
         );
     }

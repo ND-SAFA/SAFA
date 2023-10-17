@@ -103,11 +103,11 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     @Override
     protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
         assertThat(deletionMessages).hasSize(1);
-        changeMessageVerifies.verifyTraceMessage(deletionMessages.get(0), entityId, NotificationAction.DELETE);
+        messageVerificationService.verifyTraceMessage(deletionMessages.get(0), entityId, NotificationAction.DELETE);
     }
 
     private void verifyTraceUpdateMessage(EntityChangeMessage message) {
-        changeMessageVerifies.verifyTraceMessage(message, entityId, NotificationAction.UPDATE);
+        messageVerificationService.verifyTraceMessage(message, entityId, NotificationAction.UPDATE);
     }
 
     private TraceAppEntity commitTrace() throws Exception {

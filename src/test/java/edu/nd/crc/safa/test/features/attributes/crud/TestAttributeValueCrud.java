@@ -15,7 +15,6 @@ import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvid
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
@@ -29,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> {
 
     private final AttributesForTesting attributesForTesting = new AttributesForTesting();
+    private final String artifactType = "Requirement";
     @Autowired
     AttributeSystemServiceProvider attributeServiceProvider;
     private CustomAttributeType currentType;
@@ -62,7 +62,7 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
             attributeServiceProvider, currentType);
 
         ArtifactAppEntity artifact = new ArtifactAppEntity(null,
-            "Requirements",
+            artifactType,
             "RE-20",
             "summary",
             "body",
@@ -90,14 +90,17 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
-        assertThat(creationMessages).hasSize(1);
-        changeMessageVerifies.verifyArtifactMessage(creationMessages.get(0), currentId, NotificationAction.UPDATE);
+        assertThat(creationMessages).hasSize(2);
+        this.rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(creationMessages.get(0), artifactType)));
+        EntityChangeMessage artifactCreationMessage = creationMessages.get(1);
+        messageVerificationService.verifyArtifactMessage(artifactCreationMessage, currentId, NotificationAction.UPDATE);
     }
 
     @Override
     protected void updateEntity() throws Exception {
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
-            "Requirements",
+            artifactType,
             "RE-20",
             "summary",
             "body",
@@ -121,13 +124,13 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     @Override
     protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
         assertThat(updateMessages).hasSize(1);
-        changeMessageVerifies.verifyArtifactMessage(updateMessages.get(0), currentId, NotificationAction.UPDATE);
+        messageVerificationService.verifyArtifactMessage(updateMessages.get(0), currentId, NotificationAction.UPDATE);
     }
 
     @Override
     protected void deleteEntity(ArtifactAppEntity entity) throws Exception {
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
-            "Requirements",
+            artifactType,
             "RE-20",
             "summary",
             "body",
@@ -141,7 +144,9 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
-        assertThat(deletionMessages).hasSize(1);
-        changeMessageVerifies.verifyArtifactMessage(deletionMessages.get(0), currentId, NotificationAction.DELETE);
+        assertThat(deletionMessages).hasSize(2);
+        this.rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(deletionMessages.get(0), artifactType)));
+        messageVerificationService.verifyArtifactMessage(deletionMessages.get(1), currentId, NotificationAction.DELETE);
     }
 }

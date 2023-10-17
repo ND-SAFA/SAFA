@@ -56,9 +56,12 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
-        assertThat(creationMessages).hasSize(1);
-        EntityChangeMessage creationMessage = creationMessages.get(0);
-        verifyArtifactMessage(creationMessage, NotificationAction.UPDATE, true);
+        assertThat(creationMessages).hasSize(2);
+        EntityChangeMessage typeCreationMessage = creationMessages.get(0);
+        rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(typeCreationMessage, artifact.getType())));
+        EntityChangeMessage artifactCreationMessage = creationMessages.get(1);
+        verifyArtifactMessage(artifactCreationMessage, NotificationAction.UPDATE, true);
     }
 
     @Override
@@ -91,17 +94,20 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
-        assertThat(deletionMessages).hasSize(1);
-        EntityChangeMessage deletionMessage = deletionMessages.get(0);
+        assertThat(deletionMessages).hasSize(2);
+        EntityChangeMessage typeUpdateMessage = deletionMessages.get(0);
+        this.rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(typeUpdateMessage, artifact.getType())));
+        EntityChangeMessage deletionMessage = deletionMessages.get(1);
         verifyArtifactMessage(deletionMessage, NotificationAction.DELETE, true);
     }
 
     private void verifyArtifactMessage(EntityChangeMessage message,
                                        NotificationAction action,
                                        boolean updateLayout) {
-        this.changeMessageVerifies.verifyArtifactMessage(message, entityId, action);
-        this.changeMessageVerifies.verifyWarningMessage(message);
-        this.changeMessageVerifies.verifyUpdateLayout(message, updateLayout);
+        this.messageVerificationService.verifyArtifactMessage(message, entityId, action);
+        this.messageVerificationService.verifyWarningMessage(message);
+        this.messageVerificationService.verifyUpdateLayout(message, updateLayout);
     }
 
     /**

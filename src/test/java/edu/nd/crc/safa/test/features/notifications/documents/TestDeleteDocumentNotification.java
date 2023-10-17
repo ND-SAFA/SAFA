@@ -29,11 +29,11 @@ public class TestDeleteDocumentNotification extends AbstractDocumentNotification
     protected void verifyShareeMessages(List<EntityChangeMessage> messages) {
         assertThat(messages).hasSize(1);
         EntityChangeMessage message = messages.get(0);
-        this.changeMessageVerifies.verifyDocumentChange(
+        this.messageVerificationService.verifyDocumentChange(
             message,
             this.documentId,
             NotificationAction.DELETE
         );
-        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+        this.messageVerificationService.verifyUpdateLayout(message, false);
     }
 }

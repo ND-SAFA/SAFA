@@ -16,7 +16,7 @@ import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
-import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.test.services.notifications.NotificationTestService;
@@ -58,8 +58,8 @@ public class NotificationAssertionService {
 
 
     public NotificationAssertionService verifyArtifactTypeMessage(EntityChangeMessage message, String artifactTypeName) {
-        ArtifactType artifactType =
-            (ArtifactType) verifySingleEntityChanges(message,
+        TypeAppEntity artifactType =
+            (TypeAppEntity) verifySingleEntityChanges(message,
                 List.of(NotificationEntity.TYPES),
                 List.of(1)).get(0);
         assertThat(artifactType.getName()).isEqualTo(artifactTypeName);

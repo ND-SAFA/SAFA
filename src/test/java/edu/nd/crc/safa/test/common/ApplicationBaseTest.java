@@ -64,7 +64,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected VerificationTestService assertionService;
     protected RetrievalTestService retrievalService;
     protected AuthorizationTestService authorizationService;
-    protected MessageVerificationTestService changeMessageVerifies = new MessageVerificationTestService();
+    protected MessageVerificationTestService messageVerificationService = new MessageVerificationTestService();
     protected LayoutTestService layoutTestService = new LayoutTestService();
     protected RootBuilder rootBuilder;
     /**

@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
-import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.users.entities.IUser;
 
 public class ProjectChangeBuilder extends AbstractEntityChangeBuilder<ProjectChangeBuilder> {
@@ -39,7 +39,7 @@ public class ProjectChangeBuilder extends AbstractEntityChangeBuilder<ProjectCha
         return withEntityDelete(NotificationEntity.TRACE_MATRICES, matrixIds);
     }
 
-    public ProjectChangeBuilder withTypeUpdate(ArtifactType artifactType) {
+    public ProjectChangeBuilder withTypeUpdate(TypeAppEntity artifactType) {
         return withEntitiesUpdate(NotificationEntity.TYPES, List.of(artifactType));
     }
 

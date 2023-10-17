@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -46,6 +47,10 @@ public class ProjectVersionChangeBuilder extends AbstractEntityChangeBuilder<Pro
 
     public ProjectVersionChangeBuilder withTracesDelete(List<UUID> traceLinkIds) {
         return (ProjectVersionChangeBuilder) withEntityDelete(NotificationEntity.TRACES, traceLinkIds);
+    }
+
+    public ProjectVersionChangeBuilder withTypeUpdate(TypeAppEntity typeAppEntity) {
+        return (ProjectVersionChangeBuilder) withEntitiesUpdate(NotificationEntity.TYPES, List.of(typeAppEntity));
     }
 
     @Override

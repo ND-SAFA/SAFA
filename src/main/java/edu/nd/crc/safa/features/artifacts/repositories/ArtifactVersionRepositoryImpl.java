@@ -17,10 +17,13 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
@@ -52,6 +55,8 @@ public class ArtifactVersionRepositoryImpl
     private AttributeValueService attributeValueService;
     @Setter(onMethod = @__({@Autowired}))
     private ArtifactTypeCountService typeCountService;
+    @Setter(onMethod = @__({@Autowired}))
+    private NotificationService notificationService;
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
@@ -99,7 +104,6 @@ public class ArtifactVersionRepositoryImpl
                                                   SafaUser user) throws SafaError {
         Artifact artifact = createOrUpdateArtifactFromAppEntity(projectVersion.getProject(), artifactAppEntity, user);
         artifactAppEntity.setId(artifactAppEntity.getId());
-
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
         return artifact;
     }
@@ -179,6 +183,13 @@ public class ArtifactVersionRepositoryImpl
             }
 
             typeCountService.save(typeCount);
+
+            TypeAppEntity typeAppEntity = new TypeAppEntity(type);
+            typeAppEntity.setCount(typeCount.getCount());
+            
+            notificationService
+                .broadcastChange(EntityChangeBuilder.create(user, projectVersion)
+                    .withTypeUpdate(typeAppEntity));
         }
     }
 

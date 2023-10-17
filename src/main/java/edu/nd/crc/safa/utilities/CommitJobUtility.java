@@ -41,7 +41,8 @@ public class CommitJobUtility {
 
     public static void deleteCommitProject(CommitJob commitJob) throws IOException {
         ProjectService projectService = commitJob.getServiceProvider().getProjectService();
-        projectService.deleteProject(commitJob.getProjectVersion().getProject());
+        projectService.deleteProject(commitJob.getProjectCommitDefinition().getUser(),
+            commitJob.getProjectVersion().getProject());
     }
 
 }

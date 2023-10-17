@@ -48,8 +48,14 @@ public class ProjectMembershipService {
         userProjectMembershipRepo.save(membership);
 
         notificationService.broadcastChange(
-            EntityChangeBuilder.create(user, project)
+            EntityChangeBuilder
+                .create(user, project)
                 .withMembersUpdate(membership.getId())
+        );
+
+        notificationService.broadcastChange(
+            EntityChangeBuilder.create(user)
+                .withProjectUpdate(project)
         );
 
         return membership;

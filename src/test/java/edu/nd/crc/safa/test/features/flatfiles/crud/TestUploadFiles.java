@@ -31,7 +31,7 @@ class TestUploadFiles extends ApplicationBaseTest {
 
         //Cleanup
         this.projectVersionRepository.delete(projectVersion);
-        projectService.deleteProject(project);
+        projectService.deleteProject(getCurrentUser(), project);
         File oldStorage = new File(ProjectPaths.Storage.projectUploadsPath(project, false));
         assertThat(oldStorage).as("delete project storage").doesNotExist();
     }

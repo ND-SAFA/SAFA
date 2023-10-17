@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.projects.controllers;
 import static edu.nd.crc.safa.utilities.AssertUtils.assertNotNull;
 import static edu.nd.crc.safa.utilities.AssertUtils.assertNull;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -151,10 +152,10 @@ public class ProjectController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Projects.DELETE_PROJECT_BY_ID)
     @ResponseStatus(HttpStatus.OK)
-    public void deleteProject(@PathVariable UUID projectId) throws SafaError {
+    public void deleteProject(@PathVariable UUID projectId) throws SafaError, IOException {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
             .withPermission(ProjectPermission.DELETE, user).get();
-        getServiceProvider().getProjectRepository().delete(project);
+        getServiceProvider().getProjectService().deleteProject(user, project);
     }
 }

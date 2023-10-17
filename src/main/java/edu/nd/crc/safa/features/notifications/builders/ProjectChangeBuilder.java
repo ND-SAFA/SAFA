@@ -13,10 +13,12 @@ import edu.nd.crc.safa.features.users.entities.IUser;
 
 public class ProjectChangeBuilder extends AbstractEntityChangeBuilder<ProjectChangeBuilder> {
 
+    private final Project project;
+
     public ProjectChangeBuilder(IUser user, Project project) {
         super(user.getUserId());
-        String projectTopic = TopicCreator.getProjectTopic(project.getProjectId());
-        this.getEntityChangeMessage().setTopic(projectTopic);
+        this.project = project;
+        this.getEntityChangeMessage().setTopic(TopicCreator.getProjectTopic(project.getProjectId()));
     }
 
     public ProjectChangeBuilder withArtifactsUpdate(List<UUID> artifactIds) {
@@ -47,8 +49,12 @@ public class ProjectChangeBuilder extends AbstractEntityChangeBuilder<ProjectCha
         return withEntityDelete(NotificationEntity.TYPES, List.of(artifactTypeId));
     }
 
-    public ProjectChangeBuilder withProjectUpdate(UUID projectId) {
-        return withEntityUpdate(NotificationEntity.PROJECT, List.of(projectId));
+    public ProjectChangeBuilder withProjectUpdate() {
+        return withEntityUpdate(NotificationEntity.PROJECT, List.of(this.project.getProjectId()));
+    }
+
+    public ProjectChangeBuilder withProjectDelete() {
+        return withEntityDelete(NotificationEntity.PROJECT, List.of(this.project.getProjectId()));
     }
 
     public ProjectChangeBuilder withMembersUpdate(UUID membershipId) {

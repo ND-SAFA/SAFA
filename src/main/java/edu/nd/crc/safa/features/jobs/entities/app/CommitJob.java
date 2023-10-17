@@ -89,7 +89,7 @@ public abstract class CommitJob extends AbstractJob {
         if (this.deleteProjectOnFail && createdProjectVersion != null) {
             this.getDbLogger().log("Job failed, deleting job.");
             Project project = createdProjectVersion.getProject();
-            getServiceProvider().getProjectService().deleteProject(project);
+            getServiceProvider().getProjectService().deleteProject(getUser(), project);
         }
     }
 

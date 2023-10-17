@@ -12,6 +12,8 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
@@ -52,16 +54,24 @@ public class ProjectService {
     @Setter(onMethod = @__({@Autowired}))
     private JobService jobService;
 
+    @Setter(onMethod = @__({@Autowired}))
+    private NotificationService notificationService;
+
     /**
      * Deletes given project and all related entities through cascade property.
      *
      * @param project The project to delete.
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */
-    public void deleteProject(Project project) throws SafaError, IOException {
+    public void deleteProject(SafaUser user, Project project) throws SafaError, IOException {
         this.jobService.removeProjectFromJobs(project);
         this.projectRepository.delete(project);
         FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
+        if (user != null) { // null in testing scenarios.
+            notificationService.broadcastChange(EntityChangeBuilder
+                .create(user, project)
+                .withProjectDelete());
+        }
     }
 
     /**

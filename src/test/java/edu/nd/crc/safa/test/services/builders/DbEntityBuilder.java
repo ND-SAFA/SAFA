@@ -137,7 +137,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     public void deleteProjectFiles() throws IOException {
         //Deletes project data
         for (Project project : this.projectRepository.findAll()) {
-            projectService.deleteProject(project);
+            projectService.deleteProject(null, project);
         }
         projectRepository.deleteAll();
     }

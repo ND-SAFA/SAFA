@@ -1,5 +1,5 @@
-from tgen.common.constants.project_summary_constants import PS_NOTES_TAG, PS_ENTITIES_TAG, PS_FEATURE_TAG, PS_OVERVIEW_TAG, \
-    PS_SUBSYSTEM_TAG, PS_DATA_FLOW_TAG
+from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TAG, PS_ENTITIES_TAG, PS_FEATURE_TAG, PS_NOTES_TAG, \
+    PS_OVERVIEW_TAG, PS_SUBSYSTEM_TAG
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -54,8 +54,10 @@ SUBSYSTEM_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                                           QuestionPrompt("The differences to other similar sub-system in the system.")],
                         response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
     QuestionPrompt("Using your notes, create a comprehensive description of each of the system's sub-systems.",
-                   response_manager=PromptResponseManager(response_tag=PS_SUBSYSTEM_TAG,
-                                                          response_instructions_format="Enclose each sub-system in {}."))
+                   response_manager=PromptResponseManager(response_tag={PS_SUBSYSTEM_TAG: ["name", "descr"]},
+                                                          response_instructions_format="Enclose each sub-system in {} "
+                                                                                       "with the name of the subsystem inside of "
+                                                                                       "{} and the description inside of {}."))
 ])
 
 DATA_FLOW_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[

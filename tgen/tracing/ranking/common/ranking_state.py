@@ -4,14 +4,12 @@ from typing import Dict, List, Optional
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.state.state import State
-from tgen.summarizer.summary import Summary
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 
 @dataclass
 class RankingState(State):
-
     artifact_map: Dict[str, str] = None
 
     # sorting
@@ -40,4 +38,5 @@ class RankingState(State):
             self.candidate_entries = [entry for entries in self.sorted_parent2children.values() for entry in entries]
             return self.candidate_entries
         else:
-            return None
+            raise Exception(
+                "Could not identify the current entries from `selected_entries`, `candidate_entries`, `sorted_parent2children`.")

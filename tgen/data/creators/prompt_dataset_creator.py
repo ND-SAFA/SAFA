@@ -25,7 +25,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
     """
 
     def __init__(self, project_reader: AbstractProjectReader = None, trace_dataset_creator: TraceDatasetCreator = None,
-                 data_export_path: str = None, project_file_id: str = None, project_summary: Union[Summary] = None,
+                 data_export_path: str = None, project_file_id: str = None, project_summary: Union[Summary, str] = None,
                  summarizer: ArtifactsSummarizer = None, ensure_code_is_summarized: bool = True):
         """
         Initializes creator with entities extracted from reader.
@@ -53,7 +53,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         artifact_df = df if isinstance(df, ArtifactDataFrame) else None
         prompt_df = df if isinstance(df, PromptDataFrame) else None
         trace_dataset = self.trace_dataset_creator.create() if self.trace_dataset_creator else None
-        project_summary = self.read_project_summary(self.get_project_path()) if not self.project_summary else self.project_summary
+        project_summary = self.__load_project_summary()
         dataset = PromptDataset(prompt_df=prompt_df, artifact_df=artifact_df, trace_dataset=trace_dataset,
                                 project_file_id=self.project_file_id, data_export_path=self.data_export_path,
                                 project_summary=project_summary)
@@ -144,3 +144,15 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
             self.project_reader.set_summarizer(summarizer)
         if self.trace_dataset_creator is not None:
             self.trace_dataset_creator.project_reader.set_summarizer(summarizer)
+
+    def __load_project_summary(self) -> Summary:
+        """
+        Loads project summary from either the summary object, a string, or the project path.
+        :return: Initialized summary object.
+        """
+        if isinstance(self.project_summary, Summary):
+            return self.project_summary
+        elif isinstance(self.project_summary, str):
+            return Summary.from_string(self.project_summary)
+        else:
+            return self.read_project_summary(self.get_project_path())

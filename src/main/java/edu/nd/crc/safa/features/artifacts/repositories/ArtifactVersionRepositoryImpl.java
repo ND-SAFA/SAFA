@@ -29,6 +29,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -37,9 +38,8 @@ import org.springframework.context.annotation.Lazy;
  */
 public class ArtifactVersionRepositoryImpl
     extends GenericVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity> {
-
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ArtifactVersionRepository artifactVersionRepository;
-
     @Autowired
     private ArtifactRepository artifactRepository;
     @Autowired
@@ -53,11 +53,6 @@ public class ArtifactVersionRepositoryImpl
     @Autowired
     private ArtifactTypeCountService typeCountService;
 
-    @Lazy
-    @Autowired
-    public void setArtifactVersionRepository(ArtifactVersionRepository artifactVersionRepository) {
-        this.artifactVersionRepository = artifactVersionRepository;
-    }
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {

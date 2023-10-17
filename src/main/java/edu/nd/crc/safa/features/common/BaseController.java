@@ -122,7 +122,7 @@ public abstract class BaseController {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public SafaError handleGenericError(Exception ex) {
+    public Exception handleGenericError(Exception ex) {
         ex.printStackTrace();
         return new SafaError(ex.getMessage(), ex);
     }

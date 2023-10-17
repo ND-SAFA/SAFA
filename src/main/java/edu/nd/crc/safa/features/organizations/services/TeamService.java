@@ -25,15 +25,20 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TeamService {
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private TeamRepository teamRepo;
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private OrganizationService orgService;
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private TeamMembershipService teamMembershipService;
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ProjectService projectService;
 
     /**
@@ -189,49 +194,5 @@ public class TeamService {
      */
     public void deleteTeam(Team team) {
         teamRepo.delete(team);
-    }
-
-    /**
-     * Sets the autowired team membership server lazily.
-     *
-     * @param teamMembershipService The auto-constructed team membership service.
-     */
-    @Lazy
-    @Autowired
-    public void setTeamMembershipService(TeamMembershipService teamMembershipService) {
-        this.teamMembershipService = teamMembershipService;
-    }
-
-    /**
-     * Sets the autowired project service lazily.
-     *
-     * @param projectService The auto-constructed project service.
-     */
-    @Lazy
-    @Autowired
-    public void setProjectService(ProjectService projectService) {
-        this.projectService = projectService;
-    }
-
-    /**
-     * Sets the autowired project service lazily.
-     *
-     * @param organizationService The auto-constructed organization service.
-     */
-    @Lazy
-    @Autowired
-    public void setOrganizationService(OrganizationService organizationService) {
-        this.orgService = organizationService;
-    }
-
-    /**
-     * Sets the autowired project service lazily.
-     *
-     * @param teamRepository The auto-constructed team repository.
-     */
-    @Lazy
-    @Autowired
-    public void setTeamRepository(TeamRepository teamRepository) {
-        this.teamRepo = teamRepository;
     }
 }

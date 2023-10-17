@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -29,14 +30,8 @@ public class VersionService {
     private final ProjectVersionRepository projectVersionRepository;
     private final ArtifactTypeCountService typeCountService;
     private final TraceMatrixService traceMatrixService;
-
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private TypeService typeService;
-
-    @Autowired
-    @Lazy
-    public void setTypeService(TypeService typeService) {
-        this.typeService = typeService;
-    }
 
     public List<ProjectVersion> getProjectVersions(@PathVariable Project project) {
         return this.projectVersionRepository.findByProjectInBackwardsOrder(project);

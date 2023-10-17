@@ -26,6 +26,7 @@ import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -34,7 +35,7 @@ import org.springframework.context.annotation.Lazy;
  */
 public class TraceLinkVersionRepositoryImpl
     extends GenericVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity> {
-
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private TraceLinkVersionRepository traceLinkVersionRepository;
     @Autowired
     private TraceLinkRepository traceLinkRepository;
@@ -44,12 +45,6 @@ public class TraceLinkVersionRepositoryImpl
     private TraceMatrixService traceMatrixService;
     @Autowired
     private NotificationService notificationService;
-
-    @Lazy
-    @Autowired
-    public void setTraceLinkVersionRepository(TraceLinkVersionRepository traceLinkVersionRepository) {
-        this.traceLinkVersionRepository = traceLinkVersionRepository;
-    }
 
     @Override
     public TraceLinkVersion save(TraceLinkVersion traceLinkVersion) {

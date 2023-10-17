@@ -30,6 +30,18 @@ $color-node-gradient5: var(--q-nodeGradient5);
 
 // Background Palette Tags
 
+.bg-gradient {
+  background: linear-gradient(
+                  to bottom right,
+                  #{$color-node-gradient1},
+                  #{$color-node-gradient2},
+                  #{$color-node-gradient3},
+                  #{$color-node-gradient4},
+                  #{$color-node-gradient5}
+  ) !important;
+;
+}
+
 .bg-transparent {
   background-color: transparent !important;
 }

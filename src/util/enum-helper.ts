@@ -138,7 +138,7 @@ export function searchModeOptions(): SearchSelectOption[] {
     },
     {
       id: "search",
-      name: "Basic",
+      name: "Text",
       description: "Search through currently displayed artifacts",
       placeholder: "Search current artifacts...",
       artifactSearch: true,

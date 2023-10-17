@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.traces.entities.app;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotEmpty;
 
@@ -96,8 +98,16 @@ public class TraceAppEntity implements IAppEntity {
     }
 
     @JsonIgnore
-    public boolean isValid() {
-        return ((sourceName != null && !sourceName.isBlank()) || sourceId != null)
-            && ((targetName != null && !targetName.isBlank()) || targetId != null);
+    public List<String> getMissingRequiredFields() {
+        List<String> missingFields = new ArrayList<>();
+
+        if ((sourceName == null || !sourceName.isBlank()) && sourceId == null) {
+            missingFields.add("sourceName or sourceId");
+        }
+        if ((targetName == null || !targetName.isBlank()) && targetId == null) {
+            missingFields.add("targetName or targetId");
+        }
+
+        return missingFields;
     }
 }

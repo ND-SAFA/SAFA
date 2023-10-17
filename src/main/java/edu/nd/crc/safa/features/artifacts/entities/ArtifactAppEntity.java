@@ -133,9 +133,18 @@ public class ArtifactAppEntity implements IAppEntity {
     }
 
     @JsonIgnore
-    public boolean isValid() {
-        return name != null && !name.isBlank()
-            && body != null
-            && type != null && !type.isBlank();
+    public List<String> getMissingRequiredFields() {
+        List<String> missingFields = new ArrayList<>();
+        if (name == null || name.isBlank()) {
+            missingFields.add("name");
+        }
+        if (body == null) {
+            missingFields.add("body");
+        }
+        if (type == null || type.isBlank()) {
+            missingFields.add("type");
+        }
+
+        return missingFields;
     }
 }

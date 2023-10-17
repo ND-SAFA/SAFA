@@ -60,11 +60,12 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
             ObjectMapper mapper = ObjectMapperConfig.create();
             TraceAppEntity traceAppEntity = mapper.readValue(entityRecord.toString(), TraceAppEntity.class);
 
-            if (traceAppEntity.isValid()) {
+            List<String> missingFields = traceAppEntity.getMissingRequiredFields();
+            if (missingFields.size() == 0) {
                 return new Pair<>(traceAppEntity, null);
             } else {
                 return new Pair<>(null,
-                    String.format("Trace missing one or more required fields: %s", traceAppEntity));
+                    String.format("Trace missing one or more required fields: %s", missingFields));
             }
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());

@@ -60,11 +60,12 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
             ObjectMapper mapper = ObjectMapperConfig.create();
             ArtifactAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), ArtifactAppEntity.class);
 
-            if (artifactAppEntity.isValid()) {
+            List<String> missingFields = artifactAppEntity.getMissingRequiredFields();
+            if (missingFields.size() == 0) {
                 return new Pair<>(artifactAppEntity, null);
             } else {
                 return new Pair<>(null,
-                    String.format("Artifact missing one or more required fields: %s", artifactAppEntity));
+                    String.format("Artifact missing one or more required fields: %s", missingFields));
             }
         } catch (Exception e) {
             return new Pair<>(null, String.format("%s: %s", getFilename(), e.getMessage()));

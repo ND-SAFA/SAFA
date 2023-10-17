@@ -19,6 +19,7 @@
     v-if="smallWindow"
     tooltip="Toggle more options"
     class="q-mx-sm"
+    color="text"
     :icon="collapsed ? 'down' : 'up'"
     @click="collapsed = !collapsed"
   />

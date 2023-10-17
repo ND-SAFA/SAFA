@@ -21,7 +21,7 @@
     />
     <typography
       ellipsis
-      :color="enumerated ? displayColor : 'text'"
+      color="text"
       :small="text.length >= 20"
       :l="iconVisible ? '1' : ''"
       :value="text"
@@ -73,7 +73,9 @@ const emit = defineEmits<{
 
 const { darkMode } = useTheme();
 
-const enumerated = computed(() => props.approvalType || props.deltaType);
+const enumerated = computed(
+  () => props.approvalType || props.deltaType || props.artifactType
+);
 
 const text = computed(() => {
   if (props.confidenceScore) {

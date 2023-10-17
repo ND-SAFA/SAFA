@@ -59,7 +59,6 @@ public class AuthenticationConfig {
                     AppRoutes.Accounts.CREATE_ACCOUNT,
                     AppRoutes.Accounts.FORGOT_PASSWORD,
                     AppRoutes.Accounts.RESET_PASSWORD,
-                    "/websocket/**",
                     "/swagger-ui/**", // Needed to get config
                     "/v3/api-docs/**",
                     "/docs/**")
@@ -89,7 +88,8 @@ public class AuthenticationConfig {
 
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("https://localhost.safa.ai:8080");
-        config.addAllowedOriginPattern("http://localhost:8080");
+        config.addAllowedOriginPattern("https://app.safa.ai:8080");
+        config.addAllowedOriginPattern("https://dev.safa.ai:8080");
         config.setAllowedHeaders(SecurityConstants.allowedCorsHeaders);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setExposedHeaders(List.of(

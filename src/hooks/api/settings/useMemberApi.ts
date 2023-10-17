@@ -12,14 +12,14 @@ import {
 } from "@/types";
 import { removeMatches } from "@/util";
 import {
-  useApi,
   getProjectApiStore,
   logStore,
   membersStore,
-  sessionStore,
   projectStore,
+  sessionStore,
+  useApi,
 } from "@/hooks";
-import { deleteMember, editMember, createMember, getMembers } from "@/api";
+import { createMember, deleteMember, editMember, getMembers } from "@/api";
 import { pinia } from "@/plugins";
 
 /**

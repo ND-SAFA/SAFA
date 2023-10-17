@@ -202,6 +202,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-eye";
     case "pw-hide":
       return "mdi-eye-off";
+    case "connected":
+      return "mdi-network";
+    case "disconnected":
+      return "mdi-network-off";
     default:
       return "";
   }

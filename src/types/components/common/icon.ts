@@ -92,7 +92,9 @@ export type IconVariant =
   | "version-add"
   | "version-delete"
   | "pw-show"
-  | "pw-hide";
+  | "pw-hide"
+  | "connected"
+  | "disconnected";
 
 /**
  * Defines props for an icon.

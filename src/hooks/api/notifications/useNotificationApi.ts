@@ -1,34 +1,38 @@
-import { defineStore } from "pinia";
+import { defineStore, MutationType } from "pinia";
 import { Frame } from "webstomp-client";
 
 import {
   ActionType,
+  ArtifactSchema,
+  ArtifactTypeSchema,
   ChangeMessageSchema,
   ChangeSchema,
+  MembershipSchema,
   NotificationApiHook,
-  notifyUserEntities,
   ProjectSchema,
+  StompChannel,
+  TraceLinkSchema,
+  TraceMatrixSchema,
 } from "@/types";
+import { buildProject, isProjectTopic } from "@/util";
 import {
-  appStore,
   artifactStore,
   attributesStore,
   documentStore,
-  jobStore,
-  membersStore,
-  projectStore,
-  subtreeStore,
-  traceStore,
-  logStore,
-  stompApiStore,
-  setProjectApiStore,
   getVersionApiStore,
   jobApiStore,
-  warningApiStore,
+  jobStore,
+  logStore,
+  membersStore,
+  projectStore,
+  setProjectApiStore,
+  stompApiStore,
+  subtreeStore,
   timStore,
+  traceStore,
+  warningApiStore,
 } from "@/hooks";
-import { router } from "@/router";
-import { fillEndpoint, getChanges } from "@/api";
+import { fillEndpoint } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -37,6 +41,40 @@ import { pinia } from "@/plugins";
 export const useNotificationApi = defineStore(
   "notificationApi",
   (): NotificationApiHook => {
+    /**
+     * Converts a change into updated project data.
+     *
+     * @param change - The change.
+     */
+    function createProjectSchema(change: ChangeSchema): ProjectSchema {
+      const project = buildProject();
+
+      switch (change.entity) {
+        case "ARTIFACTS":
+          project.artifacts = <ArtifactSchema[]>change.entities;
+          break;
+        case "TRACES":
+          project.traces = <TraceLinkSchema[]>change.entities;
+          break;
+        case "WARNINGS":
+          break;
+        case "TRACE_MATRICES":
+          project.traceMatrices = <TraceMatrixSchema[]>change.entities;
+          break;
+        case "TYPES":
+          project.artifactTypes = <ArtifactTypeSchema[]>change.entities;
+          break;
+        case "MEMBERS":
+          project.members = <MembershipSchema[]>change.entities;
+          break;
+        case "ACTIVE_MEMBERS":
+          project.members = <MembershipSchema[]>change.entities;
+          break;
+      }
+
+      return project;
+    }
+
     /**
      * Deletes stored project information.
      *
@@ -113,7 +151,7 @@ export const useNotificationApi = defineStore(
      * Updates stored project information.
      *
      * @param change - The update change.
-     * @param project - The updated project.
+     * @param project - The project to update.
      */
     async function handleUpdateChange(
       change: ChangeSchema,
@@ -123,123 +161,130 @@ export const useNotificationApi = defineStore(
 
       switch (change.entity) {
         case "PROJECT":
-          projectStore.updateProject({
+          return projectStore.updateProject({
             name: project.name,
             description: project.description,
           });
-          break;
         case "MEMBERS":
-          membersStore.updateMembers(project.members, {
+          //TODO: Non-trivial to retrieve the current `active` status of members.
+          // Currently, active members are cleared when a new member is added.
+          return membersStore.updateMembers(project.members, {
             entityType: "PROJECT",
-            entityId: project.projectId,
+            entityId: projectStore.projectId,
           });
+        case "ACTIVE_MEMBERS":
+          membersStore.setActiveMembers(project.members);
           break;
         case "VERSION":
           return getVersionApiStore.handleLoad(versionId);
         case "TYPES":
-          timStore.addOrUpdateArtifactTypes(project.artifactTypes);
-          break;
+          return timStore.addOrUpdateArtifactTypes(project.artifactTypes);
         case "TRACE_MATRICES":
-          timStore.addOrUpdateTraceMatrices(project.traceMatrices);
-          break;
+          return timStore.addOrUpdateTraceMatrices(project.traceMatrices);
         case "DOCUMENT":
-          await documentStore.updateDocuments(project.documents);
-          break;
+          return await documentStore.updateDocuments(project.documents);
         case "ARTIFACTS":
-          artifactStore.addOrUpdateArtifacts(project.artifacts);
-          break;
+          return artifactStore.addOrUpdateArtifacts(project.artifacts);
         case "TRACES":
-          traceStore.addOrUpdateTraceLinks(project.traces);
-          break;
+          return traceStore.addOrUpdateTraceLinks(project.traces);
         case "WARNINGS":
           return warningApiStore.handleReload(versionId);
         case "JOBS":
           return jobApiStore.handleReload();
         case "LAYOUT":
-          documentStore.updateBaseLayout(project.layout);
-          break;
+          return documentStore.updateBaseLayout(project.layout);
         case "SUBTREES":
-          subtreeStore.initializeProject(project);
-          break;
+          return subtreeStore.initializeProject(project);
         case "MODELS":
-          projectStore.updateProject({ models: project.models });
-          break;
+          return projectStore.updateProject({ models: project.models });
         case "ATTRIBUTES":
-          attributesStore.updateAttributes(project.attributes || []);
-          break;
+          return attributesStore.updateAttributes(project.attributes || []);
         case "ATTRIBUTE_LAYOUTS":
-          attributesStore.updateAttributeLayouts(
+          return attributesStore.updateAttributeLayouts(
             project.attributeLayouts || []
           );
-          break;
       }
     }
 
     /**
      * Handles changes messages by updating affected parts of the app.
      *
-     * @param versionId - The project version being updated.
      * @param frame - The message describing changes.
      */
-    async function handleEntityChangeMessage(
-      versionId: string,
-      frame: Frame
-    ): Promise<void> {
-      const routeRequiresProject = router.currentRoute.value.matched.some(
-        ({ meta }) => meta.requiresProject
-      );
+    async function handleEntityChangeMessage(frame: Frame): Promise<void> {
       const message: ChangeMessageSchema = JSON.parse(frame.body);
-      const project = await getChanges(versionId, message);
-      let hasLayoutChange = false; // Layout changes are currently disabled.
 
       // Step - Iterate through message and delete entities.
       for (const change of message.changes) {
-        if (!notifyUserEntities.includes(change.entity)) return;
-
         if (change.action === ActionType.DELETE) {
           await handleDeleteChange(change);
         } else if (change.action === ActionType.UPDATE) {
-          await handleUpdateChange(change, project);
+          const project = createProjectSchema(change);
 
-          if (change.entity === "ARTIFACTS") {
-            hasLayoutChange = true;
-          }
+          await handleUpdateChange(change, project);
+        } else {
+          throw Error("Unable to handle action:" + change.action);
         }
       }
-
-      // Step - Update default layout if needed.
-      if (!routeRequiresProject || !hasLayoutChange) return;
-
-      appStore.enqueueChanges(async () => {
-        documentStore.updateBaseLayout(project.layout);
-      });
     }
 
     async function handleSubscribeVersion(
       projectId: string,
       versionId: string
     ): Promise<void> {
-      if (!projectId || !versionId) return;
+      if (!projectId || !versionId) {
+        logStore.onDevError(
+          "Received invalid project " + projectId + "or version id " + versionId
+        );
+        return;
+      }
+      if (stompApiStore.isConnected) {
+        await clearProjectSubscriptions();
+      }
 
-      await stompApiStore.connectStomp();
-
-      stompApiStore.clearStompSubscriptions();
-
-      await stompApiStore.subscribeToStomp(
+      await stompApiStore.subscribeTo(
         fillEndpoint("projectTopic", { projectId }),
-        (frame) =>
-          handleEntityChangeMessage(versionId, frame).catch((e) =>
-            logStore.onError(e)
-          )
+        handleEntityChangeMessage
       );
-
-      await stompApiStore.subscribeToStomp(
+      await stompApiStore.subscribeTo(
         fillEndpoint("versionTopic", { versionId }),
-        (frame) =>
-          handleEntityChangeMessage(versionId, frame).catch((e) =>
-            logStore.onError(e)
-          )
+        handleEntityChangeMessage
       );
+    }
+
+    /**
+     * Change the current project subscribed to when the project changes.
+     */
+    projectStore.$subscribe((mutation) => {
+      if (mutation.type === MutationType.direct) {
+        if (mutation.events.key === "project") {
+          const oldProject: ProjectSchema = mutation.events.oldValue;
+          const newProject: ProjectSchema = mutation.events.newValue;
+          const oldProjectVersion = oldProject.projectVersion?.versionId || "";
+          const newProjectVersion = newProject.projectVersion?.versionId || "";
+
+          if (newProjectVersion && oldProjectVersion !== newProjectVersion) {
+            handleSubscribeVersion(
+              newProject.projectId,
+              newProjectVersion
+            ).then();
+          } else if (!newProjectVersion && oldProjectVersion) {
+            // no project selected, clear subscriptions
+            clearProjectSubscriptions().then();
+          }
+        }
+      }
+    });
+
+    /**
+     * Clears subscriptions to project and related versions.
+     */
+    async function clearProjectSubscriptions() {
+      const channels: StompChannel[] = stompApiStore.channels;
+      const projectSubscriptions = channels.filter((c) =>
+        isProjectTopic(c.topic)
+      );
+      await stompApiStore.unsubscribe(projectSubscriptions);
     }
 
     return { handleSubscribeVersion };

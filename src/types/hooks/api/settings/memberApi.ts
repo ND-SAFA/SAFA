@@ -16,12 +16,14 @@ export interface MemberApiHook {
    * Whether a member request is loading.
    */
   loading: ComputedRef<boolean>;
+
   /**
    * Updates the stored members for a project, team, or organization.
    *
    * @param entity - The entity to load the members of.
    */
   handleReload(entity: MemberEntitySchema): Promise<void>;
+
   /**
    * Invites a user to a project, team, or organization.
    *
@@ -32,6 +34,7 @@ export interface MemberApiHook {
     member: MembershipSchema,
     callbacks: IOHandlerCallback
   ): Promise<void>;
+
   /**
    * Updates the role of a member.
    *
@@ -42,6 +45,7 @@ export interface MemberApiHook {
     member: MembershipSchema,
     callbacks: IOHandlerCallback
   ): Promise<void>;
+
   /**
    * Opens a confirmation modal to delete the given member.
    *

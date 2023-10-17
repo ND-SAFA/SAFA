@@ -11,7 +11,7 @@
       />
       <typography
         :align="props.align"
-        class="full-width"
+        :class="isCode ? 'full-width text-word-break-all' : 'full-width'"
         :el="props.isHeader ? 'h1' : undefined"
         :variant="props.isHeader ? 'subtitle' : undefined"
         :value="displayName"

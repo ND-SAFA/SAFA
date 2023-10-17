@@ -187,7 +187,7 @@ export const useDocuments = defineStore("documents", {
       this.currentDocument = document;
       this.history.push(document);
       this.historyIndex = this.history.length - 1;
-      selectionStore.clearSelections();
+      selectionStore.clearSelections({ onlySubtree: !document.documentId });
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);

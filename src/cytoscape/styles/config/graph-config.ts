@@ -9,7 +9,7 @@ import {
  * General configuration.
  */
 export const USE_MOTION_BLUR = false;
-export const ANIMATION_DURATION = 200; // ms
+export const ANIMATION_DURATION = 300; // ms
 
 /**
  * Viewport configuration.

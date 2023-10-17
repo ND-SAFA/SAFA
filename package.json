@@ -14,11 +14,10 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "serve:bend": "vue-cli-service serve --mode=bend",
     "serve:dev": "vue-cli-service serve --mode=development",
     "serve:local": "vue-cli-service serve --mode=local",
     "serve:prod": "vue-cli-service serve --mode=production",
-    "start": "npm run serve:local",
+    "start": "npm run serve:dev",
     "test": "npm run test:e2e && npm run test:unit",
     "sec:updates": "ncu",
     "sec:outdated": "npm outdated"

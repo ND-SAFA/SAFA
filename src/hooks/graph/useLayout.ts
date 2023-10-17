@@ -9,7 +9,14 @@ import {
   CytoEvent,
   CSSCursor,
 } from "@/types";
-import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
+import { LARGE_NODE_LAYOUT_COUNT } from "@/util";
+import {
+  appStore,
+  artifactStore,
+  cyStore,
+  selectionStore,
+  subtreeStore,
+} from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -139,7 +146,12 @@ export const useLayout = defineStore("layout", {
     async updatePositions(positions: LayoutPositionsSchema): Promise<void> {
       this.artifactPositions = positions;
 
-      await this.resetLayout();
+      if (artifactStore.currentArtifacts.length > LARGE_NODE_LAYOUT_COUNT) {
+        await this.resetLayout();
+      } else {
+        this.setGraphLayout("project", true);
+        cyStore.centerNodes(true);
+      }
     },
     /**
      * Adds auto-move handlers to all nodes, so that their children are dragged along with then.

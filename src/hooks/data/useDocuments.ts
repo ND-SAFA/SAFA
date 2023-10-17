@@ -178,7 +178,12 @@ export const useDocuments = defineStore("documents", {
      * @param document - The document to add.
      */
     async addDocument(document: DocumentSchema): Promise<void> {
-      this.allDocuments = [...this.allDocuments, document];
+      this.allDocuments = [
+        ...removeMatches(this.allDocuments, "documentId", [
+          document.documentId,
+        ]),
+        document,
+      ];
 
       await this.switchDocuments(document);
     },
@@ -205,7 +210,6 @@ export const useDocuments = defineStore("documents", {
         artifactIds,
       });
 
-      await this.removeDocument("");
       await this.addDocument(document);
       layoutStore.mode = "tree";
     },
@@ -224,7 +228,6 @@ export const useDocuments = defineStore("documents", {
           .reduce((acc, cur) => [...acc, ...cur], []),
       });
 
-      await this.removeDocument("");
       await this.addDocument(document);
       layoutStore.mode = types.length > 1 ? "tree" : "table";
     },

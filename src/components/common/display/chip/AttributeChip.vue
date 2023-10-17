@@ -2,7 +2,7 @@
   <chip
     v-if="!props.confidenceScore"
     :class="chipClassName"
-    :outlined="enumerated"
+    :outlined="enumerated || props.artifactType"
     :color="displayColor"
     :removable="props.removable"
     :data-cy="props.dataCy"
@@ -73,9 +73,7 @@ const emit = defineEmits<{
 
 const { darkMode } = useTheme();
 
-const enumerated = computed(
-  () => props.approvalType || props.deltaType || props.artifactType
-);
+const enumerated = computed(() => props.approvalType || props.deltaType);
 
 const text = computed(() => {
   if (props.confidenceScore) {

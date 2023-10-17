@@ -1,3 +1,23 @@
+import { Message, Subscription } from "webstomp-client";
+
+/**
+ * A channel for stomp messages.
+ */
+export interface StompChannel {
+  /**
+   * The subscription to the channel.
+   */
+  subscription: Subscription;
+  /**
+   * The topic of the channel.
+   */
+  topic: string;
+  /**
+   * A callback for handling messages to the channel.
+   */
+  handler: (message: Message) => void;
+}
+
 /**
  * Notifies client of a series of changes to the project.
  *

@@ -6,6 +6,7 @@
         <project-selector />
         <version-selector />
       </flex-box>
+      <members-bar />
       <q-space />
       <update-button />
       <project-searchbar v-if="graphVisible" />
@@ -31,6 +32,7 @@ import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { VersionSelector, ProjectSelector } from "@/components/project";
 import { ProjectSearchbar } from "@/components/search";
+import MembersBar from "./MembersBar.vue";
 import NavBreadcrumbs from "./NavBreadcrumbs.vue";
 import UpdateButton from "./UpdateButton.vue";
 

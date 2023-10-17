@@ -32,7 +32,7 @@ import { FlexBox } from "@/components/common/display";
 import IconButton from "./IconButton.vue";
 
 const props = withDefaults(defineProps<ColorProps>(), {
-  color: "primary",
+  color: "text",
 });
 
 const buttons = computed(() => [

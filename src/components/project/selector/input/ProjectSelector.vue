@@ -1,15 +1,13 @@
 <template>
   <q-select
     v-model="getProjectApiStore.currentProject"
-    outlined
-    dark
-    :options-dark="darkMode"
+    standout
+    bg-color="transparent"
+    class="nav-breadcrumb"
     label="Project"
     :options="projectStore.allProjects"
     option-value="projectId"
     option-label="name"
-    :class="className"
-    color="primary"
     @popup-show="handleReload"
   >
     <template #option="{ opt, itemProps }: { opt: ProjectSchema }">
@@ -74,19 +72,15 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MemberEntitySchema, ProjectSchema } from "@/types";
 import {
   getProjectApiStore,
   identifierSaveStore,
   permissionStore,
   projectStore,
-  useTheme,
 } from "@/hooks";
 import { FlexBox, IconButton, ListItem, TextButton } from "@/components/common";
 import { InviteMemberModal } from "@/components/members";
-
-const { darkMode } = useTheme();
 
 const projectInviteId = ref<string>();
 
@@ -98,9 +92,6 @@ const entity = computed(
     }) as MemberEntitySchema
 );
 
-const className = computed(() =>
-  projectStore.isProjectDefined ? "nav-input nav-multi-input-left" : "nav-input"
-);
 /**
  * Reloads the project list and resets any selected project.
  */

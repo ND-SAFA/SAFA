@@ -2,15 +2,13 @@
   <q-select
     v-if="isProjectDefined"
     v-model="getVersionApiStore.currentVersion"
-    outlined
-    dark
-    :options-dark="darkMode"
+    standout
+    bg-color="transparent"
+    class="nav-breadcrumb"
     options-selected-class="primary"
     label="Version"
     :options="allVersions"
     option-value="versionId"
-    class="nav-input nav-version nav-multi-input-right q-mr-sm"
-    color="accent"
     @popup-show="getVersionApiStore.handleReload"
   >
     <template #selected>
@@ -74,14 +72,11 @@ import {
   permissionStore,
   projectApiStore,
   projectStore,
-  useTheme,
 } from "@/hooks";
 import { TextButton, ListItem, IconButton, FlexBox } from "@/components/common";
 import { CreateVersionModal } from "@/components/project/creator";
 
 const openCreateVersion = ref(false);
-
-const { darkMode } = useTheme();
 
 const allVersions = computed(() => getVersionApiStore.allVersions);
 const project = computed(() => projectStore.project);

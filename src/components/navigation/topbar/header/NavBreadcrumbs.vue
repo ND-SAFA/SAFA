@@ -1,44 +1,27 @@
 <template>
-  <q-breadcrumbs
-    v-if="projectStore.isProjectDefined"
-    gutter="xs"
-    class="nav-breadcrumb-list"
-    separator-color="primary"
-  >
-    <q-breadcrumbs-el>
-      <q-select
-        standout
-        label="Project"
-        label-color="primary"
-        bg-color="transparent"
-        :model-value="projectName"
-        class="nav-breadcrumb"
-        hide-dropdown-icon
-      />
+  <q-breadcrumbs gutter="xs" class="nav-breadcrumb-list" separator-color="grey">
+    <q-breadcrumbs-el v-if="displayOrgOptions">
+      <organization-selector />
     </q-breadcrumbs-el>
+
     <q-breadcrumbs-el>
-      <q-select
-        standout
-        label="Version"
-        label-color="primary"
-        bg-color="transparent"
-        :model-value="versionName"
-        class="nav-breadcrumb"
-        hide-dropdown-icon
-      />
+      <project-selector />
     </q-breadcrumbs-el>
-    <q-breadcrumbs-el>
-      <q-select
-        standout
-        label="View"
-        label-color="primary"
-        bg-color="transparent"
-        :model-value="viewName"
-        class="nav-breadcrumb"
-        hide-dropdown-icon
-      />
+
+    <q-breadcrumbs-el v-if="displayProjectOptions">
+      <version-selector />
+    </q-breadcrumbs-el>
+    <q-breadcrumbs-el v-if="displayProjectOptions">
+      <document-selector />
     </q-breadcrumbs-el>
   </q-breadcrumbs>
+  <icon-button
+    v-if="smallWindow"
+    tooltip="Toggle more options"
+    class="q-mx-sm"
+    :icon="collapsed ? 'down' : 'up'"
+    @click="collapsed = !collapsed"
+  />
 </template>
 
 <script lang="ts">
@@ -51,11 +34,22 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { versionToString } from "@/util";
-import { documentStore, projectStore } from "@/hooks";
+import { computed, ref } from "vue";
+import { projectStore, useScreen } from "@/hooks";
+import { ProjectSelector, VersionSelector } from "@/components/project";
+import { DocumentSelector } from "@/components/document";
+import { IconButton } from "@/components/common";
+import { OrganizationSelector } from "@/components/organization";
 
-const projectName = computed(() => projectStore.project.name || "Project");
-const versionName = computed(() => versionToString(projectStore.version));
-const viewName = computed(() => documentStore.currentDocument.name);
+const { smallWindow } = useScreen();
+
+const collapsed = ref(true);
+
+const displayOptions = computed(() => !smallWindow.value || !collapsed.value);
+
+const displayOrgOptions = computed(() => !projectStore.isProjectDefined);
+
+const displayProjectOptions = computed(
+  () => displayOptions.value && projectStore.isProjectDefined
+);
 </script>

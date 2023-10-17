@@ -1,13 +1,10 @@
 <template>
   <flex-box full-width justify="between" align="center" y="1">
+    <mode-buttons />
     <flex-box align="center">
-      <document-selector v-if="!ENABLED_FEATURES.NAV_BREADCRUMBS" />
-      <mode-buttons />
-    </flex-box>
-    <flex-box align="center">
-      <visible-type-buttons />
-      <graph-buttons />
       <commit-buttons />
+      <graph-buttons />
+      <visible-type-buttons />
     </flex-box>
   </flex-box>
 </template>
@@ -22,9 +19,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ENABLED_FEATURES } from "@/util";
 import { FlexBox, CommitButtons } from "@/components/common";
-import { DocumentSelector } from "@/components/document";
 import GraphButtons from "./GraphButtons.vue";
 import ModeButtons from "./ModeButtons.vue";
 import VisibleTypeButtons from "./VisibleTypeButtons.vue";

@@ -80,6 +80,7 @@ export const ThemeColors = {
   nodeDefault: Colors.brownDark,
   nodeGenerated: Colors.brown,
 
+  gradient: "", // Overwritten by `colors.scss`
   ...ThemeGradient,
 };
 
@@ -111,6 +112,7 @@ export const lightPalette = {
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
 
+  gradient: ThemeColors.gradient,
   ...ThemeGradient,
 };
 
@@ -142,6 +144,7 @@ export const darkPalette = {
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
 
+  gradient: ThemeColors.gradient,
   ...ThemeGradient,
 };
 

@@ -22,9 +22,6 @@
       :small="props.small"
       :large="props.large"
     />
-    <q-tooltip v-if="props.hideLabel">
-      {{ props.label }}
-    </q-tooltip>
     <slot />
   </q-btn>
 </template>

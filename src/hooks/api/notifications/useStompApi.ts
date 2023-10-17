@@ -10,6 +10,7 @@ import { pinia } from "@/plugins";
 
 const TIME_BETWEEN_RECONNECT = 2 * 1000; // every 2 seconds
 const MAX_RECONNECT_ATTEMPTS = 20; // for a minute
+
 /**
  * The hook with a client for connecting to the backend websocket server.
  */

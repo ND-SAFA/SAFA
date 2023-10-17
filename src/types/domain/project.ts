@@ -11,7 +11,6 @@ import {
   SubtreeMapSchema,
   TraceLinkSchema,
   TraceMatrixSchema,
-  WarningSchema,
 } from "@/types";
 
 /**

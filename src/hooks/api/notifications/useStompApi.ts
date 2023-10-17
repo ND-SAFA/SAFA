@@ -8,59 +8,48 @@ import { logStore } from "@/hooks";
 import { WEBSOCKET_URL } from "@/api";
 import { pinia } from "@/plugins";
 
+const MAX_RECONNECT_ATTEMPTS = 10;
+const TIME_BETWEEN_RECONNECT = 2000;
 /**
  * The hook with a client for connecting to the backend websocket server.
  */
 export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   const stompClient = ref<Client>();
-  const socket = ref<WebSocket>();
   const isConnected = ref(false);
   const channels = ref<StompChannel[]>([]);
+  const attempts = ref(0);
 
   /**
    * Returns the current stomp client, creating one if none exists.
    *
-   * @param reconnect - Whether to create a new connection regardless
-   * of websocket state.
    * @throws If unable to connect to the server.
    * @return The stomp client.
    */
-  function getStomp(reconnect = false): Client | undefined {
-    if (
-      socket.value === undefined ||
-      stompClient.value === undefined ||
-      reconnect
-    ) {
-      try {
-        socket.value = new SockJS(WEBSOCKET_URL());
-        socket.value.onclose = () => {
-          logStore.onDevInfo("Closing WebSocket.");
-          connectStomp().then();
-        };
-        stompClient.value = Stomp.over(socket.value, { debug: false });
-      } catch (e) {
-        if (!reconnect) {
-          throw e;
-        }
-      }
+  function getStomp(): Client {
+    if (!isConnected.value || stompClient.value === undefined) {
+      const sockJS = new SockJS(WEBSOCKET_URL());
+      sockJS.onclose = () => {
+        isConnected.value = false;
+        stompClient.value = undefined;
+        logStore.onDevError("Closing SockJS client.");
+      };
+      stompClient.value = Stomp.over(sockJS, { debug: false });
     }
 
-    return stompClient.value;
+    const client = stompClient.value;
+    if (client === undefined) {
+      throw Error("Stomp client is unavailable.");
+    }
+
+    return client;
   }
 
   /**
    * Setup up connection to back-end.
-   * @param isReconnect Whether this is a reconnection attempt.
    */
-  function connectStomp(isReconnect = false): Promise<void> {
+  function connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const stomp = getStomp(isReconnect);
-
-      if (!stomp) {
-        const error = "Stomp returned null value:" + stomp;
-        logStore.onDevError(error);
-        return reject(error);
-      }
+      const stomp = getStomp();
 
       if (stomp.connected) {
         isConnected.value = true;
@@ -70,18 +59,19 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
       stomp.connect(
         { host: WEBSOCKET_URL() },
         () => {
-          logStore.onDevInfo("Websocket connection successful.");
+          logStore.onDevDebug("Websocket connection successful.");
           isConnected.value = true;
-          if (isReconnect) {
-            subscribeToTopics()
-              .then(() => resolve())
-              .catch(reject);
-          }
           return resolve();
         },
         (error: CloseEvent | Frame) => {
-          logStore.onDevError("Stomp has lost connection to server." + error);
           isConnected.value = false;
+          if (attempts.value <= MAX_RECONNECT_ATTEMPTS) {
+            logStore.onDevDebug("Reconnecting to server...");
+            setTimeout(async () => await reconnect(), TIME_BETWEEN_RECONNECT);
+          }
+          attempts.value += 1;
+          logStore.onDevError("Stomp has lost connection to server." + error);
+          return reject();
         }
       );
     });
@@ -90,12 +80,15 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   /**
    * Subscribes user to current stored topics. Useful on case of reconnection.
    */
-  function subscribeToTopics(): Promise<void[]> {
-    const subscriptionPromises = channels.value.map((channel) =>
+  async function reconnect(): Promise<void> {
+    await connect();
+    const oldChannels = channels.value;
+    channels.value = [];
+    const subscriptionPromises = oldChannels.map((channel) =>
       subscribeTo(channel.topic, channel.handler)
     );
 
-    return Promise.all(subscriptionPromises);
+    await Promise.all(subscriptionPromises);
   }
 
   /**
@@ -107,13 +100,7 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     topic: string,
     handler: (message: Message) => void
   ): Promise<void> {
-    await connectStomp();
-
-    const stomp = getStomp();
-
-    if (!stomp) {
-      throw Error("Unable to get stomp client.");
-    }
+    await connect();
 
     if (topic.trim() === "") {
       throw Error("Expected destination to be non-empty.");
@@ -124,6 +111,7 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
       return;
     }
 
+    const stomp = getStomp();
     const subscription = stomp.subscribe(topic, handler);
     const channel: StompChannel = { subscription, topic, handler };
 
@@ -136,14 +124,10 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
    */
   async function unsubscribe(targets: StompChannel[]): Promise<void> {
     if (!isConnected.value) {
+      logStore.onDevDebug("Attempting to unsubscribe while disconnected.");
       return;
     }
-    const stomp = getStomp();
 
-    if (!stomp) {
-      logStore.onDevError("Stomp client is null on clearing subscriptions.");
-      return;
-    }
     const channelTopics = targets.map((c) => c.topic);
     const persistentSubscriptions: StompChannel[] = [];
     channels.value.forEach((c) => {
@@ -170,9 +154,10 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   return {
     isConnected,
     channels,
-    connectStomp,
+    connect,
     subscribeTo,
     unsubscribe,
+    reconnect,
   };
 });
 

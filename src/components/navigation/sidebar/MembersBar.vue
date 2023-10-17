@@ -5,7 +5,7 @@
     :icon="icon"
     :large="true"
     :tooltip="message"
-    @click="stompApiStore.connectStomp(true)"
+    @click="handleReconnect"
   />
   <list :items="options">
     <template v-for="item in options" :key="item.title">
@@ -42,8 +42,7 @@ const options = computed(() =>
     .filter((m) => m.email !== sessionStore.userEmail)
     .map((m) => {
       return {
-        title: "TITLE",
-        iconTitle: "ICON TITLE",
+        title: m.email,
         toolTip: m.email,
         color: "primary",
       };
@@ -59,4 +58,8 @@ const icon = computed<IconVariant>(() =>
 const message = computed(() =>
   connected.value ? "Connected" : "Disconnected"
 );
+
+function handleReconnect() {
+  stompApiStore.reconnect().then();
+}
 </script>

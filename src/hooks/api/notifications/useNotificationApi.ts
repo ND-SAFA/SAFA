@@ -238,7 +238,10 @@ export const useNotificationApi = defineStore(
         );
         return;
       }
-      await clearProjectSubscriptions();
+      if (stompApiStore.isConnected) {
+        await clearProjectSubscriptions();
+      }
+
       await stompApiStore.subscribeTo(
         fillEndpoint("projectTopic", { projectId }),
         handleEntityChangeMessage

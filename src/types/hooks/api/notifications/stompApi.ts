@@ -32,7 +32,7 @@ export interface StompApiHook {
    *
    * @param isReconnect - Whether this is a reconnect attempt.
    */
-  connectStomp(isReconnect?: boolean): Promise<void>;
+  connect(isReconnect?: boolean): Promise<void>;
 
   /**
    * Subscribes to a websocket destination and returns the subscription.
@@ -49,4 +49,9 @@ export interface StompApiHook {
    * Unsubscribes from channels.
    */
   unsubscribe(channels: StompChannel[]): Promise<void>;
+
+  /**
+   * Attempts to resubscribe to last stored topics.
+   */
+  reconnect(): Promise<void>;
 }

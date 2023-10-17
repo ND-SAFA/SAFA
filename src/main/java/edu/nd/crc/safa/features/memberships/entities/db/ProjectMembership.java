@@ -17,7 +17,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -30,8 +29,8 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Table(name = "user_project_membership")
-@Data
 @NoArgsConstructor
+@Data
 public class ProjectMembership implements Serializable, EntityMembership {
 
     @Id

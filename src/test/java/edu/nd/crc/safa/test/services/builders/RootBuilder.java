@@ -6,7 +6,7 @@ import java.util.function.Function;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.test.services.AuthorizationTestService;
 import edu.nd.crc.safa.test.services.CommonRequestService;
-import edu.nd.crc.safa.test.services.assertions.VerificationTestSerfice;
+import edu.nd.crc.safa.test.services.assertions.VerificationTestService;
 import edu.nd.crc.safa.test.services.notifications.NotificationTestService;
 
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class RootBuilder {
     private NotificationTestService notificationTestService;
     private DatabaseTestBuilder databaseTestBuilder;
     private AuthorizationTestService authorizationTestService;
-    private VerificationTestSerfice verificationTestService;
+    private VerificationTestService verificationTestService;
     private CommonRequestService commonRequestService;
     private ActionBuilder actionBuilder;
 
@@ -121,19 +121,19 @@ public class RootBuilder {
     /**
      * Creates new verification test service.
      */
-    public <T> AndBuilder<RootBuilder, T> verify(BiFunction<BuilderState, VerificationTestSerfice, T> consumer) {
-        VerificationTestSerfice verificationTestSerfice = this.getAssertionTestService();
-        T result = consumer.apply(this.state, verificationTestSerfice);
+    public <T> AndBuilder<RootBuilder, T> verify(BiFunction<BuilderState, VerificationTestService, T> consumer) {
+        VerificationTestService verificationTestService = this.getAssertionTestService();
+        T result = consumer.apply(this.state, verificationTestService);
         return new AndBuilder<>(this, result, this.state);
     }
 
-    public <T> AndBuilder<RootBuilder, T> verify(Function<VerificationTestSerfice, T> consumer) {
+    public <T> AndBuilder<RootBuilder, T> verify(Function<VerificationTestService, T> consumer) {
         return verify((s, v) -> consumer.apply(v));
     }
 
-    public VerificationTestSerfice getAssertionTestService() {
+    public VerificationTestService getAssertionTestService() {
         if (this.verificationTestService == null) {
-            this.verificationTestService = new VerificationTestSerfice(this.state);
+            this.verificationTestService = new VerificationTestService(this.state);
         }
         return this.verificationTestService;
     }

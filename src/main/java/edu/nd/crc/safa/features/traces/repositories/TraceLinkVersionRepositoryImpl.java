@@ -37,13 +37,13 @@ public class TraceLinkVersionRepositoryImpl
     extends GenericVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity> {
     @Setter(onMethod = @__({@Autowired, @Lazy}))
     private TraceLinkVersionRepository traceLinkVersionRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private TraceLinkRepository traceLinkRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private ArtifactRepository artifactRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private TraceMatrixService traceMatrixService;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private NotificationService notificationService;
 
     @Override

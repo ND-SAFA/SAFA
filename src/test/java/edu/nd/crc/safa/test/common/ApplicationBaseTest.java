@@ -20,7 +20,7 @@ import edu.nd.crc.safa.test.services.CreationTestService;
 import edu.nd.crc.safa.test.services.LayoutTestService;
 import edu.nd.crc.safa.test.services.MessageVerificationTestService;
 import edu.nd.crc.safa.test.services.RetrievalTestService;
-import edu.nd.crc.safa.test.services.assertions.VerificationTestSerfice;
+import edu.nd.crc.safa.test.services.assertions.VerificationTestService;
 import edu.nd.crc.safa.test.services.builders.BuilderState;
 import edu.nd.crc.safa.test.services.builders.DbEntityBuilder;
 import edu.nd.crc.safa.test.services.builders.JsonBuilder;
@@ -61,7 +61,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected String projectName = this.getClass().getSimpleName();
     protected CommitTestService commitService = new CommitTestService();
     protected CreationTestService creationService;
-    protected VerificationTestSerfice assertionService;
+    protected VerificationTestService assertionService;
     protected RetrievalTestService retrievalService;
     protected AuthorizationTestService authorizationService;
     protected MessageVerificationTestService changeMessageVerifies = new MessageVerificationTestService();
@@ -140,7 +140,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
             attributeSystemServiceProvider, artifactVersionRepositoryImpl);
         this.jsonBuilder = new JsonBuilder();
         this.creationService = new CreationTestService(this.getServiceProvider(), this.dbEntityBuilder);
-        this.assertionService = new VerificationTestSerfice(state);
+        this.assertionService = new VerificationTestService(state);
         this.retrievalService = new RetrievalTestService(getServiceProvider(), this.dbEntityBuilder);
         this.authorizationService = new AuthorizationTestService(this.getServiceProvider(), state);
         SafaRequest.setMockMvc(mockMvc);

@@ -17,10 +17,10 @@ import org.json.JSONObject;
 /**
  * Provides list of custom assertions.
  */
-public class VerificationTestSerfice {
+public class VerificationTestService {
     private final BuilderState state;
 
-    public VerificationTestSerfice(BuilderState builderState) {
+    public VerificationTestService(BuilderState builderState) {
         this.state = builderState;
     }
 
@@ -84,7 +84,7 @@ public class VerificationTestSerfice {
         }
     }
 
-    public <T> AndBuilder<VerificationTestSerfice, T> notifications(Function<NotificationAssertionService, T> consumer) {
+    public <T> AndBuilder<VerificationTestService, T> notifications(Function<NotificationAssertionService, T> consumer) {
         NotificationAssertionService notificationAssertionService = new NotificationAssertionService();
         T result = consumer.apply(notificationAssertionService);
         return new AndBuilder<>(this, result, this.state);

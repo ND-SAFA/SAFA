@@ -40,17 +40,17 @@ public class ArtifactVersionRepositoryImpl
     extends GenericVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity> {
     @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ArtifactVersionRepository artifactVersionRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private ArtifactRepository artifactRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private TypeService artifactTypeService;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private DocumentArtifactRepository documentArtifactRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private DocumentRepository documentRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private AttributeValueService attributeValueService;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private ArtifactTypeCountService typeCountService;
 
 

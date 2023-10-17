@@ -156,7 +156,6 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
    */
   function handleConnectionFailure() {
     if (attempts.value <= MAX_RECONNECT_ATTEMPTS) {
-      logStore.onDevDebug("Reconnecting to server promptly...");
       setTimeout(async () => {
         await reconnect();
       }, TIME_BETWEEN_RECONNECT);

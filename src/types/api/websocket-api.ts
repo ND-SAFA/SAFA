@@ -1,3 +1,23 @@
+import { Message, Subscription } from "webstomp-client";
+
+/**
+ * A channel for stomp messages.
+ */
+export interface StompChannel {
+  /**
+   * The subscription to the channel.
+   */
+  subscription: Subscription;
+  /**
+   * The topic of the channel.
+   */
+  topic: string;
+  /**
+   * A callback for handling messages to the channel.
+   */
+  handler: (message: Message) => void;
+}
+
 /**
  * Notifies client of a series of changes to the project.
  *
@@ -38,15 +58,29 @@ export type EntityType =
   | "SUBTREES"
   | "MODELS"
   | "ATTRIBUTES"
-  | "ATTRIBUTE_LAYOUTS";
+  | "ATTRIBUTE_LAYOUTS"
+  | "ACTIVE_MEMBERS";
 
 /**
  * Represents list of changed entities.
  */
 export interface ChangeSchema {
+  /**
+   * The entity being changed.
+   */
   entity: EntityType;
+  /**
+   * The action performed on the entity.
+   */
   action: ActionType;
+  /**
+   * The ids of the entities being changed.
+   */
   entityIds: string[];
+  /**
+   * The entities being changed themselves.
+   */
+  entities: object[];
 }
 
 /**

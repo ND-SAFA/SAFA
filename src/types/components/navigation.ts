@@ -36,6 +36,10 @@ export interface NavOption {
    * The navigation path corresponding to this option.
    */
   path: string | { path: string; query: URLQuery };
+  /**
+   * The tooltip to display on option when hovered.
+   */
+  tooltip?: string;
 }
 
 /**

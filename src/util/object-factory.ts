@@ -80,7 +80,6 @@ export function buildProject(project?: Partial<ProjectSchema>): ProjectSchema {
     artifactTypes: project?.artifactTypes || [],
     traceMatrices: project?.traceMatrices || [],
     documents: project?.documents || [],
-    warnings: project?.warnings || {},
     layout: project?.layout || {},
     subtrees: project?.subtrees || {},
     models: project?.models || [],

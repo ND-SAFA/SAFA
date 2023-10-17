@@ -1,145 +1,177 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import SockJS from "sockjs-client";
-import Stomp, { Client, Message, Subscription } from "webstomp-client";
-
-import { StompApiHook } from "@/types";
+import Stomp, { Client, Frame, Message } from "webstomp-client";
+import { StompApiHook, StompChannel } from "@/types";
+import { formatTopic } from "@/util";
 import { logStore } from "@/hooks";
-import {
-  MAX_RECONNECT_ATTEMPTS,
-  RECONNECT_WAIT_TIME,
-  WEBSOCKET_URL,
-} from "@/api";
+import { WEBSOCKET_URL } from "@/api";
 import { pinia } from "@/plugins";
+
+const TIME_BETWEEN_RECONNECT = 2 * 1000; // every 2 seconds
+const MAX_RECONNECT_ATTEMPTS = 20; // for a minute
 
 /**
  * The hook with a client for connecting to the backend websocket server.
  */
 export const useStompApi = defineStore("stompApi", (): StompApiHook => {
   const stompClient = ref<Client>();
-  const socket = ref<WebSocket>();
-  const reconnectInterval = ref<NodeJS.Timeout>();
-  const reconnectAttempts = ref(0);
+  const isConnected = ref(false);
+  const channels = ref<StompChannel[]>([]);
+  const attempts = ref(0);
 
   /**
    * Returns the current stomp client, creating one if none exists.
    *
-   * @param reconnect - Whether to create a new connection regardless
-   * of websocket state.
    * @throws If unable to connect to the server.
    * @return The stomp client.
    */
-  function getStomp(reconnect = false): Client | undefined {
-    if (
-      socket.value === undefined ||
-      stompClient.value === undefined ||
-      reconnect
-    ) {
-      try {
-        socket.value = new SockJS(WEBSOCKET_URL(), { DEBUG: false });
-        socket.value.onclose = () => {
-          logStore.onDevInfo("Closing WebSocket.");
-          connectStomp().then();
-        };
-        stompClient.value = Stomp.over(socket.value, { debug: false });
-      } catch (e) {
-        if (!reconnect) {
-          throw e;
-        }
-      }
+  function getStomp(): Client {
+    if (!isConnected.value || stompClient.value === undefined) {
+      logStore.onDevDebug("Creating new stomp client.");
+      const sockJS = new SockJS(WEBSOCKET_URL());
+      sockJS.onclose = () => {
+        isConnected.value = false;
+        stompClient.value = undefined;
+        logStore.onDevError("Closing SockJS client.");
+      };
+      stompClient.value = Stomp.over(sockJS, { debug: false });
     }
 
-    return stompClient.value;
+    const client = stompClient.value;
+    if (client === undefined) {
+      throw Error("Stomp client is unavailable.");
+    }
+
+    return client;
   }
 
-  function connectStomp(
-    maxReconnectAttempts: number = MAX_RECONNECT_ATTEMPTS,
-    reconnectWaitTime: number = RECONNECT_WAIT_TIME,
-    isReconnect = false
-  ): Promise<void> {
+  /**
+   * Setup up connection to back-end.
+   */
+  function connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const stomp = getStomp(isReconnect);
-
-      if (!stomp) return;
+      const stomp = getStomp();
 
       if (stomp.connected) {
-        logStore.onDevInfo("Client is connected to WebSocket.");
-        clearInterval(reconnectInterval.value);
+        isConnected.value = true;
         return resolve();
       }
-
-      if (reconnectAttempts.value > 0) {
-        logStore.onDevInfo(
-          `Websocket reconnect attempt:${reconnectAttempts.value}`
-        );
-      }
-
-      reconnectAttempts.value++;
 
       stomp.connect(
         { host: WEBSOCKET_URL() },
         () => {
-          logStore.onDevInfo(
-            "Websocket connection successful. " +
-              `Subscriptions: ${JSON.stringify(stomp.subscriptions)}`
-          );
-
-          clearInterval(reconnectInterval.value);
-
-          reconnectAttempts.value = 0;
-          resolve();
+          logStore.onDevDebug("Websocket connection successful.");
+          isConnected.value = true;
+          attempts.value = 0;
+          return resolve();
         },
-        () => {
-          logStore.onDevInfo("Re-connecting with WebSocket.");
-
-          clearInterval(reconnectInterval.value);
-
-          reconnectInterval.value = setInterval(function () {
-            if (reconnectAttempts.value < maxReconnectAttempts) {
-              connectStomp(maxReconnectAttempts, reconnectWaitTime, true)
-                .then(resolve)
-                .catch(reject);
-            } else {
-              clearInterval(reconnectInterval.value);
-
-              const error =
-                "Web Socket lost connection to server, please reload page.";
-              logStore.onDevError(error);
-              reject(error);
-            }
-          }, reconnectWaitTime);
+        (error: CloseEvent | Frame) => {
+          logStore.onDevError(
+            "Stomp has lost connection to server.\n" + JSON.stringify(error)
+          );
+          isConnected.value = false;
+          attempts.value += 1;
+          handleConnectionFailure();
+          return reject();
         }
       );
     });
   }
 
-  async function subscribeToStomp(
-    destination: string,
-    callback?: (message: Message) => void
-  ): Promise<Subscription | undefined> {
-    await connectStomp();
-
-    const stomp = getStomp();
-
-    if (!stomp) return;
-
-    return stomp.subscribe(destination, callback);
+  /**
+   * Subscribes user to current stored topics. Useful on case of reconnection.
+   */
+  async function reconnect(): Promise<void> {
+    await connect();
+    const oldChannels = channels.value;
+    channels.value = [];
+    const subscriptionPromises = oldChannels.map((channel) =>
+      subscribeTo(channel.topic, channel.handler)
+    );
+    await Promise.all(subscriptionPromises);
   }
 
-  function clearStompSubscriptions(): void {
+  /**
+   * Subscribes to topic.
+   * @param topic The topic to subscribe to.
+   * @param handler Handles messages to topic.
+   */
+  async function subscribeTo(
+    topic: string,
+    handler: (message: Message) => void
+  ): Promise<void> {
+    await connect();
+
+    if (topic.trim() === "") {
+      throw Error("Expected destination to be non-empty.");
+    }
+
+    if (isSubscribedToTopic(topic)) {
+      logStore.onDevDebug(formatTopic(topic) + " is already subscribed to.");
+      return;
+    }
+
     const stomp = getStomp();
+    const subscription = stomp.subscribe(topic, handler);
+    const channel: StompChannel = { subscription, topic, handler };
 
-    if (!stomp) return;
+    channels.value.push(channel);
+    logStore.onDevDebug("Subscribed to " + formatTopic(topic));
+  }
 
-    const subscriptionIds = Object.keys(stomp.subscriptions);
+  /**
+   * Unsubscribes user from all subscriptions.
+   */
+  async function unsubscribe(targets: StompChannel[]): Promise<void> {
+    if (!isConnected.value) {
+      logStore.onDevDebug("Attempting to unsubscribe while disconnected.");
+      return;
+    }
 
-    subscriptionIds.forEach((subId) => stomp.unsubscribe(subId));
+    const channelTopics = targets.map((c) => c.topic);
+    const persistentSubscriptions: StompChannel[] = [];
+    channels.value.forEach((c) => {
+      if (channelTopics.includes(c.topic)) {
+        c.subscription.unsubscribe();
+        logStore.onDevDebug("Unsubscribed from " + formatTopic(c.topic));
+      } else {
+        persistentSubscriptions.push(c);
+      }
+    });
+    channels.value = persistentSubscriptions;
+  }
+
+  /**
+   * Evaluates if topic is already subscribed to.
+   * @param topic The topic to check.
+   */
+  function isSubscribedToTopic(topic: string): boolean {
+    return channels.value
+      .map((c) => c.topic === topic)
+      .reduce((p, c) => p || c, false);
+  }
+
+  /**
+   * Attempts to perpetually reconnect user until the maximum
+   */
+  function handleConnectionFailure() {
+    if (attempts.value <= MAX_RECONNECT_ATTEMPTS) {
+      setTimeout(async () => {
+        await reconnect();
+      }, TIME_BETWEEN_RECONNECT);
+    } else {
+      logStore.onDevDebug("Maximum number of reconnections reached.");
+    }
   }
 
   return {
-    connectStomp,
-    subscribeToStomp,
-    clearStompSubscriptions,
+    isConnected,
+    channels,
+    connect,
+    subscribeTo,
+    unsubscribe,
+    reconnect,
   };
 });
 

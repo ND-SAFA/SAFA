@@ -59,11 +59,11 @@ public class TimFileParser implements IProjectDefinitionParser {
             String artifactType = artifact.getType();
 
             if (fileName == null || fileName.isBlank()) {
-                throw new SafaError("Missing filename for TIM artifact");
+                throw new SafaError("Artifact definition missing field 'fileName' in TIM.json");
             }
 
             if (artifactType == null || artifactType.isBlank()) {
-                throw new SafaError("Missing artifactType for TIM artifact");
+                throw new SafaError("Artifact definition missing field 'artifactType' in TIM.json");
             }
 
             // Step - Create artifact file parser

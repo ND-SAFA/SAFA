@@ -63,22 +63,26 @@ export const useLayout = defineStore("layout", {
     /**
      * Resets the graph layout.
      * @param type - The type of graph to set the layout for.
+     * @param animated - Whether to animate the layout, and keep the graph displayed.
      */
-    setGraphLayout(type?: "project" | "creator"): void {
+    setGraphLayout(type?: "project" | "creator", animated?: boolean): void {
       const cyPromise = cyStore.getCy(type);
       const generate =
-        type === "creator"
-          ? true
-          : this.mode === "tim" ||
-            Object.keys(this.artifactPositions).length === 0;
+        animated ||
+        type === "creator" ||
+        this.mode === "tim" ||
+        Object.keys(this.artifactPositions).length === 0;
 
       cyPromise.then((cy) => {
-        appStore.onLoadStart();
+        if (!animated) appStore.onLoadStart();
 
         if (generate) {
           cy.layout({
             name: "klay",
             klay: CYTO_CONFIG.KLAY_CONFIG,
+            animate: animated,
+            animationDuration: CYTO_CONFIG.ANIMATION_DURATION,
+            padding: CYTO_CONFIG.CENTER_GRAPH_PADDING,
           }).run();
         } else {
           cy.layout(this.layoutOptions).run();
@@ -86,6 +90,8 @@ export const useLayout = defineStore("layout", {
 
         this.styleGeneratedLinks();
         this.applyAutomove();
+
+        if (animated) return;
 
         // Wait for the graph to render.
         setTimeout(() => {

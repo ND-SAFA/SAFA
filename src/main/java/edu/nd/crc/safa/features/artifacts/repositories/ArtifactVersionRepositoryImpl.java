@@ -53,7 +53,6 @@ public class ArtifactVersionRepositoryImpl
     @Setter(onMethod = @__({@Autowired}))
     private ArtifactTypeCountService typeCountService;
 
-
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
         ArtifactVersion version = this.artifactVersionRepository.save(artifactVersion);

@@ -189,8 +189,8 @@ public class ProjectService {
     /**
      * Get all permissions granted to the user via their membership(s) within the given team.
      *
-     * @param project     The project the user is a part of. Note that the user can have permissions on a project even if
-     *                    they do not have a direct project membership, as they could be a member of a team or an
+     * @param project     The project the user is a part of. Note that the user can have permissions on a project even
+     *                    if they do not have a direct project membership, as they could be a member of a team or an
      *                    organization that grants them project permissions.
      * @param currentUser The user in question
      * @return A list of permissions the user has for the project

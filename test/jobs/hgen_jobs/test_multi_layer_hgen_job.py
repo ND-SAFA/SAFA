@@ -2,6 +2,8 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.status import Status
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -10,12 +12,14 @@ from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
+from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.paths.paths import TEST_HGEN_PATH
@@ -44,10 +48,10 @@ class TestMultiLayerHGenJob(BaseJobTest):
         Tests that job is completed succesfully.
         """
         args: HGenArgs = self.get_args()
-        source_arts = args.dataset_for_sources.artifact_df.filter_by_row(lambda row:
-                                                                         row[ArtifactKeys.LAYER_ID.value]
-                                                                         ==
-                                                                         args.source_layer_id)
+        source_arts = args.dataset.artifact_df.filter_by_row(lambda row:
+                                                             row[ArtifactKeys.LAYER_ID.value]
+                                                             ==
+                                                             args.source_layer_id)
         self.ranking_calls = 0
         expected_user_story_names, anthropic_responses = get_all_responses(target_type=args.target_type)
 
@@ -69,10 +73,10 @@ class TestMultiLayerHGenJob(BaseJobTest):
         open_ai_responses = HGenTestConstants.open_ai_responses * 3
         openai_ai_manager.set_responses(open_ai_responses)
         ranking_mock.side_effect = lambda _, __: self.fake_ranking_job_run([expected_user_story_names,
-                                                                                  expected_requirements_names,
-                                                                                  expected_design_doc_name],
-                                                                                 [source_arts.index, expected_user_story_names,
-                                                                                  expected_requirements_names])
+                                                                            expected_requirements_names,
+                                                                            expected_design_doc_name],
+                                                                           [source_arts.index, expected_user_story_names,
+                                                                            expected_requirements_names])
 
         self._test_run_success()
 
@@ -83,7 +87,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         source_types = [args.source_type, args.target_type, self.higher_levels[0]]
         for target, source in zip(target_types, source_types):
             FileUtil.delete_file_safely(GenerateInputsStep._get_inputs_save_path(target, source))
-        orig_dataset = args.dataset_creator_for_sources.create()
+        orig_dataset = args.dataset_creator.create()
         dataset: TraceDataset = job_result.body
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
         layers = [args.source_layer_id] + [args.target_type, self.higher_levels[0],
@@ -110,9 +114,13 @@ class TestMultiLayerHGenJob(BaseJobTest):
     @mock_anthropic
     def get_args(self, anthropic_ai_manager: TestAIManager):
         anthropic_ai_manager.mock_summarization()
+        project_summary_sections = {sec for sec in HierarchyGenerator.PROJECT_SUMMARY_SECTIONS}
+        project_summary_sections.update(set(DEFAULT_PROJECT_SUMMARY_SECTIONS))
         args = HGenArgs(source_layer_id="C++ Code",
                         target_type="Test User Story",
-                        dataset_creator_for_sources=PromptDatasetCreator(
+                        dataset_creator=PromptDatasetCreator(
+                            project_summary=Summary({title: EnumDict({"title": title, "chunks": ["summary of project"]})
+                                                     for title in project_summary_sections}),
                             trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))),
                         create_new_code_summaries=False)
         return args

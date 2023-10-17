@@ -4,7 +4,7 @@ import pandas as pd
 
 from tgen.common.util.json_util import JsonUtil
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class JsonEntityFormat(AbstractEntityFormat):

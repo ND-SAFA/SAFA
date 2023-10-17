@@ -1,5 +1,7 @@
-from typing import Type
+from copy import deepcopy
+from typing import Type, Dict
 
+from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE, PS_OVERVIEW_TITLE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -12,13 +14,18 @@ from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactConte
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.summarizer.summarizer_args import SummarizerArgs
 
 
 class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     """
     Responsible for generating higher-level artifacts from low-level artifacts
     """
+    HGEN_SECTION_TITLE = "Hgen"
+    PROJECT_SUMMARY_SECTIONS = [PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE, PS_OVERVIEW_TITLE, HGEN_SECTION_TITLE]
     steps = [InitializeDatasetStep,
              GenerateInputsStep,
              GenerateArtifactContentStep,
@@ -30,8 +37,25 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         Initializes the generator with necessary trainer information
         :param args: The arguments required for the hierarchy generation
         """
-        super().__init__(args, HierarchyGenerator.steps)
+        summarizer_args = SummarizerArgs(do_resummarize_project=False,
+                                              summarize_code_only=True,
+                                              do_resummarize_artifacts=False,
+                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
+                                         new_sections=self._get_new_project_summary_sections(args.target_type)
+                                         )
+        super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
+
+    def _get_new_project_summary_sections(self, target_type: str) -> Dict:
+        """
+        Gets the hgen section to create in the project summary
+        :param target_type: The target type to create
+        :return: Dictionary mapping section title to the prompt to create it
+        """
+        hgen_section_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_SUMMARY_QUESTIONNAIRE.value
+        hgen_section_questionnaire.format_value(target_type=target_type)
+        new_sections = {self.HGEN_SECTION_TITLE: hgen_section_questionnaire}
+        return new_sections
 
     def state_class(self) -> Type[HGenState]:
         """

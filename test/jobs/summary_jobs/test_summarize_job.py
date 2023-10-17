@@ -8,7 +8,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.summary_jobs.summarize_artifacts_job import SummarizeArtifactsJob
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MOCK_PS_RES_MAP, MockResponses, create

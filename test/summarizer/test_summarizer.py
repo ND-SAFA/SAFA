@@ -1,129 +1,142 @@
-import os
-
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE, TAB
-from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.prompts.prompt_args import PromptArgs
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
-from tgen.summarizer.summary_types import SummaryTypes
-from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.paths import TEST_DATA_DIR
-from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.mock_responses import MockResponses, TEST_PROJECT_SUMMARY
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.testprojects.safa_test_project import SafaTestProject
 
 
 class TestSummarizer(BaseTest):
-    CHUNKS = ["The cat in the hat sat", "on a log with a frog and a hog."]
-    CONTENT = " ".join(CHUNKS)
-    CODE_FILE_PATH = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
-    CODE_CONTENT = FileUtil.read_file(CODE_FILE_PATH)
-    MODEL_NAME = "gpt-3.5-turbo"
-    MAX_COMPLETION_TOKENS = 500
 
-    @mock_openai
-    def test_summarize(self, response_manager: TestAIManager):
-        """
-        Tests ability to summarize single artifacts.
-        - Verifies that code is chunked according to model token limit via data manager.
-        - Verifies that summarized chunks are re-summarized.
-        """
-        NL_SUMMARY = "NL_SUMMARY"
-        summarizer = self.get_summarizer()
-        response_manager.set_responses([ lambda prompt: self.get_response(prompt, SummaryTypes.NL_BASE, NL_SUMMARY)])
-        content_summary = summarizer.summarize_single(content="This is some text.")
-        self.assertEqual(content_summary, NL_SUMMARY)
+    N_ARTIFACTS = len(SafaTestProject.get_source_artifacts() + SafaTestProject.get_target_artifacts())
+    N_PROJECT_SECTIONS = len(MockResponses.project_summary_responses)
 
-    @mock_openai
-    def test_code_or_exceeds_limit_true(self, ai_manager: TestAIManager):
+    """
+    NO RE-SUMMARIZATIONS SO EVERYTHING IS SUMMARIZED AT MAX ONCE
+    """
+    @mock_anthropic
+    def test_with_no_resummarize_and_no_summaries(self, ai_manager: TestAIManager):
+        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args)
+        n_expected_summarizations = self.N_ARTIFACTS + self.N_PROJECT_SECTIONS
+        self._assert_summarization(summarizer, n_expected_summarizations, ai_manager)
+
+    @mock_anthropic
+    def test_with_no_resummarize_with_project_summary(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+
+        summarizer = self.get_summarizer(args, with_project_summary=True)
+        self._assert_summarization(summarizer, self.N_ARTIFACTS, ai_manager)
+
+    @mock_anthropic
+    def test_with_no_resummarize_with_artifact_summaries(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args, with_artifact_summaries=True)
+        self._assert_summarization(summarizer, self.N_PROJECT_SECTIONS, ai_manager)
+
+    @mock_anthropic
+    def test_with_no_resummarize_with_all_summarized(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+
+        summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
+        self._assert_summarization(summarizer, 0, ai_manager)
+
+
+    """
+    RE_SUMMARIZE ARTIFACTS SO ARTIFACTS ARE ALWAYS SUMMARIZED AT LEAST ONCE, PROJECT SUMMARIZED NO MORE THAN ONCE
+    """
+    @mock_anthropic
+    def test_with_resummarize_artifacts_and_no_summaries(self, ai_manager: TestAIManager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args)
+        n_expected_summarizations = 2*self.N_ARTIFACTS + self.N_PROJECT_SECTIONS
+        self._assert_summarization(summarizer, n_expected_summarizations, ai_manager)
+
+    @mock_anthropic
+    def test_with_resummarize_artifacts_with_project_summary(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+
+        summarizer = self.get_summarizer(args, with_project_summary=True)
+        self._assert_summarization(summarizer, 2*self.N_ARTIFACTS, ai_manager)
+
+    @mock_anthropic
+    def test_with_resummarize_artifacts_with_artifact_summaries(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args, with_artifact_summaries=True)
+        self._assert_summarization(summarizer, self.N_PROJECT_SECTIONS+self.N_ARTIFACTS, ai_manager)
+
+    @mock_anthropic
+    def test_with_resummarize_artifacts_with_all_summarized(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+
+        summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
+        self._assert_summarization(summarizer, self.N_ARTIFACTS, ai_manager)
+
+    """
+    RE_SUMMARIZE ARTIFACTS + PROJECT SO ARTIFACTS AND PROJECT ARE ALWAYS SUMMARIZED AT LEAST ONCE
+    """
+    @mock_anthropic
+    def test_with_resummarize_all_and_no_summaries(self, ai_manager: TestAIManager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses + MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args)
+        n_expected_summarizations = 2*self.N_ARTIFACTS + 2*self.N_PROJECT_SECTIONS
+        self._assert_summarization(summarizer, n_expected_summarizations, ai_manager)
+
+    @mock_anthropic
+    def test_with_resummarize_all_with_project_summary(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args, with_project_summary=True)
+        self._assert_summarization(summarizer, 2*self.N_ARTIFACTS + self.N_PROJECT_SECTIONS, ai_manager)
+
+    @mock_anthropic
+    def test_with_resummarize_all_with_artifact_summaries(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses + MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args, with_artifact_summaries=True)
+        self._assert_summarization(summarizer, 2*self.N_PROJECT_SECTIONS+self.N_ARTIFACTS, ai_manager)
+
+    @mock_anthropic
+    def test_with_resummarize_all_with_all_summarized(self, ai_manager):
+        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
+
+        ai_manager.set_responses(MockResponses.project_summary_responses)
+        summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
+        self._assert_summarization(summarizer, self.N_ARTIFACTS+self.N_PROJECT_SECTIONS, ai_manager)
+
+    def _assert_summarization(self, summarizer: Summarizer, expected_summarization_calls: int, ai_manager: TestAIManager):
         ai_manager.mock_summarization()
-        short_text = "This is a short text under the token limit"
-        summarizer = self.get_summarizer(summarize_code_only=True)
-        content_summary = summarizer.summarize_single(content=short_text)
-        self.assertEqual(content_summary, short_text)  # shouldn't have summarized
+        dataset = summarizer.summarize()
+        self.assertEqual(ai_manager.mock_calls, expected_summarization_calls)
+        self.assertFalse(DataFrameUtil.contains_empty_string(dataset.artifact_df[ArtifactKeys.SUMMARY]))
+        self.assertFalse(DataFrameUtil.contains_na(dataset.artifact_df[ArtifactKeys.SUMMARY]))
+        self.assertIsInstance(dataset.project_summary, Summary)
 
-    @mock_openai
-    def test_code_summarization(self, ai_manager: TestAIManager):
-        ai_manager.set_responses([ lambda prompt: self.get_response(prompt, SummaryTypes.CODE_BASE, CODE_SUMMARY)])
-        CODE_SUMMARY = "CODE_SUMMARY"
-        summarizer = self.get_summarizer()
-        content_summary = summarizer.summarize_single(self.CODE_CONTENT, filename="file.py")
-        self.assertEqual(content_summary, CODE_SUMMARY)
-
-    @mock_openai
-    def test_summarize_bulk(self, response_manager: TestAIManager):
-        """
-        Tests ability to summarize in bulk while still using chunkers.
-        - Verifies that content under limit is not summarized
-        - Verifies that content over limit is summarized
-        - Verifies that mix of content under and over limit work well together.
-        """
-        NL_SUMMARY = "NL_SUMMARY"
-        PL_SUMMARY = "PL_SUMMARY"
-
-        # data
-        nl_content = "Hello, this is a short text."
-        contents = [nl_content, self.CODE_CONTENT]
-        summarizer = self.get_summarizer(summarize_code_only=False)
-
-        response_manager.set_responses([lambda prompt: self.get_response(prompt, SummaryTypes.NL_BASE, NL_SUMMARY),
-                                        lambda prompt: self.get_response(prompt, SummaryTypes.CODE_BASE, PL_SUMMARY)])
-
-        summaries = summarizer.summarize_bulk(bodies=contents,
-                                              filenames=["natural language", "file.py"])
-        self.assertEqual(NL_SUMMARY, summaries[0])
-        self.assertEqual(PL_SUMMARY, summaries[1])
-
-    @mock_openai
-    def test_summarize_bulk_summarize_code_only(self, response_manager: TestAIManager):
-        """
-        Tests bulk summaries with code or exceeds limit only.
-        - Verifies that only content over limit is summarized.
-        """
-        summarizer = self.get_summarizer(
-            summarize_code_only=True)
-        TEXT_1 = self.CODE_CONTENT
-        TEXT_2 = "short text"
-        TEXTS = [TEXT_1, TEXT_2]
-        SUMMARY_1 = "SUMMARY_1"
-        response_manager.set_responses([
-            PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, SUMMARY_1)  # The re-summarization of the artifact.
-        ])
-        summaries = summarizer.summarize_bulk(bodies=TEXTS, filenames=["file.py", "unknown"])
-
-        self.assertEqual(summaries[0], SUMMARY_1)
-        self.assertEqual(summaries[1], TEXT_2)  # shouldn't have summarized
-
-    def get_summarizer(self, **kwargs):
-        internal_kwargs = {"summarize_code_only": False}
-        internal_kwargs.update(kwargs)
-        llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager, **internal_kwargs))
-        return summarizer
-
-    @staticmethod
-    def _remove_irrelevant_chars(orig_content):
-        orig_content = orig_content.replace(NEW_LINE, "")
-        orig_content = orig_content.replace(SPACE, "")
-        orig_content = orig_content.replace(TAB, "")
-        return orig_content
-
-    @staticmethod
-    def get_chunk_summary_prompts(prompt_args: PromptArgs, summarizer):
-        def build_prompt(chunk):
-            prompt_dict = summarizer.code_prompt_builder.build(prompt_args,
-                                                               artifact={ArtifactKeys.CONTENT: chunk})
-            return prompt_dict[PromptKeys.PROMPT]
-
-        prompts = [build_prompt(chunk) for chunk in TestSummarizer.CHUNKS]
-        return prompts
-
-    @staticmethod
-    def get_response(prompt: str, summary_type: SummaryTypes, expected_summary: str):
-        if summary_type.value[0].value not in prompt:
-            return "fail"
-        return PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, expected_summary)
+    def get_summarizer(self, summarizer_args: SummarizerArgs,
+                       with_artifact_summaries: bool = False, with_project_summary: bool = False) -> Summarizer:
+        creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(SafaTestProject.get_project_reader()))
+        dataset = creator.create()
+        if with_artifact_summaries:
+            dataset.artifact_df[ArtifactKeys.SUMMARY] = [f"summary of {c}" for c in dataset.artifact_df[ArtifactKeys.CONTENT]]
+        if with_project_summary:
+            dataset.project_summary = TEST_PROJECT_SUMMARY
+        summarizer_args.summarize_code_only = False
+        return Summarizer(summarizer_args, dataset)

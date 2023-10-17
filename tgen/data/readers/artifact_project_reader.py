@@ -8,7 +8,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 import pandas as pd
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):

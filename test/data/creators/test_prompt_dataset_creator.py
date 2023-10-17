@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.enum_util import EnumDict
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -18,9 +19,10 @@ from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPromp
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.question_prompt import QuestionPrompt
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
+from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_openai import mock_openai
@@ -124,7 +126,8 @@ class TestPromptDatasetCreator(BaseTest):
     @mock_anthropic
     def test_dataset_creator_with_no_code_summaries(self, anthropic_ai_manager: TestAIManager, project_summarizer_mock: MagicMock):
         # contains no summaries so all should be summarized
-        project_summary = "summary of project"
+        project_summary = Summary(overview=EnumDict({"chunks": ["summary of project"],
+                                                     "title": "overview"}))
         project_summarizer_mock.return_value = project_summary
         anthropic_ai_manager.mock_summarization()
 

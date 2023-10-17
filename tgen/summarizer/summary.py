@@ -1,4 +1,5 @@
 import re
+from copy import deepcopy
 from enum import Enum
 from typing import List, Dict, Union
 
@@ -36,10 +37,12 @@ class Summary(EnumDict):
         :param filepath: The path to save to
         :return: None
         """
-        assert filepath.endswith(FileUtil.JSON_EXT), "Must save as a json file"
         dirpath = FileUtil.get_directory_path(filepath)
         FileUtil.create_dir_safely(dirpath)
-        JsonUtil.save_to_json_file(self, filepath)
+        if filepath.endswith(FileUtil.JSON_EXT):
+            JsonUtil.save_to_json_file(self, filepath)
+        else:
+            FileUtil.write(self.to_string(), filepath)
 
     @staticmethod
     def load_from_file(filepath: str) -> "Summary":
@@ -48,12 +51,17 @@ class Summary(EnumDict):
         :param filepath: The path to save to
         :return: The loaded summary
         """
-        json_dict = JsonUtil.read_json_file(filepath)
-        summary_dict = {}
-        for key, val in json_dict.items():
-            JsonUtil.require_properties(val, required_properties=[e.value for e in SummarySectionKeys])
-            summary_dict[key] = SummarySection(**val)
-        return Summary(summary_dict)
+        if filepath.endswith(FileUtil.JSON_EXT):
+            json_dict = JsonUtil.read_json_file(filepath)
+            summary_dict = {}
+            for key, val in json_dict.items():
+                JsonUtil.require_properties(val, required_properties=[e.value for e in SummarySectionKeys])
+                summary_dict[key] = SummarySection(**val)
+            summary = Summary(summary_dict)
+        else:
+            summary_string = FileUtil.read_file(file_path=filepath, raise_exception=True)
+            summary = Summary.from_string(summary_string)
+        return summary
 
     @staticmethod
     def from_string(summary_string: str) -> "Summary":
@@ -64,26 +72,42 @@ class Summary(EnumDict):
         """
         summary = Summary()
         current_title = None
-        chunk = []
-        for line in summary_string.split(NEW_LINE):
+        sections = re.split(r'\n(#\s.*?)\n', NEW_LINE + summary_string)
+        sections.pop(0)
+        for i, line in enumerate(sections):
             line = line.strip()
-            match = re.match(r'^(#*) (.*)', line)
+            if not line:
+                continue
+            match = re.match(r'^(#) (.*)', line)
             if match:
-                if chunk and current_title:
-                    summary.add_chunk(current_title, NEW_LINE.join(chunk))
-                header_level = len(match.group(1))
-                if header_level == 1:
-                    current_title = match.group(2).strip()
-                    summary.add_section(current_title)
-                    chunk.clear()
-                else:
-                    chunk = [line]
-            elif line and current_title:
-                if chunk:
-                    chunk.append(line)
-                else:
-                    summary.add_chunk(current_title, line)
+                if len(match.groups()) > 1:
+                    current_title = match.group(2)
+            elif current_title:
+                summary.add_section(section_id=current_title, body=line)
         return summary
+
+    def re_order_sections(self, section_order: List[str] = None,
+                          raise_exception_on_not_found: bool = False,
+                          remove_unordered_sections: bool = False) -> None:
+        """
+        Re-orders the sections in the dictionary
+        :param section_order: The order that the sections should occur
+        :param raise_exception_on_not_found: If True, raises an exception if the section does not exist
+        :param remove_unordered_sections: If True, removes any sections that are not in the ordered list
+        :return: None
+        """
+        section_order = deepcopy(section_order)
+        section_order.reverse()
+        for section_id in section_order:
+            if section_id in self:
+                self.move_to_end(section_id, last=False)
+            else:
+                if raise_exception_on_not_found:
+                    raise KeyError(f"Header {section_id} is not in summary")
+        un_ordered_sections = set(self.keys()).difference(section_order)
+        if remove_unordered_sections:
+            for section_id in un_ordered_sections:
+                self.pop(section_id)
 
     def to_string(self, section_order: List[str] = None, raise_exception_on_not_found: bool = False) -> str:
         """
@@ -109,14 +133,17 @@ class Summary(EnumDict):
 
         return summary.strip().strip(NEW_LINE)
 
-    def add_section(self, section_id: str, section_title: str = None, chunks: List[str] = None) -> SummarySection:
+    def add_section(self, section_id: str, section_title: str = None, body: str = None, chunks: List[str] = None) -> SummarySection:
         """
         Adds a new section to the summary
         :param section_id: The section id
         :param section_title: The section title if different from id
+        :param body: The body of the section as a single string
         :param chunks: The chunks making up the body of the section
         :return: The newly created section
         """
+        if body:
+            chunks = Summary.extract_chunks_from_body(body)
         chunks = chunks if chunks else []
         section_title = section_title if section_title else section_id
         self[section_id] = SummarySection(title=section_title, chunks=chunks)
@@ -132,6 +159,30 @@ class Summary(EnumDict):
         if section_id not in self:
             self.add_section(section_id)
         self[section_id][SummarySectionKeys.CHUNKS].append(new_chunk)
+
+    @staticmethod
+    def extract_chunks_from_body(body: str) -> List[str]:
+        """
+        Breaks the section body into chunks
+        :param body: The section body
+        :return: A list of chunks making up the section body
+        """
+        chunks, chunk = [], []
+        for line in body.split(NEW_LINE):
+            line = line.strip()
+            if not line:
+                continue
+            if re.match(r'^(#*) (.*)', line):
+                if chunk:
+                    chunks.append(NEW_LINE.join(chunk))
+                chunk = [line]
+            elif chunk:
+                chunk.append(line)
+            else:
+                chunks.append(line)
+        if chunk:
+            chunks.append(NEW_LINE.join(chunk))
+        return chunks
 
     def __str__(self) -> str:
         """

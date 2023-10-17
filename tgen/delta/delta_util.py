@@ -26,7 +26,7 @@ def get_prediction_output(args: DeltaArgs, artifact_df: ArtifactDataFrame, state
     dataset = PromptDataset(artifact_df=artifact_df)
     dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
     prompt_builder = PromptBuilder(prompts=prompts)
-    prompt_builder.format_prompts_with_var(summary=state.project_summary, **kwargs)
+    prompt_builder.format_prompts_with_var(summary=state.project_summary.to_string(), **kwargs)
     trainer = LLMTrainer(LLMTrainerState(llm_manager=args.llm_manager,
                                          trainer_dataset_manager=dataset_manager,
                                          prompt_builder=prompt_builder,

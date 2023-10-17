@@ -5,7 +5,7 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
-class SummaryTypes(Enum):
+class ArtifactSummaryTypes(Enum):
     CODE_BASE = SupportedPrompts.CODE_SUMMARY
     NL_BASE = SupportedPrompts.NL_SUMMARY
 

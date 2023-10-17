@@ -1,24 +1,17 @@
 import os
 from dataclasses import dataclass, field
-
 from typing import List, Dict
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, \
     DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.state.pipeline.pipeline_args import PipelineArgs
-from tgen.summarizer.summary_types import SummaryTypes
+from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 
 
 @dataclass
-class SummarizerArgs(PipelineArgs):
-    """
-    Dataset creator used to make dataset containing original artifacts
-    """
-    dataset: PromptDataset = None
+class SummarizerArgs:
     """
     LLM manager used for the individual artifact summaries
     """
@@ -30,11 +23,7 @@ class SummarizerArgs(PipelineArgs):
     """
     The type of summary to use for the code artifacts
     """
-    code_summary_type: SummaryTypes = SummaryTypes.CODE_BASE
-    """
-    A manual project summary to use instead of creating one
-    """
-    project_summary: str = None
+    code_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.CODE_BASE
     """
     The titles of the sections that make up the project summary 
     """
@@ -46,15 +35,15 @@ class SummarizerArgs(PipelineArgs):
     """
     The list of the section titles in the order they should appear in the project summary
     """
-    section_order: List[str] = field(default_factory=lambda: DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER)
+    section_display_order: List[str] = field(default_factory=lambda: DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER)
     """
     If True, resummarizes the project with the new artifact summaries
     """
     do_resummarize_project: bool = True
     """
-    Whether to summarize the artifacts before creating the project summary.
+    Whether to summarize the artifacts after creating the project summary.
     """
-    summarize_artifacts: bool = True
+    do_resummarize_artifacts: bool = True
     """
     Path to save to
     """
@@ -76,4 +65,3 @@ class SummarizerArgs(PipelineArgs):
         if self.export_dir:
             if not self.export_dir.endswith(self.summary_dirname):
                 self.export_dir = os.path.join(self.export_dir, self.summary_dirname)
-        super().__post_init__()

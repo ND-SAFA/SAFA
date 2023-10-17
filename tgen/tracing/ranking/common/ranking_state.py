@@ -4,14 +4,13 @@ from typing import Dict, List, Optional
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.state.state import State
+from tgen.summarizer.summary import Summary
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 
 @dataclass
 class RankingState(State):
-    # Summarizing
-    project_summary: str = None
 
     artifact_map: Dict[str, str] = None
 

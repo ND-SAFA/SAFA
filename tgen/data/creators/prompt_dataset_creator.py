@@ -1,8 +1,9 @@
 import os
+from typing import Union
 
 from pydantic.class_validators import Optional
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME, PROJECT_SUMMARY_STATE_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -13,9 +14,10 @@ from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
+from tgen.summarizer.summary import Summary
 
 
 class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
@@ -25,8 +27,8 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
     """
 
     def __init__(self, project_reader: AbstractProjectReader = None, trace_dataset_creator: TraceDatasetCreator = None,
-                 data_export_path: str = None, project_file_id: str = None, summarizer: ArtifactsSummarizer = None,
-                 ensure_code_is_summarized: bool = True):
+                 data_export_path: str = None, project_file_id: str = None, project_summary: Union[Summary] = None,
+                 summarizer: ArtifactsSummarizer = None, ensure_code_is_summarized: bool = True):
         """
         Initializes creator with entities extracted from reader.
         :param data_export_path: The path to where data files will be saved if specified.May be to a directory or specific file
@@ -39,6 +41,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         self.project_file_id = project_file_id
         self.ensure_code_is_summarized = ensure_code_is_summarized
         self.summarizer = summarizer
+        self.project_summary = project_summary
         if self.summarizer is not None:
             self.set_summarizers(summarizer)
         self.data_export_path = data_export_path
@@ -52,7 +55,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         artifact_df = df if isinstance(df, ArtifactDataFrame) else None
         prompt_df = df if isinstance(df, PromptDataFrame) else None
         trace_dataset = self.trace_dataset_creator.create() if self.trace_dataset_creator else None
-        project_summary = self._read_project_summary()
+        project_summary = self.read_project_summary(self.get_project_path()) if not self.project_summary else self.project_summary
         dataset = PromptDataset(prompt_df=prompt_df, artifact_df=artifact_df, trace_dataset=trace_dataset,
                                 project_file_id=self.project_file_id, data_export_path=self.data_export_path,
                                 project_summary=project_summary)
@@ -66,23 +69,21 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         :param dataset: The original dataset (possible without summaries)
         :return: The summarized dataset
         """
-        if dataset.artifact_df is not None and not dataset.artifact_df.is_summarized(
-                dataset.artifact_df.get_code_layers()):
+        if dataset.artifact_df is not None and not dataset.artifact_df.is_summarized(code_only=True):
             export_path = dataset.data_export_path if dataset.data_export_path else self.get_project_path()
             export_path = FileUtil.get_directory_path(export_path)
             summarizer_args = SummarizerArgs(export_dir=export_path,
-                                             dataset=dataset,
-                                             project_summary=dataset.project_summary,
                                              summarize_code_only=True,
                                              do_resummarize_project=False,
-                                             summarize_artifacts=True)
+                                             do_resummarize_artifacts=True)
             summary_path = os.path.join(self.get_project_path(), summarizer_args.summary_dirname)
             if os.path.exists(summary_path):
                 self._use_existing_summaries(dataset, summary_path)
-                summarizer = ArtifactsSummarizer(summarizer_args)
+                summarizer = ArtifactsSummarizer(summarizer_args,
+                                                 project_summary=dataset.project_summary, )
                 dataset.artifact_df.summarize_content(summarizer)  # summarize any artifacts that were not in existing summaries
             else:
-                summarizer = Summarizer(summarizer_args)
+                summarizer = Summarizer(summarizer_args, dataset=dataset)
                 dataset = summarizer.summarize()
         return dataset
 
@@ -97,19 +98,20 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         artifact_df = artifact_df.filter_by_index(dataset.artifact_df.index)
         dataset.artifact_df.update_values(ArtifactKeys.SUMMARY, artifact_df.index, artifact_df[ArtifactKeys.SUMMARY])
         if not dataset.project_summary:
-            dataset.project_summary = self._read_project_summary(summary_path)
+            dataset.project_summary = self.read_project_summary(summary_path)
 
-    def _read_project_summary(self, project_path: str = None) -> Optional[str]:
+    @staticmethod
+    def read_project_summary(project_path: str) -> Optional[Summary]:
         """
         Reads the project summary if it exists
         :return: The project summary
         """
-        project_path = self.get_project_path() if not project_path else project_path
-        project_summary_path = os.path.join(FileUtil.get_directory_path(project_path), PROJECT_SUMMARY_FILENAME)
-        if not os.path.exists(project_summary_path):
-            return None
-        project_summary = FileUtil.read_file(project_summary_path, raise_exception=False)
-        return project_summary
+        project_dir = FileUtil.get_directory_path(project_path)
+        for filename in [PROJECT_SUMMARY_STATE_FILENAME, PROJECT_SUMMARY_FILENAME]:
+            project_summary_path = os.path.join(project_dir, filename)
+            if os.path.exists(project_summary_path):
+                return Summary.load_from_file(project_summary_path)
+        return None
 
     def get_project_path(self) -> str:
         """

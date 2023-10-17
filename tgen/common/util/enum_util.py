@@ -1,5 +1,6 @@
+from collections import OrderedDict
 from enum import Enum
-from typing import Any, Callable, Dict, OrderedDict, Type, Union
+from typing import Any, Callable, Dict, Type, Union
 
 from tgen.common.constants.deliminator_constants import UNDERSCORE
 

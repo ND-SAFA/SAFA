@@ -89,5 +89,5 @@ class TestPipeline(BaseTest):
         self.menu_options_printed = False
 
     def get_pipeline(self):
-        args = HGenArgs(source_layer_id="source", target_type="target", dataset_for_sources=TraceDatasetCreator(TEST_HGEN_PATH))
+        args = HGenArgs(source_layer_id="source", target_type="target", dataset=TraceDatasetCreator(TEST_HGEN_PATH))
         return HierarchyGenerator(args)

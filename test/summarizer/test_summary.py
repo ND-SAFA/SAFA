@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.summarizer.summary import Summary, SummarySection
@@ -48,9 +49,12 @@ class TestSummary(BaseTest):
         summary = Summary.load_from_file(filepath)
         self.assertEqual(self.SUMMARY, summary)
 
-        try:
-            self.SUMMARY.save(TEST_OUTPUT_DIR)
-            self.fail("should throw exception if not json file")
-        except AssertionError:
-            pass
+    def test_reorder(self):
+        summary = deepcopy(self.SUMMARY)
+        section_order = ["Data Flow", "Features", "Overview"]
+        summary.re_order_sections(section_order)
+        for i, key in enumerate(summary.keys()):
+            if i < len(section_order):
+                self.assertEqual(key, section_order[i])
+
 

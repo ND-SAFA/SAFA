@@ -6,6 +6,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
@@ -103,18 +104,19 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         return results
 
     @staticmethod
-    def _get_parent_artifact_content(child_id: str, original_dataset: TraceDataset) -> str:
+    def _get_parent_artifact_content(child_id: str, original_dataset: PromptDataset) -> str:
         """
         Gets the parent artifact content to include in the prompt as context
         :param child_id: The id of the child
         :param original_dataset: The original dataset with parent artifacts
         :return: The content to include in the prompt
         """
-        links = original_dataset.trace_df.filter_by_row(lambda row: row[TraceKeys.SOURCE.value] == child_id
-                                                                    and row[TraceKeys.LABEL.value] == 1)
-        parents = [original_dataset.artifact_df.get_artifact(link[TraceKeys.TARGET])[ArtifactKeys.CONTENT]
-                   for i, link in links.itertuples()]
-        content = NEW_LINE.join(parents)
-        if content:
-            return f"{PromptUtil.as_markdown_header(IndividualDiffSummaryStep.CONTEXT_TITLE)}{NEW_LINE}{content}"
+        if original_dataset.trace_dataset:
+            links = original_dataset.trace_df.filter_by_row(lambda row: row[TraceKeys.SOURCE.value] == child_id
+                                                                        and row[TraceKeys.LABEL.value] == 1)
+            parents = [original_dataset.artifact_df.get_artifact(link[TraceKeys.TARGET])[ArtifactKeys.CONTENT]
+                       for i, link in links.itertuples()]
+            content = NEW_LINE.join(parents)
+            if content:
+                return f"{PromptUtil.as_markdown_header(IndividualDiffSummaryStep.CONTEXT_TITLE)}{NEW_LINE}{content}"
         return EMPTY_STRING

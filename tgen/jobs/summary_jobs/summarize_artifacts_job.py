@@ -1,6 +1,6 @@
 import os
 from copy import deepcopy
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import pandas as pd
 
@@ -14,8 +14,10 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.base_summarizer_job import BaseSummarizerJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer import Summarizer
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
+from tgen.summarizer.summary import Summary
 
 
 class SummarizeArtifactsJob(BaseSummarizerJob):
@@ -24,7 +26,7 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
     """
 
     def __init__(self, artifacts: List[Dict] = None, artifact_reader: ArtifactProjectReader = None,
-                 project_summary: str = None, export_dir: str = None, do_resummarize_project: bool = True,
+                 project_summary: Union[str, Summary] = None, export_dir: str = None, do_resummarize_project: bool = True,
                  is_subset: bool = False, job_args: JobArgs = None, trace_file_path: str = None, **kwargs):
         """
         Summarizes a given dataset using the given summarizer
@@ -38,7 +40,6 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         self.do_resummarize_project = do_resummarize_project
         self.is_subset = is_subset
         self.trace_df = None if trace_file_path is None else TraceDataFrame(pd.read_csv(trace_file_path))
-        project_summary = FileUtil.get_str_or_read(project_summary)
         super().__init__(artifacts=artifacts, artifact_reader=artifact_reader,
                          project_summary=project_summary, export_dir=export_dir, job_args=job_args,
                          do_resummarize_project=do_resummarize_project,
@@ -49,25 +50,26 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         Performs the summarization of all artifacts and returns the summaries as the new artifact content
         :return: The job result containing all artifacts mapped to their summarized content
         """
-        args = self.create_summarizer_args()
+        dataset = self.create_dataset()
         use_traces_to_summarize = self.trace_df is not None
-        orig_artifact_df = args.dataset.artifact_df
+        orig_artifact_df = dataset.artifact_df
         if use_traces_to_summarize:
-            args.dataset = PromptDataset(artifact_df=self._get_artifacts_to_summarize(orig_artifact_df, self.trace_df))
+            dataset = PromptDataset(artifact_df=self._get_artifacts_to_summarize(orig_artifact_df, self.trace_df))
 
         if self.is_subset and not self.project_summary:
             summary = None
-            args.dataset.artifact_df.summarize_content(Summarizer.create_summarizer(args))
+            dataset.artifact_df.summarize_content(ArtifactsSummarizer(self.args, project_summary=dataset.project_summary))
         else:
-            args.dataset = Summarizer(args).summarize()
-            summary = args.dataset.project_summary if self.do_resummarize_project else None
+            self.args.do_resummarize_artifacts = True
+            dataset = Summarizer(self.args, dataset=dataset).summarize()
+            summary = dataset.project_summary.to_string() if self.do_resummarize_project else None
 
         if use_traces_to_summarize:
-            args.dataset.artifact_df = self._convert_artifact_content_back(args.dataset.artifact_df, orig_artifact_df)
-            artifact_export_path = os.path.join(args.export_dir, ARTIFACT_FILE_NAME)
-            args.dataset.artifact_df.to_csv(artifact_export_path)
+            dataset.artifact_df = self._convert_artifact_content_back(dataset.artifact_df, orig_artifact_df)
+            artifact_export_path = os.path.join(self.args.export_dir, ARTIFACT_FILE_NAME)
+            dataset.artifact_df.to_csv(artifact_export_path)
 
-        artifacts = args.dataset.artifact_df.to_artifacts()
+        artifacts = dataset.artifact_df.to_artifacts()
         return SummaryResponse(summary=summary, artifacts=artifacts)
 
     @staticmethod

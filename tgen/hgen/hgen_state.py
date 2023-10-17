@@ -5,6 +5,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.state.state import State
+from tgen.summarizer.summary import Summary
 
 
 @dataclass
@@ -27,7 +28,6 @@ class HGenState(State):
     """
     generation_predictions: Dict[str, List[str]] = None  # dictionary mapping generated content to a list of related source ids
     n_generations: int = 0  # number of runs of artifact generation
-    project_summary: str = None  # The summary of all the source artifacts.
 
     """
     Optional Step - Refine content on rerun of hgen

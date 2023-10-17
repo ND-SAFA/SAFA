@@ -1,4 +1,3 @@
-// eslint-disable max-lines
 import { defineStore } from "pinia";
 
 import {
@@ -216,12 +215,9 @@ export const useDocuments = defineStore("documents", {
      * @param document - The document to add.
      */
     async addDocument(document: DocumentSchema): Promise<void> {
-      this.allDocuments = [
-        ...removeMatches(this.allDocuments, "documentId", [
-          document.documentId,
-        ]),
-        document,
-      ];
+      this.allDocuments = removeMatches(this.allDocuments, "documentId", [
+        document.documentId,
+      ]).concat(document);
 
       await this.switchDocuments(document);
     },
@@ -257,9 +253,9 @@ export const useDocuments = defineStore("documents", {
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: types.join(", "),
-        artifactIds: types
-          .map((type) => artifactsByType[type].map(({ id }) => id))
-          .reduce((acc, cur) => [...acc, ...cur], []),
+        artifactIds: types.flatMap((type) =>
+          artifactsByType[type].map(({ id }) => id)
+        ),
       });
 
       await this.addDocument(document);
@@ -270,12 +266,9 @@ export const useDocuments = defineStore("documents", {
      * @param newIds - The new artifacts to add.
      */
     addDocumentArtifacts(newIds: string[]): void {
-      this.currentDocument.artifactIds = [
-        ...this.currentDocument.artifactIds.filter(
-          (id) => !newIds.includes(id)
-        ),
-        ...newIds,
-      ];
+      this.currentDocument.artifactIds = Array.from(
+        new Set([...this.currentDocument.artifactIds, ...newIds])
+      );
     },
     /**
      * Removes an existing document.

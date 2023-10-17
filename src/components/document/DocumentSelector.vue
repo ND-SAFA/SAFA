@@ -1,18 +1,15 @@
 <template>
   <q-select
     v-model="document"
-    dense
-    outlined
-    dark
-    :options-dark="darkMode"
+    standout
+    bg-color="transparent"
+    class="nav-breadcrumb"
     options-selected-class="primary"
     :options="options"
     :disable="disabled"
     label="View"
-    class="nav-input nav-document"
     option-label="name"
     option-value="name"
-    color="accent"
     data-cy="button-document-select-open"
   >
     <template v-if="canSave()" #append>
@@ -89,11 +86,8 @@ import {
   documentSaveStore,
   documentStore,
   permissionStore,
-  useTheme,
 } from "@/hooks";
 import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
-
-const { darkMode } = useTheme();
 
 const options = computed(() => documentStore.projectDocuments);
 

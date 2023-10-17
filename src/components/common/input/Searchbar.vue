@@ -9,11 +9,9 @@
     class="full-width"
     @keydown="handleKeydown"
   >
-    <template #prepend>
-      <icon variant="search" />
-    </template>
     <template #append>
       <slot name="append" :search="model as string" />
+      <icon variant="search" />
     </template>
   </q-input>
 </template>

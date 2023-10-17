@@ -40,6 +40,12 @@ export const useSession = defineStore("session", {
     userEmail(): string {
       return this.user.email || "";
     },
+    userId(): string {
+      return this.user.userId || "";
+    },
+    authToken(): string {
+      return this.session.token;
+    },
   },
   actions: {
     /**

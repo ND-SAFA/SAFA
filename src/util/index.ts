@@ -15,5 +15,5 @@ export * from "./table-headers";
 export * from "./commit-builder";
 export * from "./permissions";
 export * from "./external-links";
-
+export * from "./notification-helper";
 export * from "./enabled-features";

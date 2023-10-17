@@ -70,6 +70,26 @@ $color-node-gradient5: var(--q-nodeGradient5);
   background-color: $color-unchanged !important;
 }
 
+.bg-nodeGradient1 {
+  background-color: $color-node-gradient1 !important;
+}
+
+.bg-nodeGradient2 {
+  background-color: $color-node-gradient2 !important;
+}
+
+.bg-nodeGradient3 {
+  background-color: $color-node-gradient3 !important;
+}
+
+.bg-nodeGradient4 {
+  background-color: $color-node-gradient4 !important;
+}
+
+.bg-nodeGradient5 {
+  background-color: $color-node-gradient5 !important;
+}
+
 // Border Palette Tags
 
 .bd-primary {

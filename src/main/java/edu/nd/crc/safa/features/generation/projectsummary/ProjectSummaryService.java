@@ -118,9 +118,6 @@ public class ProjectSummaryService {
     }
 
     private void saveProjectSummary(Project project, String projectSummary, JobLogger logger) {
-        if (project.getDescription().isEmpty()) {
-            project.setDescription(projectSummary);
-        }
         project.setSpecification(projectSummary);
         this.projectRepository.save(project);
         logger.log("Project summary (%s) was saved.", projectSummary.length());

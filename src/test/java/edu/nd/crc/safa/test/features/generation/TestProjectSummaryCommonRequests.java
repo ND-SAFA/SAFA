@@ -22,10 +22,8 @@ class TestProjectSummaryCommonRequests extends GenerationalTest {
 
         refreshProject();
 
-        String projectSummary = getProject().getDescription();
         String specification = getProject().getSpecification();
 
-        assertEquals(getProjectSummary(), projectSummary);
         assertEquals(getProjectSummary(), specification);
         GenTestService.verifyJobAssociatedWithProject(this, job);
     }
@@ -45,7 +43,6 @@ class TestProjectSummaryCommonRequests extends GenerationalTest {
 
         refreshProject();
 
-        assertEquals(getProjectSummary(), getProject().getDescription());
         assertEquals(newSummary, getProject().getSpecification());
     }
 

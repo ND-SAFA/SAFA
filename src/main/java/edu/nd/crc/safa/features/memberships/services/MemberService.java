@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class MemberService implements IAppEntityService<MembershipAppEntity> {
-
+    private TeamMembershipService teamMembershipService;
     private UserProjectMembershipRepository userProjectMembershipRepository;
 
     /**
@@ -43,18 +43,20 @@ public class MemberService implements IAppEntityService<MembershipAppEntity> {
     }
 
     @Override
-    public List<MembershipAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
+    public List<MembershipAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser requester) {
         Project project = projectVersion.getProject();
-
-        return this.userProjectMembershipRepository.findByProject(project)
+        List<MembershipAppEntity> projectMembers = teamMembershipService.getProjectMemberships(project);
+        List<MembershipAppEntity> invitedMembers = this.userProjectMembershipRepository.findByProject(project)
             .stream()
             .map(MembershipAppEntity::new)
             .collect(Collectors.toList());
+        projectMembers.addAll(invitedMembers);
+        return projectMembers;
     }
 
     @Override
     public List<MembershipAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
-                                                            List<UUID> appEntityIds) {
+                                                         List<UUID> appEntityIds) {
         return this.userProjectMembershipRepository
             .findByProjectAndMembershipIdIn(projectVersion.getProject(), appEntityIds)
             .stream()

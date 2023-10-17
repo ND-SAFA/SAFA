@@ -94,7 +94,7 @@ class ProjectSummarizer(BaseObject):
         section_prompt.set_instructions(PS_QUESTIONS_HEADER)
         return prompt_builder
 
-    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, multi_line_items: bool = True) -> Tuple[str, str]:
+    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, multi_line_items: bool = False) -> Tuple[str, str]:
         """
         Has the LLM generate the section corresponding using the prompt builder
         :param prompt_builder: Contains prompts necessary for generating section
@@ -115,7 +115,7 @@ class ProjectSummarizer(BaseObject):
         task_title = parsed_responses[CUSTOM_TITLE_TAG][0] if parsed_responses.get(CUSTOM_TITLE_TAG) else None
         deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"
         task_body = body_res[0] if len(body_res) == 1 else deliminator.join(body_res)
-        return task_body, task_title
+        return deliminator + task_body, task_title
 
     def get_generation_iterator(self) -> Generator:
         """
@@ -154,6 +154,8 @@ class ProjectSummarizer(BaseObject):
         Gets the path to save the summary at
         :return: The save path
         """
+        if not self.export_dir:
+            return EMPTY_STRING
         return os.path.join(self.export_dir, PROJECT_SUMMARY_STATE_FILENAME)
 
     @staticmethod

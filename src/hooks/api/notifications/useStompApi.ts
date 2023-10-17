@@ -8,8 +8,8 @@ import { logStore } from "@/hooks";
 import { WEBSOCKET_URL } from "@/api";
 import { pinia } from "@/plugins";
 
-const MAX_RECONNECT_ATTEMPTS = 10;
-const TIME_BETWEEN_RECONNECT = 2000;
+const TIME_BETWEEN_RECONNECT = 2 * 1000; // every 2 seconds
+const MAX_RECONNECT_ATTEMPTS = 20; // for a minute
 /**
  * The hook with a client for connecting to the backend websocket server.
  */
@@ -27,6 +27,7 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
    */
   function getStomp(): Client {
     if (!isConnected.value || stompClient.value === undefined) {
+      logStore.onDevDebug("Creating new stomp client.");
       const sockJS = new SockJS(WEBSOCKET_URL());
       sockJS.onclose = () => {
         isConnected.value = false;
@@ -61,16 +62,16 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
         () => {
           logStore.onDevDebug("Websocket connection successful.");
           isConnected.value = true;
+          attempts.value = 0;
           return resolve();
         },
         (error: CloseEvent | Frame) => {
+          logStore.onDevError(
+            "Stomp has lost connection to server.\n" + JSON.stringify(error)
+          );
           isConnected.value = false;
-          if (attempts.value <= MAX_RECONNECT_ATTEMPTS) {
-            logStore.onDevDebug("Reconnecting to server...");
-            setTimeout(async () => await reconnect(), TIME_BETWEEN_RECONNECT);
-          }
           attempts.value += 1;
-          logStore.onDevError("Stomp has lost connection to server." + error);
+          handleConnectionFailure();
           return reject();
         }
       );
@@ -87,7 +88,6 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     const subscriptionPromises = oldChannels.map((channel) =>
       subscribeTo(channel.topic, channel.handler)
     );
-
     await Promise.all(subscriptionPromises);
   }
 
@@ -149,6 +149,20 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     return channels.value
       .map((c) => c.topic === topic)
       .reduce((p, c) => p || c, false);
+  }
+
+  /**
+   * Attempts to perpetually reconnect user until the maximum
+   */
+  function handleConnectionFailure() {
+    if (attempts.value <= MAX_RECONNECT_ATTEMPTS) {
+      logStore.onDevDebug("Reconnecting to server promptly...");
+      setTimeout(async () => {
+        await reconnect();
+      }, TIME_BETWEEN_RECONNECT);
+    } else {
+      logStore.onDevDebug("Maximum number of reconnections reached.");
+    }
   }
 
   return {

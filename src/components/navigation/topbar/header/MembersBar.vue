@@ -6,17 +6,17 @@
       color="negative"
       icon="disconnected"
       tooltip="Disconnected. Click to reconnect."
-      @click="stompApiStore.connectStomp(true)"
+      @click="stompApiStore.reconnect"
     />
     <div>
       <q-avatar
         v-for="member of otherMembers"
         :key="member.tooltip"
+        :color="member.color"
         size="32px"
         style="margin-right: -6px"
-        :color="member.color"
       >
-        <typography variant="subtitle" :value="member.firstLetter" />
+        <typography :value="member.firstLetter" variant="subtitle" />
         <q-tooltip self="center middle">
           {{ member.tooltip }}
         </q-tooltip>

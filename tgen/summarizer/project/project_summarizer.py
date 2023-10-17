@@ -3,12 +3,13 @@ from collections.abc import Generator
 from copy import deepcopy
 from typing import Tuple, List
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.project_summary_constants import PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME, PROJECT_SUMMARY_STATE_FILENAME
+from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.common.constants.project_summary_constants import PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -53,12 +54,16 @@ class ProjectSummarizer(BaseObject):
         """
         logger.log_title("Creating project specification.")
         self.artifact_df.summarize_content(ArtifactsSummarizer(self.args, project_summary=self.project_summary))
+        if not self.project_summary and os.path.exists(self.get_save_path()):
+            logger.info(f"Loading previous project summary from {self.get_save_path()}")
+            self.project_summary = Summary.load_from_file(self.get_save_path())
 
         for section_id, section_prompt in self.get_generation_iterator():
             logger.log_step(f"Creating section: `{section_id}`")
             prompt_builder = self._create_prompt_builder(section_id, section_prompt)
             task_tag = section_prompt.get_response_tags_for_question(-1)
-            section_body, section_title = self._generate_section(prompt_builder, task_tag)
+            section_body, section_title = self._generate_section(prompt_builder, task_tag,
+                                                                 multi_line_items=section_id in MULTI_LINE_ITEMS)
             if not section_title:
                 section_title = section_id
 
@@ -89,11 +94,12 @@ class ProjectSummarizer(BaseObject):
         section_prompt.set_instructions(PS_QUESTIONS_HEADER)
         return prompt_builder
 
-    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str) -> Tuple[str, str]:
+    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, multi_line_items: bool = True) -> Tuple[str, str]:
         """
         Has the LLM generate the section corresponding using the prompt builder
         :param prompt_builder: Contains prompts necessary for generating section
         :param task_tag: The tag used to retrieve the generations from the parsed response
+        :param multi_line_items: If True, expects each item in the body to span multiple lines
         :return: The section body and section title (if one was generated)
         """
         self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
@@ -105,8 +111,10 @@ class ProjectSummarizer(BaseObject):
         predictions = trainer.perform_prediction().predictions[0]
         parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
         body_res = parsed_responses[task_tag]
+        body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(body_res) > 1) for r in body_res]
         task_title = parsed_responses[CUSTOM_TITLE_TAG][0] if parsed_responses.get(CUSTOM_TITLE_TAG) else None
-        task_body = body_res[0] if len(body_res) == 1 else NEW_LINE.join(body_res)
+        deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"
+        task_body = body_res[0] if len(body_res) == 1 else deliminator.join(body_res)
         return task_body, task_title
 
     def get_generation_iterator(self) -> Generator:
@@ -146,7 +154,7 @@ class ProjectSummarizer(BaseObject):
         Gets the path to save the summary at
         :return: The save path
         """
-        return os.path.join(self.export_dir, PROJECT_SUMMARY_FILENAME)
+        return os.path.join(self.export_dir, PROJECT_SUMMARY_STATE_FILENAME)
 
     @staticmethod
     def _get_section_display_order(section_order: List[str], all_project_sections: List[str]) -> List[str]:
@@ -171,4 +179,3 @@ class ProjectSummarizer(BaseObject):
         current_sections = set(args.project_summary_sections)
         sections_to_add = set(args.new_sections.keys()).difference(current_sections)
         return args.project_summary_sections + list(sections_to_add)
-

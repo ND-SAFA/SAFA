@@ -1,11 +1,11 @@
 import os
 from collections.abc import Generator
 from copy import deepcopy
-from typing import Tuple, List
+from typing import List, Tuple
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME, PROJECT_SUMMARY_STATE_FILENAME
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
-from tgen.common.constants.project_summary_constants import PS_QUESTIONS_HEADER, CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_STATE_FILENAME
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
@@ -110,7 +110,16 @@ class ProjectSummarizer(BaseObject):
                                              prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
         predictions = trainer.perform_prediction().predictions[0]
         parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
+        children_tags = []
+        if isinstance(task_tag, list):
+            task_tag, children_tags = task_tag[0], task_tag[1:]
         body_res = parsed_responses[task_tag]
+        if children_tags:
+            combined_body_res = []
+            for r in body_res:
+                parts = [r[child] for child in children_tags]
+                combined_body_res.append(NEW_LINE.join(parts))
+            body_res = combined_body_res
         body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(body_res) > 1) for r in body_res]
         task_title = parsed_responses[CUSTOM_TITLE_TAG][0] if parsed_responses.get(CUSTOM_TITLE_TAG) else None
         deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"

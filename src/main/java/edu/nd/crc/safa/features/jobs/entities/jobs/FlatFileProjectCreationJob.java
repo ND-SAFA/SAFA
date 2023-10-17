@@ -118,7 +118,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
         List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(), ProjectEntity.ARTIFACTS);
         projectCommitDefinition.getErrors().addAll(artifactErrors);
-        logger.log("%d errors found.", projectCommitDefinition.getErrors().size());
+        logger.log("%d artifact errors found.", artifactCreationResponse.getErrors().size());
+        printErrors(artifactCreationResponse.getErrors(), logger);
     }
 
     public void parsingTraceFiles(JobLogger logger) throws SafaError {
@@ -132,7 +133,12 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
         List<CommitError> traceErrors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
         projectCommitDefinition.getErrors().addAll(traceErrors);
-        logger.log("%d errors found.", projectCommitDefinition.getErrors().size());
+        logger.log("%d trace errors found.", traceCreationResponse.getErrors().size());
+        printErrors(traceCreationResponse.getErrors(), logger);
+    }
+
+    private void printErrors(List<String> errors, JobLogger logger) {
+        errors.forEach(error -> logger.log("    %s", error));
     }
 
     private List<CommitError> createErrors(List<String> errorMessages,

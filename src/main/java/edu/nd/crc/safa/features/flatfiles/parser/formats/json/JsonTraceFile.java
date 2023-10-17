@@ -58,8 +58,14 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
         try {
             //TODO : make this the default logic for parsing json records with specified generic class
             ObjectMapper mapper = ObjectMapperConfig.create();
-            TraceAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), TraceAppEntity.class);
-            return new Pair<>(artifactAppEntity, null);
+            TraceAppEntity traceAppEntity = mapper.readValue(entityRecord.toString(), TraceAppEntity.class);
+
+            if (traceAppEntity.isValid()) {
+                return new Pair<>(traceAppEntity, null);
+            } else {
+                return new Pair<>(null,
+                    String.format("Trace missing one or more required fields: %s", traceAppEntity));
+            }
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }

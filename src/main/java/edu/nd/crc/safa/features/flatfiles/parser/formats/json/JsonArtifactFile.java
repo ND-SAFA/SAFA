@@ -59,7 +59,13 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
         try {
             ObjectMapper mapper = ObjectMapperConfig.create();
             ArtifactAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), ArtifactAppEntity.class);
-            return new Pair<>(artifactAppEntity, null);
+
+            if (artifactAppEntity.isValid()) {
+                return new Pair<>(artifactAppEntity, null);
+            } else {
+                return new Pair<>(null,
+                    String.format("Artifact missing one or more required fields: %s", artifactAppEntity));
+            }
         } catch (Exception e) {
             return new Pair<>(null, String.format("%s: %s", getFilename(), e.getMessage()));
         }

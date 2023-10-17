@@ -58,6 +58,14 @@ public class TimFileParser implements IProjectDefinitionParser {
             String fileName = artifact.getFileName();
             String artifactType = artifact.getType();
 
+            if (fileName == null || fileName.isBlank()) {
+                throw new SafaError("Missing filename for TIM artifact");
+            }
+
+            if (artifactType == null || artifactType.isBlank()) {
+                throw new SafaError("Missing artifactType for TIM artifact");
+            }
+
             // Step - Create artifact file parser
             String pathToFile = FileUtilities.buildPath(this.pathToFiles, fileName);
             AbstractArtifactFile<?> artifactFile

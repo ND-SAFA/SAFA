@@ -7,6 +7,8 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TraceAppEntity implements IAppEntity {
     private UUID traceLinkId;
     @NotEmpty
@@ -90,5 +93,11 @@ public class TraceAppEntity implements IAppEntity {
     @Override
     public void setId(UUID id) {
         this.traceLinkId = id;
+    }
+
+    @JsonIgnore
+    public boolean isValid() {
+        return ((sourceName != null && !sourceName.isBlank()) || sourceId != null)
+            && ((targetName != null && !targetName.isBlank()) || targetId != null);
     }
 }

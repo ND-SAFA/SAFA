@@ -2,12 +2,14 @@ package edu.nd.crc.safa.features.jobs.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.time.Instant;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.jobs.logging.services.JobLoggingService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -75,9 +77,18 @@ public class JobLogger {
      * @param exception The exception that was thrown.
      */
     public void logException(Throwable exception) {
+        while (exception instanceof InvocationTargetException && exception.getCause() != null) {
+            exception = exception.getCause();
+        }
+
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        exception.printStackTrace(printWriter);
-        log(stringWriter.toString());
+
+        if (exception instanceof SafaError) {
+            log(exception.getMessage());
+        } else {
+            exception.printStackTrace(printWriter);
+            log(stringWriter.toString());
+        }
     }
 }

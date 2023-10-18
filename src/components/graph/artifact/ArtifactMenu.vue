@@ -2,7 +2,7 @@
   <node-display
     v-if="displayActions"
     variant="menu"
-    color="primary"
+    color="neutral"
     @mousedown.stop
     @mouseup.stop
   >
@@ -12,28 +12,23 @@
         icon="create-artifact"
         data-cy="button-add-artifact"
         @click="
-          artifactSaveStore.openPanel({ isNewArtifact: true });
-          handleCloseMenu();
+          handleAction(() =>
+            artifactSaveStore.openPanel({ isNewArtifact: true })
+          )
         "
       />
       <icon-button
         tooltip="Create trace link"
         icon="create-trace"
         data-cy="button-add-trace"
-        @click="
-          traceSaveStore.openPanel();
-          handleCloseMenu();
-        "
+        @click="handleAction(() => traceSaveStore.openPanel())"
       />
       <icon-button
         :tooltip="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         :icon="drawMode ? 'cancel' : 'trace'"
-        @click="
-          cyStore.drawMode('toggle');
-          handleCloseMenu();
-        "
+        @click="handleAction(() => cyStore.drawMode('toggle'))"
       />
-      <separator vertical class="q-mx-xs" />
+      <separator v-if="displayGenerateActions" vertical class="q-mx-xs" />
       <icon-button
         v-if="displayGenerateActions"
         tooltip="Summarize artifacts"
@@ -41,8 +36,7 @@
         color="gradient"
         data-cy="button-summarize-artifact"
         @click="
-          appStore.openDetailsPanel('summarizeArtifact');
-          handleCloseMenu();
+          handleAction(() => appStore.openDetailsPanel('summarizeArtifact'))
         "
       />
       <icon-button
@@ -52,8 +46,7 @@
         color="gradient"
         data-cy="button-generate-artifact"
         @click="
-          appStore.openDetailsPanel('generateArtifact');
-          handleCloseMenu();
+          handleAction(() => appStore.openDetailsPanel('generateArtifact'))
         "
       />
       <icon-button
@@ -62,10 +55,7 @@
         icon="generate-traces"
         color="gradient"
         data-cy="button-generate-trace"
-        @click="
-          appStore.openDetailsPanel('generateTrace');
-          handleCloseMenu();
-        "
+        @click="handleAction(() => appStore.openDetailsPanel('generateTrace'))"
       />
     </flex-box>
   </node-display>
@@ -100,6 +90,15 @@ const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")
 );
 const displayGenerateActions = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
+  permissionStore.isAllowed("project.generate")
 );
+
+/**
+ * Handles a menu action and closes the menu.
+ * @param action - The action to handle.
+ */
+function handleAction(action: () => void): void {
+  action();
+  handleCloseMenu?.();
+}
 </script>

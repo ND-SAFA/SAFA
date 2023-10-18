@@ -112,7 +112,7 @@ const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")
 );
 const displayGenerateActions = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
+  permissionStore.isAllowed("project.generate")
 );
 
 /**

@@ -121,6 +121,15 @@ export const useArtifacts = defineStore("artifacts", {
       this.$patch({
         allArtifacts,
         currentArtifacts: removeMatches(this.currentArtifacts, "id", ids),
+        artifactsById: new Map(
+          allArtifacts.map((artifact) => [artifact.id, artifact])
+        ),
+        artifactsByName: new Map(
+          allArtifacts.map((artifact) => [artifact.name, artifact])
+        ),
+        artifactsByType: new Map(
+          Object.entries(collectByField(allArtifacts, "type"))
+        ),
       });
       projectStore.updateProject({ artifacts: allArtifacts });
 

@@ -98,18 +98,15 @@ export const useTraces = defineStore("traces", {
       this.$patch({
         allTraces,
         currentTraces: removeMatches(this.currentTraces, "traceLinkId", ids),
+        tracesById: new Map(
+          allTraces.map((trace) => [
+            getTraceId(trace.sourceId, trace.targetId),
+            trace,
+          ])
+        ),
       });
       projectStore.updateProject({ traces: allTraces });
       layoutStore.applyAutomove();
-    },
-    /**
-     * Returns the trace link that matches an id.
-     *
-     * @param id - The trace link id.
-     * @return The trace link, if one exists.
-     */
-    getTraceLinkById(id: string): TraceLinkSchema | undefined {
-      return this.allTraces.find(({ traceLinkId }) => traceLinkId === id);
     },
     /**
      * Returns the trace link between artifacts.

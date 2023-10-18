@@ -101,10 +101,10 @@ public class TraceAppEntity implements IAppEntity {
     public List<String> getMissingRequiredFields() {
         List<String> missingFields = new ArrayList<>();
 
-        if ((sourceName == null || !sourceName.isBlank()) && sourceId == null) {
+        if ((sourceName == null || sourceName.isBlank()) && sourceId == null) {
             missingFields.add("sourceName or sourceId");
         }
-        if ((targetName == null || !targetName.isBlank()) && targetId == null) {
+        if ((targetName == null || targetName.isBlank()) && targetId == null) {
             missingFields.add("targetName or targetId");
         }
 

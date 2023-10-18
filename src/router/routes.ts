@@ -91,16 +91,26 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.ACCOUNT,
     name: "My Account",
     component: MyAccountView,
+    meta: {
+      description:
+        "Edit account settings such as your password, theme, and integrations.",
+    },
   },
   {
     path: Routes.ORG,
     name: "My Organization",
     component: MyOrganizationView,
+    meta: {
+      description: "Manage organization members and teams.",
+    },
   },
   {
     path: Routes.TEAM,
     name: "My Team",
     component: MyTeamView,
+    meta: {
+      description: "Manage team members and projects.",
+    },
   },
   {
     path: Routes.HOME,

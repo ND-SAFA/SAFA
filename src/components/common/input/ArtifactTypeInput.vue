@@ -60,7 +60,7 @@ const options = ref(timStore.typeNames);
 
 const optionCount = computed(() =>
   props.showCount && typeof model.value === "string"
-    ? artifactStore.allArtifactsByType[model.value]?.length || 0
+    ? artifactStore.artifactsByType.get(model.value)?.length || 0
     : 0
 );
 

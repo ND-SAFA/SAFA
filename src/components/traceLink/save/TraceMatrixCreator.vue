@@ -81,9 +81,8 @@ const model = useVModel(props, "modelValue");
  * @param matrix - The matrix to get details for.
  */
 function getMatrixDetails(matrix: MatrixSchema): string[] {
-  const artifactsByType = artifactStore.allArtifactsByType;
-  const sources = artifactsByType[matrix.source] || [];
-  const targets = artifactsByType[matrix.target] || [];
+  const sources = artifactStore.getArtifactsByType(matrix.source) || [];
+  const targets = artifactStore.getArtifactsByType(matrix.target) || [];
   const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
     "manual",
   ]);

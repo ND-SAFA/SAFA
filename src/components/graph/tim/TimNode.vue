@@ -34,7 +34,7 @@
           v-if="displayActions"
           tooltip="Summarize artifacts"
           icon="generate-summaries"
-          color="primary"
+          :color="color"
           data-cy="button-summarize-artifact"
           @click="appStore.openDetailsPanel('summarizeArtifact')"
         />
@@ -42,7 +42,7 @@
           v-if="displayActions"
           tooltip="Generate parents"
           icon="generate-artifacts"
-          color="primary"
+          :color="color"
           @click="appStore.openDetailsPanel('generateArtifact')"
         />
       </flex-box>

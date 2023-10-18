@@ -111,11 +111,18 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.PROJECT_CREATOR,
     name: "Create Project",
     component: ProjectCreatorView,
+    meta: {
+      description: "Import a new project into SAFA.",
+    },
   },
   {
     path: Routes.MY_PROJECTS,
     name: "My Projects",
     component: ProjectSelectorView,
+    meta: {
+      description:
+        "Select a project and version to load, or view past uploads.",
+    },
   },
   {
     path: Routes.UPLOAD_STATUS,

@@ -1,5 +1,5 @@
 <template>
-  <private-page full-window back-to-project title="Project Settings">
+  <private-page full-window>
     <settings-tabs />
   </private-page>
 </template>

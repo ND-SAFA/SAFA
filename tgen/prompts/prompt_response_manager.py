@@ -190,8 +190,8 @@ class PromptResponseManager:
         for val in vals2format:
             if isinstance(val, bs4.NavigableString):
                 val = str(val)
-            if self.formatter:
-                val = self.formatter(tag, val)
+            if self.value_formatter:
+                val = self.value_formatter(tag, val)
             inner_vals, inner_vals_is_list = self._convert2list(val)
             if tag in self.expected_response_type:
                 inner_vals = self._convert_to_expected_type(inner_vals, tag, inner_vals_is_list)

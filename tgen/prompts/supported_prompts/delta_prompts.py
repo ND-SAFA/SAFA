@@ -72,7 +72,7 @@ CHANGE_SUMMARY_TASKS = {
                       "and ONE change type that BEST describes the change. "
                       "Change types: {categories}.",
                       PromptResponseManager(
-                          formatter=lambda tag, val: [v.replace(NEW_LINE, EMPTY_STRING).strip() for v in val.split(COMMA)]
+                          value_formatter=lambda tag, val: [v.replace(NEW_LINE, EMPTY_STRING).strip() for v in val.split(COMMA)]
                           if tag == "filenames" or tag == "type" else val,
                           required_tag_ids=REQUIRE_ALL_TAGS,
                           response_tag={"group": ["filenames", "change", "type"]},

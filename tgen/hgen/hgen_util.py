@@ -2,14 +2,11 @@ import os
 import re
 from typing import Dict, List, Set, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, DASH
-from tgen.common.util.dict_util import DictUtil
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.core.trace_output.stage_eval import TracePredictions
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -102,8 +99,8 @@ class HGenUtil:
         generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
                                                                                                            QuestionnairePrompt) \
             else task_prompt.response_manager
-        if generation_step_response_manager.formatter is None:
-            generation_step_response_manager.formatter = lambda tag, val: val.strip().strip(NEW_LINE)
+        if generation_step_response_manager.value_formatter is None:
+            generation_step_response_manager.value_formatter = lambda tag, val: val.strip().strip(NEW_LINE)
 
         artifact_type = hgen_args.source_type if not artifact_type else artifact_type
         artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
@@ -156,9 +153,9 @@ class HGenUtil:
                     name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
                                          f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
                                          PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
-                                                               formatter=lambda tag,
-                                                                                val: f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
-                                                                                     f"{HGenUtil.get_initials(hgen_args.target_type)}",
+                                                               value_formatter=lambda tag,
+                                                                                      val: f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
+                                                                                           f"{HGenUtil.get_initials(hgen_args.target_type)}",
                                                                ))
                     artifact_prompt = ArtifactPrompt(include_id=False)
                     prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])

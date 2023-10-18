@@ -1,12 +1,12 @@
 <template>
   <text-button
-    v-if="runUpdate"
+    v-if="appStore.runUpdate"
     text
     label="Load Changes"
     color="primary"
     icon="sync"
     data-cy="button-nav-load-update"
-    @click="handleClick"
+    @click="appStore.loadAppChanges()"
   />
 </template>
 
@@ -20,16 +20,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { appStore } from "@/hooks";
 import { TextButton } from "@/components/common";
-
-const runUpdate = computed(() => appStore.runUpdate);
-
-/**
- * Runs the current update.
- */
-function handleClick(): void {
-  appStore.loadAppChanges();
-}
 </script>

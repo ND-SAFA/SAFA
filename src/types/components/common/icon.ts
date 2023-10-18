@@ -25,6 +25,7 @@ export type IconVariant =
   | "integrate"
   | "warning"
   | "back"
+  | "forward"
   | "account"
   | "organization"
   | "permission"
@@ -92,7 +93,9 @@ export type IconVariant =
   | "version-add"
   | "version-delete"
   | "pw-show"
-  | "pw-hide";
+  | "pw-hide"
+  | "connected"
+  | "disconnected";
 
 /**
  * Defines props for an icon.

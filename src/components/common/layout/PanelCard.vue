@@ -76,7 +76,7 @@ import {
 import IconButton from "@/components/common/button/IconButton.vue";
 
 const props = withDefaults(defineProps<PanelCardProps>(), {
-  color: "primary",
+  color: "unchanged",
   title: undefined,
   subtitle: undefined,
   icon: undefined,

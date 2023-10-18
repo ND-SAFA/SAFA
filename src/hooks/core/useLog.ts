@@ -105,6 +105,14 @@ export const useLog = defineStore("log", {
       });
     },
     /**
+     * Logs and prints message debug message to console when not in production.
+     */
+    onDevDebug(message: string): void {
+      if (process.env.NODE_ENV !== "production") {
+        console.log("DEBUG: " + message);
+      }
+    },
+    /**
      * Logs and prints message to the console.
      */
     onDevInfo(message: string): void {

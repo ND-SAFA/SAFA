@@ -38,6 +38,14 @@ export const useDocuments = defineStore("documents", {
        * All custom project documents.
        */
       allDocuments: [baseDocument],
+      /**
+       * The history of documents visited.
+       */
+      history: [] as DocumentSchema[],
+      /**
+       * The current index in the history.
+       */
+      historyIndex: 0,
     };
   },
   getters: {
@@ -71,6 +79,18 @@ export const useDocuments = defineStore("documents", {
     isBaseDocument(): boolean {
       return this.currentId === "";
     },
+    /**
+     * @return Whether there is a next document in the history.
+     */
+    hasNextHistory(): boolean {
+      return this.historyIndex < this.history.length - 1;
+    },
+    /**
+     * @return Whether there is a previous document in the history.
+     */
+    hasPreviousHistory(): boolean {
+      return this.historyIndex > 0;
+    },
   },
   actions: {
     /**
@@ -91,7 +111,6 @@ export const useDocuments = defineStore("documents", {
         artifactIds: artifacts.map(({ id }) => id),
         layout,
       });
-
       const loadedDocument =
         documents.find(({ documentId }) => documentId === currentDocumentId) ||
         defaultDocument;
@@ -141,7 +160,6 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Updates matching documents.
-     *
      * @param updatedDocuments - The updated documents.
      */
     async updateDocuments(updatedDocuments: DocumentSchema[]): Promise<void> {
@@ -161,57 +179,73 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Sets the current document and initializes its artifacts and traces.
-     *
      * @param document - The document to switch to.
      */
     async switchDocuments(document: DocumentSchema): Promise<void> {
       const currentArtifactIds = document.artifactIds;
 
       this.currentDocument = document;
+      this.history.push(document);
+      this.historyIndex = this.history.length - 1;
+      selectionStore.clearSelections({ onlySubtree: !document.documentId });
+      artifactStore.initializeArtifacts({ currentArtifactIds });
+      traceStore.initializeTraces({ currentArtifactIds });
+      layoutStore.updatePositions(document.layout);
+    },
+    /**
+     * Switches to the next or previous document in the history.
+     * @param method - Whether to go forward or backward between documents.
+     */
+    switchDocumentHistory(method: "next" | "previous"): void {
+      const documentIndex =
+        method === "next" ? this.historyIndex + 1 : this.historyIndex - 1;
+      const document = this.history[documentIndex];
+      const currentArtifactIds = document?.artifactIds || [];
+
+      if (!document) return;
+
+      this.currentDocument = document;
+      this.historyIndex = documentIndex;
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
     },
     /**
      * Adds a new document.
-     *
      * @param document - The document to add.
      */
     async addDocument(document: DocumentSchema): Promise<void> {
-      this.allDocuments = [...this.allDocuments, document];
+      this.allDocuments = removeMatches(this.allDocuments, "documentId", [
+        document.documentId,
+      ]).concat(document);
 
       await this.switchDocuments(document);
     },
     /**
      * Creates and adds a new document based on the neighborhood of an artifact.
-     *
      * @param artifact - The artifact to display the neighborhood of.
      */
     async addDocumentOfNeighborhood(
       artifact: Pick<ArtifactSchema, "name" | "id">
     ): Promise<void> {
-      const { neighbors } = subtreeStore.subtreeMap[artifact.id];
-      const artifactIds = artifactStore.allArtifacts
-        .filter(
-          ({ id, type }) =>
-            (artifact.id === id || neighbors.includes(id)) &&
-            !selectionStore.ignoreTypes.includes(type)
-        )
-        .map(({ id }) => id);
-
+      const neighbors = new Set(subtreeStore.subtreeMap[artifact.id].neighbors);
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,
-        artifactIds,
+        artifactIds: artifactStore.allArtifacts
+          .filter(
+            ({ id, type }) =>
+              (artifact.id === id || neighbors.has(id)) &&
+              !selectionStore.ignoreTypes.includes(type)
+          )
+          .map(({ id }) => id),
       });
 
-      await this.removeDocument("");
       await this.addDocument(document);
       layoutStore.mode = "tree";
     },
     /**
      * Creates and adds a new document for multiple types of artifacts.
-     *
      * @param types - The artifact types to include in the document.
      */
     async addDocumentOfTypes(types: string[]): Promise<void> {
@@ -219,50 +253,41 @@ export const useDocuments = defineStore("documents", {
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: types.join(", "),
-        artifactIds: types
-          .map((type) => artifactsByType[type].map(({ id }) => id))
-          .reduce((acc, cur) => [...acc, ...cur], []),
+        artifactIds: types.flatMap((type) =>
+          artifactsByType[type].map(({ id }) => id)
+        ),
       });
 
-      await this.removeDocument("");
       await this.addDocument(document);
       layoutStore.mode = types.length > 1 ? "tree" : "table";
     },
     /**
      * Adds artifacts to the current document.
-     *
      * @param newIds - The new artifacts to add.
      */
     addDocumentArtifacts(newIds: string[]): void {
-      this.currentDocument.artifactIds = [
-        ...this.currentDocument.artifactIds.filter(
-          (id) => !newIds.includes(id)
-        ),
-        ...newIds,
-      ];
+      this.currentDocument.artifactIds = Array.from(
+        new Set([...this.currentDocument.artifactIds, ...newIds])
+      );
     },
     /**
      * Removes an existing document.
-     *
      * @param document - The document, or document id, to delete.
      */
     async removeDocument(document: string | DocumentSchema): Promise<void> {
       const deleteDocumentId =
         typeof document === "string" ? document : document.documentId;
 
-      const remainingDocuments = this.allDocuments.filter(
+      this.allDocuments = this.allDocuments.filter(
         ({ documentId }) => documentId !== deleteDocumentId
       );
 
-      this.allDocuments = remainingDocuments;
-
       if (this.currentDocument.documentId !== deleteDocumentId) return;
 
-      await this.switchDocuments(remainingDocuments[0] || this.baseDocument);
+      await this.switchDocuments(this.allDocuments[0] || this.baseDocument);
     },
     /**
      * Returns whether the given document name already exists.
-     *
      * @param name - The name to search for.
      * @return Whether the name exists.
      */

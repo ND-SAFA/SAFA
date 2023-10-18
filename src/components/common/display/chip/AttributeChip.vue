@@ -2,7 +2,7 @@
   <chip
     v-if="!props.confidenceScore"
     :class="chipClassName"
-    :outlined="enumerated"
+    :outlined="enumerated || props.artifactType"
     :color="displayColor"
     :removable="props.removable"
     :data-cy="props.dataCy"
@@ -21,7 +21,7 @@
     />
     <typography
       ellipsis
-      :color="enumerated ? displayColor : 'text'"
+      color="text"
       :small="text.length >= 20"
       :l="iconVisible ? '1' : ''"
       :value="text"

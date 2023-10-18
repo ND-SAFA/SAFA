@@ -66,6 +66,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-hazard-lights";
     case "back":
       return "mdi-arrow-left";
+    case "forward":
+      return "mdi-arrow-right";
     case "account":
       return "mdi-account-circle";
     case "organization":
@@ -202,6 +204,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-eye";
     case "pw-hide":
       return "mdi-eye-off";
+    case "connected":
+      return "mdi-network";
+    case "disconnected":
+      return "mdi-network-off";
     default:
       return "";
   }

@@ -27,7 +27,14 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { IconVariant } from "@/types";
-import { cyStore, layoutApiStore, layoutStore, permissionStore } from "@/hooks";
+import { LARGE_NODE_LAYOUT_COUNT } from "@/util";
+import {
+  artifactStore,
+  cyStore,
+  layoutApiStore,
+  layoutStore,
+  permissionStore,
+} from "@/hooks";
 import { IconButton, FlexBox, Separator } from "@/components/common";
 
 const viewButtons = computed(() => [
@@ -54,10 +61,13 @@ const viewButtons = computed(() => [
   },
   {
     handler: () => {
-      if (layoutStore.isTreeMode) {
+      if (
+        layoutStore.isTreeMode &&
+        artifactStore.currentArtifacts.length > LARGE_NODE_LAYOUT_COUNT
+      ) {
         layoutApiStore.handleRegenerate();
       } else {
-        layoutStore.resetLayout();
+        layoutStore.setGraphLayout("project", true);
       }
     },
     label: "Regenerate Layout",

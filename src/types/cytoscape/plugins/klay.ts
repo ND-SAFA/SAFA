@@ -117,8 +117,13 @@ export interface KlayLayoutSettings {
 
 /**
  * Defines the klay layout options.
+ * https://github.com/cytoscape/cytoscape.js-klay/blob/master/src/defaults.js
  */
 export interface KlayLayoutOptions {
   name: "klay";
   klay: KlayLayoutSettings;
+  animate?: boolean;
+  animationDuration?: number;
+  fit?: boolean;
+  padding?: number;
 }

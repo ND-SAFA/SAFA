@@ -89,7 +89,7 @@ const separatorClassName = computed(
   () =>
     "cy-node-separator " +
     (props.color.includes("#") ? "" : `bg-${props.color} `) +
-    (props.variant !== "tim" ? "q-my-xs" : "q-my-sm")
+    (props.variant !== "tim" ? "q-mt-xs q-mb-none" : "q-my-sm")
 );
 
 const cardStyle = computed(() =>

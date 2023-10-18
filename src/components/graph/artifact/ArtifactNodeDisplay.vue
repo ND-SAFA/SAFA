@@ -6,6 +6,7 @@
     :title="props.artifact.type"
     :selected="props.selected"
     @click="handleSelect"
+    @dblclick="handleSelect(true)"
   >
     <artifact-name-display
       align="center"
@@ -48,8 +49,8 @@ const showDelta = computed(() => deltaStore.inDeltaView);
  * Selects an artifact and highlights its subtree,
  * or opens a new view of the artifact's subtree if the artifact is already selected.
  */
-function handleSelect(): void {
-  if (!props.selected) {
+function handleSelect(selected = props.selected): void {
+  if (!selected) {
     selectionStore.selectArtifact(id.value);
   } else {
     documentStore.addDocumentOfNeighborhood({

@@ -36,6 +36,10 @@ export interface NavOption {
    * The navigation path corresponding to this option.
    */
   path: string | { path: string; query: URLQuery };
+  /**
+   * The tooltip to display on option when hovered.
+   */
+  tooltip?: string;
 }
 
 /**
@@ -46,6 +50,10 @@ export interface PrivatePageProps {
    * Whether to display in full window mode.
    */
   fullWindow?: boolean;
+  /**
+   * Whether to display in small window mode.
+   */
+  smallWindow?: boolean;
   /**
    * Whether a cytoscape graph is being displayed.
    */

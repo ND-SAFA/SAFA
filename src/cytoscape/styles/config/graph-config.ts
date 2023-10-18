@@ -9,7 +9,7 @@ import {
  * General configuration.
  */
 export const USE_MOTION_BLUR = false;
-export const ANIMATION_DURATION = 200; // ms
+export const ANIMATION_DURATION = 300; // ms
 
 /**
  * Viewport configuration.
@@ -17,7 +17,7 @@ export const ANIMATION_DURATION = 200; // ms
 export const DEFAULT_ARTIFACT_TREE_ZOOM = 0.75;
 export const ZOOM_INCREMENT = 0.05;
 
-export const CENTER_GRAPH_PADDING = 40;
+export const CENTER_GRAPH_PADDING = 100;
 
 /**
  * TIM Layout configuration.

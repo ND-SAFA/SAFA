@@ -1,18 +1,17 @@
 import { defineStore } from "pinia";
 
 import { computed, ref, watch } from "vue";
-import { ArtifactSchema, IOHandlerCallback, ArtifactApiHook } from "@/types";
+import { ArtifactApiHook, ArtifactSchema, IOHandlerCallback } from "@/types";
+import { ENABLED_FEATURES } from "@/util";
 import {
-  useApi,
-  artifactStore,
-  logStore,
-  projectStore,
-  traceApiStore,
-  traceStore,
   artifactCommitApiStore,
   artifactSaveStore,
+  artifactStore,
+  logStore,
+  traceApiStore,
+  traceStore,
+  useApi,
 } from "@/hooks";
-import { getDoesArtifactExist } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -54,16 +53,12 @@ export const useArtifactApi = defineStore(
           } else if (!artifactSaveStore.hasNameChanged) {
             artifactSaveStore.isNameValid = true;
             nameLoading.value = false;
+          } else if (!ENABLED_FEATURES.ARTIFACT_NAME_CHECK) {
+            artifactSaveStore.isNameValid = true;
+            nameLoading.value = false;
           } else {
-            getDoesArtifactExist(projectStore.versionId, name)
-              .then((nameExists) => {
-                artifactSaveStore.isNameValid = !nameExists;
-                nameLoading.value = false;
-              })
-              .catch(() => {
-                artifactSaveStore.isNameValid = false;
-                nameLoading.value = false;
-              });
+            artifactSaveStore.isNameValid = false;
+            nameLoading.value = false;
           }
         }, 500);
       });

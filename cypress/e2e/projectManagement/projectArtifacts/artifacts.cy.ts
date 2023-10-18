@@ -40,7 +40,7 @@ describe("Artifacts", () => {
       cy.getCy(DataCy.selectedPanelName).should("contain", name);
     });
 
-    it("Cannot create a new artifact with the same name", () => {
+    it.skip("Cannot create a new artifact with the same name", () => {
       const name = `New ${Math.random()}`;
 
       cy.createNewArtifact({ name }, true, true).createNewArtifact({ name });

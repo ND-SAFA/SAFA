@@ -113,30 +113,31 @@ export const useSelection = defineStore("selection", {
      * Each clear is wrapped in an if-statement to help improve performance on large graphs.
      *
      * @param clearFilter - Whether to clear the filter types.
+     * @param onlySubtree - Whether to only clear the subtree.
      */
-    clearSelections(clearFilter = false): void {
-      if (this.ignoreTypes.length > 0) {
+    clearSelections({ clearFilter = false, onlySubtree = false } = {}): void {
+      if (this.ignoreTypes.length > 0 && !onlySubtree) {
         this.ignoreTypes = clearFilter ? [] : this.ignoreTypes;
       }
       if (this.selectedSubtreeIds.length > 0) {
         this.selectedSubtreeIds = [];
       }
-      if (this.selectedGroupIds.length > 0) {
+      if (this.selectedGroupIds.length > 0 && !onlySubtree) {
         this.selectedGroupIds = [];
       }
-      if (this.selectedArtifactId) {
+      if (this.selectedArtifactId && !onlySubtree) {
         this.selectedArtifactId = "";
       }
-      if (this.selectedTraceLinkIds[0]) {
+      if (this.selectedTraceLinkIds[0] && !onlySubtree) {
         this.selectedTraceLinkIds = ["", ""];
       }
-      if (this.selectedArtifactLevelType) {
+      if (this.selectedArtifactLevelType && !onlySubtree) {
         this.selectedArtifactLevelType = "";
       }
-      if (this.selectedTraceMatrixTypes[0]) {
+      if (this.selectedTraceMatrixTypes[0] && !onlySubtree) {
         this.selectedTraceMatrixTypes = ["", ""];
       }
-      if (appStore.popups.detailsPanel) {
+      if (appStore.popups.detailsPanel && !onlySubtree) {
         appStore.closeSidePanels();
       }
     },

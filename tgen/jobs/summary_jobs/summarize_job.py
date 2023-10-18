@@ -1,0 +1,52 @@
+from typing import Any, Dict
+
+from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.args.job_args import JobArgs
+from tgen.jobs.summary_jobs.summary_response import SummaryResponse
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.summarizer import Summarizer
+from tgen.summarizer.summarizer_args import SummarizerArgs
+
+
+class SummarizeJob(AbstractJob):
+    """
+    Handles summarization of artifacts
+    """
+
+    def __init__(self, dataset: PromptDataset = None, dataset_creator: PromptDatasetCreator = None, export_dir: str = None,
+                 is_subset: bool = False, job_args: JobArgs = None, **kwargs):
+        """
+        Summarizes a given dataset using the given summarizer
+        :param dataset: The dataset to summarize.
+        :param dataset_creator: Creates the dataset to summarize if one is not provided
+        :param export_dir: The path to save to
+        :param is_subset: True if not all of the artifacts are provided
+        :param job_args: The arguments to the job.
+        """
+        self.is_subset = is_subset
+        self.export_dir = export_dir
+        self.dataset = dataset
+        self.dataset_creator = dataset_creator
+        self.kwargs = kwargs
+        self.args = SummarizerArgs(export_dir=export_dir, **self.kwargs)
+        super().__init__(job_args)
+
+    def _run(self) -> Dict[Any, str]:
+        """
+        Performs the summarization of all artifacts and returns the summaries as the new artifact content
+        :return: The job result containing all artifacts mapped to their summarized content
+        """
+        dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
+
+        if self.is_subset and not dataset.project_summary:
+            summary = None
+            dataset.artifact_df.summarize_content(ArtifactsSummarizer(self.args))
+        else:
+            dataset = Summarizer(self.args, dataset=dataset).summarize()
+            summary = dataset.project_summary.to_string()
+
+        artifacts = dataset.artifact_df.to_artifacts()
+        return SummaryResponse(summary=summary, artifacts=artifacts)

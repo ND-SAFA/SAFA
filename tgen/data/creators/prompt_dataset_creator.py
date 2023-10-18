@@ -26,7 +26,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
 
     def __init__(self, project_reader: AbstractProjectReader = None, trace_dataset_creator: TraceDatasetCreator = None,
                  data_export_path: str = None, project_file_id: str = None, project_summary: Union[Summary, str] = None,
-                 summarizer: ArtifactsSummarizer = None, ensure_code_is_summarized: bool = True):
+                 summarizer: ArtifactsSummarizer = None, ensure_code_is_summarized: bool = False):
         """
         Initializes creator with entities extracted from reader.
         :param data_export_path: The path to where data files will be saved if specified.May be to a directory or specific file

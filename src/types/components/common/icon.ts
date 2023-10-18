@@ -25,6 +25,7 @@ export type IconVariant =
   | "integrate"
   | "warning"
   | "back"
+  | "forward"
   | "account"
   | "organization"
   | "permission"

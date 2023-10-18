@@ -1,10 +1,9 @@
 <template>
-  <private-page title="My Account">
+  <private-page title="My Account" small-window>
     <template #actions>
       <text-button
         text
         label="Log Out"
-        color="negative"
         icon="logout"
         data-cy="button-account-logout"
         @click="handleLogoutClick"

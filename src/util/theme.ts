@@ -22,8 +22,8 @@ export enum Colors {
 
   blue = "#3055A6",
 
-  red = "#A63055",
-  redLight = "#D51552",
+  red = "#E24C15", // "#A63055",
+  redLight = "#E24C15", // "#D51552",
 
   orange = "#fb8500",
 
@@ -69,7 +69,7 @@ export const ThemeColors = {
   darkBg: Colors.greyDarkest,
   darkText: Colors.white,
   darkTextCaption: Colors.greyLight,
-  darkSelected: Colors.greyLightest,
+  darkSelected: Colors.greyLight,
 
   added: Colors.green,
   modified: Colors.blue,

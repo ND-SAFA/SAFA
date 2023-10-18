@@ -1,8 +1,12 @@
 <template>
   <flex-box full-width justify="between" align="center" y="1">
-    <mode-buttons />
     <flex-box align="center">
+      <mode-buttons />
+    </flex-box>
+    <flex-box align="center">
+      <update-button />
       <commit-buttons />
+      <document-history />
       <graph-buttons />
       <visible-type-buttons />
     </flex-box>
@@ -20,7 +24,9 @@ export default {
 
 <script setup lang="ts">
 import { FlexBox, CommitButtons } from "@/components/common";
+import { DocumentHistory } from "@/components/document";
 import GraphButtons from "./GraphButtons.vue";
 import ModeButtons from "./ModeButtons.vue";
 import VisibleTypeButtons from "./VisibleTypeButtons.vue";
+import UpdateButton from "./UpdateButton.vue";
 </script>

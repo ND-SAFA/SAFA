@@ -66,6 +66,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-hazard-lights";
     case "back":
       return "mdi-arrow-left";
+    case "forward":
+      return "mdi-arrow-right";
     case "account":
       return "mdi-account-circle";
     case "organization":

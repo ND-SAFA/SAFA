@@ -4,7 +4,6 @@
       <nav-breadcrumbs />
       <members-bar />
       <q-space />
-      <update-button />
       <project-searchbar v-if="graphVisible" />
     </flex-box>
     <separator v-if="graphVisible" nav />
@@ -28,7 +27,6 @@ import { FlexBox, Separator } from "@/components/common";
 import { ProjectSearchbar } from "@/components/search";
 import MembersBar from "./MembersBar.vue";
 import NavBreadcrumbs from "./NavBreadcrumbs.vue";
-import UpdateButton from "./UpdateButton.vue";
 
 const currentRoute = useRoute();
 

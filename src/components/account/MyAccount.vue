@@ -1,13 +1,11 @@
 <template>
-  <flex-box>
-    <flex-item parts="6" class="q-mr-md">
+  <flex-box justify="center">
+    <flex-item parts="12" class="q-mr-md">
+      <integrations-accounts />
       <theme-controller />
       <update-password />
       <delete-account />
-    </flex-item>
-    <flex-item parts="6">
       <external-links />
-      <integrations-accounts />
     </flex-item>
   </flex-box>
 </template>

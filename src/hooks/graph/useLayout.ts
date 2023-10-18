@@ -9,7 +9,14 @@ import {
   CytoEvent,
   CSSCursor,
 } from "@/types";
-import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
+import { LARGE_NODE_LAYOUT_COUNT } from "@/util";
+import {
+  appStore,
+  artifactStore,
+  cyStore,
+  selectionStore,
+  subtreeStore,
+} from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -63,22 +70,26 @@ export const useLayout = defineStore("layout", {
     /**
      * Resets the graph layout.
      * @param type - The type of graph to set the layout for.
+     * @param animated - Whether to animate the layout, and keep the graph displayed.
      */
-    setGraphLayout(type?: "project" | "creator"): void {
+    setGraphLayout(type?: "project" | "creator", animated?: boolean): void {
       const cyPromise = cyStore.getCy(type);
       const generate =
-        type === "creator"
-          ? true
-          : this.mode === "tim" ||
-            Object.keys(this.artifactPositions).length === 0;
+        animated ||
+        type === "creator" ||
+        this.mode === "tim" ||
+        Object.keys(this.artifactPositions).length === 0;
 
       cyPromise.then((cy) => {
-        appStore.onLoadStart();
+        if (!animated) appStore.onLoadStart();
 
         if (generate) {
           cy.layout({
             name: "klay",
             klay: CYTO_CONFIG.KLAY_CONFIG,
+            animate: animated,
+            animationDuration: CYTO_CONFIG.ANIMATION_DURATION,
+            padding: CYTO_CONFIG.CENTER_GRAPH_PADDING,
           }).run();
         } else {
           cy.layout(this.layoutOptions).run();
@@ -86,6 +97,8 @@ export const useLayout = defineStore("layout", {
 
         this.styleGeneratedLinks();
         this.applyAutomove();
+
+        if (animated) return;
 
         // Wait for the graph to render.
         setTimeout(() => {
@@ -133,7 +146,12 @@ export const useLayout = defineStore("layout", {
     async updatePositions(positions: LayoutPositionsSchema): Promise<void> {
       this.artifactPositions = positions;
 
-      await this.resetLayout();
+      if (artifactStore.currentArtifacts.length > LARGE_NODE_LAYOUT_COUNT) {
+        await this.resetLayout();
+      } else {
+        this.setGraphLayout("project", true);
+        cyStore.centerNodes(true);
+      }
     },
     /**
      * Adds auto-move handlers to all nodes, so that their children are dragged along with then.

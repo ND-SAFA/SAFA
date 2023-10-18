@@ -62,6 +62,7 @@ class ProjectSummarizer(BaseObject):
             logger.log_step(f"Creating section: `{section_id}`")
             prompt_builder = self._create_prompt_builder(section_id, section_prompt)
             task_tag = section_prompt.get_response_tags_for_question(-1)
+            task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
             section_body, section_title = self._generate_section(prompt_builder, task_tag,
                                                                  multi_line_items=section_id in MULTI_LINE_ITEMS)
             if not section_title:
@@ -110,17 +111,9 @@ class ProjectSummarizer(BaseObject):
                                              prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
         predictions = trainer.perform_prediction().predictions[0]
         parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
-        children_tags = []
-        if isinstance(task_tag, list):
-            task_tag, children_tags = task_tag[0], task_tag[1:]
         body_res = parsed_responses[task_tag]
-        if children_tags:
-            combined_body_res = []
-            for r in body_res:
-                parts = [r[child] for child in children_tags]
-                combined_body_res.append(NEW_LINE.join(parts))
-            body_res = combined_body_res
-        body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(body_res) > 1) for r in body_res]
+        body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(body_res) > 1 and not multi_line_items)
+                    for r in body_res]
         task_title = parsed_responses[CUSTOM_TITLE_TAG][0] if parsed_responses.get(CUSTOM_TITLE_TAG) else None
         deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"
         task_body = body_res[0] if len(body_res) == 1 else deliminator.join(body_res)

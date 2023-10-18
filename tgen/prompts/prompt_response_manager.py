@@ -4,11 +4,11 @@ from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 
 import bs4
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 
 RESPONSE_FORMAT = "Enclose your answer inside of {}"
 REQUIRE_ALL_TAGS = str(uuid.uuid4())
@@ -44,7 +44,7 @@ class PromptResponseManager:
     """
     :param formatter: A method that takes in the tag id and returns the correct format for the associated response
     """
-    formatter: Callable = None
+    value_formatter: Callable = None
     """
     :param default_factory: A method that takes in the tag id and returns a default failure for it if the response parsing fails
     """
@@ -63,6 +63,10 @@ class PromptResponseManager:
      p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
     """
     _all_tag_ids: List[str] = field(init=False, default_factory=list)
+    """
+    Formats an entry given its tag and values.
+    """
+    entry_formatter: Callable[[str, Dict], Any] = None
 
     def __post_init__(self) -> None:
         """
@@ -166,11 +170,14 @@ class PromptResponseManager:
                 formatted_val = val
                 if isinstance(val, dict):
                     formatted_val = self._format_response(val)
+                    if self.entry_formatter:
+                        formatted_val = self.entry_formatter(tag, formatted_val)
                     formatted_values.append(formatted_val)
                 else:
                     try:
                         formatted_val = self._format_value(tag, formatted_val)
                     except (TypeError, AssertionError, ValueError) as e:
+                        logger.exception(e)
                         formatted_val = self._format_on_failure(tag, formatted_val, e)
                     if formatted_val is not None:
                         formatted_values.append(formatted_val)

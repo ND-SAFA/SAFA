@@ -1,3 +1,4 @@
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TAG, PS_ENTITIES_TAG, PS_FEATURE_TAG, PS_NOTES_TAG, \
     PS_OVERVIEW_TAG, PS_SUBSYSTEM_TAG
 from tgen.prompts.prompt import Prompt
@@ -57,7 +58,8 @@ SUBSYSTEM_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                    response_manager=PromptResponseManager(response_tag={PS_SUBSYSTEM_TAG: ["name", "descr"]},
                                                           response_instructions_format="Enclose each sub-system in {} "
                                                                                        "with the name of the subsystem inside of "
-                                                                                       "{} and the description inside of {}."))
+                                                                                       "{} and the description inside of {}.",
+                                                          entry_formatter=lambda t, v: NEW_LINE.join([v["name"][0], v["descr"][0]])))
 ])
 
 DATA_FLOW_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[

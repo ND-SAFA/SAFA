@@ -112,6 +112,18 @@ $color-node-gradient5: var(--q-nodeGradient5);
   border: 1px solid $color-warning !important;
 }
 
+.bd-text {
+  border: 1px solid $color-text !important;
+}
+
+.bd-textCaption {
+  border: 1px solid $color-caption !important;
+}
+
+.bd-selected {
+  border: 1px solid $color-selected !important;
+}
+
 .bd-added {
   border: 1px solid $color-added !important;
 }

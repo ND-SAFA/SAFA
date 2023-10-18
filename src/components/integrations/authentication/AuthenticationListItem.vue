@@ -23,8 +23,8 @@
         <flex-box v-else-if="!clickable" column align="end">
           <text-button
             outlined
-            label="Installation"
-            icon="add"
+            label="Edit permissions"
+            icon="edit"
             b="2"
             @click="emit('connect')"
           />

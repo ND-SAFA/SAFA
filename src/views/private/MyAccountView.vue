@@ -4,7 +4,6 @@
       <text-button
         text
         label="Log Out"
-        color="negative"
         icon="logout"
         data-cy="button-account-logout"
         @click="handleLogoutClick"

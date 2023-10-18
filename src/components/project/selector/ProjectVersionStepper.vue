@@ -67,7 +67,7 @@ const selectedVersion = ref<VersionSchema>();
 
 const isProjectStep = computed(() => currentStep.value === 1);
 const isVersionStep = computed(() => currentStep.value === 2);
-const panelColor = computed(() => (props.minimal ? "transparent" : "primary"));
+const panelColor = computed(() => (props.minimal ? "transparent" : undefined));
 
 /**
  * Clears all modal data.

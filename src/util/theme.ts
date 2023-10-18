@@ -69,7 +69,7 @@ export const ThemeColors = {
   darkBg: Colors.greyDarkest,
   darkText: Colors.white,
   darkTextCaption: Colors.greyLight,
-  darkSelected: Colors.greyLightest,
+  darkSelected: Colors.greyLight,
 
   added: Colors.green,
   modified: Colors.blue,

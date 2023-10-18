@@ -51,6 +51,10 @@ export interface PrivatePageProps {
    */
   fullWindow?: boolean;
   /**
+   * Whether to display in small window mode.
+   */
+  smallWindow?: boolean;
+  /**
    * Whether a cytoscape graph is being displayed.
    */
   graph?: boolean;

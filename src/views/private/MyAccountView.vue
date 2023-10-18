@@ -1,5 +1,5 @@
 <template>
-  <private-page title="My Account">
+  <private-page title="My Account" small-window>
     <template #actions>
       <text-button
         text

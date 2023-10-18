@@ -1,6 +1,6 @@
 <template>
   <flex-box justify="center">
-    <flex-item parts="9" class="q-mr-md">
+    <flex-item parts="12" class="q-mr-md">
       <integrations-accounts />
       <theme-controller />
       <update-password />

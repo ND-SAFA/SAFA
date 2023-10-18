@@ -38,7 +38,7 @@
         v-if="displayGenerateActions"
         tooltip="Summarize artifacts"
         icon="generate-summaries"
-        color="primary"
+        color="gradient"
         data-cy="button-summarize-artifact"
         @click="
           appStore.openDetailsPanel('summarizeArtifact');
@@ -49,7 +49,7 @@
         v-if="displayGenerateActions"
         tooltip="Generate artifacts"
         icon="generate-artifacts"
-        color="primary"
+        color="gradient"
         data-cy="button-generate-artifact"
         @click="
           appStore.openDetailsPanel('generateArtifact');
@@ -60,7 +60,7 @@
         v-if="displayGenerateActions"
         tooltip="Generate trace links"
         icon="generate-traces"
-        color="primary"
+        color="gradient"
         data-cy="button-generate-trace"
         @click="
           appStore.openDetailsPanel('generateTrace');

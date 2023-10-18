@@ -10,44 +10,41 @@
       v-touch-pan.prevent.mouse="handleMoveFab"
       direction="up"
       vertical-actions-align="left"
-      :color="drawMode ? 'secondary' : 'primary'"
+      :color="drawMode ? 'secondary' : 'gradient'"
       :active-icon="getIcon('cancel')"
       :icon="drawMode ? getIcon('trace') : getIcon('graph-add')"
       :disable="draggingFab"
+      class="bg-background"
       data-cy="button-fab-toggle"
     >
       <q-fab-action
         v-if="displayGenerateActions"
-        outline
         label="Generate Trace Links"
         :icon="getIcon('generate-traces')"
+        color="gradient"
         class="bg-background"
-        color="primary"
         data-cy="button-fab-generate-trace"
         @click="appStore.openDetailsPanel('generateTrace')"
       />
       <q-fab-action
         v-if="displayGenerateActions"
-        outline
         label="Generate Artifacts"
         :icon="getIcon('generate-artifacts')"
+        color="gradient"
         class="bg-background"
-        color="primary"
         data-cy="button-fab-generate-artifact"
         @click="appStore.openDetailsPanel('generateArtifact')"
       />
       <q-fab-action
         v-if="displayGenerateActions"
-        outline
         label="Summarize Artifacts"
         :icon="getIcon('generate-summaries')"
+        color="gradient"
         class="bg-background"
-        color="primary"
         data-cy="button-fab-summarize-artifact"
         @click="appStore.openDetailsPanel('summarizeArtifact')"
       />
       <q-fab-action
-        outline
         :label="drawMode ? 'Cancel Draw Mode' : 'Draw Links'"
         :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
         class="bg-background"
@@ -56,7 +53,6 @@
       />
       <q-fab-action
         v-if="isTreeMode"
-        outline
         label="Create Trace Link"
         :icon="getIcon('create-trace')"
         class="bg-background"
@@ -65,7 +61,6 @@
       />
       <q-fab-action
         v-if="isTreeMode"
-        outline
         label="Create Artifact"
         :icon="getIcon('create-artifact')"
         class="bg-background"

@@ -22,7 +22,7 @@
         v-if="displayGenerateActions"
         tooltip="Summarize artifacts"
         icon="generate-summaries"
-        color="primary"
+        color="gradient"
         data-cy="button-summarize-artifact"
         @click="
           appStore.openDetailsPanel('summarizeArtifact');
@@ -33,7 +33,7 @@
         v-if="displayGenerateActions"
         tooltip="Generate artifacts"
         icon="generate-artifacts"
-        color="primary"
+        color="gradient"
         @click="
           appStore.openDetailsPanel('generateArtifact');
           handleCloseMenu();
@@ -43,7 +43,7 @@
         v-if="displayGenerateActions"
         tooltip="Generate trace links"
         icon="generate-traces"
-        color="primary"
+        color="gradient"
         @click="
           appStore.openDetailsPanel('generateTrace');
           handleCloseMenu();

@@ -22,4 +22,8 @@ export type ThemeColor =
   | "nodeGradient3"
   | "nodeGradient4"
   | "nodeGradient5"
+  | "nodeGradient6"
+  | "nodeGradient7"
+  | "nodeGradient8"
+  | "nodeGradient9"
   | string;

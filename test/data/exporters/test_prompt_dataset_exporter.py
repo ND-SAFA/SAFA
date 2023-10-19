@@ -1,5 +1,6 @@
 import os
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.exporters.api_exporter import ApiExporter
@@ -13,6 +14,7 @@ from tgen.data.readers.csv_project_reader import CsvProjectReader
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
@@ -29,7 +31,7 @@ class TestPromptDatasetExporter(BaseTest):
                                       ApiExporter: ApiProjectReader
                                       }
 
-        i=0
+        i = 0
         for dataset_exporter, project_reader in dataset_exporter_to_reader.items():
             export_path = os.path.join(TEST_OUTPUT_DIR, f"prompt_dataset_{i}")
             if issubclass(dataset_exporter, CSVExporter):
@@ -37,7 +39,8 @@ class TestPromptDatasetExporter(BaseTest):
             elif issubclass(dataset_exporter, ApiExporter):
                 export_path = os.path.join(export_path, "dataset.json")
             dataset = dataset_creator_orig.create()
-            dataset.project_summary = "project_summary"
+            dataset.project_summary = Summary(overview=EnumDict({"chunks": ["summary of project"],
+                                                                 "title": "overview"}))
             PromptDatasetExporter(export_path, dataset_exporter, dataset=dataset).export()
             new_dataset = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(
                 project_reader=project_reader(project_path=export_path))).create()
@@ -48,9 +51,9 @@ class TestPromptDatasetExporter(BaseTest):
     def test_export_df(self):
         artifact_reader = PromptTestProject.get_artifact_project_reader()
         prompt_reader = PromptTestProject.get_project_reader()
-        readers = [artifact_reader,prompt_reader]
+        readers = [artifact_reader, prompt_reader]
 
-        i=0
+        i = 0
         for reader in readers:
             dataset_creator_orig = PromptDatasetCreator(project_reader=reader)
             dataset = dataset_creator_orig.create()

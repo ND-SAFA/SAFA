@@ -3,6 +3,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from test.hgen.hgen_test_utils import HGenTestConstants
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
@@ -13,7 +14,8 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.state.state import State
-from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
+from tgen.summarizer.project.project_summarizer import ProjectSummarizer
+from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -42,7 +44,7 @@ class TestState(BaseTest):
         self.assertEqual(state.export_dir, TEST_OUTPUT_DIR)
         self.assertSetEqual(set(steps), set(state.completed_steps.keys()))
         self.assertEqual(state.description_of_artifact, HGenTestConstants.description)
-        self.assertEqual(state.project_summary, HGenTestConstants.summary)
+        self.assertEqual(state.project_summary["overview"]["chunks"][0], HGenTestConstants.summary)
         self.assertListEqual(state.questions, HGenTestConstants.questions.splitlines())
         self.assertSetEqual(set(state.generation_predictions.keys()), set(HGenTestConstants.user_stories))
         self.assertListEqual(list(state.generation_predictions.values()), HGenTestConstants.code_files)

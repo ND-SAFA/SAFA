@@ -7,12 +7,11 @@ from tgen.common.constants.ranking_constants import DEFAULT_LINK_THRESHOLD, \
     DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_PRIMARY_THRESHOLD, \
-    DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT, DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, \
+    DEFAULT_SORTING_ALGORITHM, DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, \
     GENERATE_EXPLANATIONS_DEFAULT, DEFAULT_EMBEDDINGS_SCORE_WEIGHT
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
@@ -20,10 +19,6 @@ from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionM
 
 @dataclass
 class RankingArgs(PipelineArgs):
-    """
-    - dataset: The dataset containing all the project artifacts.
-    """
-    dataset: PromptDataset = required_field(field_name="dataset")
     """
     parent_ids: List of parent artifact ids.
     """
@@ -52,10 +47,6 @@ class RankingArgs(PipelineArgs):
     - sorter: The sorting algorithm to use before ranking with claude
     """
     sorter: str = DEFAULT_SORTING_ALGORITHM
-    """
-    - generate_summary: Whether to generate a project summary.
-    """
-    generate_summary: bool = GENERATE_SUMMARY_DEFAULT
     """
     - generate_explanations: Whether to generate explanations for links.
     """

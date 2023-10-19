@@ -15,7 +15,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 

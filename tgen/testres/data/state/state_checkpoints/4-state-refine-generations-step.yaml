@@ -74,4 +74,11 @@ source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prompt
     summarizer: null
   summarizer: null
   trace_dataset_creator: null
-project_summary: "Here is a summary of the key technical details and design aspects of the system based on the provided code"
+project_summary: !!python/object/apply:tgen.summarizer.summary.Summary
+  dictitems:
+    overview: !!python/object/apply:tgen.common.util.enum_util.EnumDict
+      dictitems:
+        chunks:
+        - Here is a summary of the key technical details and design aspects of the
+          system based on the provided code
+        title: overview

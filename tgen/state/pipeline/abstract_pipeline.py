@@ -1,13 +1,18 @@
 import os
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from typing import Generic, List, Optional, Type, TypeVar
+from typing import Generic, List, Type, TypeVar, Optional
 
-from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE, F_SLASH
+from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
+from tgen.summarizer.summarizer import Summarizer
+from tgen.summarizer.summarizer_args import SummarizerArgs
 
 StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)
@@ -60,14 +65,18 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                                 InteractiveModeOptions.LOAD_NEW_STATE, InteractiveModeOptions.QUIT]
     NEW_STATE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP, InteractiveModeOptions.NEXT_STEP]
 
-    def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]]):
+    def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None):
         """
         Constructs pipeline of steps.
         :param steps: Steps to perform in sequential order.
+        :param summarizer_args: The args used to create project summary
         """
         self.args = args
         self.state: StateType = self.init_state()
         self.steps = [s() for s in steps]
+        self.summarizer_args = SummarizerArgs(do_resummarize_project=False,
+                                              summarize_code_only=True,
+                                              do_resummarize_artifacts=False) if not summarizer_args else summarizer_args
 
     def init_state(self) -> StateType:
         """
@@ -86,6 +95,13 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if self.args.export_dir:
             os.makedirs(self.args.export_dir, exist_ok=True)
             self.state.export_dir = self.args.export_dir
+        if self.summarizer_args:
+            dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
+            if not self.args.dataset.project_summary:
+                self.args.dataset = dataset
+            else:
+                self.args.dataset.update_artifact_df(dataset.artifact_df)  # keep original project summary
+            self.state.project_summary = dataset.project_summary
         for step in self.steps:
             self.run_step(step)
 

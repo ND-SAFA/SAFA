@@ -7,13 +7,12 @@ from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
-from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
+from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -21,6 +20,7 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 DATA_TOO_LITTLE_INPUTS = "Missing required dataset_creator or artifact_df + layer_ids."
@@ -96,21 +96,18 @@ class RankingJob(AbstractJob):
                                     **self.ranking_kwargs)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         pipeline.run()
-        predicted_entries = pipeline.state.candidate_entries
-        selected_trace_ids = {self.get_trace_id_from_entry(entry) for entry in pipeline.state.selected_entries}
-        selected_entries = []
+        selected_entries = pipeline.state.selected_entries
         has_positive_links = self.dataset and self.dataset.trace_dataset and len(self.dataset.trace_df.get_links_with_label(1)) > 1
         if has_positive_links:
-            for entry in predicted_entries:
+            for entry in selected_entries:
                 trace_id = self.get_trace_id_from_entry(entry)
-                if trace_id in self.dataset.trace_df and trace_id in selected_trace_ids:
-                    trace_entry = self.dataset.trace_df.loc[trace_id]
-                    label = trace_entry[TraceKeys.LABEL.value]
-                    entry[TraceKeys.LABEL] = label
-                    selected_entries.append(entry)
-                    self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
-                    if TraceKeys.EXPLANATION in entry:
-                        self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+                trace_entry = self.dataset.trace_df.loc[trace_id]
+                label = trace_entry[TraceKeys.LABEL.value]
+                entry[TraceKeys.LABEL] = label
+                self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
+                if TraceKeys.EXPLANATION in entry:
+                    self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+
         if export_dir:
             PromptDatasetExporter(export_path=os.path.join(export_dir, "final_dataset"),
                                   dataset=self.dataset, trace_dataset_exporter_type=SafaExporter).export()

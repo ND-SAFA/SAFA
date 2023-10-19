@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 import pandas as pd
 
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class AbstractEntityFormat(ABC):

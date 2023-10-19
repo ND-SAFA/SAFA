@@ -16,7 +16,9 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, \
     NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
-from tgen.summarizer.summary_types import SummaryTypes
+from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
+from tgen.summarizer.summarizer_args import SummarizerArgs
+from tgen.summarizer.summary import Summary
 
 
 class ArtifactsSummarizer(BaseObject):
@@ -26,8 +28,8 @@ class ArtifactsSummarizer(BaseObject):
     """
     SUMMARY_TAG = "summary"
 
-    def __init__(self, summarizer_args,
-                 nl_summary_type: SummaryTypes = SummaryTypes.NL_BASE):
+    def __init__(self, summarizer_args: SummarizerArgs, project_summary: Summary = None,
+                 nl_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.NL_BASE):
         """
         Initializes a summarizer for a specific model
         :param summary_args: The args for the summary
@@ -37,14 +39,14 @@ class ArtifactsSummarizer(BaseObject):
         self.args_for_summarizer_model = self.llm_manager.llm_args
         self.code_or_above_limit_only = summarizer_args.summarize_code_only
         self.prompt_args = self.llm_manager.prompt_args
-        self.project_summary = summarizer_args.project_summary
+        self.project_summary = project_summary
         code_prompts = summarizer_args.code_summary_type.value
         nl_prompts = nl_summary_type.value
         if self.project_summary:
             nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            nl_prompts.insert(1, Prompt(self.project_summary, allow_formatting=False))
+            nl_prompts.insert(1, Prompt(self.project_summary.to_string(), allow_formatting=False))
             code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            code_prompts.insert(1, Prompt(self.project_summary, allow_formatting=False))
+            code_prompts.insert(1, Prompt(self.project_summary.to_string(), allow_formatting=False))
         self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
         self.nl_prompt_builder = PromptBuilder(nl_prompts)
 
@@ -89,7 +91,7 @@ class ArtifactsSummarizer(BaseObject):
         return summary.pop()
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str, col4filename: str = None,
-                            index_to_filename: Dict[str, SummaryTypes] = None) -> List[str]:
+                            index_to_filename: Dict[str, ArtifactSummaryTypes] = None) -> List[str]:
         """
         Summarizes the information in a dataframe in a given column
         :param df: The dataframe to summarize

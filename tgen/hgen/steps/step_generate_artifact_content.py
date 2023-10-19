@@ -2,7 +2,7 @@ import os
 import uuid
 from typing import Tuple
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, COMMA
+from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
@@ -39,10 +39,9 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generated_artifacts_tag, links_tag = task_prompt.response_manager.get_all_tag_ids()
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True)
-        if state.project_summary:
-            overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
-                                               f"{NEW_LINE}{state.project_summary}", allow_formatting=False)
-            prompt_builder.add_prompt(overview_of_system_prompt, 1)
+        overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
+                                           f"{NEW_LINE}{state.project_summary.to_string()}", allow_formatting=False)
+        prompt_builder.add_prompt(overview_of_system_prompt, 1)
         generation_predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
                                                           dataset=source_layer_only_dataset, response_prompt_ids={task_prompt.id},
                                                           tags_for_response={generated_artifacts_tag}, return_first=False,
@@ -68,7 +67,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                          f"also include a comma-deliminated list of the ids for each {args.source_type} "
                                          f"from which you derived the {args.target_type} enclosed in " + "{source}",
             expected_responses={source_tag_id: set(state.source_dataset.artifact_df.index)},
-            formatter=lambda tag, val: [v.strip() for v in val.split(COMMA)] if tag == source_tag_id
+            value_formatter=lambda tag, val: [v.strip() for v in val.split(COMMA)] if tag == source_tag_id
             else val.strip().strip(NEW_LINE),
             id2tag={target_tag_id: target_type_tag,
                     source_tag_id: source_type_tag},

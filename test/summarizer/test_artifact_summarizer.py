@@ -7,9 +7,9 @@ from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
-from tgen.summarizer.summary_types import SummaryTypes
+from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
@@ -34,7 +34,7 @@ class TestSummarizer(BaseTest):
         """
         NL_SUMMARY = "NL_SUMMARY"
         summarizer = self.get_summarizer()
-        response_manager.set_responses([ lambda prompt: self.get_response(prompt, SummaryTypes.NL_BASE, NL_SUMMARY)])
+        response_manager.set_responses([lambda prompt: self.get_response(prompt, ArtifactSummaryTypes.NL_BASE, NL_SUMMARY)])
         content_summary = summarizer.summarize_single(content="This is some text.")
         self.assertEqual(content_summary, NL_SUMMARY)
 
@@ -48,7 +48,7 @@ class TestSummarizer(BaseTest):
 
     @mock_openai
     def test_code_summarization(self, ai_manager: TestAIManager):
-        ai_manager.set_responses([ lambda prompt: self.get_response(prompt, SummaryTypes.CODE_BASE, CODE_SUMMARY)])
+        ai_manager.set_responses([lambda prompt: self.get_response(prompt, ArtifactSummaryTypes.CODE_BASE, CODE_SUMMARY)])
         CODE_SUMMARY = "CODE_SUMMARY"
         summarizer = self.get_summarizer()
         content_summary = summarizer.summarize_single(self.CODE_CONTENT, filename="file.py")
@@ -70,8 +70,8 @@ class TestSummarizer(BaseTest):
         contents = [nl_content, self.CODE_CONTENT]
         summarizer = self.get_summarizer(summarize_code_only=False)
 
-        response_manager.set_responses([lambda prompt: self.get_response(prompt, SummaryTypes.NL_BASE, NL_SUMMARY),
-                                        lambda prompt: self.get_response(prompt, SummaryTypes.CODE_BASE, PL_SUMMARY)])
+        response_manager.set_responses([lambda prompt: self.get_response(prompt, ArtifactSummaryTypes.NL_BASE, NL_SUMMARY),
+                                        lambda prompt: self.get_response(prompt, ArtifactSummaryTypes.CODE_BASE, PL_SUMMARY)])
 
         summaries = summarizer.summarize_bulk(bodies=contents,
                                               filenames=["natural language", "file.py"])
@@ -123,7 +123,7 @@ class TestSummarizer(BaseTest):
         return prompts
 
     @staticmethod
-    def get_response(prompt: str, summary_type: SummaryTypes, expected_summary: str):
+    def get_response(prompt: str, summary_type: ArtifactSummaryTypes, expected_summary: str):
         if summary_type.value[0].value not in prompt:
             return "fail"
         return PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, expected_summary)

@@ -47,7 +47,7 @@ def get_generated_artifacts_response(contents=None, sources=None, target_type="u
         source = sources[i % len(sources)]
         content += PromptUtil.create_xml(source_type, COMMA.join(source))
         contents[i] = content
-    response = PromptUtil.create_xml("summary", HGenTestConstants.summary)
+    response = ""
     for us in contents:
         response += PromptUtil.create_xml(target_type, us)
     return [response]
@@ -84,5 +84,5 @@ def get_test_hgen_args(test_refinement: bool = False):
                             target_type="Test User Story",
                             optimize_with_reruns=test_refinement,
                             n_reruns=HGenTestConstants.n_reruns,
-                            dataset_creator_for_sources=PromptDatasetCreator(
+                            dataset_creator=PromptDatasetCreator(
                                 trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))

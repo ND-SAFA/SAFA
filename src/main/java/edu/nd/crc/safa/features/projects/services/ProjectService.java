@@ -280,7 +280,9 @@ public class ProjectService {
      */
     public List<ProjectIdAppEntity> getIdAppEntities(Collection<Project> projects, SafaUser currentUser) {
         return projects.stream()
-            .map(project -> getIdAppEntity(project, currentUser))
+            .filter(project -> permissionService.hasAnyPermission(
+                Set.of(TeamPermission.VIEW_PROJECTS, ProjectPermission.VIEW), project, currentUser
+            )).map(project -> getIdAppEntity(project, currentUser))
             .collect(Collectors.toUnmodifiableList());
     }
 

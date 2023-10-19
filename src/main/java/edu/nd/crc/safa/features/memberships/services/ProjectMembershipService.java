@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,9 @@ import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
@@ -32,6 +36,7 @@ public class ProjectMembershipService implements IMembershipService {
     private final UserProjectMembershipRepository userProjectMembershipRepo;
     private final TeamMembershipService teamMembershipService;
     private final NotificationService notificationService;
+    private final PermissionService permissionService;
 
     /**
      * {@inheritDoc}
@@ -111,9 +116,11 @@ public class ProjectMembershipService implements IMembershipService {
      */
     public List<ProjectIdAppEntity> getProjectIdAppEntitiesForUser(SafaUser user) {
         return getProjectsForUser(user).stream()
-                .map(project -> projectService.getIdAppEntity(project, user))
-                .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
-                .collect(Collectors.toList());
+            .filter(project -> permissionService.hasAnyPermission(
+                Set.of(TeamPermission.VIEW_PROJECTS, ProjectPermission.VIEW), project, user
+            )).map(project -> projectService.getIdAppEntity(project, user))
+            .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
+            .collect(Collectors.toList());
     }
 
     /**

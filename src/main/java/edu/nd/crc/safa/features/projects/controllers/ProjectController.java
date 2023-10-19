@@ -18,7 +18,6 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
-import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -47,17 +46,15 @@ public class ProjectController extends BaseController {
     private final ProjectMembershipService projectMembershipService;
     private final OrganizationService organizationService;
     private final TeamService teamService;
-    private final PermissionService permissionService;
 
     @Autowired
     public ProjectController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
                              ProjectMembershipService projectMembershipService, OrganizationService organizationService,
-                             TeamService teamService, PermissionService permissionService) {
+                             TeamService teamService) {
         super(resourceBuilder, serviceProvider);
         this.projectMembershipService = projectMembershipService;
         this.organizationService = organizationService;
         this.teamService = teamService;
-        this.permissionService = permissionService;
     }
 
     /**

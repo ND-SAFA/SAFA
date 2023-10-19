@@ -3,7 +3,7 @@ from copy import deepcopy
 from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_DATA_FLOW_TITLE, PS_ENTITIES_TITLE, \
     PS_FEATURE_TITLE, \
     PS_NOTES_TAG, \
-    PS_OVERVIEW_TITLE, PS_SUBSYSTEM_TITLE
+    PS_OVERVIEW_TITLE, PS_SUBSYSTEM_TITLE, MULTI_LINE_ITEMS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.summarizer.summary import Summary
@@ -24,6 +24,9 @@ def create(title: str, body_prefix: str = None, tag: str = None):
         body_prefix = ""
     tag = PROJECT_SUMMARY_TAGS[title] if not tag else tag
     body = MOCK_PS_RES_MAP.get(title, f"project_{title.lower()}")
+    if title in MULTI_LINE_ITEMS:
+        body_prefix = PromptUtil.create_xml("name", body_prefix if body_prefix else "name")
+        body = PromptUtil.create_xml("descr", body)
     r = ""
     r += PromptUtil.create_xml(PS_NOTES_TAG, "notes")
     r += PromptUtil.create_xml(tag, f"{body_prefix}{body}")

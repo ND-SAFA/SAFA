@@ -61,6 +61,7 @@ class TestHierarchyGenerator(BaseTest):
         prompt: QuestionnairePrompt = SupportedPrompts.HGEN_SUMMARY_QUESTIONNAIRE.value
         tag = prompt.get_all_response_tags()[-1]
         responses = [create(HierarchyGenerator.HGEN_SECTION_TITLE, tag=tag)]
+        anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses(responses)
         gen = HierarchyGenerator(self.HGEN_ARGS)
         gen.state.final_dataset = PromptDataset()

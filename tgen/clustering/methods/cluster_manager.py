@@ -2,9 +2,33 @@ from typing import Dict, List
 
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
+from tgen.common.constants.clustering_constants import DEFAULT_RANDOM_STATE, MAX_CLUSTER_SIZE
 from tgen.embeddings.embeddings_manager import EmbeddingType
 
-REQUIRED_CLUSTER_ESTIMATION = [SupportedClusterMethods.KMEANS, SupportedClusterMethods.AGGLOMERATIVE]
+REQUIRED_CLUSTER_ESTIMATION = [SupportedClusterMethods.KMEANS, SupportedClusterMethods.AGGLOMERATIVE, SupportedClusterMethods.BIRCH,
+                               SupportedClusterMethods.SPECTRAL]
+algo_params = {
+    SupportedClusterMethods.BIRCH: {
+        "branching_factor": 2
+    },
+    SupportedClusterMethods.OPTICS: {
+        "min_samples": 2
+    },
+    SupportedClusterMethods.HB_SCAN: {
+        "min_cluster_size": 2,
+        "max_cluster_size": MAX_CLUSTER_SIZE
+    },
+    SupportedClusterMethods.MEANSHIFT: {
+        "bandwidth": 2
+    },
+    SupportedClusterMethods.SPECTRAL: {
+        "assign_labels": "discretize",
+        "random_state": DEFAULT_RANDOM_STATE
+    },
+    SupportedClusterMethods.AFFINITY: {
+        "random_state": DEFAULT_RANDOM_STATE
+    }
+}
 
 
 class ClusterManager:
@@ -30,6 +54,7 @@ class ClusterManager:
         n_clusters = round(len(embeddings) * reduction_factor)
 
         local_kwargs = {} if self.method not in REQUIRED_CLUSTER_ESTIMATION else {"n_clusters": n_clusters}
+        local_kwargs.update(algo_params.get(self.method, {}))
 
         clustering_algo = self.method.value(**local_kwargs, **kwargs)
         clustering_algo.fit(embeddings)

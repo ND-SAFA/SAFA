@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Set
 
-from tgen.clustering.base.cluster_type import ClusterType
+from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 
 DEFAULT_SIMILARITY_THRESHOLD = 0.85
 
@@ -16,6 +16,7 @@ class UniqueClusterMap:
         :param threshold: The percentage of overlap to which consider sets are the same.
         """
         self.cluster_map = {}
+        self.cluster_votes = {}
         self.cluster_set_map: Dict[Any, Set] = {}
         self.seen_clusters = set()
         self.threshold = threshold
@@ -42,6 +43,17 @@ class UniqueClusterMap:
         self.cluster_set_map[cluster_id] = set(cluster)
         return cluster
 
+    def get_clusters(self, min_votes: int = 2) -> ClusterMapType:
+        """
+        Constructs cluster map from the clusters reaching the minimum number of votes.
+        :param min_votes: The minimum number of votes to to include in cluster map.
+        :return: Cluster map.
+        """
+        selected_cluster_ids = [c_id for c_id, votes in self.cluster_votes.items() if votes >= min_votes]
+        selected_cluster_ids = set(selected_cluster_ids)
+        cluster_map = {k: v for k, v in self.cluster_map.items() if selected_cluster_ids}
+        return cluster_map
+
     def contains_cluster(self, cluster: ClusterType) -> bool:
         """
         Calculated whether given cluster is contained within current map.
@@ -50,10 +62,21 @@ class UniqueClusterMap:
         """
         cluster_sets = self.cluster_set_map.values()
         target_c_set = set(cluster)
-        for c_set in cluster_sets:
+        for c_id, c_set in self.cluster_set_map.items():
             if self.calculate_intersection(c_set, target_c_set) >= self.threshold:
+                self.add_hit(c_id)
                 return True
         return False
+
+    def add_hit(self, c_id: str) -> None:
+        """
+        Adds one vote to cluster with ID.
+        :param c_id: ID of cluster to increment.
+        :return: None
+        """
+        if c_id not in self.cluster_votes:
+            self.cluster_votes[c_id] = 0
+        self.cluster_votes[c_id] += 1
 
     def get_next_cluster_id(self) -> int:
         """
@@ -71,6 +94,6 @@ class UniqueClusterMap:
         :return: The ratio between the number of intersection elements vs the total union.
         """
         c_intersection = c1.intersection(c2)
-        c_union = c1.union(c2)
-        c_intersection_amount = len(c_intersection) / len(c_union)
+        c_union = min(len(c1), len(c2))
+        c_intersection_amount = len(c_intersection) / c_union
         return c_intersection_amount

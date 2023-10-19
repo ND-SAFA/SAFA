@@ -1,5 +1,5 @@
 from hdbscan import HDBSCAN
-from sklearn.cluster import AgglomerativeClustering, Birch, DBSCAN, KMeans, OPTICS
+from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, Birch, DBSCAN, KMeans, MeanShift, OPTICS, SpectralClustering
 
 from tgen.common.util.supported_enum import SupportedEnum
 
@@ -14,3 +14,6 @@ class SupportedClusterMethods(SupportedEnum):
     OPTICS = OPTICS  # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.OPTICS.html#sklearn.cluster.OPTICS
     HB_SCAN = HDBSCAN  # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.HDBSCAN.html#sklearn.cluster.HDBSCAN
     DBSCAN = DBSCAN  # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html#sklearn.cluster.DBSCAN
+    MEANSHIFT = MeanShift
+    SPECTRAL = SpectralClustering
+    AFFINITY = AffinityPropagation

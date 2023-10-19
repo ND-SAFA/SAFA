@@ -3,8 +3,8 @@ from typing import List
 from tgen.clustering.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_state import ClusteringState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingSorter
 
 
 class CreateEmbeddings(AbstractPipelineStep):
@@ -19,8 +19,8 @@ class CreateEmbeddings(AbstractPipelineStep):
         artifact_df = args.dataset.trace_dataset.artifact_df
 
         artifact_map = self.create_artifact_map(artifact_df, artifact_types)
-        model = EmbeddingSorter.get_model(args.embedding_model)
-        embedding_map = EmbeddingSorter.create_embedding_map(artifact_map, model)
+        model = EmbeddingsManager.get_model(args.embedding_model)
+        embedding_map = EmbeddingsManager.create_embedding_map(artifact_map, model)
 
         state.embedding_map = embedding_map
 

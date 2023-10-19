@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, List
 
 from tgen.clustering.clustering_args import ClusterType
-from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingType
+from tgen.embeddings.embeddings_manager import EmbeddingType
 
 
 class IClusterMethod(ABC):

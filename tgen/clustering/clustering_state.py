@@ -1,8 +1,8 @@
 from typing import Dict
 
 from tgen.clustering.clustering_args import ClusterType
+from tgen.embeddings.embeddings_manager import EmbeddingType
 from tgen.state.state import State
-from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingType
 
 
 class ClusteringState(State):

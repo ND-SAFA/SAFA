@@ -22,6 +22,7 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -161,6 +162,9 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Generating Trace Links", position = 4)
     public void generatingTraces(JobLogger logger) {
+        getServiceProvider().getPermissionService()
+            .requirePermission(ProjectPermission.GENERATE, getProjectVersion().getProject(), getUser());
+
         ProjectCommitDefinition projectCommitDefinition = getProjectCommitDefinition();
 
         TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();

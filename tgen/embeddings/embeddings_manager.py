@@ -39,7 +39,7 @@ class EmbeddingsManager:
         if subset_ids is None:
             subset_ids = content_map.keys()
         contents = [content_map[c_id] for c_id in subset_ids]
-        embeddings = model.encode(contents)
+        embeddings = model.encode(contents, show_progress_bar=True)
         embedding_map = {a_id: embedding for a_id, embedding in zip(subset_ids, embeddings)}
         return embedding_map
 

@@ -1,11 +1,8 @@
 import os
 from abc import ABC, abstractmethod
-from copy import deepcopy
 from typing import Generic, List, Optional, Type, TypeVar
-from typing import Generic, List, Type, TypeVar, Optional
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, F_SLASH
-from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
@@ -65,7 +62,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                                 InteractiveModeOptions.LOAD_NEW_STATE, InteractiveModeOptions.QUIT]
     NEW_STATE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP, InteractiveModeOptions.NEXT_STEP]
 
-    def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None):
+    def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None,
+                 skip_summary: bool = False):
         """
         Constructs pipeline of steps.
         :param steps: Steps to perform in sequential order.
@@ -77,6 +75,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.summarizer_args = SummarizerArgs(do_resummarize_project=False,
                                               summarize_code_only=True,
                                               do_resummarize_artifacts=False) if not summarizer_args else summarizer_args
+        if skip_summary:
+            self.summarizer_args = None
 
     def init_state(self) -> StateType:
         """

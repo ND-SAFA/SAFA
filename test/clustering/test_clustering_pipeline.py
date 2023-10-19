@@ -12,12 +12,7 @@ class TestClusteringPipeline(TestCase):
         """
         Tests that simple clustering of sentences results in reasonable clusters.
         """
-        args = ClusteringTestUtil.create_clustering_args([
-            "I have a very fluffy dog.",
-            "My cat is a cute and a little mean.",
-            "My car goes very fast.",
-            "The road is awefully dangerous to be driving on."
-        ], clustering_method_args={"reduction_factor": 0.5})
+        args = ClusteringTestUtil.create_default_args(clustering_method_args={"reduction_factor": 0.5})
         pipeline: ClusteringPipeline = ClusteringPipeline(args)
         pipeline.run()
 

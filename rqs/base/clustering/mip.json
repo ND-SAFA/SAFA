@@ -1,0 +1,22 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CLUSTERING",
+          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/clusters",
+          "artifact_types": [
+            "Component"
+          ],
+          "dataset_creator": {
+            "object_type": "TRACE",
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

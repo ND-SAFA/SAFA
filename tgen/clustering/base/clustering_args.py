@@ -2,9 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List
 
 from tgen.clustering.methods.cluster_method import ClusterMethod
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 
@@ -17,13 +15,12 @@ class ClusteringArgs(PipelineArgs):
     :param embedding_model: The name of the model to use to create the embeddings.
     :param artifact_types: List of artifact types to cluster.
     """
-    dataset_creator: PromptDatasetCreator = None
-    dataset: PromptDataset = None
     cluster_methods: List[ClusterMethod] = None
     clustering_method_args: Dict = field(default_factory=dict)
-    embedding_model: str = None
+    embedding_model: str = DEFAULT_EMBEDDING_MODEL
     artifact_types: List[str] = None
     cluster_intersection_threshold = 0.80  # 80% or more of intersection equals same cluster
+    add_to_dataset: bool = False
 
     def __post_init__(self) -> None:
         """
@@ -31,9 +28,8 @@ class ClusteringArgs(PipelineArgs):
         :return: None
         """
         super().__post_init__()
-        self.dataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
         if self.artifact_types is None:
-            self.artifact_types = self.dataset.artifact_df.get_types()
+            self.artifact_types = self.dataset.artifact_df.get_artifact_types()
 
         if self.cluster_methods is None:
             self.cluster_methods = [c for c in ClusterMethod]

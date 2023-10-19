@@ -7,8 +7,8 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class ArtifactDataFrame(AbstractProjectDataFrame):
@@ -45,16 +45,25 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return ArtifactKeys
 
-    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1, summary: str = EMPTY_STRING) -> EnumDict:
+    def add_artifacts(self, artifacts: List[Artifact]) -> None:
+        """
+        Adds artifacts to data frame.
+        :param artifacts: The artifacts to add.
+        :return: None
+        """
+        for a in artifacts:
+            self.add_artifact(**a)
+
+    def add_artifact(self, id: Any, content: str, layer_id: Any = 1, summary: str = EMPTY_STRING) -> EnumDict:
         """
         Adds artifact to dataframe
-        :param artifact_id: The id of the Artifact
+        :param id: The id of the Artifact
         :param content: The body of the artifact
         :param layer_id: The id of the layer that the artifact is part of
         :param summary: The summary of the artifact body
         :return: The newly added artifact
         """
-        row_as_dict = {ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
+        row_as_dict = {ArtifactKeys.ID: id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
                        ArtifactKeys.SUMMARY: summary if summary else self._SUMMARY_DEFAULT}
         return self.add_or_update_row(row_as_dict)
 
@@ -91,7 +100,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         type2count = dict(counts_df)
         return type2count
 
-    def get_types(self) -> List[str]:
+    def get_artifact_types(self) -> List[str]:
         """
         :return: Returns list of unique artifact types in data frame.
         """

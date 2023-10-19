@@ -4,28 +4,35 @@ from typing import Dict, List
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.embeddings.embeddings_manager import EmbeddingType
 
+DEFAULT_REDUCTION_FACTOR = 0.25  # Expected reduction in artifacts
+
 
 class IClusterMethod(ABC):
 
-    def cluster(self, embedding_map: Dict[str, EmbeddingType], **kwargs) -> ClusterMapType:
+    def cluster(self, embedding_map: Dict[str, EmbeddingType], reduction_factor: int = DEFAULT_REDUCTION_FACTOR,
+                **kwargs) -> ClusterMapType:
         """
         Clusters embeddings in map and creates sets of links.
         :param embedding_map: Map of artifact ID to embedding.
+        :param reduction_factor: The factor by which the embeddings are reduced into clusters
+        (e.g. 0.25 => # clusters = (embeddings / 4))
         :param kwargs: Clustering method arguments.
         :return: Map of cluster ID to artifact ids in cluster.
         """
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
-        embedding_labels = self._cluster(embeddings, **kwargs)
+        n_clusters = round(len(embeddings) * reduction_factor)
+        embedding_labels = self._cluster(embeddings, n_clusters, **kwargs)
         clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels)
         return clusters
 
     @abstractmethod
-    def _cluster(self, embeddings: List[EmbeddingType], **kwargs) -> List[int]:
+    def _cluster(self, embeddings: List[EmbeddingType], n_clusters: int, **kwargs) -> List[int]:
         """
         Clusters embeddings in map and creates sets of links.
         :param embeddings: The embeddings to cluster.
-        :param args: Clustering method arguments.
+        :param n_clusters: The expected number of clusters.
+        :param kwargs: additional keyword arguemtns.
         :return: Cluster ID mapped to each embedding.
         """
         pass

@@ -10,8 +10,8 @@ DEFAULT_RANDOM_STATE = 0
 
 
 class KMeansClustering(IClusterMethod):
-    def _cluster(self, embeddings: List[EmbeddingType], reduction_factor: float = DEFAULT_REDUCTION_FACTOR,
-                 random_state: int = DEFAULT_RANDOM_STATE, **kwargs) -> List[int]:
+    def _cluster(self, embeddings: List[EmbeddingType], n_clusters: int, random_state: int = DEFAULT_RANDOM_STATE, **kwargs) -> List[
+        int]:
         """
         Performs K-Means clustering on the embeddings.
         :param embeddings: The embeddings to cluster.
@@ -20,7 +20,6 @@ class KMeansClustering(IClusterMethod):
         :param n_init: The number of times to re-initialize kmeans.
         :return: The labels associated with each embedding.
         """
-        n_clusters = round(len(embeddings) * reduction_factor)
         kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, **kwargs)
         kmeans.fit(embeddings)
         return kmeans.labels_

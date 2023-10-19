@@ -14,8 +14,11 @@ from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
 
 
 class ClusteringTestUtil:
-    default_artifact_type = "A"
-    default_artifacts = [
+    """
+    Provides utility testing methods for clustering tests.
+    """
+    DEFAULT_ARTIFACT_TYPE = "A"
+    DEFAULT_ARTIFACTS = [
         "I have a very fluffy dog.",
         "My cat is a cute and a little mean.",
         "My car goes very fast.",
@@ -29,10 +32,10 @@ class ClusteringTestUtil:
         :param kwargs: Additional keyword arguments to create clustering args.
         :return:  Clustering args.
         """
-        return ClusteringTestUtil.create_clustering_args(ClusteringTestUtil.default_artifacts, **kwargs)
+        return ClusteringTestUtil.create_clustering_args(ClusteringTestUtil.DEFAULT_ARTIFACTS, **kwargs)
 
     @staticmethod
-    def create_clustering_args(artifact_bodies: List[str], artifact_type: str = default_artifact_type,
+    def create_clustering_args(artifact_bodies: List[str], artifact_type: str = DEFAULT_ARTIFACT_TYPE,
                                embedding_model=SMALL_EMBEDDING_MODEL, **kwargs) -> ClusteringArgs:
         """
         Creates a prompt dataset containing artifacts with bodies given.

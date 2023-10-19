@@ -46,5 +46,5 @@ class TestAddToDataset(TestCase):
         layers = layer_df.as_list()
         self.assertEqual(1, len(layers))
         traced_layer = layers[0]
-        self.assertEqual(ClusteringTestUtil.default_artifact_type, traced_layer[0])
+        self.assertEqual(ClusteringTestUtil.DEFAULT_ARTIFACT_TYPE, traced_layer[0])
         self.assertEqual(AddClustersToDataset.CLUSTER_ARTIFACT_TYPE, traced_layer[1])

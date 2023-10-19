@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
-from tgen.clustering.clustering_args import ClusterType
+from tgen.clustering.base.cluster_type import ClusterType
 from tgen.embeddings.embeddings_manager import EmbeddingType
 
 

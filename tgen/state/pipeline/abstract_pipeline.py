@@ -63,7 +63,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
     NEW_STATE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP, InteractiveModeOptions.NEXT_STEP]
 
     def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None,
-                 skip_summary: bool = False):
+                 skip_summarization: bool = False):
         """
         Constructs pipeline of steps.
         :param steps: Steps to perform in sequential order.
@@ -75,7 +75,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.summarizer_args = SummarizerArgs(do_resummarize_project=False,
                                               summarize_code_only=True,
                                               do_resummarize_artifacts=False) if not summarizer_args else summarizer_args
-        if skip_summary:
+        if skip_summarization:
             self.summarizer_args = None
 
     def init_state(self) -> StateType:

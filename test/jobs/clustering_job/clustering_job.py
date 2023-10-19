@@ -30,7 +30,7 @@ class ClusteringJob(AbstractJob):
         prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=self.dataset_creator)
         args = ClusteringArgs(dataset_creator=prompt_dataset_creator, add_to_dataset=self.add_to_dataset,
                               export_dir=self.export_dir, artifact_types=self.artifact_types)
-        pipeline = ClusteringPipeline(args, summarizer_args=None, skip_summary=True)
+        pipeline = ClusteringPipeline(args, summarizer_args=None, skip_summarization=True)
 
         pipeline.run()
 

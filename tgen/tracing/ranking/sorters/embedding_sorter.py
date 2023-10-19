@@ -59,8 +59,8 @@ class EmbeddingSorter(iSorter):
         :param artifact_ids: The artifact ids to embed.
         :return: List of embeddings in same order as artifact ids.
         """
-        artifact_ids = set(artifact_ids)
-        subset_content_map = {k: v for k, v in artifact_map.items() if k in artifact_ids}
+        artifact_ids_set = set(artifact_ids)
+        subset_content_map = {k: v for k, v in artifact_map.items() if k in artifact_ids_set}
         embedding_map = EmbeddingSorter.create_embedding_map(subset_content_map, model)
         embeddings = [embedding_map[entry_id] for entry_id in artifact_ids]
         return embeddings

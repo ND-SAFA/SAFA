@@ -7,7 +7,7 @@ from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingType
 
 class IClusterMethod(ABC):
 
-    def cluster(self, embedding_map: Dict[str, EmbeddingType], args: Dict) -> CluwsterType:
+    def cluster(self, embedding_map: Dict[str, EmbeddingType], args: Dict) -> ClusterType:
         """
         Clusters embeddings in map and creates sets of links.
         :param embedding_map: Map of artifact ID to embedding.
@@ -31,15 +31,15 @@ class IClusterMethod(ABC):
         pass
 
     @staticmethod
-    def create_clusters_from_labels(artifact_ids: List[str], embedding_labels: List[int]) -> ClusterType:
+    def create_clusters_from_labels(artifact_ids: List[str], cluster_labels: List[int]) -> ClusterType:
         """
         Creates cluster by linking cluster labels associated to each artifact.
         :param artifact_ids: The artifacts to cluster.
-        :param embedding_labels: The labels associated with each artifact.
+        :param cluster_labels: The cluster ID associated with each artifact.
         :return: Map of cluster to their corresponding artifacts.
         """
         clusters = {}
-        for cluster_label, artifact_id in zip(embedding_labels, artifact_ids):
+        for cluster_label, artifact_id in zip(cluster_labels, artifact_ids):
             if cluster_label not in clusters:
                 clusters[cluster_label] = []
             clusters[cluster_label].append(artifact_id)

@@ -13,7 +13,7 @@ class ClusterEmbeddings(AbstractPipelineStep):
         """
         embedding_map = state.embedding_map
 
-        cluster_method: IClusterMethod = args.cluster_method.value
-        clusters = cluster_method.cluster(embedding_map, args.clustering_args)
+        cluster_method: IClusterMethod = args.cluster_method.value()
+        clusters = cluster_method.cluster(embedding_map, **args.clustering_args)
 
         state.clusters = clusters

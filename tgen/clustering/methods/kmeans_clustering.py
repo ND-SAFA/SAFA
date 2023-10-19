@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List
 
 from sklearn.cluster import KMeans
 
@@ -11,11 +11,16 @@ DEFAULT_N_INIT = "auto"
 
 
 class KMeansClustering(IClusterMethod):
-    def _cluster(self, embeddings: List[EmbeddingType], args: Dict) -> List[int]:
-        reduction_factor = args.get("reduction_factor", DEFAULT_REDUCTION_FACTOR)
-        random_state = args.get("random_state", DEFAULT_RANDOM_STATE)
-        n_init = args.get("n_init", DEFAULT_N_INIT)
-
+    def _cluster(self, embeddings: List[EmbeddingType], reduction_factor: float = DEFAULT_REDUCTION_FACTOR,
+                 random_state: int = DEFAULT_RANDOM_STATE, n_init: int = DEFAULT_N_INIT) -> List[int]:
+        """
+        Performs K-Means clustering on the embeddings.
+        :param embeddings: The embeddings to cluster.
+        :param reduction_factor: The reduction factor used to calculate how many clusters to produce.
+        :param random_state: The random state of the KMeans algo.
+        :param n_init: The number of times to re-initialize kmeans.
+        :return: The labels associated with each embedding.
+        """
         n_clusters = round(len(embeddings) * reduction_factor)
         kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=n_init)
         kmeans.fit(embeddings)

@@ -66,18 +66,18 @@ class EmbeddingSorter(iSorter):
         return embeddings
 
     @staticmethod
-    def create_embedding_map(content_map: Dict[str, str], model: SentenceTransformer, entry_ids: List[str] = None) -> \
+    def create_embedding_map(content_map: Dict[str, str], model: SentenceTransformer, subset_ids: List[str] = None) -> \
             Dict[str, EmbeddingType]:
         """
         Creates embeddings for entries in map.
         :param content_map: The entries in the map to embed.
         :param model: The model to use to embed the entries.
-        :param entry_ids: The IDs of the entries to embed.
+        :param subset_ids: The IDs of the set of the entries to use.
         :return: Map of id to embedding.
         """
-        if entry_ids is None:
-            entry_ids = content_map.keys()
-        embedding_map = {a_id: model.encode(content_map[a_id]) for a_id in entry_ids}
+        if subset_ids is None:
+            subset_ids = content_map.keys()
+        embedding_map = {a_id: model.encode(content_map[a_id]) for a_id in subset_ids}
         return embedding_map
 
     @staticmethod

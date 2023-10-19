@@ -1,6 +1,8 @@
+from dataclasses import field
 from typing import Dict, List
 
 from tgen.clustering.methods.cluster_method import ClusterMethod
+from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.state.pipeline.pipeline_args import PipelineArgs
@@ -17,7 +19,7 @@ class ClusteringArgs(PipelineArgs):
     :param artifact_types: List of artifact types to cluster.
     """
     cluster_method: ClusterMethod = None
-    clustering_args: Dict = None
+    clustering_method_args: Dict = field(default_factory=dict)
     embedding_model: str = None
     dataset_creator: PromptDatasetCreator = None
     dataset: PromptDataset = None
@@ -28,9 +30,6 @@ class ClusteringArgs(PipelineArgs):
         Creates dataset if creator is defined, sets optional artifact types.
         :return: None
         """
-        if self.clustering_args is None:
-            self.clustering_args = {}
-        if self.dataset_creator:
-            self.dataset = self.dataset_creator.create()
+        self.dataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
         if self.artifact_types is None:
             self.artifact_types = self.dataset.artifact_df.get_types()

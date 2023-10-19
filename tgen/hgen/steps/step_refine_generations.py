@@ -17,6 +17,7 @@ from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.summarizer.summary import Summary
 
 
 class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -49,7 +50,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
     def perform_refinement(hgen_args: HGenArgs,
                            new_generated_artifact_content: Dict[str, List[str]],
                            refined_artifact_content: Dict[str, List[str]],
-                           summary: str,
+                           summary: Summary,
                            export_path: str) -> Dict[str, List[str]]:
         """
         Performs the refinement of the original generated artifact content
@@ -68,7 +69,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                         base_prompt=SupportedPrompts.HGEN_REFINEMENT,
                                                                         artifact_type=f"V1 {hgen_args.target_type}",
                                                                         build_method=MultiArtifactPrompt.BuildMethod.NUMBERED)
-            prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
+            prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary.to_string()}"), 1)
             refined_artifacts = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"V2 {hgen_args.target_type}"),
                                                     build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                                     include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT,

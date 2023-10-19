@@ -1,5 +1,6 @@
 import os
 import uuid
+from copy import deepcopy
 from typing import Any, Callable, List, Optional, Tuple
 
 import pandas as pd
@@ -11,8 +12,8 @@ from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.idataset import iDataset
@@ -21,7 +22,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.model_manager import ModelManager
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.summary import Summary
 
 
 class PromptDataset(iDataset):
@@ -34,7 +35,7 @@ class PromptDataset(iDataset):
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
                  trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None,
-                 project_summary: str = None):
+                 project_summary: Summary = None):
         """
         Initializes the dataset with necessary artifact/trace information and generator for the prompts
         :param prompt_df: The prompt dataframe
@@ -231,8 +232,7 @@ class PromptDataset(iDataset):
         prompt_entry = self._create_prompt(prompt_builder=prompt_builder, prompt_args=prompt_args, artifacts=artifacts)
         return [prompt_entry]
 
-    def _generate_prompts_dataframe_without_artifacts(self, prompt_builder: PromptBuilder, prompt_args: PromptArgs,
-                                                      summarizer: ArtifactsSummarizer = None) -> List:
+    def _generate_prompts_dataframe_without_artifacts(self, prompt_builder: PromptBuilder, prompt_args: PromptArgs) -> List:
         """
         Builds the prompt in the format for generation model without artifacts or traces.
         :param prompt_builder: The generator of prompts for the dataset
@@ -270,7 +270,9 @@ class PromptDataset(iDataset):
         :param item: The attribute name to get
         :return: The attribute from trace dataset if it exists else attribute error is raised
         """
-        try:
-            return getattr(self.trace_dataset, item)
-        except Exception as e:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        if not item.startswith("__"):
+            try:
+                return getattr(self.trace_dataset, item)
+            except Exception as e:
+                pass
+        return super().__getattr__(self, item)

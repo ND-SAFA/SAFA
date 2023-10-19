@@ -7,6 +7,9 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+import pandas as pd
 from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
@@ -156,12 +159,14 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 self.update_values(ArtifactKeys.SUMMARY, ids, summaries)
         return self[ArtifactKeys.SUMMARY]
 
-    def is_summarized(self, layer_ids: Union[str, Iterable[str]] = None) -> bool:
+    def is_summarized(self, layer_ids: Union[str, Iterable[str]] = None, code_only: bool = False) -> bool:
         """
         Checks if the artifacts (or artifacts in given layer) are summarized
         :param layer_ids: The layer to check if it is summarized
+        :param code_only: If True, only checks that artifacts that are code are summarized
         :return: True if the artifacts (or artifacts in given layer) are summarized
         """
+        layer_ids = self.get_code_layers() if not layer_ids and code_only else layer_ids
         if not isinstance(layer_ids, set):
             layer_ids = set(layer_ids) if isinstance(layer_ids, list) else {layer_ids}
         for layer_id in layer_ids:

@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 
 from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 
@@ -78,3 +80,9 @@ class TestDataFrameUtil(BaseTest):
         source_df = pd.DataFrame(source_entries)
         target_df = DataFrameUtil.rename_columns(source_df, conversion)
         TestAssertions.verify_entities_in_df(self, target_entries, target_df)
+
+    def test_contains_empty_string(self):
+        df = pd.DataFrame({"id": [1, 2], "column1": ["hello", ""]})
+        self.assertTrue(DataFrameUtil.contains_empty_string(df["column1"]))
+        df = pd.DataFrame({"id": [1, 2], "column1": ["hello", "world"]})
+        self.assertFalse(DataFrameUtil.contains_empty_string(df))

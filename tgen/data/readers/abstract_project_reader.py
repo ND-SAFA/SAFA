@@ -3,13 +3,12 @@ from typing import Dict, Generic, Optional, Tuple, Type, TypeVar
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.file_util import FileUtil, ENV_REPLACEMENT_VARIABLES
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from tgen.scripts.modules.script_definition import ScriptDefinition
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 ProjectData = TypeVar("ProjectData")
 TraceDataFramesTypes = Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]

@@ -3,7 +3,7 @@ from typing import List
 import pandas as pd
 
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class XmlEntityFormat(AbstractEntityFormat):

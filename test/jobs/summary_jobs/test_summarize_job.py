@@ -7,8 +7,8 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
-from tgen.jobs.summary_jobs.summarize_artifacts_job import SummarizeArtifactsJob
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MOCK_PS_RES_MAP, MockResponses, create
@@ -37,7 +37,7 @@ class TestSummarizeJob(BaseJobTest):
         responses = self.get_summarize_responses()[:self.N_ARTIFACTS]
 
         ai_manager.set_responses(responses)
-        job = SummarizeArtifactsJob(self.project.ARTIFACTS, is_subset=True, summarize_code_only=False)
+        job = SummarizeJob(self.project.ARTIFACTS, is_subset=True, summarize_code_only=False)
         job.run()
         self.assert_output_on_success(job, job.result, resummarized=False)
 
@@ -76,4 +76,4 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertIn(f"{self.RESUMMARIZED} {ps_section_body}", job_result.body["summary"])
 
     def _get_job(self) -> AbstractJob:
-        return SummarizeArtifactsJob(self.project.ARTIFACTS, summarize_code_only=False)
+        return SummarizeJob(self.project.ARTIFACTS, summarize_code_only=False)

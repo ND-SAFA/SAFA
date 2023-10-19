@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Tuple, List
+from typing import Dict, List, Tuple
 
 import bs4
 from yaml.constructor import SafeConstructor
@@ -7,7 +7,6 @@ from yaml.constructor import SafeConstructor
 from tgen.common.constants.path_constants import INPUTS_FOR_GENERATION_PATH
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import HGenUtil
@@ -37,7 +36,7 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The inputs that is used to generate the new artifacts (questions, format, description)
         """
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
-        instructions_prompt.response_manager.formatter = lambda tag, val: HGenUtil.parse_generated_artifacts(val)
+        instructions_prompt.response_manager.value_formatter = lambda tag, val: HGenUtil.parse_generated_artifacts(val)
         format_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_FORMAT_QUESTIONNAIRE.value
 
         inputs_response = GenerateInputsStep._get_inputs_response(hgen_args, format_questionnaire, instructions_prompt)

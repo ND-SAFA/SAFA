@@ -151,4 +151,4 @@ class DataFrameUtil:
         :return: True if empty strings is found, False otherwise.
         """
         query = np.where(df.apply(lambda x: x == EMPTY_STRING))
-        return len(query) > 0
+        return len([1 for q in query if len(q) > 0]) > 0

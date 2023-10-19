@@ -253,12 +253,14 @@ class RankingUtil:
     def add_project_summary_prompt(prompt_builder: PromptBuilder, state: RankingState) -> None:
         """
         Creates a prompt for the project summary
-        :param prompt_builder: The prompt builder to add the promtp to
+        :param prompt_builder: The prompt builder to add the prompt to
         :param state: The current ranking state
         :return: A prompt containing the project summary
         """
         if state.project_summary is not None and len(state.project_summary) > 0:
-            uses_specification = PROJECT_SUMMARY_HEADER in state.project_summary
-            context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
+            project_summary = state.project_summary.to_string()
+            uses_specification = PROJECT_SUMMARY_HEADER in project_summary
+            context_formatted = project_summary if uses_specification \
+                else f"# Project Summary\n{project_summary}"
             prompt = Prompt(context_formatted, allow_formatting=False)
             prompt_builder.add_prompt(prompt)

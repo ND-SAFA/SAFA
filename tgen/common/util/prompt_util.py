@@ -107,10 +107,15 @@ class PromptUtil:
         return "---------------"
 
     @staticmethod
-    def strip_new_lines_and_extra_space(original_string) -> str:
+    def strip_new_lines_and_extra_space(original_string: str, remove_all_new_lines: bool = False) -> str:
         """
         Removes new lines and extra leading or trailing spaces from the string
         :param original_string: The original string
+        :param remove_all_new_lines: If True, removes new lines even if they are in the middle of the string
         :return: The string without new lines or leading or trailing spaces
         """
-        return original_string.strip(NEW_LINE).strip()
+        formatted_string = original_string.strip(NEW_LINE).strip()
+        if remove_all_new_lines:
+            formatted_string = formatted_string.replace(NEW_LINE, SPACE)
+        return formatted_string
+

@@ -9,7 +9,7 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.constants.dataset_constants import EXCLUDED_FILES
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class FolderEntityFormat(AbstractEntityFormat):

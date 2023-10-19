@@ -1,23 +1,27 @@
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
-from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
-from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
-class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
+class SearchPipeline(AbstractPipeline[RankingArgs, RankingState]):
     """
-    Ranks a set of artifacts by using their embeddings to their parents.
+    Sorts a set of artifacts from most to least similar to some target artifacts.
     """
-    steps = [SortChildrenStep, CreateExplanationsStep, SelectCandidateLinksStep]
+    steps = [SortChildrenStep, SelectCandidateLinksStep]
 
     def __init__(self, args: RankingArgs):
         """
         Ranks children artifacts from most to least related to source.
         """
-        super().__init__(args, EmbeddingRankingPipeline.steps)
+        summarizer_args = SummarizerArgs(
+            project_summary_sections=[],
+            do_resummarize_project=False,
+            do_resummarize_artifacts=False
+        )
+        super().__init__(args, SearchPipeline.steps, summarizer_args=summarizer_args)
 
     def state_class(self) -> RankingState:
         """
@@ -28,8 +32,6 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
 
     def run(self) -> None:
         """
-
         :return: List of parents mapped to their ranked children.
         """
-        self.args.sorter = SupportedSorter.EMBEDDING.name
         super().run()

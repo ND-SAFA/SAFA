@@ -97,9 +97,14 @@ public class ProjectController extends BaseController {
     public ProjectAppEntity updateProject(@RequestBody @Valid ProjectAppEntity projectAppEntity) throws SafaError {
         assertNotNull(projectAppEntity.getProjectId(), "Missing project ID");
 
+        SafaUser user = getCurrentUser();
+
         // Step - Finding project identifier
         UUID projectId = projectAppEntity.getProjectId();
-        Project project = getServiceProvider().getProjectRepository().findByProjectId(projectId);
+        Project project = getResourceBuilder()
+            .fetchProject(projectId)
+            .withPermission(ProjectPermission.EDIT, user)
+            .get();
 
         // Step - Update meta information
         project.updateFromAppEntity(projectAppEntity);

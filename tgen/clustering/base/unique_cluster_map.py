@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Set
 
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
+from tgen.common.constants.clustering_constants import DEFAULT_CLUSTER_MIN_VOTES
 
 DEFAULT_SIMILARITY_THRESHOLD = 0.85
 
@@ -43,7 +44,7 @@ class UniqueClusterMap:
         self.cluster_set_map[cluster_id] = set(cluster)
         return cluster
 
-    def get_clusters(self, min_votes: int = 2) -> ClusterMapType:
+    def get_clusters(self, min_votes: int = DEFAULT_CLUSTER_MIN_VOTES) -> ClusterMapType:
         """
         Constructs cluster map from the clusters reaching the minimum number of votes.
         :param min_votes: The minimum number of votes to to include in cluster map.

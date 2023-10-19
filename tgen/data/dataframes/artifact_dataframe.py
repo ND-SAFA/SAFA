@@ -1,15 +1,14 @@
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
 
-from tgen.common.objects.artifact import Artifact
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
-import pandas as pd
 
 
 class ArtifactDataFrame(AbstractProjectDataFrame):
@@ -75,7 +74,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return self.get_artifact(trace[TraceKeys.SOURCE]), self.get_artifact(trace[TraceKeys.TARGET])
 
-    def get_type(self, type_name: str) -> pd.DataFrame:
+    def get_type(self, type_name: str) -> "ArtifactDataFrame":
         """
         Returns data frame with artifacts of given type.
         :param type_name: The type to filter by.
@@ -91,6 +90,12 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         counts_df = self[ArtifactKeys.LAYER_ID].value_counts()
         type2count = dict(counts_df)
         return type2count
+
+    def get_types(self) -> List[str]:
+        """
+        :return: Returns list of unique artifact types in data frame.
+        """
+        return list(self[ArtifactKeys.LAYER_ID].unique())
 
     def to_map(self) -> Dict[str, str]:
         """

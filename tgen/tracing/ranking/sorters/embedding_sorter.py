@@ -1,15 +1,13 @@
-import os
 from typing import Dict, List
 
-from sentence_transformers.SentenceTransformer import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing._data import minmax_scale
 from tqdm import tqdm
 
-from tgen.common.constants.environment_constants import IS_TEST
-from tgen.common.util.list_util import ListUtil
-from tgen.tracing.ranking.sorters.i_sorter import iSorter
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
+from tgen.common.util.list_util import ListUtil
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.tracing.ranking.sorters.i_sorter import iSorter
 
 
 class EmbeddingSorter(iSorter):
@@ -26,13 +24,8 @@ class EmbeddingSorter(iSorter):
         :param return_scores: Whether to return the similarity scores (after min-max scaling per parent).
         :return: Map of parent to list of sorted children.
         """
-        cache_dir = os.environ.get("HF_DATASETS_CACHE", None)
-        if cache_dir is None or IS_TEST or not os.path.exists(cache_dir):
-            cache_dir = None
-        model = SentenceTransformer(model_name, cache_folder=cache_dir)
-
-        children_bodies = [artifact_map[a_id] for a_id in child_ids]
-        children_embeddings = model.encode(children_bodies)
+        model = EmbeddingsManager.get_model(model_name)
+        children_embeddings = EmbeddingsManager.create_artifact_embeddings(artifact_map, model, artifact_ids=child_ids)
 
         parent2rankings = {}
         for parent_id in tqdm(parent_ids, desc="Performing Ranking Via Embeddings"):

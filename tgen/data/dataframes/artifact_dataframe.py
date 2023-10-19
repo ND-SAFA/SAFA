@@ -7,8 +7,8 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 
 
 class ArtifactDataFrame(AbstractProjectDataFrame):

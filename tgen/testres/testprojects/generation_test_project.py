@@ -1,6 +1,8 @@
 from typing import List
 
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 
 
 class GenerationTestProject:
@@ -33,6 +35,7 @@ class GenerationTestProject:
         }
     ]
     ARTIFACT_MAP = {"file.java": 0, "file.py": 1, "s3": 2, "s4": 3}
+    PROJECT_DATASET = PromptDataset(artifact_df=ArtifactDataFrame(ARTIFACTS))
 
     @staticmethod
     def get_artifact(artifact_id: str):

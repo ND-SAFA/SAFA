@@ -52,21 +52,9 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     hgen_llm_manager_efficient: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
     """
-    Dataset creator used to make dataset containing source artifacts + links if tgen_trainer is not provide
-    """
-    dataset_creator_for_sources: PromptDatasetCreator = None
-    """
-    Dataset creator used to make dataset containing source artifacts + links if tgen_trainer is not provide
-    """
-    dataset_for_sources: PromptDataset = None
-    """
     Max tokens to use for predictions.
     """
     max_tokens: Dict[int, int] = field(default_factory=dict)
-    """
-    Summary of the system 
-    """
-    system_summary: str = None
     """
     If True, re-summarizes artifacts with a summary of the project 
     """
@@ -93,8 +81,7 @@ class HGenArgs(PipelineArgs, BaseObject):
         Asserts necessary params have been provided and converts Enum into the proper class
         :return: None
         """
-        self.dataset_for_sources: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset_for_sources,
-                                                                                         self.dataset_creator_for_sources)
+        super().__post_init__()
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.export_dir = os.path.join(self.export_dir, self.target_type) \
@@ -106,4 +93,4 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
-        super().__post_init__()
+

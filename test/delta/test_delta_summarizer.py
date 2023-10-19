@@ -7,6 +7,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
@@ -14,8 +15,8 @@ from tgen.delta.delta_state import DeltaState
 from tgen.delta.steps.impact_analysis_step import ImpactAnalysisStep
 from tgen.delta.steps.individual_diff_summary_step import IndividualDiffSummaryStep
 from tgen.delta.steps.overview_change_summary_step import OverviewChangeSummaryStep
-from tgen.delta.steps.project_summary_step import ProjectSummaryStep
-from tgen.summarizer.projects.project_summarizer import ProjectSummarizer
+from tgen.summarizer.project.project_summarizer import ProjectSummarizer
+from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -50,15 +51,15 @@ def get_delta_args():
                                      ArtifactKeys.LAYER_ID: layer})
     trace_df = TraceDataFrame({TraceKeys.SOURCE: ["existing_file.py"], TraceKeys.TARGET: ["p1"], TraceKeys.LABEL: [1]})
     layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: ["code"], LayerKeys.TARGET_TYPE: ["parent"]})
-    return DeltaArgs(change_type_to_diffs=DIFFS, dataset=TraceDataset(artifact_df, trace_df, layer_df))
+    return DeltaArgs(change_type_to_diffs=DIFFS, dataset=PromptDataset(trace_dataset=TraceDataset(artifact_df, trace_df, layer_df)))
 
 
 class TestProjectSummaryStep(BaseTest):
-    DELTA_STATE = DeltaState()
+    DELTA_STATE = DeltaState(project_summary=Summary(overview=EnumDict({"chunks": ["summary of project"],
+                                                                        "title": "overview"})))
     DELTA_ARGS = get_delta_args()
 
     def test_steps(self):
-        self.assert_project_summary_step()
         self.assert_individual_diff_summary_step()
         self.assert_create_diff_artifact_df()
         self.assert_overview_change_summary_step()
@@ -173,13 +174,6 @@ class TestProjectSummaryStep(BaseTest):
         self.assertIn(ChangeType.BUG_FIXES.value, modified_summary, )
         self.assertNotIn(ChangeType.DEPENDENCIES_IMPORTS.value, modified_summary)
         self.assertNotIn(ChangeType.RENAMED.value, modified_summary)
-
-    @mock.patch.object(ProjectSummarizer, "summarize")
-    def assert_project_summary_step(self, project_summary_mock: mock.MagicMock):
-        summary = "This is a project summary."
-        project_summary_mock.return_value = summary
-        ProjectSummaryStep().run(self.DELTA_ARGS, self.DELTA_STATE)
-        self.assertEqual(self.DELTA_STATE.project_summary, summary)
 
     def test_get_parent_artifact_content(self):
         content = IndividualDiffSummaryStep._get_parent_artifact_content(child_id="existing_file.py",

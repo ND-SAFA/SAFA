@@ -1,11 +1,15 @@
 from typing import Dict, List
 
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.mock_responses import TEST_PROJECT_SUMMARY
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
@@ -32,7 +36,8 @@ class TestEmbeddingPipeline(BaseTest):
         artifact_entries.extend(self.create_artifacts_entries(self.children_ids, "children"))
         artifact_df = ArtifactDataFrame(artifact_entries)
         ranking_args = RankingArgs(run_name="children2parent",
-                                   dataset=PromptDataset(artifact_df=artifact_df, project_summary="This is a project summary"),
+                                   dataset=PromptDataset(artifact_df=artifact_df,
+                                                         project_summary=TEST_PROJECT_SUMMARY),
                                    parent_ids=self.parent_ids,
                                    children_ids=self.children_ids,
                                    selection_method=None, types_to_trace=("target", "source"))

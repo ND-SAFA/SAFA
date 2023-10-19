@@ -1,4 +1,4 @@
-from tgen.common.constants.deliminator_constants import NEW_LINE, COMMA
+from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_NOTES_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
@@ -22,7 +22,7 @@ DEFINITION_PROMPT = QuestionPrompt(
     "Focus on what differentiates this artifact from other similar software artifacts. ",
     response_manager=PromptResponseManager(response_tag="description",
                                            required_tag_ids=REQUIRE_ALL_TAGS,
-                                           formatter=lambda tag, val:
+                                           value_formatter=lambda tag, val:
                                            PromptUtil.strip_new_lines_and_extra_space(val)))
 EXAMPLE_PROMPT = QuestionPrompt(
     "Then provide an example {target_type} for a software development project. The {target_type} should focus "
@@ -36,7 +36,7 @@ FORMAT_PROMPT = QuestionPrompt(
     "Include only the format. ",
     response_manager=PromptResponseManager(response_tag="format",
                                            required_tag_ids=REQUIRE_ALL_TAGS,
-                                           formatter=lambda tag, val:
+                                           value_formatter=lambda tag, val:
                                            PromptUtil.strip_new_lines_and_extra_space(val)))
 
 FORMAT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[DEFINITION_PROMPT, EXAMPLE_PROMPT, FORMAT_PROMPT],
@@ -96,8 +96,8 @@ REFINE_STEPS = {
                                                              response_instructions_format=f"{NEW_LINE}"
                                                                                           f"{PromptUtil.indent_for_markdown('* Enclosed in {} XML tags.')}",
                                                              expected_response_type=int,
-                                                             formatter=lambda tag, val: [v.strip().strip(NEW_LINE)
-                                                                                         for v in val.split(COMMA)])
+                                                             value_formatter=lambda tag, val: [v.strip().strip(NEW_LINE)
+                                                                                               for v in val.split(COMMA)])
                       )
 
 }

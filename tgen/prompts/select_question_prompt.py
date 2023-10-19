@@ -1,7 +1,7 @@
-from typing import Callable, Dict, Any, Union, List
+from typing import Any, Callable, Dict, List, Union
 
+from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.common.util.override import overrides
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, COMMA
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 
@@ -61,7 +61,8 @@ class SelectQuestionPrompt(QuestionPrompt):
                                                  expected_responses=category_names
                                                  if expected_responses is None else expected_responses,
                                                  expected_response_type=type(category_names[0]),
-                                                 formatter=None if not multiple_responses_allowed else lambda t, v: v.split(COMMA),
+                                                 value_formatter=None if not multiple_responses_allowed else lambda t, v: v.split(
+                                                     COMMA),
                                                  default_factory=default_factory)
         super().__init__(f"{question}{self.instructions}",
                          response_manager=response_manager)

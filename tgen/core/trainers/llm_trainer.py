@@ -263,7 +263,9 @@ class LLMTrainer(AbstractTrainer):
         :param item: The name of the item to get
         :return: The item
         """
-        try:
-            return self.state_manager.get(item)
-        except AttributeError:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        if not item.startswith("__"):
+            try:
+                return self.state_manager.get(item)
+            except AttributeError:
+                pass
+        return super().__getattr__(self, item)

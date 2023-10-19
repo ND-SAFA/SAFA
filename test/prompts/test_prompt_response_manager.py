@@ -1,3 +1,6 @@
+from typing import Dict
+
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.testres.base_tests.base_test import BaseTest
@@ -99,12 +102,29 @@ class TestPromptResponseManager(BaseTest):
         prm_single = self.get_single_tag_prm()
         self.assertListEqual(prm_single.get_all_tag_ids(), ["tag1"])
 
+    def test_custom_formatting(self):
+        def format_entry(tag: str, value: Dict):
+            return NEW_LINE.join([value["name"][0], value["descr"][0]])
+
+        response_manager = PromptResponseManager(response_tag={"subsystem": ["name", "descr"]},
+                                                 response_instructions_format="Enclose each sub-system in {} "
+                                                                              "with the name of the subsystem inside of "
+                                                                              "{} and the description inside of {}.",
+                                                 entry_formatter=format_entry,
+                                                 value_formatter=lambda t, v: f"({v})")
+        response = "<subsystem><name>S1</name><descr>D1</descr></subsystem>"
+        response += "\n<subsystem><name>S2</name><descr>D2</descr></subsystem>"
+        parsed_response = response_manager.parse_response(response)
+        subsystems = parsed_response["subsystem"]
+        self.assertEqual(subsystems[0], "(S1)\n(D1)")
+        self.assertEqual(subsystems[1], "(S2)\n(D2)")
+
     def get_single_tag_prm(self) -> PromptResponseManager:
         return PromptResponseManager(response_tag="tag1",
                                      include_response_instructions=False,
                                      expected_response_type=int,
                                      expected_responses=[1, 2, 3],
-                                     formatter=lambda tag, val: val.split(",")
+                                     value_formatter=lambda tag, val: val.split(",")
                                      )
 
     def get_parent_child_tag_prm(self) -> PromptResponseManager:
@@ -116,7 +136,7 @@ class TestPromptResponseManager(BaseTest):
                                      expected_response_type={"c1": int},
                                      expected_responses={"c2": ["hello", "world"]},
                                      default_factory=lambda tag, val: self.EXPECTED_FAIL_VAl,
-                                     formatter=lambda tag, val: val.replace("!", ""))
+                                     value_formatter=lambda tag, val: val.replace("!", ""))
 
     def get_multi_tag_prm(self) -> PromptResponseManager:
         return PromptResponseManager(response_tag=["tag1", "tag2", "tag3"],
@@ -125,5 +145,5 @@ class TestPromptResponseManager(BaseTest):
                                      default_factory=lambda tag, val: "this failed to parse",
                                      expected_response_type={"tag2": int},
                                      expected_responses=["one", "two", 1, 2],
-                                     formatter=lambda tag, val:
+                                     value_formatter=lambda tag, val:
                                      PromptUtil.strip_new_lines_and_extra_space(val))

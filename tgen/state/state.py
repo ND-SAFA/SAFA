@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Union, Dict
 
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
@@ -15,6 +16,7 @@ from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.summarizer.summary import Summary
 
 
 @dataclass
@@ -26,6 +28,8 @@ class State(BaseObject):
     completed_steps: Union[set, list, dict] = field(default_factory=dict)
 
     export_dir: str = EMPTY_STRING
+
+    project_summary: Summary = None
 
     _CHECKPOINT_DIRNAME: str = "state_checkpoints"
 
@@ -128,7 +132,7 @@ class State(BaseObject):
         steps.reverse()
         try:
             for i, step in enumerate(steps):
-                path = cls.get_path_to_state_checkpoint(load_dir, step, step_num=len(step_names)-i)
+                path = cls.get_path_to_state_checkpoint(load_dir, step, step_num=len(step_names) - i)
                 if os.path.exists(path):
                     state = cls.load_state_from_path(path, raise_exception=True)
                     return state

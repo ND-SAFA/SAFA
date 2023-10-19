@@ -7,6 +7,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.summarizer.summary import Summary
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
@@ -38,6 +39,7 @@ class RankingPipelineTest:
         project_reader = TestDataManager.get_project_reader()
         artifact_df, _, _ = project_reader.read_project()
         project_summary = kwargs.pop("project_summary") if "project_summary" in kwargs else None
+        project_summary = Summary({k: {"title": k, "chunks": v} for k, v in project_summary.items()}) if project_summary else None
 
         args = RankingArgs(dataset=PromptDataset(artifact_df=artifact_df, project_summary=project_summary),
                            selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD,

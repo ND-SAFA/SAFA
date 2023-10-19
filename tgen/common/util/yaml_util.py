@@ -1,18 +1,17 @@
-import traceback
+import collections
 from enum import Enum, EnumMeta
 from typing import Any, Dict
 
-import collections
-from yaml.nodes import Node, MappingNode
+from tqdm import tqdm
 from yaml.constructor import ConstructorError
 from yaml.loader import SafeLoader
+from yaml.nodes import Node, MappingNode
 
+from tgen.common.constants.deliminator_constants import COLON
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.constants.deliminator_constants import COLON
-from tqdm import tqdm
 
 
 class CustomLoader(SafeLoader):
@@ -108,7 +107,6 @@ class CustomLoader(SafeLoader):
             value = self.construct_object(value_node, deep=deep)
             mapping[key] = value
         return mapping
-
 
 class YamlUtil:
 

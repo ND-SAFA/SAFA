@@ -1,16 +1,33 @@
 from dataclasses import dataclass
 
-from tgen.common.util.base_object import BaseObject
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 
 
 @dataclass
 class PipelineArgs(BaseObject):
     """
-    The pipeline configuration and arguments.
+    :param dataset: The dataset used in the pipeline
+    """
+    dataset: PromptDataset = None
+    """
+    :param dataset_creator: Used to create the dataset if None is provided
+    """
+    dataset_creator: PromptDatasetCreator = None
+    """
+    :param export_dir: The directory to export to
     """
     export_dir: str = EMPTY_STRING
+    """
+    :param load_dir: The directory to load from
+    """
     load_dir: str = EMPTY_STRING
+    """
+    :param interactive_mode: If True, enters interactive mode
+    """
     interactive_mode: bool = False
 
     def __post_init__(self):
@@ -20,4 +37,6 @@ class PipelineArgs(BaseObject):
         """
         if not self.load_dir:
             self.load_dir = self.export_dir
+        self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset,
+                                                                             self.dataset_creator)
 

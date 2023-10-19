@@ -19,6 +19,7 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the current pipeline.
         :return: NOne
         """
+        state.artifact_map = args.dataset.artifact_df.to_map()
         use_sorter = args.sorter is not None
         use_pre_ranked = args.pre_sorted_parent2children is not None
 

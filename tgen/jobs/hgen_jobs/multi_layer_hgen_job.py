@@ -58,8 +58,8 @@ class MultiLayerHGenJob(AbstractJob):
         new_params = DataclassUtil.convert_to_dict(current_args, source_layer_id=current_args.target_type,
                                                    source_type=current_args.target_type,
                                                    target_type=next_target_type,
-                                                   dataset_for_sources=generated_dataset,
-                                                   dataset_creator_for_sources=None,
+                                                   dataset=generated_dataset,
+                                                   dataset_creator=None,
                                                    optimize_with_reruns=False,
                                                    load_dir=EMPTY_STRING)
         init_params = ParamSpecs.create_from_method(HGenArgs.__init__).param_names

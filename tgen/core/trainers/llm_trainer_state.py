@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from tgen.common.util.dataclass_util import required_field
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.state.state import State
@@ -15,7 +15,6 @@ class LLMTrainerState(State):
     """
     Represents a state of the LLMTrainer in time
     """
-
     """
     :param prompt_builder: Creates the prompts for trace link prediction.
     """
@@ -29,15 +28,7 @@ class LLMTrainerState(State):
     """
     llm_manager: AbstractLLMManager = required_field(field_name="llm_manager")
     """
-    :param summarizer: The summarizer to use for shortening artifacts over the token limit.
-    """
-    summarizer: ArtifactsSummarizer = None
-    """
     :param completion_type: The type of completion (either generation or completion)
     """
     completion_type: LLMCompletionType = LLMCompletionType.GENERATION
 
-    def __post_init__(self):
-        if self.summarizer is None:
-            self.summarizer = ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=self.llm_manager,
-                                                                 summarize_code_only=False))

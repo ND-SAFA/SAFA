@@ -6,7 +6,7 @@ from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_openai import mock_openai

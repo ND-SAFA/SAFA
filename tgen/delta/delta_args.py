@@ -5,7 +5,9 @@ from tgen.common.util.dataclass_util import required_field, DataclassUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.constants.model_constants import get_best_default_llm_manager
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -19,14 +21,6 @@ class DeltaArgs(PipelineArgs):
     """
     change_type_to_diffs: Union[str, Union[Dict[str, Dict], EnumDict[ChangeType, Dict]]] = required_field(
         field_name="change_type_to_diffs")
-    """
-    :param dataset: The dataset containing all files in the diffs and their relationships
-    """
-    dataset: TraceDataset = None
-    """
-    :param dataset_creator: The creator to make a dataset containing all files in the diffs and their relationships
-    """
-    dataset_creator: TraceDatasetCreator = None
     """
     :param llm_manager: The LLM Manager to use for generations
     """
@@ -45,9 +39,9 @@ class DeltaArgs(PipelineArgs):
         Handles any standardization steps after initialization
         :return: None
         """
-        self.dataset: TraceDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
+        super().__post_init__()
         self.dataset.artifact_df = self.dataset.artifact_df.drop_nan_indices()
         if isinstance(self.change_type_to_diffs, str):
             self.change_type_to_diffs = JsonUtil.read_json_file(self.change_type_to_diffs)
         self.change_type_to_diffs = EnumDict(self.change_type_to_diffs)
-        super().__post_init__()
+

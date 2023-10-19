@@ -17,7 +17,13 @@
 
     <q-breadcrumbs-el v-if="displayPageTitle">
       <flex-box align="center">
-        <typography variant="subtitle" el="h1" :value="pageTitle" x="2" />
+        <typography
+          variant="subtitle"
+          el="h1"
+          :value="pageTitle"
+          x="2"
+          color="text"
+        />
         <icon-button
           v-if="pageDescription"
           :tooltip="pageDescription"

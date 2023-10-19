@@ -1,13 +1,11 @@
 from typing import List
 
-from tgen.common.constants.deliminator_constants import SPACE, NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
@@ -20,7 +18,6 @@ from tgen.testres.testprojects.generation_test_project import GenerationTestProj
 
 
 class TestSummarizeJob(BaseJobTest):
-    project = GenerationTestProject()
     CODE_SUMMARY = "CODE SUMMARY"
     NL_SUMMARY = "NL SUMMARY"
     RESUMMARIZED = "resummarized"
@@ -40,7 +37,7 @@ class TestSummarizeJob(BaseJobTest):
         responses = self.get_summarize_responses()[:self.N_ARTIFACTS]
 
         ai_manager.set_responses(responses)
-        job = SummarizeJob(self.project.PROJECT_DATASET,
+        job = SummarizeJob(self.get_project().get_dataset(),
                            is_subset=True, summarize_code_only=False)
         job.run()
         self.assert_output_on_success(job, job.result, resummarized=False)
@@ -57,7 +54,6 @@ class TestSummarizeJob(BaseJobTest):
             responses.append(PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, summary))
         project_summary_components = MockResponses.project_summary_responses
         if resummarize:
-
             project_summary_components = [create(t, body_prefix=f"{self.RESUMMARIZED} ") for t in DEFAULT_PROJECT_SUMMARY_SECTIONS]
         responses.extend(project_summary_components)
         return responses
@@ -67,7 +63,7 @@ class TestSummarizeJob(BaseJobTest):
         for artifact in artifacts:
             artifact = EnumDict(artifact)
             artifact_id = artifact[ArtifactKeys.ID]
-            expected_artifact = self.project.get_artifact(artifact_id)
+            expected_artifact = self.get_project().get_artifact(artifact_id)
             if resummarized:
                 self.assertIn(self.RESUMMARIZED, artifact[ArtifactKeys.SUMMARY])
             else:
@@ -82,4 +78,7 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertIn(f"{self.RESUMMARIZED} {ps_section_body}", summary)
 
     def _get_job(self) -> AbstractJob:
-        return SummarizeJob(self.project.PROJECT_DATASET, summarize_code_only=False)
+        return SummarizeJob(self.get_project().get_dataset(), summarize_code_only=False)
+
+    def get_project(self):
+        return GenerationTestProject()

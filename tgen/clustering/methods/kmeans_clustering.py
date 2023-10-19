@@ -3,7 +3,7 @@ from typing import List
 from sklearn.cluster import KMeans
 
 from tgen.clustering.methods.icluster_method import IClusterMethod
-from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingType
+from tgen.embeddings.embeddings_manager import EmbeddingType
 
 DEFAULT_REDUCTION_FACTOR = 0.25  # Expected reduction in artifacts
 DEFAULT_RANDOM_STATE = 0

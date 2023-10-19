@@ -35,7 +35,9 @@ class GenerationTestProject:
         }
     ]
     ARTIFACT_MAP = {"file.java": 0, "file.py": 1, "s3": 2, "s4": 3}
-    PROJECT_DATASET = PromptDataset(artifact_df=ArtifactDataFrame(ARTIFACTS))
+
+    def get_dataset(self) -> PromptDataset:
+        return PromptDataset(artifact_df=ArtifactDataFrame(self.ARTIFACTS))
 
     @staticmethod
     def get_artifact(artifact_id: str):

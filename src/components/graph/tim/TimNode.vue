@@ -85,7 +85,7 @@ const props = defineProps<TimNodeProps>();
 const { darkMode } = useTheme();
 
 const displayActions = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
+  permissionStore.isAllowed("project.generate")
 );
 
 const selected = computed(

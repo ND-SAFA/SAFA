@@ -7,13 +7,16 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
+import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -23,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ProjectMembershipService {
+public class ProjectMembershipService implements IMembershipService {
 
     private final ProjectService projectService;
     private final UserProjectMembershipRepository userProjectMembershipRepo;
@@ -31,15 +34,15 @@ public class ProjectMembershipService {
     private final NotificationService notificationService;
 
     /**
-     * Applies a role to a user within a project. If the user already has this
-     * role in this project, this function does nothing.
-     *
-     * @param user The user to get the new role
-     * @param project The project the role applies to
-     * @param role The role
-     * @return The new membership representing the role, or the old one if it already existed
+     * {@inheritDoc}
      */
-    public ProjectMembership addUserRole(SafaUser user, Project project, ProjectRole role) {
+    @Override
+    public ProjectMembership addUserRole(SafaUser user, IEntityWithMembership entity, IRole iRole) {
+        assert entity instanceof Project;
+        assert iRole instanceof ProjectRole;
+        Project project = (Project) entity;
+        ProjectRole role = (ProjectRole) iRole;
+
         Optional<ProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
@@ -57,14 +60,15 @@ public class ProjectMembershipService {
     }
 
     /**
-     * Removes a role from a user within a project. If the user didn't already have this
-     * role in this project, this function does nothing.
-     *
-     * @param user The user to remove the role from
-     * @param project The project the role applies to
-     * @param role The role
+     * {@inheritDoc}
      */
-    public void removeUserRole(SafaUser user, Project project, ProjectRole role) {
+    @Override
+    public void removeUserRole(SafaUser user, IEntityWithMembership entity, IRole iRole) {
+        assert entity instanceof Project;
+        assert iRole instanceof ProjectRole;
+        Project project = (Project) entity;
+        ProjectRole role = (ProjectRole) iRole;
+
         Optional<ProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
@@ -79,16 +83,24 @@ public class ProjectMembershipService {
     }
 
     /**
-     * Get the list of roles the user has within the project.
-     *
-     * @param user The user in question
-     * @param project The project to check within
-     * @return The roles the user has in that project
+     * {@inheritDoc}
      */
-    public List<ProjectRole> getUserRoles(SafaUser user, Project project) {
+    @Override
+    public List<IRole> getRolesForUser(SafaUser user, IEntityWithMembership entity) {
+        assert entity instanceof Project;
+        Project project = (Project) entity;
         return userProjectMembershipRepo.findByProjectAndMember(project, user).stream()
                 .map(ProjectMembership::getRole)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<IEntityMembership> getMembershipsForUser(SafaUser user) {
+        // Remaking the list forces it to understand that the type is indeed correct
+        return new ArrayList<>(userProjectMembershipRepo.findByMember(user));
     }
 
     /**
@@ -118,45 +130,32 @@ public class ProjectMembershipService {
                 .map(ProjectMembership::getProject)
                 .forEach(projects::add);
 
-        teamMembershipService.getUserTeams(user)
+        teamMembershipService.getEntitiesForUser(user)
                 .stream()
-                .flatMap(team -> projectService.getProjectsOwnedByTeam(team).stream())
+                .flatMap(team -> projectService.getProjectsOwnedByTeam((Team) team).stream())
                 .forEach(projects::add);
 
         return projects;
     }
 
     /**
-     * Returns list of members in given project for which the project was shared to them directly (rather than them
-     * being on a team that has access).
-     *
-     * @param project The project whose members are retrieved.
-     * @return List of project memberships relating members to projects.
+     * {@inheritDoc}
      */
-    public List<ProjectMembership> getProjectMembers(Project project) {
-        return this.userProjectMembershipRepo.findByProject(project);
+    @Override
+    public List<IEntityMembership> getMembershipsForEntity(IEntityWithMembership entity) {
+        assert entity instanceof Project;
+        Project project = (Project) entity;
+        // Remaking the list forces it to understand that the type is indeed correct
+        return new ArrayList<>(this.userProjectMembershipRepo.findByProject(project));
     }
 
     /**
-     * Search for a project membership by its ID.
-     *
-     * @param membershipId The ID of the membership
-     * @return The membership, if it exists
+     * {@inheritDoc}
      */
-    public Optional<ProjectMembership> getUserMembershipOptionalById(UUID membershipId) {
-        return userProjectMembershipRepo.findById(membershipId);
+    @Override
+    public Optional<IEntityMembership> getMembershipOptionalById(UUID membershipId) {
+        // The map call forces it to understand that the type is indeed correct
+        return userProjectMembershipRepo.findById(membershipId).map(m -> m);
     }
 
-    /**
-     * Search for a project membership by its ID. Throw an exception
-     * if it's not found.
-     *
-     * @param membershipId The ID of the membership
-     * @return The membership, if it exists
-     * @throws SafaItemNotFoundError If the membership could not be found
-     */
-    public ProjectMembership getUserMembershipById(UUID membershipId) {
-        return getUserMembershipOptionalById(membershipId)
-            .orElseThrow(() -> new SafaItemNotFoundError("No membership found with the specified ID"));
-    }
 }

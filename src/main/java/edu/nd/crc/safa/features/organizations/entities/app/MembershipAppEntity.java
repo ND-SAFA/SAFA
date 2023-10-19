@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.organizations.entities.app;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.memberships.entities.db.EntityMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
 import lombok.Data;
@@ -28,12 +28,11 @@ public class MembershipAppEntity implements IAppEntity {
         this.role = role;
     }
 
-    public MembershipAppEntity(EntityMembership membership) {
+    public MembershipAppEntity(IEntityMembership membership) {
         this.id = membership.getId();
-        this.email = membership.getEmail();
-        this.role = membership.getRoleAsString();
+        this.email = membership.getUser().getEmail();
+        this.role = membership.getRole().name();
         this.entityType = membership.getMembershipType();
-        this.entityId = membership.getEntityId();
-
+        this.entityId = membership.getEntity().getId();
     }
 }

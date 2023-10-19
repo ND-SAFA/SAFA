@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
@@ -126,8 +126,8 @@ public class OrganizationService {
      * @return The organization front-end object
      */
     public OrganizationAppEntity getAppEntity(Organization organization, SafaUser currentUser) {
-        List<OrganizationMembership> memberships =
-            organizationMembershipService.getAllMembershipsByOrganization(organization);
+        List<IEntityMembership> memberships =
+            organizationMembershipService.getMembershipsForEntity(organization);
 
         List<MembershipAppEntity> membershipAppEntities =
             memberships
@@ -179,7 +179,7 @@ public class OrganizationService {
      * @return A list of permissions the user has from the organization
      */
     public List<Permission> getUserPermissions(Organization organization, SafaUser currentUser) {
-        return organizationMembershipService.getUserRoles(currentUser, organization)
+        return organizationMembershipService.getRolesForUser(currentUser, organization)
             .stream()
             .flatMap(role -> role.getGrants().stream())
             .collect(Collectors.toUnmodifiableList());

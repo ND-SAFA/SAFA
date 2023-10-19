@@ -22,7 +22,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Team {
+public class Team implements IEntityWithMembership {
 
     @Id
     @GeneratedValue

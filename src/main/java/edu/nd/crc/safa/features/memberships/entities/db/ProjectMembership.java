@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -30,7 +31,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "user_project_membership")
 @Data
 @NoArgsConstructor
-public class ProjectMembership implements Serializable, EntityMembership {
+public class ProjectMembership implements Serializable, IEntityMembership {
 
     @Id
     @GeneratedValue
@@ -68,22 +69,17 @@ public class ProjectMembership implements Serializable, EntityMembership {
     }
 
     @Override
-    public String getEmail() {
-        return member.getEmail();
-    }
-
-    @Override
-    public String getRoleAsString() {
-        return role.name();
-    }
-
-    @Override
     public MembershipType getMembershipType() {
         return MembershipType.PROJECT;
     }
 
     @Override
-    public UUID getEntityId() {
-        return project.getProjectId();
+    public SafaUser getUser() {
+        return member;
+    }
+
+    @Override
+    public IEntityWithMembership getEntity() {
+        return project;
     }
 }

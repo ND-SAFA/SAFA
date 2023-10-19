@@ -9,8 +9,9 @@ import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
-public enum TeamRole {
+public enum TeamRole implements IRole {
     NONE(Set.of()),
     VIEWER(Set.of(
         ProjectPermission.VIEW, TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS
@@ -30,6 +31,5 @@ public enum TeamRole {
         TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS
     ));
 
-    @Getter
     private final Set<Permission> grants;
 }

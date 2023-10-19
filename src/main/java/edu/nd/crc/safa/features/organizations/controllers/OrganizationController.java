@@ -51,7 +51,8 @@ public class OrganizationController extends BaseController {
     public List<OrganizationAppEntity> getUserOrganizations() {
         SafaUser user = getCurrentUser();
 
-        List<OrganizationMembership> orgMemberships = organizationMembershipService.getAllMembershipsByUser(user);
+        List<OrganizationMembership> orgMemberships =
+            organizationMembershipService.getOrganizationMembershipsForUser(user);
 
         return orgMemberships.stream()
             .map(OrganizationMembership::getOrganization)

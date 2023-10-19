@@ -24,7 +24,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Organization {
+public class Organization implements IEntityWithMembership {
 
     @Id
     @GeneratedValue

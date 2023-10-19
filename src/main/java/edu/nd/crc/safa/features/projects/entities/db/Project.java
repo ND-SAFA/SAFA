@@ -12,6 +12,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
@@ -29,7 +30,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "project")
 @NoArgsConstructor
 @Data
-public class Project implements Serializable {
+public class Project implements Serializable, IEntityWithMembership {
 
     /**
      * Unique identifier for project.
@@ -106,5 +107,10 @@ public class Project implements Serializable {
 
     public void setLastEdited() {
         this.lastEdited = LocalDateTime.now();
+    }
+
+    @Override
+    public UUID getId() {
+        return projectId;
     }
 }

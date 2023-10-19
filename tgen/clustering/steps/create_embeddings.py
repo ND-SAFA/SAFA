@@ -1,7 +1,7 @@
-from typing import List
+from typing import Dict, List
 
-from tgen.clustering.clustering_args import ClusteringArgs
-from tgen.clustering.clustering_state import ClusteringState
+from tgen.clustering.base.clustering_args import ClusteringArgs
+from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -17,12 +17,21 @@ class CreateEmbeddings(AbstractPipelineStep):
         """
         artifact_types = args.artifact_types
         artifact_df = args.dataset.trace_dataset.artifact_df
-
         artifact_map = self.create_artifact_map(artifact_df, artifact_types)
-        model = EmbeddingsManager.get_model(args.embedding_model)
-        embedding_map = EmbeddingsManager.create_embedding_map(artifact_map, model)
+        
+        state.embedding_map = CreateEmbeddings.create_embeddings_map(artifact_map, args.embedding_model)
 
-        state.embedding_map = embedding_map
+    @staticmethod
+    def create_embeddings_map(artifact_map: Dict[str, str], model_name: str):
+        """
+        Creates map of artifact id to embeddings.
+        :param artifact_map: Maps artifact IDs to their content.
+        :param model_name: The name of the model used to embed the artifacts.
+        :return: Map of artifact ID to embedding.
+        """
+        model = EmbeddingsManager.get_model(model_name)
+        embedding_map = EmbeddingsManager.create_embedding_map(artifact_map, model)
+        return embedding_map
 
     @staticmethod
     def create_artifact_map(artifact_df: ArtifactDataFrame, artifact_types: List[str]):

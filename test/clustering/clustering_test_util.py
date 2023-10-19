@@ -1,0 +1,62 @@
+from typing import List
+
+from sklearn.metrics.pairwise import cosine_similarity
+
+from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
+from tgen.clustering.base.clustering_args import ClusteringArgs
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.common.objects.artifact import Artifact
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.data.readers.definitions.api_definition import ApiDefinition
+from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
+
+
+class ClusteringTestUtil:
+    @staticmethod
+    def create_clustering_args(artifact_bodies: List[str], artifact_type: str = "A",
+                               embedding_model=SMALL_EMBEDDING_MODEL, **kwargs) -> ClusteringArgs:
+        """
+        Creates a prompt dataset containing artifacts with bodies given.
+        :param artifact_bodies: The bodies of the artifacts.
+        :param artifact_type: The artifact type of the artifacts.
+        :param embedding_model: The model to use to embed the artifacts.
+        :return: Prompt dataset creator.
+        """
+        artifacts = [Artifact(id=f"{artifact_type}{i + 1}", content=c, layer_id=artifact_type) for i, c in enumerate(artifact_bodies)]
+        api_definition = ApiDefinition(artifacts=artifacts)
+        api_dataset_reader = ApiProjectReader(api_definition)
+        trace_dataset_creator = TraceDatasetCreator(api_dataset_reader)
+        prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=trace_dataset_creator)
+
+        args = ClusteringArgs(dataset_creator=prompt_dataset_creator, embedding_model=embedding_model, **kwargs)
+        return args
+
+    @staticmethod
+    def assert_embeddings_equals(artifact_text: str, embedding: EmbeddingType, model_name: str = SMALL_EMBEDDING_MODEL,
+                                 threshold=0.95):
+        model = EmbeddingsManager.get_model(model_name)
+        expected_embedding = model.encode(artifact_text)
+        similarity_score = cosine_similarity([embedding], [expected_embedding])[0][0]
+        assert similarity_score > threshold, f"Embeddings are not equal ({similarity_score})."
+
+    @staticmethod
+    def assert_contains_clusters(cluster_map: ClusterMapType, clusters: List[ClusterType]):
+        for cluster in clusters:
+            ClusteringTestUtil.assert_contains_cluster(cluster_map, cluster)
+
+    @staticmethod
+    def assert_contains_cluster(cluster_map: ClusterMapType, cluster: ClusterType):
+        for s_cluster in cluster_map.values():
+            if ClusteringTestUtil.are_clusters_equal(cluster, s_cluster):
+                return True
+        return False
+
+    @staticmethod
+    def are_clusters_equal(c1: ClusterType, c2: ClusterType):
+        c1_set = set(c1)
+        c2_set = set(c2)
+
+        c_intersection = c1_set.intersection(c2_set)
+        return len(c_intersection) == len(c1) == len(c2)

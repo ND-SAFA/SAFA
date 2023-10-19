@@ -1,8 +1,8 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Generic, List, Type, TypeVar, Optional
+from typing import Generic, List, Optional, Type, TypeVar
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, F_SLASH
+from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
@@ -66,10 +66,10 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :param steps: Steps to perform in sequential order.
         """
         self.args = args
-        self.state = self.init_state()
+        self.state: StateType = self.init_state()
         self.steps = [s() for s in steps]
 
-    def init_state(self):
+    def init_state(self) -> StateType:
         """
         Creates a new state corresponding to sub-class.
         :return: The new state.

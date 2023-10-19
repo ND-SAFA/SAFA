@@ -1,6 +1,6 @@
 from typing import List
 
-from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 
 from tgen.clustering.methods.icluster_method import IClusterMethod
 from tgen.embeddings.embeddings_manager import EmbeddingType
@@ -9,7 +9,8 @@ DEFAULT_REDUCTION_FACTOR = 0.25  # Expected reduction in artifacts
 DEFAULT_RANDOM_STATE = 0
 
 
-class KMeansClustering(IClusterMethod):
+class AgglomerativeClusteringMethod(IClusterMethod):
+
     def _cluster(self, embeddings: List[EmbeddingType], reduction_factor: float = DEFAULT_REDUCTION_FACTOR,
                  random_state: int = DEFAULT_RANDOM_STATE, **kwargs) -> List[int]:
         """
@@ -20,13 +21,12 @@ class KMeansClustering(IClusterMethod):
         :param n_init: The number of times to re-initialize kmeans.
         :return: The labels associated with each embedding.
         """
-        n_clusters = round(len(embeddings) * reduction_factor)
-        kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, **kwargs)
-        kmeans.fit(embeddings)
-        return kmeans.labels_
+        agglomerative_clustering = AgglomerativeClustering()
+        agglomerative_clustering.fit(embeddings)
+        return agglomerative_clustering.labels_
 
     def get_id(self) -> str:
         """
         :return: Identifier for method.
         """
-        return "KMEANS"
+        return "AGG"

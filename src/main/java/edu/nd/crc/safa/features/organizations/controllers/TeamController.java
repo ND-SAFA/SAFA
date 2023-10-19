@@ -136,7 +136,10 @@ public class TeamController extends BaseController {
     @PutMapping(AppRoutes.Organizations.Teams.BY_ID)
     public TeamAppEntity modifyTeam(@PathVariable UUID orgId, @PathVariable UUID teamId,
                                     @RequestBody TeamAppEntity teamAppEntity) {
-        Team team = teamService.getTeamById(teamId);
+        Team team = getResourceBuilder()
+            .fetchTeam(teamId)
+            .withPermission(TeamPermission.EDIT, getCurrentUser())
+            .get();
         assertEqual(team.getOrganization().getId(), orgId, "No team with the specified ID found under this org");
         team.setFromAppEntity(teamAppEntity);
         team = teamService.updateTeam(team);

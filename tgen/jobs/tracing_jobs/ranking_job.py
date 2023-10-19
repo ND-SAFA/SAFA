@@ -104,7 +104,6 @@ class RankingJob(AbstractJob):
                 trace_entry = self.dataset.trace_df.loc[trace_id]
                 label = trace_entry[TraceKeys.LABEL.value]
                 entry[TraceKeys.LABEL] = label
-                selected_entries.append(entry)
                 self.dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
                 if TraceKeys.EXPLANATION in entry:
                     self.dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])

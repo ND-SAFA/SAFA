@@ -7,8 +7,6 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
-ClusterType = Dict[int, List[str]]
-
 
 class ClusteringArgs(PipelineArgs):
     """

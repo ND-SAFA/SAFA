@@ -1,15 +1,13 @@
-from typing import Dict
-
 from tgen.clustering.clustering_args import ClusterType
-from tgen.embeddings.embeddings_manager import EmbeddingType
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.state import State
 
 
 class ClusteringState(State):
     """
     The state of a clustering pipeline.
-    :param embedding_map: Map of artifact ID to its embedding.
+    :param embedding_manager: Map of artifact ID to its embedding.
     :param clusters: Map of cluster ID to its artifacts.
     """
-    embedding_map: Dict[str, EmbeddingType]
+    embedding_manager: EmbeddingsManager
     clusters: ClusterType

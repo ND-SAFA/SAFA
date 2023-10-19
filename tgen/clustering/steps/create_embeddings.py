@@ -8,6 +8,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateEmbeddings(AbstractPipelineStep):
+
     def _run(self, args: ClusteringArgs, state: ClusteringState) -> None:
         """
         Extracts the artifacts and embeds them.
@@ -19,10 +20,10 @@ class CreateEmbeddings(AbstractPipelineStep):
         artifact_df = args.dataset.trace_dataset.artifact_df
 
         artifact_map = self.create_artifact_map(artifact_df, artifact_types)
-        model = EmbeddingsManager.get_model(args.embedding_model)
-        embedding_map = EmbeddingsManager.create_embedding_map(artifact_map, model)
+        embeddings_manager = EmbeddingsManager(content_map=artifact_map, model_name=args.embedding_model)
+        embeddings_manager.create_embedding_map()
 
-        state.embedding_map = embedding_map
+        state.embedding_manager = embeddings_manager
 
     @staticmethod
     def create_artifact_map(artifact_df: ArtifactDataFrame, artifact_types: List[str]):

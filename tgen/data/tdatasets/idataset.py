@@ -22,3 +22,19 @@ class iDataset(BaseObject):
         :param kwargs: The arguments needed to create the trainer dataset
         :return: A data used by the HF trainer.
         """
+
+    @abstractmethod
+    def as_creator(self, project_path: str):
+        """
+        Converts the dataset into a creator that can remake it
+        :param project_path: The path to save the dataset at for reloading
+        :return: The dataset creator
+        """
+
+    def to_yaml(self, export_path: str):
+        """
+        Creates a yaml savable dataset by saving as a creator
+        :param export_path: The path to export everything to
+        :return: The dataset as a creator
+        """
+        return self.as_creator(export_path)

@@ -1,55 +1,96 @@
 import os
-from typing import Dict, List
+import uuid
+from typing import Dict, List, Any, Optional
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from tgen.common.constants.environment_constants import IS_TEST
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.reflection_util import ReflectionUtil
 
 EmbeddingType = np.array
 
 
 class EmbeddingsManager:
-    @staticmethod
-    def create_artifact_embeddings(artifact_map: Dict[str, str], model: SentenceTransformer, artifact_ids: List[str] = None) -> \
-            List[EmbeddingType]:
+
+    def __init__(self, content_map: Dict[str, str], model_name: str):
+        """
+        Initializes the embedding manager with the content used to create embeddings
+        :param content_map: Maps id to the corresponding content
+        :param model_name: Name of model to use for creating embeddings
+        """
+        self.model_name = model_name
+        self._content_map = content_map
+        self._embedding_map = {}
+        self.__ordered_ids = []
+        self.__saved_embeddings_path = None
+        self.__model = None
+        self.__state_changed_since_last_save = False
+
+    def create_artifact_embeddings(self, artifact_ids: List[str] = None) -> List[EmbeddingType]:
         """
         Creates list of embeddings for each artifact.
-        :param artifact_map: Map of artifact ids to content.
-        :param model: The model to use to embed artifact content.
         :param artifact_ids: The artifact ids to embed.
         :return: List of embeddings in same order as artifact ids.
         """
-        artifact_ids_set = set(artifact_ids)
-        subset_content_map = {k: v for k, v in artifact_map.items() if k in artifact_ids_set}
-        embedding_map = EmbeddingsManager.create_embedding_map(subset_content_map, model)
+        embedding_map = self.create_embedding_map(subset_ids=artifact_ids)
         embeddings = [embedding_map[entry_id] for entry_id in artifact_ids]
         return embeddings
 
-    @staticmethod
-    def create_embedding_map(content_map: Dict[str, str], model: SentenceTransformer, subset_ids: List[str] = None) -> \
-            Dict[str, EmbeddingType]:
+    def create_embedding_map(self, subset_ids: List[str] = None) -> Dict[str, EmbeddingType]:
         """
         Creates embeddings for entries in map.
-        :param content_map: The entries in the map to embed.
-        :param model: The model to use to embed the entries.
         :param subset_ids: The IDs of the set of the entries to use.
         :return: Map of id to embedding.
         """
         if subset_ids is None:
-            subset_ids = content_map.keys()
-        embedding_map = {a_id: model.encode(content_map[a_id]) for a_id in subset_ids}
+            subset_ids = self._content_map.keys()
+        embedding_map = {a_id: self.get_embedding(a_id) for a_id in subset_ids}
         return embedding_map
 
-    @staticmethod
-    def get_model(model_name: str) -> SentenceTransformer:
+    def get_embedding(self, a_id: Any) -> EmbeddingType:
+        """
+        Gets an embedding for a given id
+        :param a_id: The id to get an embedding for (corresponding to the ids in the content map)
+        :return: The embedding for the content corresponding to the a_id
+        """
+        if a_id not in self._embedding_map:
+            self.__state_changed_since_last_save = True
+            self._embedding_map[a_id] = self.get_model().encode(self._content_map[a_id])
+        return self._embedding_map[a_id]
+
+    def get_current_embeddings(self) -> Dict[Any, EmbeddingType]:
+        """
+        Gets all embeddings currently created
+        :return: A dictionary mapping id to the embedding created for all embeddings currently created
+        """
+        return self._embedding_map
+
+    def update_or_add_content(self, a_id: Any, content: str, create_embedding: bool = False) -> Optional[EmbeddingType]:
+        """
+        Updates or adds new content for an id
+        :param a_id: The id to update the content of
+        :param content: The new content
+        :param create_embedding: If True, automatically creates a new embedding
+        :return: The embedding if one was created, else None
+        """
+        self._content_map[a_id] = content
+        if a_id in self._embedding_map:
+            self.__state_changed_since_last_save = True
+            self._embedding_map.pop(a_id)
+        if create_embedding:
+            return self.get_embedding(a_id)
+
+    def get_model(self) -> SentenceTransformer:
         """
         Returns sentence transformer model.
-        :param model_name: The name of the model to load.
         :return: The model.
         """
-        cache_dir = EmbeddingsManager.get_cache_dir()
-        return SentenceTransformer(model_name, cache_folder=cache_dir)
+        if self.__model is None:
+            cache_dir = EmbeddingsManager.get_cache_dir()
+            self.__model = SentenceTransformer(self.model_name, cache_folder=cache_dir)
+        return self.__model
 
     @staticmethod
     def get_cache_dir() -> str:
@@ -60,3 +101,79 @@ class EmbeddingsManager:
         if cache_dir is None or IS_TEST or not os.path.exists(cache_dir):
             cache_dir = None
         return cache_dir
+
+    def to_yaml(self, export_path: str) -> "EmbeddingsManager":
+        """
+        Creates a yaml savable embedding manager by saving the embeddings to a separate file
+        :param export_path: The path to export everything to
+        :return: The yaml savable embedding manager
+        """
+        yaml_embeddings_manager = EmbeddingsManager(content_map=self._content_map, model_name=self.model_name)
+        if self.embeddings_need_saved(export_path):
+            self.save_embeddings_to_file(export_path)
+        embedding_map_var = ReflectionUtil.extract_name_of_variable(f"{self._embedding_map=}", is_self_property=True)
+        model_var = ReflectionUtil.extract_name_of_variable(f"{self.__model=}", is_self_property=True, class_attr=EmbeddingsManager)
+        replacements = {embedding_map_var: {}, model_var: None}
+        yaml_embeddings_manager.__dict__ = {k: (replacements[k] if k in replacements else v) for k, v in self.__dict__.items()}
+        return yaml_embeddings_manager
+
+    def from_yaml(self) -> None:
+        """
+        Loads any saved embeddings into the object after being reloaded from yaml
+        :return: None
+        """
+        if self.__saved_embeddings_path and self.__ordered_ids:
+            file_path = FileUtil.expand_paths(self.__saved_embeddings_path)
+            self._embedding_map = self.load_embeddings_from_file(file_path=file_path,
+                                                                 ordered_ids=self.__ordered_ids)
+
+    @staticmethod
+    def load_embeddings_from_file(file_path: str, ordered_ids: List[Any]) -> Dict[Any, EmbeddingType]:
+        """
+        Loads embeddings from a file
+        :param file_path: The file to load from
+        :param ordered_ids: Optional ordering of the ids corresponding to the order of embeddings in the file
+        :return: A dictionary mapping id to the loaded embeddings
+        """
+        embeddings = FileUtil.load_numpy(file_path)
+        assert len(ordered_ids) == len(embeddings), "The ordered ids must correspond to the embeddings but they are different lengths."
+        return {a_id: embedding for a_id, embedding in zip(ordered_ids, embeddings)}
+
+    def save_embeddings_to_file(self, dir_path: str) -> None:
+        """
+        Stores the current embeddings to a file
+        :param dir_path: The path to directory to save to
+        :return: None
+        """
+        file_path = self.get_save_path(dir_path)
+        FileUtil.save_numpy(list(self._embedding_map.values()), file_path)
+        self.__set_embedding_order()
+        self.__saved_embeddings_path = FileUtil.collapse_paths(file_path)
+        self.__state_changed_since_last_save = False
+
+    @staticmethod
+    def get_save_path(dir_path: str) -> str:
+        """
+        Creates a unique path to save the embeddings to
+        :param dir_path: Path to the directory to save to
+        :return: The path containing the filename to save to
+        """
+        return FileUtil.add_ext(os.path.join(dir_path, f"embeddings_{uuid.uuid4()}"), FileUtil.NUMPY_EXT)
+
+    def embeddings_need_saved(self, export_path: str) -> bool:
+        """
+        Returns whether if the embeddings need re-saved
+        :param export_path: The path to save the embeddings to
+        :return: True if the embeddings need re-saved
+        """
+        return not self.__saved_embeddings_path or self.__state_changed_since_last_save \
+            or FileUtil.collapse_paths(export_path) != FileUtil.get_directory_path(self.__saved_embeddings_path)
+
+    '[ROOT_PATH]/testres/output'
+
+    def __set_embedding_order(self) -> None:
+        """
+        Stores the current order of the embeddings as a list of ids in the same order as their saved embeddings
+        :return: None
+        """
+        self.__ordered_ids = list(self._embedding_map.keys())

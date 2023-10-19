@@ -30,9 +30,9 @@ class VSMSorter(iSorter):
         parent_tag_name = TraceKeys.parent_label().value
         child_tag_name = TraceKeys.child_label().value
         artifact_names = parent_ids + child_ids
-        artifact_map = [artifact_map[a_name] for a_name in artifact_names]
+        artifact_content = [artifact_map[a_name] for a_name in artifact_names]
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_names,
-                                         ArtifactKeys.CONTENT: artifact_map,
+                                         ArtifactKeys.CONTENT: artifact_content,
                                          ArtifactKeys.LAYER_ID: [parent_tag_name for source in parent_ids] +
                                                                 [child_tag_name for target in child_ids]})
         layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [child_tag_name], LayerKeys.TARGET_TYPE: [parent_tag_name]})

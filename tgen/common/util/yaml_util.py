@@ -1,4 +1,5 @@
 import collections
+import os
 from enum import Enum, EnumMeta
 from typing import Any, Dict
 
@@ -33,11 +34,16 @@ class CustomLoader(SafeLoader):
                 return self._create_enum_from_meta(cls, node)
             deep = hasattr(cls, '__setstate__')
             state = self.construct_mapping(node, deep=True)
+            use_init = False
             if hasattr(cls, '__init__'):
                 param_specs = ParamSpecs.create_from_method(cls.__init__)
                 init_params = {name: val for name, val in state.items() if name in param_specs.param_names}
-                data = cls(**init_params)
-            else:
+                try:
+                    data = cls(**init_params)
+                    use_init = True
+                except Exception as e:
+                    logger.warning(f"Could not initialize {cls.__name__}: {e}")
+            if not use_init:
                 data = cls.__new__(cls)
             if 'dictitems' in state:
                 data.update(state['dictitems'])
@@ -45,6 +51,8 @@ class CustomLoader(SafeLoader):
                 data.__setstate__(state)
             else:
                 data.__dict__.update(state)
+            if hasattr(data, "from_yaml"):
+                data.from_yaml()
             return data
         except Exception as e:
             logger.error(f"Problem loading node {node.tag}")
@@ -108,6 +116,7 @@ class CustomLoader(SafeLoader):
             mapping[key] = value
         return mapping
 
+
 class YamlUtil:
 
     @staticmethod
@@ -127,4 +136,6 @@ class YamlUtil:
         :param output_path: The path to save to
         :return: None
         """
+        export_dir = FileUtil.get_directory_path(output_path)
+        content = {k: (v.to_yaml(os.path.join(export_dir, k)) if hasattr(v, "to_yaml") else v) for k, v in content.items()}
         FileUtil.write_yaml(content, output_path)

@@ -1,13 +1,22 @@
-from abc import ABC, abstractmethod
 from typing import Dict, List
 
 from tgen.clustering.base.cluster_type import ClusterMapType
+from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
 from tgen.embeddings.embeddings_manager import EmbeddingType
 
+REQUIRED_CLUSTER_ESTIMATION = [SupportedClusterMethods.KMEANS, SupportedClusterMethods.AGGLOMERATIVE]
 
-class IClusterMethod(ABC):
 
-    def cluster(self, embedding_map: Dict[str, EmbeddingType], reduction_factor: int, **kwargs) -> ClusterMapType:
+class ClusterManager:
+
+    def __init__(self, method: SupportedClusterMethods):
+        """
+        Constructs clustering method for the given algorithm.
+        :param method:
+        """
+        self.method = method
+
+    def cluster(self, embedding_map: Dict[str, EmbeddingType], reduction_factor: float, **kwargs) -> ClusterMapType:
         """
         Clusters embeddings in map and creates sets of links.
         :param embedding_map: Map of artifact ID to embedding.
@@ -19,20 +28,14 @@ class IClusterMethod(ABC):
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         n_clusters = round(len(embeddings) * reduction_factor)
-        embedding_labels = self._cluster(embeddings, n_clusters, **kwargs)
+
+        local_kwargs = {} if self.method not in REQUIRED_CLUSTER_ESTIMATION else {"n_clusters": n_clusters}
+
+        clustering_algo = self.method.value(**local_kwargs, **kwargs)
+        clustering_algo.fit(embeddings)
+        embedding_labels = clustering_algo.labels_
         clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels)
         return clusters
-
-    @abstractmethod
-    def _cluster(self, embeddings: List[EmbeddingType], n_clusters: int, **kwargs) -> List[int]:
-        """
-        Clusters embeddings in map and creates sets of links.
-        :param embeddings: The embeddings to cluster.
-        :param n_clusters: The expected number of clusters.
-        :param kwargs: additional keyword arguemtns.
-        :return: Cluster ID mapped to each embedding.
-        """
-        pass
 
     @staticmethod
     def create_clusters_from_labels(artifact_ids: List[str], cluster_labels: List[int]) -> ClusterMapType:
@@ -49,9 +52,8 @@ class IClusterMethod(ABC):
             clusters[cluster_label].append(artifact_id)
         return clusters
 
-    @abstractmethod
     def get_id(self) -> str:
         """
         :return: Returns string identifier for the method.
         """
-        pass
+        return self.method.name

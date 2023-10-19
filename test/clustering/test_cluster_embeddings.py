@@ -2,9 +2,10 @@ from unittest import TestCase
 
 from test.clustering.clustering_test_util import ClusteringTestUtil
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.methods.cluster_method import ClusterMethod
+from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
 from tgen.clustering.steps.cluster_embeddings import ClusterEmbeddings
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
+from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 
 
@@ -30,6 +31,7 @@ class TestClusterEmbeddings(TestCase):
         ClusterEmbeddings().run(args, state)
 
         cluster_map = state.multi_method_cluster_map
-        for c in ClusterMethod:
-            c_id = f"{c.value().get_id()}0"
+        for clustering_method_name in DEFAULT_TESTING_CLUSTERING_METHODS:
+            supported_clustering_method = SupportedClusterMethods[clustering_method_name]
+            c_id = f"{supported_clustering_method.name}0"
             self.assertIn(c_id, cluster_map)

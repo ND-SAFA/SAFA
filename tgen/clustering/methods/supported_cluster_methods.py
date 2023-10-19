@@ -1,0 +1,16 @@
+from hdbscan import HDBSCAN
+from sklearn.cluster import AgglomerativeClustering, Birch, DBSCAN, KMeans, OPTICS
+
+from tgen.common.util.supported_enum import SupportedEnum
+
+
+class SupportedClusterMethods(SupportedEnum):
+    """
+    Enumerates all supporting clustering methods.
+    """
+    BIRCH = Birch  # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.Birch.html#sklearn.cluster.Birch
+    KMEANS = KMeans
+    AGGLOMERATIVE = AgglomerativeClustering
+    OPTICS = OPTICS  # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.OPTICS.html#sklearn.cluster.OPTICS
+    HB_SCAN = HDBSCAN  # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.HDBSCAN.html#sklearn.cluster.HDBSCAN
+    DBSCAN = DBSCAN  # https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html#sklearn.cluster.DBSCAN

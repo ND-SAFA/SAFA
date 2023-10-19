@@ -2,6 +2,7 @@ from typing import Any, List
 
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
+from tgen.clustering.steps.add_clusters_to_dataset import AddClustersToDataset
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -34,9 +35,13 @@ class ClusteringJob(AbstractJob):
 
         pipeline.run()
 
+        if self.artifact_types is None:
+            self.artifact_types = args.dataset.trace_dataset.artifact_df.get_artifact_types()
+
         if self.add_to_dataset:
             dataset = pipeline.args.dataset.trace_dataset
-            exporter = SafaExporter(export_path=self.export_dir, dataset=dataset)
+            artifact_types = self.artifact_types + [AddClustersToDataset.CLUSTER_ARTIFACT_TYPE]
+            exporter = SafaExporter(export_path=self.export_dir, dataset=dataset, artifact_types=artifact_types)
             exporter.export()
             return {"success": True, "path": self.export_dir}
         return {"success": True, "path": self.export_dir}

@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from tgen.clustering.methods.cluster_method import ClusterMethod
-from tgen.common.constants.clustering_constants import DEFAULT_ADD_CLUSTERS_TO_DATASET, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
+from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
+from tgen.common.constants.clustering_constants import DEFAULT_ADD_CLUSTERS_TO_DATASET, DEFAULT_CLUSTERING_METHODS, \
+    DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
     DEFAULT_REDUCTION_FACTOR
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
@@ -20,7 +21,7 @@ class ClusteringArgs(PipelineArgs):
     :param dataset: The dataset to cluster.
 
     """
-    cluster_methods: List[ClusterMethod] = None
+    cluster_methods: List[SupportedClusterMethods] = None
     clustering_method_args: Dict = field(default_factory=dict)
     embedding_model: str = DEFAULT_EMBEDDING_MODEL
     artifact_types: List[str] = None
@@ -38,6 +39,5 @@ class ClusteringArgs(PipelineArgs):
             self.artifact_types = self.dataset.artifact_df.get_artifact_types()
 
         if self.cluster_methods is None:
-            self.cluster_methods = [c for c in ClusterMethod]
-        else:
-            self.cluster_methods = [ClusterMethod.get_value(c) if isinstance(c, str) else c for c in self.cluster_methods]
+            self.cluster_methods = DEFAULT_CLUSTERING_METHODS
+        self.cluster_methods = [SupportedClusterMethods[c] if isinstance(c, str) else c for c in self.cluster_methods]

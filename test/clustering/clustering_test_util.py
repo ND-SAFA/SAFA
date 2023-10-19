@@ -4,6 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.clustering.base.clustering_args import ClusteringArgs
+from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.common.objects.artifact import Artifact
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -50,7 +51,8 @@ class ClusteringTestUtil:
         trace_dataset_creator = TraceDatasetCreator(api_dataset_reader)
         prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=trace_dataset_creator)
 
-        args = ClusteringArgs(dataset_creator=prompt_dataset_creator, embedding_model=embedding_model, **kwargs)
+        args = ClusteringArgs(dataset_creator=prompt_dataset_creator, embedding_model=embedding_model,
+                              cluster_methods=DEFAULT_TESTING_CLUSTERING_METHODS, **kwargs)
         return args
 
     @staticmethod

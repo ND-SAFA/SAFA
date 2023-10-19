@@ -3,6 +3,7 @@ package edu.nd.crc.safa.test.features.memberships.permissions;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
@@ -25,8 +26,8 @@ public class TestProjectEditDataPermissionViolation extends AbstractPermissionVi
     }
 
     @Override
-    protected Permission getExpectedPermission() {
-        return ProjectPermission.EDIT_DATA;
+    protected Set<Permission> getExpectedPermissions() {
+        return Set.of(ProjectPermission.EDIT_DATA);
     }
 
     static class Constants {

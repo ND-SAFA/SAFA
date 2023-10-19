@@ -2,9 +2,14 @@ package edu.nd.crc.safa.test.features.memberships.permissions;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +27,7 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
     /**
      * @return {@link Permission} representing permission sharee is supposed to have to achieve action.
      */
-    protected abstract Permission getExpectedPermission();
+    protected abstract Set<Permission> getExpectedPermissions();
 
     @Test
     protected void attemptProjectEdit() throws Exception {
@@ -35,7 +40,15 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
         // VP - Verify that message contains
         assertThat(error.getString("message"))
             .containsIgnoringCase("missing permission");
-        assertThat(error.getString("permission"))
-            .isEqualTo(getExpectedPermission().getName());
+
+        Set<String> violatedPermissions = new HashSet<>();
+        JSONArray permsArray = error.getJSONArray("permissions");
+        for (int i = 0; i < permsArray.length(); ++i) {
+            violatedPermissions.add(permsArray.getString(i));
+        }
+
+        Set<String> expectedPermissions =
+            getExpectedPermissions().stream().map(Permission::getName).collect(Collectors.toSet());
+        assertThat(violatedPermissions).isEqualTo(expectedPermissions);
     }
 }

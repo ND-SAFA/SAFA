@@ -2,6 +2,8 @@ package edu.nd.crc.safa.test.features.memberships.permissions;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Set;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
@@ -24,8 +26,8 @@ public class TestEditPermissionViolation extends AbstractPermissionViolationTest
     }
 
     @Override
-    protected Permission getExpectedPermission() {
-        return ProjectPermission.DELETE;
+    protected Set<Permission> getExpectedPermissions() {
+        return Set.of(ProjectPermission.DELETE);
     }
 
     @Override

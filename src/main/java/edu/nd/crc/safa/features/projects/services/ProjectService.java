@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +19,8 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -51,6 +54,9 @@ public class ProjectService {
 
     @Setter(onMethod = @__({@Autowired}))
     private JobService jobService;
+
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
+    private PermissionService permissionService;
 
     /**
      * Deletes given project and all related entities through cascade property.
@@ -134,6 +140,98 @@ public class ProjectService {
      */
     public Project createProject(ProjectAppEntity projectDefinition, Team owner) {
         return createProject(projectDefinition.getName(), projectDefinition.getDescription(), owner);
+    }
+
+    /**
+     * Deletes given project and all related entities through cascade property.
+     *
+     * @param project The project to delete.
+     * @param user The user who is creating the project (for permissions checks)
+     * @throws SafaError Throws error if error occurs while deleting flat files.
+     */
+    public void deleteProjectAsUser(Project project, SafaUser user) throws SafaError, IOException {
+        permissionService.requireAnyPermission(
+            Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS), project, user
+        );
+        deleteProject(project);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The team that owns the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(String name, String description, Team owner, SafaUser user) {
+        permissionService.requirePermission(TeamPermission.CREATE_PROJECTS, owner, user);
+        return createProject(name, description, owner);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The user that owns the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(String name, String description, SafaUser owner, SafaUser user) {
+        Team personalTeam = teamService.getPersonalTeam(owner);
+        return createProjectAsUser(name, description, personalTeam, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The organization that owns the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(String name, String description, Organization owner, SafaUser user) {
+        Team orgTeam = teamService.getFullOrganizationTeam(owner);
+        return createProjectAsUser(name, description, orgTeam, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The user who will own the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(ProjectAppEntity projectDefinition, SafaUser owner, SafaUser user) {
+        return createProjectAsUser(projectDefinition.getName(), projectDefinition.getDescription(), owner, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The organization who will own the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(ProjectAppEntity projectDefinition, Organization owner, SafaUser user) {
+        return createProjectAsUser(projectDefinition.getName(), projectDefinition.getDescription(), owner, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The team who will own the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(ProjectAppEntity projectDefinition, Team owner, SafaUser user) {
+        return createProjectAsUser(projectDefinition.getName(), projectDefinition.getDescription(), owner, user);
     }
 
     /**

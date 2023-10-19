@@ -67,6 +67,21 @@ class EmbeddingsManager:
         """
         return self._embedding_map
 
+    def get_all_ids(self) -> List[Any]:
+        """
+        Gets a list of all ids present in the context map
+        :return: A list of all ids present in the context map
+        """
+        return list(self._content_map.keys())
+
+    def get_content(self, a_id: Any) -> str:
+        """
+        Gets the content associated with a given id
+        :param a_id: The id to get content for
+        :return: The content
+        """
+        return self._content_map.get(a_id)
+
     def update_or_add_content(self, a_id: Any, content: str, create_embedding: bool = False) -> Optional[EmbeddingType]:
         """
         Updates or adds new content for an id
@@ -81,6 +96,16 @@ class EmbeddingsManager:
             self._embedding_map.pop(a_id)
         if create_embedding:
             return self.get_embedding(a_id)
+
+    def remove_from_content_map(self, a_id: Any) -> None:
+        """
+        Removes existing id and content from map
+        :param a_id: The id to remove
+        :return: None
+        """
+        if a_id in self._content_map:
+            self._content_map.pop(a_id)
+            self.__state_changed_since_last_save = a_id in self.__ordered_ids
 
     def get_model(self) -> SentenceTransformer:
         """

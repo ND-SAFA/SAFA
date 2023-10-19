@@ -6,6 +6,7 @@ from os.path import splitext
 from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union, Optional
 
 import yaml
+from yaml.dumper import Dumper, SafeDumper
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
@@ -421,16 +422,17 @@ class FileUtil:
             return yaml.load(file, Loader=loader)
 
     @staticmethod
-    def write_yaml(content: Any, output_file_path: str):
+    def write_yaml(content: Any, output_file_path: str, dumper: Type[Dumper] = None):
         """
         Saves yaml to given file
         :param content: The content of the file to create.
         :param output_file_path: The path to save the file to.
         """
+        dumper = Dumper if dumper is None else dumper
         FileUtil.create_dir_safely(output_file_path)
         output_file_path = os.path.expanduser(output_file_path)
         with open(output_file_path, 'w') as file:
-            yaml.dump(content, file, )
+            yaml.dump(content, file, Dumper=dumper)
 
     @staticmethod
     def read_pickle(file_path: str) -> Any:

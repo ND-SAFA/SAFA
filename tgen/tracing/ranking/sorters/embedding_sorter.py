@@ -1,10 +1,9 @@
 from typing import Dict, List
 
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing._data import minmax_scale
+from sklearn.preprocessing import _data
 from tqdm import tqdm
 
-from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
@@ -28,13 +27,15 @@ class EmbeddingSorter(iSorter):
         parent2rankings = {}
         for parent_id in tqdm(parent_ids, desc="Performing Ranking Via Embeddings"):
             parent_embedding = embedding_manager.get_embedding(parent_id)
-            scores = cosine_similarity([parent_embedding], children_embeddings)[0]
+            if len(parent_embedding) > 1:
+                parent_embedding = [parent_embedding]
+            scores = cosine_similarity(parent_embedding, children_embeddings)[0]
             sorted_children = sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])
             sorted_artifact_ids = [c[1] for c in sorted_children]
             sorted_artifact_scores = [c[0] for c in sorted_children]
 
             if return_scores:
-                sorted_artifact_scores = minmax_scale(sorted_artifact_scores)
+                sorted_artifact_scores = _data.minmax_scale(sorted_artifact_scores)
                 sorted_artifact_scores = ListUtil.convert_numpy_array_to_native_types(sorted_artifact_scores)
                 parent2rankings[parent_id] = (sorted_artifact_ids, sorted_artifact_scores)
             else:

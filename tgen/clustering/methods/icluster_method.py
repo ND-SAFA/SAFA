@@ -4,13 +4,10 @@ from typing import Dict, List
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.embeddings.embeddings_manager import EmbeddingType
 
-DEFAULT_REDUCTION_FACTOR = 0.25  # Expected reduction in artifacts
-
 
 class IClusterMethod(ABC):
 
-    def cluster(self, embedding_map: Dict[str, EmbeddingType], reduction_factor: int = DEFAULT_REDUCTION_FACTOR,
-                **kwargs) -> ClusterMapType:
+    def cluster(self, embedding_map: Dict[str, EmbeddingType], reduction_factor: int, **kwargs) -> ClusterMapType:
         """
         Clusters embeddings in map and creates sets of links.
         :param embedding_map: Map of artifact ID to embedding.

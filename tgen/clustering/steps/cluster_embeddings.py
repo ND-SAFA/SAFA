@@ -17,7 +17,7 @@ class ClusterEmbeddings(AbstractPipelineStep):
         global_clusters = {}
         for cluster_method_class in args.cluster_methods:
             cluster_method: IClusterMethod = cluster_method_class.value()
-            clusters = cluster_method.cluster(embedding_map, **args.clustering_method_args)
+            clusters = cluster_method.cluster(embedding_map, args.cluster_reduction_factor, **args.clustering_method_args)
             clustering_method_id = cluster_method.get_id()
             clusters = {f"{clustering_method_id}{k}": v for k, v in clusters.items()}
             global_clusters.update(clusters)

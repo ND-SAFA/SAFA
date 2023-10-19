@@ -3,13 +3,15 @@ from typing import List
 from sklearn.cluster import KMeans
 
 from tgen.clustering.methods.icluster_method import IClusterMethod
+from tgen.common.constants.clustering_constants import DEFAULT_RANDOM_STATE
 from tgen.embeddings.embeddings_manager import EmbeddingType
-
-DEFAULT_REDUCTION_FACTOR = 0.25  # Expected reduction in artifacts
-DEFAULT_RANDOM_STATE = 0
 
 
 class KMeansClustering(IClusterMethod):
+    """
+    Docs: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html
+    """
+
     def _cluster(self, embeddings: List[EmbeddingType], n_clusters: int, random_state: int = DEFAULT_RANDOM_STATE, **kwargs) -> List[
         int]:
         """

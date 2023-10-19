@@ -7,6 +7,9 @@ from tgen.embeddings.embeddings_manager import EmbeddingType
 
 
 class AgglomerativeClusteringMethod(IClusterMethod):
+    """
+    Docs: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html#sklearn.cluster.AgglomerativeClustering
+    """
 
     def _cluster(self, embeddings: List[EmbeddingType], n_clusters: int, **kwargs) -> List[int]:
         """

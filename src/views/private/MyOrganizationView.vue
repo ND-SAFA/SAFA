@@ -1,5 +1,5 @@
 <template>
-  <private-page full-window title="My Organization">
+  <private-page full-window>
     <organization-tabs />
   </private-page>
 </template>

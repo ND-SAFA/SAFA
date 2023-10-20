@@ -27,20 +27,55 @@ $color-node-gradient2: var(--q-nodeGradient2);
 $color-node-gradient3: var(--q-nodeGradient3);
 $color-node-gradient4: var(--q-nodeGradient4);
 $color-node-gradient5: var(--q-nodeGradient5);
+$color-node-gradient6: var(--q-nodeGradient6);
+$color-node-gradient7: var(--q-nodeGradient7);
+$color-node-gradient8: var(--q-nodeGradient8);
+$color-node-gradient9: var(--q-nodeGradient9);
+
+$color-gradient-list:
+        $color-node-gradient1, $color-node-gradient2, $color-node-gradient3,
+        $color-node-gradient4, $color-node-gradient5, $color-node-gradient6,
+        $color-node-gradient7, $color-node-gradient8, $color-node-gradient9;
+$color-linear-gradient: linear-gradient(
+                to bottom right,
+                #{$color-node-gradient1},
+                #{$color-node-gradient2},
+                #{$color-node-gradient3},
+                #{$color-node-gradient5},
+                #{$color-node-gradient7},
+                #{$color-node-gradient8},
+                #{$color-node-gradient9}
+) !important;
+
+// Gradient
+
+.text-gradient, .bg-gradient {
+  //background-image: $color-linear-gradient;
+  //
+  //&:before {
+  //  border-color: transparent !important;
+  //  content: '';
+  //  position: absolute;
+  //  margin: 1px;
+  //  top: 0;
+  //  left: 0;
+  //  bottom: 0;
+  //  right: 0;
+  //  background: $color-background;
+  //}
+
+  &:before {
+    border-color: $color-background !important;
+  }
+
+  i, .q-fab__label {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: $color-linear-gradient;
+  }
+}
 
 // Background Palette Tags
-
-.bg-gradient {
-  background: linear-gradient(
-                  to bottom right,
-                  #{$color-node-gradient1},
-                  #{$color-node-gradient2},
-                  #{$color-node-gradient3},
-                  #{$color-node-gradient4},
-                  #{$color-node-gradient5}
-  ) !important;
-;
-}
 
 .bg-transparent {
   background-color: transparent !important;
@@ -70,24 +105,10 @@ $color-node-gradient5: var(--q-nodeGradient5);
   background-color: $color-unchanged !important;
 }
 
-.bg-nodeGradient1 {
-  background-color: $color-node-gradient1 !important;
-}
-
-.bg-nodeGradient2 {
-  background-color: $color-node-gradient2 !important;
-}
-
-.bg-nodeGradient3 {
-  background-color: $color-node-gradient3 !important;
-}
-
-.bg-nodeGradient4 {
-  background-color: $color-node-gradient4 !important;
-}
-
-.bg-nodeGradient5 {
-  background-color: $color-node-gradient5 !important;
+@for $i from 1 through 9 {
+  .bg-nodeGradient#{$i} {
+    background-color: nth($color-gradient-list, $i) !important;
+  }
 }
 
 // Border Palette Tags
@@ -140,24 +161,10 @@ $color-node-gradient5: var(--q-nodeGradient5);
   border: 1px solid $color-unchanged !important;
 }
 
-.bd-nodeGradient1 {
-  border: 1px solid $color-node-gradient1 !important;
-}
-
-.bd-nodeGradient2 {
-  border: 1px solid $color-node-gradient2 !important;
-}
-
-.bd-nodeGradient3 {
-  border: 1px solid $color-node-gradient3 !important;
-}
-
-.bd-nodeGradient4 {
-  border: 1px solid $color-node-gradient4 !important;
-}
-
-.bd-nodeGradient5 {
-  border: 1px solid $color-node-gradient5 !important;
+@for $i from 1 through 9 {
+  .bd-nodeGradient#{$i} {
+    border: 1px solid nth($color-gradient-list, $i) !important;
+  }
 }
 
 // Text Palette Tags
@@ -194,26 +201,6 @@ $color-node-gradient5: var(--q-nodeGradient5);
   color: $color-node-generated !important;
 }
 
-.text-nodeGradient1 {
-  color: $color-node-gradient1 !important;
-}
-
-.text-nodeGradient2 {
-  color: $color-node-gradient2 !important;
-}
-
-.text-nodeGradient3 {
-  color: $color-node-gradient3 !important;
-}
-
-.text-nodeGradient4 {
-  color: $color-node-gradient4 !important;
-}
-
-.text-nodeGradient5 {
-  color: $color-node-gradient5 !important;
-}
-
 .text-added {
   color: $color-added !important;
 }
@@ -228,4 +215,10 @@ $color-node-gradient5: var(--q-nodeGradient5);
 
 .text-unchanged {
   color: $color-unchanged !important;
+}
+
+@for $i from 1 through 9 {
+  .text-nodeGradient#{$i} {
+    color: nth($color-gradient-list, $i) !important;
+  }
 }

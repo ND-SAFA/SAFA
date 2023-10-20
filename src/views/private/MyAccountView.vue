@@ -1,14 +1,5 @@
 <template>
-  <private-page title="My Account" small-window>
-    <template #actions>
-      <text-button
-        text
-        label="Log Out"
-        icon="logout"
-        data-cy="button-account-logout"
-        @click="handleLogoutClick"
-      />
-    </template>
+  <private-page small-window>
     <my-account />
   </private-page>
 </template>
@@ -23,13 +14,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { sessionApiStore } from "@/hooks";
-import { PrivatePage, MyAccount, TextButton } from "@/components";
-
-/**
- * Logs out back to the login page.
- */
-function handleLogoutClick() {
-  sessionApiStore.handleLogout(true);
-}
+import { PrivatePage, MyAccount } from "@/components";
 </script>

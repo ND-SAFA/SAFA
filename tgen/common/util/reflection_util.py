@@ -259,8 +259,10 @@ class ReflectionUtil:
         var_name = var_as_string.split('=')[0]
         if is_self_property:
             var_name = var_name.split("self.")[-1]
-        if class_attr:
+        elif class_attr:
             var_name = var_name.split(f"{class_attr.__name__}.")[-1]
+        if var_name.startswith("__") and class_attr:
+            var_name = f"_{class_attr.__name__}{var_name}"
         return var_name
 
     @staticmethod

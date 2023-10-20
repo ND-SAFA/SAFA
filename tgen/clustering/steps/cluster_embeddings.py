@@ -12,12 +12,11 @@ class ClusterEmbeddings(AbstractPipelineStep):
         :param state: Used to store final clusters.
         :return: None
         """
-        embedding_map = state.embedding_map
 
         global_clusters = {}
         for cluster_method_class in args.cluster_methods:
             cluster_manager = ClusterAlgorithmManager(cluster_method_class)
-            clusters = cluster_manager.cluster(embedding_map, args.cluster_reduction_factor, **args.clustering_method_args)
+            clusters = cluster_manager.cluster(state.embedding_manager, args.cluster_reduction_factor, **args.clustering_method_args)
             clustering_method_id = cluster_manager.get_id()
             clusters = {f"{clustering_method_id}{k}": v for k, v in clusters.items()}
             global_clusters[clustering_method_id] = clusters

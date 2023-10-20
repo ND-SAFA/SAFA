@@ -49,7 +49,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
             "Must supply clusters for manual clustering"
         if manual_clusters:
             self.cluster_methods.add(SupportedClusteringMethod.MANUAL)
-        self.manual_clusters = {uuid.uuid4(): cluster for cluster in manual_clusters.values()} if manual_clusters else {}
+        self.manual_clusters = manual_clusters
         self.clustering_params = clustering_params
         self.layer_id = str(uuid.uuid4()) if layer_id is None else layer_id
         self.summarizer = summarizer

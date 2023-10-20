@@ -6,6 +6,7 @@ from os.path import splitext
 from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union, Optional
 
 import yaml
+from yaml.dumper import Dumper, SafeDumper
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
@@ -19,12 +20,14 @@ CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "PL", "R", "PY", "JAVA", "VUE", "CC"]
 
 ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
+import numpy as np
 
 
 class FileUtil:
     JSON_EXT = "json"
     CSV_EXT = "csv"
     YAML_EXT = "yaml"
+    NUMPY_EXT = "npy"
 
     @staticmethod
     def get_directory_path(file_path: str) -> str:
@@ -419,15 +422,17 @@ class FileUtil:
             return yaml.load(file, Loader=loader)
 
     @staticmethod
-    def write_yaml(content: Any, output_file_path: str):
+    def write_yaml(content: Any, output_file_path: str, dumper: Type[Dumper] = None):
         """
         Saves yaml to given file
         :param content: The content of the file to create.
         :param output_file_path: The path to save the file to.
         """
+        dumper = Dumper if dumper is None else dumper
+        FileUtil.create_dir_safely(output_file_path)
         output_file_path = os.path.expanduser(output_file_path)
         with open(output_file_path, 'w') as file:
-            yaml.dump(content, file, )
+            yaml.dump(content, file, Dumper=dumper)
 
     @staticmethod
     def read_pickle(file_path: str) -> Any:
@@ -449,6 +454,29 @@ class FileUtil:
         with open(output_file_path, 'wb') as file:
             pickle.dump(content, file)
             yaml.dump(content, file)
+
+    @staticmethod
+    def save_numpy(array: Union[np.array, list], file_path: str) -> None:
+        """
+        Saves a numpy array to a file
+        :param array: The np array or python list to save
+        :param file_path: Where to save the array to
+        :return: None
+        """
+        FileUtil.create_dir_safely(file_path)
+        if not isinstance(array, np.ndarray):
+            array = np.asarray(array)
+        np.save(file_path, array)
+
+    @staticmethod
+    def load_numpy(file_path: str) -> np.array:
+        """
+        Loads a numpy array from a file
+        :param file_path: Where to load the array from
+        :return: The numpy array
+        """
+        file_path = FileUtil.add_ext(file_path, FileUtil.NUMPY_EXT)
+        return np.load(file_path)
 
     @staticmethod
     def add_ext(file_path: str, ext: str) -> str:

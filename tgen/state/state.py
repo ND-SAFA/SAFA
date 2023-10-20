@@ -94,9 +94,7 @@ class State(BaseObject):
         try:
             step_num = len(self.completed_steps)
             save_path = self.get_path_to_state_checkpoint(self.export_dir, step_name, run_num, step_num)
-            as_dict = {k: (v.as_creator(FileUtil.collapse_paths(self.get_path_to_state_checkpoint(self.export_dir)), k)
-                           if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()
-                       if not attrs2ignore or k not in attrs2ignore}
+            as_dict = {k: v for k, v in vars(self).items() if not attrs2ignore or k not in attrs2ignore}
             collapsed_paths = self.collapse_or_expand_paths(as_dict)
             YamlUtil.write(collapsed_paths, save_path)
             logger.info(f"Saved state to {save_path}")

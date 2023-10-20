@@ -17,7 +17,7 @@ class TestCreateEmbeddings(TestCase):
         state = ClusteringState()
 
         CreateEmbeddings().run(args, state)
-        embedding_map = state.embedding_map
+        embedding_map = state.embedding_manager.get_current_embeddings()
 
         self.assertEqual(2, len(embedding_map))
         ClusteringTestUtil.assert_embeddings_equals(a1, embedding_map["A1"])

@@ -1,8 +1,9 @@
 import os
 import re
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Set, Union, Tuple
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -17,6 +18,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
@@ -34,7 +36,7 @@ class HGenUtil:
     def get_predictions(prompt_builder: PromptBuilder, hgen_args: HGenArgs,
                         prediction_step: PredictionStep, dataset: PromptDataset = None,
                         response_prompt_ids: Union[Set, str] = None, tags_for_response: Union[Set, str] = None,
-                        return_first: bool = False, export_path: str = None) -> Dict[str, str]:
+                        return_first: bool = False, export_path: str = None) -> Union[List[Dict], Dict[str, str]]:
         """
         Gets the predictions for the given prompts on the given dataset
         :param prompt_builder: Builds the prompts for the model
@@ -80,8 +82,9 @@ class HGenUtil:
                                           base_prompt: Union[SupportedPrompts, str] = SupportedPrompts.HGEN_GENERATION,
                                           summary_prompt: Prompt = None, artifact_type: str = None,
                                           combine_summary_and_task_prompts: bool = False,
-                                          build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML) \
-            -> PromptBuilder:
+                                          build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
+                                          id_to_context_artifacts: Dict[str, List[EnumDict]] = None
+                                          ) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
         :param hgen_args: The arguments for the hierarchy generator
@@ -91,6 +94,7 @@ class HGenUtil:
         :param artifact_type: The type of artifact being presented in the prompt
         :param combine_summary_and_task_prompts: If True combines the summary and task prompts into a single Questionnaire prompt
         :param build_method: The method to use to build the artifacts into the prompt
+        :param id_to_context_artifacts: An optional mapping of artifact id to a list of the related artifacts for context
         :return: The prompt builder used for the generations
         """
         if isinstance(base_prompt, SupportedPrompts):
@@ -103,12 +107,14 @@ class HGenUtil:
             generation_step_response_manager.value_formatter = lambda tag, val: val.strip().strip(NEW_LINE)
 
         artifact_type = hgen_args.source_type if not artifact_type else artifact_type
-        artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
-                                              build_method=build_method,
-                                              include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
-                                              data_type=MultiArtifactPrompt.DataType.ARTIFACT,
-                                              xml_tags={
-                                                  HGenUtil.convert_spaces_to_dashes(artifact_type.lower()): ["id", "description"]})
+        artifact_prompt_kwargs = dict(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
+                                      build_method=build_method,
+                                      include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
+                                      data_type=MultiArtifactPrompt.DataType.ARTIFACT,
+                                      xml_tags={
+                                          HGenUtil.convert_spaces_to_dashes(artifact_type.lower()): ["id", "description"]})
+        artifact_prompt = ContextPrompt(id_to_context_artifacts=id_to_context_artifacts, **artifact_prompt_kwargs) \
+            if id_to_context_artifacts else MultiArtifactPrompt(**artifact_prompt_kwargs)
         prompts = [base_prompt, artifact_prompt]
 
         task_preface = f"{NEW_LINE}{PromptUtil.as_markdown_header('TASKS:')}{NEW_LINE}"
@@ -129,20 +135,24 @@ class HGenUtil:
         return prompt_builder
 
     @staticmethod
-    def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_generations: List[str], target_layer_id: str,
-                                                    generate_names: bool = True) -> ArtifactDataFrame:
+    def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs,
+                                                    artifact_generations: List[str], target_layer_id: str,
+                                                    generate_names: bool = True,
+                                                    cluster_dataset: PromptDataset = None) -> Tuple[ArtifactDataFrame, Dict]:
         """
         Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
         :param hgen_args: The arguments for the hierarchy generation
         :param artifact_generations: A list of generated artifact content
         :param target_layer_id: The id for the layer with the new generated artifacts
         :param generate_names: If True, generates names for the new artifacts
-        :return: The dataframe of generated artifacts
+        :param cluster_dataset: If a cluster dataset was provided, this will be used to create the artifact df
+        :return: The dataframe of generated artifacts and a dictionary mapping the original ids to the new names that were created
         """
-        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(artifact_generations))],
+        artifact_ids = [str(i) for i in range(len(artifact_generations))] if not cluster_dataset else cluster_dataset.artifact_df.index
+        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_ids,
                                              ArtifactKeys.CONTENT: artifact_generations,
                                              ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
-
+        orig_id_to_new_id = {a_id: a_id for a_id in artifact_ids}
         if generate_names:
             try:
                 long_artifacts = [content for content in artifact_generations if len(content.split()) > 5]
@@ -166,10 +176,11 @@ class HGenUtil:
                                                      export_path=os.path.join(hgen_args.export_dir, "artifact_names.json"))
                     assert len(set(names)) == len(names), f"Found duplicates names: {names}"
                     assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
+                orig_id_to_new_id = {orig_id: new_name for orig_id, new_name in zip(artifact_ids, names)}
                 new_artifact_df.index = names
             except Exception:
                 logger.exception("Unable to generate names for the artifacts")
-        return new_artifact_df
+        return new_artifact_df, orig_id_to_new_id
 
     @staticmethod
     def parse_generated_artifacts(res: str) -> List[str]:

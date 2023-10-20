@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Any
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -24,6 +25,12 @@ class HGenState(State):
     questions: List[str] = None  # The questions to use to probe the model for a good summary
 
     """
+    Optional Step - Break project into parts and generate for each part
+    """
+    id_to_cluster_artifacts: Dict[Any, List[EnumDict]] = None  # maps cluster id to the list of artifacts in that cluster
+    cluster_dataset: PromptDataset = None  # contains all the clusters and their links to the artifacts
+
+    """
     Step 3 - Artifact generation
     """
     generation_predictions: Dict[str, List[str]] = None  # dictionary mapping generated content to a list of related source ids
@@ -38,5 +45,5 @@ class HGenState(State):
     """
     Step 4 - Dataset Construction
     """
-    new_artifact_df: ArtifactDataFrame = None # Contains the new generated artifacts
+    new_artifact_df: ArtifactDataFrame = None  # Contains the new generated artifacts
     final_dataset: PromptDataset = None  # The final dataset with generated artifacts.

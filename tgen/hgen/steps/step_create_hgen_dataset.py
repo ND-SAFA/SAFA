@@ -52,15 +52,18 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             target_layer_id = CreateHGenDatasetStep._get_target_layer_id(args, original_dataset_complete)
 
             generated_artifacts, predicted_links = list(state.refined_content.keys()), list(state.refined_content.values())
-            new_artifact_df = HGenUtil.create_artifact_df_from_generated_artifacts(args, generated_artifacts, target_layer_id)
-            artifact_id_to_link_predictions = {name: predicted_links[i] for i, name in enumerate(new_artifact_df.index)}
+            new_artifact_df, orig_id_to_new_name = HGenUtil.create_artifact_df_from_generated_artifacts(
+                args, generated_artifacts, target_layer_id, cluster_dataset=state.cluster_dataset)
             PipelineUtil.save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path,
                                                  filename="generated_artifacts_only")
+            combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
 
             new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, target_layer_id)
-            combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
+
+            artifact_id_to_link_predictions = {name: predicted_links[i] for i, name in enumerate(new_artifact_df.index)}
             new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state, combined_artifact_df,
-                                                                                           artifact_id_to_link_predictions)
+                                                                                           artifact_id_to_link_predictions,
+                                                                                           orig_id_to_new_name)
             PipelineUtil.save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df,
                                                               layer_df=new_layer_df),
                                                  export_path, filename="generated_dataset_checkpoint")
@@ -100,7 +103,8 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
     @staticmethod
     def _create_trace_df_with_generated_artifacts(hgen_args: HGenArgs, hgen_state: HGenState,
                                                   artifact_df: ArtifactDataFrame,
-                                                  artifact_id_to_link_predictions: Dict[str, List[str]]) -> TraceDataFrame:
+                                                  artifact_id_to_link_predictions: Dict[str, List[str]],
+                                                  orig_id_to_new_name: Dict) -> TraceDataFrame:
         """
         Creates a dataframe of traces including the new trace links between the original lower-level artifacts
         and the newly generated upper-level artifacts
@@ -108,8 +112,15 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param hgen_state: The current state of hgen
         :param artifact_df: The dataframe containing the generated artifacts
         :param artifact_id_to_link_predictions: A dictionary mapping artifact id to the links that were predicted for it
+        :param orig_id_to_new_name: Dictionary mapping the original artifacts id to its new name
         :return: The dataframe containing new and old trace links
         """
+        if hgen_state.cluster_dataset is not None:
+            trace_df = hgen_state.cluster_dataset.trace_dataset.trace_df
+            for i, trace in trace_df.itertuples():
+                if trace[TraceKeys.TARGET] in orig_id_to_new_name:
+                    trace_df.update_value(TraceKeys.TARGET, trace[TraceKeys.LINK_ID], orig_id_to_new_name[trace[TraceKeys.TARGET]])
+            return trace_df
         if not hgen_args.generate_trace_links:
             return TraceDataFrame()
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")

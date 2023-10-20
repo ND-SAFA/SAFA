@@ -8,6 +8,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateEmbeddings(AbstractPipelineStep):
+
     def _run(self, args: ClusteringArgs, state: ClusteringState) -> None:
         """
         Extracts the artifacts and embeds them.
@@ -16,28 +17,15 @@ class CreateEmbeddings(AbstractPipelineStep):
         :return: None
         """
         artifact_types = args.artifact_types
-        artifact_df = args.dataset.trace_dataset.artifact_df
+        artifact_df = args.dataset.artifact_df
         artifact_map = self.create_artifact_map(artifact_df, artifact_types)
+        embeddings_manager = EmbeddingsManager(content_map=artifact_map, model_name=args.embedding_model)
+        embeddings_manager.create_embedding_map()
 
-        if len(artifact_map) == 0:
-            raise Exception(f"Artifact types ({artifact_types}) resulted in no artifacts.")
-
-        state.embedding_map = CreateEmbeddings.create_embeddings_map(artifact_map, args.embedding_model)
-
-    @staticmethod
-    def create_embeddings_map(artifact_map: Dict[str, str], model_name: str):
-        """
-        Creates map of artifact id to embeddings.
-        :param artifact_map: Maps artifact IDs to their content.
-        :param model_name: The name of the model used to embed the artifacts.
-        :return: Map of artifact ID to embedding.
-        """
-        model = EmbeddingsManager.get_model(model_name)
-        embedding_map = EmbeddingsManager.create_embedding_map(artifact_map, model)
-        return embedding_map
+        state.embedding_manager = embeddings_manager
 
     @staticmethod
-    def create_artifact_map(artifact_df: ArtifactDataFrame, artifact_types: List[str]):
+    def create_artifact_map(artifact_df: ArtifactDataFrame, artifact_types: List[str]) -> Dict[str, str]:
         """
         Creates artifact map containing artifacts in types.
         :param artifact_df: The artifact data frame.

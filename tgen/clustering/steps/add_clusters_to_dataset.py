@@ -6,6 +6,7 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -21,23 +22,14 @@ class AddClustersToDataset(AbstractPipelineStep[ClusteringArgs, ClusteringState]
         :param state: State of the clustering pipeline.
         :return: None
         """
-        if not args.add_to_dataset:
+        if not args.create_dataset:
             return
         cluster_map = state.final_cluster_map
-
-        artifact_df = args.dataset.trace_dataset.artifact_df
-        trace_df = args.dataset.trace_dataset.trace_df
-        layer_df = args.dataset.trace_dataset.layer_df
-
-        cluster_artifacts = AddClustersToDataset.create_artifacts_for_clusters(cluster_map)
-        cluster_traces = AddClustersToDataset.create_traces_for_clusters(cluster_map)
-
-        artifact_df.add_artifacts(cluster_artifacts)
-        trace_df.add_links(cluster_traces)
-
-        referenced_artifact_types = AddClustersToDataset.get_referenced_artifact_types(args.dataset.trace_dataset, cluster_traces)
-        for r_artifact_type in referenced_artifact_types:
-            layer_df.add_layer(r_artifact_type, AddClustersToDataset.CLUSTER_ARTIFACT_TYPE)
+        cluster_dataset_creator = ClusterDatasetCreator(prompt_dataset=args.dataset,
+                                                        manual_clusters=cluster_map,
+                                                        layer_id=self.CLUSTER_ARTIFACT_TYPE)
+        new_prompt_dataset = cluster_dataset_creator.create()
+        state.cluster_dataset = new_prompt_dataset
 
     @classmethod
     def get_referenced_artifact_types(cls, trace_dataset: TraceDataset, traces: List[Trace]) -> List[str]:

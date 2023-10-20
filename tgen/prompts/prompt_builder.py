@@ -4,6 +4,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
@@ -131,7 +132,9 @@ class PromptBuilder:
                                    requires_artifact_per_prompt=False,
                                    requires_all_artifacts=False)
         for prompt in self.prompts:
-            if isinstance(prompt, MultiArtifactPrompt):
+            if isinstance(prompt, ContextPrompt):
+                self.config.requires_artifact_per_prompt = True
+            elif isinstance(prompt, MultiArtifactPrompt):
                 if prompt.data_type == MultiArtifactPrompt.DataType.TRACES:
                     self.config.requires_trace_per_prompt = True
                 if prompt.data_type == MultiArtifactPrompt.DataType.ARTIFACT:

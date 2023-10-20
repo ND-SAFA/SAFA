@@ -3,7 +3,6 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from test.hgen.hgen_test_utils import HGenTestConstants
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
@@ -12,10 +11,10 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.state.state import State
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
-from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -39,7 +38,8 @@ class TestState(BaseTest):
     def test_load_latest(self, anthropic_manager: TestAIManager, project_summary_mock: MagicMock):
         project_summary_mock.return_value = "project_summary"
         anthropic_manager.mock_summarization()
-        steps = [step.get_step_name() for step in HierarchyGenerator.steps if step.get_step_name()]
+        EXCLUDE_STEPS = [CreateClustersStep]
+        steps = [step.get_step_name() for step in HierarchyGenerator.steps if step not in EXCLUDE_STEPS]
         state = HGenState.load_latest(TEST_STATE_PATH, steps)
         self.assertEqual(state.export_dir, TEST_OUTPUT_DIR)
         self.assertSetEqual(set(steps), set(state.completed_steps.keys()))
@@ -83,7 +83,7 @@ class TestState(BaseTest):
         orig_state = HGenState(**checked_attrs)
         orig_state.export_dir = TEST_OUTPUT_DIR
         orig_state.save(state_name)
-        save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num)
+        save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num - 1)
         reloaded_attrs = YamlUtil.read(save_path)
         self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/testres/output')
         self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])

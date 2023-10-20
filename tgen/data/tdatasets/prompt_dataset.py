@@ -129,7 +129,7 @@ class PromptDataset(iDataset):
             self.prompt_df = PromptDataFrame(prompt_entries)
         return self.prompt_df
 
-    def as_creator(self, project_path: str, dataset_dirname: str):
+    def as_creator(self, project_path: str):
         """
         Converts the dataset into a creator that can remake it
         :param project_path: The path to save the dataset at for reloading
@@ -138,13 +138,13 @@ class PromptDataset(iDataset):
         """
         from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
         from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-        project_path = os.path.join(project_path, dataset_dirname)
         PromptDatasetExporter(export_path=project_path, trace_dataset_exporter_type=SafaExporter, dataset=self).export()
+        collapsed_path = FileUtil.collapse_paths(project_path)
         if self.trace_dataset is not None:
-            prompt_creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(StructuredProjectReader(project_path)))
+            prompt_creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(StructuredProjectReader(collapsed_path)))
         elif self.artifact_df is not None:
             from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
-            prompt_creator = PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
+            prompt_creator = PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=collapsed_path))
         else:
             raise NotImplementedError("Cannot get creator for prompt dataset without an artifact df or trace dataset")
         return prompt_creator

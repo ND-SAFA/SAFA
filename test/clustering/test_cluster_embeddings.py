@@ -6,7 +6,6 @@ from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMe
 from tgen.clustering.steps.cluster_embeddings import ClusterEmbeddings
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
 from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 
 
 class TestClusterEmbeddings(TestCase):
@@ -25,9 +24,7 @@ class TestClusterEmbeddings(TestCase):
         state = ClusteringState()
         args = ClusteringTestUtil.create_clustering_args(artifacts)
 
-        embeddings_map = CreateEmbeddings.create_embeddings_map(artifact_map, SMALL_EMBEDDING_MODEL)
-        state.embedding_map = embeddings_map
-
+        CreateEmbeddings().run(args, state)
         ClusterEmbeddings().run(args, state)
 
         method_cluster_map = state.multi_method_cluster_map

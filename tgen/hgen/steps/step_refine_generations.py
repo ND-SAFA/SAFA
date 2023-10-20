@@ -29,7 +29,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state for the generator
         :return: None
         """
-        if not args.optimize_with_reruns:
+        if not args.optimize_with_reruns or state.id_to_cluster_artifacts:
             state.all_generated_content = state.generation_predictions
             state.refined_content = state.generation_predictions
             return
@@ -69,18 +69,19 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                         base_prompt=SupportedPrompts.HGEN_REFINEMENT,
                                                                         artifact_type=f"V1 {hgen_args.target_type}",
                                                                         build_method=MultiArtifactPrompt.BuildMethod.NUMBERED)
-            prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary.to_string()}"), 1)
+            if summary:
+                prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary.to_string()}"), 1)
             refined_artifacts = MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(f"V2 {hgen_args.target_type}"),
                                                     build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                                     include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                                     starting_num=len(refined_artifact_content) + 1) \
                 .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in new_generated_artifact_content.keys()])
             prompt_builder.add_prompt(Prompt(refined_artifacts), -1)
-            artifacts = HGenUtil.create_artifact_df_from_generated_artifacts(hgen_args,
-                                                                             artifact_generations=list(
-                                                                                 refined_artifact_content.keys()),
-                                                                             target_layer_id=hgen_args.target_type,
-                                                                             generate_names=False)
+            artifacts, _ = HGenUtil.create_artifact_df_from_generated_artifacts(hgen_args,
+                                                                                artifact_generations=list(
+                                                                                    refined_artifact_content.keys()),
+                                                                                target_layer_id=hgen_args.target_type,
+                                                                                generate_names=False)
             generated_artifacts_tag: str = questionnaire.get_response_tags_for_question(-1)
             selected_artifact_nums = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
                                                               prediction_step=PredictionStep.REFINEMENT,

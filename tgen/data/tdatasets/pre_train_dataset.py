@@ -50,3 +50,9 @@ class PreTrainDataset(iDataset):
         dataset = load_dataset("text", data_files={"train": self.training_file_path})
         dataset = dataset.map(tokenize_and_chunk, batched=True, remove_columns=["text"], desc="Tokenizing dataset")
         return dataset["train"]
+
+    def as_creator(self, project_path: str):
+        """
+        Pre train dataset cannot be converted to creator
+        """
+        raise NotImplementedError("Pre train dataset cannot be converted to creator")

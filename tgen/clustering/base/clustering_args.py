@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
 from tgen.common.constants.clustering_constants import DEFAULT_ADD_CLUSTERS_TO_DATASET, DEFAULT_CLUSTERING_METHODS, \
-    DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
+    DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
     DEFAULT_REDUCTION_FACTOR
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
@@ -28,6 +28,7 @@ class ClusteringArgs(PipelineArgs):
     cluster_intersection_threshold: float = DEFAULT_CLUSTER_SIMILARITY_THRESHOLD  # 80% or more of intersection equals same cluster
     cluster_reduction_factor: float = DEFAULT_REDUCTION_FACTOR
     add_to_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
+    cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
 
     def __post_init__(self) -> None:
         """

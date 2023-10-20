@@ -1,7 +1,6 @@
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.methods.cluster_manager import ClusterManager
-from tgen.common.constants.clustering_constants import MAX_CLUSTER_SIZE, MIN_CLUSTER_SIZE
+from tgen.clustering.methods.cluster_algorithm_manager import ClusterAlgorithmManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
@@ -17,11 +16,10 @@ class ClusterEmbeddings(AbstractPipelineStep):
 
         global_clusters = {}
         for cluster_method_class in args.cluster_methods:
-            cluster_manager = ClusterManager(cluster_method_class)
+            cluster_manager = ClusterAlgorithmManager(cluster_method_class)
             clusters = cluster_manager.cluster(embedding_map, args.cluster_reduction_factor, **args.clustering_method_args)
             clustering_method_id = cluster_manager.get_id()
             clusters = {f"{clustering_method_id}{k}": v for k, v in clusters.items()}
-            global_clusters.update(clusters)
+            global_clusters[clustering_method_id] = clusters
 
-        global_clusters = {k: v for k, v in global_clusters.items() if MIN_CLUSTER_SIZE <= len(v) <= MAX_CLUSTER_SIZE}
         state.multi_method_cluster_map = global_clusters

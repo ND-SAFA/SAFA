@@ -12,5 +12,5 @@ class ClusteringState(State):
     :param multi_method_cluster_map: Map of cluster ID to its artifacts.
     """
     embedding_map: Dict[str, EmbeddingType]
-    multi_method_cluster_map: ClusterMapType
+    multi_method_cluster_map: Dict[str, ClusterMapType]
     final_cluster_map: ClusterMapType

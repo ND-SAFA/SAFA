@@ -30,8 +30,10 @@ class TestClusterEmbeddings(TestCase):
 
         ClusterEmbeddings().run(args, state)
 
-        cluster_map = state.multi_method_cluster_map
+        method_cluster_map = state.multi_method_cluster_map
         for clustering_method_name in DEFAULT_TESTING_CLUSTERING_METHODS:
             supported_clustering_method = SupportedClusterMethods[clustering_method_name]
-            c_id = f"{supported_clustering_method.name}0"
-            self.assertIn(c_id, cluster_map)
+            method_name = supported_clustering_method.name
+            self.assertIn(method_name, method_cluster_map)
+            c_id = f"{method_name}0"
+            self.assertIn(c_id, method_cluster_map[method_name])

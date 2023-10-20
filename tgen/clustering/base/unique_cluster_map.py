@@ -52,7 +52,7 @@ class UniqueClusterMap:
         """
         selected_cluster_ids = [c_id for c_id, votes in self.cluster_votes.items() if votes >= min_votes]
         selected_cluster_ids = set(selected_cluster_ids)
-        cluster_map = {k: v for k, v in self.cluster_map.items() if selected_cluster_ids}
+        cluster_map = {c_id: cluster for c_id, cluster in self.cluster_map.items() if c_id in selected_cluster_ids}
         return cluster_map
 
     def contains_cluster(self, cluster: ClusterType) -> bool:
@@ -63,11 +63,12 @@ class UniqueClusterMap:
         """
         cluster_sets = self.cluster_set_map.values()
         target_c_set = set(cluster)
+        is_hit = False
         for c_id, c_set in self.cluster_set_map.items():
             if self.calculate_intersection(c_set, target_c_set) >= self.threshold:
                 self.add_hit(c_id)
-                return True
-        return False
+                is_hit = True
+        return is_hit
 
     def add_hit(self, c_id: str) -> None:
         """
@@ -87,14 +88,16 @@ class UniqueClusterMap:
         return len(self.cluster_map)
 
     @staticmethod
-    def calculate_intersection(c1: Set, c2: Set):
+    def calculate_intersection(source: Set, target: Set):
         """
         Calculates the percentage the two sets intersect.
-        :param c1: Set one.
-        :param c2: Set two.
+        :param source: Set one.
+        :param target: Set two.
         :return: The ratio between the number of intersection elements vs the total union.
         """
-        c_intersection = c1.intersection(c2)
-        c_union = min(len(c1), len(c2))
-        c_intersection_amount = len(c_intersection) / c_union
-        return c_intersection_amount
+        c_intersection = source.intersection(target)
+        c_union = min(len(source), len(target))
+        c1_intersection_amount = len(c_intersection) / len(source)
+        c2_intersection_amount = len(c_intersection) / len(target)
+        avg_intersection_amount = (c1_intersection_amount + c2_intersection_amount) / 2
+        return avg_intersection_amount

@@ -18,7 +18,10 @@ class CreateEmbeddings(AbstractPipelineStep):
         artifact_types = args.artifact_types
         artifact_df = args.dataset.trace_dataset.artifact_df
         artifact_map = self.create_artifact_map(artifact_df, artifact_types)
-        
+
+        if len(artifact_map) == 0:
+            raise Exception(f"Artifact types ({artifact_types}) resulted in no artifacts.")
+
         state.embedding_map = CreateEmbeddings.create_embeddings_map(artifact_map, args.embedding_model)
 
     @staticmethod
@@ -42,7 +45,10 @@ class CreateEmbeddings(AbstractPipelineStep):
         :return: Artifact map of all matching artifacts.
         """
         artifact_map = {}
+        available_types = artifact_df.get_artifact_types()
         for artifact_type in artifact_types:
+            if artifact_type not in available_types:
+                raise Exception(f"Expected one of ({available_types}) but got ({artifact_type}).")
             artifact_type_map = artifact_df.get_type(artifact_type).to_map()
             artifact_map.update(artifact_type_map)
         return artifact_map

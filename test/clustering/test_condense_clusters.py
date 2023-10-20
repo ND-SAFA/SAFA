@@ -19,7 +19,12 @@ class TestCondenseClusters(TestCase):
         c2: ClusterType = ["A", "B"]
         c3: ClusterType = ["A"]
         state.multi_method_cluster_map = {
-            0: c1, 1: ["A", "B", "C"], 2: c2, 3: c3
+            "T1": {
+                0: c1, 1: c2, 2: c3
+            },
+            "T2": {
+                0: ["A", "B", "C"]
+            }
         }
 
         CondenseClusters().run(args, state)

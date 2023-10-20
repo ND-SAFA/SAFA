@@ -2,36 +2,12 @@ from typing import Dict, List
 
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
-from tgen.common.constants.clustering_constants import DEFAULT_RANDOM_STATE, MAX_CLUSTER_SIZE
+from tgen.common.constants.clustering_constants import CLUSTER_METHODS_REQUIRING_N_CLUSTERS, CLUSTER_METHOD_INIT_PARAMS, \
+    NO_CLUSTER_LABEL
 from tgen.embeddings.embeddings_manager import EmbeddingType
 
-REQUIRED_CLUSTER_ESTIMATION = [SupportedClusterMethods.KMEANS, SupportedClusterMethods.AGGLOMERATIVE, SupportedClusterMethods.BIRCH,
-                               SupportedClusterMethods.SPECTRAL]
-algo_params = {
-    SupportedClusterMethods.BIRCH: {
-        "branching_factor": 2
-    },
-    SupportedClusterMethods.OPTICS: {
-        "min_samples": 2
-    },
-    SupportedClusterMethods.HB_SCAN: {
-        "min_cluster_size": 2,
-        "max_cluster_size": MAX_CLUSTER_SIZE
-    },
-    SupportedClusterMethods.MEANSHIFT: {
-        "bandwidth": 2
-    },
-    SupportedClusterMethods.SPECTRAL: {
-        "assign_labels": "discretize",
-        "random_state": DEFAULT_RANDOM_STATE
-    },
-    SupportedClusterMethods.AFFINITY: {
-        "random_state": DEFAULT_RANDOM_STATE
-    }
-}
 
-
-class ClusterManager:
+class ClusterAlgorithmManager:
 
     def __init__(self, method: SupportedClusterMethods):
         """
@@ -53,8 +29,8 @@ class ClusterManager:
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         n_clusters = round(len(embeddings) * reduction_factor)
 
-        local_kwargs = {} if self.method not in REQUIRED_CLUSTER_ESTIMATION else {"n_clusters": n_clusters}
-        local_kwargs.update(algo_params.get(self.method, {}))
+        local_kwargs = {} if self.method not in CLUSTER_METHODS_REQUIRING_N_CLUSTERS else {"n_clusters": n_clusters}
+        local_kwargs.update(CLUSTER_METHOD_INIT_PARAMS.get(self.method, {}))
 
         clustering_algo = self.method.value(**local_kwargs, **kwargs)
         clustering_algo.fit(embeddings)
@@ -72,6 +48,8 @@ class ClusterManager:
         """
         clusters = {}
         for cluster_label, artifact_id in zip(cluster_labels, artifact_ids):
+            if cluster_label == NO_CLUSTER_LABEL:
+                continue
             if cluster_label not in clusters:
                 clusters[cluster_label] = []
             clusters[cluster_label].append(artifact_id)

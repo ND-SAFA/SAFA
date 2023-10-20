@@ -46,8 +46,21 @@ class EmbeddingsManager:
         """
         if subset_ids is None:
             subset_ids = self._content_map.keys()
-        embedding_map = {a_id: self.get_embedding(a_id) for a_id in subset_ids}
+        artifact_embeddings = self.get_embeddings(subset_ids)
+        embedding_map = {a_id: a_embedding for a_id, a_embedding in zip(subset_ids, artifact_embeddings)}
         return embedding_map
+
+    def get_embeddings(self, a_ids: List[Any]) -> List[EmbeddingType]:
+        """
+        Gets embeddings for list of artifact ids, creates embeddings if they do not exist yet.
+        :param a_ids: Artifact ids whose embeddings are returned.
+        :return: Artifact embeddings, returned in the same order as ids.
+        """
+        ids_without_embeddings = [a_id for a_id in a_ids if a_id not in self._embedding_map]
+        artifact_contents = [self.get_content(a_id) for a_id in ids_without_embeddings]
+        artifact_embeddings = self.get_model().encode(artifact_contents)
+        self._embedding_map.update({a_id: embedding for a_id, embedding in zip(ids_without_embeddings, artifact_embeddings)})
+        return [self.get_embedding(a_id) for a_id in a_ids]
 
     def get_embedding(self, a_id: Any) -> EmbeddingType:
         """

@@ -1,6 +1,7 @@
 <template>
   <flex-box justify="center">
     <flex-item parts="12" class="q-mr-md">
+      <log-out />
       <integrations-accounts />
       <theme-controller />
       <update-password />
@@ -27,5 +28,6 @@ import {
   DeleteAccount,
   UpdatePassword,
   ThemeController,
+  LogOut,
 } from "@/components/account/save";
 </script>

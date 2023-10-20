@@ -1,12 +1,5 @@
 <template>
-  <q-stepper
-    v-model="currentStep"
-    flat
-    animated
-    :class="className"
-    header-nav
-    :alternative-labels="minimal"
-  >
+  <q-stepper v-model="currentStep" flat animated :class="className" header-nav>
     <q-step
       v-for="(step, idx) in props.steps"
       :key="step.title"

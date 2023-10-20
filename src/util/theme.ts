@@ -35,6 +35,10 @@ export enum Colors {
   gradient3 = "#4194A2",
   gradient4 = "#207BD0",
   gradient5 = "#0062FF",
+  gradient6 = "#3656F9",
+  gradient7 = "#6C49F3",
+  gradient8 = "#A23CED",
+  gradient9 = "#D82FE7",
 }
 
 /**
@@ -46,6 +50,10 @@ export const ThemeGradient = {
   nodeGradient3: Colors.gradient3,
   nodeGradient4: Colors.gradient4,
   nodeGradient5: Colors.gradient5,
+  nodeGradient6: Colors.gradient6,
+  nodeGradient7: Colors.gradient7,
+  nodeGradient8: Colors.gradient8,
+  nodeGradient9: Colors.gradient9,
 };
 
 /**

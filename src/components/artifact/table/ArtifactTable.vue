@@ -115,7 +115,6 @@ import {
   artifactStore,
   attributesStore,
   deltaStore,
-  permissionStore,
   selectionStore,
   subtreeStore,
   timStore,
@@ -148,10 +147,6 @@ const visibleTypes = ref<string[] | null>([]);
 const countType = ref<TraceCountTypes>("all");
 const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
-const displayActions = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
-);
-
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
 const typeOptions = computed(() => timStore.typeNames);
@@ -162,7 +157,7 @@ const columns = computed(() => [
   ...artifactColumns,
   ...(inDeltaView.value ? [artifactDeltaColumn] : []),
   ...artifactAttributesColumns(attributesStore.attributes),
-  ...(displayActions.value ? [actionsColumn] : []),
+  actionsColumn,
 ]);
 
 const rows = computed(() => artifactStore.flatArtifacts);

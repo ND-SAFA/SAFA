@@ -1,24 +1,30 @@
 <template>
-  <private-page>
+  <private-page small-window>
     <typography
       el="h1"
-      y="10"
+      b="5"
       align="center"
       variant="large"
-      value="Welcome to SAFA!"
+      value="Welcome to SAFA"
     />
     <flex-box :column="smallWindow">
-      <flex-item :parts="parts" :full-width="smallWindow" class="q-mr-md">
-        <panel-card title="Load Existing Project" icon="home-list">
-          <typography
-            variant="small"
-            value="Select an existing project and version to load."
-          />
-          <project-version-stepper minimal />
-        </panel-card>
+      <flex-item :parts="smallWindow ? '12' : '7'">
+        <div :class="smallWindow ? '' : 'q-mr-md'">
+          <panel-card
+            v-if="projectStore.allProjects.length > 0"
+            title="Load Existing Project"
+            icon="nav-open"
+          >
+            <typography
+              variant="small"
+              value="Select an existing project and version to load."
+            />
+            <project-version-stepper minimal />
+          </panel-card>
+        </div>
       </flex-item>
-      <flex-item :parts="parts" :full-width="smallWindow">
-        <panel-card title="Create New Project" icon="home-add">
+      <flex-item :parts="smallWindow ? '12' : '5'">
+        <panel-card title="Create New Project" icon="project-add">
           <typography
             variant="small"
             value="Chose which data source you would like to create a project from."
@@ -65,9 +71,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { CreatorTab } from "@/types";
-import { useScreen } from "@/hooks";
+import { projectStore, useScreen } from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   ExternalLinks,
@@ -81,8 +86,6 @@ import {
 } from "@/components";
 
 const { smallWindow } = useScreen();
-
-const parts = computed(() => (smallWindow.value ? "12" : "6"));
 
 function handleOpenStandard() {
   navigateTo(Routes.PROJECT_CREATOR, {

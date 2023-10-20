@@ -106,6 +106,12 @@
   .q-field__native {
     font-size: 16px;
     color: $color-text !important;
+
+    & > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   &:hover, &:focus, &:active, &.q-field--highlighted {

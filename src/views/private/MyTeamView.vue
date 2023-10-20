@@ -1,5 +1,5 @@
 <template>
-  <private-page full-window title="My Team">
+  <private-page full-window>
     <team-tabs />
   </private-page>
 </template>

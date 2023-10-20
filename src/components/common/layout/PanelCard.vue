@@ -8,6 +8,7 @@
             :variant="props.icon"
             class="q-mr-sm"
             size="lg"
+            color="primary"
           />
           <typography
             v-if="!!props.title"

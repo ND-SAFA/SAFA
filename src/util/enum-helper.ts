@@ -163,8 +163,8 @@ export function creatorTabOptions(): SelectOption<CreatorTab>[] {
 export function loaderTabOptions(): SelectOption<LoaderTab>[] {
   return [
     createOption("load", "Open Project"),
-    createOption("user", "User Jobs"),
-    createOption("project", "Project Jobs"),
+    createOption("user", "Recent Tasks"),
+    createOption("project", "Project Tasks"),
   ];
 }
 

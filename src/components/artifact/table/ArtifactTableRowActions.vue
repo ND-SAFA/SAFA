@@ -7,6 +7,7 @@
       @click="handleOpenTree"
     />
     <icon-button
+      v-if="displayActions"
       icon="trace"
       :rotate="-90"
       :tooltip="`Add parent to '${artifact.name}'`"
@@ -14,6 +15,7 @@
       @click="handleLinkParent"
     />
     <icon-button
+      v-if="displayActions"
       icon="trace"
       :rotate="90"
       :tooltip="`Add child to '${artifact.name}'`"
@@ -21,12 +23,14 @@
       @click="handleLinkChild"
     />
     <icon-button
+      v-if="displayActions"
       icon="edit"
       :tooltip="`Edit '${artifact.name}'`"
       data-cy="button-artifact-edit-icon"
       @click="handleEdit"
     />
     <icon-button
+      v-if="displayActions"
       icon="delete"
       :tooltip="`Delete '${artifact.name}'`"
       data-cy="button-artifact-delete-icon"
@@ -45,18 +49,24 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { ArtifactProps } from "@/types";
 import {
   artifactApiStore,
   artifactSaveStore,
   documentStore,
   layoutStore,
+  permissionStore,
   selectionStore,
   traceSaveStore,
 } from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
 const props = defineProps<ArtifactProps>();
+
+const displayActions = computed(() =>
+  permissionStore.isAllowed("project.edit_data")
+);
 
 /**
  * Opens the edit artifact window.

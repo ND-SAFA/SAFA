@@ -2,7 +2,7 @@
   <node-display
     v-if="displayActions"
     variant="menu"
-    color="primary"
+    color="neutral"
     @mousedown.stop
     @mouseup.stop
   >
@@ -12,42 +12,34 @@
           drawMode ? 'Cancel draw mode' : 'Draw artifact type direction'
         "
         :icon="drawMode ? 'cancel' : 'trace'"
-        @click="
-          cyStore.drawMode('toggle');
-          handleCloseMenu();
-        "
+        @click="handleAction(() => cyStore.drawMode('toggle'))"
       />
       <separator v-if="displayGenerateActions" vertical class="q-mx-xs" />
       <icon-button
         v-if="displayGenerateActions"
         tooltip="Summarize artifacts"
         icon="generate-summaries"
-        color="primary"
+        color="gradient"
         data-cy="button-summarize-artifact"
         @click="
-          appStore.openDetailsPanel('summarizeArtifact');
-          handleCloseMenu();
+          handleAction(() => appStore.openDetailsPanel('summarizeArtifact'))
         "
       />
       <icon-button
         v-if="displayGenerateActions"
         tooltip="Generate artifacts"
         icon="generate-artifacts"
-        color="primary"
+        color="gradient"
         @click="
-          appStore.openDetailsPanel('generateArtifact');
-          handleCloseMenu();
+          handleAction(() => appStore.openDetailsPanel('generateArtifact'))
         "
       />
       <icon-button
         v-if="displayGenerateActions"
         tooltip="Generate trace links"
         icon="generate-traces"
-        color="primary"
-        @click="
-          appStore.openDetailsPanel('generateTrace');
-          handleCloseMenu();
-        "
+        color="gradient"
+        @click="handleAction(() => appStore.openDetailsPanel('generateTrace'))"
       />
     </flex-box>
   </node-display>
@@ -76,6 +68,15 @@ const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")
 );
 const displayGenerateActions = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
+  permissionStore.isAllowed("project.generate")
 );
+
+/**
+ * Handles a menu action and closes the menu.
+ * @param action - The action to handle.
+ */
+function handleAction(action: () => void): void {
+  action();
+  handleCloseMenu?.();
+}
 </script>

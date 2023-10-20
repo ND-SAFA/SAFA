@@ -185,12 +185,14 @@ export const useCy = defineStore("cy", {
             ? cy.nodes()
             : cy.nodes().filter((n) => artifactIds.includes(n.data().id));
 
+        cy.maxZoom(0.8);
         cy.animate({
           zoom: CYTO_CONFIG.DEFAULT_ARTIFACT_TREE_ZOOM,
-          center: { eles: collection },
+          fit: { eles: collection, padding: CYTO_CONFIG.CENTER_GRAPH_PADDING },
           duration: CYTO_CONFIG.ANIMATION_DURATION,
           complete: () => setCenteredArtifacts(undefined),
         });
+        cy.maxZoom(100);
       });
     },
     /**

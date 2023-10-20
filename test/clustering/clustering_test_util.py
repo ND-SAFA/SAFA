@@ -66,7 +66,7 @@ class ClusteringTestUtil:
         :param threshold: The similarity threshold to assume sufficiently close embeddings.
         :return: None
         """
-        model = EmbeddingsManager.get_model(model_name)
+        model = EmbeddingsManager({}, model_name).get_model()
         expected_embedding = model.encode(artifact_text)
         similarity_score = cosine_similarity([embedding], [expected_embedding])[0][0]
         assert similarity_score > threshold, f"Embeddings are not equal ({similarity_score})."

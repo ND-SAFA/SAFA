@@ -1,10 +1,10 @@
-from typing import Dict, List
+from typing import List
 
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
 from tgen.common.constants.clustering_constants import CLUSTER_METHODS_REQUIRING_N_CLUSTERS, CLUSTER_METHOD_INIT_PARAMS, \
     NO_CLUSTER_LABEL
-from tgen.embeddings.embeddings_manager import EmbeddingType
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
 class ClusterAlgorithmManager:
@@ -16,7 +16,7 @@ class ClusterAlgorithmManager:
         """
         self.method = method
 
-    def cluster(self, embedding_map: Dict[str, EmbeddingType], reduction_factor: float, **kwargs) -> ClusterMapType:
+    def cluster(self, embedding_manager: EmbeddingsManager, reduction_factor: float, **kwargs) -> ClusterMapType:
         """
         Clusters embeddings in map and creates sets of links.
         :param embedding_map: Map of artifact ID to embedding.
@@ -25,6 +25,7 @@ class ClusterAlgorithmManager:
         :param kwargs: Clustering method arguments.
         :return: Map of cluster ID to artifact ids in cluster.
         """
+        embedding_map = embedding_manager.get_current_embeddings()
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         n_clusters = round(len(embeddings) * reduction_factor)

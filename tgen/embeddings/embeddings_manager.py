@@ -59,7 +59,10 @@ class EmbeddingsManager:
         ids_without_embeddings = [a_id for a_id in a_ids if a_id not in self._embedding_map]
         artifact_contents = [self.get_content(a_id) for a_id in ids_without_embeddings]
         artifact_embeddings = self.get_model().encode(artifact_contents)
-        self._embedding_map.update({a_id: embedding for a_id, embedding in zip(ids_without_embeddings, artifact_embeddings)})
+        new_embedding_map = {a_id: embedding for a_id, embedding in zip(ids_without_embeddings, artifact_embeddings)}
+        self._embedding_map.update(new_embedding_map)
+        if len(ids_without_embeddings) > 0:
+            self.__state_changed_since_last_save = True
         return [self.get_embedding(a_id) for a_id in a_ids]
 
     def get_embedding(self, a_id: Any) -> EmbeddingType:

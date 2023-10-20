@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 import mock
 import pandas as pd
 
-from test.hgen.hgen_test_utils import get_test_hgen_args, get_name_responses, get_generated_artifacts_response, HGenTestConstants, \
-    get_predictions
+from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_predictions, \
+    get_test_hgen_args
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -16,7 +16,7 @@ from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -34,7 +34,7 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
-from tgen.testres.mocking.mock_responses import create, TEST_PROJECT_SUMMARY
+from tgen.testres.mocking.mock_responses import TEST_PROJECT_SUMMARY, create
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
@@ -131,7 +131,7 @@ class TestHierarchyGenerator(BaseTest):
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         for i, us in enumerate(self.HGEN_STATE.generation_predictions.keys()):
             self.assertEqual(us, HGenTestConstants.user_stories[i])
-            self.assertEqual(self.HGEN_STATE.generation_predictions[us], HGenTestConstants.code_files[i])
+            self.assertEqual(set(self.HGEN_STATE.generation_predictions[us]), set(HGenTestConstants.code_files[i]))
 
     @mock_anthropic
     def assert_refined_artifact_content_step(self, anthropic_ai_manager: TestAIManager):

@@ -25,7 +25,7 @@ class CreateEmbeddings(AbstractPipelineStep):
         state.embedding_manager = embeddings_manager
 
     @staticmethod
-    def create_artifact_map(artifact_df: ArtifactDataFrame, artifact_types: List[str]):
+    def create_artifact_map(artifact_df: ArtifactDataFrame, artifact_types: List[str]) -> Dict[str, str]:
         """
         Creates artifact map containing artifacts in types.
         :param artifact_df: The artifact data frame.

@@ -1,9 +1,7 @@
 from typing import Any, Dict, List, Optional, Set
 
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
-from tgen.common.constants.clustering_constants import DEFAULT_CLUSTER_MIN_VOTES
-
-DEFAULT_SIMILARITY_THRESHOLD = 0.85
+from tgen.common.constants.clustering_constants import DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD
 
 
 class UniqueClusterMap:
@@ -11,7 +9,7 @@ class UniqueClusterMap:
     Creates methods for incrementally creating a unique cluster map.
     """
 
-    def __init__(self, threshold=DEFAULT_SIMILARITY_THRESHOLD):
+    def __init__(self, threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD):
         """
         Creates map with similarity threshold.
         :param threshold: The percentage of overlap to which consider sets are the same.
@@ -37,7 +35,7 @@ class UniqueClusterMap:
         :param cluster: The cluster to add.
         :return: Cluster if added, None if cluster is duplicate.
         """
-        if self.contains_cluster(cluster):
+        if self.contains_cluster(cluster, add_votes=True):
             return None
         cluster_id = self.get_next_cluster_id()
         self.cluster_map[cluster_id] = cluster
@@ -55,10 +53,11 @@ class UniqueClusterMap:
         cluster_map = {c_id: cluster for c_id, cluster in self.cluster_map.items() if c_id in selected_cluster_ids}
         return cluster_map
 
-    def contains_cluster(self, cluster: ClusterType) -> bool:
+    def contains_cluster(self, cluster: ClusterType, add_votes: bool = False) -> bool:
         """
         Calculated whether given cluster is contained within current map.
         :param cluster: The cluster to evaluate if contained.
+        :param add_votes: Whether to add votes to the clusters where collision is seen.
         :return: True if cluster in map, false otherwise.
         """
         cluster_sets = self.cluster_set_map.values()
@@ -66,7 +65,8 @@ class UniqueClusterMap:
         is_hit = False
         for c_id, c_set in self.cluster_set_map.items():
             if self.calculate_intersection(c_set, target_c_set) >= self.threshold:
-                self.add_hit(c_id)
+                if add_votes:
+                    self.add_hit(c_id)
                 is_hit = True
         return is_hit
 
@@ -96,7 +96,6 @@ class UniqueClusterMap:
         :return: The ratio between the number of intersection elements vs the total union.
         """
         c_intersection = source.intersection(target)
-        c_union = min(len(source), len(target))
         c1_intersection_amount = len(c_intersection) / len(source)
         c2_intersection_amount = len(c_intersection) / len(target)
         avg_intersection_amount = (c1_intersection_amount + c2_intersection_amount) / 2

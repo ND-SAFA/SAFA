@@ -21,7 +21,7 @@ class ClusteringArgs(PipelineArgs):
     :param dataset: The dataset to cluster.
 
     """
-    cluster_methods: List[SupportedClusterMethods] = None
+    cluster_methods: List[SupportedClusterMethods] = field(default_factory=lambda: DEFAULT_CLUSTERING_METHODS)
     clustering_method_args: Dict = field(default_factory=dict)
     embedding_model: str = DEFAULT_EMBEDDING_MODEL
     artifact_types: List[str] = None
@@ -39,6 +39,4 @@ class ClusteringArgs(PipelineArgs):
         if self.artifact_types is None:
             self.artifact_types = self.dataset.artifact_df.get_artifact_types()
 
-        if self.cluster_methods is None:
-            self.cluster_methods = DEFAULT_CLUSTERING_METHODS
         self.cluster_methods = [SupportedClusterMethods[c] if isinstance(c, str) else c for c in self.cluster_methods]

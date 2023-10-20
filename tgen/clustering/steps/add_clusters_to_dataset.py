@@ -3,6 +3,7 @@ from typing import List
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
@@ -73,7 +74,7 @@ class AddClustersToDataset(AbstractPipelineStep[ClusteringArgs, ClusteringState]
         :return: Artifact for each cluster.
         """
         cluster_ids = cluster_map.keys()
-        cluster_artifacts = [Artifact(id=cls.get_cluster_id(cluster_id), content="",
+        cluster_artifacts = [Artifact(id=cls.get_cluster_id(cluster_id), content=EMPTY_STRING,
                                       layer_id=cls.CLUSTER_ARTIFACT_TYPE)
                              for cluster_id in cluster_ids]
         return cluster_artifacts
@@ -88,7 +89,8 @@ class AddClustersToDataset(AbstractPipelineStep[ClusteringArgs, ClusteringState]
         global_trace_links = []
         for c_id, artifact_ids in cluster_map.items():
             cluster_artifact_id = AddClustersToDataset.get_cluster_id(c_id)
-            trace_links = [Trace(source=a_id, target=cluster_artifact_id, score=1, label=1, explanation="") for a_id in artifact_ids]
+            trace_links = [Trace(source=a_id, target=cluster_artifact_id, score=1, label=1, explanation=EMPTY_STRING) for a_id in
+                           artifact_ids]
             global_trace_links = global_trace_links + trace_links
         return global_trace_links
 

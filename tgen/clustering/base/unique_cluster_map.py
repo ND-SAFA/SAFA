@@ -60,7 +60,6 @@ class UniqueClusterMap:
         :param add_votes: Whether to add votes to the clusters where collision is seen.
         :return: True if cluster in map, false otherwise.
         """
-        cluster_sets = self.cluster_set_map.values()
         target_c_set = set(cluster)
         is_hit = False
         for c_id, c_set in self.cluster_set_map.items():
@@ -88,7 +87,7 @@ class UniqueClusterMap:
         return len(self.cluster_map)
 
     @staticmethod
-    def calculate_intersection(source: Set, target: Set):
+    def calculate_intersection(source: Set, target: Set) -> float:
         """
         Calculates the percentage the two sets intersect.
         :param source: Set one.

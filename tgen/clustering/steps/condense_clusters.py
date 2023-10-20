@@ -1,3 +1,4 @@
+from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.base.unique_cluster_map import UniqueClusterMap
@@ -17,6 +18,7 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         unique_cluster_map = UniqueClusterMap(threshold=args.cluster_intersection_threshold)
 
         for cluster_method, cluster_map in global_cluster_map.items():
+            cluster_map = CondenseClusters.filter_by_size(cluster_map)
             clusters = list(cluster_map.values())
             clusters = list(sorted(clusters, key=lambda v: len(v), reverse=False))
             unique_cluster_map.add_all(clusters)
@@ -24,3 +26,7 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         final_clusters = unique_cluster_map.get_clusters(args.cluster_min_votes)
         final_clusters = {k: v for k, v in final_clusters.items() if MIN_CLUSTER_SIZE <= len(v) <= MAX_CLUSTER_SIZE}
         state.final_cluster_map = final_clusters
+
+    @staticmethod
+    def filter_by_size(cluster: ClusterMapType) -> ClusterMapType:
+        return {k: v for k, v in cluster.items() if MIN_CLUSTER_SIZE <= len(v) <= MAX_CLUSTER_SIZE}

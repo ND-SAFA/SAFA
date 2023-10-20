@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -105,6 +105,8 @@ class EmbeddingsManager:
         """
         if a_id in self._content_map:
             self._content_map.pop(a_id)
+        if a_id in self._embedding_map:
+            self._embedding_map.pop(a_id)
             self.__state_changed_since_last_save = a_id in self.__ordered_ids
 
     def get_model(self) -> SentenceTransformer:

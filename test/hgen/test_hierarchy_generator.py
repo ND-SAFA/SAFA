@@ -1,3 +1,4 @@
+import math
 import os
 from unittest.mock import MagicMock
 
@@ -7,9 +8,11 @@ import pandas as pd
 from test.hgen.hgen_test_utils import get_test_hgen_args, get_name_responses, get_generated_artifacts_response, HGenTestConstants, \
     get_predictions
 from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -18,6 +21,7 @@ from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
@@ -146,7 +150,7 @@ class TestHierarchyGenerator(BaseTest):
         us3 = refined_user_stories2[2]
         for i, us in enumerate([us1, us2, us3]):
             self.assertIn(us, self.HGEN_STATE.refined_content)
-            self.assertEqual(self.HGEN_STATE.refined_content[us], HGenTestConstants.code_files[i])
+            self.assertEqual(set(self.HGEN_STATE.refined_content[us]), set(HGenTestConstants.code_files[i]))
 
     @mock_anthropic
     @mock.patch.object(CreateExplanationsStep, "run")
@@ -177,3 +181,50 @@ class TestHierarchyGenerator(BaseTest):
                                    {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
                                     LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)
+
+    @mock_anthropic
+    def test_generate_artifact_content_step_with_clustering(self, anthropic_ai_manager: TestAIManager):
+        responses = [PromptUtil.create_xml("user-story", us) for us in HGenTestConstants.user_stories]
+        names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.generation_predictions)
+        responses.extend(name_responses)
+        anthropic_ai_manager.set_responses(responses)
+        anthropic_ai_manager.mock_summarization()
+
+        args: HGenArgs = get_test_hgen_args()()
+        args.target_type = "User Story"
+        state = HGenState()
+        state.description = HGenTestConstants.description
+        state.format_of_artifacts = HGenTestConstants.format_
+        state.project_summary = TEST_PROJECT_SUMMARY
+        state.original_dataset = args.dataset
+        state.source_dataset = InitializeDatasetStep._create_dataset_with_single_layer(state.original_dataset.artifact_df,
+                                                                                       args.source_layer_id)
+        artifacts = state.source_dataset.artifact_df.to_artifacts()
+        state.id_to_cluster_artifacts = {i: [EnumDict(a) for a in artifacts[i * 11:i * 11 + 11]]
+                                         for i in range(math.floor(len(artifacts) / 11))}
+        state.cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters={i: [a[ArtifactKeys.ID] for a in artifacts]
+                                                                                             for i, artifacts in
+                                                                                             state.id_to_cluster_artifacts.items()}) \
+            .create()
+
+        GenerateArtifactContentStep().run(args, state)
+        self.assertEqual(len(state.generation_predictions), len(HGenTestConstants.user_stories))
+        for i, us in enumerate(state.generation_predictions.keys()):
+            self.assertEqual(us, HGenTestConstants.user_stories[i])
+            self.assertSetEqual(set(state.generation_predictions[us]),
+                                set([a[ArtifactKeys.ID.value] for a in artifacts[i * 11:i * 11 + 11]]))
+
+        RefineGenerationsStep().run(args, state)
+        CreateHGenDatasetStep().run(args, state)
+        for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
+            linked_artifact_ids = {art[ArtifactKeys.ID] for art in cluster_artifacts}
+            new_name = expected_names[cluster_id]
+            self.assertIn(new_name, state.final_dataset.artifact_df)
+            self.assertNotIn(cluster_id, state.final_dataset.artifact_df)
+            for art in artifacts:
+                link = state.final_dataset.trace_dataset.trace_df.get_link(source_id=art[ArtifactKeys.ID.value], target_id=new_name)
+                self.assertIsNotNone(link)
+                if art[ArtifactKeys.ID.value] in linked_artifact_ids:
+                    self.assertEqual(link[TraceKeys.LABEL], 1)
+                else:
+                    self.assertEqual(link[TraceKeys.LABEL], 0)

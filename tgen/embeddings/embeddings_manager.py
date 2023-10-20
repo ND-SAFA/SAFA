@@ -58,7 +58,7 @@ class EmbeddingsManager:
         """
         ids_without_embeddings = [a_id for a_id in a_ids if a_id not in self._embedding_map]
         artifact_contents = [self.get_content(a_id) for a_id in ids_without_embeddings]
-        artifact_embeddings = self.get_model().encode(artifact_contents)
+        artifact_embeddings = self.get_model().encode(artifact_contents, show_progress_bar=True)
         new_embedding_map = {a_id: embedding for a_id, embedding in zip(ids_without_embeddings, artifact_embeddings)}
         self._embedding_map.update(new_embedding_map)
         if len(ids_without_embeddings) > 0:

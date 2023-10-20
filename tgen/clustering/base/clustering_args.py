@@ -27,7 +27,7 @@ class ClusteringArgs(PipelineArgs):
     artifact_types: List[str] = None
     cluster_intersection_threshold: float = DEFAULT_CLUSTER_SIMILARITY_THRESHOLD  # 80% or more of intersection equals same cluster
     cluster_reduction_factor: float = DEFAULT_REDUCTION_FACTOR
-    add_to_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
+    create_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
 
     def __post_init__(self) -> None:

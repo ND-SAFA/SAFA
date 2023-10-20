@@ -20,7 +20,7 @@ class ClusteringPipeline(AbstractPipeline[ClusteringArgs, ClusteringState], Base
         """
         :param args: The starting arguments including the dataset.
         """
-        super().__init__(args, self.steps, **kwargs)
+        super().__init__(args, self.steps, project_summary_sections=[], **kwargs)
 
     def state_class(self) -> Type[ClusteringState]:
         """

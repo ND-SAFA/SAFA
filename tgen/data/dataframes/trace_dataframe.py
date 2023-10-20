@@ -2,9 +2,9 @@ from typing import Any, Dict, List, Type
 
 import numpy as np
 
+from tgen.common.objects.trace import Trace
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 
@@ -97,7 +97,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
             links.append(self.get_link(link_id))
         return links
 
-    def get_link(self, link_id: int = None, source_id: str = None, target_id: str = None) -> EnumDict:
+    def get_link(self, link_id: int = None, source_id: Any = None, target_id: Any = None) -> EnumDict:
         """
         Gets the row of the dataframe with the associated link_id or source and target id
         :param link_id: The id of the link to get. May provide source and target id instead

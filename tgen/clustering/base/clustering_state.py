@@ -1,6 +1,7 @@
 from typing import Dict
 
 from tgen.clustering.base.cluster_type import ClusterMapType
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.state import State
 
@@ -14,3 +15,4 @@ class ClusteringState(State):
     embedding_manager: EmbeddingsManager
     multi_method_cluster_map: Dict[str, ClusterMapType]
     final_cluster_map: ClusterMapType
+    cluster_dataset: PromptDataset

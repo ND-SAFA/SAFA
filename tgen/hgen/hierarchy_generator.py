@@ -1,7 +1,6 @@
-from copy import deepcopy
-from typing import Type, Dict
+from typing import Dict, Type
 
-from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE, PS_OVERVIEW_TITLE
+from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TITLE, PS_ENTITIES_TITLE, PS_OVERVIEW_TITLE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -9,6 +8,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME
+from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
@@ -28,6 +28,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     PROJECT_SUMMARY_SECTIONS = [PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE, PS_OVERVIEW_TITLE, HGEN_SECTION_TITLE]
     steps = [InitializeDatasetStep,
              GenerateInputsStep,
+             CreateClustersStep,
              GenerateArtifactContentStep,
              RefineGenerationsStep,
              CreateHGenDatasetStep]
@@ -38,8 +39,8 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         :param args: The arguments required for the hierarchy generation
         """
         summarizer_args = SummarizerArgs(do_resummarize_project=False,
-                                              summarize_code_only=True,
-                                              do_resummarize_artifacts=False,
+                                         summarize_code_only=True,
+                                         do_resummarize_artifacts=False,
                                          project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
                                          new_sections=self._get_new_project_summary_sections(args.target_type)
                                          )

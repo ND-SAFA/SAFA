@@ -37,20 +37,26 @@ class HGenTestConstants:
     n_reruns = 2
 
 
-def get_generated_artifacts_response(contents=None, sources=None, target_type="user-story", source_type="code"):
+def get_generated_artifacts_response(contents=None, sources=None, target_type="user-story", source_type="code",
+                                     use_clustering: bool = False):
     if contents is None:
         contents = HGenTestConstants.user_stories
     if sources is None:
         sources = HGenTestConstants.code_files
     contents = deepcopy(contents)
-    for i, content in enumerate(contents):
-        source = sources[i % len(sources)]
-        content += PromptUtil.create_xml(source_type, COMMA.join(source))
-        contents[i] = content
-    response = ""
-    for us in contents:
-        response += PromptUtil.create_xml(target_type, us)
-    return [response]
+    if not use_clustering:
+        for i, content in enumerate(contents):
+            source = sources[i % len(sources)]
+            content += PromptUtil.create_xml(source_type, COMMA.join(source))
+            contents[i] = content
+        response = ""
+        for us in contents:
+            response += PromptUtil.create_xml(target_type, us)
+        responses = [response]
+    else:
+        responses = [PromptUtil.create_xml(target_type, us) for us in contents]
+
+    return responses
 
 
 def get_name_responses(generated_artifact_content=None, target_type="User Story"):
@@ -65,16 +71,16 @@ def get_name_responses(generated_artifact_content=None, target_type="User Story"
 
 def get_predictions(expected_names, source_artifact_names):
     predictions = [[{"id": i, "score": 0.8, "explanation": "explanation"}
-                          for i, source in enumerate(source_artifact_names)] for name in expected_names]
+                    for i, source in enumerate(source_artifact_names)] for name in expected_names]
     return predictions
 
 
-def get_all_responses(content=None, target_type="User Story", sources=None, source_type="code"):
+def get_all_responses(content=None, target_type="User Story", sources=None, source_type="code", use_clustering: bool = True):
     step2 = HGenTestConstants.responses_inputs
     target_type_tag = "-".join(target_type.lower().split())
     source_type_tag = "-".join(source_type.lower().split())
     step3 = get_generated_artifacts_response(contents=content, target_type=target_type_tag, sources=sources,
-                                             source_type=source_type_tag)
+                                             source_type=source_type_tag, use_clustering=use_clustering)
     step4 = get_name_responses(generated_artifact_content=content, target_type=target_type)
     return step4[1], step2 + step3 + step4[-1]
 

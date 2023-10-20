@@ -17,7 +17,7 @@ class CreateEmbeddings(AbstractPipelineStep):
         :return: None
         """
         artifact_types = args.artifact_types
-        artifact_df = args.dataset.trace_dataset.artifact_df
+        artifact_df = args.dataset.artifact_df
         artifact_map = self.create_artifact_map(artifact_df, artifact_types)
         embeddings_manager = EmbeddingsManager(content_map=artifact_map, model_name=args.embedding_model)
         embeddings_manager.create_embedding_map()

@@ -7,7 +7,12 @@
     @click="emit('click')"
   >
     <template #icon>
-      <icon v-if="!props.loading" :color="color" variant="integrate" />
+      <icon
+        v-if="!props.loading"
+        :color="color"
+        variant="integrate"
+        size="sm"
+      />
       <q-circular-progress v-else indeterminate />
     </template>
     <template #actions>

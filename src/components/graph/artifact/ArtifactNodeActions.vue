@@ -34,8 +34,8 @@
         v-if="displayActions"
         tooltip="Add parent"
         icon="trace"
-        color="primary"
         :rotate="-90"
+        :color="props.color"
         @click="
           traceSaveStore.openPanel({
             type: 'source',
@@ -47,8 +47,8 @@
         v-if="displayActions"
         tooltip="Add child"
         icon="trace"
-        color="primary"
         :rotate="90"
+        :color="props.color"
         @click="
           traceSaveStore.openPanel({
             type: 'target',

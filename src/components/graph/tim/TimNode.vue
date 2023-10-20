@@ -34,7 +34,7 @@
           v-if="displayActions"
           tooltip="Summarize artifacts"
           icon="generate-summaries"
-          color="primary"
+          color="gradient"
           data-cy="button-summarize-artifact"
           @click="appStore.openDetailsPanel('summarizeArtifact')"
         />
@@ -42,7 +42,7 @@
           v-if="displayActions"
           tooltip="Generate parents"
           icon="generate-artifacts"
-          color="primary"
+          color="gradient"
           @click="appStore.openDetailsPanel('generateArtifact')"
         />
       </flex-box>
@@ -85,7 +85,7 @@ const props = defineProps<TimNodeProps>();
 const { darkMode } = useTheme();
 
 const displayActions = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
+  permissionStore.isAllowed("project.generate")
 );
 
 const selected = computed(

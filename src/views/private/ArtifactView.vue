@@ -8,6 +8,7 @@
       v-model="tab"
       :tabs="tabs"
       class="q-pa-lg bg-background"
+      style="min-height: inherit"
     >
       <template #artifact>
         <artifact-table />

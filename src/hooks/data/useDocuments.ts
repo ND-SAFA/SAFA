@@ -249,12 +249,11 @@ export const useDocuments = defineStore("documents", {
      * @param types - The artifact types to include in the document.
      */
     async addDocumentOfTypes(types: string[]): Promise<void> {
-      const artifactsByType = artifactStore.allArtifactsByType;
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: types.join(", "),
         artifactIds: types.flatMap((type) =>
-          artifactsByType[type].map(({ id }) => id)
+          artifactStore.getArtifactsByType(type).map(({ id }) => id)
         ),
       });
 

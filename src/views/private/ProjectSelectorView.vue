@@ -1,8 +1,5 @@
 <template>
-  <private-page
-    title="Open Project"
-    subtitle="Select a project and version to load, or view past uploads."
-  >
+  <private-page>
     <project-loader />
   </private-page>
 </template>

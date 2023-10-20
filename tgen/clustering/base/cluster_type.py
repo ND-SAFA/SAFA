@@ -1,3 +1,4 @@
 from typing import Dict, List
 
-ClusterType = Dict[int, List[str]]
+ClusterType = List[str]
+ClusterMapType = Dict[int, List[str]]

@@ -1,3 +1,4 @@
+from test.jobs.clustering_job.clustering_job import ClusteringJob
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.data_jobs.create_source_splits_job import CreateSourceSplitsJob
@@ -34,3 +35,4 @@ class SupportedJobType(SupportedEnum):
     VSM = VSMJob
     DOWNLOAD_REPO = DownloadRepositoryJob
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob
+    CLUSTERING = ClusteringJob

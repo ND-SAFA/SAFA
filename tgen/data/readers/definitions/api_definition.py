@@ -1,10 +1,10 @@
-from dataclasses import dataclass
-from typing import List, Dict
+from dataclasses import dataclass, field
+from typing import Dict, List
 
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.base_object import BaseObject
 from tgen.common.objects.trace import Trace
 from tgen.common.objects.trace_layer import TraceLayer
+from tgen.common.util.base_object import BaseObject
 
 
 @dataclass
@@ -13,8 +13,8 @@ class ApiDefinition(BaseObject):
     Defines the dataset received through the API.
     """
     artifacts: List[Artifact]
-    layers: List[TraceLayer]
-    links: List[Trace] = None
+    layers: List[TraceLayer] = field(default_factory=list)
+    links: List[Trace] = field(default_factory=list)
     summary: str = None
 
     def get_links(self) -> List[Trace]:

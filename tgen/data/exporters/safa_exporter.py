@@ -1,5 +1,5 @@
 import os
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 
@@ -11,7 +11,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.keys.safa_keys import SafaKeys
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
@@ -20,7 +20,8 @@ class SafaExporter(AbstractDatasetExporter):
     Exports trace dataset as a SAFA one.
     """
 
-    def __init__(self, export_path: str, dataset_creator: TraceDatasetCreator = None, dataset: TraceDataset = None):
+    def __init__(self, export_path: str, dataset_creator: TraceDatasetCreator = None, dataset: TraceDataset = None,
+                 artifact_types: List[str] = None):
         """
         Initializes exporter for given trace dataset.
         :param export_path: Path to export project to.
@@ -30,6 +31,7 @@ class SafaExporter(AbstractDatasetExporter):
         self.artifact_definitions = []
         self.trace_definitions = []
         self.artifact_type_to_artifacts = None
+        self.artifact_types = artifact_types
 
     @staticmethod
     def include_filename() -> bool:
@@ -45,6 +47,9 @@ class SafaExporter(AbstractDatasetExporter):
         Exports entities as a project in the safa format.
         :return: None
         """
+        artifact_df = self.get_dataset().artifact_df
+        if not self.artifact_types:
+            self.artifact_types = set(artifact_df[ArtifactKeys.LAYER_ID.value].unique())
         self.artifact_type_to_artifacts = self.create_artifact_definitions()
         self.create_trace_definitions()
         self.create_tim()
@@ -55,10 +60,9 @@ class SafaExporter(AbstractDatasetExporter):
         :return: None
         """
         artifact_df = self.get_dataset().artifact_df
-        artifact_types = set(artifact_df[ArtifactKeys.LAYER_ID.value].unique())
 
         artifact_type_to_artifacts = {}
-        for artifact_type in artifact_types:
+        for artifact_type in self.artifact_types:
             artifact_type_df = artifact_df.get_type(artifact_type)
             artifact_type_to_artifacts[artifact_type] = artifact_type_df
             # Export artifacts of type
@@ -80,6 +84,8 @@ class SafaExporter(AbstractDatasetExporter):
         for _, row in self.get_dataset().layer_df.itertuples():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
+            if source_type not in self.artifact_types or target_type not in self.artifact_types:
+                continue
             matrix_name = f"{source_type}2{target_type}"
             file_name = matrix_name + ".json"
             export_file_path = os.path.join(self.export_path, file_name)

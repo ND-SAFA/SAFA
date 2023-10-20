@@ -1,10 +1,8 @@
 import os
 from abc import ABC, abstractmethod
-from copy import deepcopy
-from typing import Generic, List, Type, TypeVar, Optional
+from typing import Generic, List, Optional, Type, TypeVar
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, F_SLASH
-from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
@@ -64,20 +62,23 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                                 InteractiveModeOptions.LOAD_NEW_STATE, InteractiveModeOptions.QUIT]
     NEW_STATE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP, InteractiveModeOptions.NEXT_STEP]
 
-    def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None):
+    def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None,
+                 skip_summarization: bool = False):
         """
         Constructs pipeline of steps.
         :param steps: Steps to perform in sequential order.
         :param summarizer_args: The args used to create project summary
         """
         self.args = args
-        self.state = self.init_state()
+        self.state: StateType = self.init_state()
         self.steps = [s() for s in steps]
         self.summarizer_args = SummarizerArgs(do_resummarize_project=False,
                                               summarize_code_only=True,
                                               do_resummarize_artifacts=False) if not summarizer_args else summarizer_args
+        if skip_summarization:
+            self.summarizer_args = None
 
-    def init_state(self):
+    def init_state(self) -> StateType:
         """
         Creates a new state corresponding to sub-class.
         :return: The new state.

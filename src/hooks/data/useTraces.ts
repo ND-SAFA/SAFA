@@ -6,7 +6,12 @@ import {
   DocumentTraces,
   TraceLinkSchema,
 } from "@/types";
-import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
+import {
+  getTraceId,
+  matchTrace,
+  removeMatches,
+  standardizeValueArray,
+} from "@/util";
 import { timStore, documentStore, layoutStore, projectStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -23,6 +28,10 @@ export const useTraces = defineStore("traces", {
      * The visible trace links.
      */
     currentTraces: [] as TraceLinkSchema[],
+    /**
+     * A map of trace links by artifact ids.
+     */
+    tracesById: new Map<string, TraceLinkSchema>(),
   }),
   getters: {
     /**
@@ -48,6 +57,12 @@ export const useTraces = defineStore("traces", {
                 currentArtifactIds.includes(targetId)
             )
           : traces,
+        tracesById: new Map(
+          traces.map((trace) => [
+            getTraceId(trace.sourceId, trace.targetId),
+            trace,
+          ])
+        ),
       });
     },
     /**
@@ -83,18 +98,15 @@ export const useTraces = defineStore("traces", {
       this.$patch({
         allTraces,
         currentTraces: removeMatches(this.currentTraces, "traceLinkId", ids),
+        tracesById: new Map(
+          allTraces.map((trace) => [
+            getTraceId(trace.sourceId, trace.targetId),
+            trace,
+          ])
+        ),
       });
       projectStore.updateProject({ traces: allTraces });
       layoutStore.applyAutomove();
-    },
-    /**
-     * Returns the trace link that matches an id.
-     *
-     * @param id - The trace link id.
-     * @return The trace link, if one exists.
-     */
-    getTraceLinkById(id: string): TraceLinkSchema | undefined {
-      return this.allTraces.find(({ traceLinkId }) => traceLinkId === id);
     },
     /**
      * Returns the trace link between artifacts.
@@ -109,9 +121,10 @@ export const useTraces = defineStore("traces", {
       targetId: string,
       ignoreDirection = false
     ): TraceLinkSchema | undefined {
-      return this.allTraces.find(
-        matchTrace(sourceId, targetId, ignoreDirection)
-      );
+      return ignoreDirection
+        ? this.tracesById.get(getTraceId(sourceId, targetId)) ||
+            this.tracesById.get(getTraceId(targetId, sourceId))
+        : this.tracesById.get(getTraceId(sourceId, targetId));
     },
     /**
      * Returns the trace link between sets of artifacts.

@@ -22,8 +22,26 @@ import { pinia } from "@/plugins";
  */
 export const useArtifacts = defineStore("artifacts", {
   state: () => ({
+    /**
+     * All artifacts in the project.
+     */
     allArtifacts: [] as ArtifactSchema[],
+    /**
+     * The artifacts visible in the current document.
+     */
     currentArtifacts: [] as ArtifactSchema[],
+    /**
+     * A map of artifacts by id.
+     */
+    artifactsById: new Map<string, ArtifactSchema>(),
+    /**
+     * A map of artifacts by name.
+     */
+    artifactsByName: new Map<string, ArtifactSchema>(),
+    /**
+     * A map of artifacts by type.
+     */
+    artifactsByType: new Map<string, ArtifactSchema[]>(),
   }),
   getters: {
     /**
@@ -31,12 +49,6 @@ export const useArtifacts = defineStore("artifacts", {
      */
     flatArtifacts(): FlatArtifact[] {
       return this.currentArtifacts.map(flattenArtifact);
-    },
-    /**
-     * @return A collection of current artifact lists, keyed by their type.
-     */
-    allArtifactsByType(): Record<string, ArtifactSchema[]> {
-      return collectByField(this.allArtifacts, "type");
     },
   },
   actions: {
@@ -52,6 +64,15 @@ export const useArtifacts = defineStore("artifacts", {
         currentArtifacts: currentArtifactIds
           ? preserveMatches(artifacts, "id", currentArtifactIds)
           : artifacts,
+        artifactsById: new Map(
+          artifacts.map((artifact) => [artifact.id, artifact])
+        ),
+        artifactsByName: new Map(
+          artifacts.map((artifact) => [artifact.name, artifact])
+        ),
+        artifactsByType: new Map(
+          Object.entries(collectByField(artifacts, "type"))
+        ),
       });
     },
     /**
@@ -100,6 +121,15 @@ export const useArtifacts = defineStore("artifacts", {
       this.$patch({
         allArtifacts,
         currentArtifacts: removeMatches(this.currentArtifacts, "id", ids),
+        artifactsById: new Map(
+          allArtifacts.map((artifact) => [artifact.id, artifact])
+        ),
+        artifactsByName: new Map(
+          allArtifacts.map((artifact) => [artifact.name, artifact])
+        ),
+        artifactsByType: new Map(
+          Object.entries(collectByField(allArtifacts, "type"))
+        ),
       });
       projectStore.updateProject({ artifacts: allArtifacts });
 
@@ -114,7 +144,7 @@ export const useArtifacts = defineStore("artifacts", {
      * @return The matching artifact, if one exists.
      */
     getArtifactByName(name: string): ArtifactSchema | undefined {
-      return this.allArtifacts.find((artifact) => artifact.name === name);
+      return this.artifactsByName.get(name);
     },
     /**
      * Finds the given artifact by id.
@@ -123,7 +153,7 @@ export const useArtifacts = defineStore("artifacts", {
      * @return The matching artifact, if one exists.
      */
     getArtifactById(id: string): ArtifactSchema | undefined {
-      return this.allArtifacts.find((artifact) => artifact.id === id);
+      return this.artifactsById.get(id);
     },
     /**
      * Finds all artifacts of the given type.
@@ -132,7 +162,7 @@ export const useArtifacts = defineStore("artifacts", {
      * @return The matching artifacts.
      */
     getArtifactsByType(type: string): ArtifactSchema[] {
-      return this.allArtifacts.filter((artifact) => artifact.type === type);
+      return this.artifactsByType.get(type) || [];
     },
   },
 });

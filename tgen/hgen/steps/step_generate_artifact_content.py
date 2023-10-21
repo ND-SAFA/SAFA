@@ -76,7 +76,6 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                     cluster_id = cluster_ids[i]
                     sources.update({a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]})
                 generated_artifact_to_predicted_sources[generation] = list(sources)
-                break  # TODO remove this when trying to use multiple generations
         return generated_artifact_to_predicted_sources
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:

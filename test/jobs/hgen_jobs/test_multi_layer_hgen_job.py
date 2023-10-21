@@ -15,6 +15,7 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
@@ -143,7 +144,9 @@ class TestMultiLayerHGenJob(BaseJobTest):
         divisor = 3 - self.clustering_calls
         n = math.floor(len(artifacts) / divisor)
         state.final_cluster_map = {i: [a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]] for i in range(divisor)}
-        state.cluster_artifact_dataset = ClusterDatasetCreator(args.dataset,
-                                                               manual_clusters=state.final_cluster_map).create()
+        cluster_dataset = ClusterDatasetCreator(args.dataset,
+                                                manual_clusters=state.final_cluster_map).create()
+        state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
+        state.cluster_artifact_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
 
         self.clustering_calls += 1

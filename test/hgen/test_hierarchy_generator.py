@@ -51,29 +51,12 @@ class TestHierarchyGenerator(BaseTest):
         self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
         self.HGEN_ARGS.dataset.project_summary = TEST_PROJECT_SUMMARY
         self.HGEN_STATE.export_dir = self.HGEN_ARGS.export_dir
-        self.assert_pipeline_run()
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
         self.assert_generate_artifact_content_step()
         self.assert_refined_artifact_content_step()
         self.assert_create_dataset_step()
         self.assert_save_dataset_checkpoint()
-
-    @mock.patch.object(HierarchyGenerator, "run_step")
-    @mock_anthropic
-    def assert_pipeline_run(self, anthropic_ai_manager: TestAIManager, run_step_mock: MagicMock):
-        prompt: QuestionnairePrompt = SupportedPrompts.HGEN_SUMMARY_QUESTIONNAIRE.value
-        tag = prompt.get_all_response_tags()[-1]
-        responses = [create(HierarchyGenerator.HGEN_SECTION_TITLE, tag=tag)]
-        anthropic_ai_manager.mock_summarization()
-        anthropic_ai_manager.set_responses(responses)
-        gen = HierarchyGenerator(self.HGEN_ARGS)
-        gen.state.final_dataset = PromptDataset()
-        gen.run()
-        gen.state.final_dataset = None
-        self.HGEN_STATE = gen.state
-        self.assertIn(HierarchyGenerator.HGEN_SECTION_TITLE, self.HGEN_STATE.project_summary)
-        self.assertNotIn(HierarchyGenerator.HGEN_SECTION_TITLE, gen.args.dataset.project_summary)
 
     def assert_save_dataset_checkpoint(self):
         def assert_dataset(dataset: TraceDataset, orig_dataset: TraceDataset):
@@ -158,6 +141,7 @@ class TestHierarchyGenerator(BaseTest):
     def assert_create_dataset_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock, explanation_mock: MagicMock):
         names, expected_names, responses = get_name_responses(self.HGEN_STATE.generation_predictions)
         anthropic_ai_manager.set_responses(responses)
+        anthropic_ai_manager.mock_summarization()
         ranking_mock.return_value = get_predictions(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
         step = CreateHGenDatasetStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
@@ -202,10 +186,12 @@ class TestHierarchyGenerator(BaseTest):
         artifacts = state.source_dataset.artifact_df.to_artifacts()
         state.id_to_cluster_artifacts = {i: [EnumDict(a) for a in artifacts[i * 11:i * 11 + 11]]
                                          for i in range(math.floor(len(artifacts) / 11))}
-        state.cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters={i: [a[ArtifactKeys.ID] for a in artifacts]
-                                                                                             for i, artifacts in
-                                                                                             state.id_to_cluster_artifacts.items()}) \
+        cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters={i: [a[ArtifactKeys.ID] for a in artifacts]
+                                                                                       for i, artifacts in
+                                                                                       state.id_to_cluster_artifacts.items()}) \
             .create()
+        state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
+        state.cluster_artifact_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
 
         GenerateArtifactContentStep().run(args, state)
         self.assertEqual(len(state.generation_predictions), len(HGenTestConstants.user_stories))

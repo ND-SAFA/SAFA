@@ -191,7 +191,7 @@ class RepositoryExporter:
         """
         commit2files = {}
         for c in self.commits.artifacts:
-            commit2files[c.get_id()] = c.files
+            commit2files[c.get_method()] = c.files
 
         glinks = []
         for commit2issue_link in commit2issue.artifacts:

@@ -18,7 +18,7 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         unique_cluster_map = UniqueClusterMap(threshold=args.cluster_intersection_threshold)
 
         for cluster_method in args.cluster_methods:
-            cluster_map = global_cluster_map[cluster_method.name]
+            cluster_map = global_cluster_map[cluster_method]
             cluster_map = CondenseClusters.filter_by_size(cluster_map)
             clusters = list(cluster_map.values())
             clusters = list(sorted(clusters, key=lambda v: len(v), reverse=False))

@@ -1,6 +1,6 @@
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.methods.cluster_algorithm_manager import ClusterAlgorithmManager
+from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
@@ -14,11 +14,11 @@ class ClusterEmbeddings(AbstractPipelineStep):
         """
 
         global_clusters = {}
-        for cluster_method_class in args.cluster_methods:
-            cluster_manager = ClusterAlgorithmManager(cluster_method_class)
+        for clustering_method in args.cluster_methods:
+            cluster_manager = ClusteringAlgorithmManager(clustering_method)
             clusters = cluster_manager.cluster(state.embedding_manager, args.cluster_reduction_factor, **args.clustering_method_args)
-            clustering_method_id = cluster_manager.get_id()
+            clustering_method_id = cluster_manager.get_method()
             clusters = {f"{clustering_method_id}{k}": v for k, v in clusters.items()}
-            global_clusters[clustering_method_id] = clusters
+            global_clusters[clustering_method] = clusters
 
         state.multi_method_cluster_map = global_clusters

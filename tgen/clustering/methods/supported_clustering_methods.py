@@ -4,7 +4,7 @@ from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, Birch,
 from tgen.common.util.supported_enum import SupportedEnum
 
 
-class SupportedClusterMethods(SupportedEnum):
+class SupportedClusteringMethods(SupportedEnum):
     """
     Enumerates all supporting clustering methods.
     """

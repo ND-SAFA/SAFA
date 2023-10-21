@@ -1,7 +1,7 @@
 from typing import List
 
 from tgen.clustering.base.cluster_type import ClusterMapType
-from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
+from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.constants.clustering_constants import CLUSTER_METHODS_REQUIRING_N_CLUSTERS, CLUSTER_METHOD_INIT_PARAMS, \
     DEFAULT_RANDOM_STATE, NO_CLUSTER_LABEL
 from tgen.common.util.dict_util import DictUtil
@@ -9,9 +9,9 @@ from tgen.common.util.param_specs import ParamSpecs
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
-class ClusterAlgorithmManager:
+class ClusteringAlgorithmManager:
 
-    def __init__(self, method: SupportedClusterMethods):
+    def __init__(self, method: SupportedClusteringMethods):
         """
         Constructs clustering method for the given algorithm.
         :param method:
@@ -61,8 +61,8 @@ class ClusterAlgorithmManager:
             clusters[cluster_label].append(artifact_id)
         return clusters
 
-    def get_id(self) -> str:
+    def get_method(self) -> SupportedClusteringMethods:
         """
-        :return: Returns string identifier for the method.
+        :return: Returns the method associated with the manager.
         """
-        return self.method.name
+        return self.method

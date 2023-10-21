@@ -40,6 +40,7 @@ class UniqueClusterMap:
         cluster_id = self.get_next_cluster_id()
         self.cluster_map[cluster_id] = cluster
         self.cluster_set_map[cluster_id] = set(cluster)
+        self.cluster_votes[cluster_id] = 1
         return cluster
 
     def get_clusters(self, min_votes: int = DEFAULT_CLUSTER_MIN_VOTES) -> ClusterMapType:
@@ -75,8 +76,6 @@ class UniqueClusterMap:
         :param c_id: ID of cluster to increment.
         :return: None
         """
-        if c_id not in self.cluster_votes:
-            self.cluster_votes[c_id] = 0
         self.cluster_votes[c_id] += 1
 
     def get_next_cluster_id(self) -> int:

@@ -23,7 +23,7 @@ class TestAddToDataset(TestCase):
         step = AddClustersToDataset()
         step.run(args, state)
 
-        artifact_df = state.cluster_artifact_dataset.trace_dataset.artifact_df
+        artifact_df = state.cluster_dataset.artifact_df
         artifact_types = artifact_df.get_artifact_types()
         self.assertIn(AddClustersToDataset.CLUSTER_ARTIFACT_TYPE, artifact_types)
 
@@ -34,14 +34,14 @@ class TestAddToDataset(TestCase):
         self.assertIsNotNone(artifact_df.get_artifact(1))
 
         # Verifies all trace links were added
-        trace_df = state.cluster_artifact_dataset.trace_dataset.trace_df
+        trace_df = state.cluster_dataset.trace_dataset.trace_df
         for c_id, artifact_ids in state.final_cluster_map.items():
             for a_id in artifact_ids:
                 cluster_link = trace_df.get_link(source_id=a_id, target_id=c_id)
                 self.assertIsNotNone(cluster_link)
 
         # Verifies that layer id is updated
-        layer_df = state.cluster_artifact_dataset.trace_dataset.layer_df
+        layer_df = state.cluster_dataset.trace_dataset.layer_df
         layers = layer_df.as_list()
         self.assertEqual(1, len(layers))
         traced_layer = layers[0]

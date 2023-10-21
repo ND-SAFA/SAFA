@@ -98,12 +98,13 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             os.makedirs(self.args.export_dir, exist_ok=True)
             self.state.export_dir = self.args.export_dir
         if self.summarizer_args:
+            self.summarizer_args.export_dir = self.state.export_dir
             dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
             if not self.args.dataset.project_summary:
                 self.args.dataset = dataset
             else:
                 self.args.dataset.update_artifact_df(dataset.artifact_df)  # keep original project summary
-            self.state.project_summary = dataset.project_summary
+            self.state.project_summary = dataset.project_summary if dataset.project_summary else None
         for step in self.steps:
             self.run_step(step)
 

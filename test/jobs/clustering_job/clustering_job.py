@@ -38,7 +38,7 @@ class ClusteringJob(AbstractJob):
             self.artifact_types = args.dataset.trace_dataset.artifact_df.get_artifact_types()
 
         if self.add_to_dataset:
-            dataset = pipeline.state.cluster_dataset.trace_dataset
+            dataset = pipeline.state.cluster_artifact_dataset.trace_dataset
             # TODO : Test with new cluster dataset creator.
             artifact_types = self.artifact_types + [AddClustersToDataset.CLUSTER_ARTIFACT_TYPE]
             exporter = SafaExporter(export_path=self.export_dir, dataset=dataset, artifact_types=artifact_types)

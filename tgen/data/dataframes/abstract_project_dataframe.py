@@ -203,7 +203,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         is_duplicated = self.index.duplicated(keep='first')
         duplicated_indices = set(self.index[is_duplicated])
         if len(duplicated_indices) > 0:
-            logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
+            logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}.")
         return self[~is_duplicated]
 
     @overrides(pd.DataFrame)

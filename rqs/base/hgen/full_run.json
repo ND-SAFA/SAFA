@@ -7,10 +7,11 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
-              "source_layer_id": "Code",
-              "target_type": "User Story",
+              "source_layer_id": "Feature",
+              "target_type": "System Requirement",
+              "source_type": "Feature",
               "generate_trace_links": true,
-              "dataset_creator_for_sources": {
+              "dataset_creator": {
                 "object_type": "PROMPT",
                 "project_reader": {
                   "object_type": "Artifact",

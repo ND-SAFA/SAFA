@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import List, Dict
+from typing import Dict, List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.ranking_constants import DEFAULT_HGEN_LINK_THRESHOLD
@@ -13,13 +13,13 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME, HGenUtil
+from tgen.hgen.hgen_util import HGenUtil, SAVE_DATASET_DIRNAME
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
@@ -53,7 +53,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
             generated_artifacts, predicted_links = list(state.refined_content.keys()), list(state.refined_content.values())
             new_artifact_df, orig_id_to_new_name = HGenUtil.create_artifact_df_from_generated_artifacts(
-                args, generated_artifacts, target_layer_id, cluster_dataset=state.cluster_dataset)
+                args, generated_artifacts, target_layer_id, cluster_dataset=state.cluster_artifact_dataset)
             PipelineUtil.save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path,
                                                  filename="generated_artifacts_only")
             combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)

@@ -143,7 +143,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         divisor = 3 - self.clustering_calls
         n = math.floor(len(artifacts) / divisor)
         state.final_cluster_map = {i: [a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]] for i in range(divisor)}
-        state.cluster_dataset = ClusterDatasetCreator(args.dataset,
-                                                      manual_clusters=state.final_cluster_map).create()
+        state.cluster_artifact_dataset = ClusterDatasetCreator(args.dataset,
+                                                               manual_clusters=state.final_cluster_map).create()
 
         self.clustering_calls += 1

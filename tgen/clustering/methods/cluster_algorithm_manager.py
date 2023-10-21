@@ -3,7 +3,9 @@ from typing import List
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
 from tgen.common.constants.clustering_constants import CLUSTER_METHODS_REQUIRING_N_CLUSTERS, CLUSTER_METHOD_INIT_PARAMS, \
-    NO_CLUSTER_LABEL
+    DEFAULT_RANDOM_STATE, NO_CLUSTER_LABEL
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.param_specs import ParamSpecs
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
@@ -33,6 +35,9 @@ class ClusterAlgorithmManager:
         local_kwargs = {} if self.method not in CLUSTER_METHODS_REQUIRING_N_CLUSTERS else {"n_clusters": n_clusters}
         local_kwargs.update(CLUSTER_METHOD_INIT_PARAMS.get(self.method, {}))
 
+        param_specs = ParamSpecs.create_from_method(self.method.value.__init__)
+        if "random_state" in param_specs.param_names:
+            DictUtil.update_kwarg_values(local_kwargs, random_state=DEFAULT_RANDOM_STATE)
         clustering_algo = self.method.value(**local_kwargs, **kwargs)
         clustering_algo.fit(embeddings)
         embedding_labels = clustering_algo.labels_

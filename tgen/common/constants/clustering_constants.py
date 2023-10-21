@@ -1,7 +1,8 @@
 from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
 
-DEFAULT_REDUCTION_FACTOR = 0.50  # Expected reduction in # of artifacts to # clusters
-DEFAULT_CLUSTER_SIMILARITY_THRESHOLD = 0.40  # Similarity equal or greater will be considered as same clusters
+DEFAULT_REDUCTION_FACTOR = 0.20  # Expected reduction in # of artifacts to # clusters
+DEFAULT_CLUSTER_SIMILARITY_THRESHOLD = 0.6  # Similarity equal or greater will be considered as same clusters
+DEFAULT_N_NEW_ALLOWED_ARTIFACTS = 2
 DEFAULT_RANDOM_STATE = 0
 DEFAULT_TESTING_CLUSTERING_METHODS = ["KMEANS", "AGGLOMERATIVE"]
 DEFAULT_CLUSTERING_METHODS = ["OPTICS", "SPECTRAL", "AGGLOMERATIVE", "AFFINITY", "KMEANS"]
@@ -29,10 +30,6 @@ CLUSTER_METHOD_INIT_PARAMS = {
         "bandwidth": 2
     },
     SupportedClusterMethods.SPECTRAL: {
-        "assign_labels": "discretize",
-        "random_state": DEFAULT_RANDOM_STATE
-    },
-    SupportedClusterMethods.AFFINITY: {
-        "random_state": DEFAULT_RANDOM_STATE
+        "assign_labels": "discretize"
     }
 }

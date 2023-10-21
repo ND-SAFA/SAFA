@@ -1,12 +1,11 @@
 from dataclasses import dataclass
-from typing import Union, List, Dict, Any
+from typing import Any, Dict, List, Optional, Union
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.state.state import State
-from tgen.summarizer.summary import Summary
 
 
 @dataclass
@@ -28,7 +27,8 @@ class HGenState(State):
     Optional Step - Break project into parts and generate for each part
     """
     id_to_cluster_artifacts: Dict[Any, List[EnumDict]] = None  # maps cluster id to the list of artifacts in that cluster
-    cluster_dataset: PromptDataset = None  # contains all the clusters and their links to the artifacts
+    cluster_artifact_dataset: Optional[PromptDataset] = None  # contains prompt dataset with just the artifact df of the clusters.
+    cluster_dataset: Optional[PromptDataset] = None  # contains all the clusters and their links to the artifacts
 
     """
     Step 3 - Artifact generation

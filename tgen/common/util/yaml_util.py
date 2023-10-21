@@ -6,7 +6,7 @@ from typing import Any, Dict
 from tqdm import tqdm
 from yaml.constructor import ConstructorError
 from yaml.loader import SafeLoader
-from yaml.nodes import Node, MappingNode
+from yaml.nodes import MappingNode, Node
 
 from tgen.common.constants.deliminator_constants import COLON
 from tgen.common.util.file_util import FileUtil
@@ -137,5 +137,6 @@ class YamlUtil:
         :return: None
         """
         export_dir = FileUtil.get_directory_path(output_path)
-        content = {k: (v.to_yaml(os.path.join(export_dir, k)) if hasattr(v, "to_yaml") else v) for k, v in content.items()}
+        if isinstance(content, Dict):
+            content = {k: (v.to_yaml(os.path.join(export_dir, k)) if hasattr(v, "to_yaml") else v) for k, v in content.items()}
         FileUtil.write_yaml(content, output_path)

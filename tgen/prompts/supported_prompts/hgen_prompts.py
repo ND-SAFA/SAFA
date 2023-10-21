@@ -66,7 +66,10 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     enumeration_chars=["-"])
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("Identify the common feature and/or functionality provided by the {source_type} within the system. "),
+    QuestionPrompt("Use the `Overview of System` to understand the complete scope of the project. "
+                   "Section `{source_type}` contains a few software artifacts from the project that "
+                   "you will create a {target_type} from."),
+    QuestionPrompt("Identify the common feature and/or functionality provided by all the {source_type}s in section `{source_type}`. "),
     QuestionPrompt("Then, reverse engineer a {target_type}. "),
     QuestionPrompt("The {target_type} should include some technical details "
                    "but avoid directly copying details verbatim from the {source_type}. "),

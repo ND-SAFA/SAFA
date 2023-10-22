@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Dict
 
 from tgen.clustering.base.cluster_type import ClusterMapType
+from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.state import State
@@ -16,7 +17,7 @@ class ClusteringState(State):
     :TODO: param docs.
     """
     embedding_manager: EmbeddingsManager = None
-    multi_method_cluster_map: Dict[Any, ClusterMapType] = None
+    multi_method_cluster_map: Dict[SupportedClusteringMethod, ClusterMapType] = None
     final_cluster_map: ClusterMapType = None
     cluster_artifact_dataset: PromptDataset = None
     cluster_dataset: PromptDataset = None

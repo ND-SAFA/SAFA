@@ -46,7 +46,7 @@ class TestDataAugmenter(BaseTest):
         self.assertEqual(5, n_expected)
 
     def get_aug_ids(self, steps):
-        return [step.get_method() for step in steps]
+        return [step.get_id() for step in steps]
 
     def get_data_augmenter(self):
         return DataAugmenter(steps=self.STEPS)

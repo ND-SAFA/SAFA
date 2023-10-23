@@ -156,7 +156,7 @@ class YamlUtil:
         elif hasattr(content, "to_yaml"):
             if key:
                 export_dir = os.path.join(export_dir, key)
-            return content.to_yaml(export_dir)
+            return content.to_yaml(export_path=export_dir)
         else:
             return content
 

@@ -63,11 +63,13 @@ class SupportedEnum(Enum):
         """
         return [v for v in cls._value2member_map_.keys()]
 
-    def to_yaml(self, **kwargs) -> str:
+    def to_yaml(self, export_path: str = None) -> str:
         """
         Converts enum to name so it can be read from yaml
         :return: The name of the enum
         """
+        if export_path:
+            return self
         return self.name
 
     @classmethod

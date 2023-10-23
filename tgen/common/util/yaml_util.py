@@ -5,6 +5,7 @@ from typing import Any, Dict, Iterable
 
 from tqdm import tqdm
 from yaml.constructor import ConstructorError
+from yaml.dumper import Dumper
 from yaml.loader import SafeLoader
 from yaml.nodes import MappingNode, Node
 
@@ -31,6 +32,8 @@ class CustomLoader(SafeLoader):
             if ReflectionUtil.is_function(cls) or "builtins" in class_path:
                 return cls
             if isinstance(cls, EnumMeta):
+                if isinstance(node.value, str):
+                    return cls[node.value]
                 return self._create_enum_from_meta(cls, node)
             deep = hasattr(cls, '__setstate__')
             state = self.construct_mapping(node, deep=True)
@@ -117,6 +120,27 @@ class CustomLoader(SafeLoader):
         return mapping
 
 
+class CustomDumper(Dumper):
+
+    def represent_data(self, data) -> Node:
+        """
+        Represent data in a yaml form
+        :param data: The data to represent
+        :return: The data in a yaml form (node)
+        """
+        if hasattr(data, "to_yaml"):
+            try:
+                converted_data = data.to_yaml()
+                node = super().represent_data(converted_data)
+                orig_node = self.represent_object(data)
+                node.tag = orig_node.tag
+                return node
+            except Exception:
+                pass
+        node = super().represent_data(data)
+        return node
+
+
 class YamlUtil:
 
     @staticmethod
@@ -138,7 +162,7 @@ class YamlUtil:
         """
         export_dir = FileUtil.get_directory_path(output_path)
         content = YamlUtil.convert_content_to_yaml_serializable(content, export_dir)
-        FileUtil.write_yaml(content, output_path)
+        FileUtil.write_yaml(content, output_path, dumper=CustomDumper)
 
     @staticmethod
     def convert_content_to_yaml_serializable(content: Any, export_dir: str, key: str = None) -> Any:

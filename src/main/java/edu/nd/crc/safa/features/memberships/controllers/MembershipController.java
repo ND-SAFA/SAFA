@@ -136,7 +136,9 @@ public class MembershipController extends BaseController {
         IEntityWithMembership entity = getEntity(entityId);
         permissionService.requirePermission(getEditMembersPermission(entity), entity, getCurrentUser());
         IRole role = getRole(entity, membership.getRole());
-        SafaUser editedUser = removeMembership(membershipId, entity);
+        IMembershipService membershipService = getMembershipService(entity);
+        IEntityMembership currentMembership = membershipService.getMembershipById(membershipId);
+        SafaUser editedUser = removeMembership(currentMembership, entity);
         return new MembershipAppEntity(createMembership(editedUser, entity, role));
     }
 
@@ -150,8 +152,15 @@ public class MembershipController extends BaseController {
     @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
     public void deleteMembership(@PathVariable UUID entityId, @PathVariable UUID membershipId) {
         IEntityWithMembership entity = getEntity(entityId);
-        permissionService.requirePermission(getEditMembersPermission(entity), entity, getCurrentUser());
-        removeMembership(membershipId, entity);
+        IMembershipService membershipService = getMembershipService(entity);
+        IEntityMembership currentMembership = membershipService.getMembershipById(membershipId);
+        SafaUser currentUser = getCurrentUser();
+        SafaUser modifiedUser = currentMembership.getUser();
+
+        if (!currentUser.equals(modifiedUser)) {
+            permissionService.requirePermission(getEditMembersPermission(entity), entity, getCurrentUser());
+        }
+        removeMembership(currentMembership, entity);
     }
 
     /**
@@ -208,16 +217,15 @@ public class MembershipController extends BaseController {
     }
 
     /**
-     * Delete the membership with the given ID in the given entity and return the user that it represented.
+     * Delete the membership in the given entity and return the user that it represented.
      *
-     * @param membershipId The ID of the membership
+     * @param currentMembership The membership
      * @param entity The entity the membership exists within (this will be checked and an exception is
      *               thrown if the membership with the given ID doesn't exist within the given entity)
      * @return The user that had the membership, so that further operations can be performed on them if needed
      */
-    private SafaUser removeMembership(UUID membershipId, IEntityWithMembership entity) {
+    private SafaUser removeMembership(IEntityMembership currentMembership, IEntityWithMembership entity) {
         IMembershipService membershipService = getMembershipService(entity);
-        IEntityMembership currentMembership = membershipService.getMembershipById(membershipId);
         SafaUser member = currentMembership.getUser();
 
         assertEqual(currentMembership.getEntity().getId(), entity.getId(),

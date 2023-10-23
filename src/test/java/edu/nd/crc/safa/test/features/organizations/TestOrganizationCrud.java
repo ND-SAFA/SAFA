@@ -15,12 +15,14 @@ import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Functions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestOrganizationCrud extends ApplicationBaseTest {
 
@@ -36,8 +38,15 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
 
     private OrganizationAppEntity createdOrg;
 
+    @Autowired
+    private SafaUserRepository userRepository;
+
     @Test  
     public void testOrganizationCrud() throws Exception {
+        //TODO update this when we can give admin permissions in a better way
+        currentUser.setSuperuser(true);
+        currentUser = userRepository.save(currentUser);
+
         testDefaultOrganization();
         testCreateOrganization();
         testRetrieveOrganization();

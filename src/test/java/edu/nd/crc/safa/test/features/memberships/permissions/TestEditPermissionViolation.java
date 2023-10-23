@@ -8,6 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import org.json.JSONObject;
@@ -27,7 +28,7 @@ public class TestEditPermissionViolation extends AbstractPermissionViolationTest
 
     @Override
     protected Set<Permission> getExpectedPermissions() {
-        return Set.of(ProjectPermission.DELETE);
+        return Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS);
     }
 
     @Override

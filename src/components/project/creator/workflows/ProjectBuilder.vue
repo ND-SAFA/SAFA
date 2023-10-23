@@ -98,19 +98,12 @@ const uploadMode = computed(() => projectSaveStore.uploadPanels[0]?.variant);
 
 const continueDisabled = computed(() => !identifier.value.name);
 
-const uploadDisabled = computed(() => {
-  if (uploadMode.value === "bulk") {
-    const files = projectSaveStore.uploadPanels[0]?.bulkFiles || [];
-
-    return (
-      continueDisabled.value ||
-      files.length === 0 ||
-      !files.find(({ name }) => name === "tim.json")
-    );
-  } else {
-    return false;
-  }
-});
+const uploadDisabled = computed(
+  () =>
+    !projectSaveStore.uploadPanels
+      .map(({ valid }) => valid)
+      .reduce((acc, cur) => acc && cur, true)
+);
 
 /**
  * Clears all project data.

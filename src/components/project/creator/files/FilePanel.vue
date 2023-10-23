@@ -88,7 +88,7 @@
         label="Generate Trace Links"
       />
 
-      <flex-box v-if="hasSingleFile" full-width justify="between" y="2">
+      <flex-box full-width justify="between" y="2">
         <switch-input
           v-model="props.panel.ignoreErrors"
           label="Ignore Errors"
@@ -141,7 +141,7 @@ export default {
 import { computed, watch } from "vue";
 import { FilePanelProps } from "@/types";
 import { getIcon, uploadPanelOptions } from "@/util";
-import { parseApiStore, projectSaveStore } from "@/hooks";
+import { integrationsStore, parseApiStore, projectSaveStore } from "@/hooks";
 import {
   ExpansionItem,
   FileInput,
@@ -181,11 +181,27 @@ const newLabel = computed(() => `New ${label.value}`);
 
 const errorMessage = computed(() => {
   if (!props.panel.name) {
-    return "The file requires an artifact type";
-  } else if (!props.panel.file && !props.panel.isGenerated) {
-    return "No file has been uploaded";
+    return "Requires a name";
   } else if (props.panel.ignoreErrors) {
     return undefined;
+  } else if (
+    (props.panel.variant === "artifact" || props.panel.variant === "trace") &&
+    !props.panel.file &&
+    !props.panel.isGenerated
+  ) {
+    return "No files have been uploaded.";
+  } else if (
+    (props.panel.variant === "jira" || props.panel.variant === "github") &&
+    !integrationsStore.gitHubProject &&
+    !integrationsStore.jiraProject
+  ) {
+    return "Select a project to import.";
+  } else if (
+    props.panel.variant === "bulk" &&
+    (props.panel.bulkFiles.length === 0 ||
+      !props.panel.bulkFiles.find(({ name }) => name === "tim.json"))
+  ) {
+    return "Requires a tim.json configuration file.";
   } else {
     return props.panel.errorMessage;
   }
@@ -223,23 +239,30 @@ function handleDeletePanel() {
 }
 
 watch(
+  () => props.panel.variant,
+  () => {
+    props.panel.name = "";
+  }
+);
+
+watch(
   () => props.panel.type,
   (type) => {
-    if (props.panel.variant === "trace") return;
-
-    props.panel.name = type;
+    if (props.panel.variant === "artifact") {
+      props.panel.name = type;
+    }
   }
 );
 
 watch(
   () => [props.panel.type, props.panel.toType],
   ([fromType, toType]) => {
-    if (props.panel.variant === "artifact") return;
-
-    props.panel.name =
-      !props.panel.type || !props.panel.toType
-        ? ""
-        : `${fromType} to ${toType}`;
+    if (props.panel.variant === "trace") {
+      props.panel.name =
+        !props.panel.type || !props.panel.toType
+          ? ""
+          : `${fromType} to ${toType}`;
+    }
   }
 );
 

@@ -36,20 +36,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { projectSaveStore } from "@/hooks";
 import { TextButton, FlexBox, List } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
-const emit = defineEmits<{
-  (e: "validate", isValid: boolean): void;
-}>();
-
 const panels = computed(() => projectSaveStore.uploadPanels);
-
-const valid = computed(() =>
-  panels.value.map(({ valid }) => valid).reduce((acc, cur) => acc && cur, true)
-);
 
 // Only allow multiple uploads when uploading individual files.
 const allowMultiple = computed(() =>
@@ -66,9 +58,4 @@ const allowMultiple = computed(() =>
 function handleAddPanel(): void {
   projectSaveStore.addPanel("artifact");
 }
-
-watch(
-  () => valid.value,
-  (valid) => emit("validate", valid)
-);
 </script>

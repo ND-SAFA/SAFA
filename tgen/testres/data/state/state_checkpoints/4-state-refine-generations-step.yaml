@@ -3,15 +3,18 @@ all_generated_content: &id001
   ? As a game developer, I want a Player class to store player state, apply movement,
     handle collisions, perform raycasting for block selection, and render the player,
     so that I can implement a controllable character that interacts with the 3D world.
-  : - /Player.cpp
+  : !!set
+    /Player.cpp: null
   ? As a game developer, I want a RenderEngine class to handle window creation, OpenGL
     context, camera view, and scene rendering, so that I have a reusable graphics
     engine for displaying 3D scenes.
-  : - /Rendering/RenderEngine.cpp
+  : !!set
+    /Rendering/RenderEngine.cpp: null
   ? As a game developer, I want an Image class to load image files as textures using
     STB Image, so that I can apply detailed textures to 3D models.
-  : - /Rendering/Image.cpp
-    - /Rendering/stb_image.cpp
+  : !!set
+    /Rendering/Image.cpp: null
+    /Rendering/stb_image.cpp: null
 completed_steps:
   GenerateArtifactContentStep: 1
   GenerateInputsStep: 1

@@ -29,7 +29,8 @@ class ClusteringJob(AbstractJob):
         Runs clustering pipeline on dataset and exports the results
         """
         args = ClusteringArgs(dataset_creator=self.dataset_creator, create_dataset=self.add_to_dataset,
-                              export_dir=self.export_dir, artifact_types=self.artifact_types, **self.kwargs)
+                              artifact_types=self.artifact_types, **self.kwargs)
+        # TODO: Fix state not saving
         pipeline = ClusteringPipeline(args, summarizer_args=None, skip_summarization=True)
 
         pipeline.run()
@@ -38,7 +39,7 @@ class ClusteringJob(AbstractJob):
             self.artifact_types = args.dataset.trace_dataset.artifact_df.get_artifact_types()
 
         if self.add_to_dataset:
-            dataset = pipeline.state.cluster_artifact_dataset.trace_dataset
+            dataset = pipeline.state.cluster_dataset.trace_dataset
             # TODO : Test with new cluster dataset creator.
             artifact_types = self.artifact_types + [AddClustersToDataset.CLUSTER_ARTIFACT_TYPE]
             exporter = SafaExporter(export_path=self.export_dir, dataset=dataset, artifact_types=artifact_types)

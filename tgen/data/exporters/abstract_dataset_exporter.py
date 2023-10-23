@@ -19,7 +19,7 @@ class AbstractDatasetExporter(BaseObject):
         :param dataset_creator: The creator in charge of making the dataset to export
         :param dataset: The dataset to export if creator is not supplied
         """
-        assert dataset_creator is not None or dataset is not None, "Must supply either a dataset creator or a dataset"
+        assert dataset_creator is not None or dataset is not None, f"Expected a dataset creator or a dataset but got {dataset}."
         self.dataset_creator = dataset_creator
         self._dataset = dataset
         self.export_path = self.update_export_path(export_path) if export_path else export_path

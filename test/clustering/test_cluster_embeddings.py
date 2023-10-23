@@ -3,7 +3,7 @@ from unittest import TestCase
 from test.clustering.clustering_test_util import ClusteringTestUtil
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
-from tgen.clustering.steps.cluster_embeddings import ClusterEmbeddings
+from tgen.clustering.steps.cluster_embeddings_from_embeddings import CreateClustersFromEmbeddings
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
 from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
 
@@ -25,7 +25,7 @@ class TestClusterEmbeddings(TestCase):
         args = ClusteringTestUtil.create_clustering_args(artifacts)
 
         CreateEmbeddings().run(args, state)
-        ClusterEmbeddings().run(args, state)
+        CreateClustersFromEmbeddings().run(args, state)
 
         method_cluster_map = state.multi_method_cluster_map
         for clustering_method_name in DEFAULT_TESTING_CLUSTERING_METHODS:

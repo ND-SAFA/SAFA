@@ -8,29 +8,28 @@
         @click="cyStore.resetWindow('creator')"
       />
     </flex-box>
-    <panel-card>
-      <cytoscape
-        id="cytoscape-tim"
-        :graph="graph"
-        :class="className"
-        data-cy="view-tim-tree"
-      >
-        <tim-node
-          v-for="{ type, count } in artifacts"
-          :key="type"
-          :count="count"
-          :artifact-type="type"
-        />
-        <tim-link
-          v-for="{ name, sourceType, targetType, count, isGenerated } in traces"
-          :key="name"
-          :count="count"
-          :target-type="targetType"
-          :source-type="sourceType"
-          :generated="isGenerated"
-        />
-      </cytoscape>
-    </panel-card>
+    <separator />
+    <cytoscape
+      id="cytoscape-tim"
+      :graph="graph"
+      :class="className"
+      data-cy="view-tim-tree"
+    >
+      <tim-node
+        v-for="{ type, count } in artifacts"
+        :key="type"
+        :count="count"
+        :artifact-type="type"
+      />
+      <tim-link
+        v-for="{ name, sourceType, targetType, count, isGenerated } in traces"
+        :key="name"
+        :count="count"
+        :target-type="targetType"
+        :source-type="sourceType"
+        :generated="isGenerated"
+      />
+    </cytoscape>
   </div>
 </template>
 
@@ -47,7 +46,7 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { appStore, layoutStore, projectSaveStore, cyStore } from "@/hooks";
-import { FlexBox, TextButton, PanelCard } from "@/components/common";
+import { FlexBox, TextButton, Separator } from "@/components/common";
 import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 

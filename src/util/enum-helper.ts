@@ -13,6 +13,7 @@ import {
   SettingsTab,
   TeamTabTypes,
   TraceCountTypes,
+  UploadPanelType,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
 
@@ -143,6 +144,16 @@ export function searchModeOptions(): SearchSelectOption[] {
       placeholder: "Search current artifacts...",
       artifactSearch: true,
     },
+  ];
+}
+
+/**
+ * @return display names for project creator tabs.
+ */
+export function uploadPanelOptions(): SelectOption<UploadPanelType>[] {
+  return [
+    createOption("artifact", "Artifact Type"),
+    createOption("trace", "Trace Matrix"),
   ];
 }
 

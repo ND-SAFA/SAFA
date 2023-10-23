@@ -1,0 +1,92 @@
+<template>
+  <flex-box :column="smallWindow">
+    <flex-item :parts="smallWindow ? '12' : '6'">
+      <panel-card
+        class="q-ma-sm"
+        title="Create Project"
+        subtitle="Create a new project by uploading files or configuring integrations."
+      >
+        <flex-box :column="smallWindow" full-width>
+          <q-tabs v-model="tab" :vertical="!smallWindow" no-caps>
+            <q-tab name="name" label="Project Details" />
+            <q-tab name="data" label="Import Data" />
+          </q-tabs>
+          <separator vertical />
+          <q-tab-panels
+            v-model="tab"
+            animated
+            :vertical="!smallWindow"
+            transition-prev="jump-up"
+            transition-next="jump-up"
+            class="full-width"
+          >
+            <q-tab-panel name="name">
+              <project-identifier-input
+                v-model:name="identifier.name"
+                v-model:description="identifier.description"
+              />
+              <text-button
+                block
+                outlined
+                label="Import Data"
+                color="primary"
+                class="q-mt-md"
+                icon="upload"
+                @click="tab = 'data'"
+              />
+            </q-tab-panel>
+            <q-tab-panel name="data">
+              <file-format-alert />
+              <file-input label="Upload files in bulk" class="q-my-md" />
+              <file-panel-list />
+              <text-button
+                block
+                label="Create Project"
+                color="primary"
+                class="q-mt-md"
+                icon="project-add"
+              />
+            </q-tab-panel>
+          </q-tab-panels>
+        </flex-box>
+      </panel-card>
+    </flex-item>
+    <flex-item :parts="smallWindow ? '12' : '6'">
+      <panel-card class="q-ma-sm">
+        <creator-tree />
+      </panel-card>
+    </flex-item>
+  </flex-box>
+</template>
+
+<script lang="ts">
+/**
+ * Builds project data uploads from all data sources.
+ */
+export default {
+  name: "ProjectBuilder",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { identifierSaveStore, useScreen } from "@/hooks";
+import {
+  FileFormatAlert,
+  FileInput,
+  FlexBox,
+  FlexItem,
+  PanelCard,
+  Separator,
+  TextButton,
+} from "@/components/common";
+import { CreatorTree } from "@/components/graph";
+import { ProjectIdentifierInput } from "@/components/project/save";
+import { FilePanelList } from "@/components/project/creator/files";
+
+const { smallWindow } = useScreen();
+
+const tab = ref("name");
+
+const identifier = computed(() => identifierSaveStore.editedIdentifier);
+</script>

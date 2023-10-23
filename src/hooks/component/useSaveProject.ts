@@ -30,8 +30,8 @@ export const useSaveProject = defineStore("saveProject", {
   state: () => ({
     name: "",
     description: "",
-    artifactPanels: [createEmptyPanel("artifact")] as CreatorFilePanel[],
-    tracePanels: [createEmptyPanel("trace")] as CreatorFilePanel[],
+    artifactPanels: [] as CreatorFilePanel[],
+    tracePanels: [] as CreatorFilePanel[],
     artifactMap: {} as ArtifactMap,
   }),
   getters: {

@@ -1,6 +1,7 @@
 <template>
-  <private-page>
-    <project-creator />
+  <private-page :full-window="ENABLED_FEATURES.PROJECT_CREATOR_WORKFLOW">
+    <project-builder v-if="ENABLED_FEATURES.PROJECT_CREATOR_WORKFLOW" />
+    <project-creator v-else />
   </private-page>
 </template>
 
@@ -14,5 +15,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { PrivatePage, ProjectCreator } from "@/components";
+import { ENABLED_FEATURES } from "@/util";
+import { PrivatePage, ProjectCreator, ProjectBuilder } from "@/components";
 </script>

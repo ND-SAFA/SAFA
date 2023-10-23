@@ -8,6 +8,11 @@ export type ArtifactMap = Record<string, ArtifactSchema>;
 /**
  * The types of create project tabs.
  */
+export type UploadPanelType = "artifact" | "trace";
+
+/**
+ * The types of create project tabs.
+ */
 export type CreatorTab = "standard" | "bulk" | "import";
 
 /**
@@ -52,16 +57,4 @@ export interface FilePanelProps {
    * The panel index.
    */
   index: number;
-  /**
-   * The type of data being created.
-   */
-  variant: "artifact" | "trace";
-  /**
-   * The label for the type of panel.
-   */
-  label: string;
-  /**
-   * The panel's label to display over the panel name.
-   */
-  newLabel: string;
 }

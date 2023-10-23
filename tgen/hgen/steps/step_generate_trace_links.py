@@ -53,7 +53,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             raise Exception(f"Trace link generation failed: {result.body}")
 
         trace_predictions: List[EnumDict] = result.body.prediction_entries
-        self._weight_scores_with_related_children_predictions(trace_predictions, id_to_related_children)
+        trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions, id_to_related_children)
         state.trace_predictions = trace_predictions
 
     @staticmethod
@@ -71,12 +71,12 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     @staticmethod
     def _weight_scores_with_related_children_predictions(trace_predictions: List[EnumDict],
-                                                         id_to_related_children: Dict[str, Set]) -> None:
+                                                         id_to_related_children: Dict[str, Set]) -> List[EnumDict]:
         """
         Adjusts the score to reflect that an artifact was predicted to be related (through clustering or artifact gen step)
         :param trace_predictions: The list of trace predictions from ranking job
         :param id_to_related_children: A dictionary mapping the generated content id to the list of predicted relationships
-        :return: None
+        :return: The adjusted trace predictions
         """
         for trace in trace_predictions:
             child = trace[TraceKeys.child_label()]
@@ -84,7 +84,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             if parent in id_to_related_children and child in id_to_related_children[parent]:
                 alpha = WEIGHT_OF_PRED_RELATED_CHILDREN
                 trace[TraceKeys.SCORE] = MathUtil.calculate_weighted_score(RELATED_CHILDREN_SCORE, trace[TraceKeys.SCORE], alpha)
-        SelectByThreshold.select(trace_predictions, DEFAULT_LINK_THRESHOLD)
+        return SelectByThreshold.select(trace_predictions, DEFAULT_LINK_THRESHOLD)
 
     @staticmethod
     def _get_ranking_dir(directory: str) -> str:

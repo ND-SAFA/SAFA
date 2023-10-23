@@ -1,7 +1,7 @@
 import collections
 import os
 from enum import Enum, EnumMeta
-from typing import Any, Dict
+from typing import Any, Dict, Iterable
 
 from tqdm import tqdm
 from yaml.constructor import ConstructorError
@@ -137,6 +137,29 @@ class YamlUtil:
         :return: None
         """
         export_dir = FileUtil.get_directory_path(output_path)
-        if isinstance(content, Dict):
-            content = {k: (v.to_yaml(os.path.join(export_dir, k)) if hasattr(v, "to_yaml") else v) for k, v in content.items()}
+        content = YamlUtil.convert_content_to_yaml_serializable(content, export_dir)
         FileUtil.write_yaml(content, output_path)
+
+    @staticmethod
+    def convert_content_to_yaml_serializable(content: Any, export_dir: str, key: str = None) -> Any:
+        """
+        Converts the content to yaml serializable if to_yaml is defined
+        :param content: The content to convert
+        :param export_dir: The directory to which the yaml will be exported
+        :param key: If part of a dictionary, the key the content is mapped to
+        :return: Content converted to yaml serializable if to_yaml is defined
+        """
+        if isinstance(content, dict):
+            converted = {k: YamlUtil.convert_content_to_yaml_serializable(v, export_dir, key=k) for k, v in content.items()}
+        elif isinstance(content, list) or isinstance(content, set):
+            converted = [YamlUtil.convert_content_to_yaml_serializable(v, export_dir) for v in content]
+        elif hasattr(content, "to_yaml"):
+            if key:
+                export_dir = os.path.join(export_dir, key)
+            return content.to_yaml(export_dir)
+        else:
+            return content
+
+        if converted.__class__ != content.__class__:
+            converted = content.__class__(converted)
+        return converted

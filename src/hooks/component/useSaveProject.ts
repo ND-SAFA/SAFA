@@ -117,12 +117,14 @@ export const useSaveProject = defineStore("saveProject", {
           .map(({ type, artifacts = [] }) => ({
             artifactType: type,
             count: artifacts.length,
+            hideActions: true,
           }));
       } else if (this.mode === "bulk") {
         return (
           this.uploadPanels[0]?.tim?.artifacts.map(({ type }) => ({
             artifactType: type,
             count: -1,
+            hideActions: true,
           })) ?? []
         );
       } else if (this.mode === "github") {
@@ -131,6 +133,7 @@ export const useSaveProject = defineStore("saveProject", {
             artifactType:
               integrationsStore.gitHubConfig.artifactType || "GitHub Code",
             count: -1,
+            hideActions: true,
           },
         ];
       } else if (this.mode === "jira") {
@@ -138,6 +141,7 @@ export const useSaveProject = defineStore("saveProject", {
           {
             artifactType: "Jira Ticket",
             count: -1,
+            hideActions: true,
           },
         ];
       } else {
@@ -156,6 +160,7 @@ export const useSaveProject = defineStore("saveProject", {
             targetType: toType,
             count: traces.length,
             generated: isGenerated,
+            hideActions: true,
           }));
       } else if (this.mode === "bulk") {
         return (
@@ -164,6 +169,7 @@ export const useSaveProject = defineStore("saveProject", {
               sourceType,
               targetType,
               count: -1,
+              hideActions: true,
             })
           ) ?? []
         );

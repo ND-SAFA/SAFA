@@ -56,6 +56,8 @@ const definition = computed<TimEdgeCytoElement>(() => ({
  * Selects this trace matrix.
  */
 function handleSelect(): void {
+  if (props.hideActions) return;
+
   if (
     selectionStore.selectedTraceMatrixTypes[0] !== props.targetType ||
     selectionStore.selectedTraceMatrixTypes[1] !== props.sourceType

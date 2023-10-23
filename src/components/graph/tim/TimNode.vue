@@ -120,6 +120,8 @@ const definition = computed<TimNodeCytoElement>(() => ({
  * Selects this artifact level.
  */
 function handleSelect(): void {
+  if (props.hideActions) return;
+
   if (!selected.value) {
     selectionStore.selectArtifactLevel(props.artifactType);
   } else {

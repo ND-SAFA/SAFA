@@ -121,6 +121,7 @@ function handleClear(): void {
   selectedFiles.value = [];
   artifactTypes.value = [];
   traceMatrices.value = [];
+  emit("update:tim", undefined);
 }
 
 /**

@@ -136,51 +136,43 @@ class HGenUtil:
 
     @staticmethod
     def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs,
-                                                    artifact_generations: List[str], target_layer_id: str,
-                                                    generate_names: bool = True,
-                                                    cluster_dataset: PromptDataset = None) -> Tuple[ArtifactDataFrame, Dict]:
+                                                    generation_predictions: Dict[str, Set],
+                                                    target_layer_id: str,
+                                                    generate_names: bool = True) -> Tuple[ArtifactDataFrame, Dict[str, Set]]:
         """
         Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
         :param hgen_args: The arguments for the hierarchy generation
-        :param artifact_generations: A list of generated artifact content
+        :param generation_predictions: A dictionary mapping generated artifact content to the predicted links
         :param target_layer_id: The id for the layer with the new generated artifacts
         :param generate_names: If True, generates names for the new artifacts
-        :param cluster_dataset: If a cluster dataset was provided, this will be used to create the artifact df
-        :return: The dataframe of generated artifacts and a dictionary mapping the original ids to the new names that were created
+        :return: The dataframe of generated artifacts and a dictionary mapping the new name to the list of predicted related artifacts
         """
-        artifact_ids = [str(i) for i in range(len(artifact_generations))] if not cluster_dataset else cluster_dataset.artifact_df.index
-        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_ids,
-                                             ArtifactKeys.CONTENT: artifact_generations,
-                                             ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
-        orig_id_to_new_id = {a_id: a_id for a_id in artifact_ids}
+        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(generation_predictions))],
+                                             ArtifactKeys.CONTENT: list(generation_predictions.keys()),
+                                             ArtifactKeys.LAYER_ID: [target_layer_id for _ in generation_predictions]})
         if generate_names:
             try:
-                long_artifacts = [content for content in artifact_generations if len(content.split()) > 5]
-                if len(long_artifacts) == 0:
-                    names = artifact_generations
-                else:
-                    logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
-                    name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
-                                         f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
-                                         PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
-                                                               value_formatter=lambda tag,
-                                                                                      val: f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
-                                                                                           f"{HGenUtil.get_initials(hgen_args.target_type)}",
-                                                               ))
-                    artifact_prompt = ArtifactPrompt(include_id=False)
-                    prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
-                    dataset = PromptDataset(artifact_df=new_artifact_df)
-                    names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=PredictionStep.NAME,
-                                                     dataset=dataset, response_prompt_ids=name_prompt.id,
-                                                     tags_for_response=name_prompt.response_manager.response_tag, return_first=True,
-                                                     export_path=os.path.join(hgen_args.export_dir, "artifact_names.json"))
-                    assert len(set(names)) == len(names), f"Found duplicates names: {names}"
-                    assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
-                orig_id_to_new_id = {orig_id: new_name for orig_id, new_name in zip(artifact_ids, names)}
+                logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
+                name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
+                                     f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
+                                     PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
+                                                           value_formatter=lambda tag, val:
+                                                           f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
+                                                           f"{HGenUtil.get_initials(hgen_args.target_type)}"))
+                artifact_prompt = ArtifactPrompt(include_id=False)
+                prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
+                dataset = PromptDataset(artifact_df=new_artifact_df)
+                names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=PredictionStep.NAME,
+                                                 dataset=dataset, response_prompt_ids=name_prompt.id,
+                                                 tags_for_response=name_prompt.response_manager.response_tag, return_first=True,
+                                                 export_path=os.path.join(hgen_args.export_dir, "artifact_names.json"))
+                assert len(set(names)) == len(names), f"Found duplicates names: {names}"
+                assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
                 new_artifact_df.index = names
             except Exception:
                 logger.exception("Unable to generate names for the artifacts")
-        return new_artifact_df, orig_id_to_new_id
+        name_2_related_children = {name: links for name, links in zip(new_artifact_df.index, list(generation_predictions.values()))}
+        return new_artifact_df, name_2_related_children
 
     @staticmethod
     def parse_generated_artifacts(res: str) -> List[str]:

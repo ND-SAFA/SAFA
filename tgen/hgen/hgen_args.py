@@ -72,6 +72,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     generate_trace_links: bool = True
     """
+    If True, creates clusters of related artifacts to create higher levels of docs for 
+    """
+    perform_clustering: bool = True
+    """
     The llm manager to use for each prediction step
     """
     llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)

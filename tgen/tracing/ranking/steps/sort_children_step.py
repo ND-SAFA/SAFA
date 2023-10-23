@@ -27,8 +27,8 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         if use_pre_ranked:
             n_parents = len(args.parent_ids)
             n_children = len(args.children_ids)
-            parent2rankings = args.pre_sorted_parent2children
-            state.sorted_parent2children = {p: [RankingUtil.create_entry(p, c) for c in rankings] for p, rankings in
+            parent2rankings = {p: list(children) for p, children in args.pre_sorted_parent2children.items()}
+            state.sorted_parent2children = {p: [RankingUtil.create_entry(p, c, score=0.99) for c in rankings] for p, rankings in
                                             parent2rankings.items()}
             add_sorted_children = len(args.pre_sorted_parent2children) < n_parents or any(
                 [len(v) < n_children for v in args.pre_sorted_parent2children.values()])

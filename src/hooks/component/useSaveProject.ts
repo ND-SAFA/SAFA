@@ -5,10 +5,12 @@ import {
   CreateProjectByJsonSchema,
   CreatorFilePanel,
   MembershipSchema,
+  TimLinkProps,
+  TimNodeProps,
   UploadPanelType,
 } from "@/types";
 import { buildProject } from "@/util";
-import { orgStore, sessionStore, teamStore } from "@/hooks";
+import { integrationsStore, orgStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 const createEmptyPanel = (
@@ -38,6 +40,12 @@ export const useSaveProject = defineStore("saveProject", {
     artifactMap: {} as ArtifactMap,
   }),
   getters: {
+    /**
+     * @return The current upload panel mode.
+     */
+    mode(): UploadPanelType {
+      return this.uploadPanels[0]?.variant ?? "artifact";
+    },
     /**
      * @return All artifact panels.
      */
@@ -98,6 +106,70 @@ export const useSaveProject = defineStore("saveProject", {
         project,
         requests,
       };
+    },
+    /**
+     * @return The nodes to display on the graph.
+     */
+    graphNodes(): TimNodeProps[] {
+      if (this.mode === "artifact" || this.mode === "trace") {
+        return this.artifactPanels
+          .filter(({ valid }) => valid)
+          .map(({ type, artifacts = [] }) => ({
+            artifactType: type,
+            count: artifacts.length,
+          }));
+      } else if (this.mode === "bulk") {
+        return (
+          this.uploadPanels[0]?.tim?.artifacts.map(({ type }) => ({
+            artifactType: type,
+            count: -1,
+          })) ?? []
+        );
+      } else if (this.mode === "github") {
+        return [
+          {
+            artifactType:
+              integrationsStore.gitHubConfig.artifactType || "GitHub Code",
+            count: -1,
+          },
+        ];
+      } else if (this.mode === "jira") {
+        return [
+          {
+            artifactType: "Jira Ticket",
+            count: -1,
+          },
+        ];
+      } else {
+        return [];
+      }
+    },
+    /**
+     * @return The edges to display on the graph.
+     */
+    graphEdges(): TimLinkProps[] {
+      if (this.mode === "artifact" || this.mode === "trace") {
+        return this.tracePanels
+          .filter(({ valid }) => valid)
+          .map(({ type, toType = "", traces = [], isGenerated }) => ({
+            sourceType: type,
+            targetType: toType,
+            count: traces.length,
+            generated: isGenerated,
+          }));
+      } else if (this.mode === "bulk") {
+        return (
+          this.uploadPanels[0]?.tim?.traces.map(
+            ({ sourceType, targetType }) => ({
+              sourceType,
+              targetType,
+              count: -1,
+            })
+          ) ?? []
+        );
+      } else {
+        return [];
+      }
     },
   },
   actions: {

@@ -70,10 +70,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import {
   createProjectApiStore,
+  gitHubApiStore,
   identifierSaveStore,
+  integrationsStore,
+  jiraApiStore,
   projectSaveStore,
   useScreen,
 } from "@/hooks";
@@ -94,7 +97,7 @@ const tab = ref("name");
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
 
-const uploadMode = computed(() => projectSaveStore.uploadPanels[0]?.variant);
+const uploadMode = computed(() => projectSaveStore.mode);
 
 const continueDisabled = computed(() => !identifier.value.name);
 
@@ -134,4 +137,26 @@ function handleCreate() {
     createProjectApiStore.handleJiraImport(callbacks);
   }
 }
+
+/**
+ * Clears all project data.
+ */
+function handleReloadIntegrations() {
+  if (integrationsStore.validJiraCredentials) {
+    jiraApiStore.handleLoadOrganizations();
+  }
+  if (integrationsStore.validGitHubCredentials) {
+    gitHubApiStore.handleLoadProjects();
+  }
+}
+
+onMounted(() => handleReloadIntegrations());
+
+watch(
+  () => [
+    integrationsStore.validJiraCredentials,
+    integrationsStore.validGitHubCredentials,
+  ],
+  () => handleReloadIntegrations()
+);
 </script>

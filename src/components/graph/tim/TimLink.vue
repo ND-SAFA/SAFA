@@ -40,7 +40,12 @@ const definition = computed<TimEdgeCytoElement>(() => ({
     target: sanitizeNodeId(props.sourceType),
 
     count: props.count,
-    label: props.count === 1 ? `1 Link` : `${props.count} Links`,
+    label:
+      props.count < 0
+        ? "1 Upload"
+        : props.count === 1
+        ? `1 Link`
+        : `${props.count} Links`,
     dark: darkMode.value,
     generated: props.generated,
   },

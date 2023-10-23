@@ -1,3 +1,4 @@
+import { TimJsonSchema } from "@/types";
 import { ArtifactSchema, TraceLinkSchema } from "@/types/domain";
 
 /**
@@ -46,6 +47,7 @@ export interface CreatorFilePanel {
 
   // Bulk
   bulkFiles: File[];
+  tim?: TimJsonSchema;
 }
 
 /**

@@ -16,18 +16,14 @@
       data-cy="view-tim-tree"
     >
       <tim-node
-        v-for="{ type, count } in artifacts"
-        :key="type"
-        :count="count"
-        :artifact-type="type"
+        v-for="node in projectSaveStore.graphNodes"
+        :key="node.artifactType"
+        v-bind="node"
       />
       <tim-link
-        v-for="{ name, sourceType, targetType, count, isGenerated } in traces"
-        :key="name"
-        :count="count"
-        :target-type="targetType"
-        :source-type="sourceType"
-        :generated="isGenerated"
+        v-for="edge in projectSaveStore.graphEdges"
+        :key="edge.sourceType + edge.targetType"
+        v-bind="edge"
       />
     </cytoscape>
   </div>
@@ -44,7 +40,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { appStore, layoutStore, projectSaveStore, cyStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 import { Cytoscape } from "./base";
@@ -60,28 +56,12 @@ const className = computed(() => {
   }
 });
 
-const artifacts = computed(() =>
-  projectSaveStore.artifactPanels
-    .filter(({ valid }) => valid)
-    .map(({ type, artifacts = [] }) => ({
-      type,
-      count: artifacts.length,
-    }))
-);
-
-const traces = computed(() =>
-  projectSaveStore.tracePanels
-    .filter(({ valid }) => valid)
-    .map(({ name, type, toType = "", traces = [], isGenerated }) => ({
-      name,
-      sourceType: type,
-      targetType: toType,
-      count: traces.length,
-      isGenerated,
-    }))
-);
-
 onMounted(() => {
   layoutStore.setGraphLayout("creator");
 });
+
+watch(
+  () => [projectSaveStore.graphNodes, projectSaveStore.graphEdges],
+  () => layoutStore.setGraphLayout("creator")
+);
 </script>

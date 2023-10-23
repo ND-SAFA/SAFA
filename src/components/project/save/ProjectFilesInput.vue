@@ -66,8 +66,9 @@ import IconButton from "@/components/common/button/IconButton.vue";
 
 const props = defineProps<ProjectFilesInputProps>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "update:modelValue", files: File[]): void;
+  (e: "update:tim", tim: TimJsonSchema | undefined): void;
 }>();
 
 const selectedFiles = useVModel(props, "modelValue");
@@ -151,6 +152,8 @@ function handleTimChange(): void {
       type: "application/json",
     }),
   ];
+
+  emit("update:tim", tim.value);
 }
 
 /**
@@ -198,6 +201,8 @@ watch(
           source: sourceType,
           target: targetType,
         }));
+
+      emit("update:tim", tim.value);
     });
 
     reader.readAsText(timFile);

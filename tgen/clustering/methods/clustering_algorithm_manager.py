@@ -19,16 +19,18 @@ class ClusteringAlgorithmManager:
         """
         self.method = method
 
-    def cluster(self, embedding_manager: EmbeddingsManager, reduction_factor: float, **kwargs) -> ClusterMapType:
+    def cluster(self, embedding_manager: EmbeddingsManager, reduction_factor: float, subset_ids: List[str] = None,
+                **kwargs) -> ClusterMapType:
         """
         Clusters embeddings in map and creates sets of links.
         :param embedding_manager: Proxy for managing project embeddings, including retrieving them.
         :param reduction_factor: The factor by which the embeddings are reduced into clusters
         (e.g. 0.25 => # clusters = (embeddings / 4))
         :param kwargs: Clustering method arguments.
+        :param subset_ids: Subset of artifacts to considering in clustering method.
         :return: Map of cluster ID to artifact ids in cluster.
         """
-        embedding_map = embedding_manager.get_current_embeddings()
+        embedding_map = embedding_manager.create_embedding_map(subset_ids)
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         n_clusters = round(len(embeddings) * reduction_factor)
@@ -38,6 +40,8 @@ class ClusteringAlgorithmManager:
         clustering_algo.fit(embeddings)
         embedding_labels = clustering_algo.labels_
         clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels)
+        for c in clusters.values():
+            c.calculate_stats(embedding_manager)
         return clusters
 
     def add_internal_kwargs(self, kwargs: Dict, n_clusters: int) -> None:

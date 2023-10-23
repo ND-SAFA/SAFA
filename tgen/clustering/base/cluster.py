@@ -68,6 +68,8 @@ class Cluster:
         :param embedding_manager: Contains the artifacts embeddings.
         :return: Embedding pointing at center of cluster.
         """
+        if len(cluster) == 0:
+            raise Exception("Cannot calculate center of empty cluster.")
         embeddings = [embedding_manager.get_embedding(c) for c in cluster]
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
@@ -123,6 +125,7 @@ class Cluster:
     def __hash__(self) -> List[Any]:
         """
         Makes this object hashable.
-        :return:
+        # TODO: Replace this with the hash for a set.
+        :return: The hash for each artifact id.
         """
-        return self.artifact_id_set.__hash__()
+        return hash("-".join(sorted(list(self.artifact_ids))))

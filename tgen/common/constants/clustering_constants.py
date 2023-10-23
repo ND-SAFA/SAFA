@@ -21,6 +21,7 @@ CLUSTER_METHOD_INIT_PARAMS = {
         "branching_factor": 2
     },
     SupportedClusteringMethods.OPTICS: {
+        "metric": "cosine",
         "min_samples": 2
     },
     SupportedClusteringMethods.HB_SCAN: {

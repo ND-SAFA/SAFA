@@ -6,7 +6,7 @@
           "object_type": "CLUSTERING",
           "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/clusters",
           "artifact_types": [
-            "Feature"
+            "Vue"
           ],
           "dataset_creator": {
             "object_type": "PROMPT",

@@ -7,6 +7,8 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
+from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
+from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
@@ -25,12 +27,35 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
 
         seen_artifacts = self.collect_unseen_artifacts(clusters)
         all_artifacts = set(state.embedding_manager.get_all_ids())
-        orphan_artifacts = all_artifacts.difference(seen_artifacts)
+        orphan_artifact_id_set = all_artifacts.difference(seen_artifacts)
 
-        self.place_orphans_in_homes(cluster_map, orphan_artifacts, state.embedding_manager)
-
+        self.cluster_orphans(cluster_map, orphan_artifact_id_set, state.embedding_manager, args.cluster_reduction_factor)
+        self.place_orphans_in_homes(cluster_map, orphan_artifact_id_set, state.embedding_manager)
         for c in cluster_map.values():
             c.calculate_stats(state.embedding_manager)
+
+        print("hi")
+
+    @staticmethod
+    def cluster_orphans(cluster_map: ClusterMapType, orphan_artifact_id_set: Set[str], embeddings_manager: EmbeddingsManager,
+                        reduction_factor: float):
+        """
+        Attempts to create clusters from the orphan artifacts.
+        :param cluster_map: The cluster map to add new clusters to.
+        :param orphan_artifact_id_set:Set of orphan artifact ids.
+        :param embeddings_manager: Embeddings manager containing orphan artifact embeddings.
+        :param reduction_factor: The factor by which to cluster the artifacts.
+        :return: None. Cluster map modified in place.
+        """
+        cluster_manager = ClusteringAlgorithmManager(SupportedClusteringMethods.SPECTRAL)
+        clusters = cluster_manager.cluster(embeddings_manager, .4,  # high number to try to group more orphans
+                                           subset_ids=list(orphan_artifact_id_set))
+        for c in clusters.values():
+            if c.avg_similarity >= 0.75:
+                next_cluster_index = len(cluster_map)
+                cluster_map[next_cluster_index] = c
+                for a in c:
+                    orphan_artifact_id_set.remove(a)
 
     @staticmethod
     def collect_unseen_artifacts(clusters: List[Cluster]) -> Set[str]:
@@ -46,16 +71,13 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         for artifact_id in orphan_artifacts:
             orphan_embedding = embeddings_manager.get_embedding(artifact_id)
             clusters = list(cluster_map.values())  # recalculate each time since new clusters could have been added
-            cluster_centroids = np.array([c.centroid for c in clusters])
-            try:
-                source_matrix = np.matrix([orphan_embedding])
-                target_matrix =
-                cluster_similarities = cosine_similarity([orphan_embedding], np.array(cluster_centroids))[0]
-                home_found = LinkOrphans.see_if_clusters_want_orphan(artifact_id, clusters, cluster_similarities, embeddings_manager)
-            except Exception as e:
-                home_found = False
+            source_matrix = np.matrix([orphan_embedding])
+            target_matrix = LinkOrphans.create_centroid_matrix(clusters)
+            cluster_similarities = cosine_similarity(source_matrix, target_matrix)[0]
+            home_found = LinkOrphans.see_if_clusters_want_orphan(artifact_id, clusters, cluster_similarities, embeddings_manager)
             if not home_found:
-                LinkOrphans.add_singleton_cluster(artifact_id, cluster_map)
+                cluster = LinkOrphans.add_singleton_cluster(artifact_id, cluster_map)
+                cluster.calculate_stats(embeddings_manager)
 
     @staticmethod
     def see_if_clusters_want_orphan(artifact_id: str, clusters: List[Cluster],
@@ -71,7 +93,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         wanting_clusters = []
         for cluster, similarity_to_cluster in zip(clusters, similarities_to_clusters):
             artifact_cluster_delta = (cluster.avg_similarity / 1.3) - similarity_to_cluster
-            if artifact_cluster_delta < 0:  # found a home
+            if artifact_cluster_delta < 0:
                 wanting_clusters.append(cluster)
 
         add_to_clusters = 0 < len(wanting_clusters) <= 3
@@ -79,12 +101,23 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             for c in wanting_clusters:
                 c.add_artifact(artifact_id)
                 c.calculate_stats(embedding_manager)
-            print("hi")
+            print("hi")  # TODO : Remove after done debugging
         return add_to_clusters
 
     @staticmethod
-    def add_singleton_cluster(a_id: str, cluster_map: ClusterMapType):
+    def add_singleton_cluster(a_id: str, cluster_map: ClusterMapType) -> Cluster:
         new_cluster = Cluster()
         new_cluster.add_artifact(a_id)
         next_cluster_index = len(cluster_map)
         cluster_map[next_cluster_index] = new_cluster
+        return new_cluster
+
+    @staticmethod
+    def create_centroid_matrix(clusters: List[Cluster]) -> np.matrix:
+        """
+        Creates matrix containing all cluster centroids.
+        :param clusters: The clusters whose centroids are stacked.
+        :return: Matrix of centroids.
+        """
+        centroids = [c.centroid.reshape(1, -1)[0] for c in clusters]
+        return np.matrix(centroids)

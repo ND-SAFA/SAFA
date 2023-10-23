@@ -3,20 +3,20 @@ from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
 
+from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
+    ALLOWED_ORPHANS_DEFAULT, \
+    NO_CHECK, REMOVE_ORPHANS_DEFAULT
+from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
-    ALLOWED_ORPHANS_DEFAULT, \
-    NO_CHECK, REMOVE_ORPHANS_DEFAULT
-from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -207,7 +207,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                                                                               target_id=target_artifact[ArtifactKeys.ID],
                                                                               label=0)
 
-            title = f"Generating negative links between {source_type} -> {target_type}"
+            title = f"Generating negative links between {source_type}({len(source_artifact_ids)}) -> {target_type}({len(target_artifact_ids)})"
             ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         all_links = trace_df.to_dict(orient="index")
         all_links.update(negative_links)

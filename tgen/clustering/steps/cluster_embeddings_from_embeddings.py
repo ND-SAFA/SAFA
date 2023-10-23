@@ -18,8 +18,6 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         for clustering_method in args.cluster_methods:
             cluster_manager = ClusteringAlgorithmManager(clustering_method)
             clusters = cluster_manager.cluster(state.embedding_manager, args.cluster_reduction_factor, **args.clustering_method_args)
-            for c in clusters.values():
-                c.calculate_stats(state.embedding_manager)
             clustering_method_id = cluster_manager.get_method()
             clusters = {f"{clustering_method_id}{k}": v for k, v in clusters.items()}
             global_clusters[clustering_method.name] = clusters

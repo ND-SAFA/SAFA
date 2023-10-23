@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
@@ -51,17 +50,10 @@ public class ProjectMembershipService implements IMembershipService {
         Optional<ProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        ProjectMembership membership = membershipOptional.orElseGet(() -> {
+        return membershipOptional.orElseGet(() -> {
             ProjectMembership newMembership = new ProjectMembership(project, user, role);
             return userProjectMembershipRepo.save(newMembership);
         });
-
-        notificationService.broadcastChange(
-            EntityChangeBuilder.create(project.getProjectId())
-                .withMembersUpdate(membership.getId())
-        );
-
-        return membership;
     }
 
     /**
@@ -77,14 +69,7 @@ public class ProjectMembershipService implements IMembershipService {
         Optional<ProjectMembership> membershipOptional =
                 userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        if (membershipOptional.isPresent()) {
-            userProjectMembershipRepo.delete(membershipOptional.get());
-
-            notificationService.broadcastChange(
-                EntityChangeBuilder.create(project.getProjectId())
-                    .withMembersDelete(membershipOptional.get().getId())
-            );
-        }
+        membershipOptional.ifPresent(userProjectMembershipRepo::delete);
     }
 
     /**

@@ -15,7 +15,7 @@
         label="Upload Type"
         :options="variantOptions"
         hint="Required"
-        class="full-width"
+        class="full-width q-mb-sm"
         option-to-value
         option-label="name"
         option-value="id"
@@ -46,6 +46,7 @@
           data-cy="input-target-type"
         />
       </flex-box>
+
       <text-input
         v-if="props.panel.variant === 'artifact'"
         v-model="props.panel.type"
@@ -55,30 +56,39 @@
       />
 
       <file-input
-        v-if="!isGenerated"
+        v-if="!isGenerated && hasSingleFile"
         v-model="props.panel.file"
         :multiple="false"
         data-cy="input-files-panel"
       />
+      <project-files-input
+        v-if="props.panel.variant === 'bulk'"
+        v-model="props.panel.bulkFiles"
+        hide-tooltip
+        data-cy="input-files-bulk"
+      />
 
-      <flex-box
+      <div v-if="props.panel.variant == 'github'">
+        <git-hub-project-input />
+      </div>
+
+      <div v-if="props.panel.variant == 'jira'">
+        <jira-project-input />
+      </div>
+
+      <switch-input
+        v-if="hasArtifactFile"
+        v-model="props.panel.summarize"
+        label="Generate artifact summaries"
+        data-cy="toggle-create-summarize"
+      />
+      <switch-input
         v-if="props.panel.variant === 'trace'"
-        full-width
-        justify="between"
-        align="center"
-        y="2"
-      >
-        <switch-input
-          v-model="props.panel.isGenerated"
-          label="Generate Trace Links"
-        />
-        <gen-method-input
-          v-if="isGenerated"
-          v-model="props.panel.generateMethod"
-        />
-      </flex-box>
+        v-model="props.panel.isGenerated"
+        label="Generate Trace Links"
+      />
 
-      <flex-box full-width justify="between" y="2">
+      <flex-box v-if="hasSingleFile" full-width justify="between" y="2">
         <switch-input
           v-model="props.panel.ignoreErrors"
           label="Ignore Errors"
@@ -89,7 +99,10 @@
         <typography v-if="!valid" :value="errorMessage" color="negative" />
       </flex-box>
 
-      <list v-if="props.panel.itemNames.length > 0" class="q-mb-md">
+      <list
+        v-if="hasSingleFile && props.panel.itemNames.length > 0"
+        class="q-mb-md"
+      >
         <expansion-item label="Parsed Entities">
           <div class="q-mx-md">
             <attribute-chip
@@ -103,7 +116,7 @@
         </expansion-item>
       </list>
 
-      <flex-box justify="end">
+      <flex-box justify="end" t="2">
         <text-button
           icon="delete"
           label="Delete"
@@ -137,19 +150,32 @@ import {
   FlexBox,
   Typography,
   TextInput,
-  GenMethodInput,
   Icon,
   SelectInput,
   List,
   AttributeChip,
 } from "@/components/common";
+import { ProjectFilesInput } from "@/components/project/save";
+import {
+  GitHubProjectInput,
+  JiraProjectInput,
+} from "@/components/integrations";
 
 const props = defineProps<FilePanelProps>();
 
-const variantOptions = uploadPanelOptions();
+const variantOptions = computed(() =>
+  props.index === 0 ? uploadPanelOptions() : uploadPanelOptions().slice(0, 2)
+);
 
-const label = computed(() =>
-  props.panel.variant === "artifact" ? "Artifact Type" : "Trace Matrix"
+const label = computed(
+  () =>
+    ({
+      artifact: "Artifact Type",
+      trace: "Trace Matrix",
+      bulk: "Bulk Upload",
+      github: "GitHub Import",
+      jira: "Jira Import",
+    })[props.panel.variant]
 );
 const newLabel = computed(() => `New ${label.value}`);
 
@@ -178,6 +204,16 @@ const iconId = computed(() =>
 const artifactTypes = computed(() => projectSaveStore.artifactTypes);
 
 const isGenerated = computed(() => props.panel.isGenerated);
+
+const hasSingleFile = computed(
+  () => props.panel.variant === "artifact" || props.panel.variant === "trace"
+);
+const hasArtifactFile = computed(
+  () =>
+    props.panel.variant === "artifact" ||
+    props.panel.variant === "bulk" ||
+    props.panel.variant === "github"
+);
 
 /**
  * Deletes the current file panel.

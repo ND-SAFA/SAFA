@@ -164,7 +164,7 @@ const isGenerated = computed(() => props.panel.isGenerated);
  * Deletes the current file panel.
  */
 function handleDeletePanel() {
-  projectSaveStore.removePanel(props.variant, props.index);
+  projectSaveStore.removePanel("artifact", props.index);
 }
 
 watch(

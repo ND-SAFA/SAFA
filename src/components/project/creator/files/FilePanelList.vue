@@ -1,6 +1,6 @@
 <template>
   <div>
-    <list :bordered="panels.length > 0" class="q-my-lg">
+    <list :bordered="panels.length > 0" class="q-mb-lg">
       <file-panel
         v-for="(panel, idx) in panels"
         :key="idx"
@@ -15,6 +15,7 @@
 
     <flex-box justify="center">
       <text-button
+        v-if="allowMultiple"
         text
         icon="add"
         label="New Upload"
@@ -44,13 +45,19 @@ const emit = defineEmits<{
   (e: "validate", isValid: boolean): void;
 }>();
 
-const panels = computed(() => [
-  ...projectSaveStore.artifactPanels,
-  ...projectSaveStore.tracePanels,
-]);
+const panels = computed(() => projectSaveStore.uploadPanels);
 
 const valid = computed(() =>
   panels.value.map(({ valid }) => valid).reduce((acc, cur) => acc && cur, true)
+);
+
+// Only allow multiple uploads when uploading individual files.
+const allowMultiple = computed(() =>
+  panels.value.reduce(
+    (acc, { variant }) =>
+      acc && (variant === "artifact" || variant === "trace"),
+    true
+  )
 );
 
 /**

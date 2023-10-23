@@ -14,20 +14,20 @@
           data-cy-name="input-project-name-standard"
         />
       </template>
-      <template #2>
-        <file-panel-list
-          label="Artifact Type"
-          variant="artifact"
-          @validate="handleValidateArtifacts"
-        />
-      </template>
-      <template #3>
-        <file-panel-list
-          label="Trace Matrix"
-          variant="trace"
-          @validate="handleValidateTraces"
-        />
-      </template>
+      <!--      <template #2>-->
+      <!--        <file-panel-list-->
+      <!--          label="Artifact Type"-->
+      <!--          variant="artifact"-->
+      <!--          @validate="handleValidateArtifacts"-->
+      <!--        />-->
+      <!--      </template>-->
+      <!--      <template #3>-->
+      <!--        <file-panel-list-->
+      <!--          label="Trace Matrix"-->
+      <!--          variant="trace"-->
+      <!--          @validate="handleValidateTraces"-->
+      <!--        />-->
+      <!--      </template>-->
       <template #4>
         <creator-tree :visible="currentStep === 4" />
       </template>
@@ -49,7 +49,7 @@ import { createProjectApiStore, projectSaveStore } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
 import { CreatorTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/save";
-import { FilePanelList } from "@/components/project/creator/steps";
+// import { FilePanelList } from "@/components/project/creator/steps";
 
 const currentRoute = useRoute();
 

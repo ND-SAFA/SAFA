@@ -9,6 +9,10 @@ export interface ProjectFilesInputProps {
    */
   modelValue: File[];
   /**
+   * If true, hides the file format tooltip.
+   */
+  hideTooltip?: boolean;
+  /**
    * The test selector for the input.
    */
   dataCy?: string;

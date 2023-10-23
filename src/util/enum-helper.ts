@@ -154,6 +154,9 @@ export function uploadPanelOptions(): SelectOption<UploadPanelType>[] {
   return [
     createOption("artifact", "Artifact Type"),
     createOption("trace", "Trace Matrix"),
+    createOption("bulk", "Bulk File Upload"),
+    createOption("github", "GitHub Upload"),
+    createOption("jira", "Jira Upload"),
   ];
 }
 

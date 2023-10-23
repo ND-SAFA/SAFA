@@ -1,4 +1,4 @@
-import { ArtifactSchema, ModelType, TraceLinkSchema } from "@/types/domain";
+import { ArtifactSchema, TraceLinkSchema } from "@/types/domain";
 
 /**
  * Defines a collection of parsed artifacts.
@@ -8,7 +8,7 @@ export type ArtifactMap = Record<string, ArtifactSchema>;
 /**
  * The types of create project tabs.
  */
-export type UploadPanelType = "artifact" | "trace";
+export type UploadPanelType = "artifact" | "trace" | "bulk" | "github" | "jira";
 
 /**
  * The types of create project tabs.
@@ -24,7 +24,7 @@ export type LoaderTab = "load" | "project" | "user";
  * Represents a panel for uploading files in the project creator.
  */
 export interface CreatorFilePanel {
-  variant: "artifact" | "trace";
+  variant: UploadPanelType;
   name: string;
   type: string;
   open: boolean;
@@ -37,12 +37,15 @@ export interface CreatorFilePanel {
 
   // Artifacts
   artifacts?: ArtifactSchema[];
+  summarize: boolean;
 
   // Traces
   toType?: string;
   isGenerated: boolean;
-  generateMethod?: ModelType;
   traces?: TraceLinkSchema[];
+
+  // Bulk
+  bulkFiles: File[];
 }
 
 /**

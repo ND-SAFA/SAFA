@@ -28,6 +28,7 @@
               <text-button
                 block
                 outlined
+                :disabled="continueDisabled"
                 label="Import Data"
                 color="primary"
                 class="q-mt-md"
@@ -36,15 +37,15 @@
               />
             </q-tab-panel>
             <q-tab-panel name="data">
-              <file-format-alert />
-              <file-input label="Upload files in bulk" class="q-my-md" />
               <file-panel-list />
               <text-button
+                :disabled="uploadDisabled"
                 block
                 label="Create Project"
                 color="primary"
                 class="q-mt-md"
                 icon="project-add"
+                @click="handleCreate"
               />
             </q-tab-panel>
           </q-tab-panels>
@@ -70,10 +71,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { identifierSaveStore, useScreen } from "@/hooks";
 import {
-  FileFormatAlert,
-  FileInput,
+  createProjectApiStore,
+  identifierSaveStore,
+  projectSaveStore,
+  useScreen,
+} from "@/hooks";
+import {
   FlexBox,
   FlexItem,
   PanelCard,
@@ -89,4 +93,52 @@ const { smallWindow } = useScreen();
 const tab = ref("name");
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
+
+const uploadMode = computed(() => projectSaveStore.uploadPanels[0]?.variant);
+
+const continueDisabled = computed(() => !identifier.value.name);
+
+const uploadDisabled = computed(() => {
+  if (uploadMode.value === "bulk") {
+    const files = projectSaveStore.uploadPanels[0]?.bulkFiles || [];
+
+    return (
+      continueDisabled.value ||
+      files.length === 0 ||
+      !files.find(({ name }) => name === "tim.json")
+    );
+  } else {
+    return false;
+  }
+});
+
+/**
+ * Clears all project data.
+ */
+function handleClear() {
+  identifierSaveStore.resetIdentifier();
+  projectSaveStore.resetProject();
+}
+
+/**
+ * Creates a new project.
+ */
+function handleCreate() {
+  const callbacks = { onSuccess: handleClear };
+
+  if (uploadMode.value === "bulk") {
+    createProjectApiStore.handleBulkImport(
+      identifier.value,
+      projectSaveStore.uploadPanels[0]?.bulkFiles || [],
+      projectSaveStore.uploadPanels[0]?.summarize || false,
+      callbacks
+    );
+  } else if (uploadMode.value === "artifact" || uploadMode.value === "trace") {
+    createProjectApiStore.handleImport(callbacks);
+  } else if (uploadMode.value === "github") {
+    createProjectApiStore.handleGitHubImport(callbacks);
+  } else if (uploadMode.value === "jira") {
+    createProjectApiStore.handleJiraImport(callbacks);
+  }
+}
 </script>

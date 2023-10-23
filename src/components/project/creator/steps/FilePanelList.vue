@@ -76,7 +76,7 @@ const valid = computed(() =>
  * Adds a new panel.
  */
 function handleAddPanel(): void {
-  projectSaveStore.addPanel(props.variant);
+  projectSaveStore.addPanel("artifact");
 }
 
 watch(

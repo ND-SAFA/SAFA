@@ -24,7 +24,8 @@ public enum TeamRole implements IRole {
         ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_MEMBERS, ProjectPermission.DELETE,
         TeamPermission.VIEW, TeamPermission.EDIT, TeamPermission.EDIT_MEMBERS, TeamPermission.DELETE,
         TeamPermission.VIEW_PROJECTS, TeamPermission.CREATE_PROJECTS, TeamPermission.DELETE_PROJECTS,
-        ProjectPermission.EDIT_DATA, ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS
+        ProjectPermission.EDIT_DATA, ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS,
+        ProjectPermission.GENERATE
     )),
     GENERATOR(Set.of(
         ProjectPermission.GENERATE, ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_DATA,

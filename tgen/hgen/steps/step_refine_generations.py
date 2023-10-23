@@ -29,7 +29,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state for the generator
         :return: None
         """
-        if not args.optimize_with_reruns or state.id_to_cluster_artifacts:
+        if not args.optimize_with_reruns or args.perform_clustering:
             state.all_generated_content = state.generation_predictions
             state.refined_content = state.generation_predictions
             return
@@ -48,8 +48,8 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     @staticmethod
     def perform_refinement(hgen_args: HGenArgs,
-                           new_generated_artifact_content: Dict[str, List[str]],
-                           refined_artifact_content: Dict[str, List[str]],
+                           new_generated_artifact_content: Dict[str, Set[str]],
+                           refined_artifact_content: Dict[str, Set[str]],
                            summary: Summary,
                            export_path: str) -> Dict[str, List[str]]:
         """
@@ -78,8 +78,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in new_generated_artifact_content.keys()])
             prompt_builder.add_prompt(Prompt(refined_artifacts), -1)
             artifacts, _ = HGenUtil.create_artifact_df_from_generated_artifacts(hgen_args,
-                                                                                artifact_generations=list(
-                                                                                    refined_artifact_content.keys()),
+                                                                                generation_predictions=refined_artifact_content,
                                                                                 target_layer_id=hgen_args.target_type,
                                                                                 generate_names=False)
             generated_artifacts_tag: str = questionnaire.get_response_tags_for_question(-1)
@@ -101,7 +100,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return selected_artifacts
 
     @staticmethod
-    def _get_selected_artifacts(original_artifact_content: Dict[str, List[str]],
+    def _get_selected_artifacts(original_artifact_content: Dict[str, Set[str]],
                                 selected_artifact_nums: Set[int], offset: int = 0) -> Dict[str, List[str]]:
         """
         Retrieves only the content selected in the artifact nums

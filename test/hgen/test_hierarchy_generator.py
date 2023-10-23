@@ -27,6 +27,7 @@ from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
+from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -51,29 +52,13 @@ class TestHierarchyGenerator(BaseTest):
         self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
         self.HGEN_ARGS.dataset.project_summary = TEST_PROJECT_SUMMARY
         self.HGEN_STATE.export_dir = self.HGEN_ARGS.export_dir
-        self.assert_pipeline_run()
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
         self.assert_generate_artifact_content_step()
         self.assert_refined_artifact_content_step()
+        self.assert_generate_trace_links_step()
         self.assert_create_dataset_step()
         self.assert_save_dataset_checkpoint()
-
-    @mock.patch.object(HierarchyGenerator, "run_step")
-    @mock_anthropic
-    def assert_pipeline_run(self, anthropic_ai_manager: TestAIManager, run_step_mock: MagicMock):
-        prompt: QuestionnairePrompt = SupportedPrompts.HGEN_SUMMARY_QUESTIONNAIRE.value
-        tag = prompt.get_all_response_tags()[-1]
-        responses = [create(HierarchyGenerator.HGEN_SECTION_TITLE, tag=tag)]
-        anthropic_ai_manager.mock_summarization()
-        anthropic_ai_manager.set_responses(responses)
-        gen = HierarchyGenerator(self.HGEN_ARGS)
-        gen.state.final_dataset = PromptDataset()
-        gen.run()
-        gen.state.final_dataset = None
-        self.HGEN_STATE = gen.state
-        self.assertIn(HierarchyGenerator.HGEN_SECTION_TITLE, self.HGEN_STATE.project_summary)
-        self.assertNotIn(HierarchyGenerator.HGEN_SECTION_TITLE, gen.args.dataset.project_summary)
 
     def assert_save_dataset_checkpoint(self):
         def assert_dataset(dataset: TraceDataset, orig_dataset: TraceDataset):
@@ -144,6 +129,7 @@ class TestHierarchyGenerator(BaseTest):
                                            + get_generated_artifacts_response(contents=refined_user_stories2)
                                            + refine_response2
                                            )
+        self.HGEN_ARGS.perform_clustering = False
         RefineGenerationsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         us1 = HGenTestConstants.user_stories[0]
         us2 = refined_user_stories1[1]
@@ -155,19 +141,35 @@ class TestHierarchyGenerator(BaseTest):
     @mock_anthropic
     @mock.patch.object(CreateExplanationsStep, "run")
     @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
-    def assert_create_dataset_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock, explanation_mock: MagicMock):
+    def assert_generate_trace_links_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock,
+                                         explanation_mock: MagicMock):
         names, expected_names, responses = get_name_responses(self.HGEN_STATE.generation_predictions)
         anthropic_ai_manager.set_responses(responses)
-        ranking_mock.return_value = get_predictions(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
+        anthropic_ai_manager.mock_summarization()
+        predictions = get_predictions(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
+        ranking_mock.return_value = predictions
+        step = GenerateTraceLinksStep()
+        step.run(self.HGEN_ARGS, self.HGEN_STATE)
+        for name in expected_names:
+            self.assertIn(name, list(self.HGEN_STATE.all_artifacts_dataset.artifact_df.index))
+        us2code = {us: code for us, code in zip(expected_names, HGenTestConstants.code_files)}
+        for new_pred in self.HGEN_STATE.trace_predictions:
+            parent = new_pred[TraceKeys.parent_label()]
+            child = new_pred[TraceKeys.child_label()]
+            if child in us2code[parent]:
+                self.assertGreater(new_pred[TraceKeys.SCORE], 0.8)  # these should be weighted higher than original prediction
+
+    def assert_create_dataset_step(self):
         step = CreateHGenDatasetStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         for id_, link in self.HGEN_STATE.original_dataset.trace_dataset.trace_df.itertuples():
             found_link = self.HGEN_STATE.final_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
                                                                          target_id=link[TraceKeys.TARGET])
             self.assertIsNotNone(found_link)
-        for name in expected_names:
-            self.assertIn(name, self.HGEN_STATE.final_dataset.artifact_df.index)
-            new_artifact = self.HGEN_STATE.final_dataset.artifact_df.get_artifact(artifact_id=name)
+        for content in self.HGEN_STATE.refined_content.keys():
+            name = self.HGEN_STATE.final_dataset.artifact_df.filter_by_row(lambda row:
+                                                                           row[ArtifactKeys.CONTENT.value] == content).index[0]
+            new_artifact = self.HGEN_STATE.final_dataset.artifact_df.get_artifact(name)
             self.assertEqual(new_artifact[ArtifactKeys.LAYER_ID], self.HGEN_ARGS.target_type)
             for orig_id, orig_artifact in self.HGEN_STATE.original_dataset.artifact_df.itertuples():
                 self.assertIn(orig_id, self.HGEN_STATE.final_dataset.artifact_df.index)
@@ -192,6 +194,7 @@ class TestHierarchyGenerator(BaseTest):
 
         args: HGenArgs = get_test_hgen_args()()
         args.target_type = "User Story"
+        args.generate_trace_links = False
         state = HGenState()
         state.description = HGenTestConstants.description
         state.format_of_artifacts = HGenTestConstants.format_
@@ -202,10 +205,12 @@ class TestHierarchyGenerator(BaseTest):
         artifacts = state.source_dataset.artifact_df.to_artifacts()
         state.id_to_cluster_artifacts = {i: [EnumDict(a) for a in artifacts[i * 11:i * 11 + 11]]
                                          for i in range(math.floor(len(artifacts) / 11))}
-        state.cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters={i: [a[ArtifactKeys.ID] for a in artifacts]
-                                                                                             for i, artifacts in
-                                                                                             state.id_to_cluster_artifacts.items()}) \
+        cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters={i: [a[ArtifactKeys.ID] for a in artifacts]
+                                                                                       for i, artifacts in
+                                                                                       state.id_to_cluster_artifacts.items()}) \
             .create()
+        state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
+        state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
 
         GenerateArtifactContentStep().run(args, state)
         self.assertEqual(len(state.generation_predictions), len(HGenTestConstants.user_stories))
@@ -215,6 +220,7 @@ class TestHierarchyGenerator(BaseTest):
                                 set([a[ArtifactKeys.ID.value] for a in artifacts[i * 11:i * 11 + 11]]))
 
         RefineGenerationsStep().run(args, state)
+        GenerateTraceLinksStep().run(args, state)
         CreateHGenDatasetStep().run(args, state)
         for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
             linked_artifact_ids = {art[ArtifactKeys.ID] for art in cluster_artifacts}
@@ -225,6 +231,4 @@ class TestHierarchyGenerator(BaseTest):
                 link = state.final_dataset.trace_dataset.trace_df.get_link(source_id=art[ArtifactKeys.ID.value], target_id=new_name)
                 self.assertIsNotNone(link)
                 if art[ArtifactKeys.ID.value] in linked_artifact_ids:
-                    self.assertEqual(link[TraceKeys.LABEL], 1)
-                else:
-                    self.assertEqual(link[TraceKeys.LABEL], 0)
+                    self.assertEqual(link[TraceKeys.SCORE], 0.99)

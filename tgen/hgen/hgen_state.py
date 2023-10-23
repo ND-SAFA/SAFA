@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Set
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -24,26 +24,30 @@ class HGenState(State):
     questions: List[str] = None  # The questions to use to probe the model for a good summary
 
     """
-    Optional Step - Break project into parts and generate for each part
+    Optional Step 3 - Break project into parts and generate for each part
     """
     id_to_cluster_artifacts: Dict[Any, List[EnumDict]] = None  # maps cluster id to the list of artifacts in that cluster
-    cluster_artifact_dataset: Optional[PromptDataset] = None  # contains prompt dataset with just the artifact df of the clusters.
-    cluster_dataset: Optional[PromptDataset] = None  # contains all the clusters and their links to the artifacts
+    cluster_dataset: Optional[PromptDataset] = None  # contains prompt dataset with just the artifact df of the clusters.
 
     """
-    Step 3 - Artifact generation
+    Step 4 - Artifact generation
     """
-    generation_predictions: Dict[str, List[str]] = None  # dictionary mapping generated content to a list of related source ids
+    generation_predictions: Dict[str, Set[str]] = None  # dictionary mapping generated content to a list of related source ids
     n_generations: int = 0  # number of runs of artifact generation
 
     """
-    Optional Step - Refine content on rerun of hgen
+    Optional Step 5 - Refine content on rerun of hgen
     """
-    all_generated_content: Dict[str, List[str]] = None  # All generated content across all runs
-    refined_content: Dict[str, List[str]] = None  # The final selected artifact content
+    all_generated_content: Dict[str, Set[str]] = None  # All generated content across all runs
+    refined_content: Dict[str, Set[str]] = None  # The final selected artifact content
 
     """
-    Step 4 - Dataset Construction
+    Optional Step 5 - generate trace links between source and target artifacts
     """
-    new_artifact_df: ArtifactDataFrame = None  # Contains the new generated artifacts
+    trace_predictions: List[EnumDict] = None  # list of traces between source and target artifacts
+    all_artifacts_dataset: PromptDataset = None  # contains only the new generated artifacts
+
+    """
+    Step 6 - Dataset Construction
+    """
     final_dataset: PromptDataset = None  # The final dataset with generated artifacts.

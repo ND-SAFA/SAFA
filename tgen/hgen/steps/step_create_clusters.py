@@ -10,6 +10,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
+
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates clusters from source artifacts to generate new artifacts for each clusters.
@@ -17,6 +18,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: Current state of the hgen pipeline.
         :return: None
         """
+        if not args.perform_clustering:
+            return
         clustering_export_path = os.path.join(args.export_dir, "clustering")
         args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path)
         clustering_pipeline = ClusteringPipeline(args)
@@ -24,8 +27,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         cluster_map = clustering_pipeline.state.final_cluster_map
 
-        state.cluster_artifact_dataset = clustering_pipeline.state.cluster_artifact_dataset
-        state.cluster_dataset = clustering_pipeline.state.cluster_dataset
+        state.cluster_dataset = clustering_pipeline.state.cluster_artifact_dataset
         
         source_artifact_df = state.source_dataset.artifact_df
         state.id_to_cluster_artifacts = self._replace_ids_with_artifacts(cluster_map, source_artifact_df)

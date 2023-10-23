@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Set
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS
@@ -46,7 +46,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                f"{NEW_LINE}{state.project_summary.to_string()}", allow_formatting=False)
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
 
-        dataset = state.cluster_artifact_dataset if state.cluster_artifact_dataset is not None else state.source_dataset
+        dataset = state.cluster_dataset if state.cluster_dataset is not None else state.source_dataset
         generation_predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
                                                           dataset=dataset, response_prompt_ids={task_prompt.id},
                                                           tags_for_response={generated_artifacts_tag}, return_first=False,
@@ -57,7 +57,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     @staticmethod
     def _map_generations_to_predicted_sources(generation_predictions: List, source_tag_id: str, target_tag_id: str,
-                                              state: HGenState) -> Dict[str, List[str]]:
+                                              state: HGenState) -> Dict[str, Set[str]]:
         """
         Creates a mapping of the generated artifact to a list of the predicted links to it and the source artifacts
         :param generation_predictions: The predictions from the LLM
@@ -67,7 +67,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
         """
         generated_artifact_to_predicted_sources = {}
-        cluster_ids = list(state.cluster_artifact_dataset.artifact_df.index) if state.cluster_artifact_dataset is not None else []
+        cluster_ids = list(state.cluster_dataset.artifact_df.index) if state.cluster_dataset is not None else []
         for i, pred in enumerate(generation_predictions):
             for p in pred:
                 generation = p[target_tag_id][0]
@@ -75,8 +75,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 if cluster_ids:
                     cluster_id = cluster_ids[i]
                     sources.update({a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]})
-                generated_artifact_to_predicted_sources[generation] = list(sources)
-                break  # TODO remove this when trying to use multiple generations
+                generated_artifact_to_predicted_sources[generation] = sources
         return generated_artifact_to_predicted_sources
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:

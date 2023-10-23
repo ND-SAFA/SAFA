@@ -12,6 +12,7 @@ from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
+from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -25,12 +26,13 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     Responsible for generating higher-level artifacts from low-level artifacts
     """
     HGEN_SECTION_TITLE = "Hgen"
-    PROJECT_SUMMARY_SECTIONS = [PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE, PS_OVERVIEW_TITLE]  # TODO : , HGEN_SECTION_TITLE]
+    PROJECT_SUMMARY_SECTIONS = [PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE, PS_OVERVIEW_TITLE]
     steps = [InitializeDatasetStep,
              GenerateInputsStep,
              CreateClustersStep,
              GenerateArtifactContentStep,
              RefineGenerationsStep,
+             GenerateTraceLinksStep,
              CreateHGenDatasetStep]
 
     def __init__(self, args: HGenArgs):
@@ -42,7 +44,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
                                          summarize_code_only=True,
                                          do_resummarize_artifacts=False,
                                          project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
-                                         new_sections={}  # TODO: self._get_new_project_summary_sections(args.target_type)
                                          )
         super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args

@@ -38,3 +38,12 @@ class iDataset(BaseObject):
         :return: The dataset as a creator
         """
         return self.as_creator(export_path)
+
+    @classmethod
+    def from_yaml(cls, val: Any) -> "iDataset":
+        """
+        Creates a dataset from the yaml representation (dataset creator)
+        :param val: The yaml representation (dataset creator)
+        :return: The dataset created
+        """
+        return val.create()

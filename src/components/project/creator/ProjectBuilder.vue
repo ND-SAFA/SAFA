@@ -1,11 +1,7 @@
 <template>
   <flex-box :column="smallWindow">
     <flex-item :parts="smallWindow ? '12' : '6'">
-      <panel-card
-        class="q-ma-sm"
-        title="Create Project"
-        subtitle="Create a new project by uploading files or configuring integrations."
-      >
+      <panel-card class="q-ma-sm" title="Project Configuration">
         <flex-box :column="smallWindow" full-width>
           <q-tabs v-model="tab" :vertical="!smallWindow" no-caps>
             <q-tab name="name" label="Project Details" />
@@ -53,7 +49,7 @@
       </panel-card>
     </flex-item>
     <flex-item :parts="smallWindow ? '12' : '6'">
-      <panel-card class="q-ma-sm">
+      <panel-card class="q-ma-sm" :style="graphStyle">
         <creator-tree />
       </panel-card>
     </flex-item>
@@ -106,6 +102,10 @@ const uploadDisabled = computed(
     !projectSaveStore.uploadPanels
       .map(({ valid }) => valid)
       .reduce((acc, cur) => acc && cur, true)
+);
+
+const graphStyle = computed(() =>
+  projectSaveStore.graphNodes.length === 0 ? "opacity: 0.5" : ""
 );
 
 /**

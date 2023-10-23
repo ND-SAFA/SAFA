@@ -1,6 +1,7 @@
 <template>
   <div>
-    <flex-box justify="end">
+    <flex-box justify="between" align="center">
+      <typography variant="subtitle" value="Artifact Type Tree" />
       <text-button
         text
         label="Center Graph"
@@ -43,6 +44,7 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { appStore, layoutStore, projectSaveStore, cyStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
+import Typography from "@/components/common/display/content/Typography.vue";
 import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 

@@ -65,12 +65,11 @@
         v-if="props.panel.variant === 'bulk'"
         v-model="props.panel.bulkFiles"
         v-model:tim="props.panel.tim"
-        hide-tooltip
         data-cy="input-files-bulk"
       />
 
-      <git-hub-project-input v-if="props.panel.variant == 'github'" />
-      <jira-project-input v-if="props.panel.variant == 'jira'" />
+      <git-hub-project-input v-if="props.panel.variant === 'github'" />
+      <jira-project-input v-if="props.panel.variant === 'jira'" />
 
       <switch-input
         v-if="hasArtifactFile"

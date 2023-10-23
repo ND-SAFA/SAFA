@@ -139,7 +139,7 @@ function handleCreate() {
 }
 
 /**
- * Clears all project data.
+ * Reloads integrations data.
  */
 function handleReloadIntegrations() {
   if (integrationsStore.validJiraCredentials) {

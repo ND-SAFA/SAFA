@@ -1,21 +1,12 @@
 <template>
   <div>
-    <file-format-alert v-if="!props.hideTooltip" class="q-my-md" />
     <file-input
       v-model="selectedFiles"
       multiple
       :data-cy="props.dataCy"
       :error-message="errorMessage"
       @clear="handleClear"
-    >
-      <template #append>
-        <icon-button
-          tooltip="Read about the format of files"
-          icon="info"
-          @click="handleOpenWiki"
-        />
-      </template>
-    </file-input>
+    />
     <expansion-item
       v-if="selectedFiles.length > 0"
       class="q-mb-md"
@@ -58,11 +49,9 @@ import { MatrixSchema, ProjectFilesInputProps, TimJsonSchema } from "@/types";
 import { useVModel } from "@/hooks";
 import {
   FileInput,
-  FileFormatAlert,
   MultiselectInput,
   ExpansionItem,
 } from "@/components/common";
-import IconButton from "@/components/common/button/IconButton.vue";
 
 const props = defineProps<ProjectFilesInputProps>();
 
@@ -166,15 +155,6 @@ function handleTypesChange(): void {
   );
 
   handleTimChange();
-}
-
-/**
- * Opens the SAFA WIKI docs.
- */
-function handleOpenWiki() {
-  window.open(
-    "https://www.notion.so/nd-safa/Project-Creation-5ececa9fd233437ebb37ddf893d394df#6532e1d3f983453898a8bf6ffda007f4"
-  );
 }
 
 /**

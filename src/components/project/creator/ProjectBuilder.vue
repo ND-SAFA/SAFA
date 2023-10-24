@@ -1,5 +1,5 @@
 <template>
-  <flex-box :column="smallWindow">
+  <flex-box :column="smallWindow" justify="center">
     <flex-item :parts="smallWindow ? '12' : '6'">
       <panel-card class="q-ma-sm" title="Project Configuration">
         <flex-box :column="smallWindow" full-width>
@@ -48,8 +48,8 @@
         </flex-box>
       </panel-card>
     </flex-item>
-    <flex-item :parts="smallWindow ? '12' : '6'">
-      <panel-card class="q-ma-sm" :style="graphStyle">
+    <flex-item :parts="smallWindow ? '12' : '6'" :class="graphClassName">
+      <panel-card>
         <creator-tree />
       </panel-card>
     </flex-item>
@@ -104,8 +104,12 @@ const uploadDisabled = computed(
       .reduce((acc, cur) => acc && cur, true)
 );
 
-const graphStyle = computed(() =>
-  projectSaveStore.graphNodes.length === 0 ? "opacity: 0.5" : ""
+const displayGraph = computed(() => projectSaveStore.graphNodes.length > 0);
+
+const graphClassName = computed(() =>
+  displayGraph.value
+    ? "artifact-view visible q-ma-sm"
+    : "artifact-view collapsed q-ma-sm"
 );
 
 /**

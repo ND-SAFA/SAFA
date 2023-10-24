@@ -36,7 +36,7 @@
           class="full-width"
           data-cy="input-source-type"
         />
-        <icon class="q-mx-md" variant="trace" size="md" />
+        <icon class="q-mx-sm" variant="trace" size="sm" />
         <select-input
           v-model="props.panel.toType"
           label="Target Type"

@@ -49,10 +49,11 @@ import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 
 const graph = ref(cyStore.buildCreatorGraph());
+const loading = ref(false);
 
 const className = computed(() => {
-  if (!appStore.isLoading) {
-    return "artifact-view visible elevation-3";
+  if (!appStore.isLoading && !loading.value) {
+    return "artifact-view visible";
   } else {
     return "artifact-view";
   }
@@ -64,6 +65,14 @@ onMounted(() => {
 
 watch(
   () => [projectSaveStore.graphNodes, projectSaveStore.graphEdges],
-  () => layoutStore.setGraphLayout("creator")
+  () => {
+    loading.value = true;
+
+    // Wait for 0.1s width animation before resetting the layout.
+    setTimeout(() => {
+      layoutStore.setGraphLayout("creator");
+      loading.value = false;
+    }, 100);
+  }
 );
 </script>

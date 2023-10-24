@@ -41,7 +41,7 @@
       <jira-project-input v-if="props.panel.variant === 'jira'" />
 
       <switch-input
-        v-if="hasArtifactFile"
+        v-if="props.panel.variant === 'bulk'"
         v-model="props.panel.summarize"
         label="Generate artifact summaries"
         data-cy="toggle-create-summarize"

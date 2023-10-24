@@ -24,7 +24,7 @@ class ClusteringArgs(PipelineArgs):
     """
     cluster_methods: List[SupportedClusteringMethods] = field(default_factory=lambda: DEFAULT_CLUSTERING_METHODS)
     clustering_method_args: Dict = field(default_factory=dict)
-    embedding_model: str = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else DEFAULT_EMBEDDING_MODEL
+    embedding_model: str = None
     artifact_types: List[str] = None
     cluster_intersection_threshold: float = DEFAULT_CLUSTER_SIMILARITY_THRESHOLD  # 80% or more of intersection equals same cluster
     cluster_reduction_factor: float = DEFAULT_REDUCTION_FACTOR
@@ -38,6 +38,8 @@ class ClusteringArgs(PipelineArgs):
         :return: None
         """
         super().__post_init__()
+        if self.embedding_model is None:
+            self.embedding_model = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else DEFAULT_EMBEDDING_MODEL
         if self.artifact_types is None:
             self.artifact_types = self.dataset.artifact_df.get_artifact_types()
 

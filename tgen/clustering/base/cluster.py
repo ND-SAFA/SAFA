@@ -1,10 +1,10 @@
 from typing import Any, Iterable, List
 
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 
+from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
-from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
 class Cluster:
@@ -12,59 +12,17 @@ class Cluster:
     Manages a cluster in a dataset.
     """
 
-    def __init__(self):
+    def __init__(self, embeddings_manager: EmbeddingsManager):
         """
-        Constructs empty cluster.
+        Constructs empty cluster referencing embeddings in manager.
+        :param embeddings_manager: The container for all embeddings relating to cluster.
         """
+        self.embeddings_manager = embeddings_manager
         self.artifact_ids = []
         self.artifact_id_set = set()
         self.votes = 1
         self.avg_similarity = None
         self.centroid = None
-
-    def add_vote(self) -> None:
-        """
-        Adds vote to cluster.
-        :return: None
-        """
-        self.votes += 1
-
-    def add_artifacts(self, artifact_ids: List[str]) -> None:
-        for artifact_id in artifact_ids:
-            self.add_artifact(artifact_id)
-
-    def add_artifact(self, artifact_id: str) -> None:
-        """
-        Adds an artifact to the cluster.
-        :param artifact_id: ID of artifact to add to cluster.
-        :return: None
-        """
-        if artifact_id not in self.artifact_id_set:
-            self.artifact_id_set.add(artifact_id)
-            self.artifact_ids.append(artifact_id)
-
-    def calculate_stats(self, embedding_manager: EmbeddingsManager) -> None:
-        """
-        Calculates all statistics for the cluster.
-        :param embedding_manager: Manager containing embeddings for artifacts in cluster.
-        :return: None, stats are set in place
-        """
-        self.centroid = self.calculate_centroid(self.artifact_ids, embedding_manager)
-        self.avg_similarity = self.calculate_average_similarity(self.artifact_ids, self.centroid, embedding_manager)
-
-    @staticmethod
-    def calculate_centroid(cluster: List[str], embedding_manager: EmbeddingsManager):
-        """
-        Calculates the embedding pointing at the center of the cluster.
-        :param cluster: The artifacts whose embeddings are used to calculate the centroid.
-        :param embedding_manager: Contains the artifacts embeddings.
-        :return: Embedding pointing at center of cluster.
-        """
-        if len(cluster) == 0:
-            raise Exception("Cannot calculate center of empty cluster.")
-        embeddings = [embedding_manager.get_embedding(a_id) for a_id in cluster]
-        centroid = np.sum(embeddings, axis=0) / len(cluster)
-        return centroid
 
     @staticmethod
     def get_cluster_id(method: SupportedClusteringMethod, index: int):
@@ -77,33 +35,77 @@ class Cluster:
         return f"{method.name}{index}"
 
     @staticmethod
-    def calculate_average_similarity(cluster: List[str], centroid: EmbeddingType, embedding_manager: EmbeddingsManager):
+    def from_artifacts(artifact_ids: List[str], embeddings_manager: EmbeddingsManager) -> "Cluster":
         """
-        Calculates the average similarity to the cluster centroid for all points in the cluster.
-        :param cluster: The cluster containing the artifact ids.
-        :param centroid: The embedding at the center of the cluster.
-        :param embedding_manager: The manager able to retrieve embeddings for artifact ids.
-        :return: Score representing the average similarity score to the cluster centroid.
+        Creates cluster containing given artifact ids.
+        :param artifact_ids: The artifacts to include in the cluster.
+        :param embeddings_manager: The embeddings manager used to update the stats of the cluster.
+        :return: The cluster.
         """
-        embeddings = [embedding_manager.get_embedding(a_id) for a_id in cluster]
-        similarities = cosine_similarity([centroid], embeddings)[0]
-        avg_similarity = sum(similarities) / len(similarities)
-        return avg_similarity
+        cluster = Cluster(embeddings_manager)
+        cluster.add_artifacts(artifact_ids)
+        return cluster
+
+    def add_vote(self) -> None:
+        """
+        Adds vote to cluster.
+        :return: None. Modified in place.
+        """
+        self.votes += 1
+
+    def add_artifacts(self, artifact_ids: List[str]) -> None:
+        """
+        Adds multiple artifacts to cluster and updates its stats.
+        :param artifact_ids: The artifact ids to add to the cluster.
+        :return: None.
+        """
+        for artifact_id in artifact_ids:
+            self._add_artifact(artifact_id)
+        self.__update_stats()
+
+    def add_artifact(self, artifact_id: str) -> None:
+        """
+        Adds an artifact to the cluster.
+        :param artifact_id: ID of artifact to add to cluster.
+        :return: None
+        """
+        self._add_artifact(artifact_id)
+        self.__update_stats()
 
     def similarity_to(self, cluster: "Cluster") -> float:
         """
-        Calculates the distance between the centroids of this cluster to that given.
+        Calculates the cosine similarity between the centroid of this cluster to the cluster given.
         :param cluster: The cluster to calculate the distance to.
-        :return: The distance as a similarity score.
+        :return: The similarity to the other cluster.
         """
-        return cosine_similarity([self.centroid], [cluster.centroid])[0][0]
+        return EmbeddingUtil.calculate_similarities([self.centroid], [cluster.centroid])[0][0]
 
-    def id(self) -> str:
+    def _add_artifact(self, artifact_id: str) -> None:
         """
-        :return: Returns ID for cluster representing artifact ids.
+        Adds an artifact to the cluster.
+        :param artifact_id: ID of artifact to add to cluster.
+        :return: None
         """
-        score = "" if self.avg_similarity is None else f"({round(self.avg_similarity, 2)})"
-        return f"{self.artifact_ids.__str__()}{score}"
+        if artifact_id not in self.artifact_id_set:
+            self.artifact_id_set.add(artifact_id)
+            self.artifact_ids.append(artifact_id)
+
+    def __update_stats(self) -> None:
+        """
+        Calculates all statistics for the cluster.
+        :return: None, stats are set in place
+        """
+        self.centroid = self.embeddings_manager.calculate_centroid(self.artifact_ids)
+        self.avg_similarity = self.__calculate_average_similarity()
+
+    def __calculate_average_similarity(self) -> float:
+        """
+        Calculates the average similarity from the artifacts to the centroid.
+        :return: Average similarity to centroid.
+        """
+        artifact_embeddings = [self.embeddings_manager.get_embedding(a_id) for a_id in self.artifact_ids]
+        similarities = EmbeddingUtil.calculate_similarities([self.centroid], artifact_embeddings)[0]
+        return np.sum(similarities) / len(similarities)
 
     def __len__(self) -> int:
         """
@@ -130,13 +132,15 @@ class Cluster:
         """
         :return: Returns string version of the artifacts.
         """
-        return self.id()
+        return self.__repr__()
 
     def __repr__(self) -> str:
         """
         :return: Cluster is represented by the list of artifact ids it contains.
         """
-        return self.id()
+        score = "" if self.avg_similarity is None else f"({round(self.avg_similarity, 2)})"
+        cluster_repr = f"{self.artifact_ids.__str__()}{score}"
+        return cluster_repr
 
     def __eq__(self, other: Any) -> bool:
         """

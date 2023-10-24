@@ -148,12 +148,6 @@ const isGenerated = computed(() => props.panel.isGenerated);
 const hasSingleFile = computed(
   () => props.panel.variant === "artifact" || props.panel.variant === "trace"
 );
-const hasArtifactFile = computed(
-  () =>
-    props.panel.variant === "artifact" ||
-    props.panel.variant === "bulk" ||
-    props.panel.variant === "github"
-);
 
 /**
  * Deletes the current file panel.

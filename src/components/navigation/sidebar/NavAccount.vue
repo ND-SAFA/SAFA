@@ -43,7 +43,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { NavOption } from "@/types";
 import { FEEDBACK_LINK } from "@/util";
-import { sessionStore } from "@/hooks";
+import { orgStore, sessionStore } from "@/hooks";
 import { Routes } from "@/router";
 import { ListItem } from "@/components/common";
 import SavingIcon from "./SavingIcon.vue";
@@ -55,6 +55,7 @@ const options = computed<NavOption[]>(() => [
   {
     label: "My Organization",
     icon: "organization",
+    subtitle: orgStore.org.name,
     path: Routes.ORG,
     color: Routes.ORG === currentRoute.path ? "primary" : "text",
   },

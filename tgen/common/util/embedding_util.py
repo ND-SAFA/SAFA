@@ -27,7 +27,7 @@ class EmbeddingUtil:
         :param target_embeddings: Columns of similarity matrix.
         :return: Similarity matrix.
         """
-        source_matrix = np.matrix(source_embeddings)
-        target_matrix = np.matrix(target_embeddings)
+        source_matrix = np.asarray(source_embeddings)
+        target_matrix = np.asarray(target_embeddings)
         cluster_similarities = cosine_similarity(source_matrix, target_matrix)
         return cluster_similarities

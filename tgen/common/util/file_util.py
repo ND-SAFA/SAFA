@@ -149,9 +149,7 @@ class FileUtil:
         :param use_abs_paths: If True, returns the absolute path
         :return: Same type as value, but with its content processed.
         """
-        return FileUtil.perform_function_on_paths(paths,
-                                                  lambda p: cls.perform_replacements(p, use_abs_paths, replacements=replacements),
-                                                  replacements=replacements)
+        return cls.collapse_paths(paths, replacements=replacements)
 
     @classmethod
     def collapse_paths(cls, paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
@@ -162,10 +160,11 @@ class FileUtil:
         :return: Same type as value, but with its content processed.
         """
 
-        def process(p: str):
+        def process(p: str, **kwargs):
             """
             Makes replacements on path.
             :param p: The path to make replacements on.
+            :param kwargs: Ignored.
             :return: Processed path.
             """
             use_abs_path = os.path.isabs(p)

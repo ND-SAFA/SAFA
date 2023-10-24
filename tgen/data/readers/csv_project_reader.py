@@ -80,7 +80,6 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
             StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
             StructuredKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
         })])
-        trace_df = None
         return artifact_df, trace_df, layer_mapping_df
 
     def get_project_name(self) -> str:

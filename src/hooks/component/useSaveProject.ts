@@ -185,7 +185,7 @@ export const useSaveProject = defineStore("saveProject", {
     resetProject(): void {
       this.name = "";
       this.description = "";
-      this.uploadPanels = [];
+      this.uploadPanels = [createEmptyPanel()];
       this.artifactMap = {};
     },
     /**

@@ -135,4 +135,8 @@ export interface TabListProps {
    * The tabs to display.
    */
   tabs: SelectOption[];
+  /**
+   * Whether to display tab options to the left side, instead of the top.
+   */
+  vertical?: boolean;
 }

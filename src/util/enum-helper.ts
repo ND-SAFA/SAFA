@@ -2,7 +2,7 @@ import {
   ApprovalType,
   ArtifactDeltaState,
   AttributeType,
-  CreatorTab,
+  CreatorSectionTab,
   LoaderTab,
   MemberRole,
   MembershipType,
@@ -163,11 +163,10 @@ export function uploadPanelOptions(): SelectOption<UploadPanelType>[] {
 /**
  * @return display names for project creator tabs.
  */
-export function creatorTabOptions(): SelectOption<CreatorTab>[] {
+export function creatorTabOptions(): SelectOption<CreatorSectionTab>[] {
   return [
-    createOption("standard", "Standard Upload"),
-    createOption("bulk", "Bulk Upload"),
-    createOption("import", "Integrations Import"),
+    createOption("name", "Project Details"),
+    createOption("data", "Import Data"),
   ];
 }
 

@@ -1,22 +1,13 @@
 <template>
   <flex-box :column="smallWindow" justify="center">
-    <flex-item :parts="smallWindow ? '12' : '6'">
+    <flex-item
+      :parts="smallWindow ? '12' : '6'"
+      :class="smallWindow ? 'full-width' : ''"
+    >
       <panel-card class="q-ma-sm" title="Project Configuration">
         <flex-box :column="smallWindow" full-width>
-          <q-tabs v-model="tab" :vertical="!smallWindow" no-caps>
-            <q-tab name="name" label="Project Details" />
-            <q-tab name="data" label="Import Data" />
-          </q-tabs>
-          <separator vertical />
-          <q-tab-panels
-            v-model="tab"
-            animated
-            :vertical="!smallWindow"
-            transition-prev="jump-up"
-            transition-next="jump-up"
-            class="full-width"
-          >
-            <q-tab-panel name="name">
+          <tab-list v-model="tab" :tabs="tabs" :vertical="!smallWindow">
+            <template #name>
               <project-identifier-input
                 v-model:name="identifier.name"
                 v-model:description="identifier.description"
@@ -31,8 +22,8 @@
                 icon="upload"
                 @click="tab = 'data'"
               />
-            </q-tab-panel>
-            <q-tab-panel name="data">
+            </template>
+            <template #data>
               <file-panel-list />
               <text-button
                 :disabled="uploadDisabled"
@@ -43,8 +34,8 @@
                 icon="project-add"
                 @click="handleCreate"
               />
-            </q-tab-panel>
-          </q-tab-panels>
+            </template>
+          </tab-list>
         </flex-box>
       </panel-card>
     </flex-item>
@@ -69,6 +60,7 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { CreatorSectionTab, CreatorTab, UploadPanelType } from "@/types";
+import { creatorTabOptions } from "@/util";
 import {
   createProjectApiStore,
   gitHubApiStore,
@@ -83,8 +75,8 @@ import {
   FlexBox,
   FlexItem,
   PanelCard,
-  Separator,
   TextButton,
+  TabList,
 } from "@/components/common";
 import { CreatorTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/save";
@@ -93,6 +85,7 @@ import { FilePanelList } from "@/components/project/creator/files";
 const { smallWindow } = useScreen();
 const currentRoute = useRoute();
 
+const tabs = creatorTabOptions();
 const tab = ref<CreatorSectionTab>("name");
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
@@ -110,11 +103,14 @@ const uploadDisabled = computed(
 
 const displayGraph = computed(() => projectSaveStore.graphNodes.length > 0);
 
-const graphClassName = computed(() =>
-  displayGraph.value
-    ? "artifact-view visible q-ma-sm"
-    : "artifact-view collapsed q-ma-sm"
-);
+const graphClassName = computed(() => {
+  const graphClass = displayGraph.value
+    ? "artifact-view visible q-ma-sm "
+    : "artifact-view collapsed q-ma-sm ";
+  const screenClass = smallWindow.value ? "full-width" : "";
+
+  return graphClass + screenClass;
+});
 
 /**
  * Clears all project data.
@@ -195,6 +191,7 @@ watch(
   (path) => {
     if (path !== Routes.PROJECT_CREATOR) return;
 
+    handleClear();
     handleLoadTab();
   }
 );

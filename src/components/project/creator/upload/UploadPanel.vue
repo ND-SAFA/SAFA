@@ -22,7 +22,7 @@
         data-cy="input-upload-type"
       />
 
-      <file-panel-name v-bind="props" />
+      <upload-panel-name v-bind="props" />
 
       <file-input
         v-if="!isGenerated && hasSingleFile"
@@ -52,7 +52,7 @@
         label="Generate Trace Links"
       />
 
-      <file-panel-errors v-bind="props" />
+      <upload-panel-errors v-bind="props" />
 
       <list
         v-if="hasSingleFile && props.panel.itemNames.length > 0"
@@ -88,7 +88,7 @@
  * Provides inputs for uploading a file.
  */
 export default {
-  name: "FilePanel",
+  name: "UploadPanel",
 };
 </script>
 
@@ -112,8 +112,8 @@ import {
   GitHubProjectInput,
   JiraProjectInput,
 } from "@/components/integrations";
-import FilePanelErrors from "./FilePanelErrors.vue";
-import FilePanelName from "./FilePanelName.vue";
+import UploadPanelErrors from "./UploadPanelErrors.vue";
+import UploadPanelName from "./UploadPanelName.vue";
 
 const props = defineProps<FilePanelProps>();
 

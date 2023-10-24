@@ -24,7 +24,7 @@
               />
             </template>
             <template #data>
-              <file-panel-list />
+              <upload-panel-list />
               <text-button
                 :disabled="uploadDisabled"
                 block
@@ -80,7 +80,7 @@ import {
 } from "@/components/common";
 import { CreatorTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/save";
-import { FilePanelList } from "@/components/project/creator/files";
+import { UploadPanelList } from "@/components/project/creator/upload";
 
 const { smallWindow } = useScreen();
 const currentRoute = useRoute();

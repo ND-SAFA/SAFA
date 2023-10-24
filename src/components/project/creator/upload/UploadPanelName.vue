@@ -37,12 +37,12 @@
  * Provides inputs for the file panel name.
  */
 export default {
-  name: "FilePanelName",
+  name: "UploadPanelName",
 };
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue/dist/vue";
+import { computed } from "vue";
 import { FilePanelProps } from "@/types";
 import { projectSaveStore } from "@/hooks";
 import { FlexBox, TextInput, Icon, SelectInput } from "@/components/common";

@@ -1,7 +1,7 @@
 <template>
   <div>
     <list :bordered="panels.length > 0" class="q-mb-lg">
-      <file-panel
+      <upload-panel
         v-for="(panel, idx) in panels"
         :key="idx"
         :panel="panel"
@@ -10,7 +10,7 @@
         <template #panel>
           <slot name="panel" :panel="panel" />
         </template>
-      </file-panel>
+      </upload-panel>
     </list>
 
     <flex-box justify="center">
@@ -31,7 +31,7 @@
  * Provides inputs for uploading files.
  */
 export default {
-  name: "FilePanelList",
+  name: "UploadPanelList",
 };
 </script>
 
@@ -39,7 +39,7 @@ export default {
 import { computed } from "vue";
 import { projectSaveStore } from "@/hooks";
 import { TextButton, FlexBox, List } from "@/components/common";
-import FilePanel from "./FilePanel.vue";
+import UploadPanel from "./UploadPanel.vue";
 
 const panels = computed(() => projectSaveStore.uploadPanels);
 

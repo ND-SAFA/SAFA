@@ -16,7 +16,7 @@
  * Displays any errors for this panel.
  */
 export default {
-  name: "FilePanelErrors",
+  name: "UploadPanelErrors",
 };
 </script>
 

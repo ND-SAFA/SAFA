@@ -20,6 +20,7 @@
                 color="primary"
                 class="q-mt-md"
                 icon="upload"
+                data-cy="button-continue-project"
                 @click="tab = 'data'"
               />
             </template>
@@ -32,6 +33,7 @@
                 color="primary"
                 class="q-mt-md"
                 icon="project-add"
+                data-cy="button-create-project"
                 @click="handleCreate"
               />
             </template>

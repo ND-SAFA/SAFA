@@ -80,16 +80,16 @@ export enum DataCy {
 
   // Project Creation
 
-  creationBulkNameInput = "input-project-name-bulk",
-  creationBulkDescriptionInput = "input-project-description-bulk",
+  creationBulkNameInput = "input-project-name",
+  creationBulkDescriptionInput = "input-project-description",
   creationBulkFilesInput = "input-files-bulk",
   creationEmptyToggle = "toggle-create-empty-project",
   creationTimToggle = "toggle-tim-manage",
   creationTimArtifactsInput = "input-tim-artifacts",
   creationTimTracesInput = "input-tim-traces",
 
-  creationStandardNameInput = "input-project-name-standard",
-  creationStandardDescriptionInput = "input-project-description-standard",
+  creationStandardNameInput = "input-project-name",
+  creationStandardDescriptionInput = "input-project-description",
   creationStandardFilesInput = "input-files-panel",
   creationCreatePanelButton = "button-create-panel",
   creationTypeInput = "input-artifact-type",
@@ -99,6 +99,7 @@ export enum DataCy {
   creationIgnoreErrorsButton = "button-ignore-errors",
   creationDeletePanel = "button-delete-panel",
   creationFilePanel = "panel-files",
+  creationContinueButton = "button-continue-project",
   creationUploadButton = "button-create-project",
   creationTraceSourceInput = "input-source-type",
   creationTraceTargetInput = "input-target-type",

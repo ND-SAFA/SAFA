@@ -10,6 +10,7 @@ from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
+from tgen.summarizer.summary import Summary
 
 StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)
@@ -71,7 +72,6 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :param summarizer_args_kwargs: Keyword arguments to summarizer to customize default settings.
         """
         self.args = args
-        self.state: StateType = self.init_state()
         self.steps = [s() for s in steps]
         self.summarizer_args = SummarizerArgs(do_resummarize_project=False,
                                               summarize_code_only=True,
@@ -79,6 +79,10 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                                               **summarizer_args_kwargs) if not summarizer_args else summarizer_args
         if skip_summarization:
             self.summarizer_args = None
+        self.state: StateType = self.init_state()
+        if self.args.export_dir:
+            os.makedirs(self.args.export_dir, exist_ok=True)
+            self.state.export_dir = self.args.export_dir
 
     def init_state(self) -> StateType:
         """
@@ -96,19 +100,24 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Runs steps with store.
         :return: None
         """
-        if self.args.export_dir:
-            os.makedirs(self.args.export_dir, exist_ok=True)
-            self.state.export_dir = self.args.export_dir
         if self.summarizer_args:
-            self.summarizer_args.update_export_dir(self.state.export_dir)
-            dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
-            if not self.args.dataset.project_summary:
-                self.args.dataset = dataset
-            else:
-                self.args.dataset.update_artifact_df(dataset.artifact_df)  # keep original project summary
-            self.state.project_summary = dataset.project_summary if dataset.project_summary else None
+            self.run_summarizations()
         for step in self.steps:
             self.run_step(step)
+
+    def run_summarizations(self) -> Summary:
+        """
+        Runs the summarizer to create pipeline project summary and summarize artifacts
+        :return: The project summary
+        """
+        self.summarizer_args.update_export_dir(self.state.export_dir)
+        dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
+        if not self.args.dataset.project_summary:
+            self.args.dataset = dataset
+        else:
+            self.args.dataset.update_artifact_df(dataset.artifact_df)  # keep original project summary
+        self.state.project_summary = dataset.project_summary if dataset.project_summary else None
+        return self.state.project_summary
 
     def run_step(self, step: AbstractPipelineStep, re_run: bool = False) -> None:
         """

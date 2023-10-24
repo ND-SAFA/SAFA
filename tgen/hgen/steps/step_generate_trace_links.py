@@ -8,6 +8,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.status import Status
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -40,44 +41,79 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         if not args.generate_trace_links:
             state.trace_predictions = self._create_traces_from_generation_predictions(id_to_related_children)
-
             return
 
         logger.info(f"Predicting links between {args.target_type} and {args.source_layer_id}\n")
 
         if args.perform_clustering:
-            trace_predictions = []
-            generation2id = {content: a_id for a_id, content in new_artifact_df.to_map().items()}
-            for cluster_id in state.cluster_dataset.artifact_df.index:
-                generations = state.cluster2generation.get(cluster_id)
-                parent_ids = [generation2id[generation] for generation in generations]
-                children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
-                pipeline_args = RankingArgs(run_name=f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
-                                                                                                        args.target_type, parent_ids),
-                                            dataset=state.all_artifacts_dataset,
-                                            parent_ids=parent_ids,
-                                            children_ids=children_ids,
-                                            export_dir=os.path.join(self._get_ranking_dir(state.export_dir), str(cluster_id)),
-                                            types_to_trace=(args.source_type, args.target_type),
-                                            selection_method=None)
-                pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
-                pipeline.run()
-                state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
-                trace_predictions.extend(pipeline.state.selected_entries)
+            trace_predictions = self._trace_artifacts_in_cluster_to_generated_parents(args, state, new_artifact_df)
         else:
-            tracing_job = RankingJob(dataset=state.all_artifacts_dataset,
-                                     layer_ids=(args.target_type, args.source_layer_id),  # parent, child
-                                     export_dir=self._get_ranking_dir(state.export_dir),
-                                     load_dir=self._get_ranking_dir(args.load_dir),
-                                     ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
-                                     link_threshold=0.3)  # Only filter out really low links so that related artifacts can factor in
-            result = tracing_job.run()
-            if result.status != Status.SUCCESS:
-                raise Exception(f"Trace link generation failed: {result.body}")
-
-            trace_predictions: List[EnumDict] = result.body.prediction_entries
+            trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
         trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions, id_to_related_children)
         state.trace_predictions = trace_predictions
+
+    def _run_tracing_job_on_all_artifacts(self, args: HGenArgs, state: HGenState) -> List[EnumDict]:
+        """
+        Runs a ranking job for all candidate links between the children and generated parents
+        :param args: The arguments to HGen
+        :param state: The current state of HGen
+        :return: The trace predictions for all candidates (that were not filtered)
+        """
+        tracing_job = RankingJob(dataset=state.all_artifacts_dataset,
+                                 layer_ids=(args.target_type, args.source_layer_id),  # parent, child
+                                 export_dir=self._get_ranking_dir(state.export_dir),
+                                 load_dir=self._get_ranking_dir(args.load_dir),
+                                 ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
+                                 link_threshold=0.3)  # Only filter out really low links so that related artifacts can factor in
+        result = tracing_job.run()
+        if result.status != Status.SUCCESS:
+            raise Exception(f"Trace link generation failed: {result.body}")
+        trace_predictions: List[EnumDict] = result.body.prediction_entries
+        return trace_predictions
+
+    def _trace_artifacts_in_cluster_to_generated_parents(self, args: HGenArgs, state: HGenState,
+                                                         generated_parents_df: ArtifactDataFrame,
+                                                         max_threads: int = 10) -> List[EnumDict]:
+        """
+        Generates links between the artifacts in a cluster and the parent artifact generated from the cluster artifacts
+        :param args: The arguments to HGen
+        :param state: The current state of HGen
+        :param generated_parents_df: Contains the parent content that aws generated generated
+        :param max_threads: The maximum number of threads to run
+        :return: The trace predictions for the clusters
+        """
+
+        def generate_for_cluster(cluster_id: str) -> List[EnumDict]:
+            """
+            Runs the generation for a given cluster id
+            :param cluster_id: The id of the cluster to generate links for
+            :return: The list of link predictions for that cluster
+            """
+            generations = state.cluster2generation.get(cluster_id)
+            parent_ids = [generation2id[generation] for generation in generations]
+            children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
+            pipeline_args = RankingArgs(run_name=f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
+                                                                                                    args.target_type, parent_ids),
+                                        dataset=state.all_artifacts_dataset,
+                                        parent_ids=parent_ids,
+                                        children_ids=children_ids,
+                                        export_dir=os.path.join(self._get_ranking_dir(state.export_dir), str(cluster_id)),
+                                        types_to_trace=(args.source_type, args.target_type),
+                                        selection_method=None)
+            pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
+            pipeline.run()
+            return pipeline.state.selected_entries
+
+        cluster_ids = list(state.cluster_dataset.artifact_df.index)
+        generation2id = {content: a_id for a_id, content in generated_parents_df.to_map().items()}
+        pipeline_args = RankingArgs(dataset=state.all_artifacts_dataset, parent_ids=[], children_ids=[],
+                                    export_dir=self._get_ranking_dir(state.export_dir), types_to_trace=('', ''))
+        state.all_artifacts_dataset.project_summary = EmbeddingRankingPipeline(pipeline_args).run_summarizations()
+        trace_predictions = ThreadUtil.multi_thread_process(
+            title="Generating trace links between artifacts in cluster and generated parents",
+            iterable=cluster_ids, thread_work=generate_for_cluster, n_threads=min(len(cluster_ids), max_threads),
+            collect_results=True)
+        return trace_predictions
 
     @staticmethod
     def _create_traces_from_generation_predictions(id_to_related_children) -> List[EnumDict]:

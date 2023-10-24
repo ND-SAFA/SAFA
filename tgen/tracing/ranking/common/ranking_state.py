@@ -21,8 +21,8 @@ class RankingState(State):
     ranking_responses: List[List[Dict]] = field(default=None, repr=False)
 
     # Entries
-    candidate_entries: List[Dict] = field(default=None, repr=False)
-    selected_entries: List[Dict] = field(default=None, repr=False)  # filtered entries based on score
+    candidate_entries: List[EnumDict] = field(default=None, repr=False)
+    selected_entries: List[EnumDict] = field(default=None, repr=False)  # filtered entries based on score
 
     # IO
     export_path: str = None

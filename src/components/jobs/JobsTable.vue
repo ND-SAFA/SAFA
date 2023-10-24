@@ -1,5 +1,5 @@
 <template>
-  <panel-card>
+  <panel-card :title="panelTitle">
     <data-table
       :columns="jobColumns"
       :expanded="expanded"
@@ -84,7 +84,6 @@ export default {
 
 <script lang="ts" setup>
 import { computed, onMounted } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JobLogStepSchema, JobSchema, JobTableProps } from "@/types";
 import { FEEDBACK_LINK, jobColumns } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
@@ -93,6 +92,10 @@ import TextButton from "@/components/common/button/TextButton.vue";
 import JobRow from "./JobRow.vue";
 
 const props = defineProps<JobTableProps>();
+
+const panelTitle = computed(() =>
+  props.displayProjectJobs ? "Project Tasks" : "Recent Tasks"
+);
 const rows = computed(() =>
   props.displayProjectJobs ? jobStore.projectJobs : jobStore.jobs
 );

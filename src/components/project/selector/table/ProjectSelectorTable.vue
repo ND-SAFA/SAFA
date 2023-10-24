@@ -6,7 +6,7 @@
     :editable="isEditable"
     :deletable="isDeletable"
     :loading="getProjectApiStore.loading"
-    :columns="projectColumns"
+    :columns="columns"
     :rows="rows"
     row-key="projectId"
     item-name="project"
@@ -81,7 +81,7 @@ import {
   ProjectSchema,
   ProjectSelectorTableProps,
 } from "@/types";
-import { projectColumns } from "@/util";
+import { projectColumns, projectNameColumn } from "@/util";
 import {
   getProjectApiStore,
   identifierSaveStore,
@@ -108,6 +108,11 @@ const currentRoute = useRoute();
 const selected = ref<IdentifierSchema | undefined>();
 const projectInviteId = ref<string>();
 
+const columns = computed(() =>
+  props.minimal ? [projectNameColumn] : projectColumns
+);
+const rows = computed(() => projectStore.allProjects);
+
 const entity = computed(
   () =>
     ({
@@ -125,8 +130,6 @@ const selectedItems = computed({
     emit("selected", items[0]);
   },
 });
-
-const rows = computed(() => projectStore.allProjects);
 
 /**
  * Loads all projects.

@@ -22,38 +22,7 @@
         data-cy="input-upload-type"
       />
 
-      <flex-box
-        v-if="props.panel.variant === 'trace'"
-        full-width
-        align="center"
-        y="2"
-      >
-        <select-input
-          v-model="props.panel.type"
-          label="Source Type"
-          :options="artifactTypes"
-          hint="Required"
-          class="full-width"
-          data-cy="input-source-type"
-        />
-        <icon class="q-mx-sm" variant="trace" size="sm" />
-        <select-input
-          v-model="props.panel.toType"
-          label="Target Type"
-          :options="artifactTypes"
-          hint="Required"
-          class="full-width"
-          data-cy="input-target-type"
-        />
-      </flex-box>
-
-      <text-input
-        v-if="props.panel.variant === 'artifact'"
-        v-model="props.panel.type"
-        label="Artifact Type"
-        hint="Required"
-        data-cy="input-artifact-type"
-      />
+      <file-panel-name v-bind="props" />
 
       <file-input
         v-if="!isGenerated && hasSingleFile"
@@ -83,16 +52,7 @@
         label="Generate Trace Links"
       />
 
-      <flex-box full-width justify="between" y="2">
-        <switch-input
-          v-model="props.panel.ignoreErrors"
-          label="Ignore Errors"
-          color="grey"
-          class="q-mr-sm"
-          data-cy="button-ignore-errors"
-        />
-        <typography v-if="!valid" :value="errorMessage" color="negative" />
-      </flex-box>
+      <file-panel-errors v-bind="props" />
 
       <list
         v-if="hasSingleFile && props.panel.itemNames.length > 0"
@@ -104,7 +64,7 @@
               v-for="itemName of props.panel.itemNames"
               :key="itemName"
               :value="itemName"
-              :icon="props.panel.variant"
+              :icon="props.panel.variant === 'artifact' ? 'artifact' : 'trace'"
               data-cy="button-file-entities"
             />
           </div>
@@ -136,16 +96,13 @@ export default {
 import { computed, watch } from "vue";
 import { FilePanelProps } from "@/types";
 import { getIcon, uploadPanelOptions } from "@/util";
-import { integrationsStore, parseApiStore, projectSaveStore } from "@/hooks";
+import { parseApiStore, projectSaveStore } from "@/hooks";
 import {
   ExpansionItem,
   FileInput,
   SwitchInput,
   TextButton,
   FlexBox,
-  Typography,
-  TextInput,
-  Icon,
   SelectInput,
   List,
   AttributeChip,
@@ -155,6 +112,8 @@ import {
   GitHubProjectInput,
   JiraProjectInput,
 } from "@/components/integrations";
+import FilePanelErrors from "./FilePanelErrors.vue";
+import FilePanelName from "./FilePanelName.vue";
 
 const props = defineProps<FilePanelProps>();
 
@@ -174,38 +133,7 @@ const label = computed(
 );
 const newLabel = computed(() => `New ${label.value}`);
 
-const errorMessage = computed(() => {
-  if (
-    (props.panel.variant === "artifact" || props.panel.variant === "trace") &&
-    !props.panel.name
-  ) {
-    return "Requires a name";
-  } else if (props.panel.ignoreErrors) {
-    return undefined;
-  } else if (
-    (props.panel.variant === "artifact" || props.panel.variant === "trace") &&
-    !props.panel.file &&
-    !props.panel.isGenerated
-  ) {
-    return "No files have been uploaded.";
-  } else if (
-    (props.panel.variant === "jira" || props.panel.variant === "github") &&
-    !integrationsStore.gitHubProject &&
-    !integrationsStore.jiraProject
-  ) {
-    return "Select a project to import.";
-  } else if (
-    props.panel.variant === "bulk" &&
-    (props.panel.bulkFiles.length === 0 ||
-      !props.panel.bulkFiles.find(({ name }) => name === "tim.json"))
-  ) {
-    return "Requires a tim.json configuration file.";
-  } else {
-    return props.panel.errorMessage;
-  }
-});
-
-const valid = computed(() => !errorMessage.value);
+const valid = computed(() => !props.panel.errorMessage);
 
 const headerClass = computed(() =>
   valid.value ? "text-positive" : "text-negative"
@@ -214,8 +142,6 @@ const headerClass = computed(() =>
 const iconId = computed(() =>
   valid.value ? getIcon("success") : getIcon("error")
 );
-
-const artifactTypes = computed(() => projectSaveStore.artifactTypes);
 
 const isGenerated = computed(() => props.panel.isGenerated);
 
@@ -236,6 +162,7 @@ function handleDeletePanel() {
   projectSaveStore.removePanel(props.panel.variant, props.index);
 }
 
+// Clear the name when the variant changes.
 watch(
   () => props.panel.variant,
   () => {
@@ -243,6 +170,7 @@ watch(
   }
 );
 
+// For artifact upload, set the name to the artifact type when the type changes.
 watch(
   () => props.panel.type,
   (type) => {
@@ -252,6 +180,7 @@ watch(
   }
 );
 
+// For trace upload, set the name to the artifact types when the type changes.
 watch(
   () => [props.panel.type, props.panel.toType],
   ([fromType, toType]) => {
@@ -264,6 +193,7 @@ watch(
   }
 );
 
+// For file upload, parse uploaded files and store the parse state.
 watch(
   () => props.panel.file,
   (file) => {
@@ -281,13 +211,7 @@ watch(
   }
 );
 
-watch(
-  () => valid.value,
-  () => {
-    props.panel.valid = valid.value;
-  }
-);
-
+// For file upload, close the panel after successful upload.
 watch(
   () => props.panel.loading,
   () => {

@@ -40,6 +40,7 @@ export interface CreatorFilePanel {
   itemNames: string[];
   file?: File;
   errorMessage?: string;
+  parseErrorMessage?: string;
 
   // Artifacts
   artifacts?: ArtifactSchema[];

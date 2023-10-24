@@ -8,7 +8,6 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.status import Status
-from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -72,23 +71,18 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return trace_predictions
 
     def _trace_artifacts_in_cluster_to_generated_parents(self, args: HGenArgs, state: HGenState,
-                                                         generated_parents_df: ArtifactDataFrame,
-                                                         max_threads: int = 10) -> List[EnumDict]:
+                                                         generated_parents_df: ArtifactDataFrame) -> List[EnumDict]:
         """
         Generates links between the artifacts in a cluster and the parent artifact generated from the cluster artifacts
         :param args: The arguments to HGen
         :param state: The current state of HGen
         :param generated_parents_df: Contains the parent content that aws generated generated
-        :param max_threads: The maximum number of threads to run
         :return: The trace predictions for the clusters
         """
 
-        def generate_for_cluster(cluster_id: str) -> List[EnumDict]:
-            """
-            Runs the generation for a given cluster id
-            :param cluster_id: The id of the cluster to generate links for
-            :return: The list of link predictions for that cluster
-            """
+        trace_predictions = []
+        generation2id = {content: a_id for a_id, content in generated_parents_df.to_map().items()}
+        for cluster_id in state.cluster_dataset.artifact_df.index:
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations]
             children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
@@ -102,17 +96,8 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                         selection_method=None)
             pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
             pipeline.run()
-            return pipeline.state.selected_entries
-
-        cluster_ids = list(state.cluster_dataset.artifact_df.index)
-        generation2id = {content: a_id for a_id, content in generated_parents_df.to_map().items()}
-        pipeline_args = RankingArgs(dataset=state.all_artifacts_dataset, parent_ids=[], children_ids=[],
-                                    export_dir=self._get_ranking_dir(state.export_dir), types_to_trace=('', ''))
-        state.all_artifacts_dataset.project_summary = EmbeddingRankingPipeline(pipeline_args).run_summarizations()
-        trace_predictions = ThreadUtil.multi_thread_process(
-            title="Generating trace links between artifacts in cluster and generated parents",
-            iterable=cluster_ids, thread_work=generate_for_cluster, n_threads=min(len(cluster_ids), max_threads),
-            collect_results=True)
+            state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
+            trace_predictions.extend(pipeline.state.selected_entries)
         return trace_predictions
 
     @staticmethod

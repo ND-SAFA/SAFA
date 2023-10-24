@@ -106,7 +106,7 @@ class StrUtil:
         if not isinstance(chars2remove, list):
             chars2remove = [chars2remove]
         for char in chars2remove:
-            string.replace(char, EMPTY_STRING)
+            string = string.replace(char, EMPTY_STRING)
         return string
 
 

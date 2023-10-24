@@ -11,10 +11,11 @@ from yaml.nodes import MappingNode, Node
 
 from tgen.common.constants.deliminator_constants import COLON
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
-
+import numpy as np
 
 class CustomLoader(SafeLoader):
     __top_level_reached = False
@@ -132,13 +133,25 @@ class CustomDumper(Dumper):
             try:
                 converted_data = data.to_yaml()
                 node = super().represent_data(converted_data)
-                orig_node = self.represent_object(data)
-                node.tag = orig_node.tag
+                node.tag =  self.get_original_node_tag(data)
                 return node
             except Exception:
                 pass
+        if hasattr(data, "item"):
+            data = data.item()
+        if isinstance(data, np.ndarray):
+            data = ListUtil.convert_numpy_array_to_native_types(data)
         node = super().represent_data(data)
         return node
+
+    def get_original_node_tag(self, data) -> "str":
+        """
+        Gets the tag that yaml would typical assign the data
+        :param data: The original data
+        :return: The tag that yaml would typical assign the data
+        """
+        orig_node = self.represent_object(data)
+        return orig_node.tag
 
 
 class YamlUtil:

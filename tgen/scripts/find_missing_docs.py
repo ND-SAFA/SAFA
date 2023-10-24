@@ -1,0 +1,60 @@
+import ast
+import os
+from _ast import AST
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
+
+NodeType = AST
+
+
+def has_docstring_2(node: NodeType):
+    """
+    Check if the given AST node has a docstring.
+    :param node:
+    :return:
+    """
+    allowable_node_types = [ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef]
+    is_allowable = any([isinstance(node, node_type) for node_type in allowable_node_types])
+    return is_allowable and (ast.get_docstring(node) is not None)
+
+
+def has_docstring(node):
+    """Check if the given AST node has a docstring."""
+    return isinstance(node, ast.FunctionDef) or isinstance(node, ast.AsyncFunctionDef) \
+        or isinstance(node, ast.ClassDef) and (ast.get_docstring(node) is not None)
+
+
+def find_functions_classes_methods_without_docstring(directory):
+    """Find functions, classes, and methods without a docstring in the given directory."""
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".py") and not file == "__init__.py":
+                file_path = os.path.join(root, file)
+                with open(file_path, "r", encoding="utf-8") as f:
+                    try:
+                        tree = ast.parse(f.read(), filename=file_path)
+                    except SyntaxError as e:
+                        print(f"Error parsing {file_path}: {e}")
+                        continue
+
+                    is_exclude = any([p in file_path for p in EXCLUDES])
+                    if is_exclude:
+                        continue
+
+                    for node in ast.walk(tree):
+                        if has_docstring(node) and ast.get_docstring(node) is None:
+                            print(f"Missing docstring in {type(node).__name__} '{node.name}' "
+                                  f"at line {node.lineno} in {file_path}")
+
+
+def main():
+    directory_path = os.path.expanduser(os.environ["ROOT_PATH"])
+    find_functions_classes_methods_without_docstring(directory_path)
+
+
+if __name__ == "__main__":
+    main()

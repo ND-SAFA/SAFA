@@ -139,8 +139,8 @@ class FileUtil:
             raise Exception("Unable to read pretraining data file path " + data_path)
         return files
 
-    @classmethod
-    def expand_paths(cls, paths: Union[List, Dict, str], replacements: Dict[str, str] = None,
+    @staticmethod
+    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None,
                      use_abs_paths: bool = True):
         """
         For every string found in value, if its a path its expanded completed path
@@ -149,10 +149,26 @@ class FileUtil:
         :param use_abs_paths: If True, returns the absolute path
         :return: Same type as value, but with its content processed.
         """
-        return cls.collapse_paths(paths, replacements=replacements)
 
-    @classmethod
-    def collapse_paths(cls, paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
+        def expand(path: str, replacements: Dict[str, str] = None):
+            """
+            Performs replacements on path.
+            :param path: The path possibly containing keys.
+            :param replacements: They keys and values to be replaced with.
+            :return: The processed path.
+            """
+            if replacements:
+                for k, v in replacements.items():
+                    path = path.replace(k, v)
+            path = os.path.expanduser(path)
+            if use_abs_paths:
+                path = FileUtil.get_path_relative_to_proj_path(path)
+            return path
+
+        return FileUtil.perform_function_on_paths(paths, expand, replacements=replacements)
+
+    @staticmethod
+    def collapse_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
         """
         For every string found in value, if its a path its collapsed into a shorter form
         :param paths: List, Dict, or String containing one or more paths.
@@ -160,33 +176,23 @@ class FileUtil:
         :return: Same type as value, but with its content processed.
         """
 
-        def process(p: str, **kwargs):
+        def collapse(path: str, replacements: Dict[str, str] = None):
             """
-            Makes replacements on path.
-            :param p: The path to make replacements on.
-            :param kwargs: Ignored.
-            :return: Processed path.
+            Performs replacements on path.
+            :param path: The path possibly containing keys.
+            :param replacements: They keys and values to be replaced with.
+            :return: The processed path.
             """
-            use_abs_path = os.path.isabs(p)
-            return cls.perform_replacements(p, use_abs_path, replacements=replacements)
+            if replacements:
+                path2var = {v: k for k, v in replacements.items()}
+                ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
+                for path2replace in ordered_paths:
+                    path = path.replace(path2replace, path2var[path2replace])
+            if os.path.isabs(path):
+                path = os.path.relpath(path, PROJ_PATH)
+            return path
 
-        return FileUtil.perform_function_on_paths(paths, process, replacements=replacements)
-
-    @staticmethod
-    def perform_replacements(path: str, use_abs_paths: bool, replacements: Dict[str, str] = None):
-        """
-        Performs replacements on path and expands user path.
-        :param path: The path to process.
-        :param use_abs_paths: Whether path is absolute.
-        :return: Processed path.
-        """
-        if replacements:
-            for k, v in replacements.items():
-                path = path.replace(k, v)
-        path = os.path.expanduser(path)
-        if use_abs_paths:
-            path = FileUtil.get_path_relative_to_proj_path(path)
-        return path
+        return FileUtil.perform_function_on_paths(paths, collapse, replacements=replacements)
 
     @staticmethod
     def perform_function_on_paths(paths: Union[List, Dict, str], func: Callable, replacements: Dict[str, str] = None, **kwargs):

@@ -11,6 +11,9 @@
       <template #members>
         <project-member-table />
       </template>
+      <template #jobs>
+        <jobs-table :display-project-jobs="true" />
+      </template>
       <template #upload>
         <upload-new-version :open="tab === 'upload'" />
       </template>
@@ -48,6 +51,7 @@ import {
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
 import { ProjectMemberTable } from "@/components/members";
+import { JobsTable } from "@/components/jobs";
 
 const tabs = computed(() => {
   const options = settingsTabOptions();

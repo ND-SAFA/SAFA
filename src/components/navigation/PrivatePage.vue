@@ -58,7 +58,7 @@ const doDisplay = computed(() => sessionStore.doesSessionExist);
 
 const className = computed(() =>
   props.fullWindow
-    ? "q-mx-auto q-pa-lg"
+    ? "q-mx-auto q-pa-xl"
     : "q-mx-auto q-pa-lg nav-page-centered " +
       (props.smallWindow ? "width-fit" : "")
 );

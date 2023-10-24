@@ -180,15 +180,8 @@ export const projectNameColumn: TableColumn<IdentifierSchema> = {
   field: (row) => row.name,
 };
 
-export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
-  {
-    name: "description",
-    label: "Description",
-    sortable: false,
-    align: "right",
-    classes: "data-table-cell-200",
-    field: (row) => row.description,
-  },
+export const projectColumns: TableColumn<IdentifierSchema>[] = [
+  projectNameColumn,
   actionsColumn,
 ];
 

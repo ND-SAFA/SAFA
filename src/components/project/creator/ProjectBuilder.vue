@@ -177,9 +177,7 @@ function handleLoadTab() {
 
   projectSaveStore.uploadPanels[0].variant = variant;
 
-  if (variant !== "github") return;
-
-  tab.value = "data";
+  tab.value = variant === "github" ? "data" : "name";
 }
 
 onMounted(() => handleReloadIntegrations());

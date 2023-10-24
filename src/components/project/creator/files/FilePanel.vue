@@ -175,7 +175,10 @@ const label = computed(
 const newLabel = computed(() => `New ${label.value}`);
 
 const errorMessage = computed(() => {
-  if (!props.panel.name) {
+  if (
+    (props.panel.variant === "artifact" || props.panel.variant === "trace") &&
+    !props.panel.name
+  ) {
     return "Requires a name";
   } else if (props.panel.ignoreErrors) {
     return undefined;

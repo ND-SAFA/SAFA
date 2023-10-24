@@ -17,6 +17,11 @@ export type UploadPanelType = "artifact" | "trace" | "bulk" | "github" | "jira";
 export type CreatorTab = "standard" | "bulk" | "import";
 
 /**
+ * The types of create project tabs.
+ */
+export type CreatorSectionTab = "name" | "data";
+
+/**
  * The types of load project tabs.
  */
 export type LoaderTab = "load" | "project" | "user";

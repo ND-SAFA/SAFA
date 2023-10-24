@@ -67,6 +67,8 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { CreatorSectionTab, CreatorTab, UploadPanelType } from "@/types";
 import {
   createProjectApiStore,
   gitHubApiStore,
@@ -76,6 +78,7 @@ import {
   projectSaveStore,
   useScreen,
 } from "@/hooks";
+import { getParam, QueryParams, Routes } from "@/router";
 import {
   FlexBox,
   FlexItem,
@@ -88,8 +91,9 @@ import { ProjectIdentifierInput } from "@/components/project/save";
 import { FilePanelList } from "@/components/project/creator/files";
 
 const { smallWindow } = useScreen();
+const currentRoute = useRoute();
 
-const tab = ref("name");
+const tab = ref<CreatorSectionTab>("name");
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
 
@@ -154,6 +158,30 @@ function handleReloadIntegrations() {
   }
 }
 
+/**
+ * Reads the URL query for which tab to open to.
+ */
+function handleLoadTab() {
+  const loadedToken = getParam(QueryParams.TAB);
+
+  if (!loadedToken) return;
+
+  const variant =
+    (
+      {
+        standard: "artifact",
+        bulk: "bulk",
+        import: "github",
+      } as Record<CreatorTab | string, UploadPanelType>
+    )[String(loadedToken)] || "artifact";
+
+  projectSaveStore.uploadPanels[0].variant = variant;
+
+  if (variant !== "github") return;
+
+  tab.value = "data";
+}
+
 onMounted(() => handleReloadIntegrations());
 
 watch(
@@ -163,4 +191,15 @@ watch(
   ],
   () => handleReloadIntegrations()
 );
+
+watch(
+  () => currentRoute.path,
+  (path) => {
+    if (path !== Routes.PROJECT_CREATOR) return;
+
+    handleLoadTab();
+  }
+);
+
+onMounted(handleLoadTab);
 </script>

@@ -98,7 +98,7 @@ const color = computed(() => timStore.getTypeColor(props.artifactType));
 
 const countLabel = computed(() =>
   props.count < 0
-    ? "1 Upload"
+    ? "1 Import"
     : props.count === 1
     ? "1 Artifact"
     : `${props.count} Artifacts`

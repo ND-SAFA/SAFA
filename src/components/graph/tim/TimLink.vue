@@ -42,7 +42,7 @@ const definition = computed<TimEdgeCytoElement>(() => ({
     count: props.count,
     label:
       props.count < 0
-        ? "1 Upload"
+        ? "1 Import"
         : props.count === 1
         ? `1 Link`
         : `${props.count} Links`,

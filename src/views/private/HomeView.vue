@@ -47,7 +47,7 @@
               />
               <text-button
                 text
-                label="Import Jira/GitHub Project"
+                label="Import GitHub Repo"
                 icon="integrate"
                 color="primary"
                 @click="handleOpenImport"

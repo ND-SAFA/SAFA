@@ -1,15 +1,13 @@
 from typing import List, Set
 
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
-from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
+from tgen.common.util.embedding_util import EmbeddingUtil
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
@@ -97,25 +95,12 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         """
         wanting_clusters = []
         orphan_embedding = embedding_manager.get_embedding(artifact_id)
-        similarities_to_clusters = cls.calculate_similarities_to_clusters(orphan_embedding, clusters)
+        similarities_to_clusters = EmbeddingUtil.calculate_similarities_to_clusters(orphan_embedding, clusters)
         for cluster, similarity_to_cluster in zip(clusters, similarities_to_clusters):
             percent_similar = similarity_to_cluster / cluster.avg_similarity
             if percent_similar >= min_similarity_score:
                 wanting_clusters.append(cluster)
         return wanting_clusters
-
-    @staticmethod
-    def calculate_similarities_to_clusters(starting_embedding: EmbeddingType, clusters: List[Cluster]) -> List[float]:
-        """
-        Calculates the similarities from the starting embeddings to the centroids of the clusters.
-        :param starting_embedding: The embeddings serving as the starting point.
-        :param clusters: The clusters whose similarity to is calculated.
-        :return: List of similarity scores to the clusters.
-        """
-        source_matrix = np.matrix([starting_embedding])
-        target_matrix = LinkOrphans.create_centroid_matrix(clusters)
-        cluster_similarities = cosine_similarity(source_matrix, target_matrix)[0]
-        return cluster_similarities
 
     @classmethod
     def add_singleton_cluster(cls, a_id: str, cluster_map: ClusterMapType, embeddings_manager: EmbeddingsManager) -> None:
@@ -128,16 +113,6 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         """
         new_cluster = Cluster.from_artifacts([a_id], embeddings_manager)
         cls.add_cluster(cluster_map, new_cluster)
-
-    @staticmethod
-    def create_centroid_matrix(clusters: List[Cluster]) -> np.matrix:
-        """
-        Creates matrix containing all cluster centroids.
-        :param clusters: The clusters whose centroids are stacked.
-        :return: Matrix of centroids.
-        """
-        centroids = [c.centroid.reshape(1, -1)[0] for c in clusters]
-        return np.matrix(centroids)
 
     @staticmethod
     def add_cluster(cluster_map: ClusterMapType, cluster: Cluster) -> None:

@@ -1,10 +1,10 @@
 from typing import Any, Iterable, List
 
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 
+from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
-from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
 class Cluster:
@@ -25,20 +25,6 @@ class Cluster:
         self.centroid = None
 
     @staticmethod
-    def calculate_centroid(cluster: List[str], embedding_manager: EmbeddingsManager):
-        """
-        Calculates the embedding pointing at the center of the cluster.
-        :param cluster: The artifacts whose embeddings are used to calculate the centroid.
-        :param embedding_manager: Contains the artifacts embeddings.
-        :return: Embedding pointing at center of cluster.
-        """
-        if len(cluster) == 0:
-            raise Exception("Cannot calculate center of empty cluster.")
-        embeddings = [embedding_manager.get_embedding(a_id) for a_id in cluster]
-        centroid = np.sum(embeddings, axis=0) / len(cluster)
-        return centroid
-
-    @staticmethod
     def get_cluster_id(method: SupportedClusteringMethod, index: int):
         """
         Creates generic cluster id.
@@ -47,20 +33,6 @@ class Cluster:
         :return: The cluster id.
         """
         return f"{method.name}{index}"
-
-    @staticmethod
-    def calculate_average_similarity(cluster: List[str], centroid: EmbeddingType, embedding_manager: EmbeddingsManager):
-        """
-        Calculates the average similarity to the cluster centroid for all points in the cluster.
-        :param cluster: The cluster containing the artifact ids.
-        :param centroid: The embedding at the center of the cluster.
-        :param embedding_manager: The manager able to retrieve embeddings for artifact ids.
-        :return: Score representing the average similarity score to the cluster centroid.
-        """
-        embeddings = [embedding_manager.get_embedding(a_id) for a_id in cluster]
-        similarities = cosine_similarity([centroid], embeddings)[0]
-        avg_similarity = sum(similarities) / len(similarities)
-        return avg_similarity
 
     @staticmethod
     def from_artifacts(artifact_ids: List[str], embeddings_manager: EmbeddingsManager) -> "Cluster":
@@ -106,7 +78,7 @@ class Cluster:
         :param cluster: The cluster to calculate the distance to.
         :return: The similarity to the other cluster.
         """
-        return cosine_similarity([self.centroid], [cluster.centroid])[0][0]
+        return EmbeddingUtil.calculate_similarities([self.centroid], [cluster.centroid])[0][0]
 
     def _add_artifact(self, artifact_id: str) -> None:
         """
@@ -123,8 +95,17 @@ class Cluster:
         Calculates all statistics for the cluster.
         :return: None, stats are set in place
         """
-        self.centroid = Cluster.calculate_centroid(self.artifact_ids, self.embeddings_manager)
-        self.avg_similarity = Cluster.calculate_average_similarity(self.artifact_ids, self.centroid, self.embeddings_manager)
+        self.centroid = self.embeddings_manager.calculate_centroid(self.artifact_ids)
+        self.avg_similarity = self.__calculate_average_similarity()
+
+    def __calculate_average_similarity(self) -> float:
+        """
+        Calculates the average similarity from the artifacts to the centroid.
+        :return: Average similarity to centroid.
+        """
+        artifact_embeddings = [self.embeddings_manager.get_embedding(a_id) for a_id in self.artifact_ids]
+        similarities = EmbeddingUtil.calculate_similarities([self.centroid], artifact_embeddings)[0]
+        return np.sum(similarities) / len(similarities)
 
     def __len__(self) -> int:
         """

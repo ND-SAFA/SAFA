@@ -212,7 +212,18 @@ class EmbeddingsManager:
         return not self.__saved_embeddings_path or self.__state_changed_since_last_save \
             or FileUtil.collapse_paths(export_path) != FileUtil.get_directory_path(self.__saved_embeddings_path)
 
-    '[ROOT_PATH]/testres/output'
+    def calculate_centroid(self, cluster: List[str]):
+        """
+        Calculates the embedding pointing at the center of the cluster.
+        :param cluster: The artifacts whose embeddings are used to calculate the centroid.
+        :param embedding_manager: Contains the artifacts embeddings.
+        :return: Embedding pointing at center of cluster.
+        """
+        if len(cluster) == 0:
+            raise Exception("Cannot calculate center of empty cluster.")
+        embeddings = [self.get_embedding(a_id) for a_id in cluster]
+        centroid = np.sum(embeddings, axis=0) / len(cluster)
+        return centroid
 
     def __set_embedding_order(self) -> None:
         """

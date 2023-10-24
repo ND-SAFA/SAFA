@@ -3,23 +3,19 @@
     <project-tree />
     <graph-fab />
 
-    <tab-list
-      v-if="isTableMode"
-      v-model="tab"
-      :tabs="tabs"
-      class="q-pa-lg bg-background"
-      style="min-height: inherit"
-    >
-      <template #artifact>
-        <artifact-table />
-      </template>
-      <template #trace>
-        <trace-table />
-      </template>
-      <template #approve>
-        <approval-table />
-      </template>
-    </tab-list>
+    <div class="q-pa-lg bg-background" style="min-height: inherit">
+      <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs">
+        <template #artifact>
+          <artifact-table />
+        </template>
+        <template #trace>
+          <trace-table />
+        </template>
+        <template #approve>
+          <approval-table />
+        </template>
+      </tab-list>
+    </div>
   </private-page>
 </template>
 

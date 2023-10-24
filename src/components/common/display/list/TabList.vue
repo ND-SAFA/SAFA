@@ -5,6 +5,7 @@
     align="left"
     :breakpoint="0"
     :vertical="props.vertical"
+    :class="props.class"
   >
     <slot name="before" />
     <q-tab

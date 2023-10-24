@@ -8,7 +8,7 @@
         icon="cancel"
         @click="appStore.close('editProject')"
       />
-      <attribute-chip v-else :value="versionLabel" />
+      <typography v-else secondary :value="versionLabel" />
     </template>
 
     <div v-if="!editMode">
@@ -25,7 +25,7 @@
         v-for="[parent, children] in artifactTypeMap"
         :key="parent"
         column
-        t="2"
+        t="3"
       >
         <attribute-chip artifact-type :value="parent" />
         <flex-box v-if="children.length > 0" l="4">

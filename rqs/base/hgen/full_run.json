@@ -7,9 +7,9 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
-              "source_layer_id": "Feature",
-              "target_type": "System Requirement",
-              "source_type": "Feature",
+              "source_layer_id": "Vue",
+              "target_type": "Functional Requirement",
+              "source_type": "Vue",
               "generate_trace_links": true,
               "dataset_creator": {
                 "object_type": "PROMPT",

@@ -5,7 +5,7 @@ from tgen.clustering.methods.supported_clustering_methods import SupportedCluste
 from tgen.common.constants import environment_constants
 from tgen.common.constants.clustering_constants import DEFAULT_ADD_CLUSTERS_TO_DATASET, DEFAULT_CLUSTERING_METHODS, \
     DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
-    DEFAULT_REDUCTION_FACTOR
+    DEFAULT_MIN_ORPHAN_SIMILARITY, DEFAULT_REDUCTION_FACTOR
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
@@ -30,6 +30,7 @@ class ClusteringArgs(PipelineArgs):
     cluster_reduction_factor: float = DEFAULT_REDUCTION_FACTOR
     create_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
+    min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY
 
     def __post_init__(self) -> None:
         """

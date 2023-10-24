@@ -191,7 +191,7 @@ class PromptResponseManager:
         :param orig_val: The original value
         :return: The formatted value
         """
-        assert orig_val is not None, f"Missing {tag}"
+        assert orig_val is not None, f"{orig_val} is missing {tag}"
         vals2format, orig_vals_is_list = self._convert2list(orig_val)
         formatted = []
         for val in vals2format:

@@ -33,7 +33,7 @@ class iDataset(BaseObject):
 
     def to_yaml(self, export_path: str):
         """
-        Creates a yaml savable dataset by saving as a creator
+        Creates a yaml savable dataset by saving as a creator.
         :param export_path: The path to export everything to
         :return: The dataset as a creator
         """

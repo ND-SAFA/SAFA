@@ -1,4 +1,7 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 
-ClusterType = List[str]
-ClusterMapType = Dict[Any, List[str]]
+from tgen.clustering.base.cluster import Cluster
+
+ClusterType = Cluster
+ClusterMapType = Dict[Any, ClusterType]
+MethodClusterMapType = Dict[Any, ClusterMapType]

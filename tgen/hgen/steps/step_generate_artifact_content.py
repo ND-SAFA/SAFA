@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Dict, List, Tuple, Set
+from typing import Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS
@@ -39,8 +39,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generated_artifacts_tag, links_tag = task_prompt.response_manager.get_all_tag_ids()
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True,
-                                                                    id_to_context_artifacts=state.id_to_cluster_artifacts
-                                                                    )
+                                                                    id_to_context_artifacts=state.id_to_cluster_artifacts)
         if state.project_summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{state.project_summary.to_string()}", allow_formatting=False)

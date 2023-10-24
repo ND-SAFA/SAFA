@@ -1,15 +1,15 @@
 import os.path
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 
+from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -40,42 +40,47 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         :return: Artifact and Trace DataFrame
         """
         logger.info(f"Reading file: {self.get_full_project_path()}")
-        entity_df = pd.read_csv(self.get_full_project_path())
+        trace_df = pd.read_csv(self.get_full_project_path())
         trace_df_entries = []
         artifact_df_entries = {}
         project_name = os.path.basename(self.get_full_project_path())
 
-        def read_artifact(row_batches):
+        def read_trace_row(row_batches: List[int]) -> None:
+            """
+            Reads rows in trace data frame and processes their artifacts.
+            :param row_batches: The list of row indices to process.
+            :return: None.
+            """
             for row_index in row_batches:
-                row = entity_df.iloc[row_index]
-                source_id = row[CSVKeys.SOURCE_ID]
-                target_id = row[CSVKeys.TARGET_ID]
+                trace_row = trace_df.iloc[row_index]
+                source_id = trace_row[CSVKeys.SOURCE_ID]
+                target_id = trace_row[CSVKeys.TARGET_ID]
                 self.add_artifact(source_id,
-                                  row[CSVKeys.SOURCE],
+                                  trace_row[CSVKeys.SOURCE],
                                   CSVKeys.SOURCE,
                                   artifact_df_entries)
                 self.add_artifact(target_id,
-                                  row[CSVKeys.TARGET],
+                                  trace_row[CSVKeys.TARGET],
                                   CSVKeys.TARGET,
                                   artifact_df_entries)
                 trace_df_entries.append({
                     StructuredKeys.Trace.SOURCE.value: source_id,
                     StructuredKeys.Trace.TARGET.value: target_id,
-                    StructuredKeys.Trace.LABEL.value: row[CSVKeys.LABEL]
+                    StructuredKeys.Trace.LABEL.value: trace_row[CSVKeys.LABEL]
                 })
 
-        index_batches = ListUtil.batch(list(range(len(entity_df))), 1000)
-        ThreadUtil.multi_thread_process(f"Reading {project_name}", index_batches, read_artifact, n_threads)
+        index_batches = ListUtil.batch(list(range(len(trace_df))), 1000)
+        ThreadUtil.multi_thread_process(f"Reading {project_name}", index_batches, read_trace_row, n_threads)
 
         artifact_df = ArtifactDataFrame(artifact_df_entries)
         if self.summarizer is not None:
             artifact_df.summarize_content(self.summarizer)
-        trace_df = TraceDataFrame(trace_df_entries)
+        trace_df = TraceDataFrame(trace_df_entries)  # TODO: Order might be messed up because threading.
         layer_mapping_df = LayerDataFrame([EnumDict({
             StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
             StructuredKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
         })])
-        entity_df = None
+        trace_df = None
         return artifact_df, trace_df, layer_mapping_df
 
     def get_project_name(self) -> str:

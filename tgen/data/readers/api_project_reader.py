@@ -50,7 +50,11 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
 
         return artifact_df, trace_df, layer_mapping_df
 
-    def create_trace_df(self):
+    def create_trace_df(self) -> TraceDataFrame:
+        """
+        Creates trace data frame containing links defined by API payload.
+        :return: Trace data frame.
+        """
         links = self.api_definition.get_links()
         trace_df_entries = []
 

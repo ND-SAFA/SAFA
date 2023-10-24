@@ -1,4 +1,5 @@
 import ast
+import json
 import os
 from _ast import AST
 
@@ -30,6 +31,7 @@ def has_docstring(node):
 
 def find_functions_classes_methods_without_docstring(directory):
     """Find functions, classes, and methods without a docstring in the given directory."""
+    missing_map = {}
     for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".py") and not file == "__init__.py":
@@ -45,10 +47,15 @@ def find_functions_classes_methods_without_docstring(directory):
                     if is_exclude:
                         continue
 
+                    if file_path not in missing_map:
+                        missing_map[file_path] = []
+
                     for node in ast.walk(tree):
                         if has_docstring(node) and ast.get_docstring(node) is None:
-                            print(f"Missing docstring in {type(node).__name__} '{node.name}' "
-                                  f"at line {node.lineno} in {file_path}")
+                            msg = f"Missing docstring in {type(node).__name__} '{node.name}' at line {node.lineno}."
+                            missing_map[file_path].append(msg)
+    missing_map = {k: v for k, v in missing_map.items() if len(v) > 0}
+    print(json.dumps(missing_map, indent=4))
 
 
 def main():

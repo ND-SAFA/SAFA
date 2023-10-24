@@ -48,8 +48,9 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         return questions, format_of_artifacts, artifact_description
 
-    @staticmethod
-    def _get_inputs_response(hgen_args: HGenArgs, format_questionnaire: QuestionnairePrompt, summary_questions_prompt: Prompt) -> Dict:
+    @classmethod
+    def _get_inputs_response(cls, hgen_args: HGenArgs, format_questionnaire: QuestionnairePrompt,
+                             summary_questions_prompt: Prompt) -> Dict:
         """
         Gets the inputs used in the prompt of the next step
         :param hgen_args: The arguments for the HGen run
@@ -58,19 +59,20 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: A dictionary mapping input tag to its value
         """
 
-        def construct_tag_from_yaml(loader, node):
-            value = loader.construct_scalar(node)
-            return bs4.Tag(value)
-
         input_save_path = GenerateInputsStep._get_inputs_save_path(
             target_type=hgen_args.target_type, source_type=hgen_args.source_type)
         if os.path.exists(input_save_path):
-            SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', construct_tag_from_yaml)
+            SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', cls.construct_tag_from_yaml)
             inputs = FileUtil.read_yaml(input_save_path)
         else:
             inputs = GenerateInputsStep._generate_new_inputs(hgen_args, format_questionnaire, summary_questions_prompt)
             FileUtil.write_yaml(inputs, input_save_path)
         return inputs
+
+    @staticmethod
+    def construct_tag_from_yaml(loader, node):
+        value = loader.construct_scalar(node)
+        return bs4.Tag(value)
 
     @staticmethod
     def _generate_new_inputs(hgen_args: HGenArgs, format_questionnaire: QuestionnairePrompt, summary_questions_prompt: Prompt) -> Dict:

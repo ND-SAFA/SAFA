@@ -20,6 +20,11 @@ class GitHubId(MultiStageHubId):
         super().__init__(task=None, **kwargs)
 
     def get_project_path(self, data_dir: str) -> str:
+        """
+        Returns the path to CSV file containing git links.
+        :param data_dir: Path to directory containing project data.
+        :return: Project path.
+        """
         project_path = super().get_project_path(data_dir)
         return project_path + ".csv"
 
@@ -31,4 +36,7 @@ class GitHubId(MultiStageHubId):
 
     @staticmethod
     def get_project_reader() -> Type[AbstractProjectReader]:
+        """
+        :return: Returns project reader for csv file containing git links.
+        """
         return CsvProjectReader

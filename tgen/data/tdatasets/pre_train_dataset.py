@@ -1,7 +1,9 @@
 from typing import Any
 
+import pandas as pd
 from datasets import load_dataset
 from torch.utils.data import Dataset
+from transformers import PreTrainedTokenizer
 
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.models.model_manager import ModelManager
@@ -35,20 +37,9 @@ class PreTrainDataset(iDataset):
         :return: A data used by the HF trainer.
         """
         tokenizer = model_manager.get_tokenizer()
-
-        def tokenize_and_chunk(texts):
-            all_input_ids = []
-            tokenizer_output = tokenizer(texts["text"], add_special_tokens=True)["input_ids"]
-            for input_ids in tokenizer_output:
-                all_input_ids.extend(input_ids)
-                all_input_ids.append(tokenizer.sep_token_id)
-            chunks = []
-            for idx in range(0, len(all_input_ids), self.block_size):
-                chunks.append(all_input_ids[idx: idx + self.block_size])
-            return {"input_ids": chunks}
-
+        input_ids = self.create_input_ids(tokenizer, tex)
         dataset = load_dataset("text", data_files={"train": self.training_file_path})
-        dataset = dataset.map(tokenize_and_chunk, batched=True, remove_columns=["text"], desc="Tokenizing dataset")
+        dataset = dataset.map(create_input_ids, batched=True, remove_columns=["text"], desc="Tokenizing dataset")
         return dataset["train"]
 
     def as_creator(self, project_path: str):
@@ -56,3 +47,20 @@ class PreTrainDataset(iDataset):
         Pre train dataset cannot be converted to creator
         """
         raise NotImplementedError("Pre train dataset cannot be converted to creator")
+
+    @staticmethod
+    def create_input_ids(tokenizer: PreTrainedTokenizer, texts: pd.DataFrame, block_size: int):
+        """
+
+        :param texts:
+        :return:
+        """
+        all_input_ids = []
+        tokenizer_output = tokenizer(texts["text"], add_special_tokens=True)["input_ids"]
+        for input_ids in tokenizer_output:
+            all_input_ids.extend(input_ids)
+            all_input_ids.append(tokenizer.sep_token_id)
+        chunks = []
+        for idx in range(0, len(all_input_ids), block_size):
+            chunks.append(all_input_ids[idx: idx + block_size])
+        return {"input_ids": chunks}

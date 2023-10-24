@@ -1,3 +1,4 @@
+import { ComputedRef } from "vue/dist/vue";
 import {
   ArtifactSchema,
   DocumentSchema,
@@ -9,6 +10,10 @@ import {
  * A hook for calling document API endpoints.
  */
 export interface DocumentApiHook {
+  /**
+   * Whether any document request is loading.
+   */
+  loading: ComputedRef<boolean>;
   /**
    * Creates a new document and updates app state.
    *

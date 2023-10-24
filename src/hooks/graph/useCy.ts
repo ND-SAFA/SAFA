@@ -142,6 +142,8 @@ export const useCy = defineStore("cy", {
       this.getCy(type).then((cy) => {
         const nodes = cy.nodes();
 
+        cy.maxZoom(0.8);
+
         if (animate) {
           if (cy.animated()) {
             cy.stop(false, false);
@@ -157,6 +159,8 @@ export const useCy = defineStore("cy", {
           this.zoom("reset", type);
           cy.center(nodes);
         }
+
+        cy.maxZoom(100);
       });
     },
     /**

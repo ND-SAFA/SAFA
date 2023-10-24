@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Any
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS
@@ -50,13 +50,14 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                           dataset=dataset, response_prompt_ids={task_prompt.id},
                                                           tags_for_response={generated_artifacts_tag}, return_first=False,
                                                           export_path=export_path)
-        state.generation_predictions = self._map_generations_to_predicted_sources(generation_predictions, source_tag_id,
-                                                                                  target_tag_id, state)
+        state.generation_predictions, state.cluster2generation = self._map_generations_to_predicted_sources(generation_predictions,
+                                                                                                            source_tag_id,
+                                                                                                            target_tag_id, state)
         state.n_generations += 1
 
     @staticmethod
     def _map_generations_to_predicted_sources(generation_predictions: List, source_tag_id: str, target_tag_id: str,
-                                              state: HGenState) -> Dict[str, Set[str]]:
+                                              state: HGenState) -> Tuple[Dict[str, Set[str]], Dict[Any, str]]:
         """
         Creates a mapping of the generated artifact to a list of the predicted links to it and the source artifacts
         :param generation_predictions: The predictions from the LLM
@@ -66,16 +67,17 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
         """
         generated_artifact_to_predicted_sources = {}
-        cluster_ids = list(state.cluster_dataset.artifact_df.index) if state.cluster_dataset is not None else []
+        cluster2generations = {cluster_id: [] for cluster_id in
+                               state.cluster_dataset.artifact_df.index} if state.cluster_dataset else {}
+        cluster_ids = list(cluster2generations.keys()) if state.cluster_dataset is not None else []
         for i, pred in enumerate(generation_predictions):
             for p in pred:
                 generation = p[target_tag_id][0]
                 sources = set(p[source_tag_id][0]) if len(p[source_tag_id]) > 0 else set()
-                if cluster_ids:
-                    cluster_id = cluster_ids[i]
-                    sources.update({a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]})
                 generated_artifact_to_predicted_sources[generation] = sources
-        return generated_artifact_to_predicted_sources
+                if cluster_ids:
+                    cluster2generations[cluster_ids[i]].append(generation)
+        return generated_artifact_to_predicted_sources, cluster2generations
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:
         """
@@ -90,20 +92,17 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         target_type_tag, target_tag_id = HGenUtil.convert_spaces_to_dashes(args.target_type), "target"
         source_type_tag, source_tag_id = HGenUtil.convert_spaces_to_dashes(args.source_type), "source"
         task_prompt.response_manager = PromptResponseManager(
-            response_instructions_format=f"Enclose the {args.target_type} in "
-                                         + "{target} ",
+            response_instructions_format=f"Enclose each {args.target_type}s in "
+                                         "{target}. Inside of the {target} tag, " 
+                                         f"also include a comma-deliminated " 
+                                         f"list of the ids for each {args.source_type} " 
+                                         f"from which you derived the {args.target_type} " 
+                                         "enclosed in {source}",
             expected_responses={source_tag_id: set(state.source_dataset.artifact_df.index)},
             value_formatter=lambda tag, val: [v.strip() for v in val.split(COMMA)] if tag == source_tag_id
             else val.strip().strip(NEW_LINE),
             id2tag={target_tag_id: target_type_tag,
                     source_tag_id: source_type_tag},
             response_tag={target_type_tag: [source_type_tag]})
-        if not state.id_to_cluster_artifacts:
-            task_prompt.response_manager.response_instructions_format += f"for each of the {args.target_type} generated. " \
-                                                                         "Inside of the {target} tag, " \
-                                                                         f"also include a comma-deliminated " \
-                                                                         f"list of the ids for each {args.source_type} " \
-                                                                         f"from which you derived the {args.target_type} " \
-                                                                         "enclosed in {source}"
         task_prompt.format_value(format=state.format_of_artifacts, description=state.description_of_artifact)
         return task_prompt, target_tag_id, source_tag_id

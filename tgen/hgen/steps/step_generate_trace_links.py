@@ -9,14 +9,16 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.status import Status
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import HGenUtil
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
@@ -42,17 +44,38 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             return
 
         logger.info(f"Predicting links between {args.target_type} and {args.source_layer_id}\n")
-        tracing_job = RankingJob(dataset=state.all_artifacts_dataset,
-                                 layer_ids=(args.target_type, args.source_layer_id),  # parent, child
-                                 export_dir=self._get_ranking_dir(state.export_dir),
-                                 load_dir=self._get_ranking_dir(args.load_dir),
-                                 link_threshold=0.3,  # Only filter out really low links so that related artifacts can factor in
-                                 ranking_pipeline=SupportedRankingPipelines.EMBEDDING)
-        result = tracing_job.run()
-        if result.status != Status.SUCCESS:
-            raise Exception(f"Trace link generation failed: {result.body}")
 
-        trace_predictions: List[EnumDict] = result.body.prediction_entries
+        if args.perform_clustering:
+            trace_predictions = []
+            generation2id = {content: a_id for a_id, content in new_artifact_df.to_map().items()}
+            for cluster_id in state.cluster_dataset.artifact_df.index:
+                generations = state.cluster2generation.get(cluster_id)
+                parent_ids = [generation2id[generation] for generation in generations]
+                children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
+                pipeline_args = RankingArgs(run_name=f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
+                                                                                                        args.target_type, parent_ids),
+                                            dataset=state.all_artifacts_dataset,
+                                            parent_ids=parent_ids,
+                                            children_ids=children_ids,
+                                            export_dir=os.path.join(self._get_ranking_dir(state.export_dir), str(cluster_id)),
+                                            types_to_trace=(args.source_type, args.target_type),
+                                            selection_method=None)
+                pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
+                pipeline.run()
+                state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
+                trace_predictions.extend(pipeline.state.selected_entries)
+        else:
+            tracing_job = RankingJob(dataset=state.all_artifacts_dataset,
+                                     layer_ids=(args.target_type, args.source_layer_id),  # parent, child
+                                     export_dir=self._get_ranking_dir(state.export_dir),
+                                     load_dir=self._get_ranking_dir(args.load_dir),
+                                     ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
+                                     link_threshold=0.3)  # Only filter out really low links so that related artifacts can factor in
+            result = tracing_job.run()
+            if result.status != Status.SUCCESS:
+                raise Exception(f"Trace link generation failed: {result.body}")
+
+            trace_predictions: List[EnumDict] = result.body.prediction_entries
         trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions, id_to_related_children)
         state.trace_predictions = trace_predictions
 

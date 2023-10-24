@@ -85,6 +85,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Creates a new state corresponding to sub-class.
         :return: The new state.
         """
+        if not self.args.load_dir:
+            self.args.load_dir = self.args.export_dir
         if self.args.load_dir:
             return self.state_class().load_latest(self.args.load_dir, [step.get_step_name() for step in self.steps])
         return self.state_class()()
@@ -98,7 +100,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             os.makedirs(self.args.export_dir, exist_ok=True)
             self.state.export_dir = self.args.export_dir
         if self.summarizer_args:
-            self.summarizer_args.export_dir = self.state.export_dir
+            self.summarizer_args.update_export_dir(self.state.export_dir)
             dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
             if not self.args.dataset.project_summary:
                 self.args.dataset = dataset

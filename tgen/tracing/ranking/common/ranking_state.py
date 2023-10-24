@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from tgen.common.util.enum_util import EnumDict
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.state import State
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
@@ -14,6 +15,7 @@ class RankingState(State):
 
     # sorting
     sorted_parent2children: Optional[Dict[str, List[EnumDict]]] = None
+    embedding_manager: EmbeddingsManager = None
 
     # Ranking
     ranking_responses: List[List[Dict]] = field(default=None, repr=False)

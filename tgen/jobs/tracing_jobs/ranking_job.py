@@ -79,7 +79,7 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(dataset.artifact_df.get_type(parent_type).index)
         children_ids = list(dataset.artifact_df.get_type(child_type).index)
-        run_name = f"{child_type}({len(children_ids)}) --> {parent_type}({len(parent_ids)})"
+        run_name = self.get_run_name(child_type, children_ids, parent_type, parent_ids)
         logger.info(f"Starting to trace: {run_name}")
 
         if not self.select_top_predictions:
@@ -112,6 +112,18 @@ class RankingJob(AbstractJob):
             PromptDatasetExporter(export_path=os.path.join(export_dir, "final_dataset"),
                                   dataset=self.dataset, trace_dataset_exporter_type=SafaExporter).export()
         return selected_entries
+
+    @staticmethod
+    def get_run_name(child_type: str, children_ids: List, parent_type: str, parent_ids: List) -> str:
+        """
+        Gets the run name for the child and parent type
+        :param child_type: The type of the child artifacts
+        :param children_ids: The list of ids of each possible child
+        :param parent_type: The type of the parent artifacts
+        :param parent_ids: The list of ids of each parent being linked
+        :return: The run name
+        """
+        return f"{child_type}({len(children_ids)}) --> {parent_type}({len(parent_ids)})"
 
     @staticmethod
     def get_trace_id_from_entry(entry: EnumDict) -> int:

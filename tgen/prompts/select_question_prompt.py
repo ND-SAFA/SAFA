@@ -28,7 +28,7 @@ class SelectQuestionPrompt(QuestionPrompt):
                  response_tag: str = None,
                  multiple_responses_allowed: bool = False,
                  categories_are_continuous: bool = False,
-                 default_factory: Callable = None):
+                 **response_manager_args):
         """
         Initializes the prompt with the categories that a model can select
         :param categories: A dictionary mapping category name to its description or a list of category descriptions
@@ -63,7 +63,7 @@ class SelectQuestionPrompt(QuestionPrompt):
                                                  expected_response_type=type(category_names[0]),
                                                  value_formatter=None if not multiple_responses_allowed else lambda t, v: v.split(
                                                      COMMA),
-                                                 default_factory=default_factory)
+                                                 **response_manager_args)
         super().__init__(f"{question}{self.instructions}",
                          response_manager=response_manager)
 

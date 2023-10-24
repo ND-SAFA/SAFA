@@ -5,6 +5,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.state import State
 
 
@@ -28,11 +29,13 @@ class HGenState(State):
     """
     id_to_cluster_artifacts: Dict[Any, List[EnumDict]] = None  # maps cluster id to the list of artifacts in that cluster
     cluster_dataset: Optional[PromptDataset] = None  # contains prompt dataset with just the artifact df of the clusters.
+    embedding_manager: EmbeddingsManager = None  # allows embeddings to be reused
 
     """
     Step 4 - Artifact generation
     """
     generation_predictions: Dict[str, Set[str]] = None  # dictionary mapping generated content to a list of related source ids
+    cluster2generation: Dict[Any, str] = None  # Maps cluster id to the generation that was produced for that cluster
     n_generations: int = 0  # number of runs of artifact generation
 
     """

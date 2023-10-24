@@ -28,6 +28,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         cluster_map = clustering_pipeline.state.final_cluster_map
 
         state.cluster_dataset = clustering_pipeline.state.cluster_artifact_dataset
+        state.embedding_manager = clustering_pipeline.state.embedding_manager
         
         source_artifact_df = state.source_dataset.artifact_df
         state.id_to_cluster_artifacts = self._replace_ids_with_artifacts(cluster_map, source_artifact_df)

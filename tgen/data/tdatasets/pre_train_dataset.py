@@ -1,10 +1,11 @@
-from typing import Any
+from typing import Any, Dict
 
-import pandas as pd
 from datasets import load_dataset
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer
 
+from tgen.common.constants.hugging_face_constants import INPUT_IDS_PARAM, TEXT_PARAM, TRAIN_PARAM
+from tgen.common.util.list_util import ListUtil
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.models.model_manager import ModelManager
 
@@ -37,30 +38,38 @@ class PreTrainDataset(iDataset):
         :return: A data used by the HF trainer.
         """
         tokenizer = model_manager.get_tokenizer()
-        input_ids = self.create_input_ids(tokenizer, tex)
-        dataset = load_dataset("text", data_files={"train": self.training_file_path})
-        dataset = dataset.map(create_input_ids, batched=True, remove_columns=["text"], desc="Tokenizing dataset")
-        return dataset["train"]
+        input_id_parser = self.create_input_id_parser(tokenizer, self.block_size)
+        dataset = load_dataset(TEXT_PARAM, data_files={TRAIN_PARAM: self.training_file_path})
+        dataset = dataset.map(input_id_parser, batched=True, remove_columns=[TEXT_PARAM], desc="Tokenizing dataset")
+        return dataset[TRAIN_PARAM]
 
     def as_creator(self, project_path: str):
         """
         Pre train dataset cannot be converted to creator
         """
-        raise NotImplementedError("Pre train dataset cannot be converted to creator")
+        raise NotImplementedError("Pre train dataset cannot be converted to creator.")
 
     @staticmethod
-    def create_input_ids(tokenizer: PreTrainedTokenizer, texts: pd.DataFrame, block_size: int):
+    def create_input_id_parser(tokenizer: PreTrainedTokenizer, batch_size: int):
+        """
+        Creates a function that will parse texts into input ids.
+        :param tokenizer: The tokenizer used to convert text into input ids.
+        :param batch_size: The size of each batch of input ids.
+        :return: The parsing function.
         """
 
-        :param texts:
-        :return:
-        """
-        all_input_ids = []
-        tokenizer_output = tokenizer(texts["text"], add_special_tokens=True)["input_ids"]
-        for input_ids in tokenizer_output:
-            all_input_ids.extend(input_ids)
-            all_input_ids.append(tokenizer.sep_token_id)
-        chunks = []
-        for idx in range(0, len(all_input_ids), block_size):
-            chunks.append(all_input_ids[idx: idx + block_size])
-        return {"input_ids": chunks}
+        def parse_into_input_ids(texts: Dict):
+            """
+            Tokenizes texts and batches texts.
+            :param texts: The texts to tokenize.
+            :return: Dictionary containing input ids.
+            """
+            all_input_ids = []
+            tokenizer_output = tokenizer(texts[TEXT_PARAM], add_special_tokens=True)[INPUT_IDS_PARAM]
+            for input_ids in tokenizer_output:
+                all_input_ids.extend(input_ids)
+                all_input_ids.append(tokenizer.sep_token_id)
+            batches = ListUtil.batch(all_input_ids, batch_size)
+            return {INPUT_IDS_PARAM: batches}
+
+        return parse_into_input_ids

@@ -14,7 +14,12 @@ class NpEncoder(json.JSONEncoder):
     Handles Numpy conversion to json
     """
 
-    def default(self, obj):
+    def default(self, obj: Any):
+        """
+        Encodes object into JSON.
+        :param obj: The object to encode.
+        :return: The dictionary representing that object.
+        """
         from tgen.data.tdatasets.trace_dataset import TraceDataset
         if isinstance(obj, TraceDataset):
             from tgen.data.exporters.api_exporter import ApiExporter

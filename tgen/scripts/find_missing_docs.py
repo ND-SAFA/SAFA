@@ -59,6 +59,10 @@ def find_functions_classes_methods_without_docstring(directory):
 
 
 def main():
+    """
+    TODO
+    :return:
+    """
     directory_path = os.path.expanduser(os.environ["ROOT_PATH"])
     find_functions_classes_methods_without_docstring(directory_path)
 

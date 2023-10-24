@@ -3,15 +3,15 @@ import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union, Optional
+from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union
 
 import yaml
-from yaml.dumper import Dumper, SafeDumper
+from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
-from tgen.common.constants.path_constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM, CURRENT_PROJECT_PARAM, USER_SYM, \
-    PROJ_PATH
+from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, ROOT_PATH_PARAM, \
+    USER_SYM
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
 
@@ -139,8 +139,8 @@ class FileUtil:
             raise Exception("Unable to read pretraining data file path " + data_path)
         return files
 
-    @staticmethod
-    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None,
+    @classmethod
+    def expand_paths(cls, paths: Union[List, Dict, str], replacements: Dict[str, str] = None,
                      use_abs_paths: bool = True):
         """
         For every string found in value, if its a path its expanded completed path
@@ -149,20 +149,12 @@ class FileUtil:
         :param use_abs_paths: If True, returns the absolute path
         :return: Same type as value, but with its content processed.
         """
+        return FileUtil.perform_function_on_paths(paths,
+                                                  lambda p: cls.perform_replacements(p, use_abs_paths, replacements=replacements),
+                                                  replacements=replacements)
 
-        def expand(path: str, replacements: Dict[str, str] = None):
-            if replacements:
-                for k, v in replacements.items():
-                    path = path.replace(k, v)
-            path = os.path.expanduser(path)
-            if use_abs_paths:
-                path = FileUtil.get_path_relative_to_proj_path(path)
-            return path
-
-        return FileUtil.perform_function_on_paths(paths, expand, replacements=replacements)
-
-    @staticmethod
-    def collapse_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
+    @classmethod
+    def collapse_paths(cls, paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
         """
         For every string found in value, if its a path its collapsed into a shorter form
         :param paths: List, Dict, or String containing one or more paths.
@@ -170,17 +162,32 @@ class FileUtil:
         :return: Same type as value, but with its content processed.
         """
 
-        def collapse(path: str, replacements: Dict[str, str] = None):
-            if replacements:
-                path2var = {v: k for k, v in replacements.items()}
-                ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
-                for path2replace in ordered_paths:
-                    path = path.replace(path2replace, path2var[path2replace])
-            if os.path.isabs(path):
-                path = os.path.relpath(path, PROJ_PATH)
-            return path
+        def process(p: str):
+            """
+            Makes replacements on path.
+            :param p: The path to make replacements on.
+            :return: Processed path.
+            """
+            use_abs_path = os.path.isabs(p)
+            return cls.perform_replacements(p, use_abs_path, replacements=replacements)
 
-        return FileUtil.perform_function_on_paths(paths, collapse, replacements=replacements)
+        return FileUtil.perform_function_on_paths(paths, process, replacements=replacements)
+
+    @staticmethod
+    def perform_replacements(path: str, use_abs_paths: bool, replacements: Dict[str, str] = None):
+        """
+        Performs replacements on path and expands user path.
+        :param path: The path to process.
+        :param use_abs_paths: Whether path is absolute.
+        :return: Processed path.
+        """
+        if replacements:
+            for k, v in replacements.items():
+                path = path.replace(k, v)
+        path = os.path.expanduser(path)
+        if use_abs_paths:
+            path = FileUtil.get_path_relative_to_proj_path(path)
+        return path
 
     @staticmethod
     def perform_function_on_paths(paths: Union[List, Dict, str], func: Callable, replacements: Dict[str, str] = None, **kwargs):

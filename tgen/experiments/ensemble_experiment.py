@@ -5,11 +5,11 @@ from typing import Callable, List
 import numpy as np
 from sklearn.preprocessing import minmax_scale, scale
 
+from tgen.common.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.status import Status
-from tgen.common.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.keys.structure_keys import StructuredKeys
@@ -25,10 +25,20 @@ from tgen.models.single_layer.single_layer_model import SingleLayerModel, predic
 
 
 def average(arr):
+    """
+    Calculates average of array.
+    :param arr: The array whose elements are averaged.
+    :return: The average.
+    """
     return sum(arr) / len(arr)
 
 
 def first(arr):
+    """
+    Returns first element in array.
+    :param arr: The array.
+    :return: The first element.
+    """
     return arr[0]
 
 

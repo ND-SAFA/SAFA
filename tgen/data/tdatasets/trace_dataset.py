@@ -1,4 +1,3 @@
-import os
 import random
 from collections import Counter
 from copy import deepcopy
@@ -11,18 +10,17 @@ import torch
 from datasets import Dataset
 from tqdm import tqdm
 
-from tgen.common.util.date_time_util import DateTimeUtil
+from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
 from tgen.data.keys.csv_keys import CSVKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -63,6 +61,10 @@ class TraceDataset(iDataset):
         self.trace_df = trace_df
 
     def get_trace_matrix(self) -> TraceMatrix:
+        """
+        Returns the trace matrix associated with trace data frame.
+        :return: The trace matrix.
+        """
         if self.__trace_matrix is None:
             self.__trace_matrix = TraceMatrix(self.trace_df, randomize=self.randomize)
         return self.__trace_matrix

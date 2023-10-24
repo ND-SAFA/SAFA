@@ -33,7 +33,13 @@ class PositiveLinkIndices(AbstractTraceMetric):
         Computes the true link indices metric.
         """
 
-        def compute(labels, preds):
+        def compute_positive_link_indices(labels, preds) -> Dict:
+            """
+            Computes the indices of the positively predicted datums.
+            :param labels: The labels of the data.
+            :param preds: The predictions on the data.
+            :return: Dictionary containing indices of positive predictions.
+            """
             if 1 not in labels:
                 return np.NAN
             zipped_list = list(zip(labels, preds))
@@ -45,7 +51,7 @@ class PositiveLinkIndices(AbstractTraceMetric):
                     pos_link_indices.append(i)
             return pd.Series(pos_link_indices).value_counts().to_dict()
 
-        avg_positive_link_index = trace_matrix.calculate_query_metric(compute, joining_function=DictUtil.joining)
+        avg_positive_link_index = trace_matrix.calculate_query_metric(compute_positive_link_indices, joining_function=DictUtil.joining)
         avg_positive_link_index = dict(sorted(avg_positive_link_index.items(), key=lambda x: x[0]))
 
         return {
@@ -53,6 +59,9 @@ class PositiveLinkIndices(AbstractTraceMetric):
         }
 
     def _info(self) -> datasets.MetricInfo:
+        """
+        :return: The metric information.
+        """
         return datasets.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,

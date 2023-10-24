@@ -66,14 +66,19 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         prompts = prompt if isinstance(prompt, list) else [prompt]
         logger.info(f"Starting OpenAI batch: {params['model']}")
 
-        def perform_work(p: str):
+        def complete_prompt(p: str) -> str:
+            """
+            Completes the prompt with openai manager.
+            :param p: The prompt to complete.
+            :return: The response as a string.
+            """
             params[OpenAIParams.MESSAGES] = [{"role": "user", "content": p}]
             res = openai.ChatCompletion.create(**params)
             return res.choices[0]
 
         choices = ThreadUtil.multi_thread_process("Making completion requests",
                                                   prompts,
-                                                  perform_work,
+                                                  complete_prompt,
                                                   n_threads=open_ai_constants.OPENAI_MAX_THREADS,
                                                   max_attempts=open_ai_constants.OPENAI_MAX_ATTEMPTS,
                                                   collect_results=True)

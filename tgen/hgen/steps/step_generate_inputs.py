@@ -71,6 +71,12 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     @staticmethod
     def construct_tag_from_yaml(loader, node):
+        """
+        YAML constructor for reading BS4 tags.
+        :param loader: TODO
+        :param node: The node in the yaml being processed.
+        :return: The BS4 tag.
+        """
         value = loader.construct_scalar(node)
         return bs4.Tag(value)
 

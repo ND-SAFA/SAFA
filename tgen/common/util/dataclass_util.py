@@ -1,5 +1,5 @@
 import inspect
-from dataclasses import dataclass, field, MISSING, Field
+from dataclasses import Field, MISSING, dataclass
 from typing import Dict
 
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -25,10 +25,12 @@ def required_field(*, field_name: str, init=True, repr=True, hash=None, compare=
 
 
 class RequiredField:
-    """
-    Represents a field that is required in a dataclss
-    """
+
     def __init__(self, field_name: str):
+        """
+        Represents a field that is required in a dataclass.
+        :param field_name: The name of the field.
+        """
         raise TypeError(f"{field_name} is required.")
 
 

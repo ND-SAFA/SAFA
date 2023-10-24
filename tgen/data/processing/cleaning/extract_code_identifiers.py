@@ -1,13 +1,13 @@
-from typing import List
+from typing import List, Tuple
 
 import javac_parser
 from comment_parser import comment_parser
 from comment_parser.comment_parser import UnsupportedError
 
-from tgen.common.constants.path_constants import JAVA_KEYWORDS_PATH
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
-from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.common.constants.path_constants import JAVA_KEYWORDS_PATH
 from tgen.common.util.logging.logger_manager import logger
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):
@@ -60,14 +60,18 @@ class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):
         """
         parsed_syntax_items = self.get_java().lex(class_text)
 
-        def filter_java_identifier(syntax_item):
-            # returns true if identifier and not a reserved word
+        def is_java_identifier(syntax_item: Tuple[str, str]):
+            """
+            Calculates if word is an identifier (e.g. variable name).
+            :param syntax_item: Tuple containing label and word.
+            :return: True if identifier and not a reserved word.
+            """
             word_label = syntax_item[0]
             word = syntax_item[1]
             return word_label == "IDENTIFIER" and word.lower() not in self.java_reserved_words
 
         identifiers = list(
-            map(lambda id: id[-1], filter(filter_java_identifier, parsed_syntax_items))
+            map(lambda id: id[-1], filter(is_java_identifier, parsed_syntax_items))
         )
         if len(identifiers) == 0:
             return class_text

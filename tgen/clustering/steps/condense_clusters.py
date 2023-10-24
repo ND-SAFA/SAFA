@@ -1,4 +1,5 @@
-from tgen.clustering.base.cluster_selector import ClusterSelector
+from tgen.clustering.base.cluster_condenser import ClusterCondenser
+from tgen.clustering.base.cluster_type import MethodClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.common.constants.clustering_constants import MIN_AVG_SIMILARITY_FOR_CLUSTERING
@@ -13,8 +14,8 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param state: Current state of the clustering pipeline.
         :return: None
         """
-        global_cluster_map = state.multi_method_cluster_map
-        unique_cluster_map = ClusterSelector(state.embedding_manager, threshold=args.cluster_intersection_threshold)
+        global_cluster_map: MethodClusterMapType = state.multi_method_cluster_map
+        unique_cluster_map = ClusterCondenser(state.embedding_manager, threshold=args.cluster_intersection_threshold)
 
         clusters = []
         for cluster_method in args.cluster_methods:

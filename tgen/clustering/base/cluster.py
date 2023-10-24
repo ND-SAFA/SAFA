@@ -12,10 +12,12 @@ class Cluster:
     Manages a cluster in a dataset.
     """
 
-    def __init__(self):
+    def __init__(self, embeddings_manager: EmbeddingsManager):
         """
-        Constructs empty cluster.
+        Constructs empty cluster referencing embeddings in manager.
+        :param embeddings_manager: The container for all embeddings relating to cluster.
         """
+        self.embeddings_manager = embeddings_manager
         self.artifact_ids = []
         self.artifact_id_set = set()
         self.votes = 1
@@ -25,15 +27,30 @@ class Cluster:
     def add_vote(self) -> None:
         """
         Adds vote to cluster.
-        :return: None
+        :return: None. Modified in place.
         """
         self.votes += 1
 
     def add_artifacts(self, artifact_ids: List[str]) -> None:
+        """
+        Adds multiple artifacts to cluster and updates its stats.
+        :param artifact_ids: The artifact ids to add to the cluster.
+        :return: None.
+        """
         for artifact_id in artifact_ids:
-            self.add_artifact(artifact_id)
+            self._add_artifact(artifact_id)
+        self.calculate_stats()
 
     def add_artifact(self, artifact_id: str) -> None:
+        """
+        Adds an artifact to the cluster.
+        :param artifact_id: ID of artifact to add to cluster.
+        :return: None
+        """
+        self._add_artifact(artifact_id)
+        self.calculate_stats()
+
+    def _add_artifact(self, artifact_id: str) -> None:
         """
         Adds an artifact to the cluster.
         :param artifact_id: ID of artifact to add to cluster.
@@ -43,14 +60,72 @@ class Cluster:
             self.artifact_id_set.add(artifact_id)
             self.artifact_ids.append(artifact_id)
 
-    def calculate_stats(self, embedding_manager: EmbeddingsManager) -> None:
+    def calculate_stats(self) -> None:
         """
         Calculates all statistics for the cluster.
-        :param embedding_manager: Manager containing embeddings for artifacts in cluster.
         :return: None, stats are set in place
         """
-        self.centroid = self.calculate_centroid(self.artifact_ids, embedding_manager)
-        self.avg_similarity = self.calculate_average_similarity(self.artifact_ids, self.centroid, embedding_manager)
+        self.centroid = Cluster.calculate_centroid(self.artifact_ids, self.embeddings_manager)
+        self.avg_similarity = Cluster.calculate_average_similarity(self.artifact_ids, self.centroid, self.embeddings_manager)
+
+    def similarity_to(self, cluster: "Cluster") -> float:
+        """
+        Calculates the cosine similarity between the centroid of this cluster to the cluster given.
+        :param cluster: The cluster to calculate the distance to.
+        :return: The similarity to the other cluster.
+        """
+        return cosine_similarity([self.centroid], [cluster.centroid])[0][0]
+
+    def __len__(self) -> int:
+        """
+        :return: Length of cluster is the number of the artifacts in cluster.
+        """
+        return len(self.artifact_id_set)
+
+    def __iter__(self) -> Iterable[str]:
+        """
+        :return: Iterable goes through each artifact id.
+        """
+        for a in self.artifact_ids:
+            yield a
+
+    def __contains__(self, item: Any) -> bool:
+        """
+        Calculates whether item is an artifact ID in the cluster.
+        :param item: The artifact ID.
+        :return: True is artifact id in cluster, false otherwise.
+        """
+        return isinstance(item, str) and item in self.artifact_ids
+
+    def __str__(self) -> str:
+        """
+        :return: Returns string version of the artifacts.
+        """
+        return self.__repr__()
+
+    def __repr__(self) -> str:
+        """
+        :return: Cluster is represented by the list of artifact ids it contains.
+        """
+        score = "" if self.avg_similarity is None else f"({round(self.avg_similarity, 2)})"
+        cluster_repr = f"{self.artifact_ids.__str__()}{score}"
+        return cluster_repr
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Determines if other contains the same artifacts as this one.
+        :param other: The other cluster to compare.
+        :return: True if clusters have the same artifacts, false otherwise.
+        """
+        return isinstance(other, Cluster) and other.artifact_id_set.__eq__(self.artifact_id_set)
+
+    def __hash__(self) -> List[Any]:
+        """
+        Makes this object hashable.
+        # TODO: Replace this with the hash for a set.
+        :return: The hash for each artifact id.
+        """
+        return hash("-".join(sorted(list(self.artifact_ids))))
 
     @staticmethod
     def calculate_centroid(cluster: List[str], embedding_manager: EmbeddingsManager):
@@ -90,66 +165,14 @@ class Cluster:
         avg_similarity = sum(similarities) / len(similarities)
         return avg_similarity
 
-    def similarity_to(self, cluster: "Cluster") -> float:
+    @staticmethod
+    def from_artifacts(artifact_ids: List[str], embeddings_manager: EmbeddingsManager) -> "Cluster":
         """
-        Calculates the distance between the centroids of this cluster to that given.
-        :param cluster: The cluster to calculate the distance to.
-        :return: The distance as a similarity score.
+        Creates cluster containing given artifact ids.
+        :param artifact_ids: The artifacts to include in the cluster.
+        :param embeddings_manager: The embeddings manager used to update the stats of the cluster.
+        :return: The cluster.
         """
-        return cosine_similarity([self.centroid], [cluster.centroid])[0][0]
-
-    def id(self) -> str:
-        """
-        :return: Returns ID for cluster representing artifact ids.
-        """
-        score = "" if self.avg_similarity is None else f"({round(self.avg_similarity, 2)})"
-        return f"{self.artifact_ids.__str__()}{score}"
-
-    def __len__(self) -> int:
-        """
-        :return: Length of cluster is the number of the artifacts in cluster.
-        """
-        return len(self.artifact_id_set)
-
-    def __iter__(self) -> Iterable[str]:
-        """
-        :return: Iterable goes through each artifact id.
-        """
-        for a in self.artifact_ids:
-            yield a
-
-    def __contains__(self, item: Any) -> bool:
-        """
-        Calculates whether item is an artifact ID in the cluster.
-        :param item: The artifact ID.
-        :return: True is artifact id in cluster, false otherwise.
-        """
-        return isinstance(item, str) and item in self.artifact_ids
-
-    def __str__(self) -> str:
-        """
-        :return: Returns string version of the artifacts.
-        """
-        return self.id()
-
-    def __repr__(self) -> str:
-        """
-        :return: Cluster is represented by the list of artifact ids it contains.
-        """
-        return self.id()
-
-    def __eq__(self, other: Any) -> bool:
-        """
-        Determines if other contains the same artifacts as this one.
-        :param other: The other cluster to compare.
-        :return: True if clusters have the same artifacts, false otherwise.
-        """
-        return isinstance(other, Cluster) and other.artifact_id_set.__eq__(self.artifact_id_set)
-
-    def __hash__(self) -> List[Any]:
-        """
-        Makes this object hashable.
-        # TODO: Replace this with the hash for a set.
-        :return: The hash for each artifact id.
-        """
-        return hash("-".join(sorted(list(self.artifact_ids))))
+        cluster = Cluster(embeddings_manager)
+        cluster.add_artifacts(artifact_ids)
+        return cluster

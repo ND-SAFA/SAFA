@@ -7,9 +7,9 @@ from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NE
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
-class ClusterSelector:
+class ClusterCondenser:
     """
-    Responsible for
+    Condenses clusters into single unique set.
     """
 
     def __init__(self, embeddings_manager: EmbeddingsManager, threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD):
@@ -26,7 +26,7 @@ class ClusterSelector:
     def get_clusters(self, min_votes: int = DEFAULT_CLUSTER_MIN_VOTES) -> ClusterMapType:
         """
         Constructs cluster map from the clusters reaching the minimum number of votes.
-        :param min_votes: The minimum number of votes to to include in cluster map.
+        :param min_votes: The minimum number of votes to include in cluster map.
         :return: Cluster map.
         """
         selected_cluster_ids = [c_id for c_id, cluster in self.cluster_map.items() if cluster.votes >= min_votes]
@@ -59,15 +59,20 @@ class ClusterSelector:
         return cluster
 
     def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster):
+        """
+        Adds the artifacts of the new cluster to the source. Source is updated after being modified.
+        :param source_cluster: The existing cluster to add new cluster to.
+        :param new_cluster: The cluster whose add to source.
+        :return: None. Updates are done in place.
+        """
+        source_cluster.add_artifacts(new_cluster.artifact_id_set)
         for a_id in new_cluster.artifact_id_set:
-            source_cluster.add_artifact(a_id)
             self.seen_artifacts.add(a_id)
-        source_cluster.calculate_stats(self.embeddings_manager)
 
     def should_add(self, cluster: Cluster) -> bool:
         """
         Processes cluster and determines if we should add it to the set.
-        :param cluster: The candidate cluster.
+        :param cluster: The candidate cluster to add.
         :return: Whether cluster should be added to map.
         """
         contains_new_artifacts = self.contains_new_artifacts(cluster)
@@ -77,14 +82,15 @@ class ClusterSelector:
             return False
         return (contains_new_artifacts or not contains_cluster) and not did_merge
 
-    def try_merge(self, cluster: Cluster):
+    def try_merge(self, cluster: Cluster, min_similarity_score: float = 0.85):
         """
         Tries to merge cluster into those similar enough to it.
         :param cluster: The cluster to try to merge.
+        :param min_similarity_score: The minimum score for a cluster to be deemed similar enough to another to merge them.
         :return: Whether the cluster was merged into any others.
         """
         clusters = list(self.cluster_map.values())
-        clusters_to_merge_into: List[Cluster] = [c for c in clusters if cluster.similarity_to(c) >= 0.85]
+        clusters_to_merge_into: List[Cluster] = [c for c in clusters if cluster.similarity_to(c) >= min_similarity_score]
         for source_cluster in clusters_to_merge_into:
             self.merge_clusters(source_cluster, cluster)
         return len(clusters_to_merge_into) > 0
@@ -107,16 +113,17 @@ class ClusterSelector:
             cluster_similarities[source_cluster] = similarity_to_cluster
         return is_hit
 
-    def contains_new_artifacts(self, cluster: ClusterType, ratio: float = DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION) -> bool:
+    def contains_new_artifacts(self, cluster: ClusterType,
+                               min_new_artifact_ratio: float = DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION) -> bool:
         """
         Calculates whether cluster has enough or new artifacts to be accepted.
         :param cluster: The cluster to evaluate if it contains enough new artifacts.
-        :param ratio: The ratio of new artifacts relative to the cluster size to accept.
+        :param min_new_artifact_ratio: The minimum acceptable ratio of new artifacts to seen artifacts in the cluster.
         :return: Whether cluster contains a ratio of new artifacts greater or equal to the default value.
         """
         unseen_artifacts = [a for a in cluster if a not in self.seen_artifacts]
         new_artifact_ratio = len(unseen_artifacts) / len(cluster)
-        return new_artifact_ratio >= ratio
+        return new_artifact_ratio >= min_new_artifact_ratio
 
     def replace(self, cluster: Cluster, new_cluster: Cluster) -> None:
         """

@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
@@ -27,9 +27,9 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param args: The arguments and current state of HGEN.
         :return: None
         """
-        proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME)
+        proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME) if args.load_dir else None
 
-        if os.path.exists(proj_path):
+        if proj_path and os.path.exists(proj_path):
             dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
         else:
             original_artifact_df, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
@@ -37,7 +37,6 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             final_artifact_df = state.all_artifacts_dataset.artifact_df
             new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, args.target_type)
             new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(state, final_artifact_df, new_layer_df)
-
 
             final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
             final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df

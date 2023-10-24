@@ -2,7 +2,7 @@ import "cypress-file-upload";
 
 Cypress.Commands.add("expandViewport", (size) => {
   if (size === "l") {
-    cy.viewport(1024 * 2, 768 * 2);
+    cy.viewport(1024 * 1.5, 768 * 1.5);
   } else {
     cy.viewport(1024, 768);
   }

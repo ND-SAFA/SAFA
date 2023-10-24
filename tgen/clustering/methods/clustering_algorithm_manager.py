@@ -30,6 +30,8 @@ class ClusteringAlgorithmManager:
         :param subset_ids: Subset of artifacts to considering in clustering method.
         :return: Map of cluster ID to artifact ids in cluster.
         """
+        if subset_ids is not None and len(subset_ids) == 0:
+            raise Exception("Expected at least one artifact defined in subset ids.")
         embedding_map = embedding_manager.create_embedding_map(subset_ids)
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
@@ -37,7 +39,11 @@ class ClusteringAlgorithmManager:
 
         self.add_internal_kwargs(kwargs, n_clusters)
         clustering_algo = self.method.value(**kwargs)
-        clustering_algo.fit(embeddings)
+        try:
+            clustering_algo.fit(embeddings)
+        except Exception as e:
+            print(e)
+            print("hi")
         embedding_labels = clustering_algo.labels_
         clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels)
         for c in clusters.values():
@@ -74,7 +80,7 @@ class ClusteringAlgorithmManager:
             if cluster_label == NO_CLUSTER_LABEL:
                 continue
             if cluster_label not in clusters:
-                clusters[cluster_label] = Cluster()
+                clusters[cluster_label] = Cluster()  # TODO: Add cluster label to cluster.
             clusters[cluster_label].add_artifact(artifact_id)
         return clusters
 
@@ -82,4 +88,4 @@ class ClusteringAlgorithmManager:
         """
         :return: Returns the method associated with the manager.
         """
-        return self.method
+        return self.method.name

@@ -66,21 +66,17 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     enumeration_chars=["-"])
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("Use the `Overview of System` to understand the complete scope of the project. "
-                   "Section `{source_type}` contains a few software artifacts from the project that "
-                   "you will create a {target_type} from."),
-    QuestionPrompt("Identify the common feature and/or functionality provided by all the {source_type}s in section `{source_type}`. "),
-    QuestionPrompt("Then, reverse engineer a {target_type}. "),
-    QuestionPrompt("The {target_type} should include some technical details "
-                   "but avoid directly copying details verbatim from the {source_type}. "),
-    QuestionPrompt("Importantly, the {target_type} should be specific to certain functionalities/features and not too broad. "),
-    QuestionPrompt("Do not make up any information "
-                   "- all details in the {target_type} must accurately reflect the provided {source_type}. "),
+    QuestionPrompt("You're task is to reverse engineer a set of {target_type}s that cover the functionality defined "
+                   "by the artifacts in `{source_type}`. "
+                   "Use the `Overview of System` to understand the project that the artifacts in `{source_type}` are a part of."),
+    QuestionPrompt("Create new {target_type}s for distinct aspects of the functionality covered. "
+                   "Group common feature and/or functionality into a single {target_type}. "
+                   "Each {target_type} should be focused on a single, clear purpose. "
+                   "Make sure each {target_type} is concise, but technically detailed. "
+                   "Avoid ambiguous language and stay consistent with the information provided in the {source_type}s."),
     QuestionPrompt("{description} "),
-    QuestionPrompt("The {target_type} should use this format as a guideline: "
-                   "{format} "),
-    QuestionPrompt("Make sure the {target_type} is concise but technically detailed"),
-    QuestionPrompt("Avoid ambiguous language, and only include information contained in the {source_type}. ")],
+    QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}.")
+],
     enumeration_chars=["-"])
 
 REFINE_PROMPT = Prompt("You are an engineer that is an expert on a software system and your goal is to refine "

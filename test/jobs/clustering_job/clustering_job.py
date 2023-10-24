@@ -30,7 +30,6 @@ class ClusteringJob(AbstractJob):
         """
         args = ClusteringArgs(dataset_creator=self.dataset_creator, create_dataset=self.add_to_dataset,
                               artifact_types=self.artifact_types, **self.kwargs)
-        # TODO: Fix state not saving
         pipeline = ClusteringPipeline(args, summarizer_args=None, skip_summarization=True)
 
         pipeline.run()

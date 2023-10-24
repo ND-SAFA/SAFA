@@ -4,20 +4,22 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, DEFAULT_CLUSTER_MIN_VOTES, \
     DEFAULT_CLUSTER_SIMILARITY_THRESHOLD
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
-class UniqueClusterMap:
+class ClusterSelector:
     """
-    Creates methods for incrementally creating a unique cluster map.
+    Responsible for
     """
 
-    def __init__(self, threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD):
+    def __init__(self, embeddings_manager: EmbeddingsManager, threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD):
         """
         Creates map with similarity threshold.
+        :param embeddings_manager: Manages embeddings used to calculate distances between artifacts and clusters.
         :param threshold: The percentage of overlap to which consider sets are the same.
         """
+        self.embeddings_manager = embeddings_manager
         self.cluster_map = {}
-        self.seen_clusters = set()
         self.seen_artifacts = set()
         self.threshold = threshold
 
@@ -47,7 +49,7 @@ class UniqueClusterMap:
         :param cluster: The cluster to add.
         :return: Cluster if added, None if cluster is duplicate.
         """
-        should_add = self.process_new_cluster(cluster)
+        should_add = self.should_add(cluster)
         if not should_add:
             return
         cluster_id = self.__get_next_cluster_id()
@@ -55,6 +57,66 @@ class UniqueClusterMap:
         for a in cluster.artifact_ids:
             self.seen_artifacts.add(a)
         return cluster
+
+    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster):
+        for a_id in new_cluster.artifact_id_set:
+            source_cluster.add_artifact(a_id)
+            self.seen_artifacts.add(a_id)
+        source_cluster.calculate_stats(self.embeddings_manager)
+
+    def should_add(self, cluster: Cluster) -> bool:
+        """
+        Processes cluster and determines if we should add it to the set.
+        :param cluster: The candidate cluster.
+        :return: Whether cluster should be added to map.
+        """
+        contains_new_artifacts = self.contains_new_artifacts(cluster)
+        contains_cluster = self.contains_cluster(cluster, add_votes=True)
+        did_merge = self.try_merge(cluster)
+        if len(cluster) == 1 and not contains_new_artifacts:
+            return False
+        return (contains_new_artifacts or not contains_cluster) and not did_merge
+
+    def try_merge(self, cluster: Cluster):
+        """
+        Tries to merge cluster into those similar enough to it.
+        :param cluster: The cluster to try to merge.
+        :return: Whether the cluster was merged into any others.
+        """
+        clusters = list(self.cluster_map.values())
+        clusters_to_merge_into: List[Cluster] = [c for c in clusters if cluster.similarity_to(c) >= 0.85]
+        for source_cluster in clusters_to_merge_into:
+            self.merge_clusters(source_cluster, cluster)
+        return len(clusters_to_merge_into) > 0
+
+    def contains_cluster(self, other_cluster: ClusterType, add_votes: bool = False) -> bool:
+        """
+        Calculated whether given cluster is contained within current map.
+        :param other_cluster: The cluster to evaluate if contained.
+        :param add_votes: Whether to add votes to the clusters where collision is seen.
+        :return: True if cluster in map, false otherwise.
+        """
+        is_hit = False
+        cluster_similarities = {}
+        for c_id, source_cluster in self.cluster_map.items():
+            similarity_to_cluster = self.calculate_intersection(source_cluster.artifact_id_set, other_cluster.artifact_id_set)
+            if similarity_to_cluster >= self.threshold:
+                is_hit = True
+                if add_votes:
+                    source_cluster.add_vote()
+            cluster_similarities[source_cluster] = similarity_to_cluster
+        return is_hit
+
+    def contains_new_artifacts(self, cluster: ClusterType, ratio: float = DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION) -> bool:
+        """
+        Calculates whether cluster has enough or new artifacts to be accepted.
+        :param cluster: The cluster to evaluate if it contains enough new artifacts.
+        :param ratio: The ratio of new artifacts relative to the cluster size to accept.
+        :return: Whether cluster contains a ratio of new artifacts greater or equal to the default value.
+        """
+        unseen_artifacts = [a for a in cluster if a not in self.seen_artifacts]
+        new_artifact_ratio = len(unseen_artifacts) / len(cluster)
+        return new_artifact_ratio >= ratio
 
     def replace(self, cluster: Cluster, new_cluster: Cluster) -> None:
         """
@@ -76,49 +138,6 @@ class UniqueClusterMap:
         for a in new_cluster:
             self.seen_artifacts.add(a)
         new_cluster.votes += old_cluster.votes
-
-    def process_new_cluster(self, cluster: Cluster) -> bool:
-        contains_new_artifacts = self.contains_new_artifacts(cluster)
-        contains_cluster = self.contains_cluster(cluster, add_votes=True)
-        return contains_new_artifacts or not contains_cluster
-
-    def contains_cluster(self, other_cluster: ClusterType, add_votes: bool = False) -> bool:
-        """
-        Calculated whether given cluster is contained within current map.
-        :param other_cluster: The cluster to evaluate if contained.
-        :param add_votes: Whether to add votes to the clusters where collision is seen.
-        :return: True if cluster in map, false otherwise.
-        """
-        is_hit = False
-        replace_clusters = {}
-        for c_id, source_cluster in self.cluster_map.items():
-            if self.calculate_intersection(source_cluster.artifact_id_set, other_cluster.artifact_id_set) >= self.threshold:
-                is_hit = True
-                if add_votes:
-                    source_cluster.add_vote()
-
-                if source_cluster != other_cluster and source_cluster.avg_similarity < other_cluster.avg_similarity:
-                    is_hit = False
-                    if source_cluster not in replace_clusters:
-                        replace_clusters[source_cluster] = other_cluster
-                    else:
-                        previous_cluster = replace_clusters[source_cluster]
-                        replace_clusters[
-                            source_cluster] = previous_cluster if previous_cluster.avg_similarity > other_cluster.avg_similarity else other_cluster
-        for old_cluster, new_cluster in replace_clusters.items():
-            self.replace(old_cluster, new_cluster)
-        return is_hit
-
-    def contains_new_artifacts(self, cluster: ClusterType, ratio: float = DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION) -> bool:
-        """
-        Calculates whether cluster has enough or new artifacts to be accepted.
-        :param cluster: The cluster to evaluate if it contains enough new artifacts.
-        :param ratio: The ratio of new artifacts relative to the cluster size to accept.
-        :return: Whether cluster contains a ratio of new artifacts greater or equal to the default value.
-        """
-        unseen_artifacts = [a for a in cluster if a not in self.seen_artifacts]
-        new_artifact_ratio = len(unseen_artifacts) / len(cluster)
-        return new_artifact_ratio >= ratio
 
     def __get_next_cluster_id(self) -> int:
         """

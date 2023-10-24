@@ -3,6 +3,7 @@ from typing import Any, Iterable, List
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
 
 
@@ -28,14 +29,19 @@ class Cluster:
         """
         self.votes += 1
 
+    def add_artifacts(self, artifact_ids: List[str]) -> None:
+        for artifact_id in artifact_ids:
+            self.add_artifact(artifact_id)
+
     def add_artifact(self, artifact_id: str) -> None:
         """
         Adds an artifact to the cluster.
         :param artifact_id: ID of artifact to add to cluster.
         :return: None
         """
-        self.artifact_ids.append(artifact_id)
-        self.artifact_id_set.add(artifact_id)
+        if artifact_id not in self.artifact_id_set:
+            self.artifact_id_set.add(artifact_id)
+            self.artifact_ids.append(artifact_id)
 
     def calculate_stats(self, embedding_manager: EmbeddingsManager) -> None:
         """
@@ -47,20 +53,6 @@ class Cluster:
         self.avg_similarity = self.calculate_average_similarity(self.artifact_ids, self.centroid, embedding_manager)
 
     @staticmethod
-    def calculate_average_similarity(cluster: List[str], centroid: EmbeddingType, embedding_manager: EmbeddingsManager):
-        """
-        Calculates the average similarity to the cluster centroid for all points in the cluster.
-        :param cluster: The cluster containing the artifact ids.
-        :param centroid: The embedding at the center of the cluster.
-        :param embedding_manager: The manager able to retrieve embeddings for artifact ids.
-        :return: Score representing the average similarity score to the cluster centroid.
-        """
-        embeddings = [embedding_manager.get_embedding(c) for c in cluster]
-        similarities = cosine_similarity([centroid], embeddings)[0]
-        avg_similarity = sum(similarities) / len(similarities)
-        return avg_similarity
-
-    @staticmethod
     def calculate_centroid(cluster: List[str], embedding_manager: EmbeddingsManager):
         """
         Calculates the embedding pointing at the center of the cluster.
@@ -70,9 +62,41 @@ class Cluster:
         """
         if len(cluster) == 0:
             raise Exception("Cannot calculate center of empty cluster.")
-        embeddings = [embedding_manager.get_embedding(c) for c in cluster]
+        embeddings = [embedding_manager.get_embedding(a_id) for a_id in cluster]
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
+
+    @staticmethod
+    def get_cluster_id(method: SupportedClusteringMethod, index: int):
+        """
+        Creates generic cluster id.
+        :param method: The method used to generate the cluster.
+        :param index: The index the cluster is stored in the cluster map.
+        :return: The cluster id.
+        """
+        return f"{method.name}{index}"
+
+    @staticmethod
+    def calculate_average_similarity(cluster: List[str], centroid: EmbeddingType, embedding_manager: EmbeddingsManager):
+        """
+        Calculates the average similarity to the cluster centroid for all points in the cluster.
+        :param cluster: The cluster containing the artifact ids.
+        :param centroid: The embedding at the center of the cluster.
+        :param embedding_manager: The manager able to retrieve embeddings for artifact ids.
+        :return: Score representing the average similarity score to the cluster centroid.
+        """
+        embeddings = [embedding_manager.get_embedding(a_id) for a_id in cluster]
+        similarities = cosine_similarity([centroid], embeddings)[0]
+        avg_similarity = sum(similarities) / len(similarities)
+        return avg_similarity
+
+    def similarity_to(self, cluster: "Cluster") -> float:
+        """
+        Calculates the distance between the centroids of this cluster to that given.
+        :param cluster: The cluster to calculate the distance to.
+        :return: The distance as a similarity score.
+        """
+        return cosine_similarity([self.centroid], [cluster.centroid])[0][0]
 
     def id(self) -> str:
         """
@@ -85,7 +109,7 @@ class Cluster:
         """
         :return: Length of cluster is the number of the artifacts in cluster.
         """
-        return len(self.artifact_ids)
+        return len(self.artifact_id_set)
 
     def __iter__(self) -> Iterable[str]:
         """

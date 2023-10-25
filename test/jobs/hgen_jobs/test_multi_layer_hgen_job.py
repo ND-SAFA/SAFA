@@ -2,7 +2,7 @@ import math
 from unittest import mock
 from unittest.mock import MagicMock
 
-from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions
+from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions, MISSING_PROJECT_SUMMARY_RESPONSES
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.add_clusters_to_dataset import AddClustersToDataset
@@ -28,6 +28,7 @@ from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
+from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
@@ -98,6 +99,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         for target, source in zip(target_types, source_types):
             FileUtil.delete_file_safely(GenerateInputsStep._get_inputs_save_path(target, source))
         orig_dataset = args.dataset_creator.create()
+        self.assertEqual(job_result.status, Status.SUCCESS)
         dataset: TraceDataset = job_result.body
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
         layers = [args.source_layer_id] + [args.target_type, self.higher_levels[0],

@@ -1,9 +1,11 @@
 from math import floor
 
+from tgen.common.constants.deliminator_constants import L_CARROT, R_CARROT
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
     RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
     RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, JUSTIFICATION_TAG, RANKING_EXPLANATION_TAG, DEFAULT_SCORE
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -64,6 +66,7 @@ SCORE_INSTRUCTIONS = SelectQuestionPrompt(
                  f"Note, generally if a relationship is truly unclear, no trace-link exists. ",
     response_tag=RANKING_SCORE_TAG,
     response_format="Enclose the score in {}",
+    value_formatter=lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(StrUtil.remove_chars(val, [L_CARROT, R_CARROT])),
     default_factory=lambda tag, val: DEFAULT_SCORE)
 
 QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps used to determine "

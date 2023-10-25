@@ -2,7 +2,7 @@ import re
 import uuid
 from copy import deepcopy
 
-from typing import List
+from typing import List, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, SPACE, PERIOD
 from tgen.common.util.logging.logger_manager import logger
@@ -94,4 +94,19 @@ class StrUtil:
         :return: The floats that were found
         """
         return re.findall(StrUtil.FIND_FLOAT_PATTERN, string)
+
+    @staticmethod
+    def remove_chars(string: str, chars2remove: Union[List[str], str]) -> str:
+        """
+        Removes all characters from the string
+        :param string: The string to remove characters from
+        :param chars2remove: The characters to remove
+        :return: The string without the characters
+        """
+        if not isinstance(chars2remove, list):
+            chars2remove = [chars2remove]
+        for char in chars2remove:
+            string = string.replace(char, EMPTY_STRING)
+        return string
+
 

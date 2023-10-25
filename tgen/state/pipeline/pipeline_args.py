@@ -35,8 +35,6 @@ class PipelineArgs(BaseObject):
         Updates the load dir to match export dir if none is provided
         :return: None
         """
-        if not self.load_dir:
-            self.load_dir = self.export_dir
         self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset,
                                                                              self.dataset_creator)
 

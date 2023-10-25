@@ -63,5 +63,14 @@ class SummarizerArgs:
         :return: None
         """
         if self.export_dir:
-            if not self.export_dir.endswith(self.summary_dirname):
-                self.export_dir = os.path.join(self.export_dir, self.summary_dirname)
+            self.update_export_dir(self.export_dir)
+
+    def update_export_dir(self, new_path: str) -> None:
+        """
+        Updates the export dir to the new path value
+        :param new_path: The new path to update the export dir to
+        :return: None
+        """
+        self.export_dir = new_path
+        if self.export_dir and not self.export_dir.endswith(self.summary_dirname):
+            self.export_dir = os.path.join(self.export_dir, self.summary_dirname)

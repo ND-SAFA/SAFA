@@ -44,11 +44,19 @@ class TestAIManager:
 
         return handled_responses, unhandled_prompts
 
-    def set_responses(self, responses: List[Union[str, Callable[[str], str]]]):
+    def set_responses(self, responses: List[Union[str, Callable[[str], str]]], start_index: int = 0):
         n_responses = len(responses)
         self._responses = responses
-        self.start_index = 0
+        self.start_index = start_index
         self.end_index = n_responses
+
+    def add_responses(self, new_responses: List[Union[str, Callable[[str], str]]]):
+        """
+        Adds new responses to the manager
+        :param new_responses: List of new responses to add
+        :return: None
+        """
+        self.set_responses(self._responses + new_responses, start_index=self.start_index)
 
     def mock_summarization(self) -> None:
         """

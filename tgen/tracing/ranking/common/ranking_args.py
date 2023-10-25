@@ -79,7 +79,7 @@ class RankingArgs(PipelineArgs):
     """
     - selection_method: The method to use to select top predictions
     """
-    selection_method: SupportedSelectionMethod = SupportedSelectionMethod.SELECT_BY_THRESHOLD
+    selection_method: Optional[SupportedSelectionMethod] = SupportedSelectionMethod.SELECT_BY_THRESHOLD
     """
     - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
     """

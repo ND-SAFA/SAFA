@@ -113,6 +113,19 @@ class EmbeddingsManager:
         if create_embedding:
             return self.get_embedding(a_id)
 
+    def update_or_add_contents(self, content_map: Dict[Any, str], create_embedding: bool = False) -> Optional[EmbeddingType]:
+        """
+        Updates or adds new content for all artifacts in teh map
+        :param content_map: Maps the id of the new or existing artifact to the its content
+        :param create_embedding: If True, automatically creates a new embedding
+        :return: The embeddings if created, else None
+        """
+        for a_id, content in content_map.items():
+            if a_id not in self._content_map or self._content_map[a_id] != content:
+                self.update_or_add_content(a_id=a_id, content=content, create_embedding=False)
+        if create_embedding:
+            return self.create_embedding_map(list(content_map.keys()))
+
     def remove_from_content_map(self, a_id: Any) -> None:
         """
         Removes existing id and content from map

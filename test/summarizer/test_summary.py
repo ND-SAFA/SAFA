@@ -29,7 +29,7 @@ class TestSummary(BaseTest):
                            'This user data flows into the access management subsystem to control what users can see and do.']})})
 
     def test_from_and_to_string(self):
-        summary_string = str(self.SUMMARY)
+        summary_string = str(self.get_summary())
         summary = Summary.from_string(summary_string)
         self.assertEqual(summary, self.SUMMARY)
 
@@ -45,16 +45,28 @@ class TestSummary(BaseTest):
 
     def test_load_and_save(self):
         filepath = os.path.join(TEST_OUTPUT_DIR, "summary.json")
-        self.SUMMARY.save(filepath)
+        self.get_summary().save(filepath)
         summary = Summary.load_from_file(filepath)
         self.assertEqual(self.SUMMARY, summary)
 
     def test_reorder(self):
-        summary = deepcopy(self.SUMMARY)
+        summary = self.get_summary()
         section_order = ["Data Flow", "Features", "Overview"]
         summary.re_order_sections(section_order)
         for i, key in enumerate(summary.keys()):
             if i < len(section_order):
                 self.assertEqual(key, section_order[i])
+
+    def test_combine_summaries(self):
+        summary = self.get_summary()
+        new_summary = Summary()
+        new_summary.add_section("Overview", body="This should be ignored.")
+        new_summary.add_section("New Section", body="Add me.")
+        summary.combine_summaries(new_summary)
+        self.assertIn("New Section", summary)
+        self.assertEqual(summary["Overview"], self.SUMMARY["Overview"])
+
+    def get_summary(self):
+        return deepcopy(self.SUMMARY)
 
 

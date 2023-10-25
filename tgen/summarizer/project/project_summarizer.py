@@ -54,7 +54,7 @@ class ProjectSummarizer(BaseObject):
         """
         logger.log_title("Creating project specification.")
         self.artifact_df.summarize_content(ArtifactsSummarizer(self.args, project_summary=self.project_summary))
-        if not self.project_summary and os.path.exists(self.get_save_path()):
+        if os.path.exists(self.get_save_path()):
             logger.info(f"Loading previous project summary from {self.get_save_path()}")
             self.project_summary = Summary.load_from_file(self.get_save_path())
 

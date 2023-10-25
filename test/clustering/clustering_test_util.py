@@ -1,11 +1,11 @@
-from typing import List
+from typing import Dict, List
 
 from sklearn.metrics.pairwise import cosine_similarity
 
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.common.objects.artifact import Artifact
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -19,12 +19,26 @@ class ClusteringTestUtil:
     Provides utility testing methods for clustering tests.
     """
     DEFAULT_ARTIFACT_TYPE = "A"
-    DEFAULT_ARTIFACTS = [
-        "I have a very fluffy dog.",
-        "My cat is a cute and a little mean.",
-        "My car goes very fast.",
-        "The road is awefully dangerous to be driving on."
-    ]
+    DEFAULT_ARTIFACTS = {
+        "A": "I have a very fluffy dog.",
+        "B": "My cat is a cute and a little mean.",
+        "C": "My car goes very fast.",
+        "D": "The road is awefully dangerous to be driving on."
+    }
+
+    @staticmethod
+    def create_embeddings_manager(content_map: Dict[str, str] = None,
+                                  model: str = DEFAULT_SEARCH_EMBEDDING_MODEL) -> EmbeddingsManager:
+        """
+        Create embedding manager for content in map.
+        :param content_map: Maps artifact id to content.
+        :param model: The model used to embed the artifacts. Default is small testing model.
+        :return: The embeddings manager.
+        """
+        if content_map is None:
+            content_map = ClusteringTestUtil.DEFAULT_ARTIFACTS
+        embeddings_manager = EmbeddingsManager(content_map, model)
+        return embeddings_manager
 
     @staticmethod
     def create_default_args(**kwargs) -> ClusteringArgs:
@@ -33,11 +47,12 @@ class ClusteringTestUtil:
         :param kwargs: Additional keyword arguments to create clustering args.
         :return:  Clustering args.
         """
-        return ClusteringTestUtil.create_clustering_args(ClusteringTestUtil.DEFAULT_ARTIFACTS, **kwargs)
+        artifact_bodies = list(ClusteringTestUtil.DEFAULT_ARTIFACTS.values())
+        return ClusteringTestUtil.create_clustering_args(artifact_bodies, **kwargs)
 
     @staticmethod
     def create_clustering_args(artifact_bodies: List[str], artifact_type: str = DEFAULT_ARTIFACT_TYPE,
-                               embedding_model=SMALL_EMBEDDING_MODEL, **kwargs) -> ClusteringArgs:
+                               embedding_model=DEFAULT_SEARCH_EMBEDDING_MODEL, **kwargs) -> ClusteringArgs:
         """
         Creates a prompt dataset containing artifacts with bodies given.
         :param artifact_bodies: The bodies of the artifacts.
@@ -56,7 +71,7 @@ class ClusteringTestUtil:
         return args
 
     @staticmethod
-    def assert_embeddings_equals(artifact_text: str, embedding: EmbeddingType, model_name: str = SMALL_EMBEDDING_MODEL,
+    def assert_embeddings_equals(artifact_text: str, embedding: EmbeddingType, model_name: str = DEFAULT_SEARCH_EMBEDDING_MODEL,
                                  threshold=0.95):
         """
         Asserts that embedding is sufficiently similar to the embeddings resulting from the model.

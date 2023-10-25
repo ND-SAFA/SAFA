@@ -3,7 +3,7 @@ from tgen.clustering.methods.supported_clustering_methods import SupportedCluste
 DEFAULT_REDUCTION_FACTOR = 0.20  # Expected reduction in # of artifacts to # clusters
 DEFAULT_CLUSTER_SIMILARITY_THRESHOLD = 0.5  # Similarity equal or greater will be considered as same clusters
 DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION = .75
-DEFAULT_MIN_ORPHAN_SIMILARITY = 0.54
+DEFAULT_MIN_ORPHAN_SIMILARITY = 0.75  # Minimum similarity score for an oprhan to be placed in a cluster.
 DEFAULT_N_NEW_ALLOWED_ARTIFACTS = 2
 DEFAULT_RANDOM_STATE = 0
 DEFAULT_TESTING_CLUSTERING_METHODS = ["KMEANS", "AGGLOMERATIVE"]

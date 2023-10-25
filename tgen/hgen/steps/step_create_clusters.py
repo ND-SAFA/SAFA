@@ -20,7 +20,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         if not args.perform_clustering:
             return
-        clustering_export_path = os.path.join(args.export_dir, "clustering")
+        clustering_export_path = os.path.join(args.export_dir, "clustering") if args.export_dir else None
         args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path)
         clustering_pipeline = ClusteringPipeline(args)
         clustering_pipeline.run()
@@ -29,7 +29,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         state.cluster_dataset = clustering_pipeline.state.cluster_artifact_dataset
         state.embedding_manager = clustering_pipeline.state.embedding_manager
-        
+
         source_artifact_df = state.source_dataset.artifact_df
         state.id_to_cluster_artifacts = self._replace_ids_with_artifacts(cluster_map, source_artifact_df)
 

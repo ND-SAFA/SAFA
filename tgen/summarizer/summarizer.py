@@ -3,6 +3,7 @@ from copy import deepcopy
 from typing import Optional
 
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -76,8 +77,10 @@ class Summarizer:
         Gets the path to save the summarized artifacts to
         :return: The path to save the summarized artifacts to
         """
-        artifact_export_path = os.path.join(self.args.export_dir, ARTIFACT_FILE_NAME)
-        return artifact_export_path
+        if self.args.export_dir:
+            artifact_export_path = os.path.join(self.args.export_dir, ARTIFACT_FILE_NAME)
+            return artifact_export_path
+        return EMPTY_STRING
 
     def _create_project_summary(self, dataset: PromptDataset) -> Summary:
         """

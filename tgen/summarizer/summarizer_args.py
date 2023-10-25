@@ -72,5 +72,5 @@ class SummarizerArgs:
         :return: None
         """
         self.export_dir = new_path
-        if not self.export_dir.endswith(self.summary_dirname):
+        if self.export_dir and not self.export_dir.endswith(self.summary_dirname):
             self.export_dir = os.path.join(self.export_dir, self.summary_dirname)

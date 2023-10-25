@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
@@ -43,11 +43,8 @@ class ClusteringAlgorithmManager:
             clustering_algo.fit(embeddings)
         except Exception as e:
             print(e)
-            print("hi")
         embedding_labels = clustering_algo.labels_
-        clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels)
-        for c in clusters.values():
-            c.calculate_stats(embedding_manager)
+        clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels, embedding_manager)
         return clusters
 
     def add_internal_kwargs(self, kwargs: Dict, n_clusters: int) -> None:
@@ -68,23 +65,28 @@ class ClusteringAlgorithmManager:
             DictUtil.update_kwarg_values(kwargs, random_state=DEFAULT_RANDOM_STATE)
 
     @staticmethod
-    def create_clusters_from_labels(artifact_ids: List[str], cluster_labels: List[int]) -> ClusterMapType:
+    def create_clusters_from_labels(artifact_ids: List[str], cluster_labels: List[int],
+                                    embeddings_manager: EmbeddingsManager) -> ClusterMapType:
         """
         Creates cluster by linking cluster labels associated to each artifact.
         :param artifact_ids: The artifacts to cluster.
         :param cluster_labels: The cluster ID associated with each artifact.
+        :param embeddings_manager: The embeddings manager used to update the statistics of the cluster.
         :return: Map of cluster to their corresponding artifacts.
         """
-        clusters: ClusterMapType = {}
+        clusters: Dict[Any, List[str]] = {}
         for cluster_label, artifact_id in zip(cluster_labels, artifact_ids):
             if cluster_label == NO_CLUSTER_LABEL:
                 continue
             if cluster_label not in clusters:
-                clusters[cluster_label] = Cluster()  # TODO: Add cluster label to cluster.
-            clusters[cluster_label].add_artifact(artifact_id)
-        return clusters
+                clusters[cluster_label] = []
+            clusters[cluster_label].append(artifact_id)
 
-    def get_method(self) -> SupportedClusteringMethods:
+        cluster_map = {cluster_id: Cluster.from_artifacts(artifact_ids, embeddings_manager)
+                       for cluster_id, artifact_ids in clusters.items()}
+        return cluster_map
+
+    def get_method_name(self) -> str:
         """
         :return: Returns the method associated with the manager.
         """

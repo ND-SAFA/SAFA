@@ -162,10 +162,11 @@ class HGenUtil:
                 artifact_prompt = ArtifactPrompt(include_id=False)
                 prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
                 dataset = PromptDataset(artifact_df=new_artifact_df)
+                predictions_path = os.path.join(hgen_args.export_dir, "artifact_names.json") if hgen_args.export_dir else EMPTY_STRING
                 names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=PredictionStep.NAME,
                                                  dataset=dataset, response_prompt_ids=name_prompt.id,
                                                  tags_for_response=name_prompt.response_manager.response_tag, return_first=True,
-                                                 export_path=os.path.join(hgen_args.export_dir, "artifact_names.json"))
+                                                 export_path=predictions_path)
                 assert len(set(names)) == len(names), f"Found duplicates names: {names}"
                 assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
                 new_artifact_df.index = names

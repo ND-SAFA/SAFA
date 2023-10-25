@@ -98,6 +98,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         for target, source in zip(target_types, source_types):
             FileUtil.delete_file_safely(GenerateInputsStep._get_inputs_save_path(target, source))
         orig_dataset = args.dataset_creator.create()
+        self.assertEqual(job_result.status, Status.SUCCESS)
         dataset: TraceDataset = job_result.body
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
         layers = [args.source_layer_id] + [args.target_type, self.higher_levels[0],
@@ -122,7 +123,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         self.assertEqual(n_expected_links + len(orig_dataset.trace_dataset.trace_df), len(dataset.trace_df))
 
     @mock_anthropic
-    def get_args(self, anthropic_ai_manager: TestAIManager):
+    def get_args(self, anthropic_ai_manager: TestAIManager, **kwargs):
         anthropic_ai_manager.mock_summarization()
         project_summary_sections = {sec for sec in HierarchyGenerator.PROJECT_SUMMARY_SECTIONS}
         project_summary_sections.update(set(DEFAULT_PROJECT_SUMMARY_SECTIONS))
@@ -132,11 +133,11 @@ class TestMultiLayerHGenJob(BaseJobTest):
                             project_summary=Summary({title: EnumDict({"title": title, "chunks": ["summary of project"]})
                                                      for title in project_summary_sections}),
                             trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))),
-                        create_new_code_summaries=False)
+                        create_new_code_summaries=False, **kwargs)
         return args
 
     def _get_job(self):
-        starting_hgen_job = BaseHGenJob(self.get_args())
+        starting_hgen_job = BaseHGenJob(self.get_args(export_dir=None))  # TODO: Remove once state is able to save clustering state.
         return MultiLayerHGenJob(starting_hgen_job, self.higher_levels)
 
     def set_clustering_state(self, args: ClusteringArgs, state: ClusteringState, *other_args, **other_kwargs):

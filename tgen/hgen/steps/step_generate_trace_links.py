@@ -86,12 +86,13 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations]
             children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
+            cluster_dir = os.path.join(self._get_ranking_dir(state.export_dir), str(cluster_id)) if state.export_dir else EMPTY_STRING
             pipeline_args = RankingArgs(run_name=f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
                                                                                                     args.target_type, parent_ids),
                                         dataset=state.all_artifacts_dataset,
                                         parent_ids=parent_ids,
                                         children_ids=children_ids,
-                                        export_dir=os.path.join(self._get_ranking_dir(state.export_dir), str(cluster_id)),
+                                        export_dir=cluster_dir,
                                         types_to_trace=(args.source_type, args.target_type),
                                         selection_method=None)
             pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)

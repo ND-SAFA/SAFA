@@ -58,13 +58,13 @@ const tabs = computed(() => {
   const visibleOptions: SelectOption[] = [options[0], options[1]];
 
   if (permissionStore.isAllowed("project.edit_versions")) {
-    visibleOptions.push(options[2]);
+    visibleOptions.push(options[2], options[3]);
   }
   if (permissionStore.isAllowed("project.edit_integrations")) {
-    visibleOptions.push(options[3]);
+    visibleOptions.push(options[4]);
   }
   if (permissionStore.isAllowed("project.edit")) {
-    visibleOptions.push(options[4]);
+    visibleOptions.push(options[5]);
   }
 
   return visibleOptions;

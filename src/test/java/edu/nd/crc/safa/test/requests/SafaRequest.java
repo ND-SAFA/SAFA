@@ -304,19 +304,6 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         request.queryParams(queryParams);
 
         try {
-//            MvcResult requestResult = mockMvc
-//                .perform(request)
-//                .andDo(result -> {
-//                    if (!result.getRequest().isAsyncStarted()) {
-//                        test.match(result);
-//                    }
-//                    mockMvc.perform(asyncDispatch(requestResult))
-//                        .andExpect(test);
-//                });
-//
-//            MockHttpServletResponse response = requestResult.getResponse();
-//            String content = response.getContentAsString();
-//            return stringCreator.apply(content);
             MvcResult requestResult = mockMvc
                 .perform(request)
                 .andDo(result -> {

@@ -43,7 +43,7 @@ class ClusteringAlgorithmManager:
             clustering_algo.fit(embeddings)
         except Exception as e:
             print(e)
-        embedding_labels = clustering_algo.labels_
+        embedding_labels = clustering_algo.labels_ if hasattr(clustering_algo, "labels_") else [-1] * len(embeddings)
         clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels, embedding_manager)
         return clusters
 

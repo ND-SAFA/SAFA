@@ -3,7 +3,7 @@ from typing import Dict, Set
 from typing import List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.hgen_constants import WEIGHT_OF_PRED_RELATED_CHILDREN, RELATED_CHILDREN_SCORE
+from tgen.common.constants.hgen_constants import WEIGHT_OF_PRED_RELATED_CHILDREN, RELATED_CHILDREN_SCORE, FIRST_PASS_LINK_THRESHOLD
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
@@ -62,7 +62,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                  export_dir=self._get_ranking_dir(state.export_dir),
                                  load_dir=self._get_ranking_dir(args.load_dir),
                                  ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
-                                 link_threshold=0.3)  # Only filter out really low links so that related artifacts can factor in
+                                 link_threshold=FIRST_PASS_LINK_THRESHOLD)
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")
@@ -87,8 +87,9 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             parent_ids = [generation2id[generation] for generation in generations]
             children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
             cluster_dir = os.path.join(self._get_ranking_dir(state.export_dir), str(cluster_id)) if state.export_dir else EMPTY_STRING
-            pipeline_args = RankingArgs(run_name=f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
-                                                                                                    args.target_type, parent_ids),
+            run_name = f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
+                                                                          args.target_type, parent_ids)
+            pipeline_args = RankingArgs(run_name=run_name,
                                         dataset=state.all_artifacts_dataset,
                                         parent_ids=parent_ids,
                                         children_ids=children_ids,

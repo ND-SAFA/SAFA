@@ -2,6 +2,7 @@ import ast
 import json
 import os
 from _ast import AST
+from typing import Dict, List
 
 from dotenv import load_dotenv
 
@@ -46,8 +47,24 @@ def get_display_name(file_path: str, root_path: str):
     return display_path
 
 
-def find_functions_classes_methods_without_docstring(directory_path: str):
+def find_functions_classes_methods_without_docstring(directory_path: str) -> None:
     """Find functions, classes, and methods without a docstring in the given directory."""
+    missing_map = calculate_missing_doc_map(directory_path)
+    missing_map = {k: v for k, v in missing_map.items() if len(v) > 0}
+    if len(missing_map) > 0:
+
+        missing_map = {get_display_name(k, directory_path): v for k, v in missing_map.items()}
+        raise Exception(f"{json.dumps(missing_map, indent=4)}\nMissing docs.")
+    else:
+        print("No missing docs :)")
+
+
+def calculate_missing_doc_map(directory_path: str) -> Dict[str, List[str]]:
+    """
+    Creates a map from files to their descriptions of their missing doc functions.
+    :param directory_path: The directory to traverse.
+    :return: Map of file paths to their errors.
+    """
     missing_map = {}
     for root, _, files in os.walk(directory_path):
         for file in files:
@@ -71,19 +88,13 @@ def find_functions_classes_methods_without_docstring(directory_path: str):
                         if has_docstring(node) and ast.get_docstring(node) is None:
                             msg = f"Missing docstring in {type(node).__name__} '{node.name}' at line {node.lineno}."
                             missing_map[file_path].append(msg)
-    missing_map = {k: v for k, v in missing_map.items() if len(v) > 0}
-    if len(missing_map) > 0:
-
-        missing_map = {get_display_name(k, directory_path): v for k, v in missing_map.items()}
-        raise Exception(f"{json.dumps(missing_map, indent=4)}\nMissing docs.")
-    else:
-        print("No missing docs :)")
+    return missing_map
 
 
-def main():
+def main() -> None:
     """
-    TODO
-    :return:
+    Runs the missing docs function on the root project path.
+    :return: None
     """
     directory_path = os.path.expanduser(os.environ["ROOT_PATH"])
     find_functions_classes_methods_without_docstring(directory_path)

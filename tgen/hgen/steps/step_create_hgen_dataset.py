@@ -16,6 +16,7 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 
 
 class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -36,7 +37,8 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
             final_artifact_df = state.all_artifacts_dataset.artifact_df
             new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, args.target_type)
-            new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(state, final_artifact_df, new_layer_df)
+            new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state,
+                                                                                           final_artifact_df, new_layer_df)
 
             final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
             final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
@@ -73,17 +75,21 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return layer_df
 
     @staticmethod
-    def _create_trace_df_with_generated_artifacts(hgen_state: HGenState,
-                                                  artifact_df: ArtifactDataFrame, layer_df: LayerDataFrame) -> TraceDataFrame:
+    def _create_trace_df_with_generated_artifacts(hgen_args: HGenArgs,
+                                                  hgen_state: HGenState,
+                                                  artifact_df: ArtifactDataFrame,
+                                                  layer_df: LayerDataFrame) -> TraceDataFrame:
         """
         Creates a dataframe of traces including the new trace links between the original lower-level artifacts
         and the newly generated upper-level artifacts
+        :param hgen_args: The arguments used to run hgen
         :param hgen_state: The current state of hgen
         :param artifact_df: The dataframe containing the generated artifacts
         :param layer_df: The dataframe containing the layer mapping between artifacts
         :return: The dataframe containing new and old trace links
         """
         traces = {}
+        selected_predictions = SelectByThreshold.select(hgen_state.trace_predictions, hgen_args.link_selection_threshold)
         if hgen_state.trace_predictions:
             for entry in hgen_state.trace_predictions:
                 link = EnumDict(entry)

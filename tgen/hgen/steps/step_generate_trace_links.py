@@ -3,7 +3,7 @@ from typing import Dict, Set
 from typing import List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.hgen_constants import WEIGHT_OF_PRED_RELATED_CHILDREN, DEFAULT_LINK_THRESHOLD, RELATED_CHILDREN_SCORE
+from tgen.common.constants.hgen_constants import WEIGHT_OF_PRED_RELATED_CHILDREN, RELATED_CHILDREN_SCORE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
@@ -19,7 +19,6 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
-from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 
@@ -82,6 +81,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         trace_predictions = []
         generation2id = {content: a_id for a_id, content in generated_parents_df.to_map().items()}
+        state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         for cluster_id in state.cluster_dataset.artifact_df.index:
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations]
@@ -129,7 +129,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             if parent in id_to_related_children and child in id_to_related_children[parent]:
                 alpha = WEIGHT_OF_PRED_RELATED_CHILDREN
                 trace[TraceKeys.SCORE] = MathUtil.calculate_weighted_score(RELATED_CHILDREN_SCORE, trace[TraceKeys.SCORE], alpha)
-        return SelectByThreshold.select(trace_predictions, DEFAULT_LINK_THRESHOLD)
+        return trace_predictions
 
     @staticmethod
     def _get_ranking_dir(directory: str) -> str:

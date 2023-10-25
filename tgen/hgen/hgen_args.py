@@ -5,6 +5,7 @@ from enum import Enum, auto
 from typing import Dict
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.hgen_constants import DEFAULT_LINK_THRESHOLD
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field, DataclassUtil
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
@@ -79,6 +80,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     The llm manager to use for each prediction step
     """
     llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)
+    """
+    The threshold below which trace links will get filtered out
+    """
+    link_selection_threshold: float = DEFAULT_LINK_THRESHOLD
 
     def __post_init__(self) -> None:
         """

@@ -6,7 +6,8 @@ import mock
 import pandas as pd
 
 from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_predictions, \
-    get_test_hgen_args
+    get_test_hgen_args, HGEN_PROJECT_SUMMARY, MISSING_PROJECT_SUMMARY_RESPONSES
+from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -23,19 +24,16 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
-from tgen.testres.mocking.mock_responses import TEST_PROJECT_SUMMARY, create
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
@@ -50,7 +48,7 @@ class TestHierarchyGenerator(BaseTest):
     def test_run(self, anthropic_ai_manager: TestAIManager):
         anthropic_ai_manager.mock_summarization()
         self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
-        self.HGEN_ARGS.dataset.project_summary = TEST_PROJECT_SUMMARY
+        self.HGEN_ARGS.dataset.project_summary = HGEN_PROJECT_SUMMARY
         self.HGEN_STATE.export_dir = self.HGEN_ARGS.export_dir
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
@@ -103,9 +101,9 @@ class TestHierarchyGenerator(BaseTest):
         self.assertEqual(self.HGEN_STATE.format_of_artifacts, HGenTestConstants.format_)
         self.assertEqual(self.HGEN_STATE.questions, HGenTestConstants.questions.split("\n"))
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
+        os.remove(path)
         self.assertEqual(openai_ai_manager.n_used, 1)
         self.assertEqual(anthropic_ai_manager.n_used, 1)
-        os.remove(path)
 
     @mock_anthropic
     def assert_generate_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
@@ -144,6 +142,7 @@ class TestHierarchyGenerator(BaseTest):
     def assert_generate_trace_links_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock,
                                          explanation_mock: MagicMock):
         names, expected_names, responses = get_name_responses(self.HGEN_STATE.generation_predictions)
+        responses.extend(MISSING_PROJECT_SUMMARY_RESPONSES)
         anthropic_ai_manager.set_responses(responses)
         anthropic_ai_manager.mock_summarization()
         predictions = get_predictions(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
@@ -186,13 +185,66 @@ class TestHierarchyGenerator(BaseTest):
 
     @mock_anthropic
     def test_generate_artifact_content_step_with_clustering(self, anthropic_ai_manager: TestAIManager):
+        artifacts, expected_names, n_artifacts_per_cluster, args, state = self._setup_hgen_for_clustering(anthropic_ai_manager,
+                                                                                                          generate_trace_links=False)
+        GenerateArtifactContentStep().run(args, state)
+        RefineGenerationsStep().run(args, state)
+        GenerateTraceLinksStep().run(args, state)
+        CreateHGenDatasetStep().run(args, state)
+
+        self.assertEqual(len(state.generation_predictions), len(HGenTestConstants.user_stories))
+        for i, us in enumerate(state.generation_predictions.keys()):
+            self.assertEqual(us, HGenTestConstants.user_stories[i])
+            self.assertSetEqual(set(state.generation_predictions[us]),
+                                set([a[ArtifactKeys.ID.value] for a in state.id_to_cluster_artifacts[i][:-1]]))
+
+        for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
+            linked_artifact_ids = {art[ArtifactKeys.ID] for i, art in enumerate(cluster_artifacts) if i != n_artifacts_per_cluster - 1}
+            new_name = expected_names[cluster_id]
+            self.assertIn(new_name, state.final_dataset.artifact_df)
+            self.assertNotIn(cluster_id, state.final_dataset.artifact_df)
+            for art in artifacts:
+                link = state.final_dataset.trace_dataset.trace_df.get_link(source_id=art[ArtifactKeys.ID.value], target_id=new_name)
+                self.assertIsNotNone(link)
+                if art[ArtifactKeys.ID.value] in linked_artifact_ids:
+                    self.assertEqual(link[TraceKeys.SCORE], 0.99)
+
+    @mock_anthropic
+    def test_generate_artifact_content_step_with_clustering_and_trace_preds(self, anthropic_ai_manager: TestAIManager):
+        artifacts, expected_names, n_artifacts_per_cluster, args, state = self._setup_hgen_for_clustering(anthropic_ai_manager,
+                                                                                                          generate_trace_links=True,
+                                                                                                          )
+        mock_project_summary_responses = MISSING_PROJECT_SUMMARY_RESPONSES
+        mock_explanations = [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
+                             for _ in range(n_artifacts_per_cluster * len(expected_names))]
+        anthropic_ai_manager.add_responses(mock_project_summary_responses + mock_explanations)
+        anthropic_ai_manager.mock_summarization()
+        GenerateArtifactContentStep().run(args, state)
+        RefineGenerationsStep().run(args, state)
+        GenerateTraceLinksStep().run(args, state)
+        missing = []
+        for i, artifact in enumerate(artifacts[:-1]):
+            artifact_id = artifact[ArtifactKeys.ID.value]
+            cluster_index = math.floor(i / n_artifacts_per_cluster)
+            cluster_id = expected_names[cluster_index]
+            found = [p for p in state.trace_predictions if p[TraceKeys.child_label()] == artifact_id
+                     and p[TraceKeys.parent_label()] == cluster_id]
+            if len(found) < 1:
+                missing.append((cluster_id, artifact_id))
+        self.assertSize(0, missing)
+
+    def _setup_hgen_for_clustering(self, anthropic_ai_manager: TestAIManager,
+                                   generate_trace_links: bool = False):
+
         args: HGenArgs = get_test_hgen_args()()
         args.target_type = "User Story"
-        args.generate_trace_links = False
+        args.generate_trace_links = generate_trace_links
+        args.dataset.project_summary = HGEN_PROJECT_SUMMARY
         state = HGenState()
         state.description = HGenTestConstants.description
         state.format_of_artifacts = HGenTestConstants.format_
-        state.project_summary = TEST_PROJECT_SUMMARY
+
+        state.project_summary = HGEN_PROJECT_SUMMARY
         state.original_dataset = args.dataset
         state.source_dataset = InitializeDatasetStep._create_dataset_with_single_layer(state.original_dataset.artifact_df,
                                                                                        args.source_layer_id)
@@ -206,34 +258,13 @@ class TestHierarchyGenerator(BaseTest):
             .create()
         state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
         state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
-
         responses = [PromptUtil.create_xml("user-story", us +
                                            PromptUtil.create_xml("code",
                                                                  ", ".join([a[ArtifactKeys.ID]
-                                                                           for a in state.id_to_cluster_artifacts[i][:-1]])))
+                                                                            for a in state.id_to_cluster_artifacts[i][:-1]])))
                      for i, us in enumerate(HGenTestConstants.user_stories)]
         names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.generation_predictions)
         responses.extend(name_responses)
         anthropic_ai_manager.set_responses(responses)
         anthropic_ai_manager.mock_summarization()
-
-        GenerateArtifactContentStep().run(args, state)
-        self.assertEqual(len(state.generation_predictions), len(HGenTestConstants.user_stories))
-        for i, us in enumerate(state.generation_predictions.keys()):
-            self.assertEqual(us, HGenTestConstants.user_stories[i])
-            self.assertSetEqual(set(state.generation_predictions[us]),
-                                set([a[ArtifactKeys.ID.value] for a in state.id_to_cluster_artifacts[i][:-1]]))
-
-        RefineGenerationsStep().run(args, state)
-        GenerateTraceLinksStep().run(args, state)
-        CreateHGenDatasetStep().run(args, state)
-        for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
-            linked_artifact_ids = {art[ArtifactKeys.ID] for i, art in enumerate(cluster_artifacts) if i != n-1}
-            new_name = expected_names[cluster_id]
-            self.assertIn(new_name, state.final_dataset.artifact_df)
-            self.assertNotIn(cluster_id, state.final_dataset.artifact_df)
-            for art in artifacts:
-                link = state.final_dataset.trace_dataset.trace_df.get_link(source_id=art[ArtifactKeys.ID.value], target_id=new_name)
-                self.assertIsNotNone(link)
-                if art[ArtifactKeys.ID.value] in linked_artifact_ids:
-                    self.assertEqual(link[TraceKeys.SCORE], 0.99)
+        return artifacts, expected_names, n, args, state

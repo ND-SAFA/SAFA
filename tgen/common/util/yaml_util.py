@@ -137,10 +137,11 @@ class CustomDumper(Dumper):
                 return node
             except Exception:
                 pass
-        if hasattr(data, "item"):
-            data = data.item()
-        if isinstance(data, np.ndarray):
-            data = ListUtil.convert_numpy_array_to_native_types(data)
+        # TODO deal with numpy types in yaml saving
+        # if hasattr(data, "item"):
+        #     data = data.item()
+        # if isinstance(data, np.ndarray):
+        #     data = ListUtil.convert_numpy_array_to_native_types(data)
         node = super().represent_data(data)
         return node
 

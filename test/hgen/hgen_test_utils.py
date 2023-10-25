@@ -1,12 +1,15 @@
 from copy import deepcopy
 
 from tgen.common.constants.deliminator_constants import COMMA
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_util import HGenUtil
+from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.testres.mocking.mock_responses import TEST_PROJECT_SUMMARY, MockResponses
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 
 
@@ -92,3 +95,10 @@ def get_test_hgen_args(test_refinement: bool = False):
                             n_reruns=HGenTestConstants.n_reruns,
                             dataset_creator=PromptDatasetCreator(
                                 trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))
+
+HGEN_PROJECT_SUMMARY = deepcopy(TEST_PROJECT_SUMMARY)
+for section in list(HGEN_PROJECT_SUMMARY.keys()):
+    if section not in HierarchyGenerator.PROJECT_SUMMARY_SECTIONS:
+        HGEN_PROJECT_SUMMARY.pop(section)
+MISSING_PROJECT_SUMMARY_RESPONSES = [MockResponses.project_title_to_response[title] for title in DEFAULT_PROJECT_SUMMARY_SECTIONS
+                                      if title not in HierarchyGenerator.PROJECT_SUMMARY_SECTIONS]

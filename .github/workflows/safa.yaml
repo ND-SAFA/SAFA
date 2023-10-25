@@ -16,23 +16,13 @@ jobs:
         run: echo "Build trigger has been activated."
       - name: Checkout code.
         uses: actions/checkout@v3
-      - name: Setup Python 3.9
-        uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
           cache: 'pip'
-      - name: Creating pip cache.
-        uses: actions/cache@v2
-        id: cache-venv  # name for referring later
-        with:
-          path: ./venv/  # what we cache: the virtualenv, he cache key depends on requirements.txt
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements/*.txt') }}
-          restore-keys: ${{ runner.os }}-venv-
+          cache-dependency-path: '**/requirements/*.txt'
       - name: Install Dependencies.
-        run: python -m venv ./venv && . ./venv/bin/activate && pip install -r requirements.txt && pip install -r requirements/test.txt
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-      - name: Active VENV.
-        run: source venv/bin/activate
+        run: pip install -r requirements.txt && pip install -r requirements/test.txt
       - name: Find Missing Docs.
         run: python3 tgen/scripts/find_missing_docs.py
         env:

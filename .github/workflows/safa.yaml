@@ -11,25 +11,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if comment contains /build
+      - name: Check if comment contains /build.
         if: contains(github.event.comment.body, '/build')
-        run: |
-          echo "Build trigger has been activated."
-      - name: Checkout code
+        run: echo "Build trigger has been activated."
+      - name: Checkout code.
         uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v3
         with:
           python-version: '3.9'
           cache: 'pip'
-      - name: run
-        run: |
-          pip install -r requirements.txt
-          pip install -r requirements/test.txt
-      - name: Find missing docs
+      - name: Creating pip cache.
+        uses: actions/cache@v2
+        id: cache-venv  # name for referring later
+        with:
+          path: ./.venv/  # what we cache: the virtualenv, he cache key depends on requirements.txt
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements/*.txt') }}
+          restore-keys: ${{ runner.os }}-venv-
+      - name: Install Dependencies.
+        run: python -m venv ./venv && . ./venv/bin/activate && pip install -r requirements.txt && pip install -r requirements/test.txt
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+      - name: Find Missing Docs.
         run: python3 tgen/scripts/find_missing_docs.py
         env:
           ROOT_PATH: /home/runner/work/tgen/tgen/tgen
-      - name: Run unit tests
+      - name: Run Unit Tests.
         run: |
           python -m unittest discover -s test
         env:

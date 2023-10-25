@@ -13,17 +13,6 @@ EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
 NodeType = AST
 
 
-def has_docstring_2(node: NodeType):
-    """
-    Check if the given AST node has a docstring.
-    :param node:
-    :return:
-    """
-    allowable_node_types = [ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef]
-    is_allowable = any([isinstance(node, node_type) for node_type in allowable_node_types])
-    return is_allowable and (ast.get_docstring(node) is not None)
-
-
 def has_docstring(node):
     """
     Checks to see if node contains a docstring to check.

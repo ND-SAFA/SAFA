@@ -39,15 +39,15 @@ class EmbeddingsManager:
         return embeddings
 
     def create_embedding_map(self, subset_ids: List[str] = None) -> Dict[str, EmbeddingType]:
-        """
-        Creates embeddings for entries in map.
-        :param subset_ids: The IDs of the set of the entries to use.
-        :return: Map of id to embedding.
-        """
         if subset_ids is None:
             subset_ids = self._content_map.keys()
         artifact_embeddings = self.get_embeddings(subset_ids)
         embedding_map = {a_id: a_embedding for a_id, a_embedding in zip(subset_ids, artifact_embeddings)}
+        """
+         Creates embeddings for entries in map.
+         :param subset_ids: The IDs of the set of the entries to use.
+         :return: Map of id to embedding.
+         """
         return embedding_map
 
     def get_embeddings(self, a_ids: List[Any]) -> List[EmbeddingType]:

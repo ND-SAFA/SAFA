@@ -26,6 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements/test.txt
+      - name: Find missing docs
+        run: python3 tgen/scripts/find_missing_docs.py
+        env:
+          ROOT_PATH: /home/runner/work/tgen/tgen/tgen
       - name: Run unit tests
         run: |
           python -m unittest discover -s test

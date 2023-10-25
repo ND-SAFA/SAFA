@@ -7,7 +7,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 
 
@@ -66,7 +66,14 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         sources, targets, labels = [], [], []
 
-        def add_new_link(source_id, target_id, label=1):
+        def add_new_link(source_id: str, target_id: str, label=1) -> None:
+            """
+            Adds new links between source and target with given label.
+            :param source_id: ID of source artifact.
+            :param target_id: ID of target artifact.
+            :param label: Label between source and target.
+            :return: None
+            """
             sources.append(source_id)
             targets.append(target_id)
             labels.append(label)

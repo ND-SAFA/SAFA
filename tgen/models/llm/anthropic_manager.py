@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict
 
 import anthropic
 
@@ -89,22 +89,25 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         prompts = params[AnthropicParams.PROMPT]
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
 
-        global_responses = []
         if isinstance(prompts, str):
             prompts = [prompts]
 
-        global_responses = [None] * len(prompts)
-
-        def thread_work(payload):
+        def thread_work(payload: Tuple[int, str]) -> Dict:
+            """
+            Performs completion on prompt and sets response to index.
+            :param payload: Payload containing the index to set response to and the prompt to complete.
+            :return: None
+            """
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
             local_response = get_client().completion(**prompt_params)
-            global_responses[index] = local_response
+            return local_response
 
-        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
-                                        thread_work,
-                                        n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
-                                        max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS)
+        global_responses = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
+                                                           thread_work,
+                                                           collect_results=True,
+                                                           n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
+                                                           max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS)
 
         for res in global_responses:
             if res and res.get("exception", EMPTY_STRING):
@@ -159,6 +162,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 
 
 def get_client():
+    """
+    :return:  Returns the singleton anthropic client.
+    """
     if not environment_constants.IS_TEST:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
         if AnthropicManager.Client is None:

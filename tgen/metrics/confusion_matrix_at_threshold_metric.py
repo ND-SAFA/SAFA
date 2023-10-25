@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 import datasets
 
@@ -38,7 +38,13 @@ class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
         return self.calculate_confusion_matrix(references, predicted_labels)
 
     @staticmethod
-    def calculate_confusion_matrix(y_true, y_pred):
+    def calculate_confusion_matrix(y_true: List[float], y_pred: List[float]):
+        """
+        Computes confusion matrix between actual and predicted labels.
+        :param y_true: List of true labels.
+        :param y_pred: List of predicted labels
+        :return: Dictionary containing number of true positives, true negatives, false positives, and false negatives.
+        """
         errors = {
             "tp": 0,
             "tn": 0,

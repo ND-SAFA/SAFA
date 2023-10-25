@@ -29,4 +29,9 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
 
     @staticmethod
     def filter_by_size(cluster: ClusterMapType) -> ClusterMapType:
+        """
+        Filters clusters by the minimum and maximum size limit.
+        :param cluster: The clusters to filter out.
+        :return: Cluster map of clusters with valid sizes.
+        """
         return {k: v for k, v in cluster.items() if MIN_CLUSTER_SIZE <= len(v) <= MAX_CLUSTER_SIZE}

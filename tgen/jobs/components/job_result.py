@@ -16,7 +16,11 @@ class JobResult(BaseObject):
     body: Any = None
     experimental_vars: Dict = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """
+        Sets the job ID to be proper UUID.
+        :return:  None
+        """
         if not isinstance(self.job_id, UUID):
             self.job_id = UUID(self.job_id)
 

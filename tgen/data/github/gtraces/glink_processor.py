@@ -49,16 +49,21 @@ class GLinkProcessor:
         :return: Set of transitive trace links.
         """
 
-        def add_link(store, link: GLink):
-            if link.target in store:
-                store[link.target].append(link)
-            else:
-                store[link.target] = [link]
+        def save_link(store, link: GLink) -> None:
+            """
+            Saves links in store.
+            :param store: The store of all links
+            :param link: The link to store.
+            :return: None
+            """
+            if link.target not in store:
+                store[link.target] = []
+            store[link.target].append(link)
 
         level_1_store: Dict[str, List[GLink]] = {}
 
         for t in level_1:
-            add_link(level_1_store, t)
+            save_link(level_1_store, t)
 
         transitive_traces = []
         for t2 in level_2:

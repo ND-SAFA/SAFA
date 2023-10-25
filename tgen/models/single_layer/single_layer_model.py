@@ -5,25 +5,37 @@ import torch
 from torch import nn
 from tqdm import tqdm
 
+DEFAULT_HIDDEN_SIZE = [20, 100]
+
 
 class SingleLayerModel(nn.Module):
 
-    def __init__(self, input_size: int, output_size: int = 2, hidden_size1: int = 20, hidden_size2: int = 100):
+    def __init__(self, input_size: int, output_size: int = 2, hidden_sizes: List[int] = None):
+        """
+        Creates a linear model with multiple hidden layers.
+        :param input_size: The size of the input to the model.
+        :param output_size: The size of the output of the model.
+        :param hidden_sizes: The size of each of the hidden layers.
+        """
+        if hidden_sizes is None:
+            hidden_sizes = DEFAULT_HIDDEN_SIZE
         super().__init__()
-        self.input_layer = nn.Linear(input_size, hidden_size1)
-        self.act = nn.ReLU()
-        self.hidden_layer1 = nn.Linear(hidden_size1, hidden_size2)
-        self.hidden_layer2 = nn.Linear(hidden_size2, output_size)
-        self.softmax = nn.Softmax()
+        hidden_sizes.append(output_size)
+        self.starting_layers: List[nn.Module] = [nn.Linear(input_size, hidden_size1), nn.ReLU()]
+        self.hidden_layers: List[nn.Module] = [nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]) for i in range(len(hidden_sizes) - 1)]
+        self.final_layers: List[nn.Module] = [nn.Softmax()]
+        self.layers: List[nn.Module] = self.starting_layers + self.hidden_layers + self.final_layers
 
     def forward(self, x):
-        x = self.input_layer(x)
-        x = self.act(x)
-        x = self.hidden_layer1(x)
-        x = self.act(x)
-        x = self.hidden_layer2(x)
-        x = self.softmax(x)
-        return x
+        """
+        Performs the forward pass on the model with given inputs.
+        :param x: The data in batch.
+        :return: The output of the model.
+        """
+        curr = x
+        for layer in self.layers:
+            curr = layer(curr)
+        return curr
 
 
 def train(model: SingleLayerModel, training_data: List[List[float]], labels: List[float], n_epochs: int = 10) -> List[int]:

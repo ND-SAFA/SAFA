@@ -3,20 +3,20 @@ from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
 
+from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
+    ALLOWED_ORPHANS_DEFAULT, \
+    NO_CHECK, REMOVE_ORPHANS_DEFAULT
+from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
-    ALLOWED_ORPHANS_DEFAULT, \
-    NO_CHECK, REMOVE_ORPHANS_DEFAULT
-from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -140,11 +140,17 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: None
         """
 
-        def remove_traces_with_missing_artifacts(row: pd.Series):
-            return row[StructuredKeys.Trace.SOURCE.value] in artifact_ids and row[StructuredKeys.Trace.TARGET.value] in artifact_ids
+        def has_source_and_target(trace_row: pd.Series):
+            """
+            Calculates if trace row references known source and target artifacts.
+            :param trace_row: Row containing source and target artifact ids.
+            :return: True if both artifacts are known, false otherwise.
+            """
+            return trace_row[StructuredKeys.Trace.SOURCE.value] in artifact_ids and trace_row[
+                StructuredKeys.Trace.TARGET.value] in artifact_ids
 
         self.artifact_df = ArtifactDataFrame(DataFrameUtil.filter_df_by_index(self.artifact_df, list(artifact_ids)))
-        self.trace_df = TraceDataFrame(DataFrameUtil.filter_df_by_row(self.trace_df, remove_traces_with_missing_artifacts))
+        self.trace_df = TraceDataFrame(DataFrameUtil.filter_df_by_row(self.trace_df, has_source_and_target))
 
     def _verify_orphans(self) -> None:
         """

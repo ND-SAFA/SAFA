@@ -4,6 +4,7 @@ from typing import Callable, List, Sized, Tuple, Type
 from unittest import TestCase
 
 import mock
+from datasets import set_caching_enabled
 from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
@@ -14,7 +15,7 @@ from tgen.common.util.logging.logger_manager import LoggerManager
 from tgen.common.util.random_util import RandomUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
@@ -51,6 +52,9 @@ class BaseTest(TestCase):
         open_ai_constants.OPENAI_MAX_THREADS = 1
         open_ai_constants.OPENAI_MAX_ATTEMPTS = 1
         RandomUtil.set_seed(42)
+        cache_dir = os.environ.get("HF_DATASETS_CACHE", None)
+        if cache_dir is None:
+            set_caching_enabled(False)
         if BaseTest.configure_logging:
             config = LoggerConfig(output_dir=TEST_OUTPUT_DIR)
             LoggerManager.configure_logger(config)

@@ -42,8 +42,8 @@ class TestPromptDatasetExporter(BaseTest):
             dataset.project_summary = Summary(overview=EnumDict({"chunks": ["summary of project"],
                                                                  "title": "overview"}))
             PromptDatasetExporter(export_path, dataset_exporter, dataset=dataset).export()
-            new_dataset = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(
-                project_reader=project_reader(project_path=export_path))).create()
+            trace_dataset_creator = TraceDatasetCreator(project_reader=project_reader(project_path=export_path))
+            new_dataset = PromptDatasetCreator(trace_dataset_creator=trace_dataset_creator).create()
             PromptTestProject.verify_dataset(self, new_dataset)
             self.assertEqual(dataset.project_summary, new_dataset.project_summary)
             i += 1

@@ -10,7 +10,11 @@ class AbstractTraceMetric(datasets.Metric, BaseObject, ABC):
 
     @abstractmethod
     def _info(self) -> MetricInfo:
-        pass
+        """
+        Throws error if called. Should be implemented by child class.
+        :return: None
+        """
+        raise Exception(f"Could not find required method `_info` on class {self.__class__.__name__}")
 
     def get_features(self) -> datasets.Features:
         """

@@ -6,11 +6,11 @@ from transformers import AutoConfig, PreTrainedModel, PretrainedConfig
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
+from tgen.common.constants.deliminator_constants import PERIOD
+from tgen.common.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
-from tgen.common.constants.deliminator_constants import PERIOD
-from tgen.common.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
 from tgen.models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
 LAYER = List[Parameter]
@@ -63,7 +63,12 @@ class ModelManager(BaseObject):
             self._model = self._load_model()
         return self._model
 
-    def set_model(self, model):
+    def set_model(self, model) -> None:
+        """
+        Sets the current model of the manager.
+        :param model: The model to set.
+        :return: None
+        """
         self._model = model
 
     def get_config(self) -> PretrainedConfig:

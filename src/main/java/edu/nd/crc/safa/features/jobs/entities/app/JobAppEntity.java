@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 
 import lombok.Data;
 
@@ -25,6 +26,7 @@ public class JobAppEntity {
     private UUID completedEntityId;
     private UUID taskId;
     private List<String> steps;
+    private UserAppEntity user;
 
     public JobAppEntity(JobDbEntity jobDbEntity) {
         this.name = jobDbEntity.getName();
@@ -38,6 +40,7 @@ public class JobAppEntity {
         this.projectId = jobDbEntity.getProjectId();
         this.completedEntityId = jobDbEntity.getCompletedEntityId();
         this.taskId = jobDbEntity.getTaskId();
+        this.user = new UserAppEntity(jobDbEntity.getUser());
     }
 
     public JobAppEntity() {

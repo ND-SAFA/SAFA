@@ -1,6 +1,6 @@
 <template>
-  <private-page>
-    <project-creator />
+  <private-page full-window>
+    <project-builder />
   </private-page>
 </template>
 
@@ -14,5 +14,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { PrivatePage, ProjectCreator } from "@/components";
+import { PrivatePage, ProjectBuilder } from "@/components";
 </script>

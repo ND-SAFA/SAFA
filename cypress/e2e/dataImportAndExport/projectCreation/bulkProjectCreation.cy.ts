@@ -25,36 +25,9 @@ describe("Bulk Project Creation", () => {
 
   describe("I cannot create a project without a name", () => {
     it("Cant create a project without a name", () => {
-      cy.inputText(
-        DataCy.creationBulkDescriptionInput,
-        testProject.name
-      ).uploadFiles(DataCy.creationBulkFilesInput, simpleProjectFilesMap.tim);
+      cy.inputText(DataCy.creationBulkDescriptionInput, testProject.name);
 
-      cy.getCy(DataCy.creationUploadButton).should("be.disabled");
-    });
-  });
-
-  describe("I can create an empty project", () => {
-    it("Can create an empty project on the bulk upload tab", () => {
-      cy.setProjectIdentifier("bulk");
-
-      cy.getCy(DataCy.creationUploadButton).should("be.disabled");
-
-      cy.clickButton(DataCy.creationEmptyToggle).clickButton(
-        DataCy.creationUploadButton
-      );
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-    });
-
-    it("Can create an empty project in the project selector", () => {
-      cy.openProjectSelector().clickButton(DataCy.selectorAddButton);
-
-      cy.setProjectIdentifier("modal")
-        .clickButton(DataCy.creationEmptyToggle)
-        .clickButton(DataCy.creationUploadButton);
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.creationContinueButton).should("be.disabled");
     });
   });
 

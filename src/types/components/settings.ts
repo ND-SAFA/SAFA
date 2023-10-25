@@ -4,6 +4,7 @@
 export type SettingsTab =
   | "overview"
   | "members"
+  | "jobs"
   | "upload"
   | "integrations"
   | "attributes";

@@ -16,11 +16,25 @@
       delete: 'project-delete',
     }"
     data-cy="table-project"
+    :custom-cells="['name']"
     @refresh="handleReload"
     @row:add="identifierSaveStore.selectIdentifier(undefined, 'save')"
     @row:edit="identifierSaveStore.selectIdentifier($event, 'save')"
     @row:delete="identifierSaveStore.selectIdentifier($event, 'delete')"
   >
+    <template #body-cell-name="{ row }: { row: ProjectSchema }">
+      <q-td>
+        <typography :value="row.name" />
+        <typography
+          v-if="!props.minimal"
+          :value="row.description"
+          secondary
+          el="div"
+          class="text-ellipsis"
+          style="max-width: 500px"
+        />
+      </q-td>
+    </template>
     <template #cell-actions="{ row }: { row: ProjectSchema }">
       <icon-button
         v-if="isEditable(row)"
@@ -64,15 +78,10 @@ import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
   MemberEntitySchema,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ProjectSchema,
   ProjectSelectorTableProps,
 } from "@/types";
-import {
-  actionsColumn,
-  projectExpandedColumns,
-  projectNameColumn,
-} from "@/util";
+import { projectColumns, projectNameColumn } from "@/util";
 import {
   getProjectApiStore,
   identifierSaveStore,
@@ -83,6 +92,7 @@ import {
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
 import { InviteMemberModal } from "@/components/members";
+import Typography from "@/components/common/display/content/Typography.vue";
 
 const props = defineProps<ProjectSelectorTableProps>();
 
@@ -97,6 +107,11 @@ const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
 const projectInviteId = ref<string>();
+
+const columns = computed(() =>
+  props.minimal ? [projectNameColumn] : projectColumns
+);
+const rows = computed(() => projectStore.allProjects);
 
 const entity = computed(
   () =>
@@ -115,14 +130,6 @@ const selectedItems = computed({
     emit("selected", items[0]);
   },
 });
-
-const columns = computed(() =>
-  props.minimal
-    ? [projectNameColumn, actionsColumn]
-    : [projectNameColumn, ...projectExpandedColumns]
-);
-
-const rows = computed(() => projectStore.allProjects);
 
 /**
  * Loads all projects.

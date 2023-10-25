@@ -7,14 +7,10 @@
       variant="large"
       value="Welcome to SAFA"
     />
-    <flex-box :column="smallWindow">
-      <flex-item :parts="smallWindow ? '12' : '7'">
+    <flex-box :column="smallWindow" full-width>
+      <flex-item v-if="displayProjects" :parts="smallWindow ? '12' : '7'">
         <div :class="smallWindow ? '' : 'q-mr-md'">
-          <panel-card
-            v-if="projectStore.allProjects.length > 0"
-            title="Load Existing Project"
-            icon="nav-open"
-          >
+          <panel-card title="Load Existing Project" icon="nav-open">
             <typography
               variant="small"
               value="Select an existing project and version to load."
@@ -23,7 +19,7 @@
           </panel-card>
         </div>
       </flex-item>
-      <flex-item :parts="smallWindow ? '12' : '5'">
+      <flex-item :parts="smallWindow || !displayProjects ? '12' : '5'">
         <panel-card title="Create New Project" icon="project-add">
           <typography
             variant="small"
@@ -47,7 +43,7 @@
               />
               <text-button
                 text
-                label="Import Jira/GitHub Project"
+                label="Import GitHub Repo"
                 icon="integrate"
                 color="primary"
                 @click="handleOpenImport"
@@ -71,6 +67,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { CreatorTab } from "@/types";
 import { projectStore, useScreen } from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
@@ -86,6 +83,8 @@ import {
 } from "@/components";
 
 const { smallWindow } = useScreen();
+
+const displayProjects = computed(() => projectStore.allProjects.length > 0);
 
 function handleOpenStandard() {
   navigateTo(Routes.PROJECT_CREATOR, {

@@ -71,6 +71,7 @@ Cypress.Commands.add("setProjectIdentifier", (type) => {
   } else {
     cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
     cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.description);
+    cy.clickButton(DataCy.creationContinueButton);
   }
 });
 

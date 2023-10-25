@@ -8,6 +8,11 @@
       :data-cy-description="props.dataCyDescription"
     />
     <div class="q-mx-auto long-input">
+      <project-files-input
+        v-if="!emptyFiles"
+        v-model="selectedFiles"
+        data-cy="input-files-bulk"
+      />
       <switch-input
         v-model="emptyFiles"
         label="Create an empty project"
@@ -18,11 +23,6 @@
         v-model="summarize"
         label="Generate artifact summaries"
         data-cy="toggle-create-summarize"
-      />
-      <project-files-input
-        v-if="!emptyFiles"
-        v-model="selectedFiles"
-        data-cy="input-files-bulk"
       />
       <text-button
         block

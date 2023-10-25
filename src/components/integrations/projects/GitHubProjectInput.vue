@@ -1,29 +1,43 @@
 <template>
-  <stepper-list-step
-    title="GitHub Repositories"
-    empty-message="There are no repositories."
-    :item-count="projects.length"
-  >
-    <list>
-      <list-item
-        v-for="item in visibleProjects"
-        :key="item.name"
-        :title="item.name"
-        :subtitle="getRepositoryTime(item)"
-        clickable
-        :active="projectName === item.name"
-        active-class="bg-background"
-        @click="handleProjectSelect(item)"
-      />
-    </list>
-    <flex-box v-if="!!projectName" column t="3">
-      <select-input
-        v-model="importBranch"
-        label="Import Branch"
-        :options="branches"
-        hint="The branch to import files from."
-      />
-      <flex-box y="2" align="center">
+  <div>
+    <git-hub-authentication v-if="!integrationsStore.validGitHubCredentials" />
+    <select-input
+      v-else
+      v-model="integrationsStore.gitHubOrganization"
+      label="GitHub Organization"
+      :options="gitHubApiStore.organizationList"
+      :loading="gitHubApiStore.loading"
+      hint="Required"
+      class="full-width"
+      option-label="name"
+      data-cy="input-github-organization"
+    />
+    <select-input
+      v-if="!!integrationsStore.gitHubOrganization"
+      v-model="integrationsStore.gitHubProject"
+      label="GitHub Repository"
+      :options="projects"
+      hint="Required"
+      class="full-width"
+      option-label="name"
+      data-cy="input-github-project"
+    />
+    <flex-box v-if="!!projectName" column t="1">
+      <flex-box y="1">
+        <select-input
+          v-model="importBranch"
+          label="Import Branch"
+          :options="branches"
+          hint="The branch to import files from."
+        />
+        <text-input
+          v-model="artifactType"
+          label="Artifact Type"
+          hint="A name for imported artifacts."
+          class="q-mx-sm"
+        />
+      </flex-box>
+      <flex-box y="1" align="center">
         <multiselect-input
           v-model="includePatterns"
           label="Include Patterns"
@@ -45,13 +59,8 @@
           @click="handleFilePatternInfo"
         />
       </flex-box>
-      <text-input
-        v-model="artifactType"
-        label="Artifact Type"
-        hint="The artifact type name to import these files as."
-      />
     </flex-box>
-  </stepper-list-step>
+  </div>
 </template>
 
 <script lang="ts">
@@ -59,7 +68,7 @@
  * Allows for selecting a GitHub repository.
  */
 export default {
-  name: "GitHubProjectSelector",
+  name: "GitHubProjectInput",
 };
 </script>
 
@@ -68,25 +77,15 @@ import { computed, ref, onMounted, watch } from "vue";
 import { GitHubProjectSchema } from "@/types";
 import { gitHubApiStore, integrationsStore } from "@/hooks";
 import {
-  StepperListStep,
-  List,
-  ListItem,
   FlexBox,
   SelectInput,
   MultiselectInput,
   TextInput,
   IconButton,
 } from "@/components/common";
+import { GitHubAuthentication } from "@/components/integrations/authentication";
 
 const projects = ref<GitHubProjectSchema[]>([]);
-
-const visibleProjects = computed(() =>
-  integrationsStore.gitHubProject?.name
-    ? projects.value.filter(
-        ({ name }) => name === integrationsStore.gitHubProject?.name
-      )
-    : projects.value
-);
 
 const organizationName = computed(
   () => integrationsStore.gitHubOrganization?.name
@@ -103,11 +102,11 @@ const importBranch = computed({
 });
 
 const includePatterns = computed({
-  get: () => integrationsStore.gitHubConfig.include,
+  get: () => integrationsStore.gitHubConfig.include || [],
   set: (include) => (integrationsStore.gitHubConfig.include = include),
 });
 const excludePatterns = computed({
-  get: () => integrationsStore.gitHubConfig.exclude,
+  get: () => integrationsStore.gitHubConfig.exclude || [],
   set: (exclude) => (integrationsStore.gitHubConfig.exclude = exclude),
 });
 const artifactType = computed({
@@ -136,25 +135,6 @@ function handleReload() {
   projects.value = gitHubApiStore.projectList.filter(
     ({ owner }) => owner === organizationName.value
   );
-}
-
-/**
- * Returns a repository's last updated time.
- * @param repository - The repository to extract from.
- * @return The last updated time.
- */
-function getRepositoryTime(repository: GitHubProjectSchema): string {
-  const updated = new Date(repository.creationDate);
-
-  return `Created on ${updated.getMonth()}/${updated.getDate()}/${updated.getFullYear()}`;
-}
-
-/**
- * SHandles a click to select a repository.
- * @param project - The repository to select.
- */
-function handleProjectSelect(project: GitHubProjectSchema | undefined) {
-  integrationsStore.selectGitHubProject(project);
 }
 
 onMounted(() => handleReload());

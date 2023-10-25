@@ -38,6 +38,7 @@ Cypress.on("uncaught:exception", (err) => {
 before(() => {
   cy.log("Generating users...");
   cy.dbGenerateUsers();
+  cy.expandViewport("l");
 });
 
 /**

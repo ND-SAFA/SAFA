@@ -6,6 +6,7 @@
     class="nav-breadcrumb"
     label="Project"
     :options="projectStore.allProjects"
+    :loading="getVersionApiStore.loadLoading"
     option-value="projectId"
     option-label="name"
     @popup-show="handleReload"
@@ -75,6 +76,7 @@ import { computed, ref } from "vue";
 import { MemberEntitySchema, ProjectSchema } from "@/types";
 import {
   getProjectApiStore,
+  getVersionApiStore,
   identifierSaveStore,
   permissionStore,
   projectStore,

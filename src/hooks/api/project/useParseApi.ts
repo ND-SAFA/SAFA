@@ -72,7 +72,7 @@ export const useParseApi = defineStore("useParseApi", (): ParseApiHook => {
           await parseArtifactFile(panel.type, panel.file).then(
             ({ entities, errors }) => {
               panel.artifacts = entities;
-              panel.errorMessage =
+              panel.parseErrorMessage =
                 errors.length === 0 ? undefined : errors.join(", ");
               panel.itemNames = entities.map(({ name }) => name);
 
@@ -89,7 +89,7 @@ export const useParseApi = defineStore("useParseApi", (): ParseApiHook => {
 
             errors.push(...getTraceErrors(panel, artifactMap, entities));
 
-            panel.errorMessage =
+            panel.parseErrorMessage =
               errors.length === 0 ? undefined : errors.join(", ");
             panel.itemNames = entities.map(extractTraceId);
           });

@@ -69,12 +69,14 @@ export const ThemeColors = {
 
   whiteBg: Colors.white,
   lightBg: Colors.greyLightest,
+  lightBd: Colors.greyLight,
   lightText: Colors.grey,
   lightTextCaption: Colors.greyDark,
   lightSelected: Colors.greyLightest,
 
   blackBg: Colors.black,
   darkBg: Colors.greyDarkest,
+  darkBd: Colors.greyDark,
   darkText: Colors.white,
   darkTextCaption: Colors.greyLight,
   darkSelected: Colors.greyLight,
@@ -109,6 +111,7 @@ export const lightPalette = {
   textCaption: ThemeColors.lightTextCaption,
   neutral: ThemeColors.whiteBg,
   background: ThemeColors.lightBg,
+  border: ThemeColors.lightBd,
   selected: ThemeColors.lightSelected,
 
   added: ThemeColors.added,
@@ -141,6 +144,7 @@ export const darkPalette = {
   textCaption: ThemeColors.darkTextCaption,
   neutral: ThemeColors.blackBg,
   background: ThemeColors.darkBg,
+  border: ThemeColors.darkBd,
   selected: ThemeColors.darkSelected,
 
   added: ThemeColors.added,

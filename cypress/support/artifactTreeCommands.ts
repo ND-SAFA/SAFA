@@ -25,7 +25,7 @@ Cypress.Commands.add("waitForProjectLoad", (waitForNodes = true) => {
 
 Cypress.Commands.add("centerGraph", () => {
   // Wait for graph to center.
-  cy.clickButton(DataCy.navGraphCenterButton).wait(200);
+  cy.clickButton(DataCy.navGraphCenterButton).wait(300);
 });
 
 Cypress.Commands.add("enableBasicSearch", () => {

@@ -5,12 +5,17 @@ import {
   CreateProjectByJsonSchema,
   CreatorFilePanel,
   MembershipSchema,
+  TimLinkProps,
+  TimNodeProps,
+  UploadPanelType,
 } from "@/types";
 import { buildProject } from "@/util";
-import { orgStore, sessionStore, teamStore } from "@/hooks";
+import { integrationsStore, orgStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
-const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({
+const createEmptyPanel = (
+  variant: UploadPanelType = "artifact"
+): CreatorFilePanel => ({
   variant,
   name: "",
   type: "",
@@ -20,7 +25,9 @@ const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({
   ignoreErrors: false,
   itemNames: [],
   isGenerated: false,
-  generateMethod: undefined,
+  summarize: false,
+  bulkFiles: [],
+  emptyFiles: false,
 });
 
 /**
@@ -30,11 +37,28 @@ export const useSaveProject = defineStore("saveProject", {
   state: () => ({
     name: "",
     description: "",
-    artifactPanels: [createEmptyPanel("artifact")] as CreatorFilePanel[],
-    tracePanels: [createEmptyPanel("trace")] as CreatorFilePanel[],
+    uploadPanels: [createEmptyPanel()] as CreatorFilePanel[],
     artifactMap: {} as ArtifactMap,
   }),
   getters: {
+    /**
+     * @return The current upload panel mode.
+     */
+    mode(): UploadPanelType {
+      return this.uploadPanels[0]?.variant ?? "artifact";
+    },
+    /**
+     * @return All artifact panels.
+     */
+    artifactPanels(): CreatorFilePanel[] {
+      return this.uploadPanels.filter(({ variant }) => variant === "artifact");
+    },
+    /**
+     * @return All trace panels.
+     */
+    tracePanels(): CreatorFilePanel[] {
+      return this.uploadPanels.filter(({ variant }) => variant === "trace");
+    },
     /**
      * @return All artifact types.
      */
@@ -53,14 +77,13 @@ export const useSaveProject = defineStore("saveProject", {
         .reduce((acc, cur) => [...acc, ...cur], []);
       const requests = this.tracePanels
         .filter(({ isGenerated }) => isGenerated)
-        .map(({ type, toType = "", generateMethod }) => ({
+        .map(({ type, toType = "" }) => ({
           artifactLevels: [
             {
               source: type,
               target: toType,
             },
           ],
-          method: generateMethod,
         }));
       const user: MembershipSchema = {
         id: "",
@@ -85,6 +108,76 @@ export const useSaveProject = defineStore("saveProject", {
         requests,
       };
     },
+    /**
+     * @return The nodes to display on the graph.
+     */
+    graphNodes(): TimNodeProps[] {
+      if (this.mode === "artifact" || this.mode === "trace") {
+        return this.artifactPanels
+          .filter(({ valid }) => valid)
+          .map(({ type, artifacts = [] }) => ({
+            artifactType: type,
+            count: artifacts.length,
+            hideActions: true,
+          }));
+      } else if (this.mode === "bulk") {
+        return (
+          this.uploadPanels[0]?.tim?.artifacts.map(({ type }) => ({
+            artifactType: type,
+            count: -1,
+            hideActions: true,
+          })) ?? []
+        );
+      } else if (this.mode === "github") {
+        return [
+          {
+            artifactType:
+              integrationsStore.gitHubConfig.artifactType || "GitHub Code",
+            count: -1,
+            hideActions: true,
+          },
+        ];
+      } else if (this.mode === "jira") {
+        return [
+          {
+            artifactType: "Jira Ticket",
+            count: -1,
+            hideActions: true,
+          },
+        ];
+      } else {
+        return [];
+      }
+    },
+    /**
+     * @return The edges to display on the graph.
+     */
+    graphEdges(): TimLinkProps[] {
+      if (this.mode === "artifact" || this.mode === "trace") {
+        return this.tracePanels
+          .filter(({ valid }) => valid)
+          .map(({ type, toType = "", traces = [], isGenerated }) => ({
+            sourceType: type,
+            targetType: toType,
+            count: traces.length,
+            generated: isGenerated,
+            hideActions: true,
+          }));
+      } else if (this.mode === "bulk") {
+        return (
+          this.uploadPanels[0]?.tim?.traces.map(
+            ({ sourceType, targetType }) => ({
+              sourceType,
+              targetType,
+              count: -1,
+              hideActions: true,
+            })
+          ) ?? []
+        );
+      } else {
+        return [];
+      }
+    },
   },
   actions: {
     /**
@@ -93,32 +186,23 @@ export const useSaveProject = defineStore("saveProject", {
     resetProject(): void {
       this.name = "";
       this.description = "";
-      this.artifactPanels = [createEmptyPanel("artifact")];
-      this.tracePanels = [createEmptyPanel("trace")];
+      this.uploadPanels = [createEmptyPanel()];
       this.artifactMap = {};
     },
     /**
      * Adds a new creator panel.
      * @param variant - The type of panel to add.
      */
-    addPanel(variant: "artifact" | "trace"): void {
-      if (variant === "artifact") {
-        this.artifactPanels.push(createEmptyPanel("artifact"));
-      } else {
-        this.tracePanels.push(createEmptyPanel("trace"));
-      }
+    addPanel(variant: UploadPanelType = "artifact"): void {
+      this.uploadPanels.push(createEmptyPanel(variant));
     },
     /**
      * Removes a creator panel.
      * @param variant - The type of panel to remove.
      * @param index - The panel index to remove.
      */
-    removePanel(variant: "artifact" | "trace", index: number): void {
-      if (variant === "artifact") {
-        this.artifactPanels = this.artifactPanels.filter((_, i) => i !== index);
-      } else {
-        this.tracePanels = this.tracePanels.filter((_, i) => i !== index);
-      }
+    removePanel(variant: UploadPanelType, index: number): void {
+      this.uploadPanels = this.uploadPanels.filter((_, i) => i !== index);
     },
   },
 });

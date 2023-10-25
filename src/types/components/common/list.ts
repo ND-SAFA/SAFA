@@ -1,5 +1,6 @@
 import {
   ArtifactSchema,
+  ClassNameProps,
   ClickableProps,
   ColorProps,
   IconProps,
@@ -126,7 +127,7 @@ export interface ListItemProps
 /**
  * Defines props for a component that displays a set of tabs.
  */
-export interface TabListProps {
+export interface TabListProps extends ClassNameProps {
   /**
    * The tab id currently selected.
    */
@@ -135,4 +136,8 @@ export interface TabListProps {
    * The tabs to display.
    */
   tabs: SelectOption[];
+  /**
+   * Whether to display tab options to the left side, instead of the top.
+   */
+  vertical?: boolean;
 }

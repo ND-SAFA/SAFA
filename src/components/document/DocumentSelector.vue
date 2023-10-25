@@ -7,6 +7,7 @@
     options-selected-class="primary"
     :options="options"
     :disable="disabled"
+    :loading="documentApiStore.loading"
     label="View"
     option-label="name"
     option-value="name"

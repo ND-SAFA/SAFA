@@ -1,5 +1,5 @@
 <template>
-  <panel-card :color="panelColor">
+  <panel-card :color="panelColor" :title="panelTitle">
     <stepper
       v-model="currentStep"
       :steps="steps"
@@ -64,6 +64,8 @@ const currentStep = ref(1);
 const steps = ref([defaultProjectStep(), defaultVersionStep()]);
 const selectedProject = ref<IdentifierSchema>();
 const selectedVersion = ref<VersionSchema>();
+
+const panelTitle = computed(() => (props.minimal ? undefined : "My Projects"));
 
 const isProjectStep = computed(() => currentStep.value === 1);
 const isVersionStep = computed(() => currentStep.value === 2);

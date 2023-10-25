@@ -10,12 +10,7 @@
         <authentication-selector v-model="source" @input="handleSelectSource" />
       </template>
       <template #2>
-        <jira-organization-selector v-if="source === 'Jira'" />
-        <git-hub-organization-selector v-if="source === 'GitHub'" />
-      </template>
-      <template #3>
-        <jira-project-selector v-if="source === 'Jira'" />
-        <git-hub-project-selector v-if="source === 'GitHub'" />
+        <integration-selector v-if="!!source" :source="source" />
       </template>
     </stepper>
   </panel-card>
@@ -41,12 +36,8 @@ import {
   integrationsStore,
 } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
-import {
-  JiraOrganizationSelector,
-  GitHubOrganizationSelector,
-} from "./organizations";
-import { AuthenticationSelector } from "./authentication";
-import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
+import { AuthenticationSelector } from "../authentication";
+import { IntegrationSelector } from "../projects";
 
 const props = defineProps<IntegrationsStepperProps>();
 
@@ -58,7 +49,6 @@ const source = ref<"Jira" | "GitHub" | undefined>();
 const currentStep = ref(1);
 const steps = ref<StepperStep[]>([
   { title: "Connect to Source", done: false },
-  { title: "Select Organization", done: false },
   { title: "Select Project", done: false },
 ]);
 
@@ -115,27 +105,6 @@ watch(
 watch(
   () => {
     if (source.value === "Jira") {
-      return integrationsStore.jiraOrganization?.name;
-    } else if (source.value === "GitHub") {
-      return integrationsStore.gitHubOrganization?.name;
-    } else {
-      return undefined;
-    }
-  },
-  (name) => {
-    if (name) {
-      currentStep.value = 3;
-      steps.value[1].done = true;
-    } else {
-      currentStep.value = 2;
-      steps.value[1].done = false;
-    }
-  }
-);
-
-watch(
-  () => {
-    if (source.value === "Jira") {
       return integrationsStore.jiraProject?.name;
     } else if (source.value === "GitHub") {
       return integrationsStore.gitHubProject?.name;
@@ -144,7 +113,7 @@ watch(
     }
   },
   (name) => {
-    steps.value[2].done = !!name;
+    steps.value[1].done = !!name;
   }
 );
 </script>

@@ -31,6 +31,8 @@ jobs:
       - name: Install Dependencies.
         run: python -m venv ./venv && . ./venv/bin/activate && pip install -r requirements.txt && pip install -r requirements/test.txt
         if: steps.cache-venv.outputs.cache-hit != 'true'
+      - name: Active VENV.
+        run: source venv/bin/activate
       - name: Find Missing Docs.
         run: python3 tgen/scripts/find_missing_docs.py
         env:

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.traces.entities.app;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
@@ -7,6 +9,8 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 import jakarta.validation.constraints.NotEmpty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +19,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TraceAppEntity implements IAppEntity {
     private UUID traceLinkId;
     @NotEmpty
@@ -90,5 +95,19 @@ public class TraceAppEntity implements IAppEntity {
     @Override
     public void setId(UUID id) {
         this.traceLinkId = id;
+    }
+
+    @JsonIgnore
+    public List<String> getMissingRequiredFields() {
+        List<String> missingFields = new ArrayList<>();
+
+        if ((sourceName == null || sourceName.isBlank()) && sourceId == null) {
+            missingFields.add("sourceName or sourceId");
+        }
+        if ((targetName == null || targetName.isBlank()) && targetId == null) {
+            missingFields.add("targetName or targetId");
+        }
+
+        return missingFields;
     }
 }

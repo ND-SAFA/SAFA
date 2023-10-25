@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotEmpty;
@@ -22,6 +23,7 @@ import lombok.Data;
  * Represents the JSON model that is used on the front-end application.
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ArtifactAppEntity implements IAppEntity {
     /**
      * UUID uniquely identifying artifact.
@@ -128,5 +130,21 @@ public class ArtifactAppEntity implements IAppEntity {
     @JsonProperty(value = "isCode", access = JsonProperty.Access.READ_ONLY)
     public boolean isCode() {
         return FileUtilities.isCodeFile(Path.of(this.name));
+    }
+
+    @JsonIgnore
+    public List<String> getMissingRequiredFields() {
+        List<String> missingFields = new ArrayList<>();
+        if (name == null || name.isBlank()) {
+            missingFields.add("name");
+        }
+        if (body == null) {
+            missingFields.add("body");
+        }
+        if (type == null || type.isBlank()) {
+            missingFields.add("type");
+        }
+
+        return missingFields;
     }
 }

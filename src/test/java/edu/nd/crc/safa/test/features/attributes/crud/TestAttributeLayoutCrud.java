@@ -213,11 +213,16 @@ public class TestAttributeLayoutCrud extends AbstractCrudTest<AttributeLayoutApp
         verifyCreatedEntity(layoutEntity);
     }
 
-    private void verifyAttributeMessage(EntityChangeMessage message, NotificationAction action) {
+    private <E> void verifyAttributeMessage(EntityChangeMessage message, NotificationAction action, List<E> entities) {
+        Change change = verifyAttributeMessage(message, action);
+        assertThat(change.getEntities()).isEqualTo(entities);
+    }
+
+    private Change verifyAttributeMessage(EntityChangeMessage message, NotificationAction action) {
         assertThat(message.getChanges()).hasSize(1);
         Change change = message.getChanges().get(0);
         assertThat(change.getEntity()).isEqualTo(NotificationEntity.ATTRIBUTES);
         assertThat(change.getAction()).isEqualTo(action);
-        //TODO: Check entity attributes
+        return change;
     }
 }

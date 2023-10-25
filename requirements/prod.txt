@@ -7,7 +7,7 @@ datasets==2.14.6
 deepspeed==0.8.2
 GitPython==3.1.37
 hdbscan==0.8.33
-huggingface-hub==0.11.1
+huggingface-hub==0.18.0
 javac-parser==1.0.0
 javalang==0.13.0
 lxml==4.9.2

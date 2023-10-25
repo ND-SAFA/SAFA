@@ -124,7 +124,7 @@ class EmbeddingsManager:
             if a_id not in self._content_map or self._content_map[a_id] != content:
                 self.update_or_add_content(a_id=a_id, content=content, create_embedding=False)
         if create_embedding:
-            self.get_embeddings(list(content_map.keys()))
+            return self.create_embedding_map(list(content_map.keys()))
 
     def remove_from_content_map(self, a_id: Any) -> None:
         """

@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 import numpy as np
 from sentence_transformers.SentenceTransformer import SentenceTransformer
 
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -17,13 +18,7 @@ class TestEmbeddingManager(BaseTest):
 
     @mock.patch.object(SentenceTransformer, "encode")
     def test_create_embedding_map(self, encode_mock: MagicMock):
-        content_map = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
-                       for artifact in SafaTestProject.get_artifact_entries()}
-        embeddings = [[i for i in range(j, j + 3)] for j in range(len(content_map))]
-        embedding_arrays = [np.asarray(emb) for emb in embeddings]
-        encode_mock.side_effect = [embedding_arrays[:3], embedding_arrays[3:]]
-
-        embedding_manager = EmbeddingsManager(content_map=content_map, model_name="sentence-transformers/all-MiniLM-L6-v2")
+        content_map, embedding_manager = self.create_test_embedding_manager(encode_mock)
 
         embeddings = embedding_manager.create_embedding_map(subset_ids=["s1", "s2", "s3"])
         self.assertEqual(len(embeddings), 3)
@@ -32,7 +27,9 @@ class TestEmbeddingManager(BaseTest):
         self.assertEqual(len(embeddings), len(content_map))
         self.assertEqual(encode_mock.call_count, 2)  # each artifact encoded only once
 
-        original_embeddings = embedding_manager.get_current_embeddings()
+    def test_saving_and_loading_from_yaml(self):
+        content_map, embedding_manager = self.create_test_embedding_manager()
+        original_embeddings = embedding_manager.create_embedding_map()
         path = os.path.join(TEST_OUTPUT_DIR, "test.yaml")
         key = "embedding_manager"
         YamlUtil.write({key: embedding_manager}, path)  # test to_yaml
@@ -42,7 +39,31 @@ class TestEmbeddingManager(BaseTest):
         for a_id, embedding in original_embeddings.items():
             self.assertIn(a_id, loaded_embeddings)
             self.assertEqual(list(embedding), list(loaded_embeddings[a_id]))
-
         self.assertFalse(loaded_manager.embeddings_need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
         loaded_manager.update_or_add_content("s1", "something new")
         self.assertTrue(loaded_manager.embeddings_need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
+
+    @mock.patch.object(SentenceTransformer, "encode")
+    def test_update_or_add_contents(self, encode_mock: MagicMock):
+        content_map, embedding_manager = self.create_test_embedding_manager(encode_mock)
+        original_embeddings = embedding_manager.create_embedding_map(["s1", "s2"])
+        original_embeddings = {k: ListUtil.convert_numpy_array_to_native_types(v) for k, v in original_embeddings.items()}
+        new_content_map = {"s1": "new content", "new_art": "some content", "s2": content_map["s2"]}
+        new_embeddings = embedding_manager.update_or_add_contents(new_content_map, create_embedding=True)
+        new_embeddings = {k: ListUtil.convert_numpy_array_to_native_types(v) for k, v in new_embeddings.items()}
+        self.assertEqual(original_embeddings["s2"], new_embeddings["s2"])
+        self.assertNotEqual(original_embeddings["s1"], new_embeddings["s1"])
+        self.assertIn("new_art", new_embeddings)
+
+        for key, val in new_content_map.items():
+            self.assertEqual(embedding_manager.get_content(key), val)
+
+    def create_test_embedding_manager(self, encode_mock = None):
+        content_map = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
+                       for artifact in SafaTestProject.get_artifact_entries()}
+        embeddings = [[i for i in range(j, j + 3)] for j in range(len(content_map))]
+        embedding_arrays = [np.asarray(emb) for emb in embeddings]
+        if encode_mock:
+            encode_mock.side_effect = [embedding_arrays[:3], embedding_arrays[3:]]
+        embedding_manager = EmbeddingsManager(content_map=content_map, model_name="sentence-transformers/all-MiniLM-L6-v2")
+        return content_map, embedding_manager

@@ -69,15 +69,15 @@ public abstract class AbstractEntityChangeBuilder<T extends AbstractEntityChange
     }
 
     private T addChange(Change change, boolean checkIfEmpty) {
-        if (checkIfEmpty) {
-            if (change.getEntityIds().isEmpty() && change.getEntities().isEmpty()) {
-                return self();
-            }
-            this.entityChangeMessage.addChange(change);
-        } else {
+        if (!checkIfEmpty || !isEmpty(change)) {
             this.entityChangeMessage.addChange(change);
         }
+
         return self();
+    }
+
+    private boolean isEmpty(Change change) {
+        return change.getEntityIds().isEmpty() && change.getEntities().isEmpty();
     }
 
     protected abstract T self();

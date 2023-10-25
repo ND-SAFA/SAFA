@@ -54,6 +54,7 @@ export interface CreatorFilePanel {
   // Bulk
   bulkFiles: File[];
   tim?: TimJsonSchema;
+  emptyFiles: boolean;
 }
 
 /**

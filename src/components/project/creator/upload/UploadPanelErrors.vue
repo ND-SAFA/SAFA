@@ -1,5 +1,5 @@
 <template>
-  <flex-box full-width justify="between" y="2">
+  <flex-box full-width justify="between" align="center" y="2">
     <switch-input
       v-model="props.panel.ignoreErrors"
       label="Ignore Errors"
@@ -51,7 +51,8 @@ const errorMessage = computed(() => {
   } else if (
     props.panel.variant === "bulk" &&
     (props.panel.bulkFiles.length === 0 ||
-      !props.panel.bulkFiles.find(({ name }) => name === "tim.json"))
+      !props.panel.bulkFiles.find(({ name }) => name === "tim.json")) &&
+    !props.panel.emptyFiles
   ) {
     return "Requires a tim.json configuration file.";
   } else {

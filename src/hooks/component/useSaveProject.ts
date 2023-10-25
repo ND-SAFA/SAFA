@@ -27,6 +27,7 @@ const createEmptyPanel = (
   isGenerated: false,
   summarize: false,
   bulkFiles: [],
+  emptyFiles: false,
 });
 
 /**

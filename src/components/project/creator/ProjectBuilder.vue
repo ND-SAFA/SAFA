@@ -100,7 +100,8 @@ const uploadDisabled = computed(
   () =>
     !projectSaveStore.uploadPanels
       .map(({ valid }) => valid)
-      .reduce((acc, cur) => acc && cur, true)
+      .reduce((acc, cur) => acc && cur, true) ||
+    (!identifier.value.name && !["github", "jira"].includes(uploadMode.value))
 );
 
 const displayGraph = computed(() => projectSaveStore.graphNodes.length > 0);

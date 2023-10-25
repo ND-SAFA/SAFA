@@ -25,13 +25,13 @@
       <upload-panel-name v-bind="props" />
 
       <file-input
-        v-if="!isGenerated && hasSingleFile"
+        v-if="hasSingleFile"
         v-model="props.panel.file"
         :multiple="false"
         data-cy="input-files-panel"
       />
       <project-files-input
-        v-if="props.panel.variant === 'bulk'"
+        v-if="hasBulkFiles"
         v-model="props.panel.bulkFiles"
         v-model:tim="props.panel.tim"
         data-cy="input-files-bulk"
@@ -40,17 +40,24 @@
       <git-hub-project-input v-if="props.panel.variant === 'github'" />
       <jira-project-input v-if="props.panel.variant === 'jira'" />
 
-      <switch-input
-        v-if="props.panel.variant === 'bulk'"
-        v-model="props.panel.summarize"
-        label="Generate artifact summaries"
-        data-cy="toggle-create-summarize"
-      />
-      <switch-input
-        v-if="props.panel.variant === 'trace'"
-        v-model="props.panel.isGenerated"
-        label="Generate Trace Links"
-      />
+      <flex-box column>
+        <switch-input
+          v-model="props.panel.emptyFiles"
+          label="Create an empty project"
+          data-cy="toggle-create-empty-project"
+        />
+        <switch-input
+          v-if="hasBulkFiles"
+          v-model="props.panel.summarize"
+          label="Generate artifact summaries"
+          data-cy="toggle-create-summarize"
+        />
+        <switch-input
+          v-if="props.panel.variant === 'trace'"
+          v-model="props.panel.isGenerated"
+          label="Generate Trace Links"
+        />
+      </flex-box>
 
       <upload-panel-errors v-bind="props" />
 
@@ -143,10 +150,13 @@ const iconId = computed(() =>
   valid.value ? getIcon("success") : getIcon("error")
 );
 
-const isGenerated = computed(() => props.panel.isGenerated);
-
 const hasSingleFile = computed(
-  () => props.panel.variant === "artifact" || props.panel.variant === "trace"
+  () =>
+    (props.panel.variant === "artifact" || props.panel.variant === "trace") &&
+    !props.panel.isGenerated
+);
+const hasBulkFiles = computed(
+  () => props.panel.variant === "bulk" && !props.panel.emptyFiles
 );
 
 /**

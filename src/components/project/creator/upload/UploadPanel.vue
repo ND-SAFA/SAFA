@@ -80,6 +80,7 @@
 
       <flex-box justify="end" t="2">
         <text-button
+          text
           icon="delete"
           label="Delete"
           data-cy="button-delete-panel"

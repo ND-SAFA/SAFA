@@ -8,6 +8,7 @@
     <template #actions>
       <text-button
         block
+        :disabled="!files || files.length === 0"
         label="Upload Project Files"
         color="primary"
         data-cy="button-upload-files"

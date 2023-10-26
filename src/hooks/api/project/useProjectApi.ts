@@ -51,8 +51,6 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
 
         projectStore.addProject(isUpdate ? identifier : project);
 
-        console.log(projectStore.projectId, project.projectId);
-
         if (project.projectId === projectStore.projectId) {
           projectStore.updateProject({
             name: project.name,

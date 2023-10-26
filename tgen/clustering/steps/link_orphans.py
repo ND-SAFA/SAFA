@@ -6,7 +6,6 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
-from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
@@ -84,22 +83,22 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
 
     @classmethod
     def get_clusters_accepting_orphan(cls, artifact_id: str, clusters: List[Cluster], embedding_manager: EmbeddingsManager,
-                                      min_similarity_score: float = 0.75) -> List[Cluster]:
+                                      avg_similarity_threshold: float = 0.75) -> List[Cluster]:
         """
         Places orphan in cluster in which its similarity to the cluster is about the same as the average cluster distance.
         :param artifact_id: The artifact ID of the orphan.
         :param clusters: The clusters to check if want artifact.
         :param embedding_manager: The embeddings manager allowing clusters to update their stats.
-        :param min_similarity_score: The minimum similarity score for an artifact to be considered similar to a cluster.
+        :param avg_similarity_threshold: The minimum similarity score for an artifact to be considered similar to a cluster.
         :return: The clusters accepting that artifacts.
         """
         wanting_clusters = []
-        orphan_embedding = embedding_manager.get_embedding(artifact_id)
-        similarities_to_clusters = EmbeddingUtil.calculate_similarities_to_clusters(orphan_embedding, clusters)
-        for cluster, similarity_to_cluster in zip(clusters, similarities_to_clusters):
-            percent_similar = similarity_to_cluster / cluster.avg_similarity
-            if percent_similar >= min_similarity_score:
-                wanting_clusters.append(cluster)
+        similarities_to_clusters = [c.similarity_to_neighbors(artifact_id) for c in clusters]
+        similarity_score, best_cluster = sorted(zip(similarities_to_clusters, clusters), key=lambda t: t[0], reverse=True)[0]
+
+        if similarity_score >= avg_similarity_threshold:
+            wanting_clusters.append(best_cluster)
+
         return wanting_clusters
 
     @classmethod

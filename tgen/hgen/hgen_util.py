@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Dict, List, Set, Union, Tuple
+from typing import Dict, List, Set, Tuple, Union
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.util.enum_util import EnumDict
@@ -112,7 +112,8 @@ class HGenUtil:
                                       include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
                                       data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                       xml_tags={
-                                          HGenUtil.convert_spaces_to_dashes(artifact_type.lower()): ["id", "description"]})
+                                          HGenUtil.convert_spaces_to_dashes(artifact_type.lower()): ["id",
+                                                                                                     "description"]})
         artifact_prompt = ContextPrompt(id_to_context_artifacts=id_to_context_artifacts, **artifact_prompt_kwargs) \
             if id_to_context_artifacts else MultiArtifactPrompt(**artifact_prompt_kwargs)
         prompts = [base_prompt, artifact_prompt]
@@ -162,17 +163,21 @@ class HGenUtil:
                 artifact_prompt = ArtifactPrompt(include_id=False)
                 prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
                 dataset = PromptDataset(artifact_df=new_artifact_df)
-                predictions_path = os.path.join(hgen_args.export_dir, "artifact_names.json") if hgen_args.export_dir else EMPTY_STRING
-                names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=PredictionStep.NAME,
+                predictions_path = os.path.join(hgen_args.export_dir,
+                                                "artifact_names.json") if hgen_args.export_dir else EMPTY_STRING
+                names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
+                                                 prediction_step=PredictionStep.NAME,
                                                  dataset=dataset, response_prompt_ids=name_prompt.id,
-                                                 tags_for_response=name_prompt.response_manager.response_tag, return_first=True,
+                                                 tags_for_response=name_prompt.response_manager.response_tag,
+                                                 return_first=True,
                                                  export_path=predictions_path)
-                assert len(set(names)) == len(names), f"Found duplicates names: {names}"
+                names = [f"{n}{i + 1}" for i, n in enumerate(names)]
                 assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
                 new_artifact_df.index = names
             except Exception:
                 logger.exception("Unable to generate names for the artifacts")
-        name_2_related_children = {name: links for name, links in zip(new_artifact_df.index, list(generation_predictions.values()))}
+        name_2_related_children = {name: links for name, links in
+                                   zip(new_artifact_df.index, list(generation_predictions.values()))}
         return new_artifact_df, name_2_related_children
 
     @staticmethod
@@ -182,7 +187,8 @@ class HGenUtil:
         :param res: The response from the model containing the generated artifact content
         :return: The list of the generated artifact content
         """
-        return [re.sub(r'^\d+\.\s', '', content).strip(DASH).strip() for content in res.split(NEW_LINE) if len(content) > 1]
+        return [re.sub(r'^\d+\.\s', '', content).strip(DASH).strip() for content in res.split(NEW_LINE) if
+                len(content) > 1]
 
     @staticmethod
     def convert_spaces_to_dashes(str2convert) -> str:

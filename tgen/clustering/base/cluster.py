@@ -1,4 +1,4 @@
-from typing import Any, Iterable, List
+from typing import Any, Iterable, List, Tuple
 
 import numpy as np
 
@@ -23,6 +23,10 @@ class Cluster:
         self.votes = 1
         self.avg_similarity = None
         self.centroid = None
+        self.similarity_matrix = None
+        self.min_sim = None
+        self.max_sim = None
+        self.avg_pairwise_sim = None
 
     @staticmethod
     def get_cluster_id(method: SupportedClusteringMethod, index: int):
@@ -80,6 +84,13 @@ class Cluster:
         """
         return EmbeddingUtil.calculate_similarities([self.centroid], [cluster.centroid])[0][0]
 
+    def similarity_to_neighbors(self, a_id: str):
+        unique_artifacts_embeddings = [self.embeddings_manager.get_embedding(a) for a in self.artifact_id_set if a != a_id]
+        artifact_embedding = [self.embeddings_manager.get_embedding(a_id)]
+        similarities = EmbeddingUtil.calculate_similarities(artifact_embedding, unique_artifacts_embeddings)[0]
+        avg_sim = sum(similarities) / len(similarities)
+        return avg_sim
+
     def _add_artifact(self, artifact_id: str) -> None:
         """
         Adds an artifact to the cluster.
@@ -97,6 +108,10 @@ class Cluster:
         """
         self.centroid = self.embeddings_manager.calculate_centroid(self.artifact_ids)
         self.avg_similarity = self.__calculate_average_similarity()
+        if len(self.artifact_id_set) > 1:
+            self.similarity_matrix = self.__calculate_similarity_matrix()
+            self.min_sim, self.max_sim = self.__calculate_min_max_similarity()
+            self.avg_pairwise_sim = self.__calculate_avg_pairwise_distance()
 
     def __calculate_average_similarity(self) -> float:
         """
@@ -106,6 +121,34 @@ class Cluster:
         artifact_embeddings = [self.embeddings_manager.get_embedding(a_id) for a_id in self.artifact_ids]
         similarities = EmbeddingUtil.calculate_similarities([self.centroid], artifact_embeddings)[0]
         return np.sum(similarities) / len(similarities)
+
+    def __calculate_similarity_matrix(self) -> np.array:
+        artifact_embeddings = [self.embeddings_manager.get_embedding(a_id) for a_id in self.artifact_ids]
+        similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
+        return similarity_matrix
+
+    def __calculate_min_max_similarity(self) -> Tuple[float, float]:
+        unique_indices = self.get_unique_indices(len(self.artifact_id_set))
+        similarities = self.get_values(self.similarity_matrix, unique_indices)
+        min_sim = np.min(similarities)
+        max_sim = np.max(similarities)
+        return min_sim, max_sim
+
+    def __calculate_avg_pairwise_distance(self) -> float:
+        n_artifacts = len(self.artifact_id_set)
+        indices = self.get_unique_indices(n_artifacts)
+        unique_scores = self.get_values(self.similarity_matrix, indices)
+        return sum(unique_scores) / len(unique_scores)
+
+    @staticmethod
+    def get_unique_indices(matrix_length: int):
+        indices = [(i, j) for i in range(matrix_length) for j in range(i + 1, matrix_length) if i != j]
+        return indices
+
+    @staticmethod
+    def get_values(matrix: np.array, indices: List[Tuple[int, int]]):
+        values = [matrix[i][j] for i, j in indices]
+        return values
 
     def __len__(self) -> int:
         """
@@ -138,8 +181,9 @@ class Cluster:
         """
         :return: Cluster is represented by the list of artifact ids it contains.
         """
-        score = "" if self.avg_similarity is None else f"({round(self.avg_similarity, 2)})"
-        cluster_repr = f"{self.artifact_ids.__str__()}{score}"
+        metrics = {"AVG": self.avg_similarity, "MIN": self.min_sim, "MAX": self.max_sim, "P": self.avg_pairwise_sim}
+        metrics = {k: round(v, 2) for k, v in metrics.items() if v is not None}
+        cluster_repr = f"{self.artifact_ids.__str__()}{str(metrics)}"
         return cluster_repr
 
     def __eq__(self, other: Any) -> bool:

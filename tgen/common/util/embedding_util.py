@@ -19,6 +19,16 @@ class EmbeddingUtil:
         cluster_similarities = cls.calculate_similarities([embedding], centroids)[0]
         return cluster_similarities
 
+    @classmethod
+    def calculate_similarity(cls, source_embedding: EmbeddingType, target_embedding: EmbeddingType) -> float:
+        """
+        Calculates similarity score between two embeddings.
+        :param source_embedding: The first embedding.
+        :param target_embedding: The second embedding.
+        :return: The similarity score.
+        """
+        return cls.calculate_similarities([source_embedding], [target_embedding])[0][0]
+
     @staticmethod
     def calculate_similarities(source_embeddings: List[EmbeddingType], target_embeddings: List[EmbeddingType]) -> List[List[float]]:
         """

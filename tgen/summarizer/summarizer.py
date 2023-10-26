@@ -2,6 +2,8 @@ import os
 from copy import deepcopy
 from typing import Optional
 
+import pandas as pd
+
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.logging.logger_manager import logger
@@ -12,7 +14,6 @@ from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
-import pandas as pd
 
 
 class Summarizer:
@@ -39,13 +40,15 @@ class Summarizer:
         if self.args.do_resummarize_artifacts or not artifact_df.is_summarized(code_only=self.args.summarize_code_only):
             artifact_df = self._resummarize_artifacts(self.dataset.artifact_df, project_summary)
             if self.args.do_resummarize_project:
-                project_summary = self._create_project_summary(PromptDataset(artifact_df=artifact_df))
+                project_summary = self._create_project_summary(PromptDataset(artifact_df=artifact_df),
+                                                               reload_existing=False)
         summarized_dataset = deepcopy(self.dataset)
         summarized_dataset.update_artifact_df(artifact_df)
         summarized_dataset.project_summary = project_summary
         return summarized_dataset
 
-    def _resummarize_artifacts(self, orig_artifact_df: ArtifactDataFrame, project_summary: Summary) -> ArtifactDataFrame:
+    def _resummarize_artifacts(self, orig_artifact_df: ArtifactDataFrame,
+                               project_summary: Summary) -> ArtifactDataFrame:
         """
         Resummarizes the artifacts with the project summary
         :param orig_artifact_df: Contains the original artifacts to re-summarize
@@ -82,11 +85,12 @@ class Summarizer:
             return artifact_export_path
         return EMPTY_STRING
 
-    def _create_project_summary(self, dataset: PromptDataset) -> Summary:
+    def _create_project_summary(self, dataset: PromptDataset, reload_existing: bool = True) -> Summary:
         """
         Creates a project summary from the artifacts provided
         :param dataset: contains artifacts to make the summary from
+        :param reload_existing: If True, reloads an existing project summary if it exists
         :return: The project summary
         """
         args = SummarizerArgs(**vars(self.args))
-        return ProjectSummarizer(args, dataset=dataset).summarize()
+        return ProjectSummarizer(args, dataset=dataset, reload_existing=reload_existing).summarize()

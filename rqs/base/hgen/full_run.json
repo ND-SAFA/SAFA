@@ -9,7 +9,6 @@
               "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
               "source_layer_id": "Vue",
               "target_type": "Functional Requirement",
-              "source_type": "Vue",
               "generate_trace_links": true,
               "dataset_creator": {
                 "object_type": "PROMPT",

@@ -132,9 +132,11 @@ class State(BaseObject):
                     state = cls.load_state_from_path(path, raise_exception=True)
                     return state
             raise FileNotFoundError(f"Unable to find a previous state to load from {load_dir}")
+        except FileNotFoundError as f:
+            logger.info(str(f))
         except Exception:
             logger.exception(f"Could not reload state of step: {step}. Creating new instance.")
-            return cls()
+        return cls()
 
     @classmethod
     def load_state_from_path(cls, path: str, raise_exception: bool = False) -> Union["State", Exception]:
@@ -188,7 +190,8 @@ class State(BaseObject):
         return val
 
     @staticmethod
-    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1, step_num: int = None) -> str:
+    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1,
+                                     step_num: int = None) -> str:
         """
         Gets the path to the checkpoint for the state corresponding to the given step name
         :param directory: The directory that the checkpoints live in

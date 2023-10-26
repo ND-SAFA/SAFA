@@ -8,8 +8,7 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
-from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
@@ -30,21 +29,19 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME) if args.load_dir else None
 
-        if proj_path and os.path.exists(proj_path):
-            dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
-        else:
-            original_artifact_df, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
+        original_artifact_df, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
 
-            final_artifact_df = state.all_artifacts_dataset.artifact_df
-            new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, args.target_type)
-            new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state,
-                                                                                           final_artifact_df, new_layer_df)
+        final_artifact_df = state.all_artifacts_dataset.artifact_df
+        new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, args.target_type)
+        new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state,
+                                                                                       final_artifact_df, new_layer_df)
 
-            final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
-            final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
+        final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
+        final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
 
-            dataset = PromptDataset(trace_dataset=TraceDataset(final_artifact_df, final_trace_df, final_layer_df),
-                                    project_summary=args.dataset.project_summary)
+        dataset = PromptDataset(trace_dataset=TraceDataset(final_artifact_df, final_trace_df, final_layer_df),
+                                project_summary=args.dataset.project_summary)
+
         state.final_dataset = dataset
 
     @staticmethod
@@ -90,8 +87,8 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         traces = {}
         selected_predictions = SelectByThreshold.select(hgen_state.trace_predictions, hgen_args.link_selection_threshold)
-        if hgen_state.trace_predictions:
-            for entry in hgen_state.trace_predictions:
+        if selected_predictions:
+            for entry in selected_predictions:
                 link = EnumDict(entry)
                 DataFrameUtil.append(traces, link)
 

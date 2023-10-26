@@ -5,7 +5,8 @@ from typing import List, Tuple
 
 from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_STATE_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER
+from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
+    USE_PROJECT_SUMMARY_SECTIONS
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.logging.logger_manager import logger
@@ -29,10 +30,13 @@ from tgen.summarizer.summary import Summary
 
 class ProjectSummarizer(BaseObject):
 
-    def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset, n_tokens: int = DEFAULT_SUMMARY_TOKENS):
+    def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset,
+                 reload_existing: bool = True, n_tokens: int = DEFAULT_SUMMARY_TOKENS):
         """
         Generates a system specification document for containing all artifacts.
         :param summarizer_args: The args necessary for the summary
+        :param dataset: The dataset to create the summary for
+        :param reload_existing: If True, reloads an existing project summary if it exists
         :param n_tokens: The token limit for the LLM
         """
         super().__init__()
@@ -43,9 +47,11 @@ class ProjectSummarizer(BaseObject):
         self.save_progress = bool(self.export_dir)
         self.args = summarizer_args
         self.dataset = dataset
+        self.reload_existing = reload_existing
         self.project_summary = Summary() if not dataset.project_summary else deepcopy(dataset.project_summary)
         self.all_project_sections = self._get_all_project_sections(self.args)
-        self.section_display_order = self._get_section_display_order(self.args.section_display_order, self.all_project_sections)
+        self.section_display_order = self._get_section_display_order(self.args.section_display_order,
+                                                                     self.all_project_sections)
 
     def summarize(self) -> Summary:
         """
@@ -54,7 +60,7 @@ class ProjectSummarizer(BaseObject):
         """
         logger.log_title("Creating project specification.")
         self.artifact_df.summarize_content(ArtifactsSummarizer(self.args, project_summary=self.project_summary))
-        if os.path.exists(self.get_save_path()):
+        if os.path.exists(self.get_save_path()) and self.reload_existing:
             logger.info(f"Loading previous project summary from {self.get_save_path()}")
             self.project_summary = Summary.load_from_file(self.get_save_path())
 
@@ -89,13 +95,14 @@ class ProjectSummarizer(BaseObject):
         prompt_builder = PromptBuilder(prompts=[SupportedPrompts.PROJECT_SUMMARY_CONTEXT.value,
                                                 artifacts_prompt,
                                                 section_prompt])
-        if self.project_summary:
+        if self.project_summary and section_id in USE_PROJECT_SUMMARY_SECTIONS:
             current_summary = self.project_summary.to_string()
             prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
         section_prompt.set_instructions(PS_QUESTIONS_HEADER)
         return prompt_builder
 
-    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, multi_line_items: bool = False) -> Tuple[str, str]:
+    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, multi_line_items: bool = False) -> Tuple[
+        str, str]:
         """
         Has the LLM generate the section corresponding using the prompt builder
         :param prompt_builder: Contains prompts necessary for generating section
@@ -106,13 +113,16 @@ class ProjectSummarizer(BaseObject):
         self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
         self.llm_manager.llm_args.temperature = 0
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
-                                                                                  PromptDataset(artifact_df=self.artifact_df)})
+            PromptDataset(
+                artifact_df=self.artifact_df)})
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
-                                             prompt_builder=prompt_builder, trainer_dataset_manager=trainer_dataset_manager))
+                                             prompt_builder=prompt_builder,
+                                             trainer_dataset_manager=trainer_dataset_manager))
         predictions = trainer.perform_prediction().predictions[0]
         parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
         body_res = parsed_responses[task_tag]
-        body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(body_res) > 1 and not multi_line_items)
+        body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(
+            body_res) > 1 and not multi_line_items)
                     for r in body_res]
         task_title = parsed_responses[CUSTOM_TITLE_TAG][0] if parsed_responses.get(CUSTOM_TITLE_TAG) else None
         deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"

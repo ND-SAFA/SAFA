@@ -17,18 +17,18 @@ from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
-    REVERSE_CATEGORIES
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
+    REVERSE_CATEGORIES
 from tgen.state.state_manager import StateManager
 
 
@@ -85,7 +85,7 @@ class LLMTrainer(AbstractTrainer):
 
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompts = self._get_prompts_for_prediction(dataset) if not prompts else prompts
+        prompts = self._get_prompts_for_prediction(dataset)[1:2] if not prompts else prompts
         if os.path.exists(save_and_load_path):
             logger.info(f"IMPORTANT!!! Loading previous LLM responses from {save_and_load_path}")
             res = YamlUtil.read(save_and_load_path)
@@ -96,7 +96,7 @@ class LLMTrainer(AbstractTrainer):
                 logger.info(f"Saved LLM responses to {save_and_load_path}")
                 FileUtil.create_dir_safely(save_and_load_path)
                 YamlUtil.write(res, save_and_load_path)
-
+        debugging = [p + "\n" + r for p, r in zip(prompts, res.batch_responses)]
         if isinstance(res, ClassificationResponse):
             output = self._create_classification_output(res, dataset, self.prompt_builder)
         elif isinstance(res, GenerationResponse):

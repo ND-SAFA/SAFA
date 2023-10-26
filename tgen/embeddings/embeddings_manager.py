@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -28,17 +28,17 @@ class EmbeddingsManager:
         self.__model = None
         self.__state_changed_since_last_save = False
 
-    def create_artifact_embeddings(self, artifact_ids: List[str] = None) -> List[EmbeddingType]:
+    def create_artifact_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:
         """
         Creates list of embeddings for each artifact.
         :param artifact_ids: The artifact ids to embed.
         :return: List of embeddings in same order as artifact ids.
         """
-        embedding_map = self.create_embedding_map(subset_ids=artifact_ids)
+        embedding_map = self.create_embedding_map(subset_ids=artifact_ids, **kwargs)
         embeddings = [embedding_map[entry_id] for entry_id in artifact_ids]
         return embeddings
 
-    def create_embedding_map(self, subset_ids: List[str] = None) -> Dict[str, EmbeddingType]:
+    def create_embedding_map(self, subset_ids: List[str] = None, **kwargs) -> Dict[str, EmbeddingType]:
         """
         Creates embeddings for entries in map.
         :param subset_ids: The IDs of the set of the entries to use.
@@ -46,26 +46,26 @@ class EmbeddingsManager:
         """
         if subset_ids is None:
             subset_ids = self._content_map.keys()
-        artifact_embeddings = self.get_embeddings(subset_ids)
+        artifact_embeddings = self.get_embeddings(subset_ids, **kwargs)
         embedding_map = {a_id: a_embedding for a_id, a_embedding in zip(subset_ids, artifact_embeddings)}
         return embedding_map
 
-    def get_embeddings(self, a_ids: List[Any]) -> List[EmbeddingType]:
+    def get_embeddings(self, a_ids: List[Any], **kwargs) -> List[EmbeddingType]:
         """
         Gets embeddings for list of artifact ids, creates embeddings if they do not exist yet.
         :param a_ids: Artifact ids whose embeddings are returned.
         :return: Artifact embeddings, returned in the same order as ids.
         """
         ids_without_embeddings = [a_id for a_id in a_ids if a_id not in self._embedding_map]
-        artifact_contents = [self.get_content(a_id) for a_id in ids_without_embeddings]
-        artifact_embeddings = self.get_model().encode(artifact_contents, show_progress_bar=True)
-        new_embedding_map = {a_id: embedding for a_id, embedding in zip(ids_without_embeddings, artifact_embeddings)}
-        self._embedding_map.update(new_embedding_map)
         if len(ids_without_embeddings) > 0:
+            artifact_embeddings = self.__encode(ids_without_embeddings, **kwargs)
+            new_embedding_map = {a_id: embedding for a_id, embedding in
+                                 zip(ids_without_embeddings, artifact_embeddings)}
+            self._embedding_map.update(new_embedding_map)
             self.__state_changed_since_last_save = True
         return [self.get_embedding(a_id) for a_id in a_ids]
 
-    def get_embedding(self, a_id: Any) -> EmbeddingType:
+    def get_embedding(self, a_id: Any, **kwargs) -> EmbeddingType:
         """
         Gets an embedding for a given id
         :param a_id: The id to get an embedding for (corresponding to the ids in the content map)
@@ -73,7 +73,7 @@ class EmbeddingsManager:
         """
         if a_id not in self._embedding_map:
             self.__state_changed_since_last_save = True
-            self._embedding_map[a_id] = self.get_model().encode(self._content_map[a_id])
+            self._embedding_map[a_id] = self.__encode(a_id, **kwargs)
         return self._embedding_map[a_id]
 
     def get_current_embeddings(self) -> Dict[Any, EmbeddingType]:
@@ -113,7 +113,8 @@ class EmbeddingsManager:
         if create_embedding:
             return self.get_embedding(a_id)
 
-    def update_or_add_contents(self, content_map: Dict[Any, str], create_embedding: bool = False) -> Optional[EmbeddingType]:
+    def update_or_add_contents(self, content_map: Dict[Any, str], create_embedding: bool = False) -> Optional[
+        EmbeddingType]:
         """
         Updates or adds new content for all artifacts in teh map
         :param content_map: Maps the id of the new or existing artifact to the its content
@@ -168,9 +169,11 @@ class EmbeddingsManager:
         if self.embeddings_need_saved(export_path):
             self.save_embeddings_to_file(export_path)
         embedding_map_var = ReflectionUtil.extract_name_of_variable(f"{self._embedding_map=}", is_self_property=True)
-        model_var = ReflectionUtil.extract_name_of_variable(f"{self.__model=}", is_self_property=True, class_attr=EmbeddingsManager)
+        model_var = ReflectionUtil.extract_name_of_variable(f"{self.__model=}", is_self_property=True,
+                                                            class_attr=EmbeddingsManager)
         replacements = {embedding_map_var: {}, model_var: None}
-        yaml_embeddings_manager.__dict__ = {k: (replacements[k] if k in replacements else v) for k, v in self.__dict__.items()}
+        yaml_embeddings_manager.__dict__ = {k: (replacements[k] if k in replacements else v) for k, v in
+                                            self.__dict__.items()}
         return yaml_embeddings_manager
 
     def from_yaml(self) -> None:
@@ -192,7 +195,8 @@ class EmbeddingsManager:
         :return: A dictionary mapping id to the loaded embeddings
         """
         embeddings = FileUtil.load_numpy(file_path)
-        assert len(ordered_ids) == len(embeddings), "The ordered ids must correspond to the embeddings but they are different lengths."
+        assert len(ordered_ids) == len(
+            embeddings), "The ordered ids must correspond to the embeddings but they are different lengths."
         return {a_id: embedding for a_id, embedding in zip(ordered_ids, embeddings)}
 
     def save_embeddings_to_file(self, dir_path: str) -> None:
@@ -237,6 +241,17 @@ class EmbeddingsManager:
         embeddings = [self.get_embedding(a_id) for a_id in cluster]
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
+
+    def __encode(self, subset_ids: Union[List[Any], Any], include_ids: bool = False, **kwargs):
+        return_as_list = True
+        if not isinstance(subset_ids, list):
+            subset_ids = [subset_ids]
+            return_as_list = False
+        artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
+        if include_ids:
+            artifact_contents = [f"{a_id}: {content}" for a_id, content in zip(subset_ids, artifact_contents)]
+        embeddings = self.get_model().encode(artifact_contents, show_progress_bar=True)
+        return embeddings if return_as_list else embeddings[0]
 
     def __set_embedding_order(self) -> None:
         """

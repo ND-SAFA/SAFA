@@ -66,18 +66,16 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     enumeration_chars=["-"])
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("You're task is to reverse engineer a set of {target_type}s that cover the functionality defined "
-                   "by the artifacts in `{source_type}`. "
-                   "Use the `Overview of System` to understand the project that the artifacts in `{source_type}` are a part of."),
-    QuestionPrompt("Create new {target_type}s for distinct aspects of the functionality covered. "
-                   "Group common feature and/or functionality into a single {target_type}. "
-                   "Each {target_type} should be focused on a single, clear purpose. "
-                   "Make sure each {target_type} is concise, but technically detailed. "
-                   "Avoid ambiguous language and stay consistent with the information provided in the {source_type}s."),
+    QuestionPrompt("The primary objective is to generalize and abstract the functionality represented across the {source_type} "
+                   "into a minimal set (1-2) of overarching {target_type}s. The {target_type}s should consolidate and group "
+                   "together common features and functionality from multiple {source_type}."),
+    QuestionPrompt("The {target_type}s should focus purely on the artifacts in `{source_type}` but you can use the "
+                   "`Overview of System` to understand the project that the artifacts in `{source_type}` are a part of."),
+    QuestionPrompt("Each {target_type} should be focused on a single, clear purpose. "
+                   "Make sure each {target_type} is technically detailed but stays focused on a unified purpose."),
     QuestionPrompt("{description} "),
-    QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}.")
-],
-    enumeration_chars=["-"])
+    QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}."),
+], enumeration_chars=["-"])
 
 REFINE_PROMPT = Prompt("You are an engineer that is an expert on a software system and your goal is to refine "
                        "{target_type}s. There are many duplicate {target_type} between the new and original {target_type}s "

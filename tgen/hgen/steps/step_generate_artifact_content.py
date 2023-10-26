@@ -1,12 +1,11 @@
 import os
 import uuid
-from typing import Dict, List, Set, Tuple, Any
+from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import HGenUtil
@@ -93,11 +92,12 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         source_type_tag, source_tag_id = HGenUtil.convert_spaces_to_dashes(args.source_type), "source"
         task_prompt.response_manager = PromptResponseManager(
             response_instructions_format=f"Enclose each {args.target_type}s in "
-                                         "{target}. Inside of the {target} tag, " 
-                                         f"also include a comma-deliminated " 
-                                         f"list of the ids for each {args.source_type} " 
-                                         f"from which you derived the {args.target_type} " 
-                                         "enclosed in {source}",
+                                         "{target}. ",
+            # Inside of the {target} tag, "
+            # f"also include a comma-deliminated "
+            # f"list of the ids for each {args.source_type} "
+            # f"from which you derived the {args.target_type} "
+            # "enclosed in {source}",
             expected_responses={source_tag_id: set(state.source_dataset.artifact_df.index)},
             value_formatter=lambda tag, val: [v.strip() for v in val.split(COMMA)] if tag == source_tag_id
             else val.strip().strip(NEW_LINE),

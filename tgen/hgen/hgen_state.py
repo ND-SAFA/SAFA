@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union, Set
+from typing import Any, Dict, List, Optional, Set, Union
 
 from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -35,7 +34,7 @@ class HGenState(State):
     Step 4 - Artifact generation
     """
     generation_predictions: Dict[str, Set[str]] = None  # dictionary mapping generated content to a list of related source ids
-    cluster2generation: Dict[Any, str] = None  # Maps cluster id to the generation that was produced for that cluster
+    cluster2generation: Dict[Any, List[str]] = None  # Maps cluster id to the generation that was produced for that cluster
     n_generations: int = 0  # number of runs of artifact generation
 
     """
@@ -45,10 +44,16 @@ class HGenState(State):
     refined_content: Dict[str, Set[str]] = None  # The final selected artifact content
 
     """
-    Optional Step 5 - generate trace links between source and target artifacts
+    Step 6 - Rename the artifacts generated.
+    """
+    new_artifact_dataset: PromptDataset = None  # Dataset containing only the new generated artifacts.
+    id_to_related_children: Dict[str, Set[str]] = None  # Maps new artifact names to the artifacts in their cluster.
+    all_artifacts_dataset: PromptDataset = None  # Dataset containing source and new artifacts.
+
+    """
+    Optional Step 7 - generate trace links between source and target artifacts
     """
     trace_predictions: List[EnumDict] = None  # list of traces between source and target artifacts
-    all_artifacts_dataset: PromptDataset = None  # contains only the new generated artifacts
 
     """
     Step 6 - Dataset Construction

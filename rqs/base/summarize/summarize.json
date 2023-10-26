@@ -14,7 +14,7 @@
               }
             }
           },
-          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/export"
+          "export_dir": "[OUTPUT_PATH]/[CURRENT_PROJECT]/summarize"
         }
       ]
     }

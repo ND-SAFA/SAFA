@@ -65,9 +65,13 @@ class ClusterCondenser:
         :param new_cluster: The cluster whose add to source.
         :return: None. Updates are done in place.
         """
-        source_cluster.add_artifacts(new_cluster.artifact_id_set)
+        artifacts_to_add = []
         for a_id in new_cluster.artifact_id_set:
-            self.seen_artifacts.add(a_id)
+            similarity = source_cluster.similarity_to_neighbors(a_id)
+            if similarity >= 0.8:
+                artifacts_to_add.append(a_id)
+                self.seen_artifacts.add(a_id)
+        source_cluster.add_artifacts(artifacts_to_add)
 
     def should_add(self, cluster: Cluster) -> bool:
         """

@@ -205,3 +205,20 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 ids.append(i)
                 content.append(artifact[ArtifactKeys.CONTENT])
         return ids, content
+
+    def remove_artifacts(self, artifact_ids: List[str]) -> None:
+        """
+        Removes artifacts with given ids.
+        :param artifact_ids: The artifact to remove.
+        :return: None
+        """
+        for a_id in artifact_ids:
+            self.remove_artifact(a_id)
+
+    def remove_artifact(self, artifact_id: str) -> None:
+        """
+        Removes artifact row with given id.
+        :param artifact_id: The artifact id to remove.
+        :return: None
+        """
+        self.drop(artifact_id, inplace=True)

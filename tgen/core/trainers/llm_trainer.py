@@ -4,7 +4,7 @@ from typing import Any, List, Union
 
 from openai.api_resources.fine_tune import FineTune
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -85,7 +85,7 @@ class LLMTrainer(AbstractTrainer):
 
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompts = self._get_prompts_for_prediction(dataset)[1:2] if not prompts else prompts
+        prompts = self._get_prompts_for_prediction(dataset) if not prompts else prompts
         if os.path.exists(save_and_load_path):
             logger.info(f"IMPORTANT!!! Loading previous LLM responses from {save_and_load_path}")
             res = YamlUtil.read(save_and_load_path)
@@ -96,7 +96,7 @@ class LLMTrainer(AbstractTrainer):
                 logger.info(f"Saved LLM responses to {save_and_load_path}")
                 FileUtil.create_dir_safely(save_and_load_path)
                 YamlUtil.write(res, save_and_load_path)
-        debugging = [p + "\n" + r for p, r in zip(prompts, res.batch_responses)]
+        debugging = [p + NEW_LINE + r for p, r in zip(prompts, res.batch_responses)]
         if isinstance(res, ClassificationResponse):
             output = self._create_classification_output(res, dataset, self.prompt_builder)
         elif isinstance(res, GenerationResponse):

@@ -1,3 +1,4 @@
+import os.path
 from typing import List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -57,7 +58,9 @@ class MultiLayerHGenJob(AbstractJob):
         generated_dataset = current_state.final_dataset
         project_summary = generated_dataset.project_summary
         project_summary.combine_summaries(current_state.all_artifacts_dataset.project_summary)
+        export_dir = os.path.dirname(current_state.export_dir)
         new_params = DataclassUtil.convert_to_dict(current_args, source_layer_id=current_args.target_type,
+                                                   export_dir=export_dir,
                                                    source_type=current_args.target_type,
                                                    target_type=next_target_type,
                                                    dataset=generated_dataset,

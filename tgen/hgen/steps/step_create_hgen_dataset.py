@@ -15,7 +15,6 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 
 
 class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -86,7 +85,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The dataframe containing new and old trace links
         """
         traces = {}
-        selected_predictions = SelectByThreshold.select(hgen_state.trace_predictions, hgen_args.link_selection_threshold)
+        selected_predictions = hgen_state.selected_predictions
         if selected_predictions:
             for entry in selected_predictions:
                 link = EnumDict(entry)

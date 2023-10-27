@@ -67,12 +67,12 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("The primary objective is to generalize and abstract the functionality represented across the {source_type} "
-                   "into a minimal set (1-2) of overarching {target_type}s. The {target_type}s should consolidate and group "
-                   "together common features and functionality from multiple {source_type}."),
-    QuestionPrompt("The {target_type}s should focus purely on the artifacts in `{source_type}` but you can use the "
-                   "`Overview of System` to understand the project that the artifacts in `{source_type}` are a part of."),
-    QuestionPrompt("Each {target_type} should be focused on a single, clear purpose. "
-                   "Make sure each {target_type} is technically detailed but stays focused on a unified purpose."),
+                   "into a minimal set ({n_targets}) of overarching {target_type}s. "
+                   "The {target_type}s should group and consolidate common functionality from multiple {source_type}s. "),
+    QuestionPrompt("The {target_type}s should focus on the what the functionality achieves in `{source_type}`. "
+                   "You can use the `Overview of System` to understand the project."),
+    QuestionPrompt("Make sure each {target_type} is detailed and stays focused on a single, clear purpose. "
+                   "Their should be enough details to guide the implementation of the {target_type}."),
     QuestionPrompt("{description} "),
     QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}."),
 ], enumeration_chars=["-"])

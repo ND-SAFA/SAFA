@@ -1,6 +1,6 @@
 from typing import Dict, Type
 
-from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TITLE, PS_ENTITIES_TITLE, PS_OVERVIEW_TITLE
+from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -28,7 +28,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     Responsible for generating higher-level artifacts from low-level artifacts
     """
     HGEN_SECTION_TITLE = "Hgen"
-    PROJECT_SUMMARY_SECTIONS = [PS_ENTITIES_TITLE, PS_DATA_FLOW_TITLE, PS_OVERVIEW_TITLE]
+    PROJECT_SUMMARY_SECTIONS = [PS_ENTITIES_TITLE]
     steps = [InitializeDatasetStep,
              GenerateInputsStep,
              CreateClustersStep,
@@ -75,7 +75,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
-
+        self.summarizer_args = None
         super().run()
 
         dataset = self.state.final_dataset

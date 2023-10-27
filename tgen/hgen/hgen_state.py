@@ -54,8 +54,9 @@ class HGenState(State):
     Optional Step 7 - generate trace links between source and target artifacts
     """
     trace_predictions: List[EnumDict] = None  # list of traces between source and target artifacts
+    selected_predictions: List[EnumDict] = None  # met the criteria required to count as a trace
 
     """
-    Step 6 - Dataset Construction
+    Step 8 - Dataset Construction
     """
     final_dataset: PromptDataset = None  # The final dataset with generated artifacts.

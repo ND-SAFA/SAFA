@@ -36,15 +36,20 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         task_prompt, target_tag_id, source_tag_id = self._create_task_prompt(args, state)
         generated_artifacts_tag, links_tag = task_prompt.response_manager.get_all_tag_ids()
+
+        dataset = state.cluster_dataset if state.cluster_dataset is not None else state.source_dataset
+
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True,
                                                                     id_to_context_artifacts=state.id_to_cluster_artifacts)
+        branching_factor = 2
+        n_targets = [max(round(len(state.id_to_cluster_artifacts[i]) * (1 / branching_factor)), 1) for i in dataset.artifact_df.index]
+        prompt_builder.format_variables = {"n_targets": n_targets}
         if state.project_summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{state.project_summary.to_string()}", allow_formatting=False)
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
 
-        dataset = state.cluster_dataset if state.cluster_dataset is not None else state.source_dataset
         generation_predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
                                                           dataset=dataset, response_prompt_ids={task_prompt.id},
                                                           tags_for_response={generated_artifacts_tag}, return_first=False,

@@ -16,6 +16,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
+from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 
@@ -36,11 +37,21 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         logger.info(f"Predicting links between {args.target_type} and {args.source_layer_id}\n")
 
         if args.perform_clustering:
-            trace_predictions = self._trace_artifacts_in_cluster_to_generated_parents(args, state)
+            trace_predictions, selected_predictions = self._trace_artifacts_in_cluster_to_generated_parents(args, state)
+            child2predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label())
+            child2selected = RankingUtil.group_trace_predictions(selected_predictions, TraceKeys.child_label())
+
+            for child, child_preds in child2predictions.items():
+                selected_child_links = child2selected.get(child, [])
+                if len(selected_child_links) == 0:
+                    all_child_predictions = sorted(child_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)
+                    selected_predictions.append(all_child_predictions[0])
         else:
             trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
-        trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
-                                                                                  state.id_to_related_children)
+            trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
+                                                                                      state.id_to_related_children)
+            selected_predictions = SelectByThreshold.select(trace_predictions, args.link_selection_threshold)
+        state.selected_predictions = selected_predictions
         state.trace_predictions = trace_predictions
 
     def _run_tracing_job_on_all_artifacts(self, args: HGenArgs, state: HGenState) -> List[EnumDict]:
@@ -71,7 +82,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The trace predictions for the clusters
         """
         new_artifact_map = state.new_artifact_dataset.artifact_df.to_map()
-        trace_predictions = []
+        trace_predictions, selected_traces = [], []
         generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         for cluster_id in state.cluster_dataset.artifact_df.index:
@@ -97,8 +108,14 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             pipeline.run()
             state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
             cluster_predictions = pipeline.state.selected_entries
+            parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
+            for parent, parent_preds in parent2predictions.items():
+                parent_selected_traces = SelectByThreshold.select(parent_preds, FIRST_PASS_LINK_THRESHOLD)
+                if len(parent_selected_traces) == 0:
+                    parent_selected_traces = sorted(parent_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[:1]
+                selected_traces.extend(parent_selected_traces)
             trace_predictions.extend(cluster_predictions)
-        return trace_predictions
+        return trace_predictions, selected_traces
 
     @staticmethod
     def _create_traces_from_generation_predictions(id_to_related_children) -> List[EnumDict]:

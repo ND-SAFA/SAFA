@@ -4,6 +4,7 @@
       "jobs": [
         {
           "object_type": "SUMMARY",
+          "summarize_code_only": false,
           "dataset_creator": {
             "object_type": "PROMPT",
             "trace_dataset_creator": {

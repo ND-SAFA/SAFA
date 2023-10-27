@@ -2,6 +2,8 @@ import os
 import re
 from typing import Dict, List, Set, Tuple, Union
 
+import pandas as pd
+
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -153,32 +155,50 @@ class HGenUtil:
                                              ArtifactKeys.LAYER_ID: [target_layer_id for _ in generation_predictions]})
         if generate_names:
             try:
-                logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
-                name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
-                                     f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
-                                     PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
-                                                           value_formatter=lambda tag, val:
-                                                           f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
-                                                           f"{HGenUtil.get_initials(hgen_args.target_type)}"))
-                artifact_prompt = ArtifactPrompt(include_id=False)
-                prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
-                dataset = PromptDataset(artifact_df=new_artifact_df)
-                predictions_path = os.path.join(hgen_args.export_dir,
-                                                "artifact_names.json") if hgen_args.export_dir else EMPTY_STRING
-                names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
-                                                 prediction_step=PredictionStep.NAME,
-                                                 dataset=dataset, response_prompt_ids=name_prompt.id,
-                                                 tags_for_response=name_prompt.response_manager.response_tag,
-                                                 return_first=True,
-                                                 export_path=predictions_path)
+                use_content_as_names = {i: HGenUtil.format_names(content, hgen_args.target_type)
+                                        for i, content in enumerate(new_artifact_df[ArtifactKeys.CONTENT])
+                                        if len(content.split()) <= 5}
+
+                if len(use_content_as_names) == len(new_artifact_df):
+                    names = list(use_content_as_names.values())
+                else:
+                    logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
+                    name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
+                                         f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
+                                         PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
+                                                               value_formatter=lambda tag, val:
+                                                               HGenUtil.format_names(val, hgen_args.target_type))
+                                         )
+                    artifact_prompt = ArtifactPrompt(include_id=False)
+                    prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
+                    dataset = PromptDataset(artifact_df=new_artifact_df)
+                    predictions_path = os.path.join(hgen_args.export_dir,
+                                                    "artifact_names.json") if hgen_args.export_dir else EMPTY_STRING
+                    names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
+                                                     prediction_step=PredictionStep.NAME,
+                                                     dataset=dataset, response_prompt_ids=name_prompt.id,
+                                                     tags_for_response=name_prompt.response_manager.response_tag,
+                                                     return_first=True,
+                                                     export_path=predictions_path)
+                    assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
+                    names = [name if i not in use_content_as_names else use_content_as_names[i] for i, name in enumerate(names)]
                 names = [f"{n}{i + 1}" for i, n in enumerate(names)]
-                assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
-                new_artifact_df.index = names
+                new_artifact_df.index = pd.Index(names, name=new_artifact_df.index_name())
             except Exception:
                 logger.exception("Unable to generate names for the artifacts")
         name_2_related_children = {name: links for name, links in
                                    zip(new_artifact_df.index, list(generation_predictions.values()))}
         return new_artifact_df, name_2_related_children
+
+    @staticmethod
+    def format_names(name: str, target_type: str) -> str:
+        """
+        Formats the names with the initials of the target type
+        :param name: The name of the artifact
+        :param target_type: The type of artifact
+        :return: The formatted name with the initials of the target type
+        """
+        return f"{PromptUtil.strip_new_lines_and_extra_space(name)} {HGenUtil.get_initials(target_type)}"
 
     @staticmethod
     def parse_generated_artifacts(res: str) -> List[str]:

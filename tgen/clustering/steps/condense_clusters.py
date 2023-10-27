@@ -1,3 +1,8 @@
+from typing import List
+
+import numpy as np
+
+from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_condenser import ClusterCondenser
 from tgen.clustering.base.cluster_type import MethodClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
@@ -21,9 +26,17 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         for cluster_method in args.cluster_methods:
             cluster_map = global_cluster_map[cluster_method.name]
             clusters.extend(list(cluster_map.values()))
-        clusters = list(filter(lambda c: c.avg_pairwise_sim >= MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING, clusters))
+
+        min_pairwise_avg = self._calculate_min_pairwise_avg_threshold(clusters)
+        clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, clusters))
         clusters = list(sorted(clusters, key=lambda v: v.avg_pairwise_sim, reverse=True))
         unique_cluster_map.add_all(clusters)
 
         final_clusters = unique_cluster_map.get_clusters(args.cluster_min_votes)
         state.final_cluster_map = final_clusters
+
+    def _calculate_min_pairwise_avg_threshold(self, clusters: List[Cluster]):
+        pairwise_avgs = [cluster.avg_pairwise_sim for cluster in clusters]
+        if max(pairwise_avgs) >= MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING:
+            return MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
+        return np.percentile(pairwise_avgs, 75)

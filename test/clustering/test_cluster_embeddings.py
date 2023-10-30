@@ -3,7 +3,7 @@ from unittest import TestCase
 from test.clustering.clustering_test_util import ClusteringTestUtil
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
-from tgen.clustering.steps.cluster_embeddings_from_embeddings import CreateClustersFromEmbeddings
+from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
 from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
 

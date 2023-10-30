@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Iterable, List, Tuple
 
 import numpy as np
@@ -21,12 +22,7 @@ class Cluster:
         self.artifact_ids = []
         self.artifact_id_set = set()
         self.votes = 1
-        self.avg_similarity = None
-        self.centroid = None
-        self.similarity_matrix = None
-        self.min_sim = None
-        self.max_sim = None
-        self.avg_pairwise_sim = None
+        self.__init_stats()
 
     @staticmethod
     def get_cluster_id(method: SupportedClusteringMethod, index: int):
@@ -113,6 +109,18 @@ class Cluster:
             self.min_sim, self.max_sim = self.__calculate_min_max_similarity()
             self.avg_pairwise_sim = self.__calculate_avg_pairwise_distance()
 
+    def __init_stats(self) -> None:
+        """
+        Sets all stats back to their initial state
+        :return:
+        """
+        self.avg_similarity = None
+        self.centroid = None
+        self.similarity_matrix = None
+        self.min_sim = None
+        self.max_sim = None
+        self.avg_pairwise_sim = None
+
     def __calculate_average_similarity(self) -> float:
         """
         Calculates the average similarity from the artifacts to the centroid.
@@ -149,6 +157,23 @@ class Cluster:
     def get_values(matrix: np.array, indices: List[Tuple[int, int]]):
         values = [matrix[i][j] for i, j in indices]
         return values
+
+    def to_yaml(self, **kwargs) -> "Cluster":
+        """
+        Removes stats that take a while to be saved
+        :return: The cluster cleaned up for efficient saving as yaml
+        """
+        yaml_safe_cluster = deepcopy(self)
+        yaml_safe_cluster.__init_stats()
+        return yaml_safe_cluster
+
+    def from_yaml(self, **kwargs) -> "Cluster":
+        """
+        Updates states after loading from yaml
+        :return: The Cluster with updated states
+        """
+        self.__update_stats()
+        return self
 
     def __len__(self) -> int:
         """

@@ -3,6 +3,7 @@ from typing import Any, Iterable, List, Tuple
 import numpy as np
 
 from tgen.common.util.embedding_util import EmbeddingUtil
+from tgen.common.util.np_util import NpUtil
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
@@ -128,7 +129,7 @@ class Cluster:
         return similarity_matrix
 
     def __calculate_min_max_similarity(self) -> Tuple[float, float]:
-        unique_indices = self.get_unique_indices(len(self.artifact_id_set))
+        unique_indices = NpUtil.get_unique_indices(len(self.artifact_id_set))
         similarities = self.get_values(self.similarity_matrix, unique_indices)
         min_sim = np.min(similarities)
         max_sim = np.max(similarities)
@@ -136,14 +137,9 @@ class Cluster:
 
     def __calculate_avg_pairwise_distance(self) -> float:
         n_artifacts = len(self.artifact_id_set)
-        indices = self.get_unique_indices(n_artifacts)
+        indices = NpUtil.get_unique_indices(n_artifacts)
         unique_scores = self.get_values(self.similarity_matrix, indices)
         return sum(unique_scores) / len(unique_scores)
-
-    @staticmethod
-    def get_unique_indices(matrix_length: int):
-        indices = [(i, j) for i in range(matrix_length) for j in range(i + 1, matrix_length) if i != j]
-        return indices
 
     @staticmethod
     def get_values(matrix: np.array, indices: List[Tuple[int, int]]):

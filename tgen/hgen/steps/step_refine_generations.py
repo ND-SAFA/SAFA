@@ -1,6 +1,6 @@
 import os
 from copy import deepcopy
-from typing import List, Set, Dict
+from typing import Dict, List, Set
 
 from tqdm import tqdm
 
@@ -9,9 +9,9 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import HGenUtil
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt

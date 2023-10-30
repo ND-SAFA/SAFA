@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.state import State
@@ -21,8 +22,8 @@ class RankingState(State):
     ranking_responses: List[List[Dict]] = field(default=None, repr=False)
 
     # Entries
-    candidate_entries: List[EnumDict] = field(default=None, repr=False)
-    selected_entries: List[EnumDict] = field(default=None, repr=False)  # filtered entries based on score
+    candidate_entries: List[Trace] = field(default=None, repr=False)
+    selected_entries: List[Trace] = field(default=None, repr=False)  # filtered entries based on score
 
     # IO
     export_path: str = None

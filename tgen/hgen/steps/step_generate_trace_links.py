@@ -1,9 +1,10 @@
 import os
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
+from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
@@ -38,14 +39,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         if args.perform_clustering:
             trace_predictions, selected_predictions = self._trace_artifacts_in_cluster_to_generated_parents(args, state)
-            child2predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label())
-            child2selected = RankingUtil.group_trace_predictions(selected_predictions, TraceKeys.child_label())
-
-            for child, child_preds in child2predictions.items():
-                selected_child_links = child2selected.get(child, [])
-                if len(selected_child_links) == 0:
-                    all_child_predictions = sorted(child_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)
-                    selected_predictions.append(all_child_predictions[0])
+            self.place_orphans_in_homes(args, state, trace_predictions, selected_predictions)
         else:
             trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
             trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
@@ -53,6 +47,46 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             selected_predictions = SelectByThreshold.select(trace_predictions, args.link_selection_threshold)
         state.selected_predictions = selected_predictions
         state.trace_predictions = trace_predictions
+
+    @staticmethod
+    def place_orphans_in_homes(args: HGenArgs,
+                               state: HGenState,
+                               trace_predictions: List[Trace],
+                               trace_selections: List[Trace]) -> None:
+        all_children_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.source_layer_id).index)
+        all_parent_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.target_type).index)
+
+        child2predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label())
+        child2selected = RankingUtil.group_trace_predictions(trace_selections, TraceKeys.child_label())
+
+        orphans = set()
+        for child in all_children_ids:
+            predicted_child_links = child2predictions.get(child, [])
+            selected_child_links = child2selected.get(child, [])
+            if len(selected_child_links) == 0:
+                if len(predicted_child_links) == 0:
+                    orphans.add(child)
+                else:
+                    all_child_predictions = sorted(predicted_child_links, key=lambda t: t[TraceKeys.SCORE], reverse=True)
+                    trace_selections.append(all_child_predictions[0])
+
+        run_name = "Placing Orphans in Homes"
+        export_dir = os.path.join(args.export_dir, "orphan_ranking")
+        pipeline_args = RankingArgs(run_name=run_name,
+                                    dataset=state.all_artifacts_dataset,
+                                    parent_ids=all_parent_ids,
+                                    children_ids=list(orphans),
+                                    export_dir=export_dir,
+                                    types_to_trace=(args.source_type, args.target_type),
+                                    generate_explanations=False,  # TODO make this a hgen arg
+                                    selection_method=None)
+        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
+        pipeline.run()
+
+        orphan2predictions = RankingUtil.group_trace_predictions(pipeline.state.selected_entries, TraceKeys.child_label())
+        for orphan_id, orphan_preds in orphan2predictions.items():
+            top_prediction = sorted(orphan_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[0]
+            trace_selections.append(top_prediction)
 
     def _run_tracing_job_on_all_artifacts(self, args: HGenArgs, state: HGenState) -> List[EnumDict]:
         """
@@ -73,7 +107,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         trace_predictions: List[EnumDict] = result.body.prediction_entries
         return trace_predictions
 
-    def _trace_artifacts_in_cluster_to_generated_parents(self, args: HGenArgs, state: HGenState) -> List[EnumDict]:
+    def _trace_artifacts_in_cluster_to_generated_parents(self, args: HGenArgs, state: HGenState) -> Tuple[List[Trace], List[Trace]]:
         """
         Generates links between the artifacts in a cluster and the parent artifact generated from the cluster artifacts
         :param args: The arguments to HGen
@@ -89,7 +123,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations if
                           generation in generation2id]  # ignores if dup deleted already
-            if len(parent_ids) == 0:
+            if len(parent_ids) == 0:  # TODO: Filter out cluster ids that get removed
                 continue
             children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
             cluster_dir = os.path.join(self._get_ranking_dir(state.export_dir),

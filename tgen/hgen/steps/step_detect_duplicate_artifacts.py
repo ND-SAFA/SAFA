@@ -21,7 +21,7 @@ class DetectDuplicateArtifacts(AbstractPipelineStep[HGenArgs, HGenState]):
 
         similarity_matrix = EmbeddingUtil.calculate_similarities(new_artifact_embeddings, new_artifact_embeddings)
 
-        indices = np.argwhere(similarity_matrix > 0.85)
+        indices = np.argwhere(similarity_matrix > 0.55)
         max_index = math.ceil(len(new_artifact_ids) / 2)
         filtered_indices = [(i, j) for i, j in indices if i != j and i < max_index]
 

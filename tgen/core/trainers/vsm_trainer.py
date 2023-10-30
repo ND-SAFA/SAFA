@@ -10,15 +10,15 @@ from sklearn.metrics import pairwise_distances
 
 from tgen.common.constants.other_constants import VSM_THRESHOLD_DEFAULT
 from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
+from tgen.common.objects.trace import Trace
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.common.objects.trace import Trace
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
@@ -147,7 +147,7 @@ class VSMTrainer(AbstractTrainer):
 
         if self.select_predictions:
             self.convert_to_percentiles(prediction_entries)
-            prediction_entries = RankingUtil.select_predictions(prediction_entries)
+            prediction_entries = RankingUtil.select_predictions(prediction_entries, 0.9, 0.7, 0.4)
         metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries)
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)

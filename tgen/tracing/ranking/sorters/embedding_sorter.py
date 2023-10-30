@@ -1,9 +1,9 @@
 from typing import Dict, List
 
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import _data
 from tqdm import tqdm
 
+from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
@@ -22,12 +22,14 @@ class EmbeddingSorter(iSorter):
         :param return_scores: Whether to return the similarity scores (after min-max scaling per parent).
         :return: Map of parent to list of sorted children.
         """
+        if len(child_ids) == 0:
+            return {p: [] for p in parent_ids}
         children_embeddings = embedding_manager.create_artifact_embeddings(artifact_ids=child_ids)
 
         parent2rankings = {}
         for parent_id in tqdm(parent_ids, desc="Performing Ranking Via Embeddings"):
             parent_embedding = embedding_manager.get_embedding(parent_id)
-            scores = cosine_similarity([parent_embedding], children_embeddings)[0]
+            scores = EmbeddingUtil.calculate_similarities([parent_embedding], children_embeddings)[0]
             sorted_children = sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])
             sorted_artifact_ids = [c[1] for c in sorted_children]
             sorted_artifact_scores = [c[0] for c in sorted_children]

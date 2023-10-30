@@ -1,18 +1,13 @@
 import os
-import uuid
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.hgen_constants import DEFAULT_LINK_THRESHOLD
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dataclass_util import required_field, DataclassUtil
+from tgen.common.constants.hgen_constants import DEFAULT_LINK_THRESHOLD, DEFAULT_ORPHAN_THRESHOLD
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
-from tgen.common.util.str_util import StrUtil
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dataclass_util import required_field
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
@@ -84,6 +79,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     The threshold below which trace links will get filtered out
     """
     link_selection_threshold: float = DEFAULT_LINK_THRESHOLD
+    """
+    Threshold for which all orphan links have to exceed or equal.
+    """
+    min_orphan_score_threshold: float = DEFAULT_ORPHAN_THRESHOLD
 
     def __post_init__(self) -> None:
         """
@@ -102,4 +101,3 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
-

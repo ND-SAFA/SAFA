@@ -36,6 +36,7 @@ export const useIntegrationsApi = defineStore(
 
     async function handleSync(
       installation: Omit<InstallationSchema, "lastUpdate">,
+      isNew: boolean,
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       await integrationsApi.handleRequest(
@@ -46,12 +47,14 @@ export const useIntegrationsApi = defineStore(
                   projectStore.versionId,
                   installation.installationOrgId,
                   installation.installationId,
-                  integrationsStore.gitHubConfig
+                  integrationsStore.gitHubConfig,
+                  isNew
                 )
               : await createJiraProjectSync(
                   projectStore.versionId,
                   installation.installationOrgId,
-                  installation.installationId
+                  installation.installationId,
+                  isNew
                 );
 
           await jobApiStore.handleCreate(job);
@@ -81,6 +84,7 @@ export const useIntegrationsApi = defineStore(
               installationOrgId: integrationsStore.gitHubOrganization?.id || "",
               installationId: integrationsStore.gitHubProject?.name || "",
             },
+        true,
         callbacks
       );
     }

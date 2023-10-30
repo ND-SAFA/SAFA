@@ -158,16 +158,19 @@ export async function createJiraProject(
  * @param versionId - The project version to sync.
  * @param cloudId - The Jira installation to import projects from.
  * @param id - The Jira project id to import.
+ * @param isNew - Whether or not this is a new installation.
+ * @return The created import job.
  */
 export async function createJiraProjectSync(
   versionId: string,
   cloudId: string,
-  id: string
+  id: string,
+  isNew?: boolean
 ): Promise<JobSchema> {
-  return (
-    await buildRequest<{ payload: JobSchema }, "versionId" | "cloudId" | "id">(
-      "jiraSyncProject",
-      { versionId, id, cloudId }
-    ).put()
-  ).payload;
+  const endpoint = buildRequest<
+    { payload: JobSchema },
+    "versionId" | "cloudId" | "id"
+  >("jiraSyncProject", { versionId, id, cloudId });
+
+  return (await (isNew ? endpoint.post() : endpoint.put())).payload;
 }

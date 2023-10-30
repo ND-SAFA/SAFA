@@ -1,9 +1,13 @@
 package edu.nd.crc.safa.features.email;
 
+
+import javax.annotation.PostConstruct;
+
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+
 import com.infobip.ApiClient;
+import com.infobip.ApiException;
 import com.infobip.api.SendEmailApi;
-import com.infobip.model.EmailSendResponse;
-import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +37,12 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Value("${email.infobip.sender-address}")
     private String senderEmailAddress;
 
+    @Value("${fend.base}")
+    private String fendBase;
+
+    @Value("${fend.reset-email-path}")
+    private String resetPasswordUrl;
+
     private SendEmailApi sendEmailApi;
 
     @PostConstruct
@@ -46,15 +56,14 @@ public class InfobipEmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void send(String subject, String messageContent, String recipient) throws Exception {
-        log.info("Sending email to " + recipient);
-
-        EmailSendResponse emailResponse = this.sendEmailApi
-            .sendEmail(senderEmailAddress, recipient, subject)
-            .text(messageContent)
-            .execute();
-
-        log.info("Email response " + emailResponse.toString());
+    public void sendPasswordReset(String recipient, String token) {
+        try {
+            sendEmailApi.sendEmail(senderEmailAddress, recipient, "Requested password reset token")
+                .text(String.format(fendBase + resetPasswordUrl, token))
+                .execute();
+        } catch (ApiException e) {
+            throw new SafaError("Failed to send email", e);
+        }
     }
 
 }

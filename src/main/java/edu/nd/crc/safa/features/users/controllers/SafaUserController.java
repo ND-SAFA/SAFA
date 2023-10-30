@@ -27,8 +27,6 @@ import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,7 +47,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SafaUserController extends BaseController {
 
-    private static final Logger log = LoggerFactory.getLogger(SafaUserController.class);
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
@@ -122,16 +119,7 @@ public class SafaUserController extends BaseController {
         String token = tokenService.createTokenForUsername(username, expirationDate);
         PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser, token, expirationDate);
 
-        try {
-            emailService.send(
-                "Requested password reset token",
-                this.buildResetURL(token),
-                user.getEmail()
-            );
-        } catch (Exception e) {
-            log.error("Error occurred while trying to send email to {} " + e, user.getEmail());
-            throw new SafaError("Could not send email");
-        }
+        emailService.sendPasswordReset(user.getEmail(), token);
 
         // Just in case the user had a previous forget token they never clicked on
         this.passwordResetTokenRepository.deleteByUser(retrievedUser);

@@ -5,5 +5,5 @@ package edu.nd.crc.safa.features.email;
  */
 public interface EmailService {
 
-    void send(String subject, String messageContent, String recipient) throws Exception;
+    void sendPasswordReset(String recipient, String token);
 }

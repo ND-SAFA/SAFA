@@ -46,7 +46,7 @@ class CustomLoader(SafeLoader):
                     data = cls(**init_params)
                     use_init = True
                 except Exception as e:
-                    logger.warning(f"Could not initialize {cls.__name__}: {e}")
+                    pass
             if not use_init:
                 data = cls.__new__(cls)
             if 'dictitems' in state:
@@ -194,7 +194,7 @@ class YamlUtil:
             converted = [YamlUtil.convert_content_to_yaml_serializable(v, export_dir) for v in content]
         elif hasattr(content, "to_yaml"):
             if key:
-                export_dir = os.path.join(export_dir, key)
+                export_dir = os.path.join(export_dir, str(key))
             return content.to_yaml(export_path=export_dir)
         else:
             return content

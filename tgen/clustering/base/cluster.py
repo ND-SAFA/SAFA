@@ -86,6 +86,11 @@ class Cluster:
         return EmbeddingUtil.calculate_similarities([self.centroid], [cluster.centroid])[0][0]
 
     def similarity_to_neighbors(self, a_id: str):
+        """
+        Calculates the average similarity to the cluster's artifacts.
+        :param a_id: Artifact id to compare to cluster.
+        :return: Average similarity.
+        """
         unique_artifacts_embeddings = [self.embeddings_manager.get_embedding(a) for a in self.artifact_id_set if a != a_id]
         artifact_embedding = [self.embeddings_manager.get_embedding(a_id)]
         similarities = EmbeddingUtil.calculate_similarities(artifact_embedding, unique_artifacts_embeddings)[0]
@@ -124,11 +129,19 @@ class Cluster:
         return np.sum(similarities) / len(similarities)
 
     def __calculate_similarity_matrix(self) -> np.array:
+        """
+        Calculates the similarity scores between all artifacts in the cluster.
+        :return: The similarity matrix.
+        """
         artifact_embeddings = [self.embeddings_manager.get_embedding(a_id) for a_id in self.artifact_ids]
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
         return similarity_matrix
 
     def __calculate_min_max_similarity(self) -> Tuple[float, float]:
+        """
+        Calculates the minimum and maximum similarity scores in the similarity matrix.
+        :return: Min and Max similarity scores.
+        """
         unique_indices = NpUtil.get_unique_indices(len(self.artifact_id_set))
         similarities = self.get_values(self.similarity_matrix, unique_indices)
         min_sim = np.min(similarities)
@@ -136,6 +149,10 @@ class Cluster:
         return min_sim, max_sim
 
     def __calculate_avg_pairwise_distance(self) -> float:
+        """
+        Calculates the average pairwise distance between all points of a matrix.
+        :return: Calculates the pairwise distances and returns its average.
+        """
         n_artifacts = len(self.artifact_id_set)
         indices = NpUtil.get_unique_indices(n_artifacts)
         unique_scores = self.get_values(self.similarity_matrix, indices)

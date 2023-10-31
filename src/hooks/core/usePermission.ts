@@ -52,10 +52,10 @@ export const usePermission = defineStore("permissionStore", {
         | TeamSchema
         | OrganizationSchema = projectStore.project
     ): boolean {
-      if (permission === "safa.view") {
-        return true;
-      } else if (this.isDemo) {
+      if (this.isDemo) {
         return false;
+      } else if (permission === "safa.view") {
+        return true;
       } else if (permission.startsWith("safa.")) {
         return !!sessionStore.user.superuser;
       } else {

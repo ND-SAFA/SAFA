@@ -15,6 +15,7 @@ import {
   logStore,
   permissionStore,
   getOrgApiStore,
+  getVersionApiStore,
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -122,9 +123,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     permissionStore.isDemo = true;
 
     await handleLogin(DEMO_ACCOUNT).then(() =>
-      navigateTo(Routes.ARTIFACT, {
-        [QueryParams.VERSION]: "cf354d4b-21d7-4f8e-8951-e447ddf77997",
-      })
+      getVersionApiStore.handleLoad("cb9ddfba-a91b-43aa-9943-9558bd3f3b4e")
     );
   }
 

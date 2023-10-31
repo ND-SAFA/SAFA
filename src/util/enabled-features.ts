@@ -6,4 +6,5 @@ export const ENABLED_FEATURES = {
   ARTIFACT_NAME_CHECK: false,
 
   PROJECT_CREATOR_WORKFLOW: true,
+  ACTIVE_USERS: false,
 };

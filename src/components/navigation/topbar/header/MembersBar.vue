@@ -1,5 +1,5 @@
 <template>
-  <flex-box l="2">
+  <flex-box v-if="ENABLED_FEATURES.ACTIVE_USERS" l="2">
     <icon-button
       v-if="!connected"
       class="q-ml-md"
@@ -36,6 +36,7 @@ export default {
 
 <script lang="ts" setup>
 import { computed } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import {
   membersStore,
   projectStore,

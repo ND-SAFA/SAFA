@@ -1,6 +1,5 @@
 <template>
   <div>
-    <file-format-alert class="q-my-md" />
     <file-input
       v-model="selectedFiles"
       multiple
@@ -50,15 +49,15 @@ import { MatrixSchema, ProjectFilesInputProps, TimJsonSchema } from "@/types";
 import { useVModel } from "@/hooks";
 import {
   FileInput,
-  FileFormatAlert,
   MultiselectInput,
   ExpansionItem,
 } from "@/components/common";
 
 const props = defineProps<ProjectFilesInputProps>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "update:modelValue", files: File[]): void;
+  (e: "update:tim", tim: TimJsonSchema | undefined): void;
 }>();
 
 const selectedFiles = useVModel(props, "modelValue");
@@ -111,6 +110,7 @@ function handleClear(): void {
   selectedFiles.value = [];
   artifactTypes.value = [];
   traceMatrices.value = [];
+  emit("update:tim", undefined);
 }
 
 /**
@@ -142,6 +142,8 @@ function handleTimChange(): void {
       type: "application/json",
     }),
   ];
+
+  emit("update:tim", tim.value);
 }
 
 /**
@@ -180,6 +182,8 @@ watch(
           source: sourceType,
           target: targetType,
         }));
+
+      emit("update:tim", tim.value);
     });
 
     reader.readAsText(timFile);

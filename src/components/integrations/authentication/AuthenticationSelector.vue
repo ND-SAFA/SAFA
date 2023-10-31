@@ -1,15 +1,6 @@
 <template>
-  <stepper-list-step
-    title="Integration Sources"
-    :item-count="2"
-    empty-message=""
-  >
-    <jira-authentication :inactive="false" @click="emit('input', 'Jira')" />
-    <git-hub-authentication
-      :inactive="false"
-      @click="emit('input', 'GitHub')"
-    />
-  </stepper-list-step>
+  <jira-authentication :inactive="false" @click="emit('input', 'Jira')" />
+  <git-hub-authentication :inactive="false" @click="emit('input', 'GitHub')" />
 </template>
 
 <script lang="ts">
@@ -22,7 +13,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { StepperListStep } from "@/components/common";
 import JiraAuthentication from "./JiraAuthentication.vue";
 import GitHubAuthentication from "./GitHubAuthentication.vue";
 

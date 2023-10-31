@@ -23,15 +23,19 @@ $graph-border-radius: 8px;
 
 .artifact-view {
   opacity: 0;
+  transition: opacity 0.1s ease-in-out, width 0.1s ease-in-out;
 
   &.visible {
-    transition: opacity 0.1s ease-in-out;
     transition-delay: 0.1s;
     opacity: 100;
   }
 
   &.disabled {
     display: none;
+  }
+
+  &.collapsed {
+    width: 0 !important;
   }
 }
 

@@ -1,4 +1,5 @@
-import { ArtifactSchema, ModelType, TraceLinkSchema } from "@/types/domain";
+import { TimJsonSchema } from "@/types";
+import { ArtifactSchema, TraceLinkSchema } from "@/types/domain";
 
 /**
  * Defines a collection of parsed artifacts.
@@ -8,7 +9,17 @@ export type ArtifactMap = Record<string, ArtifactSchema>;
 /**
  * The types of create project tabs.
  */
+export type UploadPanelType = "artifact" | "trace" | "bulk" | "github" | "jira";
+
+/**
+ * The types of create project tabs.
+ */
 export type CreatorTab = "standard" | "bulk" | "import";
+
+/**
+ * The types of create project tabs.
+ */
+export type CreatorSectionTab = "name" | "data";
 
 /**
  * The types of load project tabs.
@@ -19,7 +30,7 @@ export type LoaderTab = "load" | "project" | "user";
  * Represents a panel for uploading files in the project creator.
  */
 export interface CreatorFilePanel {
-  variant: "artifact" | "trace";
+  variant: UploadPanelType;
   name: string;
   type: string;
   open: boolean;
@@ -29,15 +40,21 @@ export interface CreatorFilePanel {
   itemNames: string[];
   file?: File;
   errorMessage?: string;
+  parseErrorMessage?: string;
 
   // Artifacts
   artifacts?: ArtifactSchema[];
+  summarize: boolean;
 
   // Traces
   toType?: string;
   isGenerated: boolean;
-  generateMethod?: ModelType;
   traces?: TraceLinkSchema[];
+
+  // Bulk
+  bulkFiles: File[];
+  tim?: TimJsonSchema;
+  emptyFiles: boolean;
 }
 
 /**
@@ -52,16 +69,4 @@ export interface FilePanelProps {
    * The panel index.
    */
   index: number;
-  /**
-   * The type of data being created.
-   */
-  variant: "artifact" | "trace";
-  /**
-   * The label for the type of panel.
-   */
-  label: string;
-  /**
-   * The panel's label to display over the panel name.
-   */
-  newLabel: string;
 }

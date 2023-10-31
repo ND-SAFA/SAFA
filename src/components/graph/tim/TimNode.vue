@@ -97,7 +97,11 @@ const style = computed(() => (selected.value ? "z-index: 10;" : "z-index: 1;"));
 const color = computed(() => timStore.getTypeColor(props.artifactType));
 
 const countLabel = computed(() =>
-  props.count === 1 ? "1 Artifact" : `${props.count} Artifacts`
+  props.count < 0
+    ? "1 Import"
+    : props.count === 1
+    ? "1 Artifact"
+    : `${props.count} Artifacts`
 );
 
 const definition = computed<TimNodeCytoElement>(() => ({
@@ -116,6 +120,8 @@ const definition = computed<TimNodeCytoElement>(() => ({
  * Selects this artifact level.
  */
 function handleSelect(): void {
+  if (props.hideActions) return;
+
   if (!selected.value) {
     selectionStore.selectArtifactLevel(props.artifactType);
   } else {

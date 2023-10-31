@@ -75,9 +75,7 @@ const displayMore = computed(
 
 const displayOptions = computed(() => !smallWindow.value || !collapsed.value);
 
-const displayOrgOptions = computed(
-  () => !projectStore.isProjectDefined || currentRoute.path === Routes.ORG
-);
+const displayOrgOptions = computed(() => currentRoute.path === Routes.ORG);
 
 const displayProjectOptions = computed(
   () =>

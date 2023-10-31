@@ -52,8 +52,11 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
         projectStore.addProject(isUpdate ? identifier : project);
 
         if (project.projectId === projectStore.projectId) {
-          projectStore.project.name = project.name;
-          projectStore.project.description = project.description;
+          projectStore.updateProject({
+            name: project.name,
+            description: project.description,
+            specification: project.specification,
+          });
         }
 
         return project;

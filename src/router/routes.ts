@@ -122,7 +122,8 @@ export const routes: Array<RouteRecordRaw> = [
     name: "Create Project",
     component: ProjectCreatorView,
     meta: {
-      description: "Import a new project into SAFA.",
+      description:
+        "Create a new project by uploading files or configuring integrations.",
     },
   },
   {

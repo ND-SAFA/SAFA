@@ -2,7 +2,7 @@ import {
   ApprovalType,
   ArtifactDeltaState,
   AttributeType,
-  CreatorTab,
+  CreatorSectionTab,
   LoaderTab,
   MemberRole,
   MembershipType,
@@ -13,6 +13,7 @@ import {
   SettingsTab,
   TeamTabTypes,
   TraceCountTypes,
+  UploadPanelType,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
 
@@ -149,11 +150,23 @@ export function searchModeOptions(): SearchSelectOption[] {
 /**
  * @return display names for project creator tabs.
  */
-export function creatorTabOptions(): SelectOption<CreatorTab>[] {
+export function uploadPanelOptions(): SelectOption<UploadPanelType>[] {
   return [
-    createOption("standard", "Standard Upload"),
-    createOption("bulk", "Bulk Upload"),
-    createOption("import", "Integrations Import"),
+    createOption("artifact", "Artifact Type"),
+    createOption("trace", "Trace Matrix"),
+    createOption("bulk", "Bulk File Upload"),
+    createOption("github", "GitHub Upload"),
+    createOption("jira", "Jira Upload"),
+  ];
+}
+
+/**
+ * @return display names for project creator tabs.
+ */
+export function creatorTabOptions(): SelectOption<CreatorSectionTab>[] {
+  return [
+    createOption("name", "Project Details"),
+    createOption("data", "Import Data"),
   ];
 }
 
@@ -162,7 +175,7 @@ export function creatorTabOptions(): SelectOption<CreatorTab>[] {
  */
 export function loaderTabOptions(): SelectOption<LoaderTab>[] {
   return [
-    createOption("load", "Open Project"),
+    createOption("load", "My Projects"),
     createOption("user", "Recent Tasks"),
     createOption("project", "Project Tasks"),
   ];
@@ -175,6 +188,7 @@ export function settingsTabOptions(): SelectOption<SettingsTab>[] {
   return [
     createOption("overview", "Overview"),
     createOption("members", "Members"),
+    createOption("jobs", "Tasks"),
     createOption("upload", "Data Upload"),
     createOption("integrations", "Data Integrations"),
     createOption("attributes", "Custom Attributes"),

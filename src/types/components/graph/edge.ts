@@ -84,4 +84,8 @@ export interface TimLinkProps {
    * Whether this matrix contains generated links.
    */
   generated?: boolean;
+  /**
+   * If true, the actions for this edge will be hidden.
+   */
+  hideActions?: boolean;
 }

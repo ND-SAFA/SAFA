@@ -11,6 +11,9 @@
       <template #members>
         <project-member-table />
       </template>
+      <template #jobs>
+        <jobs-table :display-project-jobs="true" />
+      </template>
       <template #upload>
         <upload-new-version :open="tab === 'upload'" />
       </template>
@@ -48,19 +51,20 @@ import {
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
 import { ProjectMemberTable } from "@/components/members";
+import { JobsTable } from "@/components/jobs";
 
 const tabs = computed(() => {
   const options = settingsTabOptions();
   const visibleOptions: SelectOption[] = [options[0], options[1]];
 
   if (permissionStore.isAllowed("project.edit_versions")) {
-    visibleOptions.push(options[2]);
+    visibleOptions.push(options[2], options[3]);
   }
   if (permissionStore.isAllowed("project.edit_integrations")) {
-    visibleOptions.push(options[3]);
+    visibleOptions.push(options[4]);
   }
   if (permissionStore.isAllowed("project.edit")) {
-    visibleOptions.push(options[4]);
+    visibleOptions.push(options[5]);
   }
 
   return visibleOptions;

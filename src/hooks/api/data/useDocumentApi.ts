@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { computed } from "vue";
 import {
   DocumentType,
   IOHandlerCallback,
@@ -28,6 +29,8 @@ import { pinia } from "@/plugins";
  */
 const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
   const documentApi = useApi("documentApi");
+
+  const loading = computed(() => documentApi.loading);
 
   async function handleCreate(
     name: string,
@@ -164,6 +167,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
   }
 
   return {
+    loading,
     handleCreate,
     handleCreatePreset,
     handleUpdate,

@@ -19,10 +19,12 @@ export interface IntegrationsApiHook {
    * Syncs the current project with the selected installation's data.
    *
    * @param installation - The installation to sync data with.
+   * @param isNew - Whether or not this is a new installation.
    * @param callbacks - Called once the action is complete.
    */
   handleSync(
     installation: Omit<InstallationSchema, "lastUpdate">,
+    isNew?: boolean,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**

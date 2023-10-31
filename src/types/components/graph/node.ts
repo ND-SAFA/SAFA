@@ -121,4 +121,8 @@ export interface TimNodeProps {
    * The icon to display for this artifact type.
    */
   icon?: string;
+  /**
+   * If true, the actions for this node will be hidden.
+   */
+  hideActions?: boolean;
 }

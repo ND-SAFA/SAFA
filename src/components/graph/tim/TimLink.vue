@@ -40,7 +40,12 @@ const definition = computed<TimEdgeCytoElement>(() => ({
     target: sanitizeNodeId(props.sourceType),
 
     count: props.count,
-    label: props.count === 1 ? `1 Link` : `${props.count} Links`,
+    label:
+      props.count < 0
+        ? "1 Import"
+        : props.count === 1
+        ? `1 Link`
+        : `${props.count} Links`,
     dark: darkMode.value,
     generated: props.generated,
   },
@@ -51,6 +56,8 @@ const definition = computed<TimEdgeCytoElement>(() => ({
  * Selects this trace matrix.
  */
 function handleSelect(): void {
+  if (props.hideActions) return;
+
   if (
     selectionStore.selectedTraceMatrixTypes[0] !== props.targetType ||
     selectionStore.selectedTraceMatrixTypes[1] !== props.sourceType

@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict
 
-from tgen.common.constants.hgen_constants import DEFAULT_LINK_THRESHOLD, DEFAULT_ORPHAN_THRESHOLD
+from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
+    DEFAULT_ORPHAN_THRESHOLD
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field
@@ -83,6 +84,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     Threshold for which all orphan links have to exceed or equal.
     """
     min_orphan_score_threshold: float = DEFAULT_ORPHAN_THRESHOLD
+    """
+    Threshold for which generated artifacts are deemed duplicates.
+    """
+    duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
 
     def __post_init__(self) -> None:
         """

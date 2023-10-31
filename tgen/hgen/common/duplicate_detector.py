@@ -24,7 +24,7 @@ class DuplicateDetector:
         """
         artifact_embeddings = self.embeddings_manager.get_embeddings(artifact_ids)
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
-        similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, 0.55)
+        similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, self.duplicate_similarity_threshold)
         dup_counter, dup_pairs = DuplicateDetector.count_duplicates(artifact_ids, similar_indices)
         duplicate_artifact_ids = self.find_most_duplicated_artifacts(dup_counter, dup_pairs)
         unique_artifact_ids = [a_id for a_id in duplicate_artifact_ids if a_id not in duplicate_artifact_ids]

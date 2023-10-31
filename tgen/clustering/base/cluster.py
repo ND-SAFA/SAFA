@@ -168,6 +168,12 @@ class Cluster:
 
     @staticmethod
     def get_values(matrix: np.array, indices: List[Tuple[int, int]]):
+        """
+        Gets the values in the matrix. TODO: Replace with actual numpy notation.
+        :param matrix: The matrix to index.
+        :param indices: The index in the matrix to retrieve. Expected to be 2D.
+        :return: List of values in the matrix.
+        """
         values = [matrix[i][j] for i, j in indices]
         return values
 

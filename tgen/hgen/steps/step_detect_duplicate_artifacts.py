@@ -27,7 +27,7 @@ class DetectDuplicateArtifacts(AbstractPipelineStep[HGenArgs, HGenState]):
         new_artifact_embeddings_map = embeddings_manager.update_or_add_contents(new_artifact_map, create_embedding=True)
         new_artifact_ids = list(new_artifact_embeddings_map.keys())
 
-        duplicate_detector = DuplicateDetector(embeddings_manager, duplicate_similarity_threshold=0.55)
+        duplicate_detector = DuplicateDetector(embeddings_manager, duplicate_similarity_threshold=args.duplicate_similarity_threshold)
         duplicate_artifact_ids = duplicate_detector.get_duplicates(new_artifact_ids)
 
         logger.info(f"Removing: {len(duplicate_artifact_ids)} duplicates.")

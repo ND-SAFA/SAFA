@@ -11,9 +11,9 @@ from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.hgen.common.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 

@@ -105,19 +105,21 @@ export async function createGitHubProject(
  * @param owner - The owner of the repository to sync a project from.
  * @param repositoryName - The repository to create a project from.
  * @param configuration - The configuration to use for the sync.
+ * @param isNew - Whether or not this is a new installation.
  * @return The created import job.
  */
 export async function createGitHubProjectSync(
   versionId: string,
   owner: string,
   repositoryName: string,
-  configuration?: GitHubImportSchema
+  configuration?: GitHubImportSchema,
+  isNew?: boolean
 ): Promise<JobSchema> {
-  return buildRequest<
+  const endpoint = buildRequest<
     JobSchema,
     "versionId" | "owner" | "repositoryName",
     GitHubImportSchema | undefined
-  >("githubSyncProject", { versionId, owner, repositoryName }).put(
-    configuration
-  );
+  >("githubSyncProject", { versionId, owner, repositoryName });
+
+  return isNew ? endpoint.post(configuration) : endpoint.put(configuration);
 }

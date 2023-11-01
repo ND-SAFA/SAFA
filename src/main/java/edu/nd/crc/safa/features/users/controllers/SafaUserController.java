@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.users.entities.db.PasswordResetToken;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.PasswordResetTokenRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.users.services.EmailVerificationService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import io.jsonwebtoken.Claims;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -52,6 +54,7 @@ public class SafaUserController extends BaseController {
     private final SafaUserRepository safaUserRepository;
     private final SafaUserService safaUserService;
     private final EmailService emailService;
+    private final EmailVerificationService emailVerificationService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     @Value("${fend.base}")
     private String fendBase;
@@ -62,6 +65,7 @@ public class SafaUserController extends BaseController {
     public SafaUserController(ResourceBuilder resourceBuilder,
                               ServiceProvider serviceProvider,
                               EmailService emailService,
+                              EmailVerificationService emailVerificationService,
                               PasswordResetTokenRepository passwordResetTokenRepository) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
@@ -69,6 +73,7 @@ public class SafaUserController extends BaseController {
         this.safaUserRepository = serviceProvider.getSafaUserRepository();
         this.safaUserService = serviceProvider.getSafaUserService();
         this.emailService = emailService;
+        this.emailVerificationService = emailVerificationService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
@@ -86,9 +91,19 @@ public class SafaUserController extends BaseController {
             .getSafaUserService()
             .createUser(newUser.getEmail(), newUser.getPassword());
 
-        emailService.sendEmailVerification(createdAccount.getEmail(), "TODO_temp_fake_token");
+        emailVerificationService.sendVerificationEmail(createdAccount);
 
         return new UserAppEntity(createdAccount);
+    }
+
+    /**
+     * Verify a user's email from an email verification token
+     *
+     * @param token The email verification token
+     */
+    @GetMapping(AppRoutes.Accounts.VERIFY_ACCOUNT)
+    public void verifyAccount(@RequestParam("token") String token) {
+        emailVerificationService.verifyToken(token);
     }
 
     /**
@@ -199,10 +214,6 @@ public class SafaUserController extends BaseController {
     public void updateDefaultOrg(@RequestBody DefaultOrgDTO newOrgDto) {
         SafaUser currentUser = getCurrentUser();
         safaUserService.updateDefaultOrg(currentUser, newOrgDto.defaultOrgId);
-    }
-
-    private String buildResetURL(String token) {
-        return String.format(fendBase + fendPath, token);
     }
 
     @Data

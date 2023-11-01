@@ -45,11 +45,8 @@ public class TestPasswordReset extends ApplicationBaseTest {
     private AutoCloseable closeable;
 
     @BeforeEach
-    @Override
-    public void initTestResources() throws Exception {
-        super.initTestResources();
-        Mockito.doNothing().when(emailService).send(
-            Mockito.anyString(),
+    public void testSetup() throws Exception {
+        Mockito.doNothing().when(emailService).sendPasswordReset(
             Mockito.anyString(),
             Mockito.anyString());
 

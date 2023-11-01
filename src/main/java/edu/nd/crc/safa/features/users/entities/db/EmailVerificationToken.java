@@ -2,38 +2,38 @@ package edu.nd.crc.safa.features.users.entities.db;
 
 import java.util.Date;
 import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.hibernate.annotations.JdbcTypeCode;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.Type;
 
 /**
- * Represents list of tokens used to reset user password
+ * Represent a token for user email verification
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "password_reset_token")
-public class PasswordResetToken {
+@Table(name = "email_verification_token")
+public class EmailVerificationToken {
 
     /**
      * Uniquely identifies the user token.
      */
     @Id
     @GeneratedValue
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "id", columnDefinition = "VARCHAR(36)")
+    @Column
     private UUID id;
 
     /**
@@ -41,7 +41,7 @@ public class PasswordResetToken {
      */
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Type(type = "uuid-char")
     @JoinColumn(name = "user_id", nullable = false, columnDefinition = "VARCHAR(36)")
     @NonNull
     private SafaUser user;
@@ -57,9 +57,9 @@ public class PasswordResetToken {
     @NonNull
     private Date expirationDate;
 
-    public PasswordResetToken(@NonNull SafaUser user,
-                              @NonNull String token,
-                              @NonNull Date expirationDate) {
+    public EmailVerificationToken(@NonNull SafaUser user,
+                                  @NonNull String token,
+                                  @NonNull Date expirationDate) {
         this.user = user;
         this.token = token;
         this.expirationDate = expirationDate;

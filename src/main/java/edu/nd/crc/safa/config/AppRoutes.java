@@ -23,6 +23,7 @@ public class AppRoutes {
         public static final String RESET_PASSWORD = Accounts.PREFIX + "/reset";
         public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
         public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
+        public static final String VERIFY_ACCOUNT = Accounts.PREFIX + "/verify";
         public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
         public static final String SELF = Accounts.PREFIX + "/self";
         public static final String DEFAULT_ORG = Accounts.PREFIX + "/organization";

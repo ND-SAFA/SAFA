@@ -243,7 +243,14 @@ class EmbeddingsManager:
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
 
-    def __encode(self, subset_ids: Union[List[Any], Any], include_ids: bool = False, **kwargs):
+    def __encode(self, subset_ids: Union[List[Any], Any], include_ids: bool = False, **kwargs) -> List:
+        """
+        Encodes the artifacts corresponding to the ids in the list
+        :param subset_ids: The subset of artifacts to create embeddings for
+        :param include_ids: If True, includes the id in the embedding
+        :param kwargs: Not used
+        :return: The embedding(s)
+        """
         return_as_list = True
         if not isinstance(subset_ids, list):
             subset_ids = [subset_ids]

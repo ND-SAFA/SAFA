@@ -35,7 +35,13 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         final_clusters = unique_cluster_map.get_clusters(args.cluster_min_votes)
         state.final_cluster_map = final_clusters
 
-    def _calculate_min_pairwise_avg_threshold(self, clusters: List[Cluster]):
+    @staticmethod
+    def _calculate_min_pairwise_avg_threshold(clusters: List[Cluster]) -> float:
+        """
+        Calculates the minimum acceptable pairwise similarity for a cluster based on the minimum avg of the artifacts in all clusters
+        :param clusters: List of the clusters to base the threshold on
+        :return: The threshold for the minimum acceptable pairwise similarity
+        """
         pairwise_avgs = [cluster.avg_pairwise_sim for cluster in clusters]
         if max(pairwise_avgs) >= MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING:
             return MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING

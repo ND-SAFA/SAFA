@@ -1,5 +1,6 @@
 from typing import List, Set, Tuple
 
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -16,19 +17,18 @@ class DuplicateDetector:
         self.embeddings_manager = embeddings_manager
         self.duplicate_similarity_threshold = duplicate_similarity_threshold
 
-    def get_duplicates(self, artifact_ids: List[str]) -> Tuple[Set[str], List[str]]:
+    def get_duplicates(self, artifact_ids: List[str]) -> Tuple[Set[str], Set[Tuple]]:
         """
         Returns the list of duplicate artifact ids and the list of unique artifact ids.
         :param artifact_ids: The artifacts ids to compare.
-        :return: List of duplicate artifact ids and unique artifact ids.
+        :return: List of duplicate artifact ids and all identified duplicate pairs.
         """
         artifact_embeddings = self.embeddings_manager.get_embeddings(artifact_ids)
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
         similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, self.duplicate_similarity_threshold)
         dup_counter, dup_pairs = DuplicateDetector.count_duplicates(artifact_ids, similar_indices)
         duplicate_artifact_ids = self.find_most_duplicated_artifacts(dup_counter, dup_pairs)
-        unique_artifact_ids = [a_id for a_id in duplicate_artifact_ids if a_id not in duplicate_artifact_ids]
-        return duplicate_artifact_ids, unique_artifact_ids
+        return duplicate_artifact_ids, dup_pairs
 
     @staticmethod
     def find_most_duplicated_artifacts(dup_counter: CountMap, dup_pairs: Set[ArtifactPair]) -> Set[str]:
@@ -63,22 +63,9 @@ class DuplicateDetector:
             source_artifact_id = artifact_ids[source_index]
             target_artifact_id = artifact_ids[target_index]
 
-            cls.set_or_increment_count(dup_counter, source_artifact_id, 1)
-            cls.set_or_increment_count(dup_counter, target_artifact_id, 1)
+            DictUtil.set_or_increment_count(dup_counter, source_artifact_id, 1)
+            DictUtil.set_or_increment_count(dup_counter, target_artifact_id, 1)
 
             dup_pairs.add((source_artifact_id, target_artifact_id))
         return dup_counter, dup_pairs
 
-    @staticmethod
-    def set_or_increment_count(mapping: CountMap, item_key: str, item_value: int) -> None:
-        """
-        Adds item to mapping if it does not exists, otherwise increments it.
-        :param mapping: The map to add item to.
-        :param item_key: The key to store item under.
-        :param item_value: The value to place under key if key is not contained.
-        :return: None
-        """
-        if item_key not in mapping:
-            mapping[item_key] = item_value
-        else:
-            mapping[item_key] += item_value

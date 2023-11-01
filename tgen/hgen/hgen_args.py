@@ -69,6 +69,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     generate_trace_links: bool = True
     """
+    If True, automatically generates trace links explanations
+    """
+    generate_explanations: bool = True
+    """
     If True, creates clusters of related artifacts to create higher levels of docs for 
     """
     perform_clustering: bool = True

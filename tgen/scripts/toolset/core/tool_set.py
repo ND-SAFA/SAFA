@@ -1,17 +1,16 @@
 import inspect
 from typing import Callable, Dict, List
 
-FUNC_PARAM = "func"
-DESC_PARAM = "desc"
-IGNORE_PARAMS = ["self"]
+from tgen.scripts.toolset.core.constants import DESC_PARAM, FUNC_PARAM, IGNORE_PARAMS
 
 
-class ToolManager:
-    """
-
-    """
+class ToolSet:
 
     def __init__(self, tool_functions: List[Callable]):
+        """
+        Creates manager for running the functions.
+        :param tool_functions: The functions serving as entry points to your tool set.
+        """
         self.tool_functions = tool_functions
         self.tool_map, self.tool_choices = self.create_tool_map(tool_functions)
         self.tool_params = self.read_tool_params(self.tool_map)
@@ -47,7 +46,7 @@ class ToolManager:
         :param tool_map: Map of tool id to tool contents.
         :return: List of tool descriptions.
         """
-        return [ToolManager.create_description(t_id, tool) for t_id, tool in tool_map.items()]
+        return [ToolSet.create_description(t_id, tool) for t_id, tool in tool_map.items()]
 
     @staticmethod
     def create_tool_map(tool_functions: List[Callable]) -> Dict:
@@ -73,7 +72,7 @@ class ToolManager:
                 class_functions = [f for f in class_functions if callable(f)]
                 class_functions = [f for f in class_functions if getattr(f, 'climethod', False)]
 
-                class_map, class_choices = ToolManager.create_tool_map(class_functions)
+                class_map, class_choices = ToolSet.create_tool_map(class_functions)
                 tool_map.update(class_map)
                 tool_choices.update(class_choices)
         tool_choices["Exit"] = "Leave."
@@ -101,7 +100,7 @@ class ToolManager:
                 param_default = None
                 if param.default is not inspect.Parameter.empty:
                     param_default = param.default
-                param_desc = ToolManager.get_param_description(pydoc, param_name)
+                param_desc = ToolSet.get_param_description(pydoc, param_name)
                 params.append((param_name, param_desc, param_default))
             tool_params[tool_id] = params
         return tool_params
@@ -122,5 +121,11 @@ class ToolManager:
         return None
 
     @staticmethod
-    def create_description(tool_id: str, tool):
-        return f"{tool_id} - {tool[DESC_PARAM]}"
+    def create_description(tool_id: str, tool_info: Dict):
+        """
+        Returns description of the tool.
+        :param tool_id: The id of the tool
+        :param tool_info: Information dictionary about the tool.
+        :return: String representing description.
+        """
+        return f"{tool_id} - {tool_info[DESC_PARAM]}"

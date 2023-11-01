@@ -5,7 +5,6 @@ from typing import Any, List
 import boto3
 
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.list_util import ListUtil
 from tgen.scripts.toolset.core.confirm import confirm
 from tgen.scripts.toolset.core.constants import DEFAULT_CONFIG_PATH, DEFAULT_DATA_BUCKET, IGNORE_FILES
 
@@ -39,12 +38,13 @@ def ls_buckets() -> None:
     display_items(bucket_names, "Buckets")
 
 
-def upload_folder(folder_path: str, bucket_name: str = DEFAULT_DATA_BUCKET, bucket_path: str = None, show_files: bool = True):
+def upload_folder(folder_path: str, bucket_path: str = None, bucket_name: str = DEFAULT_DATA_BUCKET,
+                  show_files: bool = True):
     """
     Uploads folder to bucket.
     :param folder_path: Path to folder to upload.
-    :param bucket_name: The bucket to upload to.
     :param bucket_path: The name of the folder to store data in bucket. Default uses input folder name.
+    :param bucket_name: The bucket to upload to.
     :param show_files: Whether to display files before copying to bucket.
     :return: None
     """
@@ -54,18 +54,17 @@ def upload_folder(folder_path: str, bucket_name: str = DEFAULT_DATA_BUCKET, buck
     if not os.path.isdir(folder_path):
         print(f"Cannot find folder at path: {folder_path}")
         return
-    files_to_upload = [f for f in FileUtil.ls_dir(folder_path) if f not in IGNORE_FILES]
 
-    confirm_message = f"Copy {len(files_to_upload)} files?"
+    files_to_upload = get_copyable_files(folder_path)
+    confirm_message = f"Copy {len(files_to_upload)} files to {bucket_path}?"
     if show_files:
-        files_display = "\n".join(files_to_upload)
-        confirm_message = files_display + confirm_message
+        display_items(files_to_upload, "Files")
     if not confirm(confirm_message):
         return
 
-    for file_name in files_to_upload:
-        file_path = os.path.join(folder_path, file_name)
-        command = f"aws s3 cp {file_path} s3://{bucket_name}/{bucket_path}/{file_name}"
+    for file_path in files_to_upload:
+        relative_path = os.path.relpath(file_path, start=folder_path)
+        command = f"aws s3 cp {file_path} s3://{bucket_name}/{bucket_path}/{relative_path}"
         cmd(command)
 
 
@@ -90,6 +89,36 @@ def delete_folder(folder_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
     """
     bucket = s3.Bucket(bucket_name)
     bucket.objects.filter(Prefix=folder_path).delete()
+    dir_path = os.path.dirname(folder_path)
+    ls_bucket(bucket, dir_path)
+
+
+def download_s3_folder(s3_folder: str, store_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
+    """
+    Download the contents of a folder directory.
+    :param s3_folder: The folder path in the s3 bucket.
+    :param store_path: Path to store data on local machine.
+    :param bucket_name: The name of the s3 bucket.
+    :return: None
+    """
+    store_path = os.path.expanduser(store_path)
+    bucket = s3.Bucket(bucket_name)
+
+    saved_files = []
+    for obj in bucket.objects.filter(Prefix=s3_folder):
+        target = os.path.join(store_path, obj.key)
+        if not os.path.exists(os.path.dirname(target)):
+            os.makedirs(os.path.dirname(target))
+        if obj.key[-1] == '/':  # checks if folder
+            continue
+        bucket.download_file(obj.key, target)
+        saved_files.append(target)
+    display_items(saved_files, "Files Downloaded")
+
+
+"""
+Private methods.
+"""
 
 
 def cmd(command: str):
@@ -102,19 +131,46 @@ def cmd(command: str):
     return subprocess.run(command_words)
 
 
-def display_items(items: List[Any], header: str, n_per_batch: int = N_PER_BATCH):
+def display_items(items: List[Any], header: str, relative_path: str = None, print_message: bool = True):
     """
     Displays the items in the list.
     :param items: The items to display.
     :param header: The header to display items under.
-    :param n_per_batch: The number of items per batch.
+    :param relative_path: The path to display items from.
     :return: None
     """
-    batches = ListUtil.batch(items, n_per_batch)
     HEADER_BAR = "-" * 25
-    print(HEADER_BAR, header, HEADER_BAR)
-    for batch in batches:
-        print(repr(batch))
+    header_message = " ".join([HEADER_BAR, header, HEADER_BAR])
+    messages = []
+    for item in items:
+        if relative_path:
+            item_message = os.path.relpath(item, start=relative_path)
+        else:
+            item_message = repr(item)
+        messages.append(item_message)
+
+    if len(items) == 0:
+        messages.append("No items to show.")
+
+    message = "\n".join([header_message] + messages)
+    if print_message:
+        print(message)
+    return message
 
 
-S3_TOOLS = [configure, ls_buckets, upload_folder, ls_bucket, delete_folder]
+def get_copyable_files(folder_path: str):
+    """
+    Gets list of file paths valid for copying to S3 bucket.
+    :param folder_path: Path to folder to list files for.
+    :return: List of copyable files.
+    """
+    files_to_upload = []
+    for file_path in FileUtil.get_all_paths(folder_path):
+        file_name = os.path.basename(file_path)
+        if file_name[0] == "." or file_name in IGNORE_FILES or os.path.isdir(file_path):
+            continue
+        files_to_upload.append(file_path)
+    return files_to_upload
+
+
+S3_TOOLS = [upload_folder, download_s3_folder, ls_bucket, delete_folder, ls_buckets, configure]

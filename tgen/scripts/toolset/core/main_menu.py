@@ -1,6 +1,6 @@
 import inquirer
 
-from tgen.scripts.toolset.core.constants import EXIT_COMMAND, TOOL_RUNNER_NAME
+from tgen.scripts.toolset.core.constants import BACK_COMMAND, EXIT_COMMAND, TOOL_RUNNER_NAME
 from tgen.scripts.toolset.core.tool_set import ToolSet
 
 
@@ -15,6 +15,7 @@ def main_menu(tool_manager: ToolSet):
 
 def select_tool(tool_manager: ToolSet, default_tool_id: str = None, *args):
     while True:
+        exit_loop = False
         if default_tool_id:
             tool_id = tool_manager.get_tool_id(default_tool_id)
         else:
@@ -33,8 +34,13 @@ def select_tool(tool_manager: ToolSet, default_tool_id: str = None, *args):
                 if param_default is not None:
                     param_message += f"({param_default})"
                 arg = inquirer.text(message=param_message)
+                if BACK_COMMAND in arg.lower():
+                    print("Exiting command.")
+                    exit_loop = True
+                    break
                 arg = param_default if arg == "" else arg
                 args.append(arg)
-        tool_func = tool_manager.get_tool_function(tool_id)
-        tool_func(*args)
-        print(f"\n:-)\n")  # add a blank line after the output
+        if not exit_loop:
+            tool_func = tool_manager.get_tool_function(tool_id)
+            tool_func(*args)
+            print(f"\n:-)\n")  # add a blank line after the output

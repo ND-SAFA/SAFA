@@ -3,15 +3,15 @@ import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Tuple, Type, Union, Optional
+from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union
 
 import yaml
-from yaml.dumper import Dumper, SafeDumper
+from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
-from tgen.common.constants.path_constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM, CURRENT_PROJECT_PARAM, USER_SYM, \
-    PROJ_PATH
+from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, ROOT_PATH_PARAM, \
+    USER_SYM
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
 
@@ -151,6 +151,12 @@ class FileUtil:
         """
 
         def expand(path: str, replacements: Dict[str, str] = None):
+            """
+            Performs replacements on path.
+            :param path: The path possibly containing keys.
+            :param replacements: They keys and values to be replaced with.
+            :return: The processed path.
+            """
             if replacements:
                 for k, v in replacements.items():
                     path = path.replace(k, v)
@@ -171,6 +177,12 @@ class FileUtil:
         """
 
         def collapse(path: str, replacements: Dict[str, str] = None):
+            """
+            Performs replacements on path.
+            :param path: The path possibly containing keys.
+            :param replacements: They keys and values to be replaced with.
+            :return: The processed path.
+            """
             if replacements:
                 path2var = {v: k for k, v in replacements.items()}
                 ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)

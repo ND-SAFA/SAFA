@@ -48,6 +48,7 @@ class EmbeddingsManager:
             subset_ids = self._content_map.keys()
         artifact_embeddings = self.get_embeddings(subset_ids, **kwargs)
         embedding_map = {a_id: a_embedding for a_id, a_embedding in zip(subset_ids, artifact_embeddings)}
+
         return embedding_map
 
     def get_embeddings(self, a_ids: List[Any], **kwargs) -> List[EmbeddingType]:

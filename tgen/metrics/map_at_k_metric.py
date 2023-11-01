@@ -42,7 +42,13 @@ class MapAtKMetric(AbstractTraceMetric):
         """
         results = {}
 
-        def calculate_ap(labels, preds):
+        def calculate_ap(labels, preds) -> float:
+            """
+            Calculates the average precision of the predictions on labeled data.
+            :param labels: The labels of the data.
+            :param preds: The predictions on the data (in same order as labels).
+            :return: The average precision score.
+            """
             return average_precision_score(labels, preds)
 
         for k in K_METRIC_DEFAULT:

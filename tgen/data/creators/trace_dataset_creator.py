@@ -140,11 +140,17 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: None
         """
 
-        def remove_traces_with_missing_artifacts(row: pd.Series):
-            return row[StructuredKeys.Trace.SOURCE.value] in artifact_ids and row[StructuredKeys.Trace.TARGET.value] in artifact_ids
+        def has_source_and_target(trace_row: pd.Series):
+            """
+            Calculates if trace row references known source and target artifacts.
+            :param trace_row: Row containing source and target artifact ids.
+            :return: True if both artifacts are known, false otherwise.
+            """
+            return trace_row[StructuredKeys.Trace.SOURCE.value] in artifact_ids and trace_row[
+                StructuredKeys.Trace.TARGET.value] in artifact_ids
 
         self.artifact_df = ArtifactDataFrame(DataFrameUtil.filter_df_by_index(self.artifact_df, list(artifact_ids)))
-        self.trace_df = TraceDataFrame(DataFrameUtil.filter_df_by_row(self.trace_df, remove_traces_with_missing_artifacts))
+        self.trace_df = TraceDataFrame(DataFrameUtil.filter_df_by_row(self.trace_df, has_source_and_target))
 
     def _verify_orphans(self) -> None:
         """

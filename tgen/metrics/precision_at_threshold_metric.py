@@ -39,8 +39,15 @@ class PrecisionAtKMetric(AbstractTraceMetric):
         """
         results = {}
 
-        def precision(labels, preds):
-            return precision_score(labels, [1] * len(preds))
+        def precision(labels, preds, label: int = 1):
+            """
+            Calculates the precision of predicting true for all predictions.
+            :param labels: The labels defining if true labels are accurate.
+            :param preds: The predictions used to calculate how many 1 to set.
+            :param label: The label to set for the prediction.
+            :return: The precision of predicting all of the same label for predictions.
+            """
+            return precision_score(labels, [label] * len(preds))
 
         for k in K_METRIC_DEFAULT:
             score = trace_matrix.calculate_query_metric_at_k(precision, k)

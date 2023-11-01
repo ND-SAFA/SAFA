@@ -12,7 +12,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
@@ -82,6 +82,11 @@ class CreateSourceSplitsJob(AbstractJob):
         """
 
         def check_exists(item):
+            """
+            Closure checking if item is in artifact ids.
+            :param item: The item to check.
+            :return: True if item is contained.
+            """
             return item in artifact_ids
 
         relevant_traces = DataFrameUtil.filter_df_by_row(trace_links,

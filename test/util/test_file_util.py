@@ -2,10 +2,10 @@ import os
 
 from test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from tgen.common.constants.path_constants import PROJ_PATH
+from tgen.common.util.file_util import FileUtil
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.common.util.file_util import FileUtil
 
 
 class TestFileUtil(BaseTest):

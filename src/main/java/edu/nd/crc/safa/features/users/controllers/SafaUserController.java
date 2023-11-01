@@ -119,7 +119,7 @@ public class SafaUserController extends BaseController {
         if (!currentUser.isSuperuser()) {
             throw new MissingPermissionException(() -> "safa.create_verified_account");
         }
-        
+
         SafaUser createdAccount = safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
         createdAccount = safaUserService.setAccountVerification(createdAccount, true);
         return new UserIdentifierDTO(createdAccount);

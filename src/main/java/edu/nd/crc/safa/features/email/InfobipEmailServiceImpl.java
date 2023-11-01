@@ -103,8 +103,8 @@ public class InfobipEmailServiceImpl implements EmailService {
      * Wrap an email send call in a try catch for consistent error handling.
      *
      * @param emailSendFunction The function to send the email
-     * @return Whatever the email send function returns
      * @param <T> The type of the parameter returned by the email send function
+     * @return Whatever the email send function returns
      */
     private <T> T wrapSendEmail(Callable<T> emailSendFunction) {
         try {

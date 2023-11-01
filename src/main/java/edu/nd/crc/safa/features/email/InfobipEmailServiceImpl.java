@@ -1,10 +1,14 @@
 package edu.nd.crc.safa.features.email;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.infobip.ApiClient;
 import com.infobip.ApiKey;
@@ -25,6 +29,8 @@ import org.springframework.stereotype.Service;
     matchIfMissing = true
 )
 public class InfobipEmailServiceImpl implements EmailService {
+
+    private static final Logger log = Logger.getLogger(InfobipEmailServiceImpl.class.getName());
 
     @Value("${email.infobip.endpoint}")
     private String infobipEndpoint;
@@ -72,12 +78,16 @@ public class InfobipEmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmailVerification(String recipient, String token) {
+        String url = String.format(fendBase + verifyEmailUrl, token);
+        String emailTemplate = getVerificationEmailTemplate();
+        String emailText = String.format(emailTemplate, url);
+
         wrapSendEmail(() ->
             emailApi
                 .sendEmail(List.of(recipient))
                 .from(senderEmailAddress)
                 .subject("Verify your email")
-                .text(String.format(fendBase + verifyEmailUrl, token))
+                .html(emailText)
                 .execute()
         );
     }
@@ -87,6 +97,15 @@ public class InfobipEmailServiceImpl implements EmailService {
             return emailSendFunction.call();
         } catch (Exception e) {
             throw new SafaError("Failed to send email", e);
+        }
+    }
+
+    private String getVerificationEmailTemplate() {
+        try {
+            return FileUtilities.readClasspathFile("verification-email-template.html");
+        } catch (IOException e) {
+            log.log(Level.WARNING, "Failed to get verification email template", e);
+            return "Please click this link to verify your email: %s";
         }
     }
 }

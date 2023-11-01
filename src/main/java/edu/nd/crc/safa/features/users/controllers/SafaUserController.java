@@ -10,6 +10,8 @@ import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.EmailService;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordChangeRequest;
@@ -55,6 +57,7 @@ public class SafaUserController extends BaseController {
     private final SafaUserService safaUserService;
     private final EmailService emailService;
     private final EmailVerificationService emailVerificationService;
+    private final PermissionService permissionService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     @Value("${fend.base}")
     private String fendBase;
@@ -66,6 +69,7 @@ public class SafaUserController extends BaseController {
                               ServiceProvider serviceProvider,
                               EmailService emailService,
                               EmailVerificationService emailVerificationService,
+                              PermissionService permissionService,
                               PasswordResetTokenRepository passwordResetTokenRepository) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
@@ -74,6 +78,7 @@ public class SafaUserController extends BaseController {
         this.safaUserService = serviceProvider.getSafaUserService();
         this.emailService = emailService;
         this.emailVerificationService = emailVerificationService;
+        this.permissionService = permissionService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
@@ -94,6 +99,30 @@ public class SafaUserController extends BaseController {
         emailVerificationService.sendVerificationEmail(createdAccount);
 
         return new UserAppEntity(createdAccount);
+    }
+
+    /**
+     * <p>Creates new account with given email and password.
+     * Error is thrown is email is already associated with another account.</p>
+     *
+     * <p>The created account will be automatically verified and will not send
+     * a verification email.</p>
+     *
+     * <p>This action can only be done by a superuser</p>
+     *
+     * @param newUser User to create containing email and password.
+     * @return Created user entity
+     */
+    @PostMapping(AppRoutes.Accounts.CREATE_VERIFIED_ACCOUNT)
+    public UserIdentifierDTO createNewVerifiedUser(@RequestBody CreateAccountRequest newUser) {
+        SafaUser currentUser = getCurrentUser();
+        if (!currentUser.isSuperuser()) {
+            throw new MissingPermissionException(() -> "safa.create_verified_account");
+        }
+        
+        SafaUser createdAccount = safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
+        createdAccount = safaUserService.setAccountVerification(createdAccount, true);
+        return new UserIdentifierDTO(createdAccount);
     }
 
     /**

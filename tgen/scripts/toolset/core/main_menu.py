@@ -37,4 +37,4 @@ def select_tool(tool_manager: ToolSet, default_tool_id: str = None, *args):
                 args.append(arg)
         tool_func = tool_manager.get_tool_function(tool_id)
         tool_func(*args)
-        print(f"{tool_id} finished.")  # add a blank line after the output
+        print(f"\n:-)\n")  # add a blank line after the output

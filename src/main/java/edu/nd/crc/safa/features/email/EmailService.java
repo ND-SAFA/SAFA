@@ -6,4 +6,6 @@ package edu.nd.crc.safa.features.email;
 public interface EmailService {
 
     void sendPasswordReset(String recipient, String token);
+
+    void sendEmailVerification(String recipient, String token);
 }

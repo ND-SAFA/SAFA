@@ -82,9 +82,13 @@ public class SafaUserController extends BaseController {
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
     public UserAppEntity createNewUser(@RequestBody CreateAccountRequest newUser) {
         // Step - Create user
-        return new UserAppEntity(getServiceProvider()
+        SafaUser createdAccount = getServiceProvider()
             .getSafaUserService()
-            .createUser(newUser.getEmail(), newUser.getPassword()));
+            .createUser(newUser.getEmail(), newUser.getPassword());
+
+        emailService.sendEmailVerification(createdAccount.getEmail(), "TODO_temp_fake_token");
+
+        return new UserAppEntity(createdAccount);
     }
 
     /**

@@ -105,7 +105,7 @@ dependencies {
     implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
 
     // email
-    implementation 'com.infobip:infobip-api-java-client:3.2.0'
+    implementation 'com.infobip:infobip-api-java-client:4.0.0'
 
     // testing
     implementation 'org.springframework.boot:spring-boot-starter-test'

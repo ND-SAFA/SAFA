@@ -1,15 +1,15 @@
 package edu.nd.crc.safa.features.email;
 
-
+import java.util.List;
+import java.util.concurrent.Callable;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.infobip.ApiClient;
-import com.infobip.ApiException;
-import com.infobip.api.SendEmailApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.infobip.ApiKey;
+import com.infobip.BaseUrl;
+import com.infobip.api.EmailApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 )
 public class InfobipEmailServiceImpl implements EmailService {
 
-    private static final Logger log = LoggerFactory.getLogger(InfobipEmailServiceImpl.class);
-
     @Value("${email.infobip.endpoint}")
     private String infobipEndpoint;
 
@@ -43,27 +41,52 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Value("${fend.reset-email-path}")
     private String resetPasswordUrl;
 
-    private SendEmailApi sendEmailApi;
+    @Value("${fend.verify-email-path}")
+    private String verifyEmailUrl;
+
+    @Value("${email.infobip.verify-email-template-id}")
+    private Long verifyEmailTemplateId;
+
+    private EmailApi emailApi;
 
     @PostConstruct
     public void init() {
-        ApiClient client = new ApiClient();
+        ApiClient client = ApiClient.forApiKey(ApiKey.from(infobipKey))
+            .withBaseUrl(BaseUrl.from(infobipEndpoint))
+            .build();
 
-        client.setApiKeyPrefix("App");
-        client.setApiKey(infobipKey);
-        client.setBasePath(infobipEndpoint);
-        this.sendEmailApi = new SendEmailApi(client);
+        this.emailApi = new EmailApi(client);
     }
 
     @Override
     public void sendPasswordReset(String recipient, String token) {
-        try {
-            sendEmailApi.sendEmail(senderEmailAddress, recipient, "Requested password reset token")
+        wrapSendEmail(() ->
+            emailApi
+                .sendEmail(List.of(recipient))
+                .from(senderEmailAddress)
+                .subject("Requested password reset token")
                 .text(String.format(fendBase + resetPasswordUrl, token))
-                .execute();
-        } catch (ApiException e) {
+                .execute()
+        );
+    }
+
+    @Override
+    public void sendEmailVerification(String recipient, String token) {
+        wrapSendEmail(() ->
+            emailApi
+                .sendEmail(List.of(recipient))
+                .from(senderEmailAddress)
+                .subject("Verify your email")
+                .text(String.format(fendBase + verifyEmailUrl, token))
+                .execute()
+        );
+    }
+
+    private <T> T wrapSendEmail(Callable<T> emailSendFunction) {
+        try {
+            return emailSendFunction.call();
+        } catch (Exception e) {
             throw new SafaError("Failed to send email", e);
         }
     }
-
 }

@@ -1,14 +1,8 @@
-from typing import Dict, Tuple
-
 from tgen.common.util.logging.logger_manager import logger
 from tgen.hgen.common.duplicate_detector import DuplicateDetector
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-
-CountMap = Dict[str, int]
-MatrixIndex = Tuple[int, int]
-ArtifactPair = Tuple[str, str]
 
 
 class DetectDuplicateArtifacts(AbstractPipelineStep[HGenArgs, HGenState]):

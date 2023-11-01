@@ -3,7 +3,7 @@ from typing import List, Set, Tuple
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.hgen.steps.step_detect_duplicate_artifacts import ArtifactPair, CountMap, MatrixIndex
+from tgen.hgen.common.hgen_types import ArtifactPair, CountMap, MatrixIndex
 
 
 class DuplicateDetector:

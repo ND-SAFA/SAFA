@@ -8,6 +8,7 @@ import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvid
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
@@ -21,7 +22,10 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import lombok.Getter;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 /**
  * Provides layer of access to entities in database.
@@ -85,4 +89,18 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
 
     @Autowired
     protected ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
+
+    @MockBean
+    private EmailService emailService;
+
+    @BeforeEach
+    public void mockEmailSend() throws Exception {
+        Mockito.doNothing().when(emailService).sendEmailVerification(
+            Mockito.anyString(),
+            Mockito.anyString());
+        Mockito.doNothing().when(emailService).sendPasswordReset(
+            Mockito.anyString(),
+            Mockito.anyString());
+    }
+
 }

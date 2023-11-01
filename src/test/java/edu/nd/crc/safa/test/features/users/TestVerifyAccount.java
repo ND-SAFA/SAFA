@@ -4,7 +4,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.db.EmailVerificationToken;
@@ -17,14 +16,9 @@ import edu.nd.crc.safa.test.requests.SafaRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 public class TestVerifyAccount extends ApplicationBaseTest {
-
-    @MockBean
-    private EmailService emailService;
 
     @Autowired
     private EmailVerificationTokenRepository tokenRepository;
@@ -34,10 +28,6 @@ public class TestVerifyAccount extends ApplicationBaseTest {
 
     @BeforeEach
     public void mockEmailSend() throws Exception {
-        Mockito.doNothing().when(emailService).sendEmailVerification(
-            Mockito.anyString(),
-            Mockito.anyString());
-
         tokenRepository.deleteAll();
     }
 

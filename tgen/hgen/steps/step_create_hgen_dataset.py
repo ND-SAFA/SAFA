@@ -1,4 +1,3 @@
-import os
 import uuid
 from typing import Tuple, Union
 
@@ -11,7 +10,6 @@ from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.common.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -26,14 +24,12 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param args: The arguments and current state of HGEN.
         :return: None
         """
-        proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME) if args.load_dir else None
 
         original_artifact_df, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
 
         final_artifact_df = state.all_artifacts_dataset.artifact_df
         new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, args.target_type)
-        new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state,
-                                                                                       final_artifact_df, new_layer_df)
+        new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(state, final_artifact_df, new_layer_df)
 
         final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
         final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
@@ -71,14 +67,12 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return layer_df
 
     @staticmethod
-    def _create_trace_df_with_generated_artifacts(hgen_args: HGenArgs,
-                                                  hgen_state: HGenState,
+    def _create_trace_df_with_generated_artifacts(hgen_state: HGenState,
                                                   artifact_df: ArtifactDataFrame,
                                                   layer_df: LayerDataFrame) -> TraceDataFrame:
         """
         Creates a dataframe of traces including the new trace links between the original lower-level artifacts
         and the newly generated upper-level artifacts
-        :param hgen_args: The arguments used to run hgen
         :param hgen_state: The current state of hgen
         :param artifact_df: The dataframe containing the generated artifacts
         :param layer_df: The dataframe containing the layer mapping between artifacts

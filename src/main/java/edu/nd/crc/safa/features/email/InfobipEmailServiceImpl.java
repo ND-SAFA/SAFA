@@ -12,6 +12,7 @@ import com.infobip.ApiClient;
 import com.infobip.ApiKey;
 import com.infobip.BaseUrl;
 import com.infobip.api.EmailApi;
+import com.infobip.model.EmailSendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,7 +69,7 @@ public class InfobipEmailServiceImpl implements EmailService {
 
     @Override
     public void sendPasswordReset(String recipient, String token) {
-        wrapSendEmail(() ->
+        EmailSendResponse response = wrapSendEmail(() ->
             emailApi
                 .sendEmail(List.of(recipient))
                 .from(senderEmailAddress)
@@ -76,11 +77,13 @@ public class InfobipEmailServiceImpl implements EmailService {
                 .text(String.format(fendBase + resetPasswordUrl, token))
                 .execute()
         );
+
+        log.info("Password reset email sent to " + recipient + ": " + response);
     }
 
     @Override
     public void sendEmailVerification(String recipient, String token) {
-        wrapSendEmail(() -> {
+        EmailSendResponse response = wrapSendEmail(() -> {
             String url = String.format(fendBase + verifyEmailUrl, token);
             String emailTemplate = getVerificationEmailTemplate();
             String emailText = String.format(emailTemplate, url);
@@ -92,6 +95,8 @@ public class InfobipEmailServiceImpl implements EmailService {
                 .html(emailText)
                 .execute();
         });
+
+        log.info("Verification email sent to " + recipient + ": " + response);
     }
 
     /**

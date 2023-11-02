@@ -28,7 +28,7 @@ disable_caching()
 
 
 class TrainerDatasetManager(BaseObject):
-    DATASET_TYPE = Union[PreTrainDataset, TraceDataset, iDataset]
+    DATASET_TYPE = Union[TraceDataset, PreTrainDataset, iDataset]
 
     def __init__(self,
                  pre_train_dataset_creator: MLMPreTrainDatasetCreator = None,

@@ -14,4 +14,4 @@ from tgen.scripts.toolset.tools.s3_tools import S3_TOOLS
 
 TOOLS = S3_TOOLS + RQ_TOOLS
 if __name__ == "__main__":
-    select_tool(ToolSet(TOOLS), "train", "~/desktop/safa/datasets/my_mip/task1/task1_answer")
+    select_tool(ToolSet(TOOLS))

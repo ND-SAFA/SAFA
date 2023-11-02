@@ -59,13 +59,14 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
             logger.info(msg)
 
         n_steps = len(train_dataloader) + 1
+
+        logger.info("Starting to train...")
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
                        epochs=self.args.num_train_epochs,
                        warmup_steps=self.args.warmup_steps,
                        evaluation_steps=n_steps,
                        evaluator=evaluator,
-                       callback=eval_callback,
-                       show_progress_bar=False)
+                       callback=eval_callback)
 
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
         return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)

@@ -15,10 +15,10 @@ def train(dataset_path: str, model: str = SMALL_EMBEDDING_MODEL):
     """
     dataset_path = os.path.expanduser(dataset_path)
     replacements = {
-        "MODEL": model,
-        "DATA_PATH": os.path.dirname(dataset_path),
-        "CURRENT_PROJECT": os.path.basename(dataset_path),
-        "OUTPUT_PATH": os.path.expanduser(os.environ["OUTPUT_PATH"])
+        "[MODEL]": model,
+        "[DATA_PATH]": os.path.dirname(dataset_path),
+        "[CURRENT_PROJECT]": os.path.basename(dataset_path),
+        "[OUTPUT_PATH]": os.path.expanduser(os.environ["OUTPUT_PATH"])
     }
     experiment_path = os.path.join(os.environ["RQ_PATH"], "base/huggingface/train.json")
     experiment_path = os.path.expanduser(experiment_path)

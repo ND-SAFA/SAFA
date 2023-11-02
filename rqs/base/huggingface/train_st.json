@@ -21,7 +21,8 @@
             "skip_save": false,
             "load_best_model_at_end": true,
             "save_strategy": "epoch",
-            "evaluation_strategy": "epoch"
+            "evaluation_strategy": "epoch",
+            "eval_steps": 1
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

@@ -2,10 +2,12 @@ from typing import List, Optional
 
 from datasets import Dataset
 from sentence_transformers import InputExample, losses
+from sentence_transformers.evaluation import BinaryClassificationEvaluator
 from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
@@ -50,9 +52,31 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         """
         train_dataloader = DataLoader(self.train_dataset, shuffle=True, batch_size=self.args.train_batch_size)
         train_loss = losses.CosineSimilarityLoss(self.model)
+        evaluator = self.__get_evaluator(self.eval_dataset)
+
+        def eval_callback(score, epochs, steps):
+            msg = f"Score: {score} Epoch: {epochs} Steps: {steps}"
+            logger.info(msg)
+
+        n_steps = len(train_dataloader) + 1
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
                        epochs=self.args.num_train_epochs,
-                       warmup_steps=self.args.warmup_steps)
+                       warmup_steps=self.args.warmup_steps,
+                       evaluation_steps=n_steps,
+                       evaluator=evaluator,
+                       callback=eval_callback,
+                       show_progress_bar=False)
 
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
         return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
+
+    def __get_evaluator(self, dataset: List[InputExample]):
+        source_sentences = []
+        target_sentences = []
+        scores = []
+        for example in dataset:
+            source_sentences.append(example.texts[0])
+            target_sentences.append(example.texts[1])
+            scores.append(example.label)
+        evaluator = BinaryClassificationEvaluator(source_sentences, target_sentences, scores)
+        return evaluator

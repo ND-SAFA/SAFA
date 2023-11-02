@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import torch
 from datasets import Dataset
+from sentence_transformers import InputExample
 from tqdm import tqdm
 
 from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
@@ -348,16 +349,18 @@ class TraceDataset(iDataset):
         :return: feature name, value mappings
         """
         source, target = self.get_link_source_target_artifact(link_id)
+        label = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
         if arch_type == ModelArchitectureType.SIAMESE:
-            entry = {
-                **self._extract_feature_info(feature_func(text=source[ArtifactKeys.CONTENT]), DataKey.SOURCE_PRE + DataKey.SEP),
-                **self._extract_feature_info(feature_func(text=target[ArtifactKeys.CONTENT]), DataKey.TARGET_PRE + DataKey.SEP)}
+            source_text = source[ArtifactKeys.CONTENT]
+            target_text = target[ArtifactKeys.CONTENT]
+            entry = InputExample(texts=[source_text, target_text], label=float(label))
+
         else:
             entry = self._extract_feature_info(feature_func(text=source[ArtifactKeys.CONTENT],
                                                             text_pair=target[ArtifactKeys.CONTENT],
                                                             return_token_type_ids=True,
                                                             add_special_tokens=True))
-        entry[DataKey.LABEL_KEY] = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
+            entry[DataKey.LABEL_KEY] = label
         return entry
 
     def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:

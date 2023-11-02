@@ -1,6 +1,19 @@
 from enum import Enum, IntEnum
 
-from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSequenceClassification
+from sentence_transformers import SentenceTransformer
+from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSequenceClassification, BertModel
+
+model = BertModel
+
+
+class AutoModelForSentenceTransformer:
+    """
+    Creates proxy API for sentence transformers models.
+    """
+
+    @staticmethod
+    def from_pretrained(model_path: str, **kwargs):
+        return SentenceTransformer(model_path)
 
 
 class ModelTask(Enum):
@@ -8,6 +21,7 @@ class ModelTask(Enum):
     MASKED_LEARNING = AutoModelForMaskedLM
     AUTO = AutoModel
     CAUSAL_LM = AutoModelForCausalLM
+    SBERT = AutoModelForSentenceTransformer
 
 
 class ModelArchitectureType(IntEnum):

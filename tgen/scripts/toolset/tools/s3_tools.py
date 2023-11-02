@@ -90,7 +90,6 @@ def delete_folder(folder_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
     bucket = s3.Bucket(bucket_name)
     bucket.objects.filter(Prefix=folder_path).delete()
     dir_path = os.path.dirname(folder_path)
-    ls_bucket(bucket, dir_path)
 
 
 def download_s3_folder(s3_folder: str, store_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):

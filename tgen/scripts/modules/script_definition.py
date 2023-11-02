@@ -1,9 +1,9 @@
 import os
 from typing import Any, Dict, List, Tuple
 
-from tgen.common.util.file_util import FileUtil, ENV_REPLACEMENT_VARIABLES
-from tgen.common.util.json_util import JsonUtil
 from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
+from tgen.common.util.file_util import ENV_REPLACEMENT_VARIABLES, FileUtil
+from tgen.common.util.json_util import JsonUtil
 
 
 class ScriptDefinition:
@@ -51,7 +51,7 @@ class ScriptDefinition:
             script_output_path = script_definition[ScriptDefinition.OUTPUT_DIR_PARAM]
         script_output_path = os.path.expanduser(script_output_path)
         script_definition[ScriptDefinition.OUTPUT_DIR_PARAM] = script_output_path
-        script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
+        # script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
         script_definition = ScriptDefinition.set_object_property(
             ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, script_output_path),
             script_definition)

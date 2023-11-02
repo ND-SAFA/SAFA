@@ -9,43 +9,10 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "[MODEL]"
+            "model_path": "[MODEL_PATH]"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
-            "gradient_accumulation_steps": 1,
-            "learning_rate": 5e-5,
-            "skip_save": false,
-            "load_best_model_at_end": true,
-            "save_strategy": "epoch",
-            "evaluation_strategy": "epoch",
-            "hub_model_id": "thearod5/[MODEL]"
-          },
-          "trainer_dataset_manager": {
-            "train_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
-              }
-            },
-            "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
-            },
-            "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
-            },
-            "augmenter": {
-              "steps": [
-                {
-                  "object_type": "RESAMPLE"
-                }
-              ]
-            }
+            "hub_model_id": "thearod5/[MODEL_NAME]"
           }
         }
       ]

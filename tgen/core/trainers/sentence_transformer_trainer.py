@@ -1,15 +1,50 @@
 from typing import List, Optional
 
 from datasets import Dataset
-from sentence_transformers import InputExample, losses
-from sentence_transformers.evaluation import BinaryClassificationEvaluator
+from sentence_transformers import InputExample, SentenceTransformer, losses
+from sentence_transformers.evaluation import BinaryClassificationEvaluator, SentenceEvaluator
 from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.common.util.logging.logger_manager import logger
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.data.tdatasets.dataset_role import DatasetRole
+
+
+def predict(model: SentenceTransformer, test_dataset: List[InputExample], ):
+    embeddings = {}
+
+    def encode(batch: List[str]):
+        batch_embeddings = model.encode(batch)
+        for k, v in zip(batch, batch_embeddings):
+            embeddings[k] = v
+
+    unique_texts = set([a for e in test_dataset for a in e.texts])
+    encode(list(unique_texts))
+
+    scores = []
+    labels = []
+    for example in test_dataset:
+        source_text, target_text = example.texts
+        source_embedding = embeddings[source_text]
+        target_embedding = embeddings[target_text]
+        score = cosine_similarity([source_embedding], [target_embedding])[0][0]
+        scores.append(score)
+        labels.append(example.label)
+    return PredictionOutput(predictions=scores, label_ids=labels, metrics={})
+
+
+class SentenceTransformerEvaluator(SentenceEvaluator):
+    def __init__(self, trainer: HuggingFaceTrainer, dataset_role: DatasetRole = DatasetRole.VAL):
+        self.trainer = trainer
+        self.dataset_role = dataset_role
+
+    def __call__(self, model, output_path: str = None, epoch: int = -1, steps: int = -1) -> float:
+        prediction_output: TracePredictionOutput = self.trainer.perform_prediction(self.dataset_role)
+        metrics = prediction_output.metrics
+        return metrics["map"]
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -20,26 +55,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     def predict(
             self, test_dataset: List[InputExample], ignore_keys: Optional[List[str]] = None, metric_key_prefix: str = "test"
     ) -> PredictionOutput:
-        embeddings = {}
-
-        def encode(batch: List[str]):
-            batch_embeddings = self.model.encode(batch)
-            for k, v in zip(batch, batch_embeddings):
-                embeddings[k] = v
-
-        unique_texts = set([a for e in test_dataset for a in e.texts])
-        encode(list(unique_texts))
-
-        scores = []
-        labels = []
-        for example in test_dataset:
-            source_text, target_text = example.texts
-            source_embedding = embeddings[source_text]
-            target_embedding = embeddings[target_text]
-            score = cosine_similarity([source_embedding], [target_embedding])[0][0]
-            scores.append(score)
-            labels.append(example.label)
-        return PredictionOutput(predictions=scores, label_ids=labels, metrics={})
+        return predict(self.model, test_dataset)
 
     def train(
             self,
@@ -52,11 +68,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         """
         train_dataloader = DataLoader(self.train_dataset, shuffle=True, batch_size=self.args.train_batch_size)
         train_loss = losses.CosineSimilarityLoss(self.model)
-        evaluator = self.__get_evaluator(self.eval_dataset)
-
-        def eval_callback(score, epochs, steps):
-            msg = f"Score: {score} Epoch: {epochs} Steps: {steps}"
-            logger.info(msg)
+        evaluator = SentenceTransformerEvaluator(self)
 
         n_steps = min(len(train_dataloader) + 1, 25)
 
@@ -65,8 +77,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
                        epochs=self.args.num_train_epochs,
                        warmup_steps=self.args.warmup_steps,
                        evaluation_steps=n_steps,
-                       evaluator=evaluator,
-                       callback=eval_callback)
+                       evaluator=evaluator)
 
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
         return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)

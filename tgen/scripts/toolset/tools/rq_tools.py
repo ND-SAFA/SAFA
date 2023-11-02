@@ -1,9 +1,10 @@
 import os
 
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.scripts.modules.script_definition import ScriptDefinition
 
 
-def train(dataset_path: str, model: str = "all-MiniLM-L6-v2"):
+def train(dataset_path: str, model: str = SMALL_EMBEDDING_MODEL):
     """
     Trains a model on the given dataset.
     :param dataset_path: Path to folder defining dataset.

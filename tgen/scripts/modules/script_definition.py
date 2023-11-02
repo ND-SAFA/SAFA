@@ -15,20 +15,23 @@ class ScriptDefinition:
     ENV_OUTPUT_PARAM = f"[{OUTPUT_PATH_PARAM}]"
 
     @staticmethod
-    def read_experiment_definition(definition_path: str, env_replacements: List[str] = None) -> Dict:
+    def read_experiment_definition(definition_path: str, env_replacements: Dict = None,
+                                   default_variables: List[str] = ENV_REPLACEMENT_VARIABLES) -> Dict:
         """
         Reads the experiment definition and applies env replacements.
         :param definition_path: Path to experiment jobs.
-        :param env_replacements: List of environment variables to replace in definition.
+        :param env_replacements: Replacements to use instead of those defined by ENV.
+        :param default_variables: List of env variables to include in replacements.
         :return: Processed definition.
         """
         if env_replacements is None:
-            env_replacements = ENV_REPLACEMENT_VARIABLES
+            env_variables = ENV_REPLACEMENT_VARIABLES
+            env_replacements = FileUtil.get_env_replacements(env_variables)
         if not os.path.isfile(definition_path):
             raise ValueError(f"{definition_path} does not exists.")
 
         definition_path = os.path.expanduser(definition_path)
-        env_replacements = FileUtil.get_env_replacements(env_replacements)
+
         job_definition = JsonUtil.read_json_file(definition_path)
 
         script_name = ScriptDefinition.get_script_name(definition_path)

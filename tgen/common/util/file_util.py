@@ -102,11 +102,12 @@ class FileUtil:
             return file.readlines()
 
     @staticmethod
-    def get_env_replacements(env_variables: List[str]) -> Dict[str, str]:
+    def get_env_replacements(env_variables: List[str], replacements: Dict = None) -> Dict[str, str]:
         """
         :return: Dictionary of environment variables to their values.
         """
-        replacements = {}
+        if replacements is None:
+            replacements = {}
         for replacement_path in env_variables:
             path_value = os.environ.get(replacement_path, None)
             if path_value:

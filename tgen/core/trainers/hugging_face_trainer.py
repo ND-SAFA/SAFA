@@ -7,9 +7,9 @@ from transformers.integrations import WandbCallback
 from transformers.trainer import Trainer
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
-from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
@@ -86,7 +86,8 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         :return: THe prediction output
         """
         dataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
-        self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
+        if self.eval_dataset is None:
+            self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         metrics_manager = MetricsManager(trace_df=dataset.trace_df,
                                          link_ids=dataset.get_ordered_link_ids(),

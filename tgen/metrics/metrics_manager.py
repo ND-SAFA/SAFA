@@ -1,3 +1,4 @@
+import collections
 import warnings
 from typing import Dict, List, Tuple, Union
 
@@ -5,9 +6,9 @@ import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
 
+from tgen.common.objects.trace import Trace
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
-from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
@@ -92,5 +93,7 @@ class MetricsManager:
         n_predictions = predictions.shape[0] if isinstance(predictions, np.ndarray) else len(predictions)
         for pred_i in range(n_predictions):
             prediction = predictions[pred_i]
-            similarity_scores.append(softmax(prediction)[1])
+            if isinstance(prediction, collections.abc.Sequence):
+                prediction = softmax(prediction)[1]
+            similarity_scores.append(prediction)
         return similarity_scores

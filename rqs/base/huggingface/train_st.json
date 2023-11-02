@@ -15,8 +15,8 @@
             "model_architecture": "SIAMESE"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
-            "gradient_accumulation_steps": 1,
+            "num_train_epochs": 4,
+            "gradient_accumulation_steps": 4,
             "learning_rate": 5e-5,
             "skip_save": false,
             "load_best_model_at_end": true,

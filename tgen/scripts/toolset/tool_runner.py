@@ -1,5 +1,11 @@
+import os
+import sys
+
 from dotenv import load_dotenv
 
+root_path = os.path.expanduser(os.environ["ROOT_PATH"])
+print("ROOT:", root_path)
+sys.path.append(root_path)
 from tgen.scripts.toolset.core.main_menu import select_tool
 from tgen.scripts.toolset.core.tool_set import ToolSet
 from tgen.scripts.toolset.tools.rq_tools import RQ_TOOLS

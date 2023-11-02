@@ -58,7 +58,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
             msg = f"Score: {score} Epoch: {epochs} Steps: {steps}"
             logger.info(msg)
 
-        n_steps = len(train_dataloader) + 1
+        n_steps = min(len(train_dataloader) + 1, 25)
 
         logger.info("Starting to train...")
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],

@@ -15,6 +15,7 @@ from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -95,26 +96,29 @@ class TraceDataset(iDataset):
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
         return hf_dataset
 
-    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=20) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=20, batch_size: int = 20) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :param n_threads: The number of threads to use to calculate link features.
+        :param batch_size: The number of trace links ids to process per thread batch.
         :return: A data used by the trace trainer.
         """
         feature_entries = {}
 
-        def create_link_feature(target_link_id: int) -> None:
+        def create_link_feature(target_link_ids: List[int]) -> None:
             """
             Creates and store link feature in feature_entries.
-            :param target_link_id: The trace link id to generate feature for.
+            :param target_link_ids: Batch of trace link id to generate feature for.
             :return: None
             """
-            feature_entries[target_link_id] = self._get_feature_entry(target_link_id,
-                                                                      model_generator.arch_type,
-                                                                      model_generator.get_feature)
+            for target_link_id in target_link_ids:
+                feature_entries[target_link_id] = self._get_feature_entry(target_link_id,
+                                                                          model_generator.arch_type,
+                                                                          model_generator.get_feature)
 
-        ThreadUtil.multi_thread_process("Generating trace features.", list(self.trace_df.index), create_link_feature, n_threads)
+        trace_index_batches = ListUtil.batch(list(self.trace_df.index), batch_size)
+        ThreadUtil.multi_thread_process("Generating trace features.", trace_index_batches, create_link_feature, n_threads)
 
         project_link_ids = self.get_ordered_link_ids()
         logger.info(f"Trace links after processing: {len(project_link_ids)}")

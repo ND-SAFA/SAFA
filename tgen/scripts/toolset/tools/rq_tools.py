@@ -6,6 +6,8 @@ from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
 from tgen.testres.object_creator import ObjectCreator
 
+DATA_PATH = os.environ.get("DATA_PATH", None)
+
 
 def push(input_model_path: str, model_name: str):
     """
@@ -22,19 +24,27 @@ def push(input_model_path: str, model_name: str):
     run_rq("base/huggingface/push.json", replacements)
 
 
-def train(train_path: str, eval_path: str, model: str = SMALL_EMBEDDING_MODEL):
+def train(train_path: str, eval_path: str, data_path: str = DATA_PATH, model: str = SMALL_EMBEDDING_MODEL):
     """
     Trains a model on the given dataset.
     :param train_path: Path to training data.
     :param eval_path: Path to evaluation data.
+    :param data_path: Folder to where the data is stored. If none data paths are assumed to be complete.
     :param model: The starting model to train off with.
     :return: None
     """
+    if data_path:
+        data_path = os.path.expanduser(data_path)
+        train_path = os.path.join(data_path, train_path)
+        eval_path = os.path.join(data_path, eval_path)
+    else:
+        train_path = os.path.expanduser(train_path)
+        eval_path = os.path.expanduser(eval_path)
     replacements = {
         "[MODEL]": model,
-        "[TRAIN_PROJECT_PATH]": os.path.expanduser(train_path),
+        "[TRAIN_PROJECT_PATH]": train_path,
         "[OUTPUT_PATH]": os.path.expanduser(os.environ["OUTPUT_PATH"]),
-        "[EVAL_PROJECT_PATH]": os.path.expanduser(eval_path)
+        "[EVAL_PROJECT_PATH]": eval_path
     }
     run_rq("base/huggingface/train_st.json", replacements)
 

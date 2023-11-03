@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer, losses
 from sentence_transformers.evaluation import SentenceEvaluator
@@ -8,9 +9,15 @@ from torch.utils.data import DataLoader
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.common.util.logging.logger_manager import logger
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.models.model_manager import ModelManager
+from tgen.models.model_properties import ModelArchitectureType, ModelTask
+
+SEPARATOR_BAR = "-" * 50
 
 
 def predict(model: SentenceTransformer, test_dataset: List[InputExample], ):
@@ -43,6 +50,7 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
 
     def __call__(self, model, output_path: str = None, epoch: int = -1, steps: int = -1) -> float:
         prediction_output: TracePredictionOutput = self.trainer.perform_prediction(self.dataset_role)
+        logger.info(SEPARATOR_BAR)
         metrics = prediction_output.metrics
         return metrics["map"]
 
@@ -52,10 +60,12 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     Trains sentence transformer models. They have a slightly modified API for training the models and loading the data.
     """
 
-    def predict(
-            self, test_dataset: List[InputExample], ignore_keys: Optional[List[str]] = None, metric_key_prefix: str = "test"
-    ) -> PredictionOutput:
-        return predict(self.model, test_dataset)
+    def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
+                 min_eval_steps: int = 100, **kwargs):
+        model_manager.model_task = ModelTask.SBERT
+        model_manager.arch_type = ModelArchitectureType.SIAMESE
+        super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
+        self.min_eval_steps = min_eval_steps
 
     def train(
             self,
@@ -70,7 +80,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         train_loss = losses.CosineSimilarityLoss(self.model)
         evaluator = SentenceTransformerEvaluator(self)
 
-        n_steps = min(len(train_dataloader) + 1, 25)
+        n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
 
         logger.info("Starting to train...")
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
@@ -78,6 +88,11 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
                        warmup_steps=self.args.warmup_steps,
                        evaluation_steps=n_steps,
                        evaluator=evaluator)
+
+    def predict(
+            self, test_dataset: List[InputExample], ignore_keys: Optional[List[str]] = None, metric_key_prefix: str = "test"
+    ) -> PredictionOutput:
+        return predict(self.model, test_dataset)
 
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
         return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)

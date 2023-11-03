@@ -33,9 +33,11 @@
               }
             },
             "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[EVAL_PROJECT_PATH]"
+              }
             },
             "eval_dataset_creator": {
               "object_type": "TRACE",

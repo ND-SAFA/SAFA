@@ -60,7 +60,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     """
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
-                 min_eval_steps: int = 100, **kwargs):
+                 min_eval_steps: int = 50, **kwargs):
         model_manager.model_task = ModelTask.SBERT
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)

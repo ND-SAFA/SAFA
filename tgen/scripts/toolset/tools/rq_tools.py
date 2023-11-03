@@ -30,14 +30,11 @@ def train(train_path: str, eval_path: str, model: str = SMALL_EMBEDDING_MODEL):
     :param model: The starting model to train off with.
     :return: None
     """
-    train_path = os.path.expanduser(train_path)
-    eval_path = os.path.expanduser(eval_path)
     replacements = {
         "[MODEL]": model,
-        "[DATA_PATH]": os.path.dirname(train_path),
-        "[CURRENT_PROJECT]": os.path.basename(train_path),
+        "[TRAIN_PROJECT_PATH]": os.path.expanduser(train_path),
         "[OUTPUT_PATH]": os.path.expanduser(os.environ["OUTPUT_PATH"]),
-        "[EVAL_PROJECT]": eval_path
+        "[EVAL_PROJECT_PATH]": os.path.expanduser(eval_path)
     }
     run_rq("base/huggingface/train_st.json", replacements)
 

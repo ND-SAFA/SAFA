@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer, losses
-from sentence_transformers.evaluation import BinaryClassificationEvaluator, SentenceEvaluator
+from sentence_transformers.evaluation import SentenceEvaluator
 from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import PredictionOutput
@@ -81,14 +81,3 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
 
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
         return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
-
-    def __get_evaluator(self, dataset: List[InputExample]):
-        source_sentences = []
-        target_sentences = []
-        scores = []
-        for example in dataset:
-            source_sentences.append(example.texts[0])
-            target_sentences.append(example.texts[1])
-            scores.append(example.label)
-        evaluator = BinaryClassificationEvaluator(source_sentences, target_sentences, scores)
-        return evaluator

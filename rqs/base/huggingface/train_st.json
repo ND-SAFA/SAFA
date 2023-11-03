@@ -38,20 +38,21 @@
               "val_percentage": 0.30
             },
             "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
-            },
-            "augmenter": {
-              "steps": [
-                {
-                  "object_type": "RESAMPLE"
-                }
-              ]
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[EVAL_PROJECT]"
+              },
+              "augmenter": {
+                "steps": [
+                  {
+                    "object_type": "RESAMPLE"
+                  }
+                ]
+              }
             }
           }
+          ]
         }
       ]
     }
-  ]
-}

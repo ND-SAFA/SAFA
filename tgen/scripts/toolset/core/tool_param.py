@@ -24,18 +24,9 @@ class ToolParam:
         Prompts user to give value for param.
         :return: The value of the param.
         """
-        param_message = self._get_inquirer_message()
+        param_message = f"{self.name} - {self.description}"
         param_value = inquirer_value(param_message, self.annotation, self.default)
         return param_value
-
-    def _get_inquirer_message(self) -> str:
-        """
-        :return: The message used to inquire about the param value.
-        """
-        message = f"{self.name} - {self.annotation.__name__} - {self.description}"
-        if self.default is not None:
-            message += f"({self.default})"
-        return message
 
     @staticmethod
     def get_default(param: inspect.Parameter):

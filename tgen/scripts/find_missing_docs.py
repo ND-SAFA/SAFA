@@ -1,16 +1,79 @@
 import ast
 import json
 import os
+import sys
 from _ast import AST
 from typing import Dict, List
 
 from dotenv import load_dotenv
 
 load_dotenv()
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
+sys.path.append(ROOT_PATH)
 
-EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
+from tgen.common.util.file_util import FileUtil
 
 NodeType = AST
+EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
+INCLUDES = [os.path.join(ROOT_PATH, "tgen")]
+
+
+def print_missing_headers(directory_paths: List[str] = INCLUDES, throw_error: bool = False) -> None:
+    """
+    Finds all functions and methods not containing a doc-string.
+    :param directory_paths: The paths to check for python files.
+    :param throw_error: Whether to throw error if invalid functions/methods found.
+    :return: None
+    """
+    missing_map = {}
+    for directory_path in directory_paths:
+        path_map = calculate_missing_doc_map(directory_path)
+        path_map = {k: v for k, v in path_map.items() if len(v) > 0}
+        path_map = {get_display_name(k, directory_path): v for k, v in path_map.items()}
+        missing_map.update(path_map)
+
+    if len(missing_map) > 0:
+        missing_header_message = json.dumps(missing_map, indent=4)
+        if throw_error:
+            raise Exception(f"{missing_header_message}\nMissing docs.")
+        else:
+            print(missing_header_message)
+    else:
+        print("No missing docs :)")
+
+
+def filter_files(file_path: str):
+    """
+    Returns whether given file should be included in analysis.
+    :param file_path: Path to file.
+    :return: True if valid for analyzing.
+    """
+    file_name = os.path.basename(file_path)
+    is_exclude = any([p in file_path for p in EXCLUDES])
+    return os.path.isfile(file_path) and file_name.endswith(".py") and file_name != "__init__.py" and not is_exclude
+
+
+def calculate_missing_doc_map(directory_path: str) -> Dict[str, List[str]]:
+    """
+    Creates a map from files to their descriptions of their missing doc functions.
+    :param directory_path: The directory to traverse.
+    :return: Map of file paths to their errors.
+    """
+    missing_map = {}
+    files = [f for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
+    for file_path in files:
+        file_content = FileUtil.read_file(file_path)
+        tree = ast.parse(file_content, filename=file_path)
+
+        if file_path not in missing_map:
+            missing_map[file_path] = []
+
+        for node in ast.walk(tree):
+            if has_docstring(node) and ast.get_docstring(node) is None:
+                msg = f"Missing docstring in {type(node).__name__} '{node.name}' at line {node.lineno}."
+                missing_map[file_path].append(msg)
+
+    return missing_map
 
 
 def has_docstring(node):
@@ -36,58 +99,5 @@ def get_display_name(file_path: str, root_path: str):
     return display_path
 
 
-def find_functions_classes_methods_without_docstring(directory_path: str) -> None:
-    """Find functions, classes, and methods without a docstring in the given directory."""
-    missing_map = calculate_missing_doc_map(directory_path)
-    missing_map = {k: v for k, v in missing_map.items() if len(v) > 0}
-    if len(missing_map) > 0:
-
-        missing_map = {get_display_name(k, directory_path): v for k, v in missing_map.items()}
-        raise Exception(f"{json.dumps(missing_map, indent=4)}\nMissing docs.")
-    else:
-        print("No missing docs :)")
-
-
-def calculate_missing_doc_map(directory_path: str) -> Dict[str, List[str]]:
-    """
-    Creates a map from files to their descriptions of their missing doc functions.
-    :param directory_path: The directory to traverse.
-    :return: Map of file paths to their errors.
-    """
-    missing_map = {}
-    for root, _, files in os.walk(directory_path):
-        for file in files:
-            if file.endswith(".py") and not file == "__init__.py":
-                file_path = os.path.join(root, file)
-                with open(file_path, "r", encoding="utf-8") as f:
-                    try:
-                        tree = ast.parse(f.read(), filename=file_path)
-                    except SyntaxError as e:
-                        print(f"Error parsing {file_path}: {e}")
-                        continue
-
-                    is_exclude = any([p in file_path for p in EXCLUDES])
-                    if is_exclude:
-                        continue
-
-                    if file_path not in missing_map:
-                        missing_map[file_path] = []
-
-                    for node in ast.walk(tree):
-                        if has_docstring(node) and ast.get_docstring(node) is None:
-                            msg = f"Missing docstring in {type(node).__name__} '{node.name}' at line {node.lineno}."
-                            missing_map[file_path].append(msg)
-    return missing_map
-
-
-def main() -> None:
-    """
-    Runs the missing docs function on the root project path.
-    :return: None
-    """
-    directory_path = os.path.expanduser(os.environ["ROOT_PATH"])
-    find_functions_classes_methods_without_docstring(directory_path)
-
-
 if __name__ == "__main__":
-    main()
+    print_missing_headers(INCLUDES, throw_error=True)

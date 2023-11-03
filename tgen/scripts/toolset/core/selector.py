@@ -39,7 +39,8 @@ def inquirer_value(message: str, class_type: Type, default_value: Any):
     :param default_value: The default value to use if optional.
     :return: The value after parsing user response.
     """
-    message += f"- {class_type.__name__} -"
+    annotation_name = class_type.__name__ if hasattr(class_type, "__name__") else repr(class_type)
+    message += f"- {annotation_name} -"
     if default_value is not None:
         message += f"({default_value})"
     user_value = inquirer.text(message=message)

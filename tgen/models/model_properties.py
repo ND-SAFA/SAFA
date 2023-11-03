@@ -7,13 +7,16 @@ model = BertModel
 
 
 class AutoModelForSentenceTransformer:
-    """
-    Creates proxy API for sentence transformers models.
-    """
 
     @staticmethod
-    def from_pretrained(model_path: str, **kwargs):
-        return SentenceTransformer(model_path)
+    def from_pretrained(model_path: str, **kwargs) -> SentenceTransformer:
+        """
+        Creates proxy API for sentence transformers models.
+        :param model_path: The path to the sentence transformer model.
+        :param kwargs: Ignored.
+        :return: Sentence transformer model.
+        """
+        return SentenceTransformer(model_path, **kwargs)
 
 
 class ModelTask(Enum):

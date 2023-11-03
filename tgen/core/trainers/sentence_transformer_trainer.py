@@ -25,6 +25,7 @@ EmbeddingType = np.array  # TODO: Merge with embedding type.
 
 DEFAULT_EVAL_METRIC = "map"
 DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
+DEFAULT_SAVE_BEST_MODEL = True
 
 
 class SupportedLossFunctions(SupportedEnum):
@@ -69,7 +70,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL,
-                 loss_function: SupportedLossFunctions = SupportedLossFunctions.COSINE, **kwargs):
+                 loss_function: SupportedLossFunctions = SupportedLossFunctions.COSINE,
+                 save_best_model: bool = DEFAULT_SAVE_BEST_MODEL, **kwargs):
         """
         Trainer for sentence transformer models. Provides API that allows training and prediction operations.
         :param trainer_args: The trainer arguments.
@@ -83,6 +85,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
         self.loss_function = loss_function
+        self.save_best_model = save_best_model
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -104,7 +107,9 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
                        epochs=int(self.args.num_train_epochs),
                        warmup_steps=self.args.warmup_steps,
                        evaluation_steps=n_steps,
-                       evaluator=evaluator)
+                       evaluator=evaluator,
+                       output_path=self.args.output_dir,
+                       save_best_model=self.save_best_model)
         return TrainOutput(metrics=evaluator.metrics, training_loss=None, global_step=None)
 
     @overrides(HuggingFaceTrainer)

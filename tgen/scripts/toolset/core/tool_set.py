@@ -35,7 +35,7 @@ class ToolSet:
         """
         return [t.description for t in self.tool_map.values()]
 
-    def inquirer(self) -> Optional[Tool]:
+    def inquire_tool(self) -> Optional[Tool]:
         """
         Prompts user to select a tool. If back is selected then None is returned.
         :return: The selected tool.

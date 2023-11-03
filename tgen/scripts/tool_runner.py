@@ -37,17 +37,20 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
             default_tool_set_name = inquirer_selection(list(tool_set_map.keys()), "Select tool set")
             tools = tool_set_map[default_tool_set_name]
             tool_set = ToolSet(tools)
-            tool = tool_set.inquirer()
-            if tool is None:
-                continue
-            args = [param.inquirer() for param in tool.params]
+            if len(tools) == 1:
+                tool = list(tool_set.tool_map.values())[0]
+            else:
+                tool = tool_set.inquire_tool()
+                if tool is None:
+                    continue
+            args = [param.inquire_tool() for param in tool.params]
         tool.func(*args)
     print(f"\n:-)\n")  # add a blank line after the output
 
 
 TOOLS = {
     "Data": S3_TOOLS,
-    "RQS": RQ_TOOLS,
+    "Run RQ": RQ_TOOLS,
     "Dev-Ops": [print_missing_headers]
 }
 if __name__ == "__main__":

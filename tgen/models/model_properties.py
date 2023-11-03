@@ -13,10 +13,10 @@ class AutoModelForSentenceTransformer:
         """
         Creates proxy API for sentence transformers models.
         :param model_path: The path to the sentence transformer model.
-        :param kwargs: Ignored.
+        :param kwargs: Ignored. Allows ST to confirm to API.
         :return: Sentence transformer model.
         """
-        return SentenceTransformer(model_path, **kwargs)
+        return SentenceTransformer(model_path)
 
 
 class ModelTask(Enum):

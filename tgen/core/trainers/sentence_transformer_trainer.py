@@ -7,7 +7,7 @@ from sentence_transformers.evaluation import SentenceEvaluator
 from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss
 from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
-from transformers.trainer_utils import PredictionOutput
+from transformers.trainer_utils import PredictionOutput, TrainOutput
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
@@ -46,6 +46,7 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         self.trainer = trainer
         self.dataset_role = dataset_role
         self.evaluator_metric = evaluator_metric
+        self.metrics = []
 
     def __call__(self, model: SentenceTransformer, **kwargs) -> float:
         """
@@ -57,6 +58,7 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         prediction_output: TracePredictionOutput = self.trainer.perform_prediction(self.dataset_role)
         logger.info(SEPARATOR_BAR)
         metrics = prediction_output.metrics
+        self.metrics.append(metrics)
         return metrics[self.evaluator_metric]
 
 
@@ -66,7 +68,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     """
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
-                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL, **kwargs):
+                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL,
+                 loss_function: SupportedLossFunctions = SupportedLossFunctions.COSINE, **kwargs):
         """
         Trainer for sentence transformer models. Provides API that allows training and prediction operations.
         :param trainer_args: The trainer arguments.
@@ -79,32 +82,30 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
+        self.loss_function = loss_function
 
     @overrides(HuggingFaceTrainer)
-    def train(
-            self,
-            **kwargs,
-    ) -> None:
+    def train(self, **kwargs) -> TrainOutput:
         """
         Trains a sentence transformer model.
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        train_dataloader = DataLoader(self.train_dataset, shuffle=True, batch_size=self.args.train_batch_size)
-        train_loss = CosineSimilarityLoss(self.model)
-        evaluator = SentenceTransformerEvaluator(self)
-
-        n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
-
         logger.log_title("Starting Performance")
         self.perform_prediction(DatasetRole.VAL)
 
+        train_dataloader = DataLoader(self.train_dataset, shuffle=True, batch_size=self.args.train_batch_size)
+        train_loss = self.loss_function.value(self.model)
+        n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
+        evaluator = SentenceTransformerEvaluator(self)
+
         logger.log_title("Starting Training")
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
-                       epochs=self.args.num_train_epochs,
+                       epochs=int(self.args.num_train_epochs),
                        warmup_steps=self.args.warmup_steps,
                        evaluation_steps=n_steps,
                        evaluator=evaluator)
+        return TrainOutput(metrics=evaluator.metrics, training_loss=None, global_step=None)
 
     @overrides(HuggingFaceTrainer)
     def predict(self, test_dataset: List[InputExample], **kwargs) -> PredictionOutput:

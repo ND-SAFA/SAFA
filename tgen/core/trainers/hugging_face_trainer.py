@@ -85,12 +85,11 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         :param dataset: The dataset to use instead of from the dataset manager
         :return: THe prediction output
         """
-        dataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
-        if self.eval_dataset is None:
-            self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
-        output = self.predict(self.eval_dataset)
-        metrics_manager = MetricsManager(trace_df=dataset.trace_df,
-                                         link_ids=dataset.get_ordered_link_ids(),
+        eval_trace_dataset = self.trainer_dataset_manager[dataset_role]
+        eval_dataset = self._get_dataset(dataset_role)
+        output = self.predict(eval_dataset)
+        metrics_manager = MetricsManager(trace_df=eval_trace_dataset.trace_df,
+                                         link_ids=eval_trace_dataset.get_ordered_link_ids(),
                                          trace_predictions=output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics)
         logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))

@@ -63,6 +63,14 @@ class SupportedEnum(Enum):
         """
         return [v for v in cls._value2member_map_.keys()]
 
+    def __iter__(self):
+        """
+        Iterates through each enum.
+        :return: Next enum.
+        """
+        for enum_key in self.get_keys():
+            yield self[enum_key]
+
     def __deepcopy__(self, memodict={}) -> "SupportedEnum":
         """
         Makes a copy of the enum bc Python struggles for some reason

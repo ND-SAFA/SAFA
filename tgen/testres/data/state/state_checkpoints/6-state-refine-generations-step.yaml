@@ -19,7 +19,7 @@ completed_steps:
   RefineGenerationsStep: 1
 description_of_artifact: A User story is a concise, informal description of a software
   feature or functionality, written from the perspective of the end user
-export_dir: "[ROOT_PATH]/testres/output"
+export_dir: "[ROOT_PATH]/tgen/testres/output"
 final_dataset: null
 format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
   or benefit].
@@ -35,14 +35,14 @@ original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prom
   project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
-    project_path: "[ROOT_PATH]/testres/data/state/original_dataset"
+    project_path: "[ROOT_PATH]/tgen/testres/data/state/original_dataset"
     structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
       _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
       definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
       overrides: {}
-      project_path: "[ROOT_PATH]/testres/data/state/original_dataset"
+      project_path: "[ROOT_PATH]/tgen/testres/data/state/original_dataset"
       summarizer: null
     summarizer: null
   summarizer: null
@@ -62,14 +62,14 @@ source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prompt
   project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
-    project_path: "[ROOT_PATH]/testres/data/state/source_dataset"
+    project_path: "[ROOT_PATH]/tgen/testres/data/state/source_dataset"
     structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
       _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
       definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
       overrides: {}
-      project_path: "[ROOT_PATH]/testres/data/state/source_dataset"
+      project_path: "[ROOT_PATH]/tgen/testres/data/state/source_dataset"
       summarizer: null
     summarizer: null
   summarizer: null

@@ -85,7 +85,7 @@ class TestState(BaseTest):
         orig_state.save(state_name)
         save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num - 1)
         reloaded_attrs = YamlUtil.read(save_path)
-        self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/testres/output')
+        self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/tgen/testres/output')
         self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])
         self.assertEqual(orig_state.description_of_artifact, reloaded_attrs["description_of_artifact"])
         self.assertEqual(orig_state.project_summary, reloaded_attrs["project_summary"])

@@ -213,7 +213,7 @@ class EmbeddingsManager:
         return not self.__saved_embeddings_path or self.__state_changed_since_last_save \
             or FileUtil.collapse_paths(export_path) != FileUtil.get_directory_path(self.__saved_embeddings_path)
 
-    '[ROOT_PATH]/testres/output'
+    '[ROOT_PATH]/tgen/testres/output'
 
     def __set_embedding_order(self) -> None:
         """

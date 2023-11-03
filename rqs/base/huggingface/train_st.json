@@ -42,17 +42,18 @@
               "project_reader": {
                 "object_type": "STRUCTURE",
                 "project_path": "[DATA_PATH]/[EVAL_PROJECT]"
-              },
-              "augmenter": {
-                "steps": [
-                  {
-                    "object_type": "RESAMPLE"
-                  }
-                ]
               }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
             }
           }
-          ]
         }
       ]
     }
+  ]
+}

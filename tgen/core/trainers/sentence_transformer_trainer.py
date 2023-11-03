@@ -81,7 +81,10 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
 
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
 
-        logger.info("Starting to train...")
+        logger.log_title("Starting Performance")
+        self.trainer.perform_prediction(DatasetRole.VAL)
+
+        logger.log_title("Starting Training")
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
                        epochs=self.args.num_train_epochs,
                        warmup_steps=self.args.warmup_steps,

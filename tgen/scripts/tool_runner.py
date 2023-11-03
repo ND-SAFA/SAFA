@@ -4,18 +4,17 @@ from typing import Callable, Dict, List
 
 from dotenv import load_dotenv
 
-from tgen.scripts.toolset.core.selector import selector
-
 load_dotenv()
 root_path = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(root_path)
 
+from tgen.scripts.toolset.core.selector import inquirer_selection
 from tgen.scripts.toolset.core.tool_set import ToolSet
 from tgen.scripts.toolset.tools.rq_tools import RQ_TOOLS
 from tgen.scripts.toolset.tools.s3_tools import S3_TOOLS
 
 
-def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_name: str = None, default_tool_id: str = None, **args):
+def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_name: str = None, default_tool_id: str = None, *args):
     """
     Prompts user to select and run tools.
     :param tool_set_map: Map of tool set names and their functions.
@@ -33,7 +32,7 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
             tool = tool_set.tool_map[default_tool_id]
             exit_loop = True
         else:
-            default_tool_set_name = selector(list(tool_set_map.keys()), "Select tool set")
+            default_tool_set_name = inquirer_selection(list(tool_set_map.keys()), "Select tool set")
             tools = tool_set_map[default_tool_set_name]
             tool_set = ToolSet(tools)
             tool = tool_set.inquirer()
@@ -46,7 +45,7 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
 
 TOOLS = {
     "Data": S3_TOOLS,
-    "Models": RQ_TOOLS
+    "RQS": RQ_TOOLS
 }
 if __name__ == "__main__":
     tool_runner_loop(TOOLS)

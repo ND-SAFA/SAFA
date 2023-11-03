@@ -16,6 +16,8 @@ class Tool:
         self.doc = inspect.getdoc(tool_func)
         self.sig = inspect.signature(self.func)
         self.params = self.get_params()
+        if self.doc is None:
+            raise Exception(f"Tool {self.id} does have a doc-string.")
         self.description = f"{self.id} - {self.get_tool_description(self.doc)}"
 
     def get_params(self):

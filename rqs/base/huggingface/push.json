@@ -9,11 +9,13 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "[MODEL_PATH]"
+            "model_path": "[MODEL_PATH]",
+            "model_task": "AUTO"
           },
           "trainer_args": {
             "hub_model_id": "thearod5/[MODEL_NAME]"
-          }
+          },
+          "trainer_dataset_manager": {}
         }
       ]
     }

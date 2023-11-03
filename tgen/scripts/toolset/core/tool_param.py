@@ -1,9 +1,7 @@
 import inspect
 from typing import Any
 
-import inquirer
-
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.scripts.toolset.core.selector import inquirer_value
 
 
 class ToolParam:
@@ -27,10 +25,8 @@ class ToolParam:
         :return: The value of the param.
         """
         param_message = self._get_inquirer_message()
-        arg = inquirer.text(message=param_message)
-        arg = self.default if arg == EMPTY_STRING else arg
-        arg = self.annotation(arg)
-        return arg
+        param_value = inquirer_value(param_message, self.annotation, self.default)
+        return param_value
 
     def _get_inquirer_message(self) -> str:
         """

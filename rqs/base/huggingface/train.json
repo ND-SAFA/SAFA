@@ -9,10 +9,10 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "[MODEL]"
+            "model_path": "[BASE_MODEL]"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
+            "num_train_epochs": "[EPOCHS_INT]",
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "skip_save": false,

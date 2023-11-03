@@ -10,11 +10,10 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "[MODEL]"
+            "model_path": "[BASE_MODEL]"
           },
           "trainer_args": {
-            "num_train_epochs": 4,
-            "gradient_accumulation_steps": 1,
+            "num_train_epochs": "[EPOCHS]",
             "learning_rate": 5e-5,
             "skip_save": false,
             "load_best_model_at_end": true,
@@ -34,7 +33,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[EVAL_PROJECT_PATH]"
+                "project_path": "[VAL_PROJECT_PATH]"
               }
             },
             "eval_dataset_creator": {

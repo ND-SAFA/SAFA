@@ -1,61 +1,72 @@
 import os
-from typing import Dict
+from typing import List
 
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
+from tgen.scripts.toolset.core.rq_proxy import RQProxy
+from tgen.scripts.toolset.core.selector import inquirer_selection
 from tgen.testres.object_creator import ObjectCreator
 
 DATA_PATH = os.environ.get("DATA_PATH", None)
 
 
-def push(input_model_path: str, model_name: str):
+def run() -> None:
     """
-    Pushes input model to the bug (under thearod5)
-    :param input_model_path: Path to model to push.
-    :param model_name: The name of the model to save to.
+    Navigates and runs RQ.
     :return: None
     """
-    input_model_path = os.path.expanduser(input_model_path)
-    replacements = {
-        "[MODEL_PATH]": input_model_path,
-        "[MODEL_NAME]": model_name
-    }
-    run_rq("base/huggingface/push.json", replacements)
+    base_rq_path = os.path.join(get_rq_path(), "base")
+    rq_to_run = navigate_to_rq(base_rq_path)
+    run_rq(rq_to_run)
 
 
-def train(train_path: str, eval_path: str, data_path: str = DATA_PATH, model: str = SMALL_EMBEDDING_MODEL):
-    """
-    Trains a model on the given dataset.
-    :param train_path: Path to training data.
-    :param eval_path: Path to evaluation data.
-    :param data_path: Folder to where the data is stored. If none data paths are assumed to be complete.
-    :param model: The starting model to train off with.
-    :return: None
-    """
-    if data_path:
-        data_path = os.path.expanduser(data_path)
-        train_path = os.path.join(data_path, train_path)
-        eval_path = os.path.join(data_path, eval_path)
+def navigate_to_rq(curr_path: str) -> str:
+    items = os.listdir(curr_path)
+    item_paths = [os.path.join(curr_path, i) for i in items]
+    files = [i for i in item_paths if os.path.isfile(i) and ".json" in i]
+    if len(files) > 0:
+        return navigate_to_rq_from_files(curr_path, files)
+    return navigate_to_rq_from_folder(curr_path, item_paths)
+
+
+def navigate_to_rq_from_folder(curr_path: str, item_paths: List[str]):
+    folders = [i for i in item_paths if os.path.isdir(i)]
+    folder_names = [os.path.basename(f) for f in folders]
+    folder_selected = inquirer_selection(folder_names, "Select RQ Folder", allow_back=True)
+    if folder_selected is None:
+        return go_back(curr_path)
+    return navigate_to_rq(os.path.join(curr_path, folder_selected))
+
+
+def navigate_to_rq_from_files(curr_path: str, files: List[str]):
+    file_names = [os.path.basename(f) for f in files]
+    file_selected = inquirer_selection(file_names, "Select RQ to run", allow_back=True)
+    if file_selected is not None:
+        return os.path.join(curr_path, file_selected)
     else:
-        train_path = os.path.expanduser(train_path)
-        eval_path = os.path.expanduser(eval_path)
-    replacements = {
-        "[MODEL]": model,
-        "[TRAIN_PROJECT_PATH]": train_path,
-        "[OUTPUT_PATH]": os.path.expanduser(os.environ["OUTPUT_PATH"]),
-        "[EVAL_PROJECT_PATH]": eval_path
-    }
-    run_rq("base/huggingface/train_st.json", replacements)
+        return go_back(curr_path)
 
 
-def run_rq(rq_relative_path: str, replacements: Dict[str, str]):
-    experiment_path = os.path.join(os.environ["RQ_PATH"], rq_relative_path)
-    experiment_path = os.path.expanduser(experiment_path)
+def go_back(curr_path):
+    back_path = os.path.normpath(os.path.join(curr_path, ".."))
+    return navigate_to_rq(back_path)
+
+
+def run_rq(rq_path: str):
+    experiment_path = os.path.expanduser(rq_path)
+    rq_proxy = RQProxy(experiment_path)
+
+    os_variables = {f"[{env_key}]": env_value for env_key, env_value in os.environ.items()}
+    replacements = rq_proxy.inquirer_unknown_variables(os_variables)
+
     experiment_definition = ScriptDefinition.read_experiment_definition(experiment_path, replacements)
     experiment_class = ScriptRunner.get_experiment_class(experiment_definition)
     experiment = ObjectCreator.create(experiment_class, override=True, **experiment_definition)
     experiment.run()
 
 
-RQ_TOOLS = [train, push]
+def get_rq_path() -> str:
+    return os.path.expanduser(os.environ["RQ_PATH"])
+
+
+RQ_TOOLS = [run]

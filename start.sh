@@ -1,1 +1,1 @@
-python3 tgen/scripts/toolset/tool_runner.py
+python3 tgen/scripts/tool_runner.py

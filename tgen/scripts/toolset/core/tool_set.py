@@ -2,7 +2,7 @@ from typing import Callable, Dict, List, Optional
 
 from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.scripts.toolset.core.constants import CLI_METHOD_PARAM
-from tgen.scripts.toolset.core.selector import selector
+from tgen.scripts.toolset.core.selector import inquirer_selection
 from tgen.scripts.toolset.core.tool import Tool
 
 
@@ -40,7 +40,7 @@ class ToolSet:
         Prompts user to select a tool. If back is selected then None is returned.
         :return: The selected tool.
         """
-        selected_choice = selector(self.get_tool_descriptions(), "Choose a tool to run:", allow_back=True)
+        selected_choice = inquirer_selection(self.get_tool_descriptions(), "Choose a tool to run:", allow_back=True)
         if selected_choice is None:
             return None
         tool_id = self.get_tool_id(selected_choice)

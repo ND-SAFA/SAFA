@@ -1,4 +1,3 @@
-import collections
 import warnings
 from typing import Dict, List, Tuple, Union
 
@@ -93,7 +92,7 @@ class MetricsManager:
         n_predictions = predictions.shape[0] if isinstance(predictions, np.ndarray) else len(predictions)
         for pred_i in range(n_predictions):
             prediction = predictions[pred_i]
-            if isinstance(prediction, collections.abc.Sequence):
+            if type(prediction) is np.ndarray:
                 prediction = softmax(prediction)[1]
             similarity_scores.append(prediction)
         return similarity_scores

@@ -8,11 +8,11 @@ class TestTraceDataFrame(BaseTest):
 
     def test_add_link(self):
         df = self.get_trace_data_frame()
-        link = df.add_link(source_id="s3", target_id="t3", label=1)
+        link = df.add_link(source="s3", target="t3", label=1)
         self.assert_link(link, "s3", "t3", 1, TraceDataFrame.generate_link_id("s3", "t3"))
 
         df_empty = TraceDataFrame()
-        link = df_empty.add_link(source_id="s3", target_id="t3", label=1)
+        link = df_empty.add_link(source="s3", target="t3", label=1)
         self.assert_link(link, "s3", "t3", 1, TraceDataFrame.generate_link_id("s3", "t3"))
 
     def test_get_link(self):

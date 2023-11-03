@@ -5,7 +5,7 @@ from unittest import mock
 from unittest.mock import patch
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.resample_step import ResampleStep
@@ -235,18 +235,24 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEqual(len(set(trace_dataset_aug.get_pos_link_ids())), self.N_POSITIVE + len(aug_links))
         self.assertEqual(len(trace_dataset_aug.get_pos_link_ids()), len(trace_dataset_aug.get_neg_link_ids()))
 
-    def test_get_feature_entry(self):
+    def test_get_feature_entry_siamese(self):
+        trace_dataset = self.get_trace_dataset()
+
+        source, target = ApiTestProject.get_positive_links()[0]
+        test_link = trace_dataset.trace_df.get_link(source_id=source, target_id=target)
+        source_text = trace_dataset.artifact_df.get_artifact(source)[ArtifactKeys.CONTENT]
+        target_text = trace_dataset.artifact_df.get_artifact(target)[ArtifactKeys.CONTENT]
+
+        input_example = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SIAMESE, None)
+        feature_s_text, feature_t_text = input_example.texts
+        self.assertEqual(source_text, feature_s_text)
+        self.assertEqual(target_text, feature_t_text)
+        self.assertEqual(test_link[TraceKeys.LABEL], input_example.label)
+
+    def test_get_feature_entry_single(self):
         trace_dataset = self.get_trace_dataset()
         source, target = ApiTestProject.get_positive_links()[0]
         test_link = TestDataManager._create_test_link(TraceDataFrame(), source, target)
-
-        feature_entry_siamese = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SIAMESE,
-                                                                 fake_method)
-        source, target = trace_dataset.get_link_source_target_artifact(test_link[TraceKeys.LINK_ID])
-        self.assertIn(source[ArtifactKeys.CONTENT], feature_entry_siamese.values())
-        self.assertIn(target[ArtifactKeys.CONTENT], feature_entry_siamese.values())
-        self.assertIn(DataKey.LABEL_KEY, feature_entry_siamese)
-
         feature_entry_single = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SINGLE,
                                                                 fake_method)
         self.assertIn(FEATURE_VALUE.format(source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT]),
@@ -278,4 +284,4 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
         for i, link in trace_dataset.trace_df.itertuples():
             self.assertIsNotNone(recreated_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
-                                                                                   target_id=link[TraceKeys.TARGET]))
+                                                                     target_id=link[TraceKeys.TARGET]))

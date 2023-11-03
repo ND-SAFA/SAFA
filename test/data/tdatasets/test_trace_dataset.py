@@ -236,12 +236,7 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEqual(len(trace_dataset_aug.get_pos_link_ids()), len(trace_dataset_aug.get_neg_link_ids()))
 
     def test_get_feature_entry_siamese(self):
-        trace_dataset = self.get_trace_dataset()
-
-        source, target = ApiTestProject.get_positive_links()[0]
-        test_link = trace_dataset.trace_df.get_link(source_id=source, target_id=target)
-        source_text = trace_dataset.artifact_df.get_artifact(source)[ArtifactKeys.CONTENT]
-        target_text = trace_dataset.artifact_df.get_artifact(target)[ArtifactKeys.CONTENT]
+        trace_dataset, test_link, source_text, target_text = self.get_single_testing_link()
 
         input_example = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SIAMESE, None)
         feature_s_text, feature_t_text = input_example.texts
@@ -250,13 +245,10 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEqual(test_link[TraceKeys.LABEL], input_example.label)
 
     def test_get_feature_entry_single(self):
-        trace_dataset = self.get_trace_dataset()
-        source, target = ApiTestProject.get_positive_links()[0]
-        test_link = TestDataManager._create_test_link(TraceDataFrame(), source, target)
+        trace_dataset, test_link, source_text, target_text = self.get_single_testing_link()
         feature_entry_single = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SINGLE,
                                                                 fake_method)
-        self.assertIn(FEATURE_VALUE.format(source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT]),
-                      feature_entry_single.values())
+        self.assertIn(FEATURE_VALUE.format(source_text, target_text), feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)
 
     def test_extract_feature_info(self):
@@ -285,3 +277,12 @@ class TestTraceDataset(BaseTraceTest):
         for i, link in trace_dataset.trace_df.itertuples():
             self.assertIsNotNone(recreated_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
                                                                      target_id=link[TraceKeys.TARGET]))
+
+    def get_single_testing_link(self):
+        trace_dataset = self.get_trace_dataset()
+
+        source, target = ApiTestProject.get_positive_links()[0]
+        test_link = trace_dataset.trace_df.get_link(source_id=source, target_id=target)
+        source_text = trace_dataset.artifact_df.get_artifact(source)[ArtifactKeys.CONTENT]
+        target_text = trace_dataset.artifact_df.get_artifact(target)[ArtifactKeys.CONTENT]
+        return trace_dataset, test_link, source_text, target_text

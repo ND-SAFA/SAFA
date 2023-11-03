@@ -10,9 +10,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "[MODEL]",
-            "model_task": "SBERT",
-            "model_architecture": "SIAMESE"
+            "model_path": "[MODEL]"
           },
           "trainer_args": {
             "num_train_epochs": 4,

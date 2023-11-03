@@ -1,13 +1,17 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
+import numpy as np
 from datasets import Dataset
-from sentence_transformers import InputExample, SentenceTransformer, losses
+from sentence_transformers import InputExample, SentenceTransformer
 from sentence_transformers.evaluation import SentenceEvaluator
+from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss
 from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.override import overrides
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
@@ -17,41 +21,43 @@ from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
 
 SEPARATOR_BAR = "-" * 50
+EmbeddingType = np.array  # TODO: Merge with embedding type.
+
+DEFAULT_EVAL_METRIC = "map"
+DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
 
 
-def predict(model: SentenceTransformer, test_dataset: List[InputExample], ):
-    embeddings = {}
-
-    def encode(batch: List[str]):
-        batch_embeddings = model.encode(batch)
-        for k, v in zip(batch, batch_embeddings):
-            embeddings[k] = v
-
-    unique_texts = set([a for e in test_dataset for a in e.texts])
-    encode(list(unique_texts))
-
-    scores = []
-    labels = []
-    for example in test_dataset:
-        source_text, target_text = example.texts
-        source_embedding = embeddings[source_text]
-        target_embedding = embeddings[target_text]
-        score = cosine_similarity([source_embedding], [target_embedding])[0][0]
-        scores.append(score)
-        labels.append(example.label)
-    return PredictionOutput(predictions=scores, label_ids=labels, metrics={})
+class SupportedLossFunctions(SupportedEnum):
+    """
+    Enumerates the different loss functions available for sentence embedding models.
+    """
+    COSINE = CosineSimilarityLoss
+    CONTRASTIVE = ContrastiveLoss
 
 
 class SentenceTransformerEvaluator(SentenceEvaluator):
-    def __init__(self, trainer: HuggingFaceTrainer, dataset_role: DatasetRole = DatasetRole.VAL):
+    def __init__(self, trainer: HuggingFaceTrainer, dataset_role: DatasetRole = DatasetRole.VAL,
+                 evaluator_metric: str = DEFAULT_EVAL_METRIC):
+        """
+        Evaluates dataset under role with given trainer.
+        :param trainer: The trainer used to predict on the dataset.
+        :param dataset_role: The role the dataset to predict should be found under.
+        """
         self.trainer = trainer
         self.dataset_role = dataset_role
+        self.evaluator_metric = evaluator_metric
 
-    def __call__(self, model, output_path: str = None, epoch: int = -1, steps: int = -1) -> float:
+    def __call__(self, model: SentenceTransformer, **kwargs) -> float:
+        """
+        Evaluates the model on the evaluation dataset.
+        :param model: The model to evaluate.
+        :param kwargs: Ignored.
+        :return: The score for this evaluation run.
+        """
         prediction_output: TracePredictionOutput = self.trainer.perform_prediction(self.dataset_role)
         logger.info(SEPARATOR_BAR)
         metrics = prediction_output.metrics
-        return metrics["map"]
+        return metrics[self.evaluator_metric]
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -60,12 +66,21 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     """
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
-                 min_eval_steps: int = 50, **kwargs):
+                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL, **kwargs):
+        """
+        Trainer for sentence transformer models. Provides API that allows training and prediction operations.
+        :param trainer_args: The trainer arguments.
+        :param model_manager: The model manager container sentence transformer.
+        :param trainer_dataset_manager: Contains the datasets used for training, validation, and evaluation.
+        :param max_steps_before_eval: The maximum number of training steps that are allowed before evaluating.
+        :param kwargs: Additional keyword arguments passed to parent trainer.
+        """
         model_manager.model_task = ModelTask.SBERT
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
-        self.min_eval_steps = min_eval_steps
+        self.min_eval_steps = max_steps_before_eval
 
+    @overrides(HuggingFaceTrainer)
     def train(
             self,
             **kwargs,
@@ -76,7 +91,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :return: None
         """
         train_dataloader = DataLoader(self.train_dataset, shuffle=True, batch_size=self.args.train_batch_size)
-        train_loss = losses.CosineSimilarityLoss(self.model)
+        train_loss = CosineSimilarityLoss(self.model)
         evaluator = SentenceTransformerEvaluator(self)
 
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
@@ -91,10 +106,53 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
                        evaluation_steps=n_steps,
                        evaluator=evaluator)
 
-    def predict(
-            self, test_dataset: List[InputExample], ignore_keys: Optional[List[str]] = None, metric_key_prefix: str = "test"
-    ) -> PredictionOutput:
-        return predict(self.model, test_dataset)
+    @overrides(HuggingFaceTrainer)
+    def predict(self, test_dataset: List[InputExample], **kwargs) -> PredictionOutput:
+        """
+        Predicts on the dataset given.
+        :param test_dataset: The dataset to predict scores for.
+        :return: Prediction output containing similarity scores as predictions.
+        """
+        embeddings = self.create_embedding_map(self.model, test_dataset)
+        return self.calculate_similarities(embeddings, test_dataset)
 
+    @overrides(HuggingFaceTrainer)
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
+        """
+        Returns the dataset in the given role.
+        :param dataset_role: The role to retrieve.
+        :return: Trainer dataset containing input examples.
+        """
         return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
+
+    @staticmethod
+    def create_embedding_map(model: SentenceTransformer, test_dataset: List[InputExample]):
+        """
+        Creates embedding map from content to embedding for texts in dataset. TODO: Replace with embedding manager.
+        :param model: The model used to embed the test dataset.
+        :param test_dataset: The dataset containing source and target texts per example.
+        :return: Map of text to embedding.
+        """
+        unique_texts = list(set([a for e in test_dataset for a in e.texts]))
+        batch_embeddings = model.encode(unique_texts)
+        embeddings = {k: v for k, v in zip(unique_texts, batch_embeddings)}
+        return embeddings
+
+    @staticmethod
+    def calculate_similarities(embedding_map: Dict[str, EmbeddingType], input_examples: List[InputExample]) -> PredictionOutput:
+        """
+        Calculates the cosine similarity between the texts in each input example. TODO: Replace with embedding util.
+        :param embedding_map: Maps text to embedding for all input examples.
+        :param input_examples: The list of input examples to calculate similarities for.
+        :return: Prediction output containing scores as predictions and labels as label ids.
+        """
+        scores = []
+        labels = []
+        for example in input_examples:
+            source_text, target_text = example.texts
+            source_embedding = embedding_map[source_text]
+            target_embedding = embedding_map[target_text]
+            score = cosine_similarity([source_embedding], [target_embedding])[0][0]
+            scores.append(score)
+            labels.append(example.label)
+        return PredictionOutput(predictions=scores, label_ids=labels, metrics={})

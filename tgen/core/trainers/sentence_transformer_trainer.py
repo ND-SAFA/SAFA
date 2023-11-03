@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-from
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer, losses
 from sentence_transformers.evaluation import SentenceEvaluator

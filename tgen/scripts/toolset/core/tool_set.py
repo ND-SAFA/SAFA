@@ -1,7 +1,9 @@
-import inspect
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
-from tgen.scripts.toolset.core.constants import DESC_PARAM, FUNC_PARAM, IGNORE_PARAMS
+from tgen.common.constants.deliminator_constants import UNDERSCORE
+from tgen.scripts.toolset.core.constants import CLI_METHOD_PARAM
+from tgen.scripts.toolset.core.selector import selector
+from tgen.scripts.toolset.core.tool import Tool
 
 
 class ToolSet:
@@ -12,9 +14,7 @@ class ToolSet:
         :param tool_functions: The functions serving as entry points to your tool set.
         """
         self.tool_functions = tool_functions
-        self.tool_map, self.tool_choices = self.create_tool_map(tool_functions)
-        self.tool_params = self.read_tool_params(self.tool_map)
-        self.descriptions = self.create_descriptions(self.tool_map)
+        self.tool_map = self.create_tool_map(tool_functions)
 
     def get_tool_id(self, tool_choice: str):
         """
@@ -24,32 +24,31 @@ class ToolSet:
         """
         tool_choices = list(self.tool_map.keys())
         for t_id, tool in self.tool_map.items():
-            tool_desc = self.create_description(t_id, tool)
-            if tool_choice in tool_desc:
+            if tool_choice in tool.description:
                 return t_id
         raise Exception(f"{tool_choice} not recognized, must be one of {tool_choices}")
 
-    def get_tool_function(self, tool_id: str):
-        return self.tool_map[tool_id][FUNC_PARAM]
-
-    def get_tool_params(self, tool_id: str):
-        tool_params = self.tool_params
-        tool_param_names = [p[0] for p in tool_params[tool_id]]
-        tool_param_descs = [p[1] for p in tool_params[tool_id]]
-        tool_param_defaults = [p[2] for p in tool_params[tool_id]]
-        return tool_param_names, tool_param_descs, tool_param_defaults
-
-    @staticmethod
-    def create_descriptions(tool_map) -> List[str]:
+    def get_tool_descriptions(self) -> List[str]:
         """
-        Returns printable descriptions of tools.
-        :param tool_map: Map of tool id to tool contents.
+        Gets descriptions for tools in tool map.
         :return: List of tool descriptions.
         """
-        return [ToolSet.create_description(t_id, tool) for t_id, tool in tool_map.items()]
+        return [t.description for t in self.tool_map.values()]
+
+    def inquirer(self) -> Optional[Tool]:
+        """
+        Prompts user to select a tool. If back is selected then None is returned.
+        :return: The selected tool.
+        """
+        selected_choice = selector(self.get_tool_descriptions(), "Choose a tool to run:", allow_back=True)
+        if selected_choice is None:
+            return None
+        tool_id = self.get_tool_id(selected_choice)
+        tool = self.tool_map[tool_id]
+        return tool
 
     @staticmethod
-    def create_tool_map(tool_functions: List[Callable]) -> Dict:
+    def create_tool_map(tool_functions: List[Callable]) -> Dict[str, Tool]:
         """
         Creates mapping of tool name to its contents including function and description.
         :param tool_functions: List of tools to run as functions.
@@ -59,73 +58,14 @@ class ToolSet:
         tool_map = {}
         for tool_func in tool_functions:
             if callable(tool_func):
-                tool_id = tool_func.__name__
-                tool_desc = inspect.getdoc(tool_func)
-                tool_desc = "" if tool_desc is None else tool_desc.splitlines()[0]
-                tool_choices[tool_id] = tool_desc
-                tool_map[tool_id] = {
-                    "desc": tool_desc,
-                    "func": tool_func
-                }
+                tool = Tool(tool_func)
+                tool_map[tool.id] = tool
             else:
-                class_functions = [getattr(tool_func, f) for f in dir(tool_func) if not f.startswith("_")]
+                class_functions = [getattr(tool_func, f) for f in dir(tool_func) if not f.startswith(UNDERSCORE)]
                 class_functions = [f for f in class_functions if callable(f)]
-                class_functions = [f for f in class_functions if getattr(f, 'climethod', False)]
-
-                class_map, class_choices = ToolSet.create_tool_map(class_functions)
-                tool_map.update(class_map)
-                tool_choices.update(class_choices)
+                class_functions = [f for f in class_functions if getattr(f, CLI_METHOD_PARAM, False)]
+                class_tools = [Tool(f) for f in class_functions]
+                class_tool_map = {t.id: t for t in class_tools}
+                tool_map.update(class_tool_map)
         tool_choices["Exit"] = "Leave."
-        return tool_map, tool_choices
-
-    @staticmethod
-    def read_tool_params(tool_map: Dict):
-        """
-        Reads tool function an extracts the name and description of each parameter.
-        :param tool_map: Map of tool id to tool contents including function and description.
-        :return: Mapping of tool id to list of parameters and their descriptions.
-        """
-        tool_params = {}
-
-        for tool_id, tool in tool_map.items():
-            tool_func = tool["func"]
-            sig = inspect.signature(tool_func)
-            pydoc = inspect.getdoc(tool_func)
-            if pydoc is None:
-                raise Exception(f"{tool_func.__name__} is missing a PyDoc.")
-            params = []
-            for param_name, param in sig.parameters.items():
-                if param_name in IGNORE_PARAMS:
-                    continue
-                param_default = None
-                if param.default is not inspect.Parameter.empty:
-                    param_default = param.default
-                param_desc = ToolSet.get_param_description(pydoc, param_name)
-                params.append((param_name, param_desc, param_default))
-            tool_params[tool_id] = params
-        return tool_params
-
-    @staticmethod
-    def get_param_description(pydoc_str, param_name):
-        """
-        Returns the description of parameter in DocString.
-        :param pydoc_str: The PyDoc as a string.
-        :param param_name: The name of the parameter whose description is returned.
-        :returns: The description of parameters.
-        """
-        assert pydoc_str is not None, "PyDoc is missing on a tool function."
-        lines = pydoc_str.split('\n')
-        for line in lines:
-            if f':param {param_name}:' in line:
-                return line.split(f':param {param_name}:')[1].strip()
-        return None
-
-    @staticmethod
-    def create_description(tool_id: str, tool_info: Dict):
-        """
-        Returns description of the tool.
-        :param tool_id: The id of the tool
-        :param tool_info: Information dictionary about the tool.
-        :return: String representing description.
-        """
-        return f"{tool_id} - {tool_info[DESC_PARAM]}"
+        return tool_map

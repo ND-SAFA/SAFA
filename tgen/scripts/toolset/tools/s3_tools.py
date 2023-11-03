@@ -68,7 +68,7 @@ def upload_folder(folder_path: str, bucket_path: str = None, bucket_name: str = 
         cmd(command)
 
 
-def ls_bucket(bucket_name: str = DEFAULT_DATA_BUCKET, starting_path: str = ""):
+def ls_bucket_files(bucket_name: str = DEFAULT_DATA_BUCKET, starting_path: str = ""):
     """
     Lists all files in folder on bucket.
     :param bucket_name: The name of the bucket.
@@ -92,7 +92,7 @@ def delete_folder(folder_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
     dir_path = os.path.dirname(folder_path)
 
 
-def download_s3_folder(s3_folder: str, store_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
+def download_folder(s3_folder: str, store_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
     """
     Download the contents of a folder directory.
     :param s3_folder: The folder path in the s3 bucket.
@@ -172,4 +172,4 @@ def get_copyable_files(folder_path: str):
     return files_to_upload
 
 
-S3_TOOLS = [upload_folder, download_s3_folder, ls_bucket, delete_folder, ls_buckets, configure]
+S3_TOOLS = [upload_folder, download_folder, ls_bucket_files, delete_folder, ls_buckets, configure]

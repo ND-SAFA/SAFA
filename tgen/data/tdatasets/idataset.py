@@ -16,14 +16,6 @@ class iDataset(BaseObject):
         """
 
     @abstractmethod
-    def to_trainer_dataset(self, **kwargs) -> Any:
-        """
-        Converts data to that used by Huggingface (HF) trainer.
-        :param kwargs: The arguments needed to create the trainer dataset
-        :return: A data used by the HF trainer.
-        """
-
-    @abstractmethod
     def as_creator(self, project_path: str):
         """
         Converts the dataset into a creator that can remake it

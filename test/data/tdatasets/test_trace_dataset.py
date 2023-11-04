@@ -1,7 +1,6 @@
 import os
 import uuid
 from collections import Counter
-from unittest import mock
 from unittest.mock import patch
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -13,7 +12,6 @@ from tgen.data.processing.augmentation.simple_word_replacement_step import Simpl
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -238,7 +236,7 @@ class TestTraceDataset(BaseTraceTest):
     def test_get_feature_entry_siamese(self):
         trace_dataset, test_link, source_text, target_text = self.get_single_testing_link()
 
-        input_example = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SIAMESE, None)
+        input_example = trace_dataset._get_feature_entry(ModelArchitectureType.SIAMESE, None, link_id=test_link[TraceKeys.LINK_ID])
         feature_s_text, feature_t_text = input_example.texts
         self.assertEqual(source_text, feature_s_text)
         self.assertEqual(target_text, feature_t_text)
@@ -246,8 +244,8 @@ class TestTraceDataset(BaseTraceTest):
 
     def test_get_feature_entry_single(self):
         trace_dataset, test_link, source_text, target_text = self.get_single_testing_link()
-        feature_entry_single = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SINGLE,
-                                                                fake_method)
+        feature_entry_single = trace_dataset._get_feature_entry(ModelArchitectureType.SINGLE, fake_method,
+                                                                link_id=test_link[TraceKeys.LINK_ID])
         self.assertIn(FEATURE_VALUE.format(source_text, target_text), feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)
 
@@ -259,15 +257,6 @@ class TestTraceDataset(BaseTraceTest):
         feature_info_prefix = TraceDataset._extract_feature_info(self.TEST_FEATURE, prefix)
         for feature_name in feature_info_prefix.keys():
             self.assertTrue(feature_name.startswith(prefix))
-
-    @patch.object(ModelManager, "get_tokenizer")
-    def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        train_dataset = self.get_trace_dataset()
-        model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
-        trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
-        self.assertTrue(isinstance(trainer_dataset[0], dict))
-        self.assertEqual(len(train_dataset), len(trainer_dataset))
 
     def test_as_creator(self):
         trace_dataset = self.get_trace_dataset()

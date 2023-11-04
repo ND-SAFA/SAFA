@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import numpy as np
 from datasets import Dataset
@@ -97,7 +97,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         logger.log_title("Starting Performance")
         self.perform_prediction(DatasetRole.VAL)
 
-        train_dataloader = DataLoader(self.train_dataset, shuffle=True, batch_size=self.args.train_batch_size)
+        train_examples = self.to_input_examples(self.train_dataset)
+        train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=self.args.train_batch_size)
         train_loss = self.loss_function.value(self.model)
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
         evaluator = SentenceTransformerEvaluator(self)
@@ -113,33 +114,35 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         return TrainOutput(metrics=evaluator.metrics, training_loss=None, global_step=None)
 
     @overrides(HuggingFaceTrainer)
-    def predict(self, test_dataset: List[InputExample], **kwargs) -> PredictionOutput:
+    def predict(self, test_dataset: Dataset, **kwargs) -> PredictionOutput:
         """
         Predicts on the dataset given.
         :param test_dataset: The dataset to predict scores for.
         :return: Prediction output containing similarity scores as predictions.
         """
-        embeddings = self.create_embedding_map(self.model, test_dataset)
-        return self.calculate_similarities(embeddings, test_dataset)
-
-    @overrides(HuggingFaceTrainer)
-    def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
-        """
-        Returns the dataset in the given role.
-        :param dataset_role: The role to retrieve.
-        :return: Trainer dataset containing input examples.
-        """
-        return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
+        input_examples = self.to_input_examples(test_dataset)
+        embeddings = self.create_embedding_map(self.model, input_examples)
+        return self.calculate_similarities(embeddings, input_examples)
 
     @staticmethod
-    def create_embedding_map(model: SentenceTransformer, test_dataset: List[InputExample]):
+    def to_input_examples(dataset: Dataset) -> List[InputExample]:
+        """
+        Converts a huggingface dataset into a list of sentence transformer input examples.
+        :param dataset: The huggingface dataset.
+        :return: List of input examples.
+        """
+        input_examples = [example for input_batch in dataset for example in input_batch.values()]
+        return input_examples
+
+    @staticmethod
+    def create_embedding_map(model: SentenceTransformer, input_examples: List[InputExample]):
         """
         Creates embedding map from content to embedding for texts in dataset. TODO: Replace with embedding manager.
         :param model: The model used to embed the test dataset.
-        :param test_dataset: The dataset containing source and target texts per example.
+        :param input_examples: The dataset containing source and target texts per example.
         :return: Map of text to embedding.
         """
-        unique_texts = list(set([a for e in test_dataset for a in e.texts]))
+        unique_texts = list(set([a for e in input_examples for a in e.texts]))
         batch_embeddings = model.encode(unique_texts)
         embeddings = {k: v for k, v in zip(unique_texts, batch_embeddings)}
         return embeddings

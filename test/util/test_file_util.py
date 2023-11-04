@@ -127,6 +127,13 @@ class TestFileUtil(BaseTest):
 
         self.assertEqual(expected_path, FileUtil.expand_paths(expected_path))
 
+    def test_expand_paths_int(self):
+        """
+        Tests that numbers can replace variables.
+        """
+        result = FileUtil.expand_paths("[EPOCHS_INT]", {"[EPOCHS_INT]": 3})
+        self.assertEqual(3, result)
+
     def test_order_paths_by_least_to_most_overlap(self):
         paths = ["root/path1", "root/path1/path2", "unrelated/path1", "root/other", "root", "unrelated"]
         expected_order = ['root', 'root/path1', 'root/path1/path2', 'root/other', 'unrelated', 'unrelated/path1']

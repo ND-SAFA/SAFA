@@ -23,7 +23,7 @@ from tgen.models.model_properties import ModelArchitectureType, ModelTask
 SEPARATOR_BAR = "-" * 50
 EmbeddingType = np.array  # TODO: Merge with embedding type.
 
-DEFAULT_EVAL_METRIC = "map"
+DEFAULT_EVAL_METRIC = "f2"
 DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
 DEFAULT_SAVE_BEST_MODEL = True
 
@@ -94,7 +94,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        logger.log_title("Starting Performance")
+        logger.log_title("Starting Performance", prefix="\n\n")
         self.perform_prediction(DatasetRole.VAL)
 
         train_examples = self.to_input_examples(self.train_dataset)
@@ -103,7 +103,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
         evaluator = SentenceTransformerEvaluator(self)
 
-        logger.log_title("Starting Training")
+        logger.log_title("Starting Training", prefix="\n\n")
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
                        epochs=int(self.args.num_train_epochs),
                        warmup_steps=self.args.warmup_steps,

@@ -142,7 +142,7 @@ class FileUtil:
         return files
 
     @staticmethod
-    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None,
+    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, Any] = None,
                      use_abs_paths: bool = True):
         """
         For every string found in value, if its a path its expanded completed path
@@ -161,7 +161,10 @@ class FileUtil:
             """
             if replacements:
                 for k, v in replacements.items():
-                    path = path.replace(k, v)
+                    if k == path:
+                        return v
+                    if k in path:
+                        path = path.replace(k, v)
             path = os.path.expanduser(path)
             if use_abs_paths:
                 path = FileUtil.get_path_relative_to_proj_path(path)

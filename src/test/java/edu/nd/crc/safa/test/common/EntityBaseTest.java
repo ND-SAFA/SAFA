@@ -22,8 +22,6 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import lombok.Getter;
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -91,16 +89,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
 
     @MockBean
-    private EmailService emailService;
-
-    @BeforeEach
-    public void mockEmailSend() throws Exception {
-        Mockito.doNothing().when(emailService).sendEmailVerification(
-            Mockito.anyString(),
-            Mockito.anyString());
-        Mockito.doNothing().when(emailService).sendPasswordReset(
-            Mockito.anyString(),
-            Mockito.anyString());
-    }
+    protected EmailService emailService;
 
 }

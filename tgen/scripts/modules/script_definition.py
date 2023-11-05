@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Tuple
 from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
 from tgen.common.util.file_util import ENV_REPLACEMENT_VARIABLES, FileUtil
 from tgen.common.util.json_util import JsonUtil
+from tgen.scripts.constants import MISSING_DEFINITION_ERROR
 
 
 class ScriptDefinition:
@@ -28,7 +29,7 @@ class ScriptDefinition:
             env_variables = ENV_REPLACEMENT_VARIABLES
             env_replacements = FileUtil.get_env_replacements(env_variables)
         if not os.path.isfile(definition_path):
-            raise ValueError(f"{definition_path} does not exists.")
+            raise ValueError(MISSING_DEFINITION_ERROR.format(definition_path))
 
         definition_path = os.path.expanduser(definition_path)
 

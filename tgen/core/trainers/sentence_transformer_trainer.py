@@ -95,7 +95,10 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :return: None
         """
         logger.log_title("Starting Performance", prefix="\n\n")
+        logger.log_step("Validation Set")
         self.perform_prediction(DatasetRole.VAL)
+        logger.log_step("Evaluation Set")
+        self.perform_prediction(DatasetRole.EVAL)
 
         train_examples = self.to_input_examples(self.train_dataset)
         train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=self.args.train_batch_size)

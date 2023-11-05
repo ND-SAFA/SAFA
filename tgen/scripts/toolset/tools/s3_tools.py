@@ -5,8 +5,8 @@ from typing import Any, List
 import boto3
 
 from tgen.common.util.file_util import FileUtil
+from tgen.scripts.constants import DEFAULT_CONFIG_PATH, DEFAULT_DATA_BUCKET, IGNORE_FILES
 from tgen.scripts.toolset.core.confirm import confirm
-from tgen.scripts.toolset.core.constants import DEFAULT_CONFIG_PATH, DEFAULT_DATA_BUCKET, IGNORE_FILES
 
 s3 = boto3.resource('s3')
 N_PER_BATCH = 2

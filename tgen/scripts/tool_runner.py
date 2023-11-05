@@ -5,6 +5,7 @@ from typing import Callable, Dict, List
 from dotenv import load_dotenv
 
 from tgen.scripts.find_missing_docs import print_missing_headers
+from tgen.scripts.toolset.core.tool import Tool
 
 load_dotenv()
 root_path = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -31,7 +32,7 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
         if default_tool_id:
             tools = tool_set_map[default_tool_set_name]
             tool_set = ToolSet(tools)
-            tool = tool_set.tool_map[default_tool_id]
+            tool: Tool = tool_set.tool_map[default_tool_id]
             exit_loop = True
         else:
             default_tool_set_name = inquirer_selection(list(tool_set_map.keys()), "Select tool set")
@@ -43,7 +44,10 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
                 tool = tool_set.inquire_tool()
                 if tool is None:
                     continue
-            args = [param.inquire_tool() for param in tool.params]
+
+            args = tool.get_tool_args()
+            if args is None:
+                continue
         tool.func(*args)
     print(f"\n:-)\n")  # add a blank line after the output
 

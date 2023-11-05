@@ -1,7 +1,7 @@
 import inspect
-from typing import Callable
+from typing import Any, Callable, List, Optional
 
-from tgen.scripts.toolset.core.constants import IGNORE_PARAMS
+from tgen.scripts.constants import IGNORE_PARAMS, TOOL_MISSING_DOCSTRING_ERROR
 from tgen.scripts.toolset.core.tool_param import ToolParam
 
 
@@ -17,7 +17,7 @@ class Tool:
         self.sig = inspect.signature(self.func)
         self.params = self.get_params()
         if self.doc is None:
-            raise Exception(f"Tool {self.id} does have a doc-string.")
+            raise Exception(TOOL_MISSING_DOCSTRING_ERROR.format(self.id))
         self.description = f"{self.id} - {self.get_tool_description(self.doc)}"
 
     def get_params(self):
@@ -34,6 +34,19 @@ class Tool:
             except Exception as e:
                 raise Exception(f"{self.id}.{str(e)}")
         return params
+
+    def get_tool_args(self) -> Optional[List[Any]]:
+        """
+        Prompts the user to enter the args to tool
+        :return: Argument to tool func.
+        """
+        args = []
+        for param in self.params:
+            user_value = param.inquirer_value(allow_back=True)
+            if user_value is None:
+                return None
+            args.append(user_value)
+        return args
 
     def __hash__(self) -> int:
         """

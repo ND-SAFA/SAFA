@@ -26,7 +26,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[TRAIN_PROJECT_PATH]"
+                "project_path": "[DATA_PATH]/[TRAIN_PROJECT]"
               }
             },
             "val_dataset_creator": {
@@ -38,7 +38,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[EVAL_PROJECT_PATH]"
+                "project_path": "[DATA_PATH]/[EVAL_PROJECT]"
               }
             },
             "augmenter": {

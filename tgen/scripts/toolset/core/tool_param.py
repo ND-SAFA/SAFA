@@ -1,6 +1,8 @@
 import inspect
 from typing import Any
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.scripts.constants import MISSING_PARAM_ERROR, PARAM_DOCSTRING_QUERY
 from tgen.scripts.toolset.core.selector import inquirer_value
 
 
@@ -19,13 +21,14 @@ class ToolParam:
         self.default = ToolParam.get_default(param)
         self.annotation = param.annotation
 
-    def inquirer(self) -> Any:
+    def inquirer_value(self, **kwargs) -> Any:
         """
         Prompts user to give value for param.
+        :param kwargs: Keyword arguments to inquirer value from user.
         :return: The value of the param.
         """
         param_message = f"{self.name} - {self.description}"
-        param_value = inquirer_value(param_message, self.annotation, self.default)
+        param_value = inquirer_value(param_message, self.annotation, self.default, **kwargs)
         return param_value
 
     @staticmethod
@@ -48,10 +51,11 @@ class ToolParam:
         :param param_name: The name of the parameter whose description is returned.
         :returns: The description of parameters.
         """
-        error_message = f"`{param_name}` is missing a description.."
+        error_message = MISSING_PARAM_ERROR.format(param_name)
         assert method_doc is not None, error_message
-        lines = method_doc.split('\n')
+        lines = method_doc.split(NEW_LINE)
         for line in lines:
-            if f':param {param_name}:' in line:
-                return line.split(f':param {param_name}:')[1].strip()
+            param_doc_query = PARAM_DOCSTRING_QUERY.format(param_name)
+            if param_doc_query in line:
+                return line.split(param_doc_query)[1].strip()
         raise Exception(error_message)

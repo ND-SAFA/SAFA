@@ -5,10 +5,12 @@ import inquirer
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.logging.logger_manager import logger
-from tgen.scripts.toolset.core.constants import BACK_COMMAND, EXIT_COMMAND
+from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, DEFAULT_VALUE_MESSAGE, EXIT_COMMAND, EXIT_MESSAGE, \
+    REQUIRED_FIELD_ERROR, \
+    SINGLETON_PROMPT_ID
 
 
-def inquirer_selection(selections: List[str], message: str = None, allow_back: bool = False):
+def inquirer_selection(selections: List[str], message: str = None, allow_back: bool = DEFAULT_ALLOW_BACK):
     """
     Prompts user to select an option.
     :param selections: The options to select from.
@@ -16,22 +18,22 @@ def inquirer_selection(selections: List[str], message: str = None, allow_back: b
     :param allow_back: Allow the user to select command to move `back` in menu.
     :return: The selected option.
     """
-    prompt_id = "prompt_id"
+
     other_commands = [EXIT_COMMAND]
     if allow_back:
         other_commands.insert(0, BACK_COMMAND)
-    prompts = [inquirer.List(prompt_id, message=message, choices=selections + other_commands)]
+    prompts = [inquirer.List(SINGLETON_PROMPT_ID, message=message, choices=selections + other_commands)]
     answers = inquirer.prompt(prompts)
-    selected_choice = answers[prompt_id]
+    selected_choice = answers[SINGLETON_PROMPT_ID]
     if selected_choice == EXIT_COMMAND:
-        print("Bye bye :)")
+        logger.info(EXIT_MESSAGE)
         sys.exit()
     if allow_back and selected_choice == BACK_COMMAND:
         return None
     return selected_choice
 
 
-def inquirer_value(message: str, class_type: Type, default_value: Any):
+def inquirer_value(message: str, class_type: Type, default_value: Any, allow_back: bool = DEFAULT_ALLOW_BACK):
     """
     Prompts user with message for a value.
     :param message: The message to prompt user with.
@@ -40,13 +42,17 @@ def inquirer_value(message: str, class_type: Type, default_value: Any):
     :return: The value after parsing user response.
     """
     annotation_name = class_type.__name__ if hasattr(class_type, "__name__") else repr(class_type)
-    message += f"- {annotation_name} -"
+    message += f" - {annotation_name} -"
     if default_value is not None:
-        message += f"({default_value})"
+        message += f" ({default_value})"
     user_value = inquirer.text(message=message)
+    if allow_back and user_value.lower() == BACK_COMMAND:
+        return None
+    if class_type is list:  # TODO: Support list of ints, bools, and floats.
+        return user_value.split(",")
     if user_value.strip() == EMPTY_STRING:
         if default_value is None:
-            raise Exception("Required field received empty value.")
-        logger.info("Default value used.")
+            raise Exception(REQUIRED_FIELD_ERROR)
+        logger.info(DEFAULT_VALUE_MESSAGE)
         return default_value
     return class_type(user_value)

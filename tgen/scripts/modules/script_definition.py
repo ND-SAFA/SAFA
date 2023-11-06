@@ -2,8 +2,6 @@ import os
 from typing import Any, Dict, Tuple
 
 from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
-from tgen.common.util.file_util import FileUtil
-from tgen.scripts.constants import MISSING_DEFINITION_ERROR
 from tgen.scripts.toolset.rq_definition import RQDefinition
 
 
@@ -25,25 +23,16 @@ class ScriptDefinition:
         :param default_variables: List of env variables to include in replacements.
         :return: Processed definition.
         """
-        if env_replacements is None:
-            env_replacements = FileUtil.get_env_replacements()
         if definition_path:
-            if not os.path.isfile(definition_path):
-                raise ValueError(MISSING_DEFINITION_ERROR.format(definition_path))
-            definition_path = os.path.expanduser(definition_path)
             rq_definition = RQDefinition(definition_path)
-        elif not rq_definition:
+
+        if not rq_definition:
             raise Exception("Expected definition path or rq definition to be given.")
 
-        variable2value, unknown_variables = rq_definition.get_unknown_variables(env_replacements)
-        variable2value = {f"[{k}]": v for k, v in variable2value.items()}
-        if len(unknown_variables) > 0:
-            raise Exception("Unknown variables: " + repr(unknown_variables))
+        rq_definition_json = rq_definition.build_rq(error_on_fail=True)
+        rq_definition_json = ScriptDefinition.set_output_paths(rq_definition_json, rq_definition.script_name)
 
-        script_name = ScriptDefinition.get_script_name(definition_path)
-        job_definition = ScriptDefinition.set_output_paths(rq_definition.rq_json, script_name)
-        result = FileUtil.expand_paths(job_definition, variable2value, use_abs_paths=False)
-        return result
+        return rq_definition_json
 
     @staticmethod
     def set_output_paths(script_definition: Dict, script_name: str) -> Dict:
@@ -60,7 +49,6 @@ class ScriptDefinition:
             script_output_path = script_definition[ScriptDefinition.OUTPUT_DIR_PARAM]
         script_output_path = os.path.expanduser(script_output_path)
         script_definition[ScriptDefinition.OUTPUT_DIR_PARAM] = script_output_path
-        script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
         script_definition = ScriptDefinition.set_object_property(
             ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, script_output_path),
             script_definition)

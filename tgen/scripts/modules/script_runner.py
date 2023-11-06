@@ -1,10 +1,10 @@
 import os
 from typing import Dict, Type
 
+from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.logger_manager import LoggerManager, logger
-from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from tgen.experiments.experiment import Experiment
 from tgen.scripts.modules.experiment_types import ExperimentTypes
 from tgen.scripts.modules.script_definition import ScriptDefinition
@@ -54,13 +54,6 @@ class ScriptRunner:
         self._load_experiment_definition()
         self.script_reader.print_val()
         self.script_reader.print_eval()
-
-    def upload_results(self) -> None:
-        """
-        Uploads results to tensorboard and s3 if bucket is available.
-        :return: None
-        """
-        self.script_reader.upload_to_s3()
 
     def get_experiment(self) -> Experiment:
         """

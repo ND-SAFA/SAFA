@@ -1,10 +1,12 @@
-import json
+import os
 import re
 from typing import Any, Dict, List, Tuple, Type
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.scripts.constants import RQ_VARIABLE_REGEX, RQ_VARIABLE_START, SUPPORTED_TYPES_RQ
+from tgen.scripts.constants import MISSING_DEFINITION_ERROR, RQ_INQUIRER_CONFIRM_MESSAGE, RQ_VARIABLE_REGEX, RQ_VARIABLE_START, \
+    SUPPORTED_TYPES_RQ
 from tgen.scripts.toolset.confirm import confirm
 from tgen.scripts.toolset.selector import inquirer_value
 
@@ -18,7 +20,25 @@ class RQVariable:
         """
         self.definition = variable_definition
         self.name, self.type_class = RQVariable.get_variable_type(variable_definition)
-        self.value = None
+        self.__value = None
+        self.__default_value = None
+
+    def get_value(self) -> Any:
+        """
+        :return: Returns the value of the variable.
+        """
+        value = self.__default_value if self.__value is None else self.__value
+        if isinstance(value, str):
+            value = os.path.expanduser(value)
+        return value
+
+    def inquirer_value(self, default_value: Any = None) -> None:
+        """
+        Prompts user to enter valid value for variable.
+        :return: None
+        """
+        message = f"{self.name}"
+        self.__value = inquirer_value(message, self.type_class, default_value=default_value)
 
     def parse_value(self, variable_value: Any) -> Any:
         """
@@ -27,8 +47,25 @@ class RQVariable:
         :return: Value of variable.
         """
         typed_value = self.type_class(variable_value)
-        self.value = typed_value
+        self.__value = typed_value
         return typed_value
+
+    def has_valid_value(self, throw_error: bool = False) -> bool:
+        """
+        :param throw_error: Whether to throw error if value is not valid.
+        :return: Returns whether variable contains value of specified type.
+        """
+        value = self.get_value()
+        result = True
+        if value is None:
+            if throw_error:
+                raise Exception(f"{self.name} has value of None.")
+            result = False
+        if not isinstance(value, self.type_class):
+            if throw_error:
+                raise Exception(f"{self.name} contains value of type {type(value)} but expected {self.type_class}.")
+            result = False
+        return result
 
     @classmethod
     def get_variable_type(cls, variable_definition: str, default_type: Type = str) -> Tuple[str, Type]:
@@ -51,7 +88,7 @@ class RQVariable:
         Represents class with variable name.
         :return: Variable name.
         """
-        return self.name
+        return f"{self.name}={self.get_value()}"
 
 
 class RQDefinition:
@@ -60,46 +97,63 @@ class RQDefinition:
         Defines proxy API for RQ at path.
         :param rq_path: Path to RQ to create proxy for.
         """
+        if not os.path.isfile(rq_path):
+            raise ValueError(MISSING_DEFINITION_ERROR.format(rq_path))
         self.rq_path = rq_path
         self.script_name = self.get_script_name(rq_path)
         self.rq_json = JsonUtil.read_json_file(rq_path)
         self.variables = self.extract_variables(self.rq_json)
 
-    def get_unknown_variables(self, default_values: Dict):
+    def build_rq(self, error_on_fail: bool = True) -> Dict:
+        """
+        Builds the RQ JSON with all variables filled in.
+        :param error_on_fail: Whether to throw an error if a variable does not have a valid value.
+        :return: RQ Json.
+        """
+        self.has_all_variable(throw_error=error_on_fail)
+        variable_replacements = self.__get_variable_replacements()
+        built_rq = FileUtil.expand_paths(self.rq_json, variable_replacements)
+        return built_rq
+
+    def inquirer_variables(self, default_values: Dict) -> None:
         """
         Prompts user to fill in any missing variables in RQ definition.
         :param default_values: Dictionary of default values to allow user to select from.
-        :return: Dictionary of variable to values selected.
+        :return: None
         """
-        variable2value = {}
-        unknown_variables = []
         for variable in self.variables:
-            variable_name = variable.name
-            if variable_name in variable2value:
-                continue
-            if variable_name in default_values:
-                variable2value[variable.definition] = variable.parse_value(default_values[variable_name])
-            else:
-                unknown_variables.append(variable)
-        return variable2value, unknown_variables
+            default_value = default_values.get(variable.name, None)
+            variable.inquirer_value(default_value=default_value)
+        if not self.confirm():
+            self.inquirer_variables(default_values)
 
-    def inquirer_variables(self, default_values: Dict) -> Dict:
+    def confirm(self, title: str = RQ_INQUIRER_CONFIRM_MESSAGE) -> bool:
         """
-        Prompts user to fill in any missing variables in RQ definition.
-        :param default_values: Dictionary of default values to allow user to select from.
-        :return: Dictionary of variable to values selected.
+        Confirms values of the rq with the user.
+        :param title: The title of the message.
+        :return: Whether the user confirmed the values.
         """
-        variable2value, unknown_variables = self.get_unknown_variables(default_values)
-
+        variable_messages = []
         for variable in self.variables:
-            message = f"{variable.name}"
-            user_value = inquirer_value(message, variable.type_class, default_value=variable.value)
-            variable2value[variable.definition] = user_value
-        confirmation_message = json.dumps(variable2value, indent=4)
-        if confirm(f"Are these the correct values?\n{confirmation_message}"):
-            return variable2value
-        else:
-            return inquirer_value(default_values)
+            variable_messages.append(repr(variable))
+        variable_values_message = NEW_LINE.join(variable_messages)
+        return confirm(f"\n{title}\n{variable_values_message}")
+
+    def has_all_variable(self, throw_error: bool = True):
+        """
+        Checks is all variables have valid values.
+        :param throw_error: Whether to throw error
+        :return:
+        """
+        for variable in self.variables:
+            variable.has_valid_value(throw_error=True)
+        return True
+
+    def __get_variable_replacements(self) -> Dict:
+        """
+        :return: Returns the map of variable names to their values.
+        """
+        return {f"[{v.definition}]": v.get_value() for v in self.variables}
 
     @classmethod
     def extract_variables(cls, rq_definition: Dict) -> List[RQVariable]:

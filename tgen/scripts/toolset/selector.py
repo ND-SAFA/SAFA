@@ -55,5 +55,5 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
         if default_value is None:
             raise Exception(REQUIRED_FIELD_ERROR)
         logger.info(DEFAULT_VALUE_MESSAGE)
-        return default_value
+        user_value = default_value
     return class_type(user_value)

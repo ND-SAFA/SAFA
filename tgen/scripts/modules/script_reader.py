@@ -1,15 +1,14 @@
 import os
-import subprocess
 from functools import reduce
 from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
+from tgen.common.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
-from tgen.common.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES
 from tgen.jobs.components.job_result import JobResult
 from tgen.scripts.modules.script_definition import ScriptDefinition
 
@@ -66,17 +65,6 @@ class ScriptOutputReader:
         Prints the validation metrics of experiment.
         :return: None
         """
-
-    def upload_to_s3(self) -> None:
-        """
-        Uploads results files to s3 bucket.
-        :return: None
-        """
-        bucket_name = os.environ.get("BUCKET", None)
-        if bucket_name:
-            bucket_path = os.path.join(f"s3://{bucket_name}", self.script_name)
-            for output_path in [self.val_output_path, self.eval_output_path]:
-                subprocess.run(["aws", "s3", "cp", output_path, bucket_path])
 
     def read(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """

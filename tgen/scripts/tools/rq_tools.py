@@ -89,11 +89,13 @@ def run_rq(rq_path: str) -> None:
     rq_definition = RQDefinition(experiment_path)
 
     os_variables = {env_key: env_value for env_key, env_value in os.environ.items()}
-    replacements = rq_definition.inquirer_variables(default_values=os_variables)
+    rq_definition.inquirer_variables(default_values=os_variables)
+    final_rq_json = rq_definition.build_rq(error_on_fail=True)
 
-    experiment_definition = ScriptDefinition.read_experiment_definition(experiment_path, replacements)
-    experiment_class = ScriptRunner.get_experiment_class(experiment_definition)
-    experiment = ObjectCreator.create(experiment_class, override=True, **experiment_definition)
+    print(final_rq_json)
+    final_rq_json = ScriptDefinition.set_output_paths(final_rq_json, rq_definition.script_name)
+    experiment_class = ScriptRunner.get_experiment_class(final_rq_json)
+    experiment = ObjectCreator.create(experiment_class, override=True, **final_rq_json)
     experiment.run()
 
 

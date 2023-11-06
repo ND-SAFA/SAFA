@@ -6,7 +6,7 @@ def confirm(confirm_question: str = CONFIRM_MESSAGE_DEFAULT):
     Confirms with the user.
     :param confirm_question: The prompt to show the user.
     """
-    confirm_prompt = f"{confirm_question} {CONFIRM_OPTIONS}:"
+    confirm_prompt = f"{confirm_question}\n{CONFIRM_OPTIONS}:"
     confirm_response = input(confirm_prompt)
     if CONFIRM_POS in confirm_response.lower():
         return True

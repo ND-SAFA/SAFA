@@ -164,7 +164,7 @@ class FileUtil:
                     if k in path:
                         path = path.replace(k, v)
             path = os.path.expanduser(path)
-            if use_abs_paths:
+            if ("~" in path or "/" in path) and use_abs_paths:
                 path = FileUtil.get_path_relative_to_proj_path(path)
             return path
 
@@ -189,8 +189,9 @@ class FileUtil:
             if replacements:
                 path2var = {v: k for k, v in replacements.items()}
                 ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
-                for path2replace in ordered_paths:
-                    path = path.replace(path2replace, path2var[path2replace])
+                for curr_value in ordered_paths:
+                    new_value = path2var[curr_value]
+                    path = path.replace(curr_value, new_value)
             if os.path.isabs(path):
                 path = os.path.relpath(path, PROJ_PATH)
             return path
@@ -245,8 +246,9 @@ class FileUtil:
         for a in paths:
             ordered = [a]
             for b in paths:
-                if a == b:
+                if a == b or not isinstance(a, str) or not isinstance(b, str):
                     continue
+
                 if a in b:
                     ordered.append(b)
                 elif b in a:

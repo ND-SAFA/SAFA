@@ -1,6 +1,10 @@
 import os
 
 """
+RQ DEFINITION
+"""
+RQ_INQUIRER_CONFIRM_MESSAGE = "Are these the correct values?"
+"""
 Tool Set
 """
 FUNC_PARAM = "func"
@@ -32,7 +36,7 @@ PARENT_FOLDER = ".."
 RQ_PATH_PARAM = "RQ_PATH"
 MISSING_DEFINITION_ERROR = "{} does not exists."
 CONFIRM_MESSAGE_DEFAULT = "Confirm?"
-CONFIRM_OPTIONS = "(Yes/No)"
+CONFIRM_OPTIONS = "(y/n)"
 CONFIRM_PARSE_ERROR = "Unable to parse response: {}"
 CONFIRM_POS = "y"
 CONFIRM_NEG = "n"

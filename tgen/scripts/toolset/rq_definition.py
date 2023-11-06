@@ -131,6 +131,8 @@ class RQDefinition:
         :param default_values: Map of variable names to their default values.
         :return: None
         """
+        if default_values is None and not use_os_values:
+            raise Exception("Expected default_values to be passed or os values to be turned on.")
         if default_values is None:
             default_values = {}
         if use_os_values:

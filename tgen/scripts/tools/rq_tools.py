@@ -88,11 +88,11 @@ def run_rq(rq_path: str) -> None:
     experiment_path = os.path.expanduser(rq_path)
     rq_definition = RQDefinition(experiment_path)
 
+    ScriptDefinition.set_output_paths(rq_definition)
     rq_definition.set_default_values(use_os_values=True)
     rq_definition.inquirer_variables()
     final_rq_json = rq_definition.build_rq(error_on_fail=True)
 
-    final_rq_json = ScriptDefinition.set_output_paths(final_rq_json, rq_definition.script_name)
     experiment_class = ScriptRunner.get_experiment_class(final_rq_json)
     experiment = ObjectCreator.create(experiment_class, override=True, **final_rq_json)
     experiment.run()

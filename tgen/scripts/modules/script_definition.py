@@ -27,23 +27,23 @@ class ScriptDefinition:
         if not rq_definition:
             raise Exception("Expected definition path or rq definition to be given.")
 
-        rq_definition.rq_json = ScriptDefinition.set_output_paths(rq_definition.rq_json, rq_definition.script_name)
+        ScriptDefinition.set_output_paths(rq_definition)
         rq_definition.set_default_values(use_os_values=True)
         rq_definition_json = rq_definition.build_rq(error_on_fail=True)
 
         return rq_definition_json
 
     @staticmethod
-    def set_output_paths(script_definition: Dict, script_name: str) -> Dict:
+    def set_output_paths(rq_definition: RQDefinition) -> None:
         """
         Sets the output path for the job results, logger, and model base dir.
-        :param script_definition: The script definition to set output paths of.
-        :param script_name: The name of the script.
-        :return: Script definition with output paths modifications.
+        :param rq_definition: The rq definition to set output paths for.
+        :return: None, modifications in place.
         """
 
+        script_definition = rq_definition.rq_json
         if ScriptDefinition.OUTPUT_DIR_PARAM not in script_definition:
-            script_output_path = os.path.join(ScriptDefinition.ENV_OUTPUT_PARAM, script_name)
+            script_output_path = os.path.join(ScriptDefinition.ENV_OUTPUT_PARAM, rq_definition.script_name)
         else:
             script_output_path = script_definition[ScriptDefinition.OUTPUT_DIR_PARAM]
         script_output_path = os.path.expanduser(script_output_path)
@@ -51,7 +51,7 @@ class ScriptDefinition:
         script_definition = ScriptDefinition.set_object_property(
             ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, script_output_path),
             script_definition)
-        return script_definition
+        rq_definition.rq_json = script_definition
 
     @staticmethod
     def set_object_property(object_properties: Tuple[str, str, Any], object_data: Dict) -> Dict:

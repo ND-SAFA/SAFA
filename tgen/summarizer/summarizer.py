@@ -55,8 +55,8 @@ class Summarizer:
         """
         loaded_artifact_df = ArtifactDataFrame(pd.read_csv(self._get_artifact_save_path()))
         original_artifacts = set(self.dataset.artifact_df.index)
-        added_artifacts = set(loaded_artifact_df.index).difference(original_artifacts)
-        loaded_artifact_df.remove_rows(list(added_artifacts))
+        removed_artifacts = set(loaded_artifact_df.index).difference(original_artifacts)
+        loaded_artifact_df.remove_rows(list(removed_artifacts))
         for a_id in original_artifacts:
             orig_artifact = self.dataset.artifact_df.get_artifact(a_id)
             loaded_artifact = loaded_artifact_df.get_artifact(a_id)

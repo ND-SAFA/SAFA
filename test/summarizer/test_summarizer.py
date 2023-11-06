@@ -1,3 +1,4 @@
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -9,6 +10,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MockResponses, TEST_PROJECT_SUMMARY
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
 
 
@@ -130,6 +132,27 @@ class TestSummarizer(BaseTest):
         self.assertFalse(DataFrameUtil.contains_na(dataset.artifact_df[ArtifactKeys.SUMMARY]))
         self.assertIsInstance(dataset.project_summary, Summary)
 
+    def test_load_artifacts_from_file(self):
+        summarizer = self.get_summarizer(SummarizerArgs(export_dir=TEST_OUTPUT_DIR), with_artifact_summaries=True)
+        summarizer._save_artifact_summaries(summarizer.dataset.artifact_df)
+        artifacts_in_dataframe = list(summarizer.dataset.artifact_df.index)
+        removed_artifact_id = artifacts_in_dataframe[0]
+        changed_artifact_id = artifacts_in_dataframe[1]
+        new_artifact_id = "new_a_id"
+        summarizer.dataset.artifact_df[ArtifactKeys.SUMMARY] = [EMPTY_STRING for _ in summarizer.dataset.artifact_df.index]
+        summarizer.dataset.artifact_df.remove_row(removed_artifact_id)
+        summarizer.dataset.artifact_df.update_value(ArtifactKeys.CONTENT, changed_artifact_id, "changed content")
+        summarizer.dataset.artifact_df.add_artifact(new_artifact_id, "new content", "some layer")
+        summarizer._load_artifacts_from_file()
+        self.assertNotIn(removed_artifact_id, summarizer.dataset.artifact_df)
+        self.assertIn(new_artifact_id, summarizer.dataset.artifact_df)
+        changed_artifact = summarizer.dataset.artifact_df.get_artifact(changed_artifact_id)
+        self.assertEqual(changed_artifact[ArtifactKeys.CONTENT], "changed content")
+        self.assertFalse(changed_artifact[ArtifactKeys.SUMMARY])
+        for id_, artifact in summarizer.dataset.artifact_df.itertuples():
+            if id_ != changed_artifact_id and id_ != new_artifact_id:
+                self.assertTrue(artifact[ArtifactKeys.SUMMARY])
+
     def get_summarizer(self, summarizer_args: SummarizerArgs,
                        with_artifact_summaries: bool = False, with_project_summary: bool = False) -> Summarizer:
         creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(SafaTestProject.get_project_reader()))
@@ -140,3 +163,5 @@ class TestSummarizer(BaseTest):
             dataset.project_summary = TEST_PROJECT_SUMMARY
         summarizer_args.summarize_code_only = False
         return Summarizer(summarizer_args, dataset)
+
+

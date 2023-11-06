@@ -9,8 +9,10 @@ import numpy as np
 from test.hgen.hgen_test_utils import HGenTestConstants, get_name_responses, get_test_hgen_args, HGEN_PROJECT_SUMMARY, \
     MISSING_PROJECT_SUMMARY_RESPONSES
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
+from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
@@ -26,33 +28,38 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from bs4 import BeautifulSoup, Tag
 
 
 class TestHierarchyGeneratorWithClustering(BaseTest):
-    HGEN_ARGS = None
+    HGEN_ARGS: HGenArgs = None
     HGEN_STATE = HGenState()
 
     @mock_anthropic
     def test_hgen_with_clusters(self, anthropic_ai_manager: TestAIManager):
-        artifacts, expected_names, n_artifacts_per_cluster, args, state = self._setup_hgen_for_clustering(anthropic_ai_manager,
-                                                                                                          generate_trace_links=True)
-
-        self.assert_generate_artifact_content_step(args, state, anthropic_ai_manager)
+        artifacts, expected_names, n_artifacts_per_cluster, n_artifacts_last_cluster, args, state = self._setup_hgen_for_clustering(
+            anthropic_ai_manager, generate_trace_links=True)
+        added_artifacts_to_last_cluster = n_artifacts_last_cluster - n_artifacts_per_cluster
+        self.assert_generate_artifact_content_step(args, state, anthropic_ai_manager, added_artifacts_to_last_cluster)
         RefineGenerationsStep().run(args, state)
         NameArtifactsStep().run(args, state)
-        self.assert_generate_trace_links_step(expected_names, n_artifacts_per_cluster, args, state, anthropic_ai_manager)
+        self.assert_generate_trace_links_step(expected_names, n_artifacts_per_cluster,
+                                              args, state, anthropic_ai_manager)
 
     def assert_generate_artifact_content_step(self, args, state,
-                                              anthropic_ai_manager: TestAIManager):
+                                              anthropic_ai_manager: TestAIManager, added_artifacts_to_last_cluster: int):
         anthropic_ai_manager.mock_summarization()
         GenerateArtifactContentStep().run(args, state)
         self.assertEqual(len(state.generation_predictions), len(HGenTestConstants.user_stories))
         for i, us in enumerate(state.generation_predictions.keys()):
             self.assertEqual(us, HGenTestConstants.user_stories[i])
-        # TODO test that n_targets is used properly
+        last_cluster_artifacts = state.id_to_cluster_artifacts[len(state.generation_predictions) - 1]
+        state.id_to_cluster_artifacts[len(state.generation_predictions) - 1] = last_cluster_artifacts[
+                                                                               :-added_artifacts_to_last_cluster]
 
     @mock.patch.object(EmbeddingUtil, "calculate_similarities")
-    def assert_generate_trace_links_step(self, expected_names, n_artifacts_per_cluster, args: HGenArgs, state,
+    def assert_generate_trace_links_step(self, expected_names, n_artifacts_per_cluster,
+                                         args: HGenArgs, state,
                                          anthropic_ai_manager: TestAIManager,
                                          calculate_sim: MagicMock = None):
         threshold = int(args.link_selection_threshold * 10)
@@ -79,9 +86,19 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                 else:
                     self.assertNotIn(TraceKeys.EXPLANATION, found[0])
 
+    def assert_generation_prompts(self, prompt: str, return_value: str):
+        n_artifacts = len(BeautifulSoup(prompt, features="lxml").findAll(self.HGEN_ARGS.source_type))
+        expected_value = GenerateArtifactContentStep._calculate_proportion_of_artifacts(n_artifacts, DEFAULT_BRANCHING_FACTOR)
+        self.assertIn(f"a minimal set ({expected_value})", prompt)
+        return return_value
+
     def _setup_hgen_for_clustering(self, anthropic_ai_manager: TestAIManager,
                                    generate_trace_links: bool = False):
+        def prompt_res_creator(r):
+            return lambda prompt: self.assert_generation_prompts(prompt, return_value=r)
+
         args: HGenArgs = get_test_hgen_args()()
+        self.HGEN_ARGS = args
         args.target_type = "User Story"
         args.perform_clustering = True
         args.generate_trace_links = generate_trace_links
@@ -96,18 +113,27 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                                                                                        args.source_layer_id)
         artifacts = state.source_dataset.artifact_df.to_artifacts()
         n = 11
+        n_artifacts_last_cluster = n
+        n_clusters = math.floor(len(artifacts) / n)
         state.id_to_cluster_artifacts = {i: [EnumDict(a) for a in artifacts[i * n:i * n + n]]
-                                         for i in range(math.floor(len(artifacts) / n))}
+                                         for i in range(n_clusters)}
+        if n_clusters * n < len(artifacts):
+            rem = n_clusters * n
+            added_clusters = [EnumDict(a) for a in artifacts[rem:] + artifacts[:2]]
+            state.id_to_cluster_artifacts[n_clusters - 1].extend(added_clusters)
+            n_artifacts_last_cluster += len(added_clusters)
+
         cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters={i: [a[ArtifactKeys.ID] for a in artifacts]
                                                                                        for i, artifacts in
                                                                                        state.id_to_cluster_artifacts.items()}) \
             .create()
         state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
         state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
-        responses = [PromptUtil.create_xml("user-story", us)
-                     for i, us in enumerate(HGenTestConstants.user_stories)]
+        user_story_responses = [PromptUtil.create_xml("user-story", us) for i, us in enumerate(HGenTestConstants.user_stories)]
+
+        responses = [prompt_res_creator(user_story_responses[i]) for i in range(len(user_story_responses))]
         names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.generation_predictions)
         responses.extend(name_responses)
         anthropic_ai_manager.set_responses(responses)
         anthropic_ai_manager.mock_summarization()
-        return artifacts, expected_names, n, args, state
+        return artifacts, expected_names, n, n_artifacts_last_cluster, args, state

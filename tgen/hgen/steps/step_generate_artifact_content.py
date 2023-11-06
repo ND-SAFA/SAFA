@@ -71,8 +71,19 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param branching_factor: Determines the percentage of target artifacts per source artifacts
         :return: A list of the expected number of target artifacts for each cluster
         """
-        n_targets = [max(round(len(state.id_to_cluster_artifacts[i]) * (1 / branching_factor)), 1) for i in artifact_ids]
+        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(state.id_to_cluster_artifacts[i]),
+                                                                                    branching_factor) for i in artifact_ids]
         return n_targets
+
+    @staticmethod
+    def _calculate_proportion_of_artifacts(n_artifacts: int,  branching_factor: int) -> int:
+        """
+        Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
+        :param n_artifacts: Total number of artifacts
+        :param branching_factor: Determines the proportion (e.g. branching_factor = 2 would be 50% of artifacts)
+        :return: The number of artifacts equal to a proportion of the total
+        """
+        return max(round(n_artifacts * (1 / branching_factor)), 1)
 
     @staticmethod
     def _map_generations_to_predicted_sources(generation_predictions: List, source_tag_id: str, target_tag_id: str,

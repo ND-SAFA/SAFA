@@ -14,3 +14,4 @@ export * from "./search";
 export * from "./members";
 export * from "./settings";
 export * from "./organization";
+export * from "./onboarding";

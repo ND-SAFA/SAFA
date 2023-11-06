@@ -69,4 +69,8 @@ export interface FilePanelProps {
    * The panel index.
    */
   index: number;
+  /**
+   * If true, the upload type editor will be hidden.
+   */
+  hideUploadType?: boolean;
 }

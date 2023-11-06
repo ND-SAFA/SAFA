@@ -55,7 +55,7 @@ $color-linear-gradient: linear-gradient(
     border-color: $color-background !important;
   }
 
-  i, .q-fab__label {
+  i, .q-fab__label, .q-btn__content {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-image: $color-linear-gradient;

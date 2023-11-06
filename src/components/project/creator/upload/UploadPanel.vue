@@ -11,6 +11,7 @@
       <slot name="panel" :panel="props.panel" />
 
       <select-input
+        v-if="!props.hideUploadType"
         v-model="props.panel.variant"
         label="Upload Type"
         :options="variantOptions"
@@ -40,46 +41,52 @@
       <git-hub-project-input v-if="props.panel.variant === 'github'" />
       <jira-project-input v-if="props.panel.variant === 'jira'" />
 
-      <flex-box column>
-        <switch-input
-          v-model="props.panel.emptyFiles"
-          label="Create an empty project"
-          data-cy="toggle-create-empty-project"
-        />
-        <switch-input
-          v-if="hasBulkFiles"
-          v-model="props.panel.summarize"
-          label="Generate artifact summaries"
-          data-cy="toggle-create-summarize"
-        />
-        <switch-input
-          v-if="props.panel.variant === 'trace'"
-          v-model="props.panel.isGenerated"
-          label="Generate Trace Links"
-        />
-      </flex-box>
+      <expansion-item v-if="!props.hideUploadType" label="Advanced Settings">
+        <flex-box column>
+          <switch-input
+            v-if="hasBulkFiles"
+            v-model="props.panel.emptyFiles"
+            label="Create an empty project"
+            data-cy="toggle-create-empty-project"
+          />
+          <switch-input
+            v-if="hasBulkFiles"
+            v-model="props.panel.summarize"
+            label="Generate artifact summaries"
+            data-cy="toggle-create-summarize"
+          />
+          <switch-input
+            v-if="props.panel.variant === 'trace'"
+            v-model="props.panel.isGenerated"
+            label="Generate Trace Links"
+          />
+        </flex-box>
 
-      <upload-panel-errors v-bind="props" />
+        <upload-panel-errors v-bind="props" />
 
-      <list
-        v-if="hasSingleFile && props.panel.itemNames.length > 0"
-        class="q-mb-md"
-      >
-        <expansion-item label="Parsed Entities">
-          <div class="q-mx-md">
-            <attribute-chip
-              v-for="itemName of props.panel.itemNames"
-              :key="itemName"
-              :value="itemName"
-              :icon="props.panel.variant === 'artifact' ? 'artifact' : 'trace'"
-              data-cy="button-file-entities"
-            />
-          </div>
-        </expansion-item>
-      </list>
+        <list
+          v-if="hasSingleFile && props.panel.itemNames.length > 0"
+          class="q-mb-md"
+        >
+          <expansion-item label="Parsed Entities">
+            <div class="q-mx-md">
+              <attribute-chip
+                v-for="itemName of props.panel.itemNames"
+                :key="itemName"
+                :value="itemName"
+                :icon="
+                  props.panel.variant === 'artifact' ? 'artifact' : 'trace'
+                "
+                data-cy="button-file-entities"
+              />
+            </div>
+          </expansion-item>
+        </list>
+      </expansion-item>
 
       <flex-box justify="end" t="2">
         <text-button
+          v-if="!props.hideUploadType"
           text
           icon="delete"
           label="Delete"

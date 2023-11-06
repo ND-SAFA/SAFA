@@ -7,6 +7,7 @@
       variant="large"
       value="Welcome to SAFA"
     />
+
     <flex-box :column="smallWindow" full-width>
       <flex-item v-if="displayProjects" :parts="smallWindow ? '12' : '7'">
         <div :class="smallWindow ? '' : 'q-mr-md'">
@@ -19,6 +20,7 @@
           </panel-card>
         </div>
       </flex-item>
+
       <flex-item :parts="smallWindow || !displayProjects ? '12' : '5'">
         <panel-card title="Create New Project" icon="project-add">
           <typography

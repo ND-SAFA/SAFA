@@ -19,6 +19,8 @@ import {
   OrganizationSchema,
   TeamSchema,
   TraceLinkSchema,
+  UploadPanelType,
+  CreatorFilePanel,
 } from "@/types";
 
 export function buildSnackbarMessage(): SnackbarMessage {
@@ -52,6 +54,25 @@ export function buildSession(): SessionSchema {
   return {
     token: "",
     versionId: "",
+  };
+}
+
+export function buildEmptyPanel(
+  variant: UploadPanelType = "artifact"
+): CreatorFilePanel {
+  return {
+    variant,
+    name: "",
+    type: "",
+    open: true,
+    valid: false,
+    loading: false,
+    ignoreErrors: false,
+    itemNames: [],
+    isGenerated: false,
+    summarize: false,
+    bulkFiles: [],
+    emptyFiles: false,
   };
 }
 

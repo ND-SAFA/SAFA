@@ -9,26 +9,9 @@ import {
   TimNodeProps,
   UploadPanelType,
 } from "@/types";
-import { buildProject } from "@/util";
+import { buildEmptyPanel, buildProject } from "@/util";
 import { integrationsStore, orgStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
-
-const createEmptyPanel = (
-  variant: UploadPanelType = "artifact"
-): CreatorFilePanel => ({
-  variant,
-  name: "",
-  type: "",
-  open: true,
-  valid: false,
-  loading: false,
-  ignoreErrors: false,
-  itemNames: [],
-  isGenerated: false,
-  summarize: false,
-  bulkFiles: [],
-  emptyFiles: false,
-});
 
 /**
  * The save project store assists in creating new projects.
@@ -37,7 +20,7 @@ export const useSaveProject = defineStore("saveProject", {
   state: () => ({
     name: "",
     description: "",
-    uploadPanels: [createEmptyPanel()] as CreatorFilePanel[],
+    uploadPanels: [buildEmptyPanel()] as CreatorFilePanel[],
     artifactMap: {} as ArtifactMap,
   }),
   getters: {
@@ -186,7 +169,7 @@ export const useSaveProject = defineStore("saveProject", {
     resetProject(): void {
       this.name = "";
       this.description = "";
-      this.uploadPanels = [createEmptyPanel()];
+      this.uploadPanels = [buildEmptyPanel()];
       this.artifactMap = {};
     },
     /**
@@ -194,7 +177,7 @@ export const useSaveProject = defineStore("saveProject", {
      * @param variant - The type of panel to add.
      */
     addPanel(variant: UploadPanelType = "artifact"): void {
-      this.uploadPanels.push(createEmptyPanel(variant));
+      this.uploadPanels.push(buildEmptyPanel(variant));
     },
     /**
      * Removes a creator panel.

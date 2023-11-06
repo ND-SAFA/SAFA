@@ -140,4 +140,15 @@ public class SafaUserService {
         user.setDefaultOrgId(newDefaultOrgId);
         safaUserRepository.save(user);
     }
+
+    /**
+     * Adds the superuser permission to the given user
+     *
+     * @param updatedUser The user to update
+     * @return The updated user
+     */
+    public SafaUser addSuperUser(SafaUser updatedUser) {
+        updatedUser.setSuperuser(true);
+        return safaUserRepository.save(updatedUser);
+    }
 }

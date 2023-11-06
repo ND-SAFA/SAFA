@@ -10,6 +10,7 @@ import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.EmailService;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordChangeRequest;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,6 +57,7 @@ public class SafaUserController extends BaseController {
     private final SafaUserRepository safaUserRepository;
     private final SafaUserService safaUserService;
     private final EmailService emailService;
+    private final PermissionService permissionService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     @Value("${fend.base}")
     private String fendBase;
@@ -65,6 +68,7 @@ public class SafaUserController extends BaseController {
     public SafaUserController(ResourceBuilder resourceBuilder,
                               ServiceProvider serviceProvider,
                               EmailService emailService,
+                              PermissionService permissionService,
                               PasswordResetTokenRepository passwordResetTokenRepository) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
@@ -72,6 +76,7 @@ public class SafaUserController extends BaseController {
         this.safaUserRepository = serviceProvider.getSafaUserRepository();
         this.safaUserService = serviceProvider.getSafaUserService();
         this.emailService = emailService;
+        this.permissionService = permissionService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
@@ -207,6 +212,20 @@ public class SafaUserController extends BaseController {
     public void updateDefaultOrg(@RequestBody DefaultOrgDTO newOrgDto) {
         SafaUser currentUser = getCurrentUser();
         safaUserService.updateDefaultOrg(currentUser, newOrgDto.defaultOrgId);
+    }
+
+    /**
+     * Set the user with the given ID to be a superuser
+     *
+     * @param userId The ID of the user to update
+     */
+    @PutMapping(AppRoutes.Accounts.SuperUser.BY_USER)
+    public void addSuperUser(@PathVariable UUID userId) {
+        SafaUser currentUser = getCurrentUser();
+        permissionService.requireSuperuser(currentUser);
+
+        SafaUser updatedUser = safaUserService.getUserById(userId);
+        safaUserService.addSuperUser(updatedUser);
     }
 
     private String buildResetURL(String token) {

@@ -1,6 +1,7 @@
 import os
 from typing import List, Any, Dict, Set
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import TraceKeys
@@ -48,7 +49,7 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                 args.min_orphan_score_threshold)
 
         run_name = "Placing Orphans in Homes"
-        export_dir = os.path.join(args.export_dir, "orphan_ranking")
+        export_dir = os.path.join(args.export_dir, "orphan_ranking") if args.export_dir else EMPTY_STRING
         pipeline_args = RankingArgs(run_name=run_name,
                                     dataset=state.all_artifacts_dataset,
                                     parent_ids=all_parent_ids,

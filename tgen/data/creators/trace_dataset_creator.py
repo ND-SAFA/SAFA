@@ -119,7 +119,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: None
         """
         artifact_tokens = self.artifact_df[StructuredKeys.Artifact.CONTENT]
-        artifact_tokens = self.data_cleaner.find_and_run_rq(artifact_tokens)
+        artifact_tokens = self.data_cleaner.run(artifact_tokens)
         self.artifact_df[StructuredKeys.Artifact.CONTENT] = artifact_tokens
 
     def _create_trace_dataset(self) -> TraceDataset:

@@ -25,7 +25,7 @@ class TestDataCleaner(BaseTest):
 
     def test_run(self):
         data_cleaner = self.get_data_cleaner()
-        processed_content = data_cleaner.find_and_run_rq(self.TEST_ARTIFACT_CONTENTS)
+        processed_content = data_cleaner.run(self.TEST_ARTIFACT_CONTENTS)
         self.assertListEqual(processed_content, self.EXPECTED_CONTENTS)
 
     def get_data_cleaner(self):

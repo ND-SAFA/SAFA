@@ -2,10 +2,10 @@ import os
 
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
-from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.object_creator import ObjectCreator
+from tgen.models.model_manager import ModelManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.object_creator import ObjectCreator
 
 
 class TestDeleteModelJob(BaseJobTest):
@@ -18,7 +18,7 @@ class TestDeleteModelJob(BaseJobTest):
     def test_run_dir_exists(self):
         self.make_test_output_dir()
         job = self.get_job()
-        job.find_and_run_rq()
+        job.run()
         output_dict = self._load_job_output(job)
         self.assert_output_on_success(job, output_dict)
 

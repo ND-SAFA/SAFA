@@ -121,8 +121,7 @@ class RankingArgs(PipelineArgs):
         :param file_name: The name of the file.
         :return: Path to file in output directory.
         """
-        if self.export_dir is None:
-            return None
-        path = os.path.join(self.export_dir, file_name)
-        path = os.path.expanduser(path)
+        path = FileUtil.safely_join_paths(self.export_dir, file_name)
+        if path:
+            path = os.path.expanduser(path)
         return path

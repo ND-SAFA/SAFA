@@ -9,6 +9,7 @@ from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MU
     USE_PROJECT_SUMMARY_SECTIONS
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
@@ -60,7 +61,7 @@ class ProjectSummarizer(BaseObject):
         """
         logger.log_title("Creating project specification.")
         self.artifact_df.summarize_content(ArtifactsSummarizer(self.args, project_summary=self.project_summary))
-        if os.path.exists(self.get_save_path()) and self.reload_existing:
+        if FileUtil.safely_check_path_exists(self.get_save_path()) and self.reload_existing:
             logger.info(f"Loading previous project summary from {self.get_save_path()}")
             self.project_summary = Summary.load_from_file(self.get_save_path())
 
@@ -166,9 +167,7 @@ class ProjectSummarizer(BaseObject):
         Gets the path to save the summary at
         :return: The save path
         """
-        if not self.export_dir:
-            return EMPTY_STRING
-        return os.path.join(self.export_dir, PROJECT_SUMMARY_STATE_FILENAME)
+        return FileUtil.safely_join_paths(self.export_dir, PROJECT_SUMMARY_STATE_FILENAME)
 
     @staticmethod
     def _get_section_display_order(section_order: List[str], all_project_sections: List[str]) -> List[str]:

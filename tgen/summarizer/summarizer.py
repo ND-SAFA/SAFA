@@ -6,6 +6,7 @@ import pandas as pd
 
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -32,7 +33,7 @@ class Summarizer:
         Summarizes the project and artifacts
         :return: A dataset containing the summarized artifacts and project
         """
-        if os.path.exists(self._get_artifact_save_path()):
+        if FileUtil.safely_check_path_exists(self._get_artifact_save_path()):
             self._load_artifacts_from_file()
         project_summary = self._create_project_summary(self.dataset)
         artifact_df = self.dataset.artifact_df
@@ -99,10 +100,7 @@ class Summarizer:
         Gets the path to save the summarized artifacts to
         :return: The path to save the summarized artifacts to
         """
-        if self.args.export_dir:
-            artifact_export_path = os.path.join(self.args.export_dir, ARTIFACT_FILE_NAME)
-            return artifact_export_path
-        return EMPTY_STRING
+        return FileUtil.safely_join_paths(self.args.export_dir, ARTIFACT_FILE_NAME)
 
     def _create_project_summary(self, dataset: PromptDataset, reload_existing: bool = True) -> Summary:
         """

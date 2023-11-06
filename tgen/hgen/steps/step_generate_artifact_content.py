@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS, DEFAULT_BRANCHING_FACTOR
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -33,7 +34,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         if state.n_generations > 0:
             filename = f"{filename}_{state.n_generations}"
             args.hgen_llm_manager_best.llm_args.temperature = TEMPERATURE_ON_RERUNS
-        export_path = os.path.join(state.export_dir, filename) if state.export_dir else None
+        export_path = FileUtil.safely_join_paths(state.export_dir, filename)
 
         task_prompt, target_tag_id, source_tag_id = self._create_task_prompt(args, state)
         generated_artifacts_tag, links_tag = task_prompt.response_manager.get_all_tag_ids()

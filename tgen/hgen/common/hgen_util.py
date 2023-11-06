@@ -59,8 +59,8 @@ class HGenUtil:
             if isinstance(tags_for_response, set) and len(tags_for_response) == 1 else tags_for_response
         base_name, file_name = os.path.split(export_path) if export_path else (EMPTY_STRING, EMPTY_STRING)
 
-        load_path = FileUtil.add_ext(os.path.join(hgen_args.load_dir, file_name), FileUtil.YAML_EXT) \
-            if file_name and hgen_args.load_dir else EMPTY_STRING
+        load_path = FileUtil.safely_join_paths(hgen_args.load_dir, file_name)
+        load_path = FileUtil.add_ext(load_path, FileUtil.YAML_EXT) if load_path else load_path
         if dataset is None:
             predictions = LLMTrainer.predict_from_prompts(llm_manager=llm_manager, prompt_builder=prompt_builder,
                                                           save_and_load_path=load_path).predictions
@@ -172,8 +172,7 @@ class HGenUtil:
                     artifact_prompt = ArtifactPrompt(include_id=False)
                     prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
                     dataset = PromptDataset(artifact_df=new_artifact_df)
-                    predictions_path = os.path.join(hgen_args.export_dir,
-                                                    "artifact_names.json") if hgen_args.export_dir else EMPTY_STRING
+                    predictions_path = FileUtil.safely_join_paths(hgen_args.export_dir, "artifact_names.json")
                     names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
                                                      prediction_step=PredictionStep.NAME,
                                                      dataset=dataset, response_prompt_ids=name_prompt.id,

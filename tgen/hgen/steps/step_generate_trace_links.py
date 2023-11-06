@@ -7,6 +7,7 @@ from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELA
 from tgen.common.objects.trace import Trace
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.status import Status
@@ -89,8 +90,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             if len(parent_ids) == 0:
                 continue
             children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
-            cluster_dir = os.path.join(self._get_ranking_dir(state.export_dir),
-                                       str(cluster_id)) if state.export_dir else EMPTY_STRING
+            cluster_dir = FileUtil.safely_join_paths(self._get_ranking_dir(state.export_dir), str(cluster_id))
             run_name = f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
                                                                           args.target_type, parent_ids)
             pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids, export_dir=cluster_dir,
@@ -167,4 +167,4 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param directory: The main directory used by hgen
         :return: The full path
         """
-        return os.path.join(directory, "ranking") if directory else EMPTY_STRING
+        return FileUtil.safely_join_paths(directory, "ranking")

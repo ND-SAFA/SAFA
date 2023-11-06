@@ -5,6 +5,7 @@ from typing import Dict, List, Set
 from tqdm import tqdm
 
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -87,7 +88,8 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                               dataset=PromptDataset(artifact_df=artifacts),
                                                               response_prompt_ids=questionnaire.id,
                                                               tags_for_response={generated_artifacts_tag}, return_first=True,
-                                                              export_path=os.path.join(export_path, "gen_refinement_response.yaml"))[0]
+                                                              export_path=FileUtil.safely_join_paths(export_path,
+                                                                                                     "gen_refinement_response.yaml"))[0]
             selected_artifact_nums = set(selected_artifact_nums)
             selected_artifacts = RefineGenerationsStep._get_selected_artifacts(refined_artifact_content, selected_artifact_nums)
             selected_artifacts.update(RefineGenerationsStep._get_selected_artifacts(new_generated_artifact_content,

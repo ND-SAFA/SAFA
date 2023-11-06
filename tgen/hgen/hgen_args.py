@@ -8,6 +8,7 @@ from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_TH
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field
+from tgen.common.util.file_util import FileUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
@@ -101,8 +102,8 @@ class HGenArgs(PipelineArgs, BaseObject):
         super().__post_init__()
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
-        self.export_dir = os.path.join(self.export_dir, self.target_type) \
-            if self.export_dir and not self.export_dir.endswith(self.target_type) else self.export_dir
+        self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \
+            if not self.export_dir.endswith(self.target_type) else self.export_dir
         self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-4-0314'))
         for e in PredictionStep:
             if e.value not in self.max_tokens:

@@ -145,3 +145,13 @@ class TestFileUtil(BaseTest):
         collapsed_paths = FileUtil.collapse_paths(paths, replacements)
         expanded_paths = ['[path1]/code.py', '[path2]/text.txt']
         self.assertListEqual(collapsed_paths, expanded_paths)
+
+    def test_safely_join_paths(self):
+        normal = FileUtil.safely_join_paths("path1", "path2", 3, ext=".txt")
+        self.assertEqual(normal, "path1/path2/3.txt")
+
+        with_none = FileUtil.safely_join_paths(None, "path2")
+        self.assertEqual(with_none, None)
+
+        with_empty = FileUtil.safely_join_paths("path1", "")
+        self.assertEqual(with_empty, "")

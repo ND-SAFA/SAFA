@@ -86,7 +86,7 @@ class RankingJob(AbstractJob):
             DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
         export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
-            export_dir = os.path.join(export_dir, RankingJob._get_run_dir(child_type, parent_type))
+            export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
         pipeline_args = RankingArgs(run_name=run_name,
                                     dataset=dataset,
                                     parent_ids=parent_ids,

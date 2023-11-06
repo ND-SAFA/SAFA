@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -98,6 +99,11 @@ public class JobController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Jobs.Meta.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
+        JobDbEntity job = jobService.getJobById(jobId);
+        if (job != null && !job.getUser().equals(getCurrentUser())) {
+            throw new MissingPermissionException(() -> "delete_job");
+        }
+
         JobDbEntity jobDbEntity = this.jobService.deleteJob(jobId);
         if (jobDbEntity != null) {
             UUID taskId = jobDbEntity.getTaskId();

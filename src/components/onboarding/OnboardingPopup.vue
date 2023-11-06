@@ -38,9 +38,10 @@
             <git-hub-project-input />
           </template>
           <template #3>
-            [confirm data generation cost estimate, pay with stripe]
+            [confirm docs to generate, confirm data generation cost estimate,
+            pay with stripe]
             <flex-box justify="center">
-              <text-button text color="gradient">
+              <text-button text color="gradient" @click="handleGenerate">
                 Generate Documentation
               </text-button>
             </flex-box>
@@ -71,13 +72,17 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { StepperStep } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
-import { gitHubApiStore, integrationsStore, sessionStore } from "@/hooks";
-import { TextButton, Stepper, Typography } from "@/components/common";
+import {
+  createProjectApiStore,
+  gitHubApiStore,
+  integrationsStore,
+  sessionStore,
+} from "@/hooks";
+import { TextButton, Stepper, Typography, FlexBox } from "@/components/common";
 import {
   GitHubAuthentication,
   GitHubProjectInput,
 } from "@/components/integrations";
-import FlexBox from "@/components/common/display/content/FlexBox.vue";
 
 const open = ref(false);
 
@@ -114,6 +119,21 @@ const steps = ref<StepperStep[]>([
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 
+/**
+ * Generate documentation for the selected project.
+ */
+function handleGenerate() {
+  createProjectApiStore.handleGitHubImport({
+    // onSuccess: () => {},
+    // onError: () => {},
+    // onComplete: () => {},
+    onSuccess: () => {
+      steps.value[2].done = true;
+      step.value = 4;
+    },
+  });
+}
+
 // Preload GitHub projects if credentials are already set.
 onMounted(() => {
   if (integrationsStore.validGitHubCredentials) {
@@ -125,7 +145,7 @@ onMounted(() => {
 watch(
   () => userLoggedIn.value,
   (userLoggedIn) => {
-    if (userLoggedIn) {
+    if (userLoggedIn && ENABLED_FEATURES.ONBOARDING) {
       open.value = true;
     }
   }

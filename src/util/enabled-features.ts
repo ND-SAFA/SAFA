@@ -8,5 +8,6 @@ export const ENABLED_FEATURES = {
   PROJECT_CREATOR_WORKFLOW: true,
   ACTIVE_USERS: false,
 
+  ONBOARDING: true,
   BILLING_ONBOARDING: true,
 };

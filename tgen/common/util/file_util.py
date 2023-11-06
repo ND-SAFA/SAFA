@@ -102,17 +102,15 @@ class FileUtil:
             return file.readlines()
 
     @staticmethod
-    def get_env_replacements(env_variables: List[str], replacements: Dict = None) -> Dict[str, str]:
+    def get_env_replacements(replacements: Dict = None) -> Dict[str, str]:
         """
+        :param replacements: Replacements dictionary to add on to.
         :return: Dictionary of environment variables to their values.
         """
         if replacements is None:
             replacements = {}
-        for replacement_path in env_variables:
-            path_value = os.environ.get(replacement_path, None)
-            if path_value:
-                path_key = "[%s]" % replacement_path
-                replacements[path_key] = os.path.expanduser(path_value)
+        for env_key, env_value in os.environ.items():
+            replacements[env_key] = os.path.expanduser(env_value) if "~" in env_value else env_value
         return replacements
 
     @staticmethod
@@ -209,7 +207,7 @@ class FileUtil:
         :return: Same type as value, but with its content processed.
         """
         if replacements is None:
-            replacements = FileUtil.get_env_replacements(ENV_REPLACEMENT_VARIABLES)
+            replacements = FileUtil.get_env_replacements()
         if isinstance(paths, list):
             return [FileUtil.perform_function_on_paths(v, func, replacements=replacements, **kwargs) for v in paths]
         if isinstance(paths, dict):

@@ -20,7 +20,7 @@ class TestMLMPreTrainJob(BaseJobTest):
 
     def _test_run_success(self):
         job = self.get_job()
-        job.run()
+        job.find_and_run_rq()
         self.assert_output_on_success(job, self._load_job_output(job))
 
     def _assert_success(self, job: HuggingFaceJob, output_dict: dict):

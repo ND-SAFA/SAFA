@@ -1,10 +1,10 @@
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Tuple
 
 from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
-from tgen.common.util.file_util import ENV_REPLACEMENT_VARIABLES, FileUtil
-from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.file_util import FileUtil
 from tgen.scripts.constants import MISSING_DEFINITION_ERROR
+from tgen.scripts.toolset.rq_proxy import RQProxy
 
 
 class ScriptDefinition:
@@ -16,8 +16,7 @@ class ScriptDefinition:
     ENV_OUTPUT_PARAM = f"[{OUTPUT_PATH_PARAM}]"
 
     @staticmethod
-    def read_experiment_definition(definition_path: str, env_replacements: Dict = None,
-                                   default_variables: List[str] = ENV_REPLACEMENT_VARIABLES) -> Dict:
+    def read_experiment_definition(definition_path: str = None, rq_definition: RQProxy = None, env_replacements: Dict = None) -> Dict:
         """
         Reads the experiment definition and applies env replacements.
         :param definition_path: Path to experiment jobs.
@@ -26,18 +25,23 @@ class ScriptDefinition:
         :return: Processed definition.
         """
         if env_replacements is None:
-            env_variables = ENV_REPLACEMENT_VARIABLES
-            env_replacements = FileUtil.get_env_replacements(env_variables)
-        if not os.path.isfile(definition_path):
-            raise ValueError(MISSING_DEFINITION_ERROR.format(definition_path))
+            env_replacements = FileUtil.get_env_replacements()
+        if definition_path:
+            if not os.path.isfile(definition_path):
+                raise ValueError(MISSING_DEFINITION_ERROR.format(definition_path))
+            definition_path = os.path.expanduser(definition_path)
+            rq_definition = RQProxy(definition_path)
+        elif not rq_definition:
+            raise Exception("Expected definition path or rq definition to be given.")
 
-        definition_path = os.path.expanduser(definition_path)
-
-        job_definition = JsonUtil.read_json_file(definition_path)
+        variable2value, unknown_variables = rq_definition.get_unknown_variables(env_replacements)
+        variable2value = {f"[{k}]": v for k, v in variable2value.items()}
+        if len(unknown_variables) > 0:
+            raise Exception("Unknown variables: " + repr(unknown_variables))
 
         script_name = ScriptDefinition.get_script_name(definition_path)
-        job_definition = ScriptDefinition.set_output_paths(job_definition, script_name)
-        result = FileUtil.expand_paths(job_definition, env_replacements, use_abs_paths=False)
+        job_definition = ScriptDefinition.set_output_paths(rq_definition.rq_json, script_name)
+        result = FileUtil.expand_paths(job_definition, variable2value, use_abs_paths=False)
         return result
 
     @staticmethod
@@ -55,7 +59,7 @@ class ScriptDefinition:
             script_output_path = script_definition[ScriptDefinition.OUTPUT_DIR_PARAM]
         script_output_path = os.path.expanduser(script_output_path)
         script_definition[ScriptDefinition.OUTPUT_DIR_PARAM] = script_output_path
-        # script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
+        script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
         script_definition = ScriptDefinition.set_object_property(
             ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, script_output_path),
             script_definition)
@@ -83,11 +87,3 @@ class ScriptDefinition:
                 v = [ScriptDefinition.set_object_property(object_properties, v_child) for v_child in v]
             new_obj[k] = v
         return new_obj
-
-    @staticmethod
-    def get_script_name(path: str) -> str:
-        """
-        :param path: Path used to construct id.
-        :return: Returns the directory and file name of path used to identify scripts.
-        """
-        return FileUtil.get_file_name(path, n_parents=1)

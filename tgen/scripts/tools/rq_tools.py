@@ -4,19 +4,19 @@ from typing import List, Optional
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_NAV_MESSAGE, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
-from tgen.scripts.toolset.core.rq_proxy import RQProxy
-from tgen.scripts.toolset.core.selector import inquirer_selection
+from tgen.scripts.toolset.rq_proxy import RQProxy
+from tgen.scripts.toolset.selector import inquirer_selection
 from tgen.testres.object_creator import ObjectCreator
 
 
-def run() -> None:
+def find_and_run_rq() -> None:
     """
     Navigates and runs RQ.
     :return: None
     """
     base_rq_path = os.path.join(get_rq_path(), "base")
-    rq_to_run = navigate_to_rq(base_rq_path)
-    run_rq(rq_to_run)
+    rq_path = navigate_to_rq(base_rq_path)
+    run_rq(rq_path)
 
 
 def navigate_to_rq(curr_path: str) -> str:
@@ -89,8 +89,7 @@ def run_rq(rq_path: str) -> None:
     rq_proxy = RQProxy(experiment_path)
 
     os_variables = {env_key: env_value for env_key, env_value in os.environ.items()}
-    replacements = rq_proxy.inquirer_unknown_variables(default_values=os_variables)
-    replacements = {f"[{k}]": v for k, v in replacements.items()}
+    replacements = rq_proxy.inquirer_variables(default_values=os_variables)
 
     experiment_definition = ScriptDefinition.read_experiment_definition(experiment_path, replacements)
     experiment_class = ScriptRunner.get_experiment_class(experiment_definition)
@@ -105,4 +104,4 @@ def get_rq_path() -> str:
     return os.path.expanduser(os.environ[RQ_PATH_PARAM])
 
 
-RQ_TOOLS = [run]
+RQ_TOOLS = [find_and_run_rq]

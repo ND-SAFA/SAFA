@@ -33,12 +33,13 @@ def inquirer_selection(selections: List[str], message: str = None, allow_back: b
     return selected_choice
 
 
-def inquirer_value(message: str, class_type: Type, default_value: Any, allow_back: bool = DEFAULT_ALLOW_BACK):
+def inquirer_value(message: str, class_type: Type, default_value: Any = None, allow_back: bool = DEFAULT_ALLOW_BACK):
     """
     Prompts user with message for a value.
     :param message: The message to prompt user with.
     :param class_type: The type of value to expect back.
     :param default_value: The default value to use if optional.
+    :param allow_back: Allow the user to type back command.
     :return: The value after parsing user response.
     """
     annotation_name = class_type.__name__ if hasattr(class_type, "__name__") else repr(class_type)

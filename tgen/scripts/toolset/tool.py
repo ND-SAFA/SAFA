@@ -2,7 +2,7 @@ import inspect
 from typing import Any, Callable, List, Optional
 
 from tgen.scripts.constants import IGNORE_PARAMS, TOOL_MISSING_DOCSTRING_ERROR
-from tgen.scripts.toolset.core.tool_param import ToolParam
+from tgen.scripts.toolset.tool_param import ToolParam
 
 
 class Tool:

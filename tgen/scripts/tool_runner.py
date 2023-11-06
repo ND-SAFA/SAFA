@@ -4,17 +4,17 @@ from typing import Callable, Dict, List
 
 from dotenv import load_dotenv
 
-from tgen.scripts.find_missing_docs import print_missing_headers
-from tgen.scripts.toolset.core.tool import Tool
+from tgen.scripts.tools.find_missing_docs import print_missing_headers
+from tgen.scripts.toolset.tool import Tool
 
 load_dotenv()
 root_path = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(root_path)
 
-from tgen.scripts.toolset.core.selector import inquirer_selection
-from tgen.scripts.toolset.core.tool_set import ToolSet
-from tgen.scripts.toolset.tools.rq_tools import RQ_TOOLS
-from tgen.scripts.toolset.tools.s3_tools import S3_TOOLS
+from tgen.scripts.toolset.selector import inquirer_selection
+from tgen.scripts.toolset.tool_set import ToolSet
+from tgen.scripts.tools import RQ_TOOLS
+from tgen.scripts.tools.s3_tools import S3_TOOLS
 
 
 def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_name: str = None, default_tool_id: str = None, *args):
@@ -53,9 +53,10 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
 
 
 TOOLS = {
-    "Data": S3_TOOLS,
     "Run RQ": RQ_TOOLS,
+    "Data": S3_TOOLS,
     "Dev-Ops": [print_missing_headers]
 }
+
 if __name__ == "__main__":
     tool_runner_loop(TOOLS)

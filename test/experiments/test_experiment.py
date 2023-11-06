@@ -17,7 +17,7 @@ class TestExperiment(BaseExperimentTest):
     def test_run(self, hf_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         hf_run_mock.side_effect = self.job_fake_run
         experiment = self.get_experiment()
-        experiment.run()
+        experiment.find_and_run_rq()
         self.assertEqual(hf_run_mock.call_count, 9)
         result_dirs = os.listdir(os.path.join(experiment.output_dir, "experiment_0"))
         self.assertEqual(len(result_dirs), len(experiment.steps))
@@ -29,7 +29,7 @@ class TestExperiment(BaseExperimentTest):
         hf_run_mock.side_effect = self.job_fake_run
         definition_mock.return_value = StructureProjectDefinition()
         experiment = self.get_experiment(use_metric=False)
-        experiment.run()
+        experiment.find_and_run_rq()
         self.assertEqual(hf_run_mock.call_count, len(experiment.steps[0]) + len(experiment.steps[1]))
 
     def get_experiment(self, use_metric: bool = True):

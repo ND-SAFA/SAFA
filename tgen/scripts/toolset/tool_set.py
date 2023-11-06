@@ -2,8 +2,8 @@ from typing import Callable, Dict, List, Optional
 
 from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.scripts.constants import CLI_METHOD_PARAM
-from tgen.scripts.toolset.core.selector import inquirer_selection
-from tgen.scripts.toolset.core.tool import Tool
+from tgen.scripts.toolset.selector import inquirer_selection
+from tgen.scripts.toolset.tool import Tool
 
 
 class ToolSet:

@@ -22,7 +22,7 @@ class TraceCallback(WandbCallback):
         """
         project = os.getenv("WANDB_PROJECT", "huggingface")
         run = args.run_name
-        if self._wandb.run is None:
+        if self._wandb.find_and_run_rq is None:
             self._wandb.init(
                 project=project,
                 name=run

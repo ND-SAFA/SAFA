@@ -5,7 +5,7 @@ import inquirer
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.logging.logger_manager import logger
-from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, DEFAULT_VALUE_MESSAGE, EXIT_COMMAND, EXIT_MESSAGE, \
+from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, EXIT_COMMAND, EXIT_MESSAGE, \
     REQUIRED_FIELD_ERROR, \
     SINGLETON_PROMPT_ID
 
@@ -54,6 +54,5 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
     if user_value.strip() == EMPTY_STRING:
         if default_value is None:
             raise Exception(REQUIRED_FIELD_ERROR)
-        logger.info(DEFAULT_VALUE_MESSAGE)
         user_value = default_value
     return class_type(user_value)

@@ -5,7 +5,8 @@ from typing import Any, Dict, List, Tuple, Type
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.scripts.constants import MISSING_DEFINITION_ERROR, RQ_INQUIRER_CONFIRM_MESSAGE, RQ_VARIABLE_REGEX, RQ_VARIABLE_START, \
+from tgen.scripts.constants import MISSING_DEFINITION_ERROR, RQ_INQUIRER_CONFIRM_MESSAGE, RQ_VARIABLE_REGEX, \
+    RQ_VARIABLE_START, \
     SUPPORTED_TYPES_RQ
 from tgen.scripts.toolset.confirm import confirm
 from tgen.scripts.toolset.selector import inquirer_value
@@ -32,13 +33,13 @@ class RQVariable:
             value = os.path.expanduser(value)
         return value
 
-    def inquirer_value(self, default_value: Any = None) -> None:
+    def inquirer_value(self) -> None:
         """
         Prompts user to enter valid value for variable.
         :return: None
         """
         message = f"{self.name}"
-        self.__value = inquirer_value(message, self.type_class, default_value=default_value)
+        self.__value = inquirer_value(message, self.type_class, default_value=self.__default_value)
 
     def parse_value(self, variable_value: Any) -> Any:
         """
@@ -49,6 +50,15 @@ class RQVariable:
         typed_value = self.type_class(variable_value)
         self.__value = typed_value
         return typed_value
+
+    def set_default_value(self, default_value: Any) -> None:
+        """
+        Sets the default value for variable.
+        :param default_value: Default value to set.
+        :return: None
+        """
+        typed_default_value = self.type_class(default_value)
+        self.__default_value = typed_default_value
 
     def has_valid_value(self, throw_error: bool = False) -> bool:
         """
@@ -115,17 +125,34 @@ class RQDefinition:
         built_rq = FileUtil.expand_paths(self.rq_json, variable_replacements)
         return built_rq
 
-    def inquirer_variables(self, default_values: Dict) -> None:
+    def set_default_values(self, default_values: Dict = None, use_os_values: bool = False) -> None:
+        """
+        Sets the default values for variable in map.
+        :param default_values: Map of variable names to their default values.
+        :return: None
+        """
+        if default_values is None:
+            default_values = {}
+        if use_os_values:
+            for env_key, env_value in os.environ.items():
+                default_values[env_key] = env_value
+
+        for variable in self.variables:
+            if variable.name not in default_values:
+                continue
+            default_value = default_values[variable.name]
+            variable.set_default_value(default_value)
+
+    def inquirer_variables(self) -> None:
         """
         Prompts user to fill in any missing variables in RQ definition.
         :param default_values: Dictionary of default values to allow user to select from.
         :return: None
         """
         for variable in self.variables:
-            default_value = default_values.get(variable.name, None)
-            variable.inquirer_value(default_value=default_value)
+            variable.inquirer_value()
         if not self.confirm():
-            self.inquirer_variables(default_values)
+            self.inquirer_variables()
 
     def confirm(self, title: str = RQ_INQUIRER_CONFIRM_MESSAGE) -> bool:
         """

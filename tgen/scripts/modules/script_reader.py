@@ -10,7 +10,6 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.jobs.components.job_result import JobResult
-from tgen.scripts.modules.script_definition import ScriptDefinition
 
 pd.set_option('display.max_colwidth', None)
 
@@ -43,7 +42,6 @@ class ScriptOutputReader:
             self.display_metrics = DISPLAY_METRICS
 
         self.experiment_path = experiment_path
-        self.script_name = ScriptDefinition.get_script_name(experiment_path)
         self.val_output_path = os.path.join(self.experiment_path, "validation_results.csv")
         self.eval_output_path = os.path.join(self.experiment_path, "test_results.csv")
 

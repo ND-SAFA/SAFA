@@ -14,13 +14,11 @@ class ScriptDefinition:
     ENV_OUTPUT_PARAM = f"[{OUTPUT_PATH_PARAM}]"
 
     @staticmethod
-    def read_experiment_definition(definition_path: str = None, rq_definition: RQDefinition = None,
-                                   env_replacements: Dict = None) -> Dict:
+    def read_experiment_definition(definition_path: str = None, rq_definition: RQDefinition = None) -> Dict:
         """
         Reads the experiment definition and applies env replacements.
         :param definition_path: Path to experiment jobs.
-        :param env_replacements: Replacements to use instead of those defined by ENV.
-        :param default_variables: List of env variables to include in replacements.
+        :param rq_definition: RQ definition to use in place of a new one.
         :return: Processed definition.
         """
         if definition_path:
@@ -29,8 +27,9 @@ class ScriptDefinition:
         if not rq_definition:
             raise Exception("Expected definition path or rq definition to be given.")
 
+        rq_definition.rq_json = ScriptDefinition.set_output_paths(rq_definition.rq_json, rq_definition.script_name)
+        rq_definition.set_default_values(use_os_values=True)
         rq_definition_json = rq_definition.build_rq(error_on_fail=True)
-        rq_definition_json = ScriptDefinition.set_output_paths(rq_definition_json, rq_definition.script_name)
 
         return rq_definition_json
 

@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.authentication.builders;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
@@ -58,7 +61,7 @@ public class ResourceBuilder {
         if (project == null) {
             throw new SafaItemNotFoundError("Unable to find project with ID: %s.", projectId);
         }
-        return new ProjectHolder(project);
+        return new EntityWithMembershipHolder<>(project);
     }
 
     /**
@@ -83,7 +86,7 @@ public class ResourceBuilder {
      * @return The team in a holder that allows for easy permission checking
      */
     public ObjectHolder<Team> fetchTeam(UUID teamId) {
-        return new TeamHolder(teamService.getTeamById(teamId));
+        return new EntityWithMembershipHolder<>(teamService.getTeamById(teamId));
     }
 
     /**
@@ -93,7 +96,7 @@ public class ResourceBuilder {
      * @return The organization in a holder that allows for easy permission checking
      */
     public ObjectHolder<Organization> fetchOrganization(UUID organizationId) {
-        return new OrganizationHolder(organizationService.getOrganizationById(organizationId));
+        return new EntityWithMembershipHolder<>(organizationService.getOrganizationById(organizationId));
     }
 
     /**
@@ -103,7 +106,7 @@ public class ResourceBuilder {
      * @return A holder for the project
      */
     public ObjectHolder<Project> setProject(Project project) {
-        return new ProjectHolder(project);
+        return new EntityWithMembershipHolder<>(project);
     }
 
     /**
@@ -116,7 +119,7 @@ public class ResourceBuilder {
         @Getter(AccessLevel.PROTECTED)
         private final T value;
 
-        private Permission missingPermission;
+        private final Set<Permission> missingPermissions = new HashSet<>();
         private boolean allowed = true;
 
         public ObjectHolder(T value) {
@@ -134,7 +137,7 @@ public class ResourceBuilder {
         public ObjectHolder<T> withPermission(Permission permission, SafaUser user) throws SafaError {
             if (!hasPermission(permission, user)) {
                 allowed = false;
-                missingPermission = permission;
+                missingPermissions.add(permission);
             }
             return this;
         }
@@ -146,7 +149,7 @@ public class ResourceBuilder {
          */
         public T get() {
             if (!allowed) {
-                throw new MissingPermissionException(missingPermission);
+                throw new MissingPermissionException(missingPermissions, true);
             }
             return value;
         }
@@ -175,11 +178,12 @@ public class ResourceBuilder {
     }
 
     /**
-     * Object holder for checking permissions on projects
+     * Generic object holder for classes extending {@link IEntityWithMembership}
+     * @param <T> The type being held
      */
-    private class ProjectHolder extends ObjectHolder<Project> {
-        public ProjectHolder(Project project) {
-            super(project);
+    private class EntityWithMembershipHolder<T extends IEntityWithMembership> extends ObjectHolder<T> {
+        public EntityWithMembershipHolder(T value) {
+            super(value);
         }
 
         @Override
@@ -199,36 +203,6 @@ public class ResourceBuilder {
         @Override
         protected boolean hasPermission(Permission permission, SafaUser user) {
             return permissionService.hasPermission(permission, getValue().getProject(), user);
-        }
-    }
-
-    /**
-     * Object holder for checking permissions on teams
-     */
-    private class TeamHolder extends ObjectHolder<Team> {
-
-        public TeamHolder(Team value) {
-            super(value);
-        }
-
-        @Override
-        protected boolean hasPermission(Permission permission, SafaUser user) throws SafaError {
-            return permissionService.hasPermission(permission, getValue(), user);
-        }
-    }
-
-    /**
-     * Object holder for checking permissions on organizations
-     */
-    private class OrganizationHolder extends ObjectHolder<Organization> {
-
-        public OrganizationHolder(Organization value) {
-            super(value);
-        }
-
-        @Override
-        protected boolean hasPermission(Permission permission, SafaUser user) throws SafaError {
-            return permissionService.hasPermission(permission, getValue(), user);
         }
     }
 }

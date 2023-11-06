@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import torch
 from datasets import Dataset
@@ -7,6 +7,7 @@ from transformers.integrations import WandbCallback
 from transformers.trainer import Trainer
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
@@ -30,6 +31,8 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 TRIAL = Union["optuna.Trial", Dict[str, Any]]
 
+DEFAULT_EVALUATION_ROLES = [DatasetRole.VAL, DatasetRole.EVAL]
+
 
 class HuggingFaceTrainer(AbstractTrainer, Trainer):
     """
@@ -38,28 +41,42 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager,
                  trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None,
-                 **kwargs):
+                 evaluation_roles: List[DatasetRole] = None, **kwargs):
         """
         Handles the training and evaluation of learning models
         :param trainer_args: The learning model arguments
         :param model_manager: The manager for the model used for training and/or predicting
         :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting
         :param save_strategy: The strategy used to save the best model
+        :param: evaluation_roles: Defines the roles to evaluate the model on during prediction.
         :param kwargs: Any additional arguments given to the HF Trainer
         """
         if trainer_args.eager_load_data:
             trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
+        if evaluation_roles is None:
+            evaluation_roles = DEFAULT_EVALUATION_ROLES
+        if save_strategy is None:
+            save_strategy = MetricSaveStrategy(ComparisonCriterion(["map", "f2"]))
         trainer_args.__post_init__()
         super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
         self.trainer_args.remove_unused_columns = False
+        self.evaluation_roles = evaluation_roles
+        self.save_strategy = save_strategy
+        self.post_init(trainer_args, **kwargs)
+
+    def post_init(self, trainer_args: HuggingFaceArgs, **kwargs):
+        """
+        Re-initializes the trainer static variables with the current trainer settings.
+        :param trainer_args: The starting trainer args.
+        :param kwargs: Additional keyword arguments passed to original trainer.
+        :return:
+        """
         callbacks = [TraceCallback()]
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
-        if save_strategy is None:
-            self.save_strategy = MetricSaveStrategy(ComparisonCriterion(["map", "f2"]))
         Trainer.__init__(self, model_init=model_init, args=trainer_args, tokenizer=tokenizer, callbacks=callbacks, **kwargs)
         self.remove_callback(WandbCallback)
 
@@ -72,9 +89,11 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         self.train_dataset = self._get_dataset(DatasetRole.TRAIN)
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         self.model = self.model_manager.get_model()
+        self._evaluate()
         hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
         train_output = TraceTrainOutput(train_output=hf_train_output)
-        self._evaluate_training(train_output)
+        evaluation_output = self._evaluate()
+        train_output.prediction_output = evaluation_output[DatasetRole.EVAL]
         self._set_best_model_path()
         return train_output
 
@@ -129,16 +148,18 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
                 os.rmdir(best_model_dir)
             os.rename(best_model_path, best_model_dir)
 
-    def _evaluate_training(self, train_output: TraceTrainOutput) -> None:
+    def _evaluate(self) -> Dict[DatasetRole, TracePredictionOutput]:
         """
         Performs an evaluation on the training output using the EVAL dataset if provided
-        :param train_output: Output from training
-        :return: None
+        :return: Map of dataset role evaluated to its prediction output.
         """
-        self.eval_dataset = self._get_dataset(DatasetRole.EVAL)
-        self.compute_metrics = None
-        if self.eval_dataset is not None:
-            train_output.prediction_output = self.perform_prediction(DatasetRole.EVAL)
+        logger.log_title("Evaluating Model", prefix=NEW_LINE)
+        results = {}
+        for dataset_role in self.evaluation_roles:
+            logger.log_step(f"{dataset_role.name.title()} Set")
+            prediction_output = self.perform_prediction(dataset_role)
+            results[dataset_role] = prediction_output
+        return results
 
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
@@ -171,3 +192,12 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         """
         datasets = self.trainer_dataset_manager.get_hf_datasets(self.model_manager)
         return datasets[dataset_role] if dataset_role in datasets else None
+
+    def _has_dataset(self, dataset_role: DatasetRole) -> bool:
+        """
+        Checks whether trainer contains dataset for given role.
+        :param dataset_role: The role to check for.
+        :return: Whether dataset is contained for given role.
+        """
+        datasets = self.trainer_dataset_manager.get_hf_datasets(self.model_manager)
+        return dataset_role in datasets

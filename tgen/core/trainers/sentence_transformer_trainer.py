@@ -9,6 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import PredictionOutput, TrainOutput
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.supported_enum import SupportedEnum
@@ -78,6 +79,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param model_manager: The model manager container sentence transformer.
         :param trainer_dataset_manager: Contains the datasets used for training, validation, and evaluation.
         :param max_steps_before_eval: The maximum number of training steps that are allowed before evaluating.
+        :param loss_function: The loss function to use while training model.
+        :param save_best_model: Whether to save the best model. Defaults to true
         :param kwargs: Additional keyword arguments passed to parent trainer.
         """
         model_manager.model_task = ModelTask.SBERT
@@ -94,19 +97,13 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        logger.log_title("Starting Performance", prefix="\n\n")
-        logger.log_step("Validation Set")
-        self.perform_prediction(DatasetRole.VAL)
-        logger.log_step("Evaluation Set")
-        self.perform_prediction(DatasetRole.EVAL)
-
         train_examples = self.to_input_examples(self.train_dataset)
         train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=self.args.train_batch_size)
         train_loss = self.loss_function.value(self.model)
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
         evaluator = SentenceTransformerEvaluator(self)
 
-        logger.log_title("Starting Training", prefix="\n\n")
+        logger.log_title("Starting Training", prefix=NEW_LINE)
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
                        epochs=int(self.args.num_train_epochs),
                        warmup_steps=self.args.warmup_steps,

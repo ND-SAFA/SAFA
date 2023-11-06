@@ -36,4 +36,4 @@ class NpUtil:
         sorted_indices = np.sort(indices_tuples, axis=1)  # Sort the tuples to ensure uniqueness
         unique_indices = set(map(tuple, sorted_indices))  # Get unique indices by converting the tuples back to a set
 
-        return list(unique_indices)
+        return [(i, j) for i, j in unique_indices if i != j]  # remove references comparing an artifact to itself

@@ -24,7 +24,7 @@ class TestMultiArtifactPrompt(BaseTest):
         embedding_manager = EmbeddingsManager(content_map={a[ArtifactKeys.ID]: a[ArtifactKeys.CONTENT] for a in self.ARTIFACTS},
                                               model_name="sentence-transformers/all-MiniLM-L6-v2")
         context_prompt = self.get_context_prompt()
-        prompt = context_prompt.build(artifact=EnumDict({ArtifactKeys.ID: "target", ArtifactKeys.CONTENT: ["target_content"]}),
+        prompt = context_prompt.build(artifact=EnumDict({ArtifactKeys.ID: "target", ArtifactKeys.CONTENT: "target content2"}),
                                       embedding_manager=embedding_manager, context_threshold=0.6)
         related_artifact = self.ARTIFACTS[1]
         self.assertIn(related_artifact[ArtifactKeys.ID], prompt)

@@ -16,7 +16,7 @@ from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactConte
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
-from tgen.hgen.steps.step_name_artifacts_generated import NameArtifactsGenerated
+from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -35,7 +35,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
              CreateClustersStep,
              GenerateArtifactContentStep,
              RefineGenerationsStep,
-             NameArtifactsGenerated,
+             NameArtifactsStep,
              GenerateTraceLinksStep,
              DetectDuplicateArtifactsStep,
              FindHomesForOrphansStep,

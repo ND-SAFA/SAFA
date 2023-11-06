@@ -2,10 +2,11 @@ import math
 from unittest import mock
 from unittest.mock import MagicMock
 
-from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions, MISSING_PROJECT_SUMMARY_RESPONSES
+from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.add_clusters_to_dataset import AddClustersToDataset
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -101,6 +102,8 @@ class TestMultiLayerHGenJob(BaseJobTest):
         orig_dataset = args.dataset_creator.create()
         self.assertEqual(job_result.status, Status.SUCCESS)
         dataset: TraceDataset = job_result.body
+        if isinstance(dataset, str):
+            self.fail(dataset)
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
         layers = [args.source_layer_id] + [args.target_type, self.higher_levels[0],
                                            self.higher_levels[1]]
@@ -138,7 +141,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         return args
 
     def _get_job(self):
-        starting_hgen_job = BaseHGenJob(self.get_args(export_dir=None))  # TODO: Remove once state is able to save clustering state.
+        starting_hgen_job = BaseHGenJob(self.get_args(export_dir=EMPTY_STRING))
         return MultiLayerHGenJob(starting_hgen_job, self.higher_levels)
 
     def set_clustering_state(self, args: ClusteringArgs, state: ClusteringState, *other_args, **other_kwargs):

@@ -35,8 +35,6 @@ class EmbeddingSorter(iSorter):
             sorted_artifact_scores = [c[0] for c in sorted_children]
 
             if return_scores:
-                if len(sorted_artifact_scores) >= 30:
-                    sorted_artifact_scores = _data.minmax_scale(sorted_artifact_scores)
                 sorted_artifact_scores = ListUtil.convert_numpy_array_to_native_types(sorted_artifact_scores)
                 parent2rankings[parent_id] = (sorted_artifact_ids, sorted_artifact_scores)
             else:

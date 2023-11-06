@@ -4,6 +4,7 @@ from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -18,11 +19,13 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: Current state of the hgen pipeline.
         :return: None
         """
-        if not args.perform_clustering:
-            return
         clustering_export_path = os.path.join(args.export_dir, "clustering") if args.export_dir else None
-        args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path)
-        clustering_pipeline = ClusteringPipeline(args)
+        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path)
+        if not args.perform_clustering:
+            state.embedding_manager = EmbeddingsManager(content_map={}, model_name=cluster_args.embedding_model)
+            return
+
+        clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
 
         cluster_map = clustering_pipeline.state.final_cluster_map

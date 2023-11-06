@@ -6,7 +6,7 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
-class NameArtifactsGenerated(AbstractPipelineStep[HGenArgs, HGenState]):
+class NameArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates names for the generated artifacts.

@@ -1,0 +1,185 @@
+_CHECKPOINT_DIRNAME: state_checkpoints
+artifact_map:
+  /Debug/DebugOptions.cpp: 'Summary of to Summarize`:'
+  /Debug/Graphics/FPSCounter.cpp: 'Summary of to Summarize`:'
+  /Exception/Exception.cpp: 'Summary of to Summarize`:'
+  /Exception/Exception_Linux.cpp: 'Summary of to Summarize`:'
+  /Exception/Exception_Windows.cpp: 'Summary of to Summarize`:'
+  /Game.cpp: 'Summary of to Summarize`:'
+  /Graphics/Components/Button.cpp: 'Summary of to Summarize`:'
+  /Graphics/Components/Component.cpp: 'Summary of to Summarize`:'
+  /Graphics/Components/HBox.cpp: 'Summary of to Summarize`:'
+  /Graphics/Components/Rectangle.cpp: 'Summary of to Summarize`:'
+  /Graphics/Components/Text.cpp: 'Summary of to Summarize`:'
+  /Graphics/Components/VBox.cpp: 'Summary of to Summarize`:'
+  /Graphics/Menu/ColorSelectorMenu.cpp: 'Summary of to Summarize`:'
+  /Graphics/Menu/EscapeMenu.cpp: 'Summary of to Summarize`:'
+  /Graphics/Menu/Menu.cpp: 'Summary of to Summarize`:'
+  /Graphics/Menu/SettingsMenu.cpp: 'Summary of to Summarize`:'
+  /Graphics/Screen/WorldScreen.cpp: 'Summary of to Summarize`:'
+  /Player.cpp: 'Summary of to Summarize`:'
+  /Rendering/AABBRenderer.cpp: 'Summary of to Summarize`:'
+  /Rendering/BlockSelection.cpp: 'Summary of to Summarize`:'
+  /Rendering/Image.cpp: 'Summary of to Summarize`:'
+  /Rendering/RenderEngine.cpp: 'Summary of to Summarize`:'
+  /Rendering/Renderable.cpp: 'Summary of to Summarize`:'
+  /Rendering/Shader.cpp: 'Summary of to Summarize`:'
+  /Rendering/ShaderProgram.cpp: 'Summary of to Summarize`:'
+  /Rendering/stb_image.cpp: 'Summary of to Summarize`:'
+  /Utils/AABB.cpp: 'Summary of to Summarize`:'
+  /Utils/Font.cpp: 'Summary of to Summarize`:'
+  /Utils/ICollidable.cpp: 'Summary of to Summarize`:'
+  /World/Block.cpp: 'Summary of to Summarize`:'
+  /World/BlockFace.cpp: 'Summary of to Summarize`:'
+  /World/Chunk.cpp: 'Summary of to Summarize`:'
+  /World/World.cpp: 'Summary of to Summarize`:'
+  /main.cpp: 'Summary of to Summarize`:'
+  0 DD1: Here is the final, top level design document
+  0 TUS1: As a game developer, I want a Player class to store player state, apply
+    movement, handle collisions, perform raycasting for block selection, and render
+    the player, so that I can implement a controllable character that interacts with
+    the 3D world.
+  1 TUS2: As a game developer, I want a RenderEngine class to handle window creation,
+    OpenGL context, camera view, and scene rendering, so that I have a reusable graphics
+    engine for displaying 3D scenes.
+  1 requirement2: This is another requirement for some user stories.
+  2 TUS3: As a game developer, I want an Image class to load image files as textures
+    using STB Image, so that I can apply detailed textures to 3D models.
+  Detect Block Collisions ET: Implement Collision Detection Between Player and World
+    Blocks
+  First Person Player Movement ET: Implement First-Person Controls for Player Movement
+    and Interaction
+  Generate Voxel Cubic Chunk World ET: Generate Procedural 3D Voxel World Composed
+    of Cubic Chunks Containing Block Data
+  Improve Rendering Large Procedural Worlds ET: Optimize Rendering and Memory Usage
+    for Large Procedural Worlds
+  Modular Interface Development ET: Develop Modular UI System for Menus, Settings,
+    and In-Game Overlays
+  Render 3D Block World ET: Render World and Blocks Using Vertex Arrays and Textures
+    with Custom Shaders
+  Texture Loading Utilities ET: Provide Utilities for Texture Loading, Text Rendering,
+    and Debugging
+candidate_entries:
+- !!python/object/apply:tgen.common.util.enum_util.EnumDict
+  dictitems:
+    link_id: -1301068959111220138
+    score: 0.302301824092865
+    source: 1 requirement2
+    target: 0 DD1
+completed_steps:
+  SelectCandidateLinksStep: 1
+  SortChildrenStep: 1
+embedding_manager: !!python/object:tgen.embeddings.embeddings_manager.EmbeddingsManager
+  _EmbeddingsManager__model: null
+  _EmbeddingsManager__ordered_ids:
+  - 1 requirement2
+  - 0 DD1
+  _EmbeddingsManager__saved_embeddings_path: orphan_ranking/state_checkpoints/embedding_manager/embeddings_66df8784-ccf0-4c55-88b4-0cbe1430730e.npy
+  _EmbeddingsManager__state_changed_since_last_save: false
+  _content_map:
+    /Debug/DebugOptions.cpp: 'Summary of to Summarize`:'
+    /Debug/Graphics/FPSCounter.cpp: 'Summary of to Summarize`:'
+    /Exception/Exception.cpp: 'Summary of to Summarize`:'
+    /Exception/Exception_Linux.cpp: 'Summary of to Summarize`:'
+    /Exception/Exception_Windows.cpp: 'Summary of to Summarize`:'
+    /Game.cpp: 'Summary of to Summarize`:'
+    /Graphics/Components/Button.cpp: 'Summary of to Summarize`:'
+    /Graphics/Components/Component.cpp: 'Summary of to Summarize`:'
+    /Graphics/Components/HBox.cpp: 'Summary of to Summarize`:'
+    /Graphics/Components/Rectangle.cpp: 'Summary of to Summarize`:'
+    /Graphics/Components/Text.cpp: 'Summary of to Summarize`:'
+    /Graphics/Components/VBox.cpp: 'Summary of to Summarize`:'
+    /Graphics/Menu/ColorSelectorMenu.cpp: 'Summary of to Summarize`:'
+    /Graphics/Menu/EscapeMenu.cpp: 'Summary of to Summarize`:'
+    /Graphics/Menu/Menu.cpp: 'Summary of to Summarize`:'
+    /Graphics/Menu/SettingsMenu.cpp: 'Summary of to Summarize`:'
+    /Graphics/Screen/WorldScreen.cpp: 'Summary of to Summarize`:'
+    /Player.cpp: 'Summary of to Summarize`:'
+    /Rendering/AABBRenderer.cpp: 'Summary of to Summarize`:'
+    /Rendering/BlockSelection.cpp: 'Summary of to Summarize`:'
+    /Rendering/Image.cpp: 'Summary of to Summarize`:'
+    /Rendering/RenderEngine.cpp: 'Summary of to Summarize`:'
+    /Rendering/Renderable.cpp: 'Summary of to Summarize`:'
+    /Rendering/Shader.cpp: 'Summary of to Summarize`:'
+    /Rendering/ShaderProgram.cpp: 'Summary of to Summarize`:'
+    /Rendering/stb_image.cpp: 'Summary of to Summarize`:'
+    /Utils/AABB.cpp: 'Summary of to Summarize`:'
+    /Utils/Font.cpp: 'Summary of to Summarize`:'
+    /Utils/ICollidable.cpp: 'Summary of to Summarize`:'
+    /World/Block.cpp: 'Summary of to Summarize`:'
+    /World/BlockFace.cpp: 'Summary of to Summarize`:'
+    /World/Chunk.cpp: 'Summary of to Summarize`:'
+    /World/World.cpp: 'Summary of to Summarize`:'
+    /main.cpp: 'Summary of to Summarize`:'
+    0 DD1: Here is the final, top level design document
+    0 TUS1: As a game developer, I want a Player class to store player state, apply
+      movement, handle collisions, perform raycasting for block selection, and render
+      the player, so that I can implement a controllable character that interacts
+      with the 3D world.
+    1 TUS2: As a game developer, I want a RenderEngine class to handle window creation,
+      OpenGL context, camera view, and scene rendering, so that I have a reusable
+      graphics engine for displaying 3D scenes.
+    1 requirement2: This is another requirement for some user stories.
+    2 TUS3: As a game developer, I want an Image class to load image files as textures
+      using STB Image, so that I can apply detailed textures to 3D models.
+    Detect Block Collisions ET: Implement Collision Detection Between Player and World
+      Blocks
+    First Person Player Movement ET: Implement First-Person Controls for Player Movement
+      and Interaction
+    Generate Voxel Cubic Chunk World ET: Generate Procedural 3D Voxel World Composed
+      of Cubic Chunks Containing Block Data
+    Improve Rendering Large Procedural Worlds ET: Optimize Rendering and Memory Usage
+      for Large Procedural Worlds
+    Modular Interface Development ET: Develop Modular UI System for Menus, Settings,
+      and In-Game Overlays
+    Render 3D Block World ET: Render World and Blocks Using Vertex Arrays and Textures
+      with Custom Shaders
+    Texture Loading Utilities ET: Provide Utilities for Texture Loading, Text Rendering,
+      and Debugging
+  _embedding_map: {}
+  model_name: sentence-transformers/all-MiniLM-L6-v2
+export_dir: orphan_ranking
+export_path: null
+project_summary: !!python/object/apply:tgen.summarizer.summary.Summary
+  dictitems:
+    Data Flow: !!python/object/apply:tgen.common.util.enum_util.EnumDict
+      dictitems:
+        chunks:
+        - summary of project
+        title: Data Flow
+    Entities: !!python/object/apply:tgen.common.util.enum_util.EnumDict
+      dictitems:
+        chunks:
+        - summary of project
+        title: Entities
+    Features: !!python/object/apply:tgen.common.util.enum_util.EnumDict
+      dictitems:
+        chunks:
+        - summary of project
+        title: Features
+    Overview: !!python/object/apply:tgen.common.util.enum_util.EnumDict
+      dictitems:
+        chunks:
+        - summary of project
+        title: Overview
+    Sub-systems: !!python/object/apply:tgen.common.util.enum_util.EnumDict
+      dictitems:
+        chunks:
+        - summary of project
+        title: Sub-systems
+ranking_responses: null
+selected_entries:
+- !!python/object/apply:tgen.common.util.enum_util.EnumDict
+  dictitems:
+    link_id: -1301068959111220138
+    score: 0.302301824092865
+    source: 1 requirement2
+    target: 0 DD1
+sorted_parent2children:
+  0 DD1:
+  - !!python/object/apply:tgen.common.util.enum_util.EnumDict
+    dictitems:
+      link_id: -1301068959111220138
+      score: 0.302301824092865
+      source: 1 requirement2
+      target: 0 DD1

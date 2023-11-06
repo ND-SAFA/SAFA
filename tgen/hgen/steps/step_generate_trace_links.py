@@ -5,6 +5,7 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
 from tgen.common.objects.trace import Trace
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
@@ -45,7 +46,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
             trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
                                                                                       state.id_to_related_children)
-            selected_predictions = SelectByThreshold.select(trace_predictions, args.link_selection_threshold)
+        selected_predictions = SelectByThreshold.select(trace_predictions, args.link_selection_threshold)
         state.selected_predictions = selected_predictions
         state.trace_predictions = trace_predictions
 
@@ -132,11 +133,13 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param pipeline_kwargs: Additional pipeline arguments
         :return: The list of traces with explanations
         """
-        pipeline_args = RankingArgs(run_name="explanations", parent_ids=[], children_ids=[], weight_of_explanation_scores=0,
+        pipeline_kwargs = DictUtil.update_kwarg_values(pipeline_kwargs, generate_explanations=True)
+        pipeline_args = RankingArgs(run_name="explanations", parent_ids=[], children_ids=[],
+                                    weight_of_explanation_scores=0,
                                     **pipeline_kwargs)
         pipeline_state = RankingState(candidate_entries=selected_traces)
         CreateExplanationsStep().run(pipeline_args, pipeline_state)
-        selected_traces = pipeline_state.selected_entries
+        selected_traces = pipeline_state.get_current_entries()
         return selected_traces
 
     @staticmethod

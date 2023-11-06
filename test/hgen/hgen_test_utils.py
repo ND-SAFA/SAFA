@@ -68,7 +68,7 @@ def get_name_responses(generated_artifact_content=None, target_type="User Story"
     if isinstance(generated_artifact_content, dict):
         generated_artifact_content = generated_artifact_content.keys()
     names = [f"{i}" for i, _ in enumerate(generated_artifact_content)]
-    expected_names = [f"{name} {HGenUtil.get_initials(target_type)}" for name in names]
+    expected_names = [HGenUtil.format_names(name, target_type, i) for i, name in enumerate(names)]
     return names, expected_names, [PromptUtil.create_xml("title", name) for name in names]
 
 

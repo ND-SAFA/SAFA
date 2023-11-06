@@ -31,8 +31,8 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         logger.info(f"Removing: {len(duplicate_artifact_ids)} duplicates.")
 
-        state.new_artifact_dataset.artifact_df.remove_artifacts(duplicate_artifact_ids)
-        state.all_artifacts_dataset.artifact_df.remove_artifacts(duplicate_artifact_ids)
+        state.new_artifact_dataset.artifact_df.remove_rows(duplicate_artifact_ids)
+        state.all_artifacts_dataset.artifact_df.remove_rows(duplicate_artifact_ids)
 
         self._re_trace_duplicates(args, state, duplicate_artifact_ids, duplicate_pairs)
 
@@ -49,15 +49,17 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         duplicate_map = DetectDuplicateArtifactsStep._create_duplicate_map(duplicate_pairs)
         selected_predictions, existing_traces = [], set()
+        state.embedding_manager.update_or_add_contents(content_map=state.all_artifacts_dataset.artifact_df.to_map())
         for trace in state.selected_predictions:
             parent = trace[TraceKeys.parent_label()]
             if parent in duplicate_artifact_ids:
                 potential_parents = duplicate_map[parent]
                 child = trace[TraceKeys.child_label()]
-                sorted_parents = EmbeddingSorter.sort([child], potential_parents, embedding_manager=state.embedding_manager,
+                sorted_parents, sorted_scores = EmbeddingSorter.sort([child], potential_parents,
+                                                                     embedding_manager=state.embedding_manager,
                                                       return_scores=True)[child]
-                top_parent = sorted_parents[0]
-                if top_parent[TraceKeys.SCORE] < args.link_selection_threshold:
+                top_parent, top_parent_score = sorted_parents[0], sorted_scores[0]
+                if top_parent_score < args.link_selection_threshold:
                     continue  # discard trace entirely
                 trace[TraceKeys.parent_label()] = top_parent
             pair = (trace[TraceKeys.parent_label()], trace[TraceKeys.child_label()])

@@ -4,7 +4,7 @@ from typing import Dict, List, Set, Tuple, Union
 
 import pandas as pd
 
-from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE, SPACE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
@@ -182,7 +182,7 @@ class HGenUtil:
                                                      export_path=predictions_path)
                     assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
                     names = [name if i not in use_content_as_names else use_content_as_names[i] for i, name in enumerate(names)]
-                names = [f"{n}{i + 1}" for i, n in enumerate(names)]
+                names = [HGenUtil.format_names(n, index=i) for i, n in enumerate(names)]
                 new_artifact_df.index = pd.Index(names, name=new_artifact_df.index_name())
             except Exception:
                 logger.exception("Unable to generate names for the artifacts")
@@ -191,14 +191,20 @@ class HGenUtil:
         return new_artifact_df, name_2_related_children
 
     @staticmethod
-    def format_names(name: str, target_type: str) -> str:
+    def format_names(name: str, target_type: str = None, index: int = None) -> str:
         """
         Formats the names with the initials of the target type
         :param name: The name of the artifact
         :param target_type: The type of artifact
+        :param index: The index of the artifact with the corresponding name
         :return: The formatted name with the initials of the target type
         """
-        return f"{PromptUtil.strip_new_lines_and_extra_space(name)} {HGenUtil.get_initials(target_type)}"
+        ext = EMPTY_STRING
+        if target_type:
+            ext = SPACE + HGenUtil.get_initials(target_type)
+        if index is not None:
+            ext += f"{index + 1}"
+        return f"{PromptUtil.strip_new_lines_and_extra_space(name)}{ext}"
 
     @staticmethod
     def parse_generated_artifacts(res: str) -> List[str]:

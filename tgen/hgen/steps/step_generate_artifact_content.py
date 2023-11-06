@@ -3,9 +3,10 @@ import uuid
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
-from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS
+from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS, DEFAULT_BRANCHING_FACTOR
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
@@ -42,9 +43,9 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True,
                                                                     id_to_context_artifacts=state.id_to_cluster_artifacts)
-        branching_factor = 2
-        n_targets = [max(round(len(state.id_to_cluster_artifacts[i]) * (1 / branching_factor)), 1) for i in dataset.artifact_df.index]
-        prompt_builder.format_variables = {"n_targets": n_targets}
+        if state.id_to_cluster_artifacts:
+            n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, state)
+            prompt_builder.format_variables = {"n_targets": n_targets}
         if state.project_summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{state.project_summary.to_string()}", allow_formatting=False)
@@ -58,6 +59,19 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                                                             source_tag_id,
                                                                                                             target_tag_id, state)
         state.n_generations += 1
+
+    @staticmethod
+    def _calculate_number_of_targets_per_cluster(artifact_ids: List, state: HGenState,
+                                                 branching_factor: int = DEFAULT_BRANCHING_FACTOR) -> List[int]:
+        """
+        Calculates the expected number of targets for each cluster based on the number of artifacts in each cluster
+        :param artifact_ids: The ids of the artifact representing each cluster
+        :param state: The current HGEN state
+        :param branching_factor: Determines the percentage of target artifacts per source artifacts
+        :return: A list of the expected number of target artifacts for each cluster
+        """
+        n_targets = [max(round(len(state.id_to_cluster_artifacts[i]) * (1 / branching_factor)), 1) for i in artifact_ids]
+        return n_targets
 
     @staticmethod
     def _map_generations_to_predicted_sources(generation_predictions: List, source_tag_id: str, target_tag_id: str,

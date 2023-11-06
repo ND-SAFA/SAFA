@@ -13,8 +13,11 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
+from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
+from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
+from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.state.state import State
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
@@ -40,7 +43,8 @@ class TestState(BaseTest):
     def test_load_latest(self, anthropic_manager: TestAIManager, project_summary_mock: MagicMock):
         project_summary_mock.return_value = "project_summary"
         anthropic_manager.mock_summarization()
-        EXCLUDE_STEPS = [CreateClustersStep, GenerateTraceLinksStep]
+        EXCLUDE_STEPS = [CreateClustersStep, GenerateTraceLinksStep, NameArtifactsStep,
+                         DetectDuplicateArtifactsStep, FindHomesForOrphansStep]
         steps = [step.get_step_name() for step in HierarchyGenerator.steps if step not in EXCLUDE_STEPS]
         state = HGenState.load_latest(TEST_STATE_PATH, steps)
         self.assertEqual(state.export_dir, TEST_OUTPUT_DIR)

@@ -45,7 +45,8 @@ RANKING_CATEGORIES = ["Artifacts have closely-tied functionality "
                       "Partial topical overlap. The artifacts have some loosely related content "
                       "but differences outweigh the similarities (unsure if trace-link) ",
                       "Vague or abstract similarity. "
-                      "The artifacts share only very high-level topics or broad concepts but no specifics (weak trace-link) ",
+                      "The artifacts hare only very high-level topics or broad concepts but no specifics (weak trace-link) ",
+                      "No discernible relationship between artifacts can be identified ",
                       "No discernible relationship between artifacts can be identified. "
                       "The artifacts contain different content and context with no overlaps (no trace-link)"]
 RANKING_RANGE = range(RANKING_MAX_SCORE, RANKING_MIN_SCORE - 1,

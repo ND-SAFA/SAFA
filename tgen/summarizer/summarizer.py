@@ -7,6 +7,7 @@ import pandas as pd
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -32,8 +33,7 @@ class Summarizer:
         :return: A dataset containing the summarized artifacts and project
         """
         if os.path.exists(self._get_artifact_save_path()):
-            self.dataset.artifact_df = ArtifactDataFrame(pd.read_csv(self._get_artifact_save_path()))
-            logger.info(f"Loaded artifact summaries from {self._get_artifact_save_path()}")
+            self._load_artifacts_from_file()
         project_summary = self._create_project_summary(self.dataset)
         artifact_df = self.dataset.artifact_df
         self._save_artifact_summaries(artifact_df)
@@ -46,6 +46,25 @@ class Summarizer:
         summarized_dataset.update_artifact_df(artifact_df)
         summarized_dataset.project_summary = project_summary
         return summarized_dataset
+
+    def _load_artifacts_from_file(self) -> None:
+        """
+        Loads artifact summaries from a file
+        :return: None
+        """
+        loaded_artifact_df = ArtifactDataFrame(pd.read_csv(self._get_artifact_save_path()))
+        original_artifacts = set(self.dataset.artifact_df.index)
+        added_artifacts = set(loaded_artifact_df.index).difference(original_artifacts)
+        loaded_artifact_df.remove_rows(list(added_artifacts))
+        for a_id in original_artifacts:
+            orig_artifact = self.dataset.artifact_df.get_artifact(a_id)
+            loaded_artifact = loaded_artifact_df.get_artifact(a_id)
+            if loaded_artifact and orig_artifact[ArtifactKeys.CONTENT] != loaded_artifact[ArtifactKeys.CONTENT]:
+                loaded_artifact_df.remove_row(a_id)
+            if a_id not in loaded_artifact_df:
+                loaded_artifact_df.add_artifact(**orig_artifact)
+        self.dataset.update_artifact_df(loaded_artifact_df)
+        logger.info(f"Loaded artifact summaries from {self._get_artifact_save_path()}")
 
     def _resummarize_artifacts(self, orig_artifact_df: ArtifactDataFrame,
                                project_summary: Summary) -> ArtifactDataFrame:

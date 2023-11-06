@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 
 class MathUtil:
@@ -40,3 +40,15 @@ class MathUtil:
         :return: The weighted score of the combined scores
         """
         return scoreA * weight_of_scoreA + scoreB * (1 - weight_of_scoreA)
+
+    @staticmethod
+    def difference_between(set1: Union[set, list], set2: Union[set, list]) -> set:
+        """
+        Finds all elements that are different between set1 and set2
+        :param set1: The first set or list
+        :param set2: The second set or list
+        :return: A set of all different elements
+        """
+        differences = set(set1).difference(set2)
+        differences.update(set(set2).difference(set1))
+        return differences

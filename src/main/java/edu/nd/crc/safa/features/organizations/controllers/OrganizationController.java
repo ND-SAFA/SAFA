@@ -101,7 +101,7 @@ public class OrganizationController extends BaseController {
     @PostMapping(AppRoutes.Organizations.ROOT)
     public OrganizationAppEntity createNewOrganization(@RequestBody OrganizationAppEntity newOrgEntity) {
         SafaUser user = getCurrentUser();
-        permissionService.requireSuperuser(user);
+        permissionService.requireActiveSuperuser(user);
         Organization orgDefinition = new Organization(newOrgEntity.getName(), newOrgEntity.getDescription(),
             user, "free", false);
         Organization newOrg = organizationService.createNewOrganization(orgDefinition);

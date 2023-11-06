@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.SafaApplicationPermission;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -79,7 +80,17 @@ public class PermissionService {
     }
 
     /**
-     * Returns whether the given user is a superuser.
+     * Returns whether the given user is a superuser and their superuser powers are active.
+     *
+     * @param user The user in question
+     * @return Whether the user is an active superuser
+     */
+    public boolean isActiveSuperuser(SafaUser user) {
+        return isSuperuser(user) && user.isSuperuserActive();
+    }
+
+    /**
+     * Returns whether the given user is a superuser
      *
      * @param user The user in question
      * @return Whether the user is a superuser
@@ -132,9 +143,22 @@ public class PermissionService {
      *
      * @param user The user in question
      */
+    public void requireActiveSuperuser(SafaUser user) {
+        requireSuperuser(user);
+
+        if (!isActiveSuperuser(user)) {
+            throw new MissingPermissionException(SafaApplicationPermission.SUPERUSER_ACTIVATION);
+        }
+    }
+
+    /**
+     * Throws an exception if the given user is not a superuser.
+     *
+     * @param user The user in question
+     */
     public void requireSuperuser(SafaUser user) {
         if (!isSuperuser(user)) {
-            throw new MissingPermissionException(() -> "safa.superuser");
+            throw new MissingPermissionException(SafaApplicationPermission.SUPERUSER);
         }
     }
 
@@ -199,7 +223,7 @@ public class PermissionService {
      */
     private boolean checkPermissionsAllMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
                                              SafaUser user) {
-        if (isSuperuser(user)) {
+        if (isActiveSuperuser(user)) {
             return true;
         }
         return userPermissions.containsAll(requiredPermissions);
@@ -215,7 +239,7 @@ public class PermissionService {
      */
     private boolean checkPermissionsAnyMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
                                              SafaUser user) {
-        if (isSuperuser(user)) {
+        if (isActiveSuperuser(user)) {
             return true;
         }
         return requiredPermissions.stream().anyMatch(userPermissions::contains);
@@ -230,7 +254,7 @@ public class PermissionService {
      * @return Whether the user has the required permission
      */
     private boolean checkPermission(Permission requiredPermission, Set<Permission> userPermissions, SafaUser user) {
-        if (isSuperuser(user)) {
+        if (isActiveSuperuser(user)) {
             return true;
         }
         return userPermissions.contains(requiredPermission);

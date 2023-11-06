@@ -145,10 +145,29 @@ public class SafaUserService {
      * Adds the superuser permission to the given user
      *
      * @param updatedUser The user to update
-     * @return The updated user
      */
-    public SafaUser addSuperUser(SafaUser updatedUser) {
+    public void addSuperUser(SafaUser updatedUser) {
         updatedUser.setSuperuser(true);
-        return safaUserRepository.save(updatedUser);
+        safaUserRepository.save(updatedUser);
+    }
+
+    /**
+     * Sets the activation of the superuser status for a given user
+     *
+     * @param user       The user to update
+     * @param activation Whether the user's superuser powers should be active
+     */
+    public void setSuperuserActivation(SafaUser user, boolean activation) {
+        if (activation && !user.isSuperuser()) {
+            // We should not be able to get here. It shouldn't cause an issue though
+            // since the actual permission checks will check both activation and superuser
+            // status, so just issue a warning so that we can track the issue if it ever occurs
+            logger.warn("Setting superuser activation on user who is not superuser - " + user.getEmail());
+        }
+
+        if (user.isSuperuserActive() != activation) {
+            user.setSuperuserActive(activation);
+            safaUserRepository.save(user);
+        }
     }
 }

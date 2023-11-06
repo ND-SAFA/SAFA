@@ -222,10 +222,39 @@ public class SafaUserController extends BaseController {
     @PutMapping(AppRoutes.Accounts.SuperUser.BY_USER)
     public void addSuperUser(@PathVariable UUID userId) {
         SafaUser currentUser = getCurrentUser();
-        permissionService.requireSuperuser(currentUser);
+        permissionService.requireActiveSuperuser(currentUser);
 
         SafaUser updatedUser = safaUserService.getUserById(userId);
         safaUserService.addSuperUser(updatedUser);
+    }
+
+    /**
+     * <p>Activate a user's superuser powers.</p>
+     *
+     * <p>A user's superuser powers are inactive by default to
+     * help prevent accidental misuse. By activating superuser
+     * powers, the user will be able to actually perform superuser
+     * actions.</p>
+     */
+    @PutMapping(AppRoutes.Accounts.SuperUser.ACTIVATE)
+    public void activateSuperuser() {
+        SafaUser currentUser = getCurrentUser();
+        permissionService.requireSuperuser(currentUser);
+        safaUserService.setSuperuserActivation(currentUser, true);
+    }
+
+    /**
+     * <p>Deactivate a user's superuser powers.</p>
+     *
+     * <p>A user's superuser powers are inactive by default to
+     * help prevent accidental misuse. Deactivating superuser
+     * powers on a user whose powers are active will return them
+     * to functioning like a normal user.</p>
+     */
+    @PutMapping(AppRoutes.Accounts.SuperUser.DEACTIVATE)
+    public void deactivateSuperuser() {
+        SafaUser currentUser = getCurrentUser();
+        safaUserService.setSuperuserActivation(currentUser, false);
     }
 
     private String buildResetURL(String token) {

@@ -5,6 +5,7 @@ from typing import Callable, Dict, List
 from dotenv import load_dotenv
 
 from tgen.scripts.tools.find_missing_docs import print_missing_headers
+from tgen.scripts.tools.rq_tools import RQ_TOOLS
 from tgen.scripts.toolset.tool import Tool
 
 load_dotenv()
@@ -13,7 +14,6 @@ sys.path.append(root_path)
 
 from tgen.scripts.toolset.selector import inquirer_selection
 from tgen.scripts.toolset.tool_set import ToolSet
-from tgen.scripts.tools import RQ_TOOLS
 from tgen.scripts.tools.s3_tools import S3_TOOLS
 
 

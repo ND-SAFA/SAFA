@@ -4,7 +4,7 @@ from typing import List, Optional
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_NAV_MESSAGE, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
-from tgen.scripts.toolset.rq_proxy import RQProxy
+from tgen.scripts.toolset.rq_definition import RQDefinition
 from tgen.scripts.toolset.selector import inquirer_selection
 from tgen.testres.object_creator import ObjectCreator
 
@@ -86,10 +86,10 @@ def run_rq(rq_path: str) -> None:
     :return: None
     """
     experiment_path = os.path.expanduser(rq_path)
-    rq_proxy = RQProxy(experiment_path)
+    rq_definition = RQDefinition(experiment_path)
 
     os_variables = {env_key: env_value for env_key, env_value in os.environ.items()}
-    replacements = rq_proxy.inquirer_variables(default_values=os_variables)
+    replacements = rq_definition.inquirer_variables(default_values=os_variables)
 
     experiment_definition = ScriptDefinition.read_experiment_definition(experiment_path, replacements)
     experiment_class = ScriptRunner.get_experiment_class(experiment_definition)

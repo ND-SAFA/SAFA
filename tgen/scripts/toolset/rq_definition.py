@@ -54,7 +54,7 @@ class RQVariable:
         return self.name
 
 
-class RQProxy:
+class RQDefinition:
     def __init__(self, rq_path: str):
         """
         Defines proxy API for RQ at path.

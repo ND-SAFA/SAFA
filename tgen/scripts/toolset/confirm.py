@@ -1,15 +1,16 @@
-def confirm(confirm_question: str = None):
+from tgen.scripts.constants import CONFIRM_MESSAGE_DEFAULT, CONFIRM_NEG, CONFIRM_OPTIONS, CONFIRM_PARSE_ERROR, CONFIRM_POS
+
+
+def confirm(confirm_question: str = CONFIRM_MESSAGE_DEFAULT):
     """
     Confirms with the user.
     :param confirm_question: The prompt to show the user.
     """
-    if confirm_question is None:
-        confirm_question = "Confirm?"
-    confirm_prompt = f"{confirm_question} (Yes/No):"
+    confirm_prompt = f"{confirm_question} {CONFIRM_OPTIONS}:"
     confirm_response = input(confirm_prompt)
-    if "y" in confirm_response.lower():
+    if CONFIRM_POS in confirm_response.lower():
         return True
-    elif "n" in confirm_response.lower():
+    elif CONFIRM_NEG in confirm_response.lower():
         return False
     else:
-        raise Exception(f"Unable to parse response: {confirm_question}")
+        raise Exception(CONFIRM_PARSE_ERROR.format(confirm_question))

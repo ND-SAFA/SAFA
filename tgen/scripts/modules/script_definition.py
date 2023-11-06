@@ -4,7 +4,7 @@ from typing import Any, Dict, Tuple
 from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
 from tgen.common.util.file_util import FileUtil
 from tgen.scripts.constants import MISSING_DEFINITION_ERROR
-from tgen.scripts.toolset.rq_proxy import RQProxy
+from tgen.scripts.toolset.rq_definition import RQDefinition
 
 
 class ScriptDefinition:
@@ -16,7 +16,8 @@ class ScriptDefinition:
     ENV_OUTPUT_PARAM = f"[{OUTPUT_PATH_PARAM}]"
 
     @staticmethod
-    def read_experiment_definition(definition_path: str = None, rq_definition: RQProxy = None, env_replacements: Dict = None) -> Dict:
+    def read_experiment_definition(definition_path: str = None, rq_definition: RQDefinition = None,
+                                   env_replacements: Dict = None) -> Dict:
         """
         Reads the experiment definition and applies env replacements.
         :param definition_path: Path to experiment jobs.
@@ -30,7 +31,7 @@ class ScriptDefinition:
             if not os.path.isfile(definition_path):
                 raise ValueError(MISSING_DEFINITION_ERROR.format(definition_path))
             definition_path = os.path.expanduser(definition_path)
-            rq_definition = RQProxy(definition_path)
+            rq_definition = RQDefinition(definition_path)
         elif not rq_definition:
             raise Exception("Expected definition path or rq definition to be given.")
 

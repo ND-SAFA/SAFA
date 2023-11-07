@@ -14,18 +14,20 @@ EmbeddingType = np.array
 
 class EmbeddingsManager:
 
-    def __init__(self, content_map: Dict[str, str], model_name: str):
+    def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None):
         """
         Initializes the embedding manager with the content used to create embeddings
         :param content_map: Maps id to the corresponding content
         :param model_name: Name of model to use for creating embeddings
+        :param model: The model to use to embed artifacts.
         """
+        assert model_name is not None or model is not None, f"Expected model or model name to be defined but got None for both."
         self.model_name = model_name
         self._content_map = content_map
         self._embedding_map = {}
         self.__ordered_ids = []
         self.__saved_embeddings_path = None
-        self.__model = None
+        self.__model = model
         self.__state_changed_since_last_save = False
 
     def create_artifact_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:

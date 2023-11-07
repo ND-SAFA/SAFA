@@ -1,15 +1,16 @@
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
 from sentence_transformers.evaluation import SentenceEvaluator
 from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss
-from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.util.embedding_util import EmbeddingUtil
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.supported_enum import SupportedEnum
@@ -18,6 +19,7 @@ from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
 
@@ -126,8 +128,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         self._current_eval_role = dataset_role
         dataset = self._get_dataset(dataset_role)
         input_examples = self.to_input_examples(dataset)
-        embeddings = self.create_embedding_map(self.model, input_examples)
-        scores, labels = self.calculate_similarities(embeddings, input_examples)
+        scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         return PredictionOutput(scores, labels, prediction_metrics)
 
@@ -141,35 +142,39 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         input_examples = [example for input_batch in dataset for example in input_batch.values()]
         return input_examples
 
-    @staticmethod
-    def create_embedding_map(model: SentenceTransformer, input_examples: List[InputExample]):
-        """
-        Creates embedding map from content to embedding for texts in dataset. TODO: Replace with embedding manager.
-        :param model: The model used to embed the test dataset.
-        :param input_examples: The dataset containing source and target texts per example.
-        :return: Map of text to embedding.
-        """
-        unique_texts = list(set([a for e in input_examples for a in e.texts]))
-        batch_embeddings = model.encode(unique_texts)
-        embeddings = {k: v for k, v in zip(unique_texts, batch_embeddings)}
-        return embeddings
-
-    @staticmethod
-    def calculate_similarities(embedding_map: Dict[str, EmbeddingType], input_examples: List[InputExample]) -> Tuple[
+    @classmethod
+    def calculate_similarities(cls, model: SentenceTransformer, input_examples: List[InputExample]) -> Tuple[
         List[float], List[float]]:
         """
         Calculates the cosine similarity between the texts in each input example. TODO: Replace with embedding util.
-        :param embedding_map: Maps text to embedding for all input examples.
+        :param model: The model used to embed the test dataset.
         :param input_examples: The list of input examples to calculate similarities for.
         :return: Prediction output containing scores as predictions and labels as label ids.
         """
+        unique_content = list(set(ListUtil.flatten([e.texts for e in input_examples])))
+        embedding_map = cls.create_embedding_map(model, unique_content)
         scores = []
         labels = []
         for example in input_examples:
             source_text, target_text = example.texts
             source_embedding = embedding_map[source_text]
             target_embedding = embedding_map[target_text]
-            score = cosine_similarity([source_embedding], [target_embedding])[0][0]
+
+            score = EmbeddingUtil.calculate_similarity(source_embedding, target_embedding)
             scores.append(score)
             labels.append(example.label)
         return scores, labels
+
+    @staticmethod
+    def create_embedding_map(model: SentenceTransformer, content: List[str]):
+        """
+        Creates embedding map using the embedding manager.
+        :param model: The model used to embed the content.
+        :param content: List of content to embed.
+        :return: Map from content to embedding.
+        """
+        content_map = {i: c for i, c in enumerate(content)}
+        embeddings_manager = EmbeddingsManager(content_map, model=model)
+        embedding_map = embeddings_manager.create_embedding_map()
+        translated_embedding_map = {content_map[i]: v for i, v in embedding_map.items()}
+        return translated_embedding_map

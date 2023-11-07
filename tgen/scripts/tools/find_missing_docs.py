@@ -7,12 +7,11 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
-from tgen.common.util.logging.logger_manager import logger
-
 load_dotenv()
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(ROOT_PATH)
 
+from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 
 NodeType = AST

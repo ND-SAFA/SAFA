@@ -1,7 +1,5 @@
 from typing import Callable, Dict, List, Optional
 
-from tgen.common.constants.deliminator_constants import UNDERSCORE
-from tgen.scripts.constants import CLI_METHOD_PARAM
 from tgen.scripts.toolset.selector import inquirer_selection
 from tgen.scripts.toolset.tool import Tool
 
@@ -57,25 +55,7 @@ class ToolSet:
         tool_choices = {}
         tool_map = {}
         for tool_func in tool_functions:
-            if callable(tool_func):
-                tool = Tool(tool_func)
-                tool_map[tool.id] = tool
-            else:
-                class_functions = ToolSet.get_class_functions(tool_func)
-                class_tools = [Tool(f) for f in class_functions]
-                class_tool_map = {t.id: t for t in class_tools}
-                tool_map.update(class_tool_map)
+            tool = Tool(tool_func)
+            tool_map[tool.id] = tool
         tool_choices["Exit"] = "Leave."
         return tool_map
-
-    @staticmethod
-    def get_class_functions(class_func: Callable):
-        """
-        Retrieves the functions of class instance.
-        :param class_func: The class instance.
-        :return: List of functions in class.
-        """
-        class_functions = [getattr(class_func, f) for f in dir(class_func) if not f.startswith(UNDERSCORE)]
-        class_functions = [f for f in class_functions if callable(f)]
-        class_functions = [f for f in class_functions if getattr(f, CLI_METHOD_PARAM, False)]
-        return class_functions

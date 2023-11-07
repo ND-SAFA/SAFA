@@ -52,6 +52,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     per_device_train_batch_size = 1
     eval_on_each_epoch: bool = EVAL_ON_EPOCH_DEFAULT
     save_random_model: bool = SAVE_RANDOM_MODEL_DEFAULT
+    best_model_path: str = None
 
     # GAN
     n_hidden_layers_g: int = 1

@@ -111,6 +111,9 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
                        evaluator=evaluator,
                        output_path=self.args.output_dir,
                        save_best_model=self.save_best_model)
+        self.state.best_model_checkpoint = self.args.output_dir
+        if self.args.load_best_model_at_end:
+            self.model = SentenceTransformer(self.state.best_model_checkpoint)
         return TrainOutput(metrics=evaluator.metrics, training_loss=None, global_step=None)
 
     @overrides(HuggingFaceTrainer)

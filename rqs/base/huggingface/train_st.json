@@ -14,6 +14,7 @@
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]",
+            "best_model_path": "[BEST_MODEL_PATH]",
             "num_train_epochs": "[EPOCHS_INT]",
             "learning_rate": 5e-5,
             "skip_save": false,

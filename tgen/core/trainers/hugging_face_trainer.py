@@ -1,4 +1,5 @@
 import os
+import shutil
 from typing import Any, Dict, List, Optional, Union
 
 import torch
@@ -142,11 +143,13 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         :return: None
         """
         best_model_path = self.state.best_model_checkpoint
+        base_path = self.trainer_args.best_model_path if self.trainer_args.best_model_path else self.trainer_args.output_dir
+        best_model_dir = os.path.join(base_path, BEST_MODEL_NAME)
         if best_model_path:
-            best_model_dir = os.path.join(self.trainer_args.output_dir, BEST_MODEL_NAME)
             if os.path.exists(best_model_dir):
                 os.rmdir(best_model_dir)
-            os.rename(best_model_path, best_model_dir)
+            shutil.move(best_model_path, best_model_dir)
+        logger.info(f"Best model at: {best_model_dir}")
 
     def _evaluate(self) -> Dict[DatasetRole, TracePredictionOutput]:
         """

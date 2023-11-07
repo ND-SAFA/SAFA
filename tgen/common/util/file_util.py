@@ -114,7 +114,7 @@ class FileUtil:
         for env_key, env_value in os.environ.items():
             if env_key not in variables:
                 continue
-            replacements[f"[{env_key}]"] = os.path.expanduser(env_value) if "~" in env_value else env_value
+            replacements[f"[{env_key}]"] = os.path.expanduser(env_value) if USER_SYM in env_value else env_value
         return replacements
 
     @staticmethod
@@ -168,7 +168,7 @@ class FileUtil:
                     if k in path:
                         path = path.replace(k, v)
             path = os.path.expanduser(path)
-            if ("~" in path or "/" in path) and use_abs_paths:
+            if (USER_SYM in path or F_SLASH in path) and use_abs_paths:
                 path = FileUtil.get_path_relative_to_proj_path(path)
             return path
 
@@ -310,7 +310,7 @@ class FileUtil:
 
         FileUtil.delete_dir(new_path)
         FileUtil.create_dir_safely(new_path)
-        
+
         for file in os.listdir(orig_path):
             file_path = os.path.join(orig_path, file)
             new_file_path = os.path.join(new_path, file)

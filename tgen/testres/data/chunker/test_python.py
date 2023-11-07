@@ -6,6 +6,7 @@ from inspect import getfullargspec
 from os.path import splitext
 from typing import Callable, Dict, IO, List, Set, Tuple, Type, Union, get_type_hints
 
+from tgen.common.constants.path_constants import USER_SYM
 from tgen.common.util.json_util import JsonUtil
 
 
@@ -82,7 +83,7 @@ class FileUtilTest:
         if isinstance(value, dict):
             return {k: FileUtilTest.expand_paths_in_dictionary(v, replacements=replacements) for k, v in value.items()}
         if isinstance(value, str):
-            if "~" in value:
+            if USER_SYM in value:
                 return os.path.expanduser(value)
             if replacements:
                 for k, v in replacements.items():

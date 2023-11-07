@@ -79,7 +79,7 @@ class RankingArgs(PipelineArgs):
     """
     - selection_method: The method to use to select top predictions
     """
-    selection_method: SupportedSelectionMethod = SupportedSelectionMethod.SELECT_BY_THRESHOLD
+    selection_method: Optional[SupportedSelectionMethod] = SupportedSelectionMethod.SELECT_BY_THRESHOLD
     """
     - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
     """
@@ -121,8 +121,7 @@ class RankingArgs(PipelineArgs):
         :param file_name: The name of the file.
         :return: Path to file in output directory.
         """
-        if self.export_dir is None:
-            return None
-        path = os.path.join(self.export_dir, file_name)
-        path = os.path.expanduser(path)
+        path = FileUtil.safely_join_paths(self.export_dir, file_name)
+        if path:
+            path = os.path.expanduser(path)
         return path

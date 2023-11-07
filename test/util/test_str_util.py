@@ -40,3 +40,11 @@ class TestStrUtil(BaseTest):
         sentence = "This is a sentence with 2.3 in it which should be removed but RE.2.3 and 2 should not 3.0"
         self.assertEqual(StrUtil.remove_floats(sentence),
                          "This is a sentence with  in it which should be removed but RE.2.3 and 2 should not")
+
+    def test_remove_chars(self):
+        string = "<These ^ chars ? need to be removed />"
+        removed_chars_string = StrUtil.remove_chars(string, ["?", "^", "/>", "<"])
+        self.assertEqual("These  chars  need to be removed ", removed_chars_string)
+
+        removed_chars_string = StrUtil.remove_chars(string, "<")
+        self.assertEqual("These ^ chars ? need to be removed />", removed_chars_string)

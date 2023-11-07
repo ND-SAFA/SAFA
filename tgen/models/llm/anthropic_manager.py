@@ -59,7 +59,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             llm_args = AnthropicArgs()
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
-        logger.info(f"Created Anthropic manager with Model: {self.llm_args.model}")
         AnthropicManager.Client = get_client()
 
     def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:

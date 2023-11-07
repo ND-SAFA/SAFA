@@ -1,0 +1,26 @@
+description:
+- A Functional Requirement is a specific and well-defined feature or functionality
+  that a software system must possess to meet its intended purpose. It describes what
+  the system is supposed to do and focuses on the expected behavior of the software.
+  This artifact is different from other software artifacts, such as non-functional
+  requirements, which focus on the quality attributes of the system, like performance,
+  security, and usability.
+example:
+- As a user, I should be able to create an account by providing my email address,
+  a unique username, and a password. The system must verify the email address and
+  ensure the username is not already taken. Upon successful registration, the user
+  should receive a confirmation email.
+format:
+- As a [user role], I should be able to [action] by [input or interaction]. The system
+  must [system behavior or validation]. [Additional conditions or expected outcomes].
+questions:
+- - What is the purpose of this Vue?
+  - What data is displayed in the Vue?
+  - What are the key elements/components in the Vue?
+  - How does the user interact with the Vue?
+  - What actions can the user take in the Vue?
+  - How does the data change based on user actions?
+  - What other Vues does this Vue link to?
+  - Are there any conditional displays in the Vue based on data values?
+  - Are there any required fields or validation in the Vue?
+  - What happens when the user submits or saves data in the Vue?

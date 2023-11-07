@@ -12,7 +12,12 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
+from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
+from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
+from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
+from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
+from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.state.state import State
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
@@ -38,7 +43,8 @@ class TestState(BaseTest):
     def test_load_latest(self, anthropic_manager: TestAIManager, project_summary_mock: MagicMock):
         project_summary_mock.return_value = "project_summary"
         anthropic_manager.mock_summarization()
-        EXCLUDE_STEPS = [CreateClustersStep]
+        EXCLUDE_STEPS = [CreateClustersStep, GenerateTraceLinksStep, NameArtifactsStep,
+                         DetectDuplicateArtifactsStep, FindHomesForOrphansStep]
         steps = [step.get_step_name() for step in HierarchyGenerator.steps if step not in EXCLUDE_STEPS]
         state = HGenState.load_latest(TEST_STATE_PATH, steps)
         self.assertEqual(state.export_dir, TEST_OUTPUT_DIR)
@@ -47,7 +53,7 @@ class TestState(BaseTest):
         self.assertEqual(state.project_summary["overview"]["chunks"][0], HGenTestConstants.summary)
         self.assertListEqual(state.questions, HGenTestConstants.questions.splitlines())
         self.assertSetEqual(set(state.generation_predictions.keys()), set(HGenTestConstants.user_stories))
-        self.assertListEqual(list(state.generation_predictions.values()), HGenTestConstants.code_files)
+        self.assertListEqual(list(state.generation_predictions.values()), [set(files) for files in HGenTestConstants.code_files])
         self.assertEqual(state.format_of_artifacts, HGenTestConstants.format_)
         self.assertIsInstance(state.original_dataset, PromptDataset)
         self.assertIsInstance(state.source_dataset, PromptDataset)
@@ -73,7 +79,7 @@ class TestState(BaseTest):
             return val
 
         state_name = GenerateArtifactContentStep.get_step_name()
-        step_num = HierarchyGenerator.steps.index(GenerateArtifactContentStep) + 1
+        step_num = 3
         orig_path = State.get_path_to_state_checkpoint(TEST_STATE_PATH, state_name, step_num=step_num)
         attrs = YamlUtil.read(orig_path)
         param_specs = ParamSpecs.create_from_method(HGenState.__init__)
@@ -83,7 +89,7 @@ class TestState(BaseTest):
         orig_state = HGenState(**checked_attrs)
         orig_state.export_dir = TEST_OUTPUT_DIR
         orig_state.save(state_name)
-        save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num - 1)
+        save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num)
         reloaded_attrs = YamlUtil.read(save_path)
         self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/tgen/testres/output')
         self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])

@@ -34,9 +34,9 @@ FEATURE_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
 ])
 
 ENTITIES_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("For each feature, list all the domain entities that are needed for it.",
+    QuestionPrompt("List all the domain entities and vocabulary that are needed to understand the project.",
                    response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
-    QuestionPrompt("Using your notes, create a comprehensive list of all domain entities used in the system. "
+    QuestionPrompt("Using your notes, create a comprehensive list of all domain entities and key vocabularly used in the system. "
                    "Format each entity as '{name}: {description}'",
                    response_manager=PromptResponseManager(response_tag=PS_ENTITIES_TAG,
                                                           response_instructions_format="and enclose each entity "

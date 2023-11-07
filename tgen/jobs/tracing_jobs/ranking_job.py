@@ -6,6 +6,7 @@ from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIO
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -79,14 +80,14 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(dataset.artifact_df.get_type(parent_type).index)
         children_ids = list(dataset.artifact_df.get_type(child_type).index)
-        run_name = f"{child_type}({len(children_ids)}) --> {parent_type}({len(parent_ids)})"
+        run_name = self.get_run_name(child_type, children_ids, parent_type, parent_ids)
         logger.info(f"Starting to trace: {run_name}")
 
         if not self.select_top_predictions:
             DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
         export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
-            export_dir = os.path.join(export_dir, RankingJob._get_run_dir(child_type, parent_type))
+            export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
         pipeline_args = RankingArgs(run_name=run_name,
                                     dataset=dataset,
                                     parent_ids=parent_ids,
@@ -112,6 +113,18 @@ class RankingJob(AbstractJob):
             PromptDatasetExporter(export_path=os.path.join(export_dir, "final_dataset"),
                                   dataset=self.dataset, trace_dataset_exporter_type=SafaExporter).export()
         return selected_entries
+
+    @staticmethod
+    def get_run_name(child_type: str, children_ids: List, parent_type: str, parent_ids: List) -> str:
+        """
+        Gets the run name for the child and parent type
+        :param child_type: The type of the child artifacts
+        :param children_ids: The list of ids of each possible child
+        :param parent_type: The type of the parent artifacts
+        :param parent_ids: The list of ids of each parent being linked
+        :return: The run name
+        """
+        return f"{child_type}({len(children_ids)}) --> {parent_type}({len(parent_ids)})"
 
     @staticmethod
     def get_trace_id_from_entry(entry: EnumDict) -> int:

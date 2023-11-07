@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Set, Union
 import pandas as pd
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
@@ -43,10 +44,13 @@ class ArtifactsSummarizer(BaseObject):
         code_prompts = summarizer_args.code_summary_type.value
         nl_prompts = nl_summary_type.value
         if self.project_summary:
+            project_summary = self.project_summary.to_string([PS_ENTITIES_TITLE])
+
             nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            nl_prompts.insert(1, Prompt(self.project_summary.to_string(), allow_formatting=False))
+            nl_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
+
             code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            code_prompts.insert(1, Prompt(self.project_summary.to_string(), allow_formatting=False))
+            code_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
         self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
         self.nl_prompt_builder = PromptBuilder(nl_prompts)
 

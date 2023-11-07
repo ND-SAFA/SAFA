@@ -70,7 +70,7 @@ class LLMResponseUtil:
             assert len(content) > 0, f"Found no tags ({tag_name}) in:\n{res}"
         except Exception:
             error = f"Unable to parse {tag_name}"
-            logger.exception(error)
+            logger.warning(error)
             if raise_exception:
                 raise Exception(error)
             content = [res] if return_res_on_failure else []

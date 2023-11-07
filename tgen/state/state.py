@@ -2,20 +2,17 @@ import os
 from collections.abc import Set
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, List, Union, Dict
+from typing import Any, Dict, List, Union
 
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
-from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.summarizer.summary import Summary
 
 
@@ -99,7 +96,7 @@ class State(BaseObject):
             YamlUtil.write(collapsed_paths, save_path)
             logger.info(f"Saved state to {save_path}")
             return True
-        except Exception:
+        except Exception as e:
             logger.exception("Unable to save current state.")
             return False
 
@@ -135,9 +132,11 @@ class State(BaseObject):
                     state = cls.load_state_from_path(path, raise_exception=True)
                     return state
             raise FileNotFoundError(f"Unable to find a previous state to load from {load_dir}")
+        except FileNotFoundError as f:
+            logger.info(str(f))
         except Exception:
             logger.exception(f"Could not reload state of step: {step}. Creating new instance.")
-            return cls()
+        return cls()
 
     @classmethod
     def load_state_from_path(cls, path: str, raise_exception: bool = False) -> Union["State", Exception]:
@@ -191,7 +190,8 @@ class State(BaseObject):
         return val
 
     @staticmethod
-    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1, step_num: int = None) -> str:
+    def get_path_to_state_checkpoint(directory: str, step_name: str = EMPTY_STRING, run_num: int = 1,
+                                     step_num: int = None) -> str:
         """
         Gets the path to the checkpoint for the state corresponding to the given step name
         :param directory: The directory that the checkpoints live in

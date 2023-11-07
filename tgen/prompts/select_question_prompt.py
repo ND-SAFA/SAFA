@@ -1,6 +1,7 @@
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -28,7 +29,7 @@ class SelectQuestionPrompt(QuestionPrompt):
                  response_tag: str = None,
                  multiple_responses_allowed: bool = False,
                  categories_are_continuous: bool = False,
-                 default_factory: Callable = None):
+                 **response_manager_args):
         """
         Initializes the prompt with the categories that a model can select
         :param categories: A dictionary mapping category name to its description or a list of category descriptions
@@ -56,14 +57,15 @@ class SelectQuestionPrompt(QuestionPrompt):
         self.response_format = response_format if response_format else self.DEFAULT_RESPONSE_FORMAT[default_key]
         category_names = list(self.categories.keys())
         question = f"{question}{NEW_LINE}" if question else EMPTY_STRING
+        response_manager_args = DictUtil.update_kwarg_values(response_manager_args,
+                                                             value_formatter=None if not multiple_responses_allowed
+                                                             else lambda t, v: v.split(COMMA), replace_existing=False)
         response_manager = PromptResponseManager(response_tag=self.response_tag,
                                                  response_instructions_format=self.response_format,
                                                  expected_responses=category_names
                                                  if expected_responses is None else expected_responses,
                                                  expected_response_type=type(category_names[0]),
-                                                 value_formatter=None if not multiple_responses_allowed else lambda t, v: v.split(
-                                                     COMMA),
-                                                 default_factory=default_factory)
+                                                 **response_manager_args)
         super().__init__(f"{question}{self.instructions}",
                          response_manager=response_manager)
 

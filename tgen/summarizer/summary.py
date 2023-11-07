@@ -184,6 +184,16 @@ class Summary(EnumDict):
             chunks.append(NEW_LINE.join(chunk))
         return chunks
 
+    def combine_summaries(self, other_summary: "Summary") -> None:
+        """
+        Adds any sections that are in the other summary but not in this summary
+        :param other_summary: The other summary to add from
+        :return: None
+        """
+        for section_id, section in other_summary.items():
+            if section_id not in self:
+                self[section_id] = section
+
     def __str__(self) -> str:
         """
         Converts the summary to a string

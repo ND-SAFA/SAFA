@@ -54,6 +54,10 @@ class PromptResponseManager:
     """
     required_tag_ids: Union[Set, str] = field(default_factory=set)
     """
+    Formats an entry given its tag and values.
+    """
+    entry_formatter: Callable[[str, Dict], Any] = None
+    """
     Create reverse lookup for tags to their ids after init
     """
     _tag2id: Dict[str, str] = field(init=False, default_factory=dict)
@@ -63,10 +67,6 @@ class PromptResponseManager:
      p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
     """
     _all_tag_ids: List[str] = field(init=False, default_factory=list)
-    """
-    Formats an entry given its tag and values.
-    """
-    entry_formatter: Callable[[str, Dict], Any] = None
 
     def __post_init__(self) -> None:
         """
@@ -191,7 +191,7 @@ class PromptResponseManager:
         :param orig_val: The original value
         :return: The formatted value
         """
-        assert orig_val is not None, f"Missing {tag}"
+        assert orig_val is not None, f"{orig_val} is missing {tag}"
         vals2format, orig_vals_is_list = self._convert2list(orig_val)
         formatted = []
         for val in vals2format:

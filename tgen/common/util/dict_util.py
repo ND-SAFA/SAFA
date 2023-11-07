@@ -152,6 +152,36 @@ class DictUtil:
         return orig_kwargs
 
     @staticmethod
+    def set_or_increment_count(mapping: Dict, item_key: str, item_value: int) -> None:
+        """
+        Adds item to mapping if it does not exists, otherwise increments it.
+        :param mapping: The map to add item to.
+        :param item_key: The key to store item under.
+        :param item_value: The value to place under key if key is not contained.
+        :return: None
+        """
+        if item_key not in mapping:
+            mapping[item_key] = item_value
+        else:
+            mapping[item_key] += item_value
+
+    @staticmethod
+    def set_or_append_item(mapping: Dict, item_key: str, item_value: Any, iterable_type: Type = list) -> None:
+        """
+        Initializes a list/set to mapping if it does not exists, and appends item either way.
+        :param mapping: The map to add item to.
+        :param item_key: The key to store item under.
+        :param item_value: The value to append to list/set under key
+        :param iterable_type: The type of iterable to use for the value
+        :return: None
+        """
+        if item_key not in mapping:
+            mapping[item_key] = iterable_type()
+        if isinstance(mapping[item_key], set):
+            mapping[item_key].add(item_value)
+        else:
+            mapping[item_key].append(item_value)
+
     def get_missing_keys(obj: Dict, keys: List[str]) -> List[str]:
         """
         Extracts keys missing in dict.

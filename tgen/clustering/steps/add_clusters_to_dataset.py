@@ -8,6 +8,7 @@ from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
@@ -29,7 +30,8 @@ class AddClustersToDataset(AbstractPipelineStep[ClusteringArgs, ClusteringState]
                                                         manual_clusters=cluster_map,
                                                         layer_id=self.CLUSTER_ARTIFACT_TYPE)
         new_prompt_dataset = cluster_dataset_creator.create()
-        state.cluster_dataset = new_prompt_dataset
+        state.cluster_artifact_dataset = PromptDataset(artifact_df=new_prompt_dataset.artifact_df)
+        state.cluster_dataset = PromptDataset(trace_dataset=new_prompt_dataset.trace_dataset)
 
     @classmethod
     def get_referenced_artifact_types(cls, trace_dataset: TraceDataset, traces: List[Trace]) -> List[str]:

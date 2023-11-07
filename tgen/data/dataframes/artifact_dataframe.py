@@ -205,3 +205,4 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 ids.append(i)
                 content.append(artifact[ArtifactKeys.CONTENT])
         return ids, content
+

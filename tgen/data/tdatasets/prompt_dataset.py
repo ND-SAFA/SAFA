@@ -266,4 +266,4 @@ class PromptDataset(iDataset):
                 return getattr(self.trace_dataset, item)
             except Exception as e:
                 pass
-        return super().__getattr__(self, item)
+        raise AttributeError(f"{self.__class__.__name__} object has no attribute {item}")

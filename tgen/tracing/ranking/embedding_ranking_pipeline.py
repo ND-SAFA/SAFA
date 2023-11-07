@@ -1,3 +1,4 @@
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
@@ -13,11 +14,12 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     """
     steps = [SortChildrenStep, CreateExplanationsStep, SelectCandidateLinksStep]
 
-    def __init__(self, args: RankingArgs):
+    def __init__(self, args: RankingArgs, embedding_manager: EmbeddingsManager = None):
         """
         Ranks children artifacts from most to least related to source.
         """
         super().__init__(args, EmbeddingRankingPipeline.steps)
+        self.state.embedding_manager = embedding_manager
 
     def state_class(self) -> RankingState:
         """

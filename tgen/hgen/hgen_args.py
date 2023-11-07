@@ -1,17 +1,15 @@
 import os
-import uuid
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dataclass_util import required_field, DataclassUtil
+from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
+    DEFAULT_ORPHAN_THRESHOLD
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
-from tgen.common.util.str_util import StrUtil
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dataclass_util import required_field
+from tgen.common.util.file_util import FileUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
@@ -72,9 +70,29 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     generate_trace_links: bool = True
     """
+    If True, automatically generates trace links explanations
+    """
+    generate_explanations: bool = True
+    """
+    If True, creates clusters of related artifacts to create higher levels of docs for 
+    """
+    perform_clustering: bool = True
+    """
     The llm manager to use for each prediction step
     """
     llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)
+    """
+    The threshold below which trace links will get filtered out
+    """
+    link_selection_threshold: float = DEFAULT_LINK_THRESHOLD
+    """
+    Threshold for which all orphan links have to exceed or equal.
+    """
+    min_orphan_score_threshold: float = DEFAULT_ORPHAN_THRESHOLD
+    """
+    Threshold for which generated artifacts are deemed duplicates.
+    """
+    duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
 
     def __post_init__(self) -> None:
         """
@@ -84,8 +102,8 @@ class HGenArgs(PipelineArgs, BaseObject):
         super().__post_init__()
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
-        self.export_dir = os.path.join(self.export_dir, self.target_type) \
-            if self.export_dir and not self.export_dir.endswith(self.target_type) else self.export_dir
+        self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \
+            if not self.export_dir.endswith(self.target_type) else self.export_dir
         self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-4-0314'))
         for e in PredictionStep:
             if e.value not in self.max_tokens:
@@ -93,4 +111,3 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
-

@@ -21,9 +21,10 @@ class ParamSpecs:
         """
         full_specs = getfullargspec(method)
         expected_param_names = full_specs.args
+        optional_param_names = full_specs.kwonlyargs
         expected_param_names.remove("self")
 
-        param_names = set(copy(expected_param_names))
+        param_names = set(copy(expected_param_names + optional_param_names))
         type_hints = get_type_hints(method)
         param_types = {param: type_hints[param] if param in type_hints else None for param in param_names}
 

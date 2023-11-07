@@ -65,13 +65,13 @@ class TestProjectSummarizer(BaseTest):
 
     def test_create_prompt_builder(self):
         def prompt_builder_test(summarizer: ProjectSummarizer):
-            prompt_builder = summarizer._create_prompt_builder(self.NEW_SECTION_TITLE, self.NEW_SECTIONS[self.NEW_SECTION_TITLE])
+            prompt_builder = summarizer._create_prompt_builder(PS_OVERVIEW_TITLE, PROJECT_SUMMARY_MAP.get(PS_OVERVIEW_TITLE).value)
             artifact_df = summarizer.dataset.artifact_df
             prompt = prompt_builder.build(artifacts=[artifact for _, artifact in artifact_df.itertuples()],
                                           model_format_args=AnthropicManager.prompt_args)[PromptKeys.PROMPT]
             for i, artifact in artifact_df.itertuples():
                 self.assertIn(artifact[ArtifactKeys.ID], prompt)
-            self.assertIn("A Prompt", prompt)
+            self.assertIn("Write a set of bullet points indicating what is important in the system.", prompt)
             return prompt
 
         summarizer_no_summary = self.get_project_summarizer()

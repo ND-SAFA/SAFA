@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional
 
-from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_NAV_MESSAGE, RQ_PATH_PARAM
+from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
 from tgen.scripts.toolset.rq_definition import RQDefinition
@@ -40,33 +40,38 @@ def navigate_to_rq(curr_path: str) -> str:
         return rq_selected
 
 
-def select_folder_to_navigate(folder_paths: List[str]) -> Optional[str]:
-    """
-    Allows users to navigate within a selected folder.
-    :param folder_paths: Paths of folders to select from.
-    :return: Path to selected RQ or None if user selected to go back.
-    """
-    folder_names = [os.path.basename(f) for f in folder_paths]
-    folder_selected = inquirer_selection(folder_names, FOLDER_NAV_MESSAGE, allow_back=True)
-    folder_index = folder_names.index(folder_selected)
-    folder_selected_path = folder_paths[folder_index]
-    if folder_selected is None:
-        return None
-    return navigate_to_rq(folder_selected_path)
-
-
 def navigate_to_rq_from_files(file_paths: List[str]) -> Optional[str]:
     """
     Allows users to select an RQ file.
     :param file_paths: List of RQ paths to select from.
     :return: Path to selected RQ or None if user selected to go back.
     """
-    file_names = [os.path.basename(f) for f in file_paths]
-    file_selected = inquirer_selection(file_names, RQ_NAV_MESSAGE, allow_back=True)
-    file_selected_index = file_names.index(file_selected)
-    if file_selected is None:
+    return select_navigation_items(file_paths)
+
+
+def select_folder_to_navigate(folder_paths: List[str]) -> Optional[str]:
+    """
+    Allows users to navigate within a selected folder.
+    :param folder_paths: Paths of folders to select from.
+    :return: Path to selected RQ or None if user selected to go back.
+    """
+    folder_selected = select_navigation_items(folder_paths)
+    return None if folder_selected is None else navigate_to_rq(folder_selected)
+
+
+def select_navigation_items(items: List[str]):
+    """
+    Prompts the user to select one of the items with the option to select the back command.
+    :param items: The items to choose from.
+    :return: The selected item or None is back is selected.
+    """
+    folder_names = [os.path.basename(f) for f in items]
+    folder_selected = inquirer_selection(folder_names, FOLDER_NAV_MESSAGE, allow_back=True)
+    folder_index = folder_names.index(folder_selected)
+    folder_selected_path = items[folder_index]
+    if folder_selected is None:
         return None
-    return file_paths[file_selected_index]
+    return folder_selected_path
 
 
 def navigate_parent_folder(curr_path: str) -> str:

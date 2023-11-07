@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 from tgen.common.objects.trace import Trace
 from tgen.common.util.math_util import MathUtil
@@ -17,7 +17,7 @@ class SelectByThresholdNormalizedChildren(iSelector):
         :param threshold: The threshold to filter by
         :return: filtered list of entries
         """
-        parent2children, parent2scores = SelectByThresholdNormalizedChildren._group_by_parent(candidate_entries)
+        parent2children, parent2scores = SelectByThresholdNormalizedChildren.group_by_parent(candidate_entries)
         SelectByThresholdNormalizedChildren._normalized_scores_based_on_parent(parent2children, parent2scores)
         return SelectByThreshold.select(candidate_entries, threshold)
 
@@ -36,7 +36,7 @@ class SelectByThresholdNormalizedChildren(iSelector):
                 entry[TraceKeys.SCORE] = MathUtil.convert_to_new_range(entry[TraceKeys.SCORE], (min_score, max_score), (0, 1))
 
     @staticmethod
-    def _group_by_parent(candidate_entries: List[Trace]) -> Tuple[Dict[str, List[Trace]], Dict[str, List[float]]]:
+    def group_by_parent(candidate_entries: List[Trace]) -> Tuple[Dict[str, List[Trace]], Dict[str, List[float]]]:
         """
         Groups entries and scores by the parent artifact
         :param candidate_entries: :param candidate_entries: Candidate trace entries

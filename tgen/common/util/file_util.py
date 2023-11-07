@@ -498,7 +498,9 @@ class FileUtil:
         :param ext: The extension to include
         :return: The filepath with the ext
         """
-        full_path = os.path.splitext(file_path)[0] + os.path.extsep + ext
+        if not ext.startswith(os.path.extsep):
+            ext = os.path.extsep + ext
+        full_path = os.path.splitext(file_path)[0] + ext
         return full_path
 
     @staticmethod
@@ -564,3 +566,31 @@ class FileUtil:
             return FileUtil.read_file(path)
         except Exception as e:
             return path
+
+    @staticmethod
+    def safely_join_paths(*paths, ext: str = None) -> str:
+        """
+        Joins paths as long as None of the mare EMPTY or None
+        :param paths: The paths to join
+        :param ext: The ext of the file if needed
+        :return: The path
+        """
+        is_none = [p for p in paths if not p]
+        if len(is_none) > 0:
+            return is_none[0]
+        paths = [str(p) for p in paths]
+        full_path = os.path.join(*paths)
+        if ext:
+            full_path = FileUtil.add_ext(full_path, ext)
+        return full_path
+
+    @staticmethod
+    def safely_check_path_exists(path: str) -> bool:
+        """
+        Checks whether path exists without throwing an exception if path is None
+        :param path: The path to check
+        :return: True if it exists else False
+        """
+        if not path:
+            return False
+        return os.path.exists(path)

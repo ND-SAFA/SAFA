@@ -14,7 +14,7 @@ class TestSelectByThresholdNormalizedChildren(TestCase):
                             EnumDict({'id': 5, 'source': 't1', 'target': 's5', 'score': 0.7}),
                             EnumDict({'id': 6, 'source': 't2', 'target': 's5', 'score': 0.2})
                             ]
-        parent2children, parent2scores = SelectByThresholdNormalizedChildren._group_by_parent(candidate_entries=children_entries)
+        parent2children, parent2scores = SelectByThresholdNormalizedChildren.group_by_parent(candidate_entries=children_entries)
         self.assertIn("s4", parent2children)
         self.assertEqual(parent2children["s4"], children_entries[:3])
         self.assertEqual(parent2scores["s4"], [entry['score'] for entry in children_entries[:3]])
@@ -29,6 +29,6 @@ class TestSelectByThresholdNormalizedChildren(TestCase):
         for i in low_scores_indices:
             self.assertEqual(children_entries[i]['score'], 0)
         mid_score1 = children_entries[2]['score']
-        self.assertLess(mid_score1-0, 1-mid_score1)  # score is closer to lower score than upper
+        self.assertLess(mid_score1 - 0, 1 - mid_score1)  # score is closer to lower score than upper
         mid_score2 = children_entries[3]['score']
-        self.assertGreater(mid_score2-0, 1-mid_score2)  # score is closer to upper score than lower
+        self.assertGreater(mid_score2 - 0, 1 - mid_score2)  # score is closer to upper score than lower

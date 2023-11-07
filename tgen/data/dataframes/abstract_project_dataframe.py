@@ -195,6 +195,23 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         return self.__class__(DataFrameUtil.filter_df_by_index(self, index_to_filter))
 
+    def remove_rows(self, row_ids: List[str]) -> None:
+        """
+        Removes rows with given ids.
+        :param row_ids: The ids of the rows to remove.
+        :return: None
+        """
+        for r_id in row_ids:
+            self.remove_row(r_id)
+
+    def remove_row(self, row_id: str) -> None:
+        """
+        Removes row with given id.
+        :param row_id: The id of the row to remove.
+        :return: None
+        """
+        self.drop(row_id, inplace=True)
+
     def remove_duplicate_indices(self) -> "AbstractProjectDataFrame":
         """
         Removes duplicated indices
@@ -203,7 +220,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         is_duplicated = self.index.duplicated(keep='first')
         duplicated_indices = set(self.index[is_duplicated])
         if len(duplicated_indices) > 0:
-            logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
+            logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}.")
         return self[~is_duplicated]
 
     @overrides(pd.DataFrame)

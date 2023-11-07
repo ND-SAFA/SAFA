@@ -2,7 +2,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.status import Status
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -47,7 +47,7 @@ class TestRankingJob(BaseTest):
     @mock_anthropic
     def test_non_default_ranking_pipeline(self, anthropic_ai_manager: TestAIManager, project_summarizer_mock: MagicMock):
         project_summarizer_mock.return_value = Summary(overview=EnumDict({"chunks": ["summary of project"],
-                                                     "title": "overview"}))
+                                                                          "title": "overview"}))
         anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses([RankingPipelineTest.get_response()
                                             for _ in range(TestDataManager.get_n_candidates())])
@@ -59,7 +59,7 @@ class TestRankingJob(BaseTest):
 
     def create_job_using_embeddings(self, **kwargs):
         job = self.create_job(ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
-                              embedding_model_name=SMALL_EMBEDDING_MODEL, **kwargs)
+                              embedding_model_name=DEFAULT_SEARCH_EMBEDDING_MODEL, **kwargs)
         return job
 
     @staticmethod

@@ -29,7 +29,8 @@ class ClusteringJob(AbstractJob):
         Runs clustering pipeline on dataset and exports the results
         """
         args = ClusteringArgs(dataset_creator=self.dataset_creator, create_dataset=self.add_to_dataset,
-                              export_dir=self.export_dir, artifact_types=self.artifact_types, **self.kwargs)
+                              artifact_types=self.artifact_types, export_dir=self.export_dir,
+                              **self.kwargs)
         pipeline = ClusteringPipeline(args, summarizer_args=None, skip_summarization=True)
 
         pipeline.run()

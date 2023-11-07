@@ -23,7 +23,7 @@ class TestAddToDataset(TestCase):
         step = AddClustersToDataset()
         step.run(args, state)
 
-        artifact_df = state.cluster_dataset.trace_dataset.artifact_df
+        artifact_df = state.cluster_dataset.artifact_df
         artifact_types = artifact_df.get_artifact_types()
         self.assertIn(AddClustersToDataset.CLUSTER_ARTIFACT_TYPE, artifact_types)
 

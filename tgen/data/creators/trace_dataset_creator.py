@@ -213,7 +213,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                                                                               target_id=target_artifact[ArtifactKeys.ID],
                                                                               label=0)
 
-            title = f"Generating negative links between {source_type} -> {target_type}"
+            title = f"Generating negative links between {source_type}({len(source_artifact_ids)}) -> {target_type}({len(target_artifact_ids)})"
             ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         all_links = trace_df.to_dict(orient="index")
         all_links.update(negative_links)

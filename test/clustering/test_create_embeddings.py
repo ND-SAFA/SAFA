@@ -20,5 +20,5 @@ class TestCreateEmbeddings(TestCase):
         embedding_map = state.embedding_manager.get_current_embeddings()
 
         self.assertEqual(2, len(embedding_map))
-        ClusteringTestUtil.assert_embeddings_equals(a1, embedding_map["A1"])
-        ClusteringTestUtil.assert_embeddings_equals(a2, embedding_map["A2"])
+        ClusteringTestUtil.assert_embeddings_equals("A1: " + a1, embedding_map["A1"])
+        ClusteringTestUtil.assert_embeddings_equals("A2: " + a2, embedding_map["A2"])

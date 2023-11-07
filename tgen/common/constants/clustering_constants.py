@@ -1,38 +1,39 @@
-from tgen.clustering.methods.supported_cluster_methods import SupportedClusterMethods
+from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 
-DEFAULT_REDUCTION_FACTOR = 0.50  # Expected reduction in # of artifacts to # clusters
-DEFAULT_CLUSTER_SIMILARITY_THRESHOLD = 0.40  # Similarity equal or greater will be considered as same clusters
+DEFAULT_REDUCTION_FACTOR = 0.20  # Expected reduction in # of artifacts to # clusters
+DEFAULT_CLUSTER_SIMILARITY_THRESHOLD = 0.5  # Similarity equal or greater will be considered as same clusters
+DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION = .75
+DEFAULT_MIN_ORPHAN_SIMILARITY = 0.75  # Minimum similarity score for an oprhan to be placed in a cluster.
+DEFAULT_N_NEW_ALLOWED_ARTIFACTS = 2
 DEFAULT_RANDOM_STATE = 0
 DEFAULT_TESTING_CLUSTERING_METHODS = ["KMEANS", "AGGLOMERATIVE"]
 DEFAULT_CLUSTERING_METHODS = ["OPTICS", "SPECTRAL", "AGGLOMERATIVE", "AFFINITY", "KMEANS"]
 DEFAULT_ADD_CLUSTERS_TO_DATASET = False
-DEFAULT_CLUSTER_MIN_VOTES = 2
+DEFAULT_CLUSTER_MIN_VOTES = 1
 MAX_CLUSTER_SIZE = 10
-MIN_CLUSTER_SIZE = 1
+MIN_CLUSTER_SIZE = 2
 NO_CLUSTER_LABEL = -1
-CLUSTER_METHODS_REQUIRING_N_CLUSTERS = [SupportedClusterMethods.KMEANS,
-                                        SupportedClusterMethods.AGGLOMERATIVE,
-                                        SupportedClusterMethods.BIRCH,
-                                        SupportedClusterMethods.SPECTRAL]
+MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING = 0.7
+MIN_PAIRWISE_AVG_PERCENTILE = 75
+
+RANDOM_STATE_PARAM = "random_state"
+N_CLUSTERS_PARAM = "n_clusters"
 CLUSTER_METHOD_INIT_PARAMS = {
-    SupportedClusterMethods.BIRCH: {
+    SupportedClusteringMethods.BIRCH: {
         "branching_factor": 2
     },
-    SupportedClusterMethods.OPTICS: {
+    SupportedClusteringMethods.OPTICS: {
+        "metric": "cosine",
         "min_samples": 2
     },
-    SupportedClusterMethods.HB_SCAN: {
+    SupportedClusteringMethods.HB_SCAN: {
         "min_cluster_size": 2,
         "max_cluster_size": MAX_CLUSTER_SIZE
     },
-    SupportedClusterMethods.MEANSHIFT: {
+    SupportedClusteringMethods.MEANSHIFT: {
         "bandwidth": 2
     },
-    SupportedClusterMethods.SPECTRAL: {
-        "assign_labels": "discretize",
-        "random_state": DEFAULT_RANDOM_STATE
-    },
-    SupportedClusterMethods.AFFINITY: {
-        "random_state": DEFAULT_RANDOM_STATE
+    SupportedClusteringMethods.SPECTRAL: {
+        "assign_labels": "discretize"
     }
 }

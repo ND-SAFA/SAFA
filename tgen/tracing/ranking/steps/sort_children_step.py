@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from tgen.common.constants.ranking_constants import PRE_SORTED_SCORE
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -27,9 +28,9 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         if use_pre_ranked:
             n_parents = len(args.parent_ids)
             n_children = len(args.children_ids)
-            parent2rankings = args.pre_sorted_parent2children
-            state.sorted_parent2children = {p: [RankingUtil.create_entry(p, c) for c in rankings] for p, rankings in
-                                            parent2rankings.items()}
+            parent2rankings = {p: list(children) for p, children in args.pre_sorted_parent2children.items()}
+            state.sorted_parent2children = {p: [RankingUtil.create_entry(p, c, score=PRE_SORTED_SCORE) for c in rankings]
+                                            for p, rankings in parent2rankings.items()}
             add_sorted_children = len(args.pre_sorted_parent2children) < n_parents or any(
                 [len(v) < n_children for v in args.pre_sorted_parent2children.values()])
             if add_sorted_children:
@@ -69,9 +70,12 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :return: The map of parent IDs to sorted children IDs.
         """
         sorter: iSorter = SupportedSorter.get_value(args.sorter.upper())
-        embedding_manager = EmbeddingsManager(content_map=state.artifact_map, model_name=args.embedding_model_name)
+        if state.embedding_manager:
+            state.embedding_manager.update_or_add_contents(state.artifact_map)
+        else:
+            state.embedding_manager = EmbeddingsManager(content_map=state.artifact_map, model_name=args.embedding_model_name)
         parent2rankings = sorter.sort(args.parent_ids, args.children_ids, artifact_map=state.artifact_map,
-                                      embedding_manager=embedding_manager, return_scores=True)
+                                      embedding_manager=state.embedding_manager, return_scores=True)
         parent_map = RankingUtil.convert_parent2rankings_to_prediction_entries(parent2rankings)
         parent_map = {p: c[:args.max_context_artifacts] for p, c in parent_map.items()}
         return parent_map

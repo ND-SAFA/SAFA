@@ -6,6 +6,7 @@ from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.add_clusters_to_dataset import AddClustersToDataset
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -15,6 +16,7 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
@@ -27,6 +29,7 @@ from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
+from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
@@ -46,10 +49,9 @@ class TestMultiLayerHGenJob(BaseJobTest):
 
     @mock_libraries
     @mock.patch.object(AddClustersToDataset, "run")
-    @mock.patch.object(CreateExplanationsStep, "run")
     @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
     def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager,
-                         ranking_mock: MagicMock, explanation_mock: MagicMock, final_cluster_step: MagicMock):
+                         ranking_mock: MagicMock, final_cluster_step: MagicMock):
         """
         Tests that job is completed succesfully.
         """
@@ -97,7 +99,10 @@ class TestMultiLayerHGenJob(BaseJobTest):
         for target, source in zip(target_types, source_types):
             FileUtil.delete_file_safely(GenerateInputsStep._get_inputs_save_path(target, source))
         orig_dataset = args.dataset_creator.create()
+        self.assertEqual(job_result.status, Status.SUCCESS)
         dataset: TraceDataset = job_result.body
+        if isinstance(dataset, str):
+            self.fail(dataset)
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
         layers = [args.source_layer_id] + [args.target_type, self.higher_levels[0],
                                            self.higher_levels[1]]
@@ -121,7 +126,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         self.assertEqual(n_expected_links + len(orig_dataset.trace_dataset.trace_df), len(dataset.trace_df))
 
     @mock_anthropic
-    def get_args(self, anthropic_ai_manager: TestAIManager):
+    def get_args(self, anthropic_ai_manager: TestAIManager, **kwargs):
         anthropic_ai_manager.mock_summarization()
         project_summary_sections = {sec for sec in HierarchyGenerator.PROJECT_SUMMARY_SECTIONS}
         project_summary_sections.update(set(DEFAULT_PROJECT_SUMMARY_SECTIONS))
@@ -131,11 +136,13 @@ class TestMultiLayerHGenJob(BaseJobTest):
                             project_summary=Summary({title: EnumDict({"title": title, "chunks": ["summary of project"]})
                                                      for title in project_summary_sections}),
                             trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))),
-                        create_new_code_summaries=False)
+                        create_new_code_summaries=False, **kwargs)
         return args
 
     def _get_job(self):
-        starting_hgen_job = BaseHGenJob(self.get_args())
+        args: HGenArgs = self.get_args(export_dir=EMPTY_STRING)
+        args.generate_explanations = False
+        starting_hgen_job = BaseHGenJob(args)
         return MultiLayerHGenJob(starting_hgen_job, self.higher_levels)
 
     def set_clustering_state(self, args: ClusteringArgs, state: ClusteringState, *other_args, **other_kwargs):
@@ -143,7 +150,9 @@ class TestMultiLayerHGenJob(BaseJobTest):
         divisor = 3 - self.clustering_calls
         n = math.floor(len(artifacts) / divisor)
         state.final_cluster_map = {i: [a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]] for i in range(divisor)}
-        state.cluster_dataset = ClusterDatasetCreator(args.dataset,
-                                                      manual_clusters=state.final_cluster_map).create()
+        cluster_dataset = ClusterDatasetCreator(args.dataset,
+                                                manual_clusters=state.final_cluster_map).create()
+        state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
+        state.cluster_artifact_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
 
         self.clustering_calls += 1

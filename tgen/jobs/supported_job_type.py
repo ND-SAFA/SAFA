@@ -21,7 +21,7 @@ from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 class SupportedJobType(SupportedEnum):
     HUGGING_FACE = HuggingFaceJob
     HGEN = BaseHGenJob
-    ARTIFACT_SUMMARY = SummarizeJob
+    SUMMARY = SummarizeJob
     MULTI_LAYER_HGEN = MultiLayerHGenJob
     EXPORT_ARTIFACTS = ExportArtifactsJob
     CREATE_DATASETS = CreateDatasetsJob

@@ -1,6 +1,8 @@
 from unittest import TestCase
 
-from tgen.clustering.base.unique_cluster_map import UniqueClusterMap
+from test.clustering.clustering_test_util import ClusteringTestUtil
+from tgen.clustering.base.cluster import Cluster
+from tgen.clustering.base.cluster_condenser import ClusterCondenser
 
 
 class TestUniqueClusterMap(TestCase):
@@ -8,18 +10,23 @@ class TestUniqueClusterMap(TestCase):
         """
         Tests that collisions are marked as votes.
         """
-        unique_set_map = UniqueClusterMap()
-        unique_set_map.add(["A", "B", "C", "D"])
-        collision_cluster = ["A", "B"]
+        embeddings_manager = ClusteringTestUtil.create_embeddings_manager()
+        unique_set_map = ClusterCondenser(embeddings_manager)
+
+        source_cluster = Cluster.from_artifacts(["A", "B", "C", "D"], embeddings_manager)
+        unique_set_map.add(source_cluster)
+
+        collision_cluster = Cluster.from_artifacts(["A", "B"], embeddings_manager)
+
         self.assertTrue(unique_set_map.contains_cluster(collision_cluster))
         unique_set_map.add(collision_cluster)
-        self.assertEqual(1, unique_set_map.cluster_votes[0])
+        self.assertEqual(2, source_cluster.votes)
 
     def test_intersection_calculation(self):
         """
         Tests that intersection calculation is correctly taking the average of the percentage of intersections.
         """
-        set_a = {"A", "B", "C", "D"}
-        set_b = {"A", "E"}
-        set_intersection = UniqueClusterMap.calculate_intersection(set_a, set_b)
+        set_a = {"A", "B", "C", "D"}  # 25%
+        set_b = {"A", "E"}  # 50%
+        set_intersection = ClusterCondenser.calculate_intersection(set_a, set_b)
         self.assertEqual(0.375, set_intersection)

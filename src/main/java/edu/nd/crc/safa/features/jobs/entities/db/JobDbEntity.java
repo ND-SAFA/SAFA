@@ -105,6 +105,7 @@ public class JobDbEntity {
         name = "user_id",
         nullable = false)
     private SafaUser user;
+    @Nullable
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "project_id")

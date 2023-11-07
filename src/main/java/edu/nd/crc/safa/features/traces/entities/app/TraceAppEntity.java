@@ -8,9 +8,9 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
-import jakarta.validation.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

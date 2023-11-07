@@ -6,6 +6,7 @@ from tgen.clustering.methods.supported_clustering_methods import SupportedCluste
 from tgen.common.constants.clustering_constants import CLUSTER_METHOD_INIT_PARAMS, \
     DEFAULT_RANDOM_STATE, NO_CLUSTER_LABEL, N_CLUSTERS_PARAM, RANDOM_STATE_PARAM
 from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
@@ -41,8 +42,8 @@ class ClusteringAlgorithmManager:
         clustering_algo = self.method.value(**kwargs)
         try:
             clustering_algo.fit(embeddings)
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.exception(f"Clustering failed for {self.method.name}")
         embedding_labels = clustering_algo.labels_ if hasattr(clustering_algo, "labels_") else [-1] * len(embeddings)
         clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels, embedding_manager)
         return clusters

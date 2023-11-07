@@ -8,7 +8,7 @@ from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 
-from tgen.common.constants.other_constants import VSM_THRESHOLD_DEFAULT
+from tgen.common.constants.other_constants import VSM_THRESHOLD_DEFAULT, VSM_SELECTION_THRESHOLDS
 from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.common.objects.trace import Trace
 from tgen.common.util.list_util import ListUtil
@@ -147,7 +147,7 @@ class VSMTrainer(AbstractTrainer):
 
         if self.select_predictions:
             self.convert_to_percentiles(prediction_entries)
-            prediction_entries = RankingUtil.select_predictions(prediction_entries, 0.9, 0.7, 0.4)
+            prediction_entries = RankingUtil.select_predictions(prediction_entries, *VSM_SELECTION_THRESHOLDS)
         metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries)
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)

@@ -124,11 +124,6 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         task_prompt.response_manager = PromptResponseManager(
             response_instructions_format=f"Enclose each {args.target_type}s in "
                                          "{target}. ",
-            # Inside of the {target} tag, "
-            # f"also include a comma-deliminated "
-            # f"list of the ids for each {args.source_type} "
-            # f"from which you derived the {args.target_type} "
-            # "enclosed in {source}",
             expected_responses={source_tag_id: set(state.source_dataset.artifact_df.index)},
             value_formatter=lambda tag, val: [v.strip() for v in val.split(COMMA)] if tag == source_tag_id
             else val.strip().strip(NEW_LINE),

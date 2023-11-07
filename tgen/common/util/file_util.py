@@ -102,15 +102,19 @@ class FileUtil:
             return file.readlines()
 
     @staticmethod
-    def get_env_replacements(replacements: Dict = None) -> Dict[str, str]:
+    def get_env_replacements(variables: List[str] = None) -> Dict[str, str]:
         """
-        :param replacements: Replacements dictionary to add on to.
+        Maps env names to their values for given variables.
+        :param variables: The environment variables to retrieve.
         :return: Dictionary of environment variables to their values.
         """
-        if replacements is None:
-            replacements = {}
+        if variables is None:
+            variables = ENV_REPLACEMENT_VARIABLES
+        replacements = {}
         for env_key, env_value in os.environ.items():
-            replacements[env_key] = os.path.expanduser(env_value) if "~" in env_value else env_value
+            if env_key not in variables:
+                continue
+            replacements[f"[{env_key}]"] = os.path.expanduser(env_value) if "~" in env_value else env_value
         return replacements
 
     @staticmethod
@@ -189,9 +193,8 @@ class FileUtil:
             if replacements:
                 path2var = {v: k for k, v in replacements.items()}
                 ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
-                for curr_value in ordered_paths:
-                    new_value = path2var[curr_value]
-                    path = path.replace(curr_value, new_value)
+                for path2replace in ordered_paths:
+                    path = path.replace(path2replace, path2var[path2replace])
             if os.path.isabs(path):
                 path = os.path.relpath(path, PROJ_PATH)
             return path
@@ -302,9 +305,18 @@ class FileUtil:
         :param delete_after_move: if True, deletes the original directory after moving all contents
         :return: None
         """
+        if orig_path == new_path:
+            return
+
+        FileUtil.delete_dir(new_path)
         FileUtil.create_dir_safely(new_path)
+        
         for file in os.listdir(orig_path):
             file_path = os.path.join(orig_path, file)
+            new_file_path = os.path.join(new_path, file)
+            if os.path.isfile(new_file_path):
+                FileUtil.delete_file_safely(new_file_path)
+                logger.warning(f"Deleting previous file: {new_file_path}")
             shutil.move(file_path, new_path)
         if delete_after_move:
             FileUtil.delete_dir(orig_path)

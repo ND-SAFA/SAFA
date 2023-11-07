@@ -246,7 +246,7 @@ class TrainerDatasetManager(BaseObject):
         :return: None
         """
         if not isinstance(index_value, DatasetRole):
-            raise Exception("Expected index to be data role:" + index_value)
+            raise Exception(f"Expected index to be data role but got {index_value}")
 
     def __getitem__(self, dataset_role: DatasetRole) -> Optional[DATASET_TYPE]:
         """

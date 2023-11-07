@@ -12,11 +12,10 @@ from tqdm import tqdm
 
 from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -101,7 +100,7 @@ class TraceDataset(iDataset):
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
-        for index in tqdm(self.trace_df.index, desc="Converting links to trace dataframe format."):
+        for index in tqdm(self.trace_df.index, desc="Converting links to trace dataframe format.", ncols=TQDM_NCOLS):
             link = self.trace_df.get_link(index)
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])

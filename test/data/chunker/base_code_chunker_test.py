@@ -1,6 +1,5 @@
 from collections import Callable, Counter
 
-import tgen.scripts.toolset.constants
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.data.chunkers.chunked_node import ChunkedNode
@@ -69,8 +68,8 @@ class BaseCodeChunkerTest:
         :param is_line_2_ignore: Returns True if the line should be ignored by the chunker, else False
         :param line_overrides: Returns True if the line should not cause a test failure
         """
-        content = FileUtil.read_file(tgen.scripts.toolset.constants.DATA_PATH)
-        chunks = chunker.chunk(content=content, id_=tgen.scripts.toolset.constants.DATA_PATH)
+        content = FileUtil.read_file(test.DATA_PATH)
+        chunks = chunker.chunk(content=content, id_=test.DATA_PATH)
         all_content = [line.strip() for line in content.split(NEW_LINE) if (is_line_2_ignore is None
                                                                             or not is_line_2_ignore(line.strip())) and line]
         all_content_line_counts = Counter(all_content)

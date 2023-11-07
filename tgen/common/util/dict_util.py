@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union, Any
+from typing import Any, Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
@@ -150,3 +150,25 @@ class DictUtil:
             if replace_existing or key not in orig_kwargs:
                 orig_kwargs[key] = val
         return orig_kwargs
+
+    @staticmethod
+    def get_missing_keys(obj: Dict, keys: List[str]) -> List[str]:
+        """
+        Extracts keys missing in dict.
+        :param obj: Dictionary to check for keys.
+        :param keys: The keys expected to be dictionary.
+        :return: The missing keys.
+        """
+        missing_keys = [k for k in keys if k not in obj]
+        return missing_keys
+
+    @classmethod
+    def contains_keys(cls, obj: Dict, keys: List[str]) -> bool:
+        """
+        Returns true if object contains all keys otherwise false.
+        :param obj: The object to check for keys.
+        :param keys: The keys to ensure in object.
+        :return: True if keys present in obj.
+        """
+        missing_keys = cls.get_missing_keys(obj, keys)
+        return len(missing_keys) == 0

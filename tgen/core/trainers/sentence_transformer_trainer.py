@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy as np
 from datasets import Dataset
@@ -7,7 +7,7 @@ from sentence_transformers.evaluation import SentenceEvaluator
 from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss
 from sklearn.metrics.pairwise import cosine_similarity
 from torch.utils.data import DataLoader
-from transformers.trainer_utils import PredictionOutput, TrainOutput
+from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
@@ -117,15 +117,19 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         return TrainOutput(metrics=evaluator.metrics, training_loss=None, global_step=None)
 
     @overrides(HuggingFaceTrainer)
-    def predict(self, test_dataset: Dataset, **kwargs) -> PredictionOutput:
+    def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:
         """
         Predicts on the dataset given.
-        :param test_dataset: The dataset to predict scores for.
+        :param dataset_role: Role of dataset to predict on.
         :return: Prediction output containing similarity scores as predictions.
         """
-        input_examples = self.to_input_examples(test_dataset)
+        self._current_eval_role = dataset_role
+        dataset = self._get_dataset(dataset_role)
+        input_examples = self.to_input_examples(dataset)
         embeddings = self.create_embedding_map(self.model, input_examples)
-        return self.calculate_similarities(embeddings, input_examples)
+        scores, labels = self.calculate_similarities(embeddings, input_examples)
+        prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
+        return PredictionOutput(scores, labels, prediction_metrics)
 
     @staticmethod
     def to_input_examples(dataset: Dataset) -> List[InputExample]:
@@ -151,7 +155,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         return embeddings
 
     @staticmethod
-    def calculate_similarities(embedding_map: Dict[str, EmbeddingType], input_examples: List[InputExample]) -> PredictionOutput:
+    def calculate_similarities(embedding_map: Dict[str, EmbeddingType], input_examples: List[InputExample]) -> Tuple[
+        List[float], List[float]]:
         """
         Calculates the cosine similarity between the texts in each input example. TODO: Replace with embedding util.
         :param embedding_map: Maps text to embedding for all input examples.
@@ -167,4 +172,4 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
             score = cosine_similarity([source_embedding], [target_embedding])[0][0]
             scores.append(score)
             labels.append(example.label)
-        return PredictionOutput(predictions=scores, label_ids=labels, metrics={})
+        return scores, labels

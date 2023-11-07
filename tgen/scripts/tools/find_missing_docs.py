@@ -7,6 +7,8 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
+from tgen.common.util.logging.logger_manager import logger
+
 load_dotenv()
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(ROOT_PATH)
@@ -15,18 +17,17 @@ from tgen.common.util.file_util import FileUtil
 
 NodeType = AST
 EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
-INCLUDES = [os.path.join(ROOT_PATH, "tgen")]
+DIRECTORY_PATHS = [os.path.join(ROOT_PATH, "tgen")]
 
 
-def print_missing_headers(directory_paths: List[str] = INCLUDES, throw_error: bool = False) -> None:
+def print_missing_headers(throw_error: bool = False) -> None:
     """
     Finds all functions and methods not containing a doc-string.
-    :param directory_paths: The paths to check for python files.
     :param throw_error: Whether to throw error if invalid functions/methods found.
     :return: None
     """
     missing_map = {}
-    for directory_path in directory_paths:
+    for directory_path in DIRECTORY_PATHS:
         path_map = calculate_missing_doc_map(directory_path)
         path_map = {k: v for k, v in path_map.items() if len(v) > 0}
         path_map = {get_display_name(k, directory_path): v for k, v in path_map.items()}
@@ -61,6 +62,7 @@ def calculate_missing_doc_map(directory_path: str) -> Dict[str, List[str]]:
     """
     missing_map = {}
     files = [f for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
+    logger.info(f"Checking {len(files)} files in {directory_path}...")
     for file_path in files:
         file_content = FileUtil.read_file(file_path)
         tree = ast.parse(file_content, filename=file_path)
@@ -100,4 +102,4 @@ def get_display_name(file_path: str, root_path: str):
 
 
 if __name__ == "__main__":
-    print_missing_headers(INCLUDES, throw_error=True)
+    print_missing_headers(throw_error=True)

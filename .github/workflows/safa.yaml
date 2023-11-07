@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies.
         run: pip install -r requirements.txt && pip install -r requirements/test.txt
       - name: Find Missing Docs.
-        run: python3 tgen/scripts/find_missing_docs.py
+        run: python3 tgen/scripts/tools/find_missing_docs.py
         env:
           ROOT_PATH: /home/runner/work/tgen/tgen
       - name: Run Unit Tests.

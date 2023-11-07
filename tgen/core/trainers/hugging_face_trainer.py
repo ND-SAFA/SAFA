@@ -1,15 +1,15 @@
 import os
-import shutil
 from typing import Any, Dict, List, Optional, Union
 
 import torch
 from datasets import Dataset
 from transformers.integrations import WandbCallback
 from transformers.trainer import Trainer
-from transformers.trainer_utils import PredictionOutput
+from transformers.trainer_utils import EvalPrediction, PredictionOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
@@ -24,6 +24,7 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.model_manager import ModelManager
 
@@ -67,6 +68,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         self.evaluation_roles = evaluation_roles
         self.save_strategy = save_strategy
         self.post_init(trainer_args, **kwargs)
+        self._current_eval_role = None
 
     def post_init(self, trainer_args: HuggingFaceArgs, **kwargs):
         """
@@ -93,9 +95,8 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         self._evaluate()
         hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
         train_output = TraceTrainOutput(train_output=hf_train_output)
-        evaluation_output = self._evaluate()
-        train_output.prediction_output = evaluation_output[DatasetRole.EVAL]
-        self._set_best_model_path()
+        train_output.prediction_output = self._evaluate()
+        self._save_best_model()
         return train_output
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) -> TracePredictionOutput:
@@ -105,20 +106,33 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         :param dataset: The dataset to use instead of from the dataset manager
         :return: THe prediction output
         """
-        eval_trace_dataset = self.trainer_dataset_manager[dataset_role]
-        eval_dataset = self._get_dataset(dataset_role)
-        output = self.predict(eval_dataset)
-        metrics_manager = MetricsManager(trace_df=eval_trace_dataset.trace_df,
-                                         link_ids=eval_trace_dataset.get_ordered_link_ids(),
-                                         trace_predictions=output.predictions)
-        eval_metrics = metrics_manager.eval(self.trainer_args.metrics)
-        logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
-        output.metrics.update(eval_metrics)
+        if not self._has_dataset(dataset_role):
+            raise Exception(f"Trainer does not have dataset for {dataset_role}.")
+        output = self.predict(dataset_role)
+        logger.log_with_title(f"{dataset_role.name} Metrics", repr(output.metrics))
+        trace_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role]
+        prediction_entries = trace_dataset.trace_df.get_links()
 
-        return TracePredictionOutput(predictions=metrics_manager.get_scores(),
-                                     label_ids=metrics_manager.trace_matrix.labels,
+        return TracePredictionOutput(predictions=output.predictions,
+                                     label_ids=output.label_ids,
                                      metrics=output.metrics,
-                                     prediction_entries=metrics_manager.get_trace_predictions())
+                                     prediction_entries=prediction_entries)
+
+    def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:
+        """
+        Predicts on the dataset at given role and calculates metrics.
+        :param dataset_role:
+        :param kwargs:
+        :return:
+        """
+        self._current_eval_role = dataset_role
+        dataset = self._get_dataset(dataset_role)
+        output = super().predict(dataset, **kwargs)
+
+        if not DictUtil.contains_keys(output.metrics, self.trainer_args.metrics):
+            trace_metrics = self._compute_validation_metrics(EvalPrediction(output.predictions, output.label_ids))
+            output.metrics.update(trace_metrics)
+        return output
 
     def push_to_hub(self, **kwargs) -> Dict[str, str]:
         """
@@ -137,19 +151,19 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if self.model:
             del self.model
 
-    def _set_best_model_path(self) -> None:
+    def _save_best_model(self) -> None:
         """
         Sets the path of the best to be in the expected location
         :return: None
         """
         best_model_path = self.state.best_model_checkpoint
-        base_path = self.trainer_args.best_model_path if self.trainer_args.best_model_path else self.trainer_args.output_dir
-        best_model_dir = os.path.join(base_path, BEST_MODEL_NAME)
-        if best_model_path:
-            if os.path.exists(best_model_dir):
-                os.rmdir(best_model_dir)
-            shutil.move(best_model_path, best_model_dir)
-        logger.info(f"Best model at: {best_model_dir}")
+        if best_model_path is None:
+            logger.info("State: best_model_checkpoint is not defined. Not saving best model.")
+            return
+
+        model_dir_path = self.trainer_args.best_model_path if self.trainer_args.best_model_path else self.trainer_args.output_dir
+        FileUtil.move_dir_contents(best_model_path, model_dir_path, delete_after_move=False)
+        logger.info(f"Best model at: {model_dir_path}")
 
     def _evaluate(self) -> Dict[DatasetRole, TracePredictionOutput]:
         """
@@ -159,9 +173,13 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         logger.log_title("Evaluating Model", prefix=NEW_LINE)
         results = {}
         for dataset_role in self.evaluation_roles:
-            logger.log_step(f"{dataset_role.name.title()} Set")
-            prediction_output = self.perform_prediction(dataset_role)
-            results[dataset_role] = prediction_output
+            if self._has_dataset(dataset_role):
+                logger.log_step(f"{dataset_role.name.title()} Set")
+                prediction_output = self.perform_prediction(dataset_role)
+                results[dataset_role] = prediction_output
+            else:
+                logger.warning(f"No {dataset_role} dataset. Skipping evaluation.")
+                continue
         return results
 
     @overrides(Trainer)
@@ -174,15 +192,19 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
             logger.warning("Balanced batching is not currently supported!")
         return super()._get_train_sampler()
 
-    def _compute_validation_metrics(self, output: PredictionOutput, dataset_role: DatasetRole = DatasetRole.VAL) -> Dict:
+    def _compute_validation_metrics(self, output: EvalPrediction) -> Dict:
         """
         Callback that allows Trainer to compute trace metrics on validation set.
         :param output:The prediction output on a trace dataset.
         :return: Trace metrics associated with prediction.
         """
-        dataset = self.trainer_dataset_manager[dataset_role]
-        metrics_manager = MetricsManager(trace_df=dataset.trace_df,
-                                         link_ids=dataset.get_ordered_link_ids(),
+        trace_dataset = self.trainer_dataset_manager[self._current_eval_role]
+        n_labels = trace_dataset.trace_df.get_label_count()
+        if n_labels == 0:
+            logger.info("Skipping evaluation of prediction output because no true labels are present.")
+            return {}
+        metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
+                                         link_ids=trace_dataset.get_ordered_link_ids(),
                                          trace_predictions=output.predictions)
         trace_metrics = metrics_manager.eval(self.trainer_args.metrics)
         return trace_metrics

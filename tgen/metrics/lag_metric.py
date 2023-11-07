@@ -3,7 +3,7 @@ from typing import Dict, List
 import datasets
 import numpy as np
 
-from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
+from tgen.common.constants.metric_constants import LAG_KEY, THRESHOLD_DEFAULT
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
@@ -27,7 +27,6 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class LagMetric(AbstractTraceMetric):
     name = "lag"
-    LAG_KEY = "lag"
 
     # TODO
     def _compute(self, predictions, references, trace_matrix: TraceMatrix, k=THRESHOLD_DEFAULT,
@@ -61,7 +60,7 @@ class LagMetric(AbstractTraceMetric):
 
         lag_score = trace_matrix.calculate_query_metric(lag_counter, default_value=None)
         return {
-            self.LAG_KEY: lag_score
+            LAG_KEY: lag_score
         }
 
     def _info(self) -> datasets.MetricInfo:

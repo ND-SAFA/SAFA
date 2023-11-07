@@ -28,7 +28,6 @@ class SupportedTraceMetric(SupportedEnum):
     MAP = MapMetric
     CLASSIFICATION = ClassificationMetrics
     PRECISION_AT_K = PrecisionAtKMetric
-    POS_INDICES = PositiveLinkIndices
     PRECISION_AT_RECALL = PrecisionAtRecallMetric
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
     AVERAGE_TRUE_LINKS = AverageTrueLinksMetric

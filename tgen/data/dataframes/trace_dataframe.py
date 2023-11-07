@@ -70,21 +70,21 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: None (data frame is modified).
         """
         for link in links:
-            self.add_link(source_id=link["source"], target_id=link["target"], label=link["label"], score=link.get("score", None),
+            self.add_link(source=link["source"], target=link["target"], label=link["label"], score=link.get("score", None),
                           explanation=link.get("explanation", None))
 
-    def add_link(self, source_id: str, target_id: str, label: int = 0, score: float = np.NAN, explanation: str = None) -> EnumDict:
+    def add_link(self, source: str, target: str, label: int = 0, score: float = np.NAN, explanation: str = None) -> EnumDict:
         """
         Adds link to dataframe
-        :param source_id: The id of the source
-        :param target_id: The id of the target
+        :param source: The id of the source
+        :param target: The id of the target
         :param label: The label of the link (1 if True link, 0 otherwise)
         :param score: The score of the generated links.
         :return: The newly added link
         """
-        link_id = TraceDataFrame.generate_link_id(source_id, target_id)
+        link_id = TraceDataFrame.generate_link_id(source, target)
         return self.add_or_update_row(
-            self.link_as_dict(source_id=source_id, target_id=target_id, label=label, link_id=link_id, score=score,
+            self.link_as_dict(source_id=source, target_id=target, label=label, link_id=link_id, score=score,
                               explanation=explanation))
 
     def get_links(self) -> List[EnumDict]:

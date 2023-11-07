@@ -1,9 +1,8 @@
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Tuple
 
-from tgen.common.util.file_util import FileUtil, ENV_REPLACEMENT_VARIABLES
-from tgen.common.util.json_util import JsonUtil
 from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
+from tgen.scripts.toolset.rq_definition import RQDefinition
 
 
 class ScriptDefinition:
@@ -15,47 +14,44 @@ class ScriptDefinition:
     ENV_OUTPUT_PARAM = f"[{OUTPUT_PATH_PARAM}]"
 
     @staticmethod
-    def read_experiment_definition(definition_path: str, env_replacements: List[str] = None) -> Dict:
+    def read_experiment_definition(definition_path: str = None, rq_definition: RQDefinition = None) -> Dict:
         """
         Reads the experiment definition and applies env replacements.
         :param definition_path: Path to experiment jobs.
-        :param env_replacements: List of environment variables to replace in definition.
+        :param rq_definition: RQ definition to use in place of a new one.
         :return: Processed definition.
         """
-        if env_replacements is None:
-            env_replacements = ENV_REPLACEMENT_VARIABLES
-        if not os.path.isfile(definition_path):
-            raise ValueError(f"{definition_path} does not exists.")
+        if definition_path:
+            rq_definition = RQDefinition(definition_path)
 
-        definition_path = os.path.expanduser(definition_path)
-        env_replacements = FileUtil.get_env_replacements(env_replacements)
-        job_definition = JsonUtil.read_json_file(definition_path)
+        if not rq_definition:
+            raise Exception("Expected definition path or rq definition to be given.")
 
-        script_name = ScriptDefinition.get_script_name(definition_path)
-        job_definition = ScriptDefinition.set_output_paths(job_definition, script_name)
-        result = FileUtil.expand_paths(job_definition, env_replacements, use_abs_paths=False)
-        return result
+        ScriptDefinition.set_output_paths(rq_definition)
+        rq_definition.set_default_values(use_os_values=True)
+        rq_definition_json = rq_definition.build_rq(error_on_fail=True)
+
+        return rq_definition_json
 
     @staticmethod
-    def set_output_paths(script_definition: Dict, script_name: str) -> Dict:
+    def set_output_paths(rq_definition: RQDefinition) -> None:
         """
         Sets the output path for the job results, logger, and model base dir.
-        :param script_definition: The script definition to set output paths of.
-        :param script_name: The name of the script.
-        :return: Script definition with output paths modifications.
+        :param rq_definition: The rq definition to set output paths for.
+        :return: None, modifications in place.
         """
 
+        script_definition = rq_definition.rq_json
         if ScriptDefinition.OUTPUT_DIR_PARAM not in script_definition:
-            script_output_path = os.path.join(ScriptDefinition.ENV_OUTPUT_PARAM, script_name)
+            script_output_path = os.path.join(ScriptDefinition.ENV_OUTPUT_PARAM, rq_definition.script_name)
         else:
             script_output_path = script_definition[ScriptDefinition.OUTPUT_DIR_PARAM]
         script_output_path = os.path.expanduser(script_output_path)
         script_definition[ScriptDefinition.OUTPUT_DIR_PARAM] = script_output_path
-        script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
         script_definition = ScriptDefinition.set_object_property(
             ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, script_output_path),
             script_definition)
-        return script_definition
+        rq_definition.rq_json = script_definition
 
     @staticmethod
     def set_object_property(object_properties: Tuple[str, str, Any], object_data: Dict) -> Dict:
@@ -79,11 +75,3 @@ class ScriptDefinition:
                 v = [ScriptDefinition.set_object_property(object_properties, v_child) for v_child in v]
             new_obj[k] = v
         return new_obj
-
-    @staticmethod
-    def get_script_name(path: str) -> str:
-        """
-        :param path: Path used to construct id.
-        :return: Returns the directory and file name of path used to identify scripts.
-        """
-        return FileUtil.get_file_name(path, n_parents=1)

@@ -1,21 +1,21 @@
 import random
 from collections import Counter
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
 import pandas as pd
-import torch
 from datasets import Dataset
+from sentence_transformers import InputExample
 from tqdm import tqdm
 
 from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -69,23 +69,23 @@ class TraceDataset(iDataset):
             self.__trace_matrix = TraceMatrix(self.trace_df, randomize=self.randomize)
         return self.__trace_matrix
 
-    def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
+    def to_hf_dataset(self, model_manager: ModelManager) -> Dataset:
         """
         Converts trace links in data to Huggingface (HF) dataset.
-        :param model_generator: The model generator determining architecture and feature function for trace links.
+        :param model_manager: The model generator determining architecture and feature function for trace links.
         :return: A HF dataset.
         """
 
-        def encode(batch) -> Dict:
+        def encode(batch: Dict[str, List[Union[str, int]]]) -> Dict:
             """
             Encodes the batch.
             """
-            features = model_generator.get_feature(text=batch[CSVKeys.SOURCE],
-                                                   text_pair=batch[CSVKeys.TARGET],
-                                                   return_token_type_ids=True,
-                                                   add_special_tokens=True)
-            features[DataKey.LABELS_KEY] = torch.as_tensor(batch[CSVKeys.LABEL])
-            return features
+            features = []
+            for source, target, label in zip(batch[CSVKeys.SOURCE], batch[CSVKeys.TARGET], batch[CSVKeys.LABEL]):
+                feature = self._get_feature_entry(model_manager.arch_type, model_manager.get_feature,
+                                                  source_text=source, target_text=target, label=label)
+                features.append(feature)
+            return pd.DataFrame(features).to_dict()
 
         logger.info("Transforming to HF dataset...")
         hf_dataset = Dataset.from_pandas(self.to_dataframe(include_ids=False))
@@ -94,38 +94,13 @@ class TraceDataset(iDataset):
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
         return hf_dataset
 
-    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=20) -> List[Dict]:
-        """
-        Converts trace links in data to feature entries used by Huggingface (HF) trainer.
-        :param model_generator: The model generator determining architecture and feature function for trace links.
-        :param n_threads: The number of threads to use to calculate link features.
-        :return: A data used by the trace trainer.
-        """
-        feature_entries = {}
-
-        def create_link_feature(target_link_id: int) -> None:
-            """
-            Creates and store link feature in feature_entries.
-            :param target_link_id: The trace link id to generate feature for.
-            :return: None
-            """
-            feature_entries[target_link_id] = self._get_feature_entry(target_link_id,
-                                                                      model_generator.arch_type,
-                                                                      model_generator.get_feature)
-
-        ThreadUtil.multi_thread_process("Generating trace features.", list(self.trace_df.index), create_link_feature, n_threads)
-
-        project_link_ids = self.get_ordered_link_ids()
-        logger.info(f"Trace links after processing: {len(project_link_ids)}")
-        return [feature_entries[link_id] for link_id in project_link_ids]
-
     def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
-        for index in tqdm(self.trace_df.index, desc="Converting links to trace dataframe format."):
+        for index in tqdm(self.trace_df.index, desc="Converting links to trace dataframe format.", ncols=TQDM_NCOLS):
             link = self.trace_df.get_link(index)
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])
@@ -339,25 +314,35 @@ class TraceDataset(iDataset):
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id
 
-    def _get_feature_entry(self, link_id: int, arch_type: ModelArchitectureType, feature_func: Callable) \
-            -> Dict[str, any]:
+    def _get_feature_entry(self, arch_type: ModelArchitectureType, feature_func: Callable, link_id: int = None,
+                           source_text: str = None, target_text: str = None, label: int = None) -> Dict[str, any]:
         """
         Gets a representational dictionary of the feature to be used in the data
-        :param link_id: id of link to extract features from
         :param arch_type: The model architecture determining features.
+        :param feature_func: The function used to extract feature is not siamese model. TODO: Separate this out.
+        :param link_id: id of link to extract features from
+        :param source_text: ID of the source artifact.
+        :param target_text: ID of the target artifact.
+        :param label: Label of trace link.
         :return: feature name, value mappings
         """
-        source, target = self.get_link_source_target_artifact(link_id)
+        has_link_info = all([a is not None for a in [source_text, target_text, label]])
+        assert has_link_info or link_id is not None, "Expected link id or feature info."
+        if link_id:
+            source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
+            label = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
+            source_text = source_artifact[ArtifactKeys.CONTENT]
+            target_text = target_artifact[ArtifactKeys.CONTENT]
+
         if arch_type == ModelArchitectureType.SIAMESE:
-            entry = {
-                **self._extract_feature_info(feature_func(text=source[ArtifactKeys.CONTENT]), DataKey.SOURCE_PRE + DataKey.SEP),
-                **self._extract_feature_info(feature_func(text=target[ArtifactKeys.CONTENT]), DataKey.TARGET_PRE + DataKey.SEP)}
+            entry = InputExample(texts=[source_text, target_text], label=float(label))
         else:
-            entry = self._extract_feature_info(feature_func(text=source[ArtifactKeys.CONTENT],
-                                                            text_pair=target[ArtifactKeys.CONTENT],
-                                                            return_token_type_ids=True,
-                                                            add_special_tokens=True))
-        entry[DataKey.LABEL_KEY] = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
+            feature = feature_func(text=source_text,
+                                   text_pair=target_text,
+                                   return_token_type_ids=True,
+                                   add_special_tokens=True)
+            entry = self._extract_feature_info(feature)
+            entry[DataKey.LABEL_KEY] = label
         return entry
 
     def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:

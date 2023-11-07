@@ -3,7 +3,7 @@ from typing import Dict
 import datasets
 from sklearn.metrics import average_precision_score
 
-from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
+from tgen.common.constants.metric_constants import AP_KEY, MAP_KEY, THRESHOLD_DEFAULT
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
@@ -28,8 +28,6 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MapMetric(AbstractTraceMetric):
     name = "map"
-    MAP_KEY = "map"
-    AP_KEY = "global_ap"
 
     # TODO
     def _compute(self, predictions, references, trace_matrix: TraceMatrix, k=THRESHOLD_DEFAULT,
@@ -46,8 +44,8 @@ class MapMetric(AbstractTraceMetric):
         map_score = trace_matrix.calculate_query_metric(average_precision_score, default_value=0)
         ap_score = average_precision_score(references, predictions)
         return {
-            self.MAP_KEY: map_score,
-            self.AP_KEY: ap_score
+            MAP_KEY: map_score,
+            AP_KEY: ap_score
         }
 
     def _info(self) -> datasets.MetricInfo:

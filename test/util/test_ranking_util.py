@@ -1,10 +1,9 @@
-from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from tgen.common.constants.metric_constants import LAG_KEY, MAP_KEY
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
-from tgen.metrics.lag_metric import LagMetric
-from tgen.metrics.map_metric import MapMetric
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.entry_creator import EntryCreator
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 
 class TestRankingUtil(BaseTest):
@@ -20,8 +19,8 @@ class TestRankingUtil(BaseTest):
         predictions = EntryCreator.create_trace_predictions(3, 1, scores=[0.75, 0.8, 0.95])
         trace_df = TraceDataFrame(true_links)
         metrics = RankingUtil.evaluate_trace_predictions(trace_df, predictions)
-        self.assertEqual(1, metrics[MapMetric.MAP_KEY])
-        self.assertEqual(1, metrics[LagMetric.LAG_KEY])
+        self.assertEqual(1, metrics[MAP_KEY])
+        self.assertEqual(1, metrics[LAG_KEY])
 
     def test_select_predictions(self):
         """

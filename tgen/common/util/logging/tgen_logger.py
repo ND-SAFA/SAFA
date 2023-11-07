@@ -23,13 +23,13 @@ class TGenLogger(Logger):
         msg = f"{title}\n{message}"
         self.info(msg)
 
-    def log_title(self, title: str) -> None:
+    def log_title(self, title: str, **kwargs) -> None:
         """
         Logs the message with a title
         :param title: The title to the message
         :return: None
         """
-        title_formatted = TGenLogger.__create_title(title)
+        title_formatted = TGenLogger.__create_title(title, **kwargs)
         self.info(title_formatted)
 
     def log_step(self, step: str) -> None:
@@ -42,13 +42,13 @@ class TGenLogger(Logger):
         self.info(step_formatted)
 
     @staticmethod
-    def __create_title(title: str):
+    def __create_title(title: str, prefix: str = ""):
         """
         Logs the message as a new title in the logs.
         :param title: The title name.
         :return: Title formatted as markdown header.
         """
-        title = f"{PromptUtil.as_markdown_header(title)}".strip()
+        title = prefix + f"{PromptUtil.as_markdown_header(title)}".strip()
         return title
 
     @staticmethod

@@ -25,7 +25,7 @@ class TestTraceDatasetSplitter(BaseSplitTest):
     }
 
     @patch.object(ModelManager, "get_tokenizer")
-    def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
+    def test_to_hf_dataset(self, get_tokenizer_mock: mock.MagicMock):
         """
         Tests correctness of trace entries after splitting and balancing.
         """
@@ -45,7 +45,7 @@ class TestTraceDatasetSplitter(BaseSplitTest):
             self.assertEqual(n_expected, len(role_dataset))
 
             model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
-            trainer_dataset = role_dataset.to_trainer_dataset(model_generator)
+            trainer_dataset = role_dataset.to_hf_dataset(model_generator)
             n_links = len(trainer_dataset)
 
             self.assertTrue(isinstance(trainer_dataset[0], dict))

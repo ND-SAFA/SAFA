@@ -5,6 +5,7 @@ from typing import Any, Callable, List, Union
 
 from tqdm import tqdm
 
+from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.constants.threading_constants import THREAD_SLEEP
 from tgen.common.util.logging.logger_manager import logger
 
@@ -37,7 +38,7 @@ class ThreadUtil:
         for i in iterable:
             item_queue.put(i)
 
-        progress_bar = tqdm(total=len(iterable), desc=title)
+        progress_bar = tqdm(total=len(iterable), desc=title, ncols=TQDM_NCOLS)
         global_state = {"successful": True, "exception": None}
 
         def thread_body() -> None:

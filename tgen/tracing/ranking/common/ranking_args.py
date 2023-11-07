@@ -2,13 +2,11 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
+from tgen.common.constants import environment_constants
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
-from tgen.common.constants.ranking_constants import DEFAULT_LINK_THRESHOLD, \
-    DEFAULT_MAX_CONTEXT_ARTIFACTS, \
-    DEFAULT_PARENT_MIN_THRESHOLD, \
-    DEFAULT_PARENT_PRIMARY_THRESHOLD, \
-    DEFAULT_SORTING_ALGORITHM, DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, \
-    GENERATE_EXPLANATIONS_DEFAULT, DEFAULT_EMBEDDINGS_SCORE_WEIGHT
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EMBEDDING_MODEL, \
+    DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
+    DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -62,7 +60,7 @@ class RankingArgs(PipelineArgs):
     """
     - embedding_model: The model whose embeddings are used to rank children.
     """
-    embedding_model_name: str = DEFAULT_EMBEDDING_MODEL
+    embedding_model_name: str = None
     """
     - parent_thresholds: The threshold used to establish parents from (primary, secondary and min)
     """
@@ -125,3 +123,11 @@ class RankingArgs(PipelineArgs):
         if path:
             path = os.path.expanduser(path)
         return path
+
+    def __post_init__(self) -> None:
+        """
+        Initializes ranking args with default embedding model if in production.
+        :return: None
+        """
+        super().__post_init__()
+        self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else DEFAULT_EMBEDDING_MODEL

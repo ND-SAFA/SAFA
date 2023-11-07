@@ -1,6 +1,5 @@
 import os
 import uuid
-from copy import deepcopy
 from typing import Any, Callable, List, Optional, Tuple
 
 import pandas as pd
@@ -58,14 +57,6 @@ class PromptDataset(iDataset):
         :return: A data in a HF Dataset.
         """
         raise NotImplementedError("A prompt dataset for hugging face is currently not supported")
-
-    def to_trainer_dataset(self, prompt_builder: PromptBuilder) -> pd.DataFrame:
-        """
-        Converts data to that used by the trainer.
-        :param prompt_builder: The prompt generator
-        :return: A data used by the trainer.
-        """
-        return self.get_prompt_dataframe(prompt_builder)
 
     def to_dataframe(self) -> pd.DataFrame:
         """

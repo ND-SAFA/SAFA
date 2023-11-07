@@ -3,14 +3,12 @@ from typing import Dict
 
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trainers.vsm_trainer import VSMTrainer
-from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
-from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.dataset_creator_tutil import DatasetCreatorTUtil
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestVSMTrainer(BaseTraceTest):
@@ -29,7 +27,7 @@ class TestVSMTrainer(BaseTraceTest):
         self.assert_metrics(trace_prediction_output.metrics)
 
     def get_custom_trace_trainer(self, dataset_container_args: Dict = None):
-        trainer_dataset_manager = self.create_trainer_dataset_manager(dataset_container_args)
+        trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager([DatasetRole.EVAL], kwargs=dataset_container_args)
         return VSMTrainer(trainer_dataset_manager=trainer_dataset_manager, metrics=self.TEST_METRICS_NAMES, select_predictions=False)
 
     def assert_metrics(self, metrics: Metrics):
@@ -40,20 +38,3 @@ class TestVSMTrainer(BaseTraceTest):
         for metric, aliases in self.TEST_METRIC_DEFINITION:
             for alias in aliases:
                 self.assertIn(alias, metrics)
-
-    @staticmethod
-    def create_trainer_dataset_manager(kwargs: Dict = None) -> TrainerDatasetManager:
-        """
-        Creates dataset manager with optional kwargs used to modify definition.
-        :param kwargs: Dictionary of properties to overwrite in dataset manager definition.
-        :return: Dataset manager created.
-        """
-        if kwargs is None:
-            kwargs = {}
-        return ObjectCreator.create(TrainerDatasetManager, **{
-            "eval_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
-                **ObjectCreator.dataset_creator_definition
-            },
-            **kwargs
-        })

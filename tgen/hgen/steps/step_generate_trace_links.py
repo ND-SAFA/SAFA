@@ -1,7 +1,5 @@
-import os
-from typing import Any, Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
 from tgen.common.objects.trace import Trace
@@ -10,7 +8,6 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
-from tgen.common.util.status import Status
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -22,7 +19,6 @@ from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
-from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 
 
 class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -58,16 +54,21 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state of HGen
         :return: The trace predictions for all candidates (that were not filtered)
         """
-        tracing_job = RankingJob(dataset=state.all_artifacts_dataset,
-                                 layer_ids=(args.target_type, args.source_layer_id),  # parent, child
-                                 export_dir=self._get_ranking_dir(state.export_dir),
-                                 load_dir=self._get_ranking_dir(args.load_dir),
-                                 ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
-                                 link_threshold=FIRST_PASS_LINK_THRESHOLD)
-        result = tracing_job.run()
-        if result.status != Status.SUCCESS:
-            raise Exception(f"Trace link generation failed: {result.body}")
-        trace_predictions: List[EnumDict] = result.body.prediction_entries
+        children_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.source_layer_id).index)
+        parent_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.target_type).index)
+        run_name = RankingJob.get_run_name(args.source_type, children_ids, args.target_type, parent_ids)
+        pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids,
+                                    children_ids=children_ids,
+                                    dataset=state.all_artifacts_dataset,
+                                    types_to_trace=(args.source_type, args.target_type),
+                                    export_dir=self._get_ranking_dir(state.export_dir),
+                                    generate_explanations=args.generate_explanations,
+                                    link_threshold=FIRST_PASS_LINK_THRESHOLD)
+        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
+        pipeline.run()
+        state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
+        pipeline_state: RankingState = pipeline.state
+        trace_predictions: List[EnumDict] = pipeline_state.selected_entries
         return trace_predictions
 
     def _trace_artifacts_in_cluster_to_generated_parents(self, args: HGenArgs, state: HGenState) -> Tuple[List[Trace], List[Trace]]:
@@ -108,7 +109,6 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             trace_predictions.extend(cluster_predictions)
         if args.generate_explanations:
             selected_traces = self._generate_explanations(selected_traces, **pipeline_kwargs)
-
         return trace_predictions, selected_traces
 
     @staticmethod

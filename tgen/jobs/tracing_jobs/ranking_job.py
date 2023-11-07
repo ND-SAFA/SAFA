@@ -6,6 +6,7 @@ from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIO
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput

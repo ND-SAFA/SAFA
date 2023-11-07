@@ -49,10 +49,9 @@ class TestMultiLayerHGenJob(BaseJobTest):
 
     @mock_libraries
     @mock.patch.object(AddClustersToDataset, "run")
-    @mock.patch.object(CreateExplanationsStep, "run")
     @mock.patch.object(CompleteRankingPromptsStep, "complete_ranking_prompts")
     def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager,
-                         ranking_mock: MagicMock, explanation_mock: MagicMock, final_cluster_step: MagicMock):
+                         ranking_mock: MagicMock, final_cluster_step: MagicMock):
         """
         Tests that job is completed succesfully.
         """
@@ -141,7 +140,9 @@ class TestMultiLayerHGenJob(BaseJobTest):
         return args
 
     def _get_job(self):
-        starting_hgen_job = BaseHGenJob(self.get_args(export_dir=EMPTY_STRING))
+        args: HGenArgs = self.get_args(export_dir=EMPTY_STRING)
+        args.generate_explanations = False
+        starting_hgen_job = BaseHGenJob(args)
         return MultiLayerHGenJob(starting_hgen_job, self.higher_levels)
 
     def set_clustering_state(self, args: ClusteringArgs, state: ClusteringState, *other_args, **other_kwargs):

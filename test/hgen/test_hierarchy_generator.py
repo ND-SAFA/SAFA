@@ -2,14 +2,12 @@ import os
 from copy import deepcopy
 from unittest.mock import MagicMock
 
-import os
-from unittest.mock import MagicMock
-import numpy as np
 import mock
+import numpy as np
 import pandas as pd
 
-from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_predictions, \
-    get_test_hgen_args, HGEN_PROJECT_SUMMARY, MISSING_PROJECT_SUMMARY_RESPONSES
+from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args, \
+    HGEN_PROJECT_SUMMARY, MISSING_PROJECT_SUMMARY_RESPONSES
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
@@ -28,6 +26,7 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
+from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
@@ -40,8 +39,6 @@ from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
-from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 
 
 class TestHierarchyGenerator(BaseTest):
@@ -63,7 +60,7 @@ class TestHierarchyGenerator(BaseTest):
         self.assert_name_artifacts_step()
         self.assert_generate_trace_links_step()
         self.assert_detect_duplicates_step()
-        # TODO test link orphans
+        self.assert_find_homes_for_orphans_step()
         self.assert_create_dataset_step()
         self.assert_save_dataset_checkpoint()
 
@@ -227,3 +224,8 @@ class TestHierarchyGenerator(BaseTest):
                                    {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
                                     LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)
+
+    def assert_find_homes_for_orphans_step(self):
+        FindHomesForOrphansStep().run(self.HGEN_ARGS, self.HGEN_STATE)
+
+

@@ -11,7 +11,7 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 FINE_TUNE_REQUEST = AttrDict({
     "training_file": "training_id",
     "validation_file": "validation_id",
-    "model": "gpt-3.5-turbo",
+    "model": "gpt-4",
     "n_epochs": 2,
     "batch_size": 4,
     "learning_rate_multiplier": 0.05,
@@ -23,7 +23,7 @@ FINE_TUNE_REQUEST = AttrDict({
 })
 
 COMPLETION_REQUEST = AttrDict({
-    "model": "gpt-3.5-turbo",
+    "model": "gpt-4",
     "prompt": "Say this is a test",
     "max_tokens": 7,
     "temperature": 0,

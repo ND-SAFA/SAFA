@@ -1,7 +1,5 @@
-import os
 from typing import List, Any, Dict, Set
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -73,7 +71,7 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 trace_selections.append(top_prediction)
 
         if args.generate_explanations:
-            trace_selections = FindHomesForOrphansStep._generate_missing_explanations(pipeline_args, trace_selections)
+            trace_selections = FindHomesForOrphansStep._generate_missing_explanations(pipeline_args, trace_selections, state)
 
         return trace_selections
 
@@ -107,7 +105,7 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return orphans
 
     @staticmethod
-    def _generate_missing_explanations(pipeline_args: RankingArgs, trace_selections: List[Trace]) -> List[Trace]:
+    def _generate_missing_explanations(pipeline_args: RankingArgs, trace_selections: List[Trace], state: HGenState) -> List[Trace]:
         """
         Generates explanations for traces that are missing them
         :param pipeline_args: The arguments to the ranking pipeline
@@ -117,6 +115,7 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         missing_explanations = [trace for trace in trace_selections if not trace.get(TraceKeys.EXPLANATION)]
         have_explanations = [trace for trace in trace_selections if trace.get(TraceKeys.EXPLANATION)]
         pipeline_args.generate_explanations = True
+        pipeline_args.update_llm_managers_with_state(state)
         pipeline_state = RankingState(candidate_entries=missing_explanations)
         CreateExplanationsStep().run(pipeline_args, pipeline_state)
         trace_selections = have_explanations + pipeline_state.get_current_entries()

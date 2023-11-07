@@ -11,7 +11,7 @@ from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.models.llm.token_limits import ModelTokenLimits
+from tgen.models.tokens.token_limits import ModelTokenLimits
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder

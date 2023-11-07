@@ -1,7 +1,8 @@
 import inspect
 from dataclasses import Field, MISSING, dataclass
-from typing import Dict
+from typing import Dict, Type
 
+from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
@@ -82,3 +83,19 @@ class DataclassUtil:
         else:
             assert not dataset_creator, "Must provide only a dataset OR a dataset creator"
         return dataset
+
+    @staticmethod
+    def update_attr_of_type_with_vals(dataclass: dataclass, attr_type: Type, **vals2update) -> None:
+        """
+        Updates all attributes of the given type with the values provided
+        :param dataclass: The dataclass wishing to update its values
+        :param attr_type: Will update the value of all attributes with the given type
+        :param vals2update: The name, value pairs to update
+        :return: None
+        """
+        param_specs = ParamSpecs.create_from_method(dataclass.__init__)
+        matching_attrs = [getattr(dataclass, name) for name, type_ in param_specs.param_types.items() if
+                           ReflectionUtil.is_instance_or_subclass(type_, attr_type)]
+        for attr in matching_attrs:
+            for name, val in vals2update.items():
+                setattr(attr, name, val)

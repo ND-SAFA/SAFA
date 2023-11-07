@@ -109,4 +109,15 @@ class StrUtil:
             string = string.replace(char, EMPTY_STRING)
         return string
 
+    @staticmethod
+    def remove_decimal_points_from_floats(string: str) -> str:
+        """
+        Removes all decimal points from each float in the string
+        :param string: The input string
+        :return: The string without decimal points
+        """
+        # Define a regular expression pattern to match floating-point numbers
+        return re.sub(r'\d+\.\d+', lambda x: x.group().split(PERIOD)[0], string)
+
+
 

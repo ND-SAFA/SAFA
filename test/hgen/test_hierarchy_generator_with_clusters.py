@@ -1,18 +1,17 @@
 import math
 import random
 from copy import deepcopy
-from trace import Trace
 from unittest.mock import MagicMock
 
 import mock
 import numpy as np
 from bs4 import BeautifulSoup
-from typing import List
 
 from test.hgen.hgen_test_utils import HGenTestConstants, get_name_responses, get_test_hgen_args, HGEN_PROJECT_SUMMARY, \
     MISSING_PROJECT_SUMMARY_RESPONSES
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR
+from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
@@ -21,6 +20,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
+from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
@@ -33,13 +33,12 @@ from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
-from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 
 class TestHierarchyGeneratorWithClustering(BaseTest):
     HGEN_ARGS: HGenArgs = None
-    HGEN_STATE = HGenState()
 
     @mock_anthropic
     def test_hgen_with_clusters(self, anthropic_ai_manager: TestAIManager):
@@ -57,6 +56,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         DetectDuplicateArtifactsStep().run(args, state)
         self.assert_find_homes_for_orphans(args, state, len(artifacts), anthropic_ai_manager)
         CreateHGenDatasetStep().run(args, state)
+        hgen = HierarchyGenerator(self.HGEN_ARGS)
+        hgen.state = state
+        hgen._log_costs()
 
     def assert_generate_artifact_content_step(self, args, state,
                                               anthropic_ai_manager: TestAIManager):
@@ -122,13 +124,16 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         def prompt_res_creator(r):
             return lambda prompt: self.assert_generation_prompts(prompt, return_value=r)
 
+        anthropic_ai_manager.mock_summarization()
+        anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
         args: HGenArgs = get_test_hgen_args()()
         self.HGEN_ARGS = args
         args.target_type = "User Story"
         args.perform_clustering = True
         args.generate_trace_links = generate_trace_links
-        args.dataset.project_summary = HGEN_PROJECT_SUMMARY
-        state = HGenState()
+        hgen = HierarchyGenerator(self.HGEN_ARGS)
+        hgen.run_setup_for_pipeline()
+        state = hgen.state
         state.description = HGenTestConstants.description
         state.format_of_artifacts = HGenTestConstants.format_
 
@@ -140,9 +145,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         user_story_responses = [PromptUtil.create_xml("user-story", us) for i, us in enumerate(HGenTestConstants.user_stories)]
 
         responses = [prompt_res_creator(user_story_responses[i]) for i in range(len(user_story_responses))]
-        names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.generation_predictions)
+        names, expected_names, name_responses = get_name_responses(state.generation_predictions)
         responses.extend(name_responses)
-        anthropic_ai_manager.set_responses(responses)
+        anthropic_ai_manager.add_responses(responses)
         anthropic_ai_manager.mock_summarization()
         return expected_names, args, state
 

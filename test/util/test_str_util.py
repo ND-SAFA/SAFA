@@ -48,3 +48,8 @@ class TestStrUtil(BaseTest):
 
         removed_chars_string = StrUtil.remove_chars(string, "<")
         self.assertEqual("These ^ chars ? need to be removed />", removed_chars_string)
+
+    def test_remove_decimal_points_from_floats(self):
+        string = "blah1.23something. and 4.56another 7.890here."
+        result = StrUtil.remove_decimal_points_from_floats(string)
+        self.assertEqual("blah1something. and 4another 7here.", result)

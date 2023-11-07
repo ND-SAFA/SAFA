@@ -9,6 +9,7 @@ import pandas as pd
 from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args, \
     HGEN_PROJECT_SUMMARY, MISSING_PROJECT_SUMMARY_RESPONSES
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
+from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.enum_util import EnumDict
@@ -23,6 +24,7 @@ from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_state import HGenState
+from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
@@ -37,21 +39,24 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
+from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 
 
 class TestHierarchyGenerator(BaseTest):
     HGEN_ARGS = None
-    HGEN_STATE = HGenState()
+    HGEN_STATE = None
 
     @mock_anthropic
     def test_run(self, anthropic_ai_manager: TestAIManager):
         anthropic_ai_manager.mock_summarization()
+        anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
         self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
         self.HGEN_ARGS.perform_clustering = False
-        self.HGEN_ARGS.dataset.project_summary = HGEN_PROJECT_SUMMARY
-        self.HGEN_STATE.export_dir = self.HGEN_ARGS.export_dir
+        hgen = HierarchyGenerator(self.HGEN_ARGS)
+        hgen.run_setup_for_pipeline()
+        self.HGEN_STATE = hgen.state
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
         CreateClustersStep().run(self.HGEN_ARGS, self.HGEN_STATE)
@@ -63,6 +68,7 @@ class TestHierarchyGenerator(BaseTest):
         self.assert_find_homes_for_orphans_step()
         self.assert_create_dataset_step()
         self.assert_save_dataset_checkpoint()
+        hgen._log_costs()
 
     def assert_save_dataset_checkpoint(self):
         def assert_dataset(dataset: TraceDataset, orig_dataset: TraceDataset):

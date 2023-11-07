@@ -28,6 +28,10 @@ class State(BaseObject):
 
     project_summary: Summary = None
 
+    total_input_cost: int = 0
+
+    total_output_cost: int = 0
+
     _CHECKPOINT_DIRNAME: str = "state_checkpoints"
 
     _PATH_TERMS = {"path", "dir", "directory"}
@@ -158,6 +162,15 @@ class State(BaseObject):
             if raise_exception:
                 raise e
             return e
+
+    def update_total_costs_from_state(self, other_state: "State") -> None:
+        """
+        Updates the total costs by combining current costs with those accumulated in the othhr state
+        :param other_state: The state to combine costs with
+        :return: None
+        """
+        self.total_input_cost += other_state.total_input_cost
+        self.total_output_cost += other_state.total_output_cost
 
     @staticmethod
     def _is_a_path_variable(varname: str) -> bool:

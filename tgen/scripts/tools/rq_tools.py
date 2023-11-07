@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional
 
+from tgen.common.util.file_util import FileUtil
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
@@ -27,7 +28,7 @@ def navigate_to_rq(curr_path: str) -> str:
     """
     items = os.listdir(curr_path)
     item_paths = [os.path.join(curr_path, i) for i in items]
-    files = [i for i in item_paths if os.path.isfile(i) and ".json" in i]
+    files = [i for i in item_paths if os.path.isfile(i) and FileUtil.JSON_EXT in i]
     folders = [i for i in item_paths if os.path.isdir(i)]
     if len(files) > 0:
         rq_selected = navigate_to_rq_from_files(files)

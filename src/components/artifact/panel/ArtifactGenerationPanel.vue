@@ -34,7 +34,7 @@
       </div>
       <multiselect-input
         v-model="parentArtifactTypes"
-        :options="generateTypeOptions"
+        :options="ARTIFACT_GENERATION_OPTIONS"
         label="Parent Artifact Types"
         hint="The type of parent artifacts to create. If multiple are selected, each type will be sequentially generated based on the past type."
       />
@@ -64,6 +64,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { GenerateArtifactSchema } from "@/types";
+import { ARTIFACT_GENERATION_OPTIONS } from "@/util";
 import {
   appStore,
   artifactGenerationApiStore,
@@ -79,17 +80,6 @@ import {
   ArtifactTypeInput,
   MultiselectInput,
 } from "@/components/common";
-
-const additionalOptions =
-  process.env.NODE_ENV === "production" ? [] : ["GraphQL API Documentation"];
-
-const generateTypeOptions = [
-  "User Story",
-  "Functional Requirement",
-  "Feature Description",
-  "Epic",
-  ...additionalOptions,
-];
 
 const mode = ref<"single" | "multiple">("single");
 const childArtifactIds = ref<string[]>([]);

@@ -38,10 +38,30 @@
             <git-hub-project-input />
           </template>
           <template #3>
-            [confirm docs to generate, confirm data generation cost estimate,
-            pay with stripe]
-            <flex-box justify="center">
-              <text-button text color="gradient" @click="handleGenerate">
+            <typography el="div" value="Importing from GitHub:" />
+            <attribute-chip
+              :value="integrationsStore.gitHubProject?.name || ''"
+              icon="project-add"
+              color="primary"
+            />
+            <typography el="div" value="Generating Documents:" />
+            <attribute-chip
+              v-for="type in generationTypes"
+              :key="type"
+              :value="type"
+              icon="create-artifact"
+              color="primary"
+            />
+            <!-- TODO: confirm data generation cost estimate, pay with stripe -->
+            <flex-box t="4">
+              <text-button
+                text
+                large
+                color="gradient"
+                class="bd-gradient"
+                icon="generate-artifacts"
+                @click="handleGenerate"
+              >
                 Generate Documentation
               </text-button>
             </flex-box>
@@ -71,14 +91,20 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { StepperStep } from "@/types";
-import { ENABLED_FEATURES } from "@/util";
+import { ARTIFACT_GENERATION_TYPES, ENABLED_FEATURES } from "@/util";
 import {
   createProjectApiStore,
   gitHubApiStore,
   integrationsStore,
   sessionStore,
 } from "@/hooks";
-import { TextButton, Stepper, Typography, FlexBox } from "@/components/common";
+import {
+  TextButton,
+  Stepper,
+  Typography,
+  FlexBox,
+  AttributeChip,
+} from "@/components/common";
 import {
   GitHubAuthentication,
   GitHubProjectInput,
@@ -115,6 +141,11 @@ const steps = ref<StepperStep[]>([
     caption: "Export generated data, or view the data within SAFA.",
     done: false,
   },
+]);
+
+const generationTypes = ref([
+  ARTIFACT_GENERATION_TYPES.USER_STORY,
+  ARTIFACT_GENERATION_TYPES.SUB_SYSTEM,
 ]);
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);

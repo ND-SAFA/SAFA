@@ -21,6 +21,18 @@
         <stop offset="0%" :stop-color="Colors.gradient1" />
         <stop offset="100%" :stop-color="Colors.greenDark" />
       </linearGradient>
+      <linearGradient
+        id="color-gradient-full"
+        x1="0%"
+        x2="8%"
+        y1="0"
+        y2="0"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop offset="0%" :stop-color="Colors.gradient1" />
+        <stop offset="50%" :stop-color="Colors.gradient5" />
+        <stop offset="100%" :stop-color="Colors.gradient9" />
+      </linearGradient>
     </defs>
     <safa-logo />
     <safa-name v-if="!props.iconOnly" />

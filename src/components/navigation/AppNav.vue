@@ -15,7 +15,7 @@
       align="center"
       style="height: 100vh"
     >
-      <q-spinner-ball color="primary" size="4em" />
+      <q-spinner-ball class="nav-gradient" size="4em" />
     </flex-box>
   </div>
 </template>

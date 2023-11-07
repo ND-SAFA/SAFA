@@ -6,28 +6,26 @@
           "object_type": "HUGGING_FACE",
           "task": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                812
-              ]
-            }
+            "random_seed": 812
           },
           "model_manager": {
-            "model_path": "[MODEL]"
+            "model_path": "[BASE_MODEL]"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
+            "num_train_epochs": "[EPOCHS_INT]",
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "skip_save": false,
-            "load_best_model_at_end": true
+            "load_best_model_at_end": true,
+            "save_strategy": "epoch",
+            "evaluation_strategy": "epoch"
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+                "project_path": "[DATA_PATH]/[TRAIN_PROJECT]"
               }
             },
             "val_dataset_creator": {

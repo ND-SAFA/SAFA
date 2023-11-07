@@ -23,5 +23,4 @@ if __name__ == "__main__":
     file_path = os.path.join(RQ_PATH, args.file)
     script_runner = ScriptRunner(file_path)
     script_runner.print_results()
-    script_runner.upload_results()
     sys.exit()

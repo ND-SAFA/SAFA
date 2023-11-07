@@ -118,4 +118,3 @@ class PromptUtil:
         if remove_all_new_lines:
             formatted_string = formatted_string.replace(NEW_LINE, SPACE)
         return formatted_string
-

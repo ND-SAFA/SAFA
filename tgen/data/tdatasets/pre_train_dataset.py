@@ -1,7 +1,6 @@
 from typing import Any, Dict
 
 from datasets import load_dataset
-from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer
 
 from tgen.common.constants.hugging_face_constants import INPUT_IDS_PARAM, TEXT_PARAM, TRAIN_PARAM
@@ -23,19 +22,11 @@ class PreTrainDataset(iDataset):
         self.block_size = block_size
         self.kwargs = kwargs
 
-    def to_hf_dataset(self, model_generator: ModelManager) -> Any:
+    def to_hf_dataset(self, model_manager: ModelManager) -> Any:
         """
         Converts data to a Huggingface (HF) Dataset.
-        :param model_generator: The model generator determining architecture and feature function for trace links.
+        :param model_manager: The model generator determining architecture and feature function for trace links.
         :return: A data in a HF Dataset.
-        """
-        return self.to_trainer_dataset(model_generator)
-
-    def to_trainer_dataset(self, model_manager: ModelManager) -> Dataset:
-        """
-        Uses pretrain datafile to create a Dataset (i.e. LineByLineDataset) for Huggingface (HF) trainer.
-        :param model_manager: The model generator determining tokenizer to be used.
-        :return: A data used by the HF trainer.
         """
         tokenizer = model_manager.get_tokenizer()
         input_id_parser = self.create_input_id_parser(tokenizer, self.block_size)

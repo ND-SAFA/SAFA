@@ -10,7 +10,8 @@ from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
-from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, ROOT_PATH_PARAM, \
+from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
+    ROOT_PATH_PARAM, \
     USER_SYM
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -19,7 +20,7 @@ CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
                    "PL", "R", "PY", "JAVA", "VUE", "CC"]
 
-ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
+ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM, MODEL_PARAM]
 import numpy as np
 
 
@@ -101,16 +102,19 @@ class FileUtil:
             return file.readlines()
 
     @staticmethod
-    def get_env_replacements(env_variables: List[str]) -> Dict[str, str]:
+    def get_env_replacements(variables: List[str] = None) -> Dict[str, str]:
         """
+        Maps env names to their values for given variables.
+        :param variables: The environment variables to retrieve.
         :return: Dictionary of environment variables to their values.
         """
+        if variables is None:
+            variables = ENV_REPLACEMENT_VARIABLES
         replacements = {}
-        for replacement_path in env_variables:
-            path_value = os.environ.get(replacement_path, None)
-            if path_value:
-                path_key = "[%s]" % replacement_path
-                replacements[path_key] = os.path.expanduser(path_value)
+        for env_key, env_value in os.environ.items():
+            if env_key not in variables:
+                continue
+            replacements[f"[{env_key}]"] = os.path.expanduser(env_value) if USER_SYM in env_value else env_value
         return replacements
 
     @staticmethod
@@ -140,7 +144,7 @@ class FileUtil:
         return files
 
     @staticmethod
-    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None,
+    def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, Any] = None,
                      use_abs_paths: bool = True):
         """
         For every string found in value, if its a path its expanded completed path
@@ -159,9 +163,12 @@ class FileUtil:
             """
             if replacements:
                 for k, v in replacements.items():
-                    path = path.replace(k, v)
+                    if k == path:
+                        return v
+                    if k in path:
+                        path = path.replace(k, v)
             path = os.path.expanduser(path)
-            if use_abs_paths:
+            if (USER_SYM in path or F_SLASH in path) and use_abs_paths:
                 path = FileUtil.get_path_relative_to_proj_path(path)
             return path
 
@@ -204,7 +211,7 @@ class FileUtil:
         :return: Same type as value, but with its content processed.
         """
         if replacements is None:
-            replacements = FileUtil.get_env_replacements(ENV_REPLACEMENT_VARIABLES)
+            replacements = FileUtil.get_env_replacements()
         if isinstance(paths, list):
             return [FileUtil.perform_function_on_paths(v, func, replacements=replacements, **kwargs) for v in paths]
         if isinstance(paths, dict):
@@ -242,8 +249,9 @@ class FileUtil:
         for a in paths:
             ordered = [a]
             for b in paths:
-                if a == b:
+                if a == b or not isinstance(a, str) or not isinstance(b, str):
                     continue
+
                 if a in b:
                     ordered.append(b)
                 elif b in a:
@@ -297,9 +305,18 @@ class FileUtil:
         :param delete_after_move: if True, deletes the original directory after moving all contents
         :return: None
         """
+        if orig_path == new_path:
+            return
+
+        FileUtil.delete_dir(new_path)
         FileUtil.create_dir_safely(new_path)
+
         for file in os.listdir(orig_path):
             file_path = os.path.join(orig_path, file)
+            new_file_path = os.path.join(new_path, file)
+            if os.path.isfile(new_file_path):
+                FileUtil.delete_file_safely(new_file_path)
+                logger.warning(f"Deleting previous file: {new_file_path}")
             shutil.move(file_path, new_path)
         if delete_after_move:
             FileUtil.delete_dir(orig_path)

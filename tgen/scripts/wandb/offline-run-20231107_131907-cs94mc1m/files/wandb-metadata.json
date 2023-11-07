@@ -1,0 +1,42 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.9.16",
+    "heartbeatAt": "2023-11-07T19:19:07.400073",
+    "startedAt": "2023-11-07T19:19:07.304910",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/albertorodriguez/projects/safa/tgen/tgen/scripts/tool_runner.py",
+    "codePath": "tgen/scripts/tool_runner.py",
+    "git": {
+        "remote": "https://github.com/ND-SAFA/tgen.git",
+        "commit": "96e236c32b905d8a50a86605f2c2826bffcac28b"
+    },
+    "email": "arodri39@nd.edu",
+    "root": "/Users/albertorodriguez/projects/safa/tgen",
+    "host": "myhost.local",
+    "username": "albertorodriguez",
+    "executable": "/Users/albertorodriguez/opt/anaconda3/envs/tgen/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 2300,
+        "min": 2300,
+        "max": 2300
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2300,
+            "min": 2300,
+            "max": 2300
+        }
+    ],
+    "disk": {
+        "total": 931.546989440918,
+        "used": 14.360523223876953
+    },
+    "memory": {
+        "total": 16.0
+    }
+}

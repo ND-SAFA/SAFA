@@ -3,13 +3,14 @@ from typing import Union
 
 from transformers.data.data_collator import DataCollatorForLanguageModeling
 
-from tgen.common.util.override import overrides
 from tgen.common.constants.dataset_constants import MLM_PROBABILITY_DEFAULT
 from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.common.util.override import overrides
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.trainers.supported_trainer import SupportedHuggingFaceTrainer
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -22,7 +23,7 @@ from tgen.models.model_manager import ModelManager
 class HuggingFaceJob(AbstractTrainerJob):
 
     def __init__(self, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager, trainer_args: HuggingFaceArgs,
-                 task: TrainerTask, job_args: JobArgs = None):
+                 task: TrainerTask, trainer: SupportedHuggingFaceTrainer = SupportedHuggingFaceTrainer.HF, job_args: JobArgs = None):
         """
         The base job class for tracing jobs
         :param job_args: the arguments for the job
@@ -30,6 +31,7 @@ class HuggingFaceJob(AbstractTrainerJob):
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param trainer_args: other arguments needed for the trainer
         """
+        self.trainer = trainer
         super().__init__(job_args=job_args, model_manager=model_manager, trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=trainer_args, task=task)
 
@@ -40,9 +42,10 @@ class HuggingFaceJob(AbstractTrainerJob):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = HuggingFaceTrainer(trainer_args=self.trainer_args,
-                                               trainer_dataset_manager=self.trainer_dataset_manager,
-                                               model_manager=self.model_manager, **kwargs)
+            trainer_class = self.trainer.value
+            self._trainer = trainer_class(trainer_args=self.trainer_args,
+                                          trainer_dataset_manager=self.trainer_dataset_manager,
+                                          model_manager=self.model_manager, **kwargs)
         return self._trainer
 
     @overrides(AbstractTrainerJob)

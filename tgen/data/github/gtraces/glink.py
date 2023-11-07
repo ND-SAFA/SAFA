@@ -1,5 +1,6 @@
 from typing import Dict, Union
 
+from tgen.common.constants.path_constants import USER_SYM
 from tgen.common.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 
@@ -32,7 +33,7 @@ class GLink(AbstractGithubArtifact):
         """
         :return: Returns the trace link id between source and target.
         """
-        return str(self.source) + "~" + str(self.target)
+        return str(self.source) + USER_SYM + str(self.target)
 
     @overrides(AbstractGithubArtifact)
     def get_state_dict(self) -> Dict:

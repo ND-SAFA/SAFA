@@ -71,7 +71,6 @@ class SupportedEnum(Enum):
         if export_path:
             return self
         return self.name
-
     @classmethod
     def from_yaml(cls, val: str) -> "SupportedEnum":
         """
@@ -79,6 +78,13 @@ class SupportedEnum(Enum):
         :return: The supported enum obj
         """
         return cls[val]
+    def __iter__(self):
+        """
+        Iterates through each enum.
+        :return: Next enum.
+        """
+        for enum_key in self.get_keys():
+            yield self[enum_key]
 
     def __deepcopy__(self, memodict={}) -> "SupportedEnum":
         """

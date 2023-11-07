@@ -2,15 +2,15 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import MagicMock
 
-from sentence_transformers.SentenceTransformer import SentenceTransformer
+import numpy as np
 
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
-import numpy as np
 
 
 class TestMultiArtifactPrompt(BaseTest):
@@ -22,7 +22,7 @@ class TestMultiArtifactPrompt(BaseTest):
     def test_build_embedding_manager(self, minmax_scale_mock: MagicMock):
         minmax_scale_mock.return_value = np.asarray([0.4, 0.6])
         embedding_manager = EmbeddingsManager(content_map={a[ArtifactKeys.ID]: a[ArtifactKeys.CONTENT] for a in self.ARTIFACTS},
-                                              model_name="sentence-transformers/all-MiniLM-L6-v2")
+                                              model_name=SMALL_EMBEDDING_MODEL)
         context_prompt = self.get_context_prompt()
         prompt = context_prompt.build(artifact=EnumDict({ArtifactKeys.ID: "target", ArtifactKeys.CONTENT: "target content2"}),
                                       embedding_manager=embedding_manager, context_threshold=0.6)
@@ -40,4 +40,3 @@ class TestMultiArtifactPrompt(BaseTest):
 
     def get_context_prompt(self, **params):
         return ContextPrompt(build_method=MultiArtifactPrompt.BuildMethod.XML, **params)
-

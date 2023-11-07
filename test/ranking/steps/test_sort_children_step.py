@@ -14,11 +14,10 @@ class TestSortChildrenStep(BaseTest):
         """
         Accepts a set of ranked children
         """
-        pre_ranked = {}
         expected = {"s1": ["t1", "t3", "t2"]}
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=["s1"],
                                                                     children_ids=["t1", "t2", "t3"],
-                                                                    pre_sorted_parent2children=pre_ranked)
+                                                                    pre_sorted_parent2children=expected)
         step = SortChildrenStep()
         step.run(args, state)
         parent2entries = state.sorted_parent2children

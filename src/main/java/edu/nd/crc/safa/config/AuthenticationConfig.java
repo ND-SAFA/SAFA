@@ -90,8 +90,8 @@ public class AuthenticationConfig {
 
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("https://localhost.safa.ai:8080");
-        config.addAllowedOriginPattern("https://app.safa.ai:8080");
-        config.addAllowedOriginPattern("https://dev.safa.ai:8080");
+        config.addAllowedOriginPattern("https://app.safa.ai");
+        config.addAllowedOriginPattern("https://dev.safa.ai");
         config.setAllowedHeaders(SecurityConstants.allowedCorsHeaders);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setExposedHeaders(List.of(

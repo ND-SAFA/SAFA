@@ -7,6 +7,7 @@ import edu.nd.crc.safa.authentication.AuthorizationFilter;
 import edu.nd.crc.safa.authentication.AuthorizationService;
 import edu.nd.crc.safa.authentication.TokenService;
 
+import jakarta.servlet.DispatcherType;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,6 +64,7 @@ public class AuthenticationConfig {
                     "/v3/api-docs/**",
                     "/docs/**")
                 .permitAll()
+                .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                 .anyRequest()
                 .authenticated())
             // Authentication Filters

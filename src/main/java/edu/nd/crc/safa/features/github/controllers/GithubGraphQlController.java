@@ -8,11 +8,11 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.context.request.async.DeferredResult;
 
 @Controller
 public class GithubGraphQlController extends BaseController {
@@ -31,9 +31,10 @@ public class GithubGraphQlController extends BaseController {
      * @return Accessible projects.
      */
     @GetMapping(AppRoutes.Integrations.Github.Repos.ROOT)
-    public List<GithubRepositoryDTO> retrieveGithubRepositories() {
-        SafaUser user = this.getServiceProvider().getSafaUserService().getCurrentUser();
-        return GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepositories(user));
+    public DeferredResult<List<GithubRepositoryDTO>> retrieveGithubRepositories() {
+        return makeDeferredRequest(user -> {
+            return GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepositories(user));
+        }, REQUEST_TIMEOUT);
     }
 
     /**
@@ -44,10 +45,11 @@ public class GithubGraphQlController extends BaseController {
      * @return The repo.
      */
     @GetMapping(AppRoutes.Integrations.Github.Repos.BY_OWNER_AND_NAME)
-    public GithubRepositoryDTO retrieveGithubRepository(@PathVariable("owner") String owner,
-                                                        @PathVariable("repositoryName") String repo) {
-        SafaUser user = this.getServiceProvider().getSafaUserService().getCurrentUser();
-        return GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepository(user, owner, repo));
+    public DeferredResult<GithubRepositoryDTO> retrieveGithubRepository(@PathVariable("owner") String owner,
+                                                                        @PathVariable("repositoryName") String repo) {
+        return makeDeferredRequest(user -> {
+            return GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepository(user, owner, repo));
+        });
     }
 
 }

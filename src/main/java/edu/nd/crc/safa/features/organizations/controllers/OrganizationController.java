@@ -35,7 +35,8 @@ public class OrganizationController extends BaseController {
 
     public OrganizationController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
                                   OrganizationService organizationService,
-                                  OrganizationMembershipService organizationMembershipService, PermissionService permissionService) {
+                                  OrganizationMembershipService organizationMembershipService,
+                                  PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
         this.organizationService = organizationService;
         this.organizationMembershipService = organizationMembershipService;

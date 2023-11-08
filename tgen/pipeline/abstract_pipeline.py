@@ -187,7 +187,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             next_step = self.get_next_step(curr_step)
             msg = f"Current step: {curr_step.get_step_name()}, "
         logger.info(f"{msg}Next step: {next_step.get_step_name()}")
-        selected_option = self._display_interactive_menu()
+        selected_option = self._display_interactive_menu(options)
         if selected_option == InteractiveModeOptions.LOAD_NEW_STATE:
             selected_option = self._option_new_state(curr_step)
         if selected_option == InteractiveModeOptions.RE_RUN:

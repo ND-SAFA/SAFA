@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.commits.pipeline.steps;
 
+import java.util.List;
+
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
@@ -7,7 +9,9 @@ import edu.nd.crc.safa.features.commits.pipeline.ICommitStep;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.builders.ProjectVersionChangeBuilder;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class SendNotifications implements ICommitStep {
@@ -25,12 +29,19 @@ public class SendNotifications implements ICommitStep {
         ProjectVersion projectVersion = commitDefinition.getCommitVersion();
         ProjectChange<ArtifactAppEntity> artifactChanges = result.getArtifacts();
         ProjectChange<TraceAppEntity> traceChanges = result.getTraces();
+        SafaUser user = commitDefinition.getUser();
 
-        EntityChangeBuilder builder = new EntityChangeBuilder(projectVersion.getVersionId());
-        builder
-            .withArtifactsUpdate(artifactChanges.getUpdatedIds())
+        List<TraceAppEntity> updatedTraces = traceChanges.getModified();
+        updatedTraces.addAll(traceChanges.getAdded());
+
+        List<ArtifactAppEntity> updatedArtifacts = artifactChanges.getModified();
+        updatedArtifacts.addAll(artifactChanges.getAdded());
+
+        ProjectVersionChangeBuilder builder = EntityChangeBuilder
+            .create(user, projectVersion)
+            .withArtifactsUpdate(updatedArtifacts)
             .withArtifactsDelete(artifactChanges.getDeletedIds())
-            .withTracesUpdate(traceChanges.getUpdatedIds())
+            .withTracesUpdate(updatedTraces)
             .withTracesDelete(traceChanges.getDeletedIds())
             .withWarningsUpdate();
 
@@ -38,6 +49,6 @@ public class SendNotifications implements ICommitStep {
             builder.withUpdateLayout();
         }
 
-        service.getNotificationService().broadcastChangeToUser(builder, commitDefinition.getUser());
+        service.getNotificationService().broadcastChange(builder);
     }
 }

@@ -1,9 +1,9 @@
 package edu.nd.crc.safa.features.documents.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -15,8 +15,6 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
-import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -39,7 +37,6 @@ public class DocumentArtifactController extends BaseDocumentController {
 
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
-    private final NotificationService notificationService;
 
     @Autowired
     public DocumentArtifactController(ResourceBuilder resourceBuilder,
@@ -47,7 +44,6 @@ public class DocumentArtifactController extends BaseDocumentController {
         super(resourceBuilder, serviceProvider);
         this.artifactRepository = serviceProvider.getArtifactRepository();
         this.documentArtifactRepository = serviceProvider.getDocumentArtifactRepository();
-        this.notificationService = serviceProvider.getNotificationService();
     }
 
     /**
@@ -67,7 +63,7 @@ public class DocumentArtifactController extends BaseDocumentController {
     ) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         Document document = getDocumentById(getDocumentRepository(), documentId);
         for (ArtifactAppEntity a : artifacts) {
             UUID artifactId = a.getId();
@@ -79,17 +75,7 @@ public class DocumentArtifactController extends BaseDocumentController {
 
         LayoutManager layoutManager = new LayoutManager(getServiceProvider(), projectVersion, user);
         layoutManager.generateDocumentLayout(document);
-        List<UUID> artifactIds = artifacts
-            .stream()
-            .map(ArtifactAppEntity::getId)
-            .collect(Collectors.toList());
-
-        this.notificationService.broadcastChange(
-            EntityChangeBuilder
-                .create(versionId)
-                .withDocumentUpdate(List.of(documentId))
-                .withArtifactsUpdate(artifactIds)
-        );
+        broadcastDocumentChange(user, projectVersion, document);
         return artifacts;
     }
 
@@ -100,7 +86,7 @@ public class DocumentArtifactController extends BaseDocumentController {
                                            @PathVariable UUID artifactId) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         Document document = getDocumentById(getDocumentRepository(), documentId);
         Artifact artifact = getArtifactById(artifactId);
         Optional<DocumentArtifact> documentArtifactQuery =
@@ -109,18 +95,16 @@ public class DocumentArtifactController extends BaseDocumentController {
                 artifact);
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
 
-        this.notificationService.broadcastChange(
-            EntityChangeBuilder.create(versionId)
-                .withDocumentUpdate(List.of(documentId))
-                .withArtifactsUpdate(List.of(artifactId))
-        );
+        this.getServiceProvider().getDocumentService().broadcastDocumentChange(user,
+            projectVersion, document, List.of(artifactId));
+    }
+
+    private void broadcastDocumentChange(SafaUser user, ProjectVersion projectVersion, Document document) {
+        this.getServiceProvider().getDocumentService().broadcastDocumentChange(user, projectVersion, document,
+            new ArrayList<>());
     }
 
     private Artifact getArtifactById(UUID artifactId) throws SafaError {
-        Optional<Artifact> artifactOptional = this.artifactRepository.findById(artifactId);
-        if (artifactOptional.isPresent()) {
-            return artifactOptional.get();
-        }
-        throw new SafaError("Could not find artifact with id: %s", artifactId);
+        return this.artifactRepository.findById(artifactId).orElseThrow();
     }
 }

@@ -9,11 +9,13 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.builders.ProjectChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
@@ -24,23 +26,24 @@ import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Implements the custom logic for versioning trace links.
  */
 public class TraceLinkVersionRepositoryImpl
     extends GenericVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity> {
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private TraceLinkVersionRepository traceLinkVersionRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private TraceLinkRepository traceLinkRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private ArtifactRepository artifactRepository;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private TraceMatrixService traceMatrixService;
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private NotificationService notificationService;
 
     @Override
@@ -68,8 +71,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    protected ProjectEntity getProjectActivity() {
-        return ProjectEntity.TRACES;
+    protected ProjectEntityType getProjectActivity() {
+        return ProjectEntityType.TRACES;
     }
 
     @Override
@@ -151,7 +154,7 @@ public class TraceLinkVersionRepositoryImpl
             && (previousVersionEntity == null || previousVersionEntity.getApprovalStatus() == ApprovalStatus.DECLINED);
 
         boolean removed = approvalStatus == ApprovalStatus.DECLINED
-            && previousVersionEntity.getApprovalStatus() != ApprovalStatus.DECLINED;
+            && (previousVersionEntity.getApprovalStatus() != ApprovalStatus.DECLINED);
 
         boolean modified = previousVersionEntity != null
             && versionEntity.getApprovalStatus() != previousVersionEntity.getApprovalStatus();
@@ -187,15 +190,17 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     private void notifyTraceMatrixUpdate(TraceMatrixEntry entry, SafaUser user) {
-        EntityChangeBuilder builder = EntityChangeBuilder.create(entry.getProjectVersion().getVersionId())
-            .withTraceMatrixUpdate(entry.getId());
-        notificationService.broadcastChangeToUser(builder, user);
+        ProjectChangeBuilder builder = EntityChangeBuilder
+            .create(user, entry.getProjectVersion().getProject())
+            .withTraceMatrixUpdate(new TraceMatrixAppEntity(entry));
+        notificationService.broadcastChange(builder);
     }
 
     private void notifyTraceMatrixDelete(TraceMatrixEntry entry, SafaUser user) {
-        EntityChangeBuilder builder = EntityChangeBuilder.create(entry.getProjectVersion().getVersionId())
-            .withTraceMatrixUpdate(entry.getId());
-        notificationService.broadcastChangeToUser(builder, user);
+        ProjectChangeBuilder builder = EntityChangeBuilder
+            .create(user, entry.getProjectVersion().getProject())
+            .withTraceMatrixDelete(entry.getId());
+        notificationService.broadcastChange(builder);
     }
 
     private void updateTraceMatrixEntry(TraceMatrixEntry traceMatrixEntry, TraceLinkVersion versionEntity, int amount) {
@@ -237,7 +242,9 @@ public class TraceLinkVersionRepositoryImpl
             TraceLinkVersion previousTraceLinkVersion = existingLinkOptional.get();
             if (previousTraceLinkVersion.getTraceType() == TraceType.MANUAL
                 && newTrace.getTraceType() != TraceType.MANUAL) {
-                throw new SafaError("Generated link cannot override manual one.");
+                String error = String.format("Attempting to override manual link with generated link: %s->%s",
+                    newTrace.getSourceName(), newTrace.getTargetName());
+                throw new SafaError(error);
             }
         }
     }

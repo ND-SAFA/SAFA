@@ -1,24 +1,19 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
-import java.lang.reflect.Field;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.notifications.services.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * Represents a job's information for presenting its current progress.
  */
 @Data
-public class JobAppEntity  {
+public class JobAppEntity {
     private String name;
     private UUID id;
     private JobStatus status;
@@ -31,6 +26,7 @@ public class JobAppEntity  {
     private UUID completedEntityId;
     private UUID taskId;
     private List<String> steps;
+    private UserAppEntity user;
 
     public JobAppEntity(JobDbEntity jobDbEntity) {
         this.name = jobDbEntity.getName();
@@ -44,6 +40,7 @@ public class JobAppEntity  {
         this.projectId = jobDbEntity.getProjectId();
         this.completedEntityId = jobDbEntity.getCompletedEntityId();
         this.taskId = jobDbEntity.getTaskId();
+        this.user = new UserAppEntity(jobDbEntity.getUser());
     }
 
     public JobAppEntity() {
@@ -54,10 +51,5 @@ public class JobAppEntity  {
         JobAppEntity jobAppEntity = new JobAppEntity(jobDbEntity);
         jobAppEntity.steps = JobSteps.getJobSteps(jobDbEntity.getJobType());
         return jobAppEntity;
-    }
-
-    @JsonIgnore
-    public String getTopic() {
-        return NotificationService.getTopic(this.getId());
     }
 }

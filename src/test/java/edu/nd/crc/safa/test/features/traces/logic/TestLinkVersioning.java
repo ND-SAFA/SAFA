@@ -10,9 +10,9 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.AbstractVersionedEntityTest;
 import edu.nd.crc.safa.test.requests.FlatFileRequest;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 public class TestLinkVersioning extends AbstractVersionedEntityTest<TraceAppEntity, TraceLinkVersion> {
     static String FLAT_FILES_PATH = ProjectPaths.Resources.Tests.MINI;

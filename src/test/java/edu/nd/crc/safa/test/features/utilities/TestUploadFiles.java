@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.test.features.utilities;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;

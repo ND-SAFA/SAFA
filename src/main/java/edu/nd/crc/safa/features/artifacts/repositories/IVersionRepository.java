@@ -58,14 +58,6 @@ public interface IVersionRepository<
     List<V> retrieveVersionEntitiesByBaseIds(List<UUID> baseIds);
 
     /**
-     * Returns the list of all application entities existing in given project.
-     *
-     * @param project The project whose existing entities are retrieved.
-     * @return List of application entities
-     */
-    List<A> retrieveAppEntitiesByProject(Project project);
-
-    /**
      * Returns the version of the entity specified by entity id in given project version.
      *
      * @param projectVersion The version of the entity to retrieve.

@@ -91,7 +91,7 @@ public class MembershipController extends BaseController {
      * Create a new membership within an entity. An entity can be an organization, a team,
      * or a project.
      *
-     * @param entityId The ID of the entity
+     * @param entityId      The ID of the entity
      * @param newMembership The definition of the new membership. Only the email and role fields are read
      * @return The newly created membership
      */
@@ -117,9 +117,9 @@ public class MembershipController extends BaseController {
      * or a project. Note that due to how the back end handles roles, the modified
      * membership will actually be a new membership with a new ID.
      *
-     * @param entityId The ID of the entity
+     * @param entityId     The ID of the entity
      * @param membershipId The ID of the membership to modify
-     * @param membership The modified membership definition. Only the role field is used
+     * @param membership   The modified membership definition. Only the role field is used
      * @return The new membership entity
      */
     @PutMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
@@ -139,7 +139,7 @@ public class MembershipController extends BaseController {
      * Delete a membership within an entity. An entity can be an organization, a team,
      * or a project.
      *
-     * @param entityId The ID of the entity
+     * @param entityId     The ID of the entity
      * @param membershipId The ID of the membership to delete
      */
     @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
@@ -157,8 +157,8 @@ public class MembershipController extends BaseController {
      * or a project. Either userId or userEmail must be supplied. If both are supplied, userId takes
      * precedence.
      *
-     * @param entityId the ID of the entity
-     * @param userId The ID of the user
+     * @param entityId  the ID of the entity
+     * @param userId    The ID of the user
      * @param userEmail The email of the user
      */
     @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID)
@@ -190,10 +190,10 @@ public class MembershipController extends BaseController {
      * This is the same as {@link #transformEntity(UUID, Function, Function, Function)} except that
      * it supports functions without a return type.
      *
-     * @param entityId The ID of the entity to process.
+     * @param entityId             The ID of the entity to process.
      * @param organizationConsumer The function to apply if the entity is an organization
-     * @param teamConsumer The function to apply if the entity is a team
-     * @param projectConsumer The function to apply if the entity is a project
+     * @param teamConsumer         The function to apply if the entity is a team
+     * @param projectConsumer      The function to apply if the entity is a project
      * @throws SafaItemNotFoundError If the specified ID did not map to an organization, a team, or a project
      */
     private void consumeEntity(UUID entityId, Consumer<Organization> organizationConsumer,
@@ -215,13 +215,13 @@ public class MembershipController extends BaseController {
     }
 
     /**
-    * Modify an organization membership by removing the current role and adding a new one
-    *
-    * @param membershipId The ID of the original membership
-    * @param org The organization the membership is in
-    * @param newRole The new role to give the user. Set to null to delete the membership
-    * @return The new membership
-    */
+     * Modify an organization membership by removing the current role and adding a new one
+     *
+     * @param membershipId The ID of the original membership
+     * @param org          The organization the membership is in
+     * @param newRole      The new role to give the user. Set to null to delete the membership
+     * @return The new membership
+     */
     private OrganizationMembership modifyOrgMembership(UUID membershipId, Organization org, String newRole) {
         OrganizationMembership currentMembership = orgMembershipService.getMembershipById(membershipId);
         SafaUser member = currentMembership.getUser();
@@ -242,8 +242,8 @@ public class MembershipController extends BaseController {
      * Modify a team membership by removing the current role and adding a new one
      *
      * @param membershipId The ID of the original membership
-     * @param team The team the membership is in
-     * @param newRole The new role to give the user. Set to null to delete the membership
+     * @param team         The team the membership is in
+     * @param newRole      The new role to give the user. Set to null to delete the membership
      * @return The new membership
      */
     private TeamMembership modifyTeamMembership(UUID membershipId, Team team, String newRole) {
@@ -266,8 +266,8 @@ public class MembershipController extends BaseController {
      * Modify a project membership by removing the current role and adding a new one
      *
      * @param membershipId The ID of the original membership
-     * @param project The project the membership is in
-     * @param newRole The new role to give the user. Set to null to delete the membership
+     * @param project      The project the membership is in
+     * @param newRole      The new role to give the user. Set to null to delete the membership
      * @return The new membership
      */
     private ProjectMembership modifyProjectMembership(UUID membershipId, Project project, String newRole) {
@@ -292,11 +292,11 @@ public class MembershipController extends BaseController {
      * but all functions must return the same time (or types which are implicitly convertible
      * to the same type)
      *
-     * @param entityId The ID of the entity to process.
+     * @param entityId             The ID of the entity to process.
      * @param organizationFunction The function to apply if the entity is an organization
-     * @param teamFunction The function to apply if the entity is a team
-     * @param projectFunction The function to apply if the entity is a project
-     * @param <T> The return type of the functions
+     * @param teamFunction         The function to apply if the entity is a team
+     * @param projectFunction      The function to apply if the entity is a project
+     * @param <T>                  The return type of the functions
      * @return The result of whichever function gets called
      * @throws SafaItemNotFoundError If the specified ID did not map to an organization, a team, or a project
      */

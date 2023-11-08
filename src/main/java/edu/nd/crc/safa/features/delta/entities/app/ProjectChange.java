@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.utilities.StringUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -50,10 +50,12 @@ public class ProjectChange<T extends IAppEntity> {
 
     @JsonIgnore
     public List<UUID> getUpdatedIds() {
-        List<UUID> updatedArtifactIds = new ArrayList<>();
-        updatedArtifactIds.addAll(getIds(this.getAdded()));
-        updatedArtifactIds.addAll(getIds(this.getModified()));
-        return updatedArtifactIds;
+        return getIds(this.getModified());
+    }
+
+    @JsonIgnore
+    public List<UUID> getAddedIds() {
+        return getIds(this.getAdded());
     }
 
     @JsonIgnore

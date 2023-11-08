@@ -2,6 +2,7 @@ package edu.nd.crc.safa.test.common;
 
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -19,6 +20,7 @@ import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -75,9 +77,12 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected CustomAttributeRepository customAttributeRepository;
 
     @Autowired
+    @Getter
     protected ServiceProvider serviceProvider;
 
     @Autowired
     protected AttributeSystemServiceProvider attributeSystemServiceProvider;
 
+    @Autowired
+    protected ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
 }

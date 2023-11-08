@@ -1,28 +1,32 @@
 package edu.nd.crc.safa.config;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import javax.annotation.Resource;
 
 import edu.nd.crc.safa.authentication.AuthenticationFilter;
 import edu.nd.crc.safa.authentication.AuthorizationFilter;
+import edu.nd.crc.safa.authentication.AuthorizationService;
 import edu.nd.crc.safa.authentication.TokenService;
 
+import jakarta.servlet.DispatcherType;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
-
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Creates the authentication solution for our app including:
@@ -30,92 +34,77 @@ import org.springframework.web.cors.CorsConfiguration;
  * 2. Disabled Cross Site Request Forgery policy (TODO: Replace with some policy).
  * 3. Enabled app-wide authentication except for login and create account routes. TODO: Add forgot password route.
  */
+@AllArgsConstructor
 @Configuration
-public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class AuthenticationConfig {
+    public static final List<String> OPEN_ENDPOINTS = List.of(AppRoutes.Accounts.LOGIN,
+        AppRoutes.Accounts.CREATE_ACCOUNT,
+        AppRoutes.Accounts.FORGOT_PASSWORD,
+        AppRoutes.Accounts.RESET_PASSWORD);
 
-    private static final List<String> allowedOrigins = Arrays.asList(
-        "http://localhost:8080",
-        "http://localhost:8081",
-        "https://localhost:8080",
-        "https://localhost:8081",
-        "https://localhost.safa.ai:8080",
-        "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
-        "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
-        "https://dev.safa.ai",
-        "https://app.safa.ai",
-        "https://dev-fend.safa.ai",
-        "https://prod-fend.safa.ai"
-    );
+    private final AuthorizationService authorizationService;
+    private final TokenService tokenService;
+    private final UserDetailsService userDetailsService;
 
-    private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
-
-    @Resource
-    private UserDetailsService userDetailsService;
-
-    @Resource
-    private TokenService tokenService;
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authProvider());
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   AuthenticationManager authenticationManager)
+        throws Exception {
         http
-            // CORS
-            .cors().configurationSource(request -> {
-                CorsConfiguration cors = new CorsConfiguration();
-
-                cors.setAllowedOrigins(allowedOrigins);
-                cors.setAllowedMethods(allowedMethods);
-                cors.setAllowedHeaders(Collections.singletonList("*"));
-                cors.setAllowCredentials(true);
-                return cors;
-            })
-            .and()
-            .csrf()
-            .disable()
-            // Endpoint Settings
-            .authorizeRequests()
-            .antMatchers(
-                AppRoutes.Accounts.LOGIN,
-                AppRoutes.Accounts.CREATE_ACCOUNT,
-                AppRoutes.Accounts.FORGOT_PASSWORD,
-                AppRoutes.Accounts.RESET_PASSWORD,
-                "/websocket/**",
-                "/swagger-ui/**", // Needed to get config
-                "/v3/api-docs/**",
-                "/docs/**")
-            .permitAll()
-            .and()
-            .logout()
-            .logoutUrl(AppRoutes.Accounts.LOGOUT)
-            .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
-            .logoutSuccessHandler((a, b, c) -> {
-            })
-            .and()
-            .authorizeRequests()
-            // Close authentication settings
-            .anyRequest()
-            .authenticated()
+            .cors(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(requests -> requests
+                .requestMatchers(
+                    AppRoutes.Accounts.LOGIN,
+                    AppRoutes.Accounts.CREATE_ACCOUNT,
+                    AppRoutes.Accounts.FORGOT_PASSWORD,
+                    AppRoutes.Accounts.RESET_PASSWORD,
+                    "/swagger-ui/**", // Needed to get config
+                    "/v3/api-docs/**",
+                    "/docs/**")
+                .permitAll()
+                .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
+                .anyRequest()
+                .authenticated())
             // Authentication Filters
-            .and()
-            .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .exceptionHandling()
-            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+            .addFilter(new AuthenticationFilter(authenticationManager, tokenService))
+            .addFilter(new AuthorizationFilter(authenticationManager, authorizationService))
+            .sessionManagement((sessionManager) -> sessionManager
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(h -> h.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+        return http.build();
     }
 
     @Bean
     public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("https://localhost.safa.ai:8080");
+        config.addAllowedOriginPattern("https://app.safa.ai:8080");
+        config.addAllowedOriginPattern("https://dev.safa.ai:8080");
+        config.setAllowedHeaders(SecurityConstants.allowedCorsHeaders);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setExposedHeaders(List.of(
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Methods",
+            "Access-Control-Allow-Headers",
+            "Access-Control-Allow-Credentials",
+            "Access-Control-Max-Age"
+        ));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("*", config);
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean

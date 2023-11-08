@@ -92,7 +92,7 @@ public class ResourceBuilder {
          * Check the user has the given permission on the contained object.
          *
          * @param permission Permission to check
-         * @param user The user to check permission for
+         * @param user       The user to check permission for
          * @return This
          * @throws SafaError If the user doesn't have the permission
          */
@@ -114,7 +114,7 @@ public class ResourceBuilder {
          * Check that the user has a given permission for the held object and thrown an error if not.
          *
          * @param permission The permission to check
-         * @param user The user to check for
+         * @param user       The user to check for
          */
         protected abstract void requirePermission(Permission permission, SafaUser user) throws SafaError;
     }

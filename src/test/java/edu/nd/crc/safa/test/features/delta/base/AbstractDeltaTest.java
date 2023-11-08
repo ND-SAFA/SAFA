@@ -1,12 +1,9 @@
 package edu.nd.crc.safa.test.features.delta.base;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
 import org.javatuples.Pair;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
@@ -27,21 +24,6 @@ public abstract class AbstractDeltaTest extends ApplicationBaseTest {
         this.afterVersion = versionPair.getValue1();
     }
 
-    public void verifyArtifactInDelta(JSONObject artifactDelta,
-                                      String deltaName,
-                                      String artifactName) {
-        String artifactId = retrievalService.getId(projectName, artifactName);
-        assertThat(artifactDelta.getJSONObject(deltaName).has(artifactId)).isTrue();
-    }
-
-    public void verifyNumOfChangesInDelta(JSONObject entityDelta,
-                                          String deltaName,
-                                          int expected) {
-        String assertionTitle = String.format("# of entities %s", deltaName);
-        int nTracesAdded = entityDelta.getJSONObject(deltaName).keySet().toArray().length;
-        assertThat(nTracesAdded).as(assertionTitle).isEqualTo(expected);
-
-    }
 
     protected static class Constants {
         public static String ARTIFACT_ADDED = "D12";

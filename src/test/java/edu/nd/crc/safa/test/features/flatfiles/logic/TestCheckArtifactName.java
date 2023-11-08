@@ -8,10 +8,10 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
-import edu.nd.crc.safa.test.builders.ProjectBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
+import edu.nd.crc.safa.test.services.builders.ProjectBuilder;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONObject;

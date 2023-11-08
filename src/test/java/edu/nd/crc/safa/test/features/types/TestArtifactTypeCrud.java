@@ -2,11 +2,13 @@ package edu.nd.crc.safa.test.features.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.services.TypeService;
@@ -33,8 +35,8 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
         assertThat(retrievedEntity.getIcon()).isNotNull();
     }
 
-    protected void verifyCreationMessage(EntityChangeMessage message) {
-        verifyUpdateMessage(message);
+    protected void verifyCreationMessages(List<EntityChangeMessage> messages) {
+        verifyUpdateMessages(messages);
     }
 
     protected void updateEntity() throws Exception {
@@ -50,12 +52,13 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
         assertThat(retrievedEntity.getIcon()).isEqualTo(Constants.newIconName);
     }
 
-    protected void verifyUpdateMessage(EntityChangeMessage message) {
+    protected void verifyUpdateMessages(List<EntityChangeMessage> messages) {
+        EntityChangeMessage message = messages.get(0);
         assertThat(message.getChanges()).hasSize(1);
-        this.changeMessageVerifies.verifyTypeChange(message,
+        this.messageVerificationService.verifyTypeChange(message,
             entityId,
-            Change.Action.UPDATE);
-        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+            NotificationAction.UPDATE);
+        this.messageVerificationService.verifyUpdateLayout(message, false);
     }
 
     protected void deleteEntity(TypeAppEntity entity) throws Exception {
@@ -65,17 +68,29 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
             .deleteWithJsonObject();
     }
 
-    protected void verifyDeletionMessage(EntityChangeMessage message) {
+    protected void verifyDeletionMessages(List<EntityChangeMessage> messages) {
+        assertThat(messages).hasSize(1);
+        EntityChangeMessage message = messages.get(0);
         assertThat(message.getChanges()).hasSize(1);
-        this.changeMessageVerifies.verifyTypeChange(message,
+        this.messageVerificationService.verifyTypeChange(message,
             entityId,
-            Change.Action.DELETE);
-        this.changeMessageVerifies.verifyUpdateLayout(message, true);
+            NotificationAction.DELETE);
+        this.messageVerificationService.verifyUpdateLayout(message, true);
     }
 
     @Override
-    protected UUID getTopicId() {
-        return this.project.getProjectId();
+    protected void onPostSubscribe() throws Exception {
+        this.rootBuilder
+            .notifications(n -> n.getEntityMessage(getCurrentUser())).save("root-project-members")
+            .and()
+            .verify((s, v) -> v.notifications(n -> n.verifyMemberNotification(s.getMessage("root-project-members"),
+                List.of(currentUserName))));
+    }
+
+    @Override
+    protected List<String> getTopic() {
+        String topic = TopicCreator.getProjectTopic(this.project.getProjectId());
+        return List.of(topic);
     }
 
     protected TypeService getAppService() {

@@ -2,11 +2,11 @@ package edu.nd.crc.safa.features.generation.tgen.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
 
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

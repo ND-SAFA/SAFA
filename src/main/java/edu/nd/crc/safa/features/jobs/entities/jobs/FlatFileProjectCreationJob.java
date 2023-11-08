@@ -25,7 +25,7 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -116,7 +116,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
         projectCommitDefinition.getArtifacts().setAdded(artifactCreationResponse.getEntities());
         logger.log("%d artifacts created.", projectCommitDefinition.getArtifacts().getSize());
 
-        List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(), ProjectEntity.ARTIFACTS);
+        List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(),
+            ProjectEntityType.ARTIFACTS);
         projectCommitDefinition.getErrors().addAll(artifactErrors);
         logger.log("%d artifact errors found.", artifactCreationResponse.getErrors().size());
         printErrors(artifactCreationResponse.getErrors(), logger);
@@ -131,7 +132,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         projectCommitDefinition.getTraces().setAdded(traceCreationResponse.getEntities());
         logger.log("%d traces created.", projectCommitDefinition.getTraces().getSize());
 
-        List<CommitError> traceErrors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
+        List<CommitError> traceErrors = createErrors(traceCreationResponse.getErrors(), ProjectEntityType.TRACES);
         projectCommitDefinition.getErrors().addAll(traceErrors);
         logger.log("%d trace errors found.", traceCreationResponse.getErrors().size());
         printErrors(traceCreationResponse.getErrors(), logger);
@@ -142,13 +143,13 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     private List<CommitError> createErrors(List<String> errorMessages,
-                                           ProjectEntity projectEntity) {
+                                           ProjectEntityType projectEntityType) {
         CommitErrorRepository commitErrorRepository = this.getServiceProvider().getCommitErrorRepository();
         ProjectVersion projectVersion = this.getProjectCommitDefinition().getCommitVersion();
         return
             errorMessages
                 .stream()
-                .map(e -> new CommitError(projectVersion, e, projectEntity))
+                .map(e -> new CommitError(projectVersion, e, projectEntityType))
                 .map(commitErrorRepository::save)
                 .collect(Collectors.toList());
     }

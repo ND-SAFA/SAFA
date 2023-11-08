@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
@@ -17,6 +16,7 @@ import edu.nd.crc.safa.test.features.flatfiles.base.BaseFlatFileTest;
 import edu.nd.crc.safa.test.services.MappingTestService;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
+import jakarta.validation.constraints.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
@@ -36,11 +36,11 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     @BeforeEach
     public void setJiraAuthorization() {
-        AuthorizationSetter.setSessionAuthorization(defaultUser, serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(currentUserName, serviceProvider);
 
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();
-        credentials.setUser(currentUser);
+        credentials.setUser(getCurrentUser());
         serviceProvider.getJiraAccessCredentialsRepository().save(credentials);
 
         originalJraProjectCreationSteps = Arrays.stream(JobSteps.jiraProjectCreationSteps).toArray(String[]::new);

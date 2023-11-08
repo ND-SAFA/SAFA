@@ -3,22 +3,22 @@ package edu.nd.crc.safa.authentication;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import edu.nd.crc.safa.config.AuthenticationConfig;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -26,17 +26,13 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  * Intercepts request to resources and checks if a valid JWT is given to them.
  */
 public class AuthorizationFilter extends BasicAuthenticationFilter {
-
-    private final TokenService tokenService;
-
-    private final UserDetailsService userDetailsService;
+    private static final Logger log = LoggerFactory.getLogger(AuthorizationFilter.class);
+    private final AuthorizationService authorizationService;
 
     public AuthorizationFilter(AuthenticationManager authManager,
-                               TokenService tokenService,
-                               UserDetailsService userDetailsService) {
+                               AuthorizationService authorizationService) {
         super(authManager);
-        this.tokenService = tokenService;
-        this.userDetailsService = userDetailsService;
+        this.authorizationService = authorizationService;
     }
 
     @Override
@@ -45,6 +41,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                                     FilterChain chain) throws IOException, ServletException {
         try {
             if (request.getCookies() == null) {
+                log.info("Request contained no cookies.");
+                return;
+            }
+
+            if (AuthenticationConfig.OPEN_ENDPOINTS.contains(request.getRequestURI())) {
+                log.info("Skipping authorization filter for open endpoints.");
                 return;
             }
 
@@ -54,35 +56,25 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 .map(Cookie::getValue);
 
             if (token.isEmpty()) {
+                log.info("Authorization token was empty.");
                 return;
             }
 
-            UsernamePasswordAuthenticationToken authenticationToken = authenticate(token.get());
+            UsernamePasswordAuthenticationToken authenticationToken = authorizationService.authenticate(token.get());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } catch (UsernameNotFoundException ignored) {
             // This happens if the user has a token for a deleted account. We have code that is supposed
             // to delete the cookie, so I don't know why it sticks around, but by catching the exception
             // we can at least keep the chain from dying
+            ignored.printStackTrace();
+            log.info("Authorization token referenced deleted account.");
         } catch (ExpiredJwtException ignored) {
             // If your JWT expired, just move on and force the user to log in again
+            log.info("Authorization token has expired.");
         } catch (SafaError e) {
             e.printStackTrace();
         } finally {
             chain.doFilter(request, response);
         }
-    }
-
-    /**
-     * Parses the principal user within the JWT request token.
-     *
-     * @param token Request JWT
-     * @return Successful authorization token if successful otherwise null.
-     */
-    private UsernamePasswordAuthenticationToken authenticate(String token) throws SafaError {
-        Claims userClaims = this.tokenService.getTokenClaims(token);
-        String username = userClaims.getSubject();
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 }

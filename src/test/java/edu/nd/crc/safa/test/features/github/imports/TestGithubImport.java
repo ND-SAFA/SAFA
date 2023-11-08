@@ -20,7 +20,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.github.base.AbstractGithubGraphqlTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
-import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.services.requests.CommonProjectRequests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
     @BeforeEach
     public void setup() {
         GithubAccessCredentials credentials = new GithubAccessCredentials();
-        credentials.setUser(currentUser);
+        credentials.setUser(getCurrentUser());
         String accessToken = "testAccessToken";
         credentials.setAccessToken(accessToken);
         serviceProvider.getGithubAccessCredentialsRepository().save(credentials);
@@ -86,14 +86,14 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
         assertLayout(githubProject.getProject(), "GitHub File");
 
-        List<JobAppEntity> jobs = CommonRequestService.Project.getProjectJobs(githubProject.getProject());
+        List<JobAppEntity> jobs = CommonProjectRequests.getProjectJobs(githubProject.getProject());
         Assertions.assertEquals(1, jobs.size());
     }
 
     private void assertLayout(Project project, String typeName) {
         AttributeLayoutService layoutService = serviceProvider.getAttributeLayoutService();
         ProjectVersion version = serviceProvider.getVersionService().getProjectVersions(project).get(0);
-        List<AttributeLayoutAppEntity> layouts = layoutService.getAppEntities(version, currentUser);
+        List<AttributeLayoutAppEntity> layouts = layoutService.getAppEntities(version, getCurrentUser());
         Assertions.assertEquals(1, layouts.size());
 
         AttributeLayoutAppEntity layout = layouts.get(0);

@@ -23,14 +23,17 @@ class TestBackwardComparisons extends AbstractDeltaTest {
 
         // VP - Verify that artifact changes are flipped
         JSONObject artifactDelta = projectDelta.getJSONObject("artifacts");
-        verifyArtifactInDelta(artifactDelta, "modified", Constants.ARTIFACT_MODIFIED);
-        verifyArtifactInDelta(artifactDelta, "added", Constants.ARTIFACT_REMOVED);
-        verifyArtifactInDelta(artifactDelta, "removed", Constants.ARTIFACT_ADDED);
+        assertionService.verifyArtifactInDelta(retrievalService, projectName, artifactDelta, "modified",
+            Constants.ARTIFACT_MODIFIED);
+        assertionService.verifyArtifactInDelta(retrievalService, projectName, artifactDelta, "added",
+            Constants.ARTIFACT_REMOVED);
+        assertionService.verifyArtifactInDelta(retrievalService, projectName, artifactDelta, "removed",
+            Constants.ARTIFACT_ADDED);
 
         // VP -
         JSONObject traceDelta = projectDelta.getJSONObject("traces");
-        verifyNumOfChangesInDelta(traceDelta, "added", Constants.N_TRACES_ADDED);
-        verifyNumOfChangesInDelta(traceDelta, "modified", Constants.N_TRACES_MODIFIED);
-        verifyNumOfChangesInDelta(traceDelta, "removed", Constants.N_TRACES_REMOVED);
+        assertionService.verifyNumOfChangesInDelta(traceDelta, "added", Constants.N_TRACES_ADDED);
+        assertionService.verifyNumOfChangesInDelta(traceDelta, "modified", Constants.N_TRACES_MODIFIED);
+        assertionService.verifyNumOfChangesInDelta(traceDelta, "removed", Constants.N_TRACES_REMOVED);
     }
 }

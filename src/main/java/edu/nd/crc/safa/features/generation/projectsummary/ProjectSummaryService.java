@@ -56,8 +56,8 @@ public class ProjectSummaryService {
             }
         } else {
             Map<String, Boolean> kwargs = new HashMap<>();
-            kwargs.put("do_resummarize_project", !hasCodeSummaries);
-            kwargs.put("summarize_artifacts", !hasCodeSummaries);
+            kwargs.put("do_resummarize_project", true);
+            kwargs.put("do_resummarize_artifacts", true);
             logger.log(String.format("Kwargs: %s", kwargs));
             ProjectSummaryResponse summarizationResponse = this.summarizeProject(artifacts, kwargs, logger);
 
@@ -118,9 +118,6 @@ public class ProjectSummaryService {
     }
 
     private void saveProjectSummary(Project project, String projectSummary, JobLogger logger) {
-        if (project.getDescription().isEmpty()) {
-            project.setDescription(projectSummary);
-        }
         project.setSpecification(projectSummary);
         this.projectRepository.save(project);
         logger.log("Project summary (%s) was saved.", projectSummary.length());

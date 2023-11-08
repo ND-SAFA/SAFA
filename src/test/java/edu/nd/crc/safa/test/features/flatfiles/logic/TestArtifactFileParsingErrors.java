@@ -26,16 +26,16 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
 
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-                .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
-                .withVersion(version)
-                .getFlatFileHelper()
-                .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST2,
-                    MockMvcResultMatchers.status().isBadRequest(),
-                    new JSONObject());
+            .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+            .withVersion(version)
+            .getFlatFileHelper()
+            .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST2,
+                MockMvcResultMatchers.status().isBadRequest(),
+                new JSONObject());
 
         // VP - Verify that message contains constraint
         String message = responseBody.getString("message").toLowerCase();
-        assertThat(message).matches("unknown artifact type: requirements");
+        assertThat(message).contains("unknown artifact type: requirements");
     }
 
     @Test
@@ -45,10 +45,10 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
 
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-                .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
-                .withVersion(version)
-                .getFlatFileHelper()
-                .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST3, new JSONObject());
+            .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+            .withVersion(version)
+            .getFlatFileHelper()
+            .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST3, new JSONObject());
 
         // VP - Verify that message contains artifact that failed constraint
         JSONObject errors = responseBody.getJSONObject("errors");

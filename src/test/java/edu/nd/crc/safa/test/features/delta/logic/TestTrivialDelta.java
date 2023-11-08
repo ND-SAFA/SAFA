@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.features.delta.base.AbstractDeltaTest;
+import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import org.javatuples.Pair;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that changes made in future version do not affect past ones.
  */
-class TestTrivialDelta extends AbstractDeltaTest {
+class TestTrivialDelta extends ApplicationBaseTest {
 
     @Test
     void testComparisonAgainstSameVersion() throws Exception {
@@ -44,9 +44,9 @@ class TestTrivialDelta extends AbstractDeltaTest {
         // VP - Verify that no changes are detected in artifacts
         for (String entityName : List.of("artifacts", "traces")) {
             JSONObject entityDelta = projectDelta.getJSONObject(entityName);
-            verifyNumOfChangesInDelta(entityDelta, "added", 0);
-            verifyNumOfChangesInDelta(entityDelta, "removed", 0);
-            verifyNumOfChangesInDelta(entityDelta, "modified", 0);
+            assertionService.verifyNumOfChangesInDelta(entityDelta, "added", 0);
+            assertionService.verifyNumOfChangesInDelta(entityDelta, "removed", 0);
+            assertionService.verifyNumOfChangesInDelta(entityDelta, "modified", 0);
         }
     }
 }

@@ -1,14 +1,11 @@
 package edu.nd.crc.safa.features.notifications.services;
 
-import java.util.UUID;
-
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
+import edu.nd.crc.safa.features.notifications.builders.AbstractEntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -16,52 +13,32 @@ import org.springframework.stereotype.Service;
 /**
  * Responsible for sending notifications to subscribers of certain topics.
  */
+@AllArgsConstructor
 @Service
 @Scope("singleton")
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final SafaUserService safaUserService;
-
-    @Autowired
-    public NotificationService(SimpMessagingTemplate template, SafaUserService safaUserService) {
-        this.messagingTemplate = template;
-        this.safaUserService = safaUserService;
-    }
-
-    /**
-     * Returns topic for given entity id.
-     *
-     * @param id ID of the entity to subs
-     * @return {@link String} representing topic destination
-     */
-    public static String getTopic(UUID id) {
-        return String.format("/topic/%s", id);
-    }
-
-    /**
-     * Broadcasts change in given builder.
-     *
-     * @param builder Builder for {@link edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage} to send.
-     */
-    public void broadcastChange(EntityChangeBuilder builder) {
-        SafaUser safaUser = this.safaUserService.getCurrentUser();
-        broadcastChangeToUser(builder, safaUser);
-    }
 
     /**
      * Broadcasts change in given builder to a given user.
      *
      * @param builder Builder for {@link edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage} to send.
-     * @param user    User to send message to
      */
-    public void broadcastChangeToUser(EntityChangeBuilder builder, SafaUser user) {
-        EntityChangeMessage message = builder.get(user.getEmail());
-        this.broadcastObject(builder.getTopic(), message);
+    public void broadcastChange(AbstractEntityChangeBuilder builder) {
+        EntityChangeMessage message = builder.getEntityChangeMessage();
+        String topic = message.getTopic();
+        this.broadcastObject(topic, message);
     }
 
-    public void broadcastJob(JobAppEntity jobAppEntity) {
-        this.broadcastObject(jobAppEntity.getTopic(), jobAppEntity);
+    /**
+     * Publishes job to its topic.
+     *
+     * @param jobAppEntity The job to publish.
+     */
+    public void sendJob(JobAppEntity jobAppEntity) {
+        String jobTopic = TopicCreator.getJobTopic(jobAppEntity.getId());
+        this.broadcastObject(jobTopic, jobAppEntity);
     }
 
     /**

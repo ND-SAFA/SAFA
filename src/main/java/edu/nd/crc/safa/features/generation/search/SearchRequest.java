@@ -3,9 +3,9 @@ package edu.nd.crc.safa.features.generation.search;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.layout.entities.api.LayoutGenerationResponseDTO;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.builders.ProjectVersionChangeBuilder;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -33,9 +34,9 @@ public class LayoutController extends BaseController {
                                                    @RequestBody LayoutGenerationRequestDTO layoutGeneration) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         LayoutManager layoutManager = new LayoutManager(getServiceProvider(), projectVersion, user);
-        EntityChangeBuilder notificationBuilder = EntityChangeBuilder.create(versionId);
+        ProjectVersionChangeBuilder notificationBuilder = EntityChangeBuilder.create(user, projectVersion);
         LayoutGenerationResponseDTO response = new LayoutGenerationResponseDTO();
 
         if (layoutGeneration.isDefaultDocument()) {
@@ -44,14 +45,18 @@ public class LayoutController extends BaseController {
             notificationBuilder.withUpdateLayout();
         }
 
+        getServiceProvider().getNotificationService().broadcastChange(notificationBuilder);
+
         for (UUID documentId : layoutGeneration.getDocumentIds()) {
             Document document = getServiceProvider().getDocumentService().getDocumentById(documentId);
             Map<UUID, LayoutPosition> documentLayout = layoutManager.generateDocumentLayout(document);
             response.addDocumentLayout(documentId, documentLayout);
         }
-        notificationBuilder.withDocumentUpdate(layoutGeneration.getDocumentIds());
+        getServiceProvider().getNotificationService().broadcastChange(
+            EntityChangeBuilder
+                .create(user, projectVersion.getProject())
+                .withDocumentUpdate(layoutGeneration.getDocumentIds()));
 
-        getServiceProvider().getNotificationService().broadcastChange(notificationBuilder);
         return response;
     }
 }

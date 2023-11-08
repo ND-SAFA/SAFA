@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.test.features.artifacts.base;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -7,17 +10,19 @@ import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<ArtifactAppEntity> {
     ArtifactAppEntity artifact = getStartingArtifact();
 
     @Override
-    protected UUID getTopicId() {
-        return this.projectVersion.getVersionId();
+    protected List<String> getTopic() {
+        String topic = TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
+        return List.of(topic);
     }
 
     @Override
@@ -27,7 +32,12 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected UUID createEntity() throws Exception {
-        dbEntityBuilder.newCustomAttribute(projectName, CustomAttributeType.TEXT, "key", "key");
+        this.rootBuilder
+            .request(r -> r.project()
+                .createCustomAttribute("project", c -> c
+                    .withKeyName("key")
+                    .withLabel("key")
+                    .withType(CustomAttributeType.TEXT)));
 
         ProjectCommitDefinition commit = commitService
             .commit(CommitBuilder
@@ -45,8 +55,13 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     }
 
     @Override
-    protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        verifyArtifactMessage(creationMessage, Change.Action.UPDATE, true);
+    protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
+        assertThat(creationMessages).hasSize(2);
+        EntityChangeMessage typeCreationMessage = creationMessages.get(0);
+        rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(typeCreationMessage, artifact.getType())));
+        EntityChangeMessage artifactCreationMessage = creationMessages.get(1);
+        verifyArtifactMessage(artifactCreationMessage, NotificationAction.UPDATE, true);
     }
 
     @Override
@@ -64,12 +79,13 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     }
 
     @Override
-    protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        verifyArtifactMessage(updateMessage, Change.Action.UPDATE, false);
+    protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
+        assertThat(updateMessages).hasSize(1);
+        verifyArtifactMessage(updateMessages.get(0), NotificationAction.UPDATE, false);
     }
 
     @Override
-    protected void deleteEntity(ArtifactAppEntity entity) throws Exception {
+    protected void deleteEntity(ArtifactAppEntity entity) {
         commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
@@ -77,16 +93,21 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     }
 
     @Override
-    protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        verifyArtifactMessage(deletionMessage, Change.Action.DELETE, true);
+    protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
+        assertThat(deletionMessages).hasSize(2);
+        EntityChangeMessage typeUpdateMessage = deletionMessages.get(0);
+        this.rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(typeUpdateMessage, artifact.getType())));
+        EntityChangeMessage deletionMessage = deletionMessages.get(1);
+        verifyArtifactMessage(deletionMessage, NotificationAction.DELETE, true);
     }
 
     private void verifyArtifactMessage(EntityChangeMessage message,
-                                       Change.Action action,
+                                       NotificationAction action,
                                        boolean updateLayout) {
-        this.changeMessageVerifies.verifyArtifactMessage(message, entityId, action);
-        this.changeMessageVerifies.verifyWarningMessage(message);
-        this.changeMessageVerifies.verifyUpdateLayout(message, updateLayout);
+        this.messageVerificationService.verifyArtifactMessage(message, entityId, action);
+        this.messageVerificationService.verifyWarningMessage(message);
+        this.messageVerificationService.verifyUpdateLayout(message, updateLayout);
     }
 
     /**

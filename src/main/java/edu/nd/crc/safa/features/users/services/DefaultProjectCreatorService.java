@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 
 import lombok.AllArgsConstructor;
@@ -14,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @Service
 public class DefaultProjectCreatorService {
-    private final FlatFileService flatFileService;
-
     /**
      * Creates project from flat files of project directory for user.
      *

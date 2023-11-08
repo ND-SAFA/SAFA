@@ -4,16 +4,6 @@ import static java.lang.Math.round;
 
 import java.sql.Timestamp;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
@@ -21,12 +11,23 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Responsible for storing the information needed to create jobs.
@@ -55,7 +56,7 @@ public class JobDbEntity {
      */
     @Id
     @GeneratedValue
-    @Type(type = "uuid-char")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "id")
     @NotNull
     private UUID id;
@@ -63,6 +64,7 @@ public class JobDbEntity {
      * The status of the job.
      */
     @NotNull
+    @JdbcTypeCode(SqlTypes.INTEGER)
     @Column(name = "status", nullable = false)
     private JobStatus status;
     /**
@@ -103,14 +105,16 @@ public class JobDbEntity {
         name = "user_id",
         nullable = false)
     private SafaUser user;
+    @Nullable
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "project_id")
     private Project project;
     @Column(name = "completed_entity_id")
-    @Type(type = "uuid-char")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID completedEntityId;
 
+    @JdbcTypeCode(SqlTypes.BINARY)
     @Column(name = "task_id", nullable = true)
     private UUID taskId;
 

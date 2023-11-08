@@ -20,17 +20,17 @@ import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class TestSubtreeGeneration extends ApplicationBaseTest {
+class TestSubtreeGeneration extends ApplicationBaseTest {
 
     @Autowired
     private ProjectRetrievalService projectRetrievalService;
 
     @Test
-    public void testSubtreeGeneration() {
+    void testSubtreeGeneration() {
         String typeName = "type";
         ProjectVersion version = dbEntityBuilder.newProject(projectName)
-                .newType(projectName, typeName)
-                .newVersionWithReturn(projectName);
+            .newType(projectName, typeName)
+            .newVersionWithReturn(projectName);
 
         Artifact middle = dbEntityBuilder.newArtifactWithReturn(projectName, typeName, "middle");
         Artifact parent1 = dbEntityBuilder.newArtifactWithReturn(projectName, typeName, "parent1");
@@ -45,15 +45,15 @@ public class TestSubtreeGeneration extends ApplicationBaseTest {
         UUID child2Id = child2.getArtifactId();
 
         dbEntityBuilder.newArtifactBody(projectName, 0, "middle", "", "")
-                .newArtifactBody(projectName, 0, "parent1", "", "")
-                .newArtifactBody(projectName, 0, "parent2", "", "")
-                .newArtifactBody(projectName, 0, "child1", "", "")
-                .newArtifactBody(projectName, 0, "child2", "", "");
+            .newArtifactBody(projectName, 0, "parent1", "", "")
+            .newArtifactBody(projectName, 0, "parent2", "", "")
+            .newArtifactBody(projectName, 0, "child1", "", "")
+            .newArtifactBody(projectName, 0, "child2", "", "");
 
         dbEntityBuilder.newTraceLink(projectName, child1.getName(), middle.getName(), 0)
-                .newTraceLink(projectName, child2.getName(), middle.getName(), 0)
-                .newTraceLink(projectName, middle.getName(), parent1.getName(), 0)
-                .newTraceLink(projectName, middle.getName(), parent2.getName(), 0);
+            .newTraceLink(projectName, child2.getName(), middle.getName(), 0)
+            .newTraceLink(projectName, middle.getName(), parent1.getName(), 0)
+            .newTraceLink(projectName, middle.getName(), parent2.getName(), 0);
 
         TraceLinkVersion hiddenLink1 = dbEntityBuilder
             .newTraceLinkWithReturn(projectName, parent1.getName(), middle.getName(), 0);
@@ -65,7 +65,7 @@ public class TestSubtreeGeneration extends ApplicationBaseTest {
         hiddenLink2.setApprovalStatus(ApprovalStatus.DECLINED);
         traceLinkVersionRepository.saveAll(List.of(hiddenLink1, hiddenLink2));
 
-        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(getCurrentUser(), version);
         Map<UUID, SubtreeAppEntity> subtrees = project.getSubtrees();
 
         assertEquals(5, subtrees.size());

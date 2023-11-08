@@ -17,10 +17,13 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
@@ -29,34 +32,31 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Implements custom any custom artifact repository logic.
  */
 public class ArtifactVersionRepositoryImpl
     extends GenericVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity> {
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ArtifactVersionRepository artifactVersionRepository;
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private ArtifactRepository artifactRepository;
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private TypeService artifactTypeService;
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private DocumentArtifactRepository documentArtifactRepository;
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private DocumentRepository documentRepository;
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private AttributeValueService attributeValueService;
-
-    @Autowired
+    @Setter(onMethod = @__({@Autowired}))
     private ArtifactTypeCountService typeCountService;
+    @Setter(onMethod = @__({@Autowired}))
+    private NotificationService notificationService;
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
@@ -94,8 +94,8 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    protected ProjectEntity getProjectActivity() {
-        return ProjectEntity.ARTIFACTS;
+    protected ProjectEntityType getProjectActivity() {
+        return ProjectEntityType.ARTIFACTS;
     }
 
     @Override
@@ -104,7 +104,6 @@ public class ArtifactVersionRepositoryImpl
                                                   SafaUser user) throws SafaError {
         Artifact artifact = createOrUpdateArtifactFromAppEntity(projectVersion.getProject(), artifactAppEntity, user);
         artifactAppEntity.setId(artifactAppEntity.getId());
-
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
         return artifact;
     }
@@ -184,6 +183,13 @@ public class ArtifactVersionRepositoryImpl
             }
 
             typeCountService.save(typeCount);
+
+            TypeAppEntity typeAppEntity = new TypeAppEntity(type);
+            typeAppEntity.setCount(typeCount.getCount());
+            
+            notificationService
+                .broadcastChange(EntityChangeBuilder.create(user, projectVersion)
+                    .withTypeUpdate(typeAppEntity));
         }
     }
 

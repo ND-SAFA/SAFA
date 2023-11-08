@@ -36,7 +36,7 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
 
     private OrganizationAppEntity createdOrg;
 
-    @Test  
+    @Test
     public void testOrganizationCrud() throws Exception {
         testDefaultOrganization();
         testCreateOrganization();
@@ -48,16 +48,18 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
     private void testDefaultOrganization() throws Exception {
         List<OrganizationAppEntity> userOrgs =
             SafaRequest.withRoute(AppRoutes.Organizations.ROOT)
-                .getAsType(new TypeReference<>(){});
+                .getAsType(new TypeReference<>() {
+                });
 
         assertEquals(1, userOrgs.size());
         OrganizationAppEntity org = userOrgs.get(0);
-        assertOrg(org, currentUser.getEmail(), "");
+        assertOrg(org, getCurrentUser().getEmail(), "");
         assertTrue(org.isPersonalOrg());
 
         OrganizationAppEntity personalOrg =
             SafaRequest.withRoute(AppRoutes.Organizations.SELF)
-                .getAsType(new TypeReference<>(){});
+                .getAsType(new TypeReference<>() {
+                });
         assertEquals(org, personalOrg);
     }
 
@@ -68,7 +70,7 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
         List<MembershipAppEntity> memberships = org.getMembers();
         assertEquals(1, memberships.size());
         MembershipAppEntity membership = memberships.get(0);
-        assertEquals(currentUser.getEmail(), membership.getEmail());
+        assertEquals(getCurrentUser().getEmail(), membership.getEmail());
         assertEquals(MembershipType.ORGANIZATION, membership.getEntityType());
         assertEquals(OrganizationRole.ADMIN.name(), membership.getRole());
         assertEquals(org.getId(), membership.getEntityId());
@@ -81,7 +83,7 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
         List<MembershipAppEntity> teamMemberships = team.getMembers();
         assertEquals(1, teamMemberships.size());
         MembershipAppEntity teamMembership = teamMemberships.get(0);
-        assertEquals(currentUser.getEmail(), teamMembership.getEmail());
+        assertEquals(getCurrentUser().getEmail(), teamMembership.getEmail());
         assertEquals(MembershipType.TEAM, teamMembership.getEntityType());
         assertEquals(TeamRole.ADMIN.name(), teamMembership.getRole());
         assertEquals(team.getId(), teamMembership.getEntityId());
@@ -90,7 +92,8 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
     private void testCreateOrganization() throws Exception {
         createdOrg =
             SafaRequest.withRoute(AppRoutes.Organizations.ROOT)
-                .postAndParseResponse(orgDefinition, new TypeReference<>(){});
+                .postAndParseResponse(orgDefinition, new TypeReference<>() {
+                });
 
         assertNotNull(createdOrg.getId());
         assertOrg(createdOrg, orgDefinition.getName(), orgDefinition.getDescription());
@@ -101,7 +104,8 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
         OrganizationAppEntity org =
             SafaRequest.withRoute(AppRoutes.Organizations.BY_ID)
                 .withOrgId(createdOrg.getId())
-                .getAsType(new TypeReference<>(){});
+                .getAsType(new TypeReference<>() {
+                });
 
         assertEquals(createdOrg, org);
     }
@@ -110,7 +114,8 @@ public class TestOrganizationCrud extends ApplicationBaseTest {
         OrganizationAppEntity updatedOrg =
             SafaRequest.withRoute(AppRoutes.Organizations.BY_ID)
                 .withOrgId(createdOrg.getId())
-                .putAndParseResponse(updatedOrgDefinition, new TypeReference<>(){});
+                .putAndParseResponse(updatedOrgDefinition, new TypeReference<>() {
+                });
 
         assertEquals(updatedOrgDefinition.getName(), updatedOrg.getName());
         assertEquals(updatedOrgDefinition.getDescription(), updatedOrg.getDescription());

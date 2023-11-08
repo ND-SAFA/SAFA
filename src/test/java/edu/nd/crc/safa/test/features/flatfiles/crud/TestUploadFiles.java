@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.test.features.flatfiles.crud;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ class TestUploadFiles extends ApplicationBaseTest {
 
         //Cleanup
         this.projectVersionRepository.delete(projectVersion);
-        projectService.deleteProject(project);
+        projectService.deleteProject(getCurrentUser(), project);
         File oldStorage = new File(ProjectPaths.Storage.projectUploadsPath(project, false));
         assertThat(oldStorage).as("delete project storage").doesNotExist();
     }

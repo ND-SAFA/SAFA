@@ -1,11 +1,10 @@
 package edu.nd.crc.safa.test.features.notifications;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
 
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -21,25 +20,16 @@ public abstract class AbstractNotificationTest extends AbstractSharingTest {
     /**
      * Verifies correctness of sharee message.
      *
-     * @param message Message as a result of performing action.
+     * @param messages Messages as a result of performing action.
      */
-    protected abstract void verifyShareeMessage(EntityChangeMessage message);
+    protected abstract void verifyShareeMessages(List<EntityChangeMessage> messages);
 
     @Test
-    @Disabled("Fails due to intercepting a message not meant for it")
     public void notificationTest() throws Exception {
         // Step - Perform action with default user
         performAction();
 
-        // VP - Verify that single message sent
-        assertThat(notificationService.getQueueSize(Sharee.email))
-            .as("single message for flat file upload")
-            .isEqualTo(1);
-
         // Step - Retrieve action message
-        EntityChangeMessage actionMessage = this.notificationService.getNextMessage(Sharee.email);
-
-        // VP - Verify message correctness
-        verifyShareeMessage(actionMessage);
+        this.rootBuilder.notifications(n -> n.getMessages(sharee)).consume(this::verifyShareeMessages);
     }
 }

@@ -27,7 +27,7 @@ class TestDeleteAccount extends ApplicationBaseTest {
     @Test
     void testDeleteAccount() throws Exception {
         // VP - Verify account exists
-        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(defaultUser);
+        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(currentUserName);
         assertThat(safaUserOptional).isPresent();
 
         // Step 2 - Delete account
@@ -38,7 +38,7 @@ class TestDeleteAccount extends ApplicationBaseTest {
             .postWithJsonObject(userJson);
 
         // VP - Verify account does not exist
-        safaUserOptional = this.safaUserRepository.findByEmail(defaultUser);
+        safaUserOptional = this.safaUserRepository.findByEmail(currentUserName);
         assertThat(safaUserOptional).isEmpty();
     }
 }

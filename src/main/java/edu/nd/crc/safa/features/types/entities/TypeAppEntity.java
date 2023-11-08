@@ -6,26 +6,38 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The front-end model of an artifact type
  */
+@NoArgsConstructor
 @Data
 public class TypeAppEntity implements IAppEntity {
 
-    /** ID of artifact type */
+    /**
+     * ID of artifact type
+     */
     private UUID typeId;
 
-    /** Name of artifact type */
+    /**
+     * Name of artifact type
+     */
     private String name;
 
-    /** Icon representing artifact type */
+    /**
+     * Icon representing artifact type
+     */
     private String icon;
 
-    /** Color that should be used for this type */
+    /**
+     * Color that should be used for this type
+     */
     private String color;
 
-    /** Number of artifacts of this type in the current project version. If the version is unknown, this is -1 */
+    /**
+     * Number of artifacts of this type in the current project version. If the version is unknown, this is -1
+     */
     private int count;
 
     public TypeAppEntity(ArtifactType artifactType) {

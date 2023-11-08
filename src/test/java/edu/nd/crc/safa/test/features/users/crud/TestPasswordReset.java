@@ -46,7 +46,8 @@ public class TestPasswordReset extends ApplicationBaseTest {
 
     @BeforeEach
     @Override
-    public void testSetup() throws Exception {
+    public void initTestResources() throws Exception {
+        super.initTestResources();
         Mockito.doNothing().when(emailService).send(
             Mockito.anyString(),
             Mockito.anyString(),
@@ -54,11 +55,11 @@ public class TestPasswordReset extends ApplicationBaseTest {
 
         tokenRepository.deleteAll();
         closeable = MockitoAnnotations.openMocks(this);
-        super.testSetup();
     }
 
     @AfterEach
     public void destroy() throws Exception {
+        super.clearData();
         if (closeable != null) {
             closeable.close();
         }
@@ -82,8 +83,8 @@ public class TestPasswordReset extends ApplicationBaseTest {
     }
 
     @Test
-    public void testPasswordIsChanged() throws Exception {
-        authorizationService.createUser(testEmail, testPassword);
+    void testPasswordIsChanged() throws Exception {
+        this.rootBuilder.authorize(a -> a.createUser(testEmail, testPassword));
 
         String newPassword = "newPassword";
         SafaUser storedUser = issueForgetPasswordCall();

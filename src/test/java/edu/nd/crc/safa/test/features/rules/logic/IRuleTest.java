@@ -6,7 +6,7 @@ import java.util.Map;
 import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.DbEntityBuilder;
+import edu.nd.crc.safa.test.services.builders.DbEntityBuilder;
 
 /**
  * Responsible for creating interface for testing a rule.
@@ -27,7 +27,7 @@ public interface IRuleTest {
      * Creates entities to violate rules.
      *
      * @param projectVersion T
-     * @param entityBuilder The db entity builder
+     * @param entityBuilder  The db entity builder
      */
     void createViolatingRuleEntities(ProjectVersion projectVersion,
                                      DbEntityBuilder entityBuilder);

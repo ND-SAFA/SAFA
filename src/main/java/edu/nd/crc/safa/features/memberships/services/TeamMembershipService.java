@@ -7,9 +7,12 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
 import edu.nd.crc.safa.features.memberships.repositories.TeamMembershipRepository;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -32,7 +35,7 @@ public class TeamMembershipService {
      */
     public TeamMembership addUserRole(SafaUser user, Team team, TeamRole role) {
         Optional<TeamMembership> membershipOptional =
-                teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
+            teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
 
         return membershipOptional.orElseGet(() -> {
             TeamMembership newMembership = new TeamMembership(user, team, role);
@@ -50,7 +53,7 @@ public class TeamMembershipService {
      */
     public void removeUserRole(SafaUser user, Team team, TeamRole role) {
         Optional<TeamMembership> membershipOptional =
-                teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
+            teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
 
         membershipOptional.ifPresent(teamMembershipRepo::delete);
     }
@@ -64,8 +67,8 @@ public class TeamMembershipService {
      */
     public List<TeamRole> getUserRoles(SafaUser user, Team team) {
         return teamMembershipRepo.findByUserAndTeam(user, team).stream()
-                .map(TeamMembership::getRole)
-                .collect(Collectors.toUnmodifiableList());
+            .map(TeamMembership::getRole)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -76,9 +79,9 @@ public class TeamMembershipService {
      */
     public List<Team> getUserTeams(SafaUser user) {
         return teamMembershipRepo.findByUser(user)
-                .stream()
-                .map(TeamMembership::getTeam)
-                .collect(Collectors.toList());
+            .stream()
+            .map(TeamMembership::getTeam)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -99,10 +102,10 @@ public class TeamMembershipService {
      */
     public List<SafaUser> getUsersInTeam(Team team) {
         return getTeamMemberships(team)
-                .stream()
-                .map(TeamMembership::getUser)
-                .distinct()
-                .collect(Collectors.toUnmodifiableList());
+            .stream()
+            .map(TeamMembership::getUser)
+            .distinct()
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -126,5 +129,26 @@ public class TeamMembershipService {
     public TeamMembership getMembershipById(UUID membershipId) {
         return getMembershipOptionalById(membershipId)
             .orElseThrow(() -> new SafaItemNotFoundError("No membership found with the specified ID"));
+    }
+
+    /**
+     * Returns the team members of the project.
+     *
+     * @param project Project whose members are returned.
+     * @return List of team members with access to the project.
+     */
+    public List<MembershipAppEntity> getProjectMemberships(Project project) {
+        Team owningTeam = project.getOwningTeam();
+        List<TeamMembership> teamMembers = this.getTeamMemberships(owningTeam);
+        return teamMembers
+            .stream()
+            .map(m -> {
+                MembershipAppEntity membershipAppEntity = new MembershipAppEntity();
+                membershipAppEntity.setEntityType(MembershipType.TEAM);
+                membershipAppEntity.setEntityId(owningTeam.getId());
+                membershipAppEntity.setEmail(m.getEmail());
+                membershipAppEntity.setRole(m.getRoleAsString());
+                return membershipAppEntity;
+            }).collect(Collectors.toList());
     }
 }

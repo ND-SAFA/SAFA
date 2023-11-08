@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.notifications.entities.Change;
-import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.features.notifications.AbstractNotificationTest;
 
 import org.json.JSONObject;
@@ -24,13 +23,14 @@ public abstract class AbstractDocumentNotificationTest extends AbstractNotificat
 
     protected void createDocumentAndVerifyMessage() throws Exception {
         this.createDocument();
-        EntityChangeMessage message = this.notificationService.getNextMessage(Sharee.email);
-        this.changeMessageVerifies.verifyDocumentChange(
-            message,
-            this.documentId,
-            Change.Action.UPDATE
-        );
-        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+        this.rootBuilder.notifications((s, n) -> n.getEntityMessage(s.getIUser("sharee-user"))).consume(m -> {
+            this.messageVerificationService.verifyDocumentChange(
+                m,
+                this.documentId,
+                NotificationAction.UPDATE
+            );
+            this.messageVerificationService.verifyUpdateLayout(m, false);
+        });
     }
 
     protected void createDocument() throws Exception {

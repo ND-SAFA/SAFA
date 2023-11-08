@@ -1,9 +1,8 @@
 package edu.nd.crc.safa.config;
 
-import javax.annotation.PostConstruct;
-
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

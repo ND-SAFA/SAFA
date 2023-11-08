@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.test.features.memberships.crud;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TestProjectMemberCrud extends ApplicationBaseTest {
+class TestProjectMemberCrud extends ApplicationBaseTest {
 
     private static final String otherEmail = "email@email.com";
     private static final String otherPassword = "password";
@@ -32,7 +33,7 @@ public class TestProjectMemberCrud extends ApplicationBaseTest {
     }
 
     @Test
-    public void testProjectMemberCrud() throws Exception {
+    void testProjectMemberCrud() throws Exception {
         testCreateMembership();
         testRetrieveMembership();
         testUpdateMembership();
@@ -46,7 +47,8 @@ public class TestProjectMemberCrud extends ApplicationBaseTest {
         newMembership =
             SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
                 .withEntityId(project.getProjectId())
-                .postAndParseResponse(membershipDefinition, new TypeReference<>(){});
+                .postAndParseResponse(membershipDefinition, new TypeReference<>() {
+                });
 
         assertMembership(newMembership, otherRole);
     }
@@ -55,9 +57,10 @@ public class TestProjectMemberCrud extends ApplicationBaseTest {
         List<MembershipAppEntity> memberships =
             SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
                 .withEntityId(project.getProjectId())
-                .getAsType(new TypeReference<>(){});
+                .getAsType(new TypeReference<>() {
+                });
 
-        assertThat(memberships.size()).isEqualTo(1);
+        assertThat(memberships).hasSize(1);
         assertThat(memberships.get(0)).isEqualTo(newMembership);
     }
 
@@ -68,7 +71,8 @@ public class TestProjectMemberCrud extends ApplicationBaseTest {
             SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
                 .withEntityId(project.getProjectId())
                 .withMembershipId(newMembership.getId())
-                .putAndParseResponse(updatedMembershipDefinition, new TypeReference<>(){});
+                .putAndParseResponse(updatedMembershipDefinition, new TypeReference<>() {
+                });
 
         assertMembership(newMembership, secondRole);
     }
@@ -91,9 +95,10 @@ public class TestProjectMemberCrud extends ApplicationBaseTest {
         List<MembershipAppEntity> memberships =
             SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
                 .withEntityId(project.getProjectId())
-                .getAsType(new TypeReference<>(){});
+                .getAsType(new TypeReference<>() {
+                });
 
-        assertThat(memberships.size()).isEqualTo(0);
+        assertThat(memberships).isEmpty();
     }
 
     private void testDeleteAllMemberships() throws Exception {
@@ -107,25 +112,29 @@ public class TestProjectMemberCrud extends ApplicationBaseTest {
         List<MembershipAppEntity> memberships =
             SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
                 .withEntityId(project.getProjectId())
-                .getAsType(new TypeReference<>(){});
-        assertThat(memberships.size()).isEqualTo(0);
+                .getAsType(new TypeReference<>() {
+                });
+        assertThat(memberships).isEmpty();
     }
 
     private void createTwoMemberships() throws Exception {
         MembershipAppEntity membershipDefinition = new MembershipAppEntity(otherEmail, otherRole);
         SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
             .withEntityId(project.getProjectId())
-            .postAndParseResponse(membershipDefinition, new TypeReference<>(){});
+            .postAndParseResponse(membershipDefinition, new TypeReference<>() {
+            });
 
         membershipDefinition = new MembershipAppEntity(otherEmail, secondRole);
         SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
             .withEntityId(project.getProjectId())
-            .postAndParseResponse(membershipDefinition, new TypeReference<>(){});
+            .postAndParseResponse(membershipDefinition, new TypeReference<>() {
+            });
 
         List<MembershipAppEntity> memberships =
             SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
                 .withEntityId(project.getProjectId())
-                .getAsType(new TypeReference<>(){});
-        assertThat(memberships.size()).isEqualTo(2);
+                .getAsType(new TypeReference<>() {
+                });
+        assertThat(memberships).hasSize(2);
     }
 }

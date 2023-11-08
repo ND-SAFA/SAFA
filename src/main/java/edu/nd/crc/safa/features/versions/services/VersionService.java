@@ -30,8 +30,7 @@ public class VersionService {
     private final ProjectVersionRepository projectVersionRepository;
     private final ArtifactTypeCountService typeCountService;
     private final TraceMatrixService traceMatrixService;
-
-    @Setter(onMethod = @__({@Autowired, @Lazy}))  // Prevents circular dependency
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
     private TypeService typeService;
 
     public List<ProjectVersion> getProjectVersions(@PathVariable Project project) {
@@ -99,7 +98,7 @@ public class VersionService {
     /**
      * Create type count entities for the given version for all types in a project
      *
-     * @param version The version to add counts for
+     * @param version     The version to add counts for
      * @param prevVersion The previous version
      */
     private void createTypeCountEntries(ProjectVersion version, ProjectVersion prevVersion) {
@@ -119,7 +118,7 @@ public class VersionService {
     /**
      * Copy trace count entries from one version to another
      *
-     * @param version The version to add counts for
+     * @param version     The version to add counts for
      * @param prevVersion The previous version
      */
     private void createTraceCountEntries(ProjectVersion version, ProjectVersion prevVersion) {

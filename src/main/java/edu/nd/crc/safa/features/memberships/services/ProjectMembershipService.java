@@ -43,9 +43,10 @@ public class ProjectMembershipService {
         Optional<ProjectMembership> membershipOptional =
             userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        ProjectMembership membership = membershipOptional.orElseGet(() -> new ProjectMembership(project, user, role));
-
-        userProjectMembershipRepo.save(membership);
+        ProjectMembership membership = membershipOptional.orElseGet(() -> {
+            ProjectMembership newMembership = new ProjectMembership(project, user, role);
+            return userProjectMembershipRepo.save(newMembership);
+        });
 
         notificationService.broadcastChange(
             EntityChangeBuilder

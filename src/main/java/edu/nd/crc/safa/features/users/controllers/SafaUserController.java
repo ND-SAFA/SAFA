@@ -30,6 +30,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -243,6 +244,7 @@ public class SafaUserController extends BaseController {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class AccountVerificationDTO {
         private String token;
     }

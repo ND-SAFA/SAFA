@@ -57,11 +57,13 @@ public class TestVerifyAccount extends ApplicationBaseTest {
         createAccountRequest.setEmail("test@example.com");
         createAccountRequest.setPassword("test123");
 
-        UserAppEntity userIdentifier = new SafaRequest(AppRoutes.Accounts.CREATE_ACCOUNT)
+        new SafaRequest(AppRoutes.Accounts.CREATE_ACCOUNT)
             .postAndParseResponse(createAccountRequest, new TypeReference<>() {});
 
         new SafaRequest(AppRoutes.Accounts.VERIFY_ACCOUNT)
-            .withQueryParam("token", "NOT THE RIGHT TOKEN")
-            .getWithoutBody(status().is4xxClientError());
+            .postWithJsonObject(
+                new SafaUserController.AccountVerificationDTO("NOT THE RIGHT TOKEN"),
+                status().is4xxClientError()
+            );
     }
 }

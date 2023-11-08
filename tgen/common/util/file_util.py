@@ -18,7 +18,7 @@ from tgen.common.util.logging.logger_manager import logger
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
-                   "PL", "R", "PY", "JAVA", "VUE", "CC"]
+                   "PL", "R", "PY", "JAVA", "VUE", "CC", "SQL"]
 
 ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM, MODEL_PARAM]
 import numpy as np

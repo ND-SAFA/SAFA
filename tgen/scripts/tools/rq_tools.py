@@ -68,10 +68,10 @@ def select_navigation_items(items: List[str]):
     """
     folder_names = [os.path.basename(f) for f in items]
     folder_selected = inquirer_selection(folder_names, FOLDER_NAV_MESSAGE, allow_back=True)
-    folder_index = folder_names.index(folder_selected)
-    folder_selected_path = items[folder_index]
     if folder_selected is None:
         return None
+    folder_index = folder_names.index(folder_selected)
+    folder_selected_path = items[folder_index]
     return folder_selected_path
 
 

@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.test.features.notifications.documentartifact;
 
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.test.common.EntityConstants;
@@ -19,19 +18,6 @@ public abstract class AbstractDocumentArtifactTest
      * Instance of artifact constants.
      */
     protected EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();
-
-    /**
-     * Test service used to construct project setup.
-     */
-    protected DocumentArtifactNotificationTestService testService;
-
-    @PostConstruct
-    public void initService() {
-        this.testService = new DocumentArtifactNotificationTestService(
-            this.commitService,
-            this.notificationService,
-            this.changeMessageVerifies);
-    }
 
     @Override
     public ArtifactAppEntity getArtifact() {

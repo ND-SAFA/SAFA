@@ -1,10 +1,9 @@
 package edu.nd.crc.safa.features.email;
 
-import javax.annotation.PostConstruct;
-
 import com.infobip.ApiClient;
 import com.infobip.api.SendEmailApi;
 import com.infobip.model.EmailSendResponse;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.context.annotation.Scope;
@@ -18,5 +18,5 @@ public interface CommitErrorRepository extends CrudRepository<CommitError, UUID>
     List<CommitError> findByProjectVersion(ProjectVersion projectVersion);
 
     List<CommitError> findByProjectVersionAndApplicationActivity(ProjectVersion projectVersion,
-                                                                 ProjectEntity activity);
+                                                                 ProjectEntityType activity);
 }

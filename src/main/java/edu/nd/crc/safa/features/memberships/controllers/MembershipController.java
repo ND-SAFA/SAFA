@@ -106,7 +106,7 @@ public class MembershipController extends BaseController {
      * Create a new membership within an entity. An entity can be an organization, a team,
      * or a project.
      *
-     * @param entityId The ID of the entity
+     * @param entityId      The ID of the entity
      * @param newMembership The definition of the new membership. Only the email and role fields are read
      * @return The newly created membership
      */
@@ -125,9 +125,9 @@ public class MembershipController extends BaseController {
      * or a project. Note that due to how the back end handles roles, the modified
      * membership will actually be a new membership with a new ID.
      *
-     * @param entityId The ID of the entity
+     * @param entityId     The ID of the entity
      * @param membershipId The ID of the membership to modify
-     * @param membership The modified membership definition. Only the role field is used
+     * @param membership   The modified membership definition. Only the role field is used
      * @return The new membership entity
      */
     @PutMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
@@ -146,7 +146,7 @@ public class MembershipController extends BaseController {
      * Delete a membership within an entity. An entity can be an organization, a team,
      * or a project.
      *
-     * @param entityId The ID of the entity
+     * @param entityId     The ID of the entity
      * @param membershipId The ID of the membership to delete
      */
     @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
@@ -168,8 +168,8 @@ public class MembershipController extends BaseController {
      * or a project. Either userId or userEmail must be supplied. If both are supplied, userId takes
      * precedence.
      *
-     * @param entityId the ID of the entity
-     * @param userId The ID of the user
+     * @param entityId  the ID of the entity
+     * @param userId    The ID of the user
      * @param userEmail The email of the user
      */
     @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID)

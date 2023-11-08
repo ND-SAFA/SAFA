@@ -41,7 +41,7 @@ public class AttributeLayoutController extends BaseController {
      * Creates a new attribute layout within the given project.
      *
      * @param projectId The ID of project containing the new layout.
-     * @param layout The layout entity to create.
+     * @param layout    The layout entity to create.
      * @return The newly created layout entity.
      */
     @PostMapping(AppRoutes.AttributeLayout.ROOT)
@@ -49,7 +49,7 @@ public class AttributeLayoutController extends BaseController {
                                                  @RequestBody AttributeLayoutAppEntity layout) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
         AttributeLayout savedLayout = attributeLayoutService.saveLayoutEntity(user, layout, project, true);
         return attributeLayoutService.appEntityFromAttributeLayout(savedLayout);
     }
@@ -58,8 +58,8 @@ public class AttributeLayoutController extends BaseController {
      * Edits an existing attribute layout.
      *
      * @param projectId The ID of project containing the layout to edit.
-     * @param id The ID of the layout to edit.
-     * @param layout The new version of the layout.
+     * @param id        The ID of the layout to edit.
+     * @param layout    The new version of the layout.
      * @return The new version of the layout as saved in the database.
      */
     @PutMapping(AppRoutes.AttributeLayout.BY_ID)
@@ -67,7 +67,7 @@ public class AttributeLayoutController extends BaseController {
                                                @RequestBody AttributeLayoutAppEntity layout) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            .withPermission(ProjectPermission.EDIT, user).get();
 
         if (layout.getId() == null) {
             layout.setId(id);
@@ -85,7 +85,7 @@ public class AttributeLayoutController extends BaseController {
      * Deletes an attribute layout.
      *
      * @param projectId The ID of project containing the layout to delete.
-     * @param id The ID of the layout to delete.
+     * @param id        The ID of the layout to delete.
      */
     @DeleteMapping(AppRoutes.AttributeLayout.BY_ID)
     public void deleteLayout(@PathVariable UUID projectId, @PathVariable UUID id) {
@@ -98,7 +98,7 @@ public class AttributeLayoutController extends BaseController {
      * Returns a specific attribute layout.
      *
      * @param projectId The ID of project containing the layout.
-     * @param id The ID of the layout.
+     * @param id        The ID of the layout.
      * @return The layout with that ID.
      */
     @GetMapping(AppRoutes.AttributeLayout.BY_ID)
@@ -106,8 +106,8 @@ public class AttributeLayoutController extends BaseController {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         getResourceBuilder().fetchProject(projectId).withPermission(ProjectPermission.VIEW, user);
         return attributeLayoutService.getLayoutById(id)
-                .map(attributeLayoutService::appEntityFromAttributeLayout)
-                .orElseThrow(() -> new SafaError("No layout with ID %s found.", id));
+            .map(attributeLayoutService::appEntityFromAttributeLayout)
+            .orElseThrow(() -> new SafaError("No layout with ID %s found.", id));
     }
 
     /**
@@ -120,10 +120,10 @@ public class AttributeLayoutController extends BaseController {
     public List<AttributeLayoutAppEntity> getProjectLayouts(@PathVariable UUID projectId) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         return attributeLayoutService.getLayoutsByProject(project)
-                .stream()
-                .map(attributeLayoutService::appEntityFromAttributeLayout)
-                .collect(Collectors.toList());
+            .stream()
+            .map(attributeLayoutService::appEntityFromAttributeLayout)
+            .collect(Collectors.toList());
     }
 }

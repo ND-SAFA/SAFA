@@ -34,7 +34,7 @@ class TestUpdateAndDeleteMemberships extends AbstractSharingTest {
 
     @Test
     void testRemoveSelfWithoutEditPermission() throws Exception {
-        authorizationService.loginUser(Sharee.email, Sharee.password);
+        authorizationService.loginUser(Sharee.email, Sharee.password, this);
         authorizationService.removeMemberFromProject(project, Sharee.email);
     }
 }

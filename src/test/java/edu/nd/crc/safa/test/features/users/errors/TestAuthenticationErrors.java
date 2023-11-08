@@ -21,6 +21,6 @@ class TestAuthenticationErrors extends ApplicationBaseTest {
     void testForbiddenIsUserNotAuthorized() throws Exception {
         String testEmail = "test@123.com";
         String testPassword = "testpassword";
-        authorizationService.loginUser(testEmail, testPassword, status().is4xxClientError(), false);
+        authorizationService.loginUser(testEmail, testPassword, status().is4xxClientError(), false, this);
     }
 }

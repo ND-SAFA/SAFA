@@ -4,13 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
@@ -28,8 +30,19 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     );
 
     @Override
-    protected UUID getTopicId() {
-        return this.project.getProjectId();
+    protected void onPostSubscribe() throws Exception {
+        this.rootBuilder
+            .notifications(n -> n.getEntityMessage(getCurrentUser()))
+            .consume(m -> this.rootBuilder
+                .verify(v -> v
+                    .notifications(n -> n.verifyMemberNotification(m, List.of(currentUserName)))));
+    }
+
+    @Override
+    protected List<String> getTopic() {
+        String projectTopic = TopicCreator.getProjectTopic(this.project.getProjectId());
+        String versionTopic = TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
+        return List.of(projectTopic, versionTopic);
     }
 
     @Override
@@ -50,12 +63,14 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     }
 
     @Override
-    protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        changeMessageVerifies.verifyDocumentChange(
+    protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
+        assertThat(creationMessages).hasSize(1);
+        EntityChangeMessage creationMessage = creationMessages.get(0);
+        messageVerificationService.verifyDocumentChange(
             creationMessage,
             entityId,
-            Change.Action.UPDATE);
-        changeMessageVerifies.verifyUpdateLayout(creationMessage, false);
+            NotificationAction.UPDATE);
+        messageVerificationService.verifyUpdateLayout(creationMessage, false);
     }
 
     @Override
@@ -75,12 +90,14 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     }
 
     @Override
-    protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        changeMessageVerifies.verifyDocumentChange(
+    protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
+        assertThat(updateMessages).hasSize(1);
+        EntityChangeMessage updateMessage = updateMessages.get(0);
+        messageVerificationService.verifyDocumentChange(
             updateMessage,
             entityId,
-            Change.Action.UPDATE);
-        changeMessageVerifies.verifyUpdateLayout(updateMessage, false);
+            NotificationAction.UPDATE);
+        messageVerificationService.verifyUpdateLayout(updateMessage, false);
     }
 
     @Override
@@ -92,12 +109,14 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     }
 
     @Override
-    protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        changeMessageVerifies.verifyDocumentChange(
+    protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
+        assertThat(deletionMessages).hasSize(1);
+        EntityChangeMessage deletionMessage = deletionMessages.get(0);
+        messageVerificationService.verifyDocumentChange(
             deletionMessage,
             entityId,
-            Change.Action.DELETE);
-        changeMessageVerifies.verifyUpdateLayout(deletionMessage, false);
+            NotificationAction.DELETE);
+        messageVerificationService.verifyUpdateLayout(deletionMessage, false);
 
     }
 }

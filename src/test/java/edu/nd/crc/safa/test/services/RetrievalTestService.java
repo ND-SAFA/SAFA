@@ -13,9 +13,9 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.DbEntityBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.builders.DbEntityBuilder;
 
 import lombok.AllArgsConstructor;
 import org.json.JSONArray;
@@ -26,7 +26,7 @@ public class RetrievalTestService {
     DbEntityBuilder dbEntityBuilder;
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
-        AuthorizationSetter.setSessionAuthorization(ApplicationBaseTest.defaultUser, this.serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(ApplicationBaseTest.currentUserName, this.serviceProvider);
         return this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(projectVersion);
     }
 

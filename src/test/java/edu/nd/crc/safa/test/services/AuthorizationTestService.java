@@ -4,7 +4,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import java.util.Optional;
-import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.SecurityConstants;
@@ -12,11 +11,14 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.test.builders.DbEntityBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.builders.AndBuilder;
+import edu.nd.crc.safa.test.services.builders.BuilderState;
 
+import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -24,23 +26,26 @@ import org.springframework.test.web.servlet.ResultMatcher;
 public class AuthorizationTestService {
 
     ServiceProvider serviceProvider;
-    DbEntityBuilder dbEntityBuilder;
+    BuilderState state;
 
-    public void defaultLogin() throws Exception {
-        String defaultUser = ApplicationBaseTest.defaultUser;
-        String defaultUserPassword = ApplicationBaseTest.defaultUserPassword;
-        createUser(defaultUser, defaultUserPassword);
-        loginUser(defaultUser, defaultUserPassword);
-        ApplicationBaseTest.currentUser = serviceProvider
+    public String loginDefaultUser(ApplicationBaseTest test) {
+        String token = loginUser(
+            ApplicationBaseTest.currentUserName,
+            ApplicationBaseTest.defaultUserPassword,
+            test).get();
+        SafaUser currentUser = serviceProvider
             .getAccountLookupService()
-            .getUserFromUsername(defaultUser);
+            .getUserFromUsername(ApplicationBaseTest.currentUserName);
+        test.setCurrentUser(currentUser, token);
+        return token;
     }
 
-    public void createUser(String email, String password) throws Exception {
+    public AndBuilder<AuthorizationTestService, UserAppEntity> createUser(String email, String password) {
         SafaUser user = new SafaUser(email, password);
-        SafaRequest
+        UserAppEntity result = SafaRequest
             .withRoute(AppRoutes.Accounts.CREATE_ACCOUNT)
-            .postWithJsonObject(user);
+            .postWithJsonObject(user, UserAppEntity.class);
+        return new AndBuilder<>(this, result, this.state);
     }
 
     public void createUser(String email, String password, ResultMatcher test) throws Exception {
@@ -50,16 +55,19 @@ public class AuthorizationTestService {
             .postWithJsonObject(user, test);
     }
 
-    public void loginUser(String email, String password) throws Exception {
-        this.loginUser(email, password, true);
+    public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password,
+                                                                  ApplicationBaseTest test) {
+        return this.loginUser(email, password, true, test);
     }
 
-    public void loginUser(String email, String password, boolean setToken) throws Exception {
-        loginUser(email, password, status().is2xxSuccessful(), setToken);
+    public AndBuilder<AuthorizationTestService, String> loginUser(String email, String password, boolean setToken,
+                                                                  ApplicationBaseTest test) {
+        String token = this.loginUser(email, password, status().is2xxSuccessful(), setToken, test);
+        return new AndBuilder<>(this, token, this.state);
     }
 
-    public void loginUser(String email, String password, ResultMatcher test) throws Exception {
-        this.loginUser(email, password, test, true);
+    public String loginUser(String email, String password, ResultMatcher resultMatcher, ApplicationBaseTest test) throws Exception {
+        return this.loginUser(email, password, resultMatcher, true, test);
     }
 
     /**
@@ -71,12 +79,12 @@ public class AuthorizationTestService {
      * @param password      Account password.
      * @param resultMatcher Expected HTTP response assertions.
      * @param setToken      Whether to set authorization token.
-     * @throws Exception If http error occurs.
      */
-    public void loginUser(String email,
-                          String password,
-                          ResultMatcher resultMatcher,
-                          boolean setToken) throws Exception {
+    public String loginUser(String email,
+                            String password,
+                            ResultMatcher resultMatcher,
+                            boolean setToken,
+                            ApplicationBaseTest test) {
         // Step - Clear token if setting new one
         if (setToken) {
             SafaRequest.clearAuthorizationToken();
@@ -87,17 +95,25 @@ public class AuthorizationTestService {
             .sendPostRequestAndRetrieveCookie(new SafaUser(email, password),
                 resultMatcher, SecurityConstants.JWT_COOKIE_NAME);
 
-        if (setToken && token.isPresent()) {
-            SafaRequest.setAuthorizationToken(token.get());
+
+        if (token.isPresent()) { // Result matcher may have failing reques
+            Cookie authorizationCookie = token.orElseThrow();
+            String userToken = authorizationCookie.getValue();
+            if (setToken) {
+                SafaRequest.setAuthorizationToken(authorizationCookie);
+                test.setCurrentUser(serviceProvider.getAccountLookupService().getUserFromUsername(email), userToken);
+            }
+            return userToken;
         }
+        return null;
     }
 
-    public void removeMemberFromProject(Project project, String username) throws Exception {
+    public AuthorizationTestService removeMemberFromProject(Project project, String username) {
         removeMemberFromProject(project, username, status().is2xxSuccessful());
+        return this;
     }
 
-    public void removeMemberFromProject(Project project, String username, ResultMatcher resultMatcher)
-        throws Exception {
+    public void removeMemberFromProject(Project project, String username, ResultMatcher resultMatcher) {
 
         Optional<SafaUser> safaUserOptional = this.serviceProvider
             .getSafaUserRepository()
@@ -123,5 +139,9 @@ public class AuthorizationTestService {
                 .withMembershipId(membership.getMembershipId())
                 .deleteWithJsonObject(resultMatcher);
         }
+    }
+
+    public SafaUser getAccount(String email) {
+        return this.serviceProvider.getAccountLookupService().getUserFromUsername(email);
     }
 }

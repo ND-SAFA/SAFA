@@ -2,18 +2,20 @@ package edu.nd.crc.safa.test.features.traces.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
-import edu.nd.crc.safa.test.builders.ProjectBuilder;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
+import edu.nd.crc.safa.test.services.builders.ProjectBuilder;
 
 public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     private final TraceAppEntity trace = new TraceAppEntity(
@@ -39,8 +41,9 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     }
 
     @Override
-    protected UUID getTopicId() {
-        return this.projectVersion.getVersionId();
+    protected List<String> getTopic() {
+        String topic = TopicCreator.getVersionTopic(this.projectVersion.getVersionId());
+        return List.of(topic);
     }
 
     @Override
@@ -66,8 +69,9 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     }
 
     @Override
-    protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        verifyTraceUpdateMessage(creationMessage);
+    protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
+        assertThat(creationMessages).hasSize(1);
+        verifyTraceUpdateMessage(creationMessages.get(0));
     }
 
     @Override
@@ -83,8 +87,9 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     }
 
     @Override
-    protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        verifyTraceUpdateMessage(updateMessage);
+    protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
+        assertThat(updateMessages).hasSize(1);
+        verifyTraceUpdateMessage(updateMessages.get(0));
     }
 
     @Override
@@ -96,12 +101,13 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     }
 
     @Override
-    protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        changeMessageVerifies.verifyTraceMessage(deletionMessage, entityId, Change.Action.DELETE);
+    protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
+        assertThat(deletionMessages).hasSize(1);
+        messageVerificationService.verifyTraceMessage(deletionMessages.get(0), entityId, NotificationAction.DELETE);
     }
 
     private void verifyTraceUpdateMessage(EntityChangeMessage message) {
-        changeMessageVerifies.verifyTraceMessage(message, entityId, Change.Action.UPDATE);
+        messageVerificationService.verifyTraceMessage(message, entityId, NotificationAction.UPDATE);
     }
 
     private TraceAppEntity commitTrace() throws Exception {

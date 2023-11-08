@@ -2,8 +2,6 @@ package edu.nd.crc.safa.features.common;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
@@ -25,6 +23,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.util.function.ThrowingConsumer;
+import org.springframework.util.function.ThrowingFunction;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -122,9 +122,9 @@ public abstract class BaseController {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public SafaError handleGenericError(Exception ex) {
+    public Exception handleGenericError(Exception ex) {
         ex.printStackTrace();
-        return new SafaError("An unexpected server error occurred.", ex);
+        return new SafaError(ex.getMessage(), ex);
     }
 
     @ExceptionHandler(MissingPermissionException.class)
@@ -148,10 +148,10 @@ public abstract class BaseController {
      * Perform a deferred request which will make the request in the background.
      *
      * @param request The request to make.
-     * @param <T> The desired output type.
+     * @param <T>     The desired output type.
      * @return A deferred result that will perform the request.
      */
-    protected <T> DeferredResult<T> makeDeferredRequest(Function<SafaUser, T> request) {
+    protected <T> DeferredResult<T> makeDeferredRequest(ThrowingFunction<SafaUser, T> request) {
         return makeDeferredRequest(request, BaseController.DEFAULT_REQUEST_TIMEOUT);
     }
 
@@ -161,7 +161,7 @@ public abstract class BaseController {
      * @param request The request to make.
      * @return A deferred result that will perform the request.
      */
-    protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request) {
+    protected DeferredResult<Void> makeDeferredRequest(ThrowingConsumer<SafaUser> request) {
         return makeDeferredRequest(request, BaseController.DEFAULT_REQUEST_TIMEOUT);
     }
 
@@ -172,7 +172,7 @@ public abstract class BaseController {
      * @param timeout The timeout for the request.
      * @return A deferred result that will perform the request.
      */
-    protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request, long timeout) {
+    protected DeferredResult<Void> makeDeferredRequest(ThrowingConsumer<SafaUser> request, long timeout) {
         return makeDeferredRequest((user) -> {
             request.accept(user);
             return null;
@@ -184,10 +184,10 @@ public abstract class BaseController {
      *
      * @param request The request to make.
      * @param timeout The timeout for the request.
-     * @param <T> The desired output type.
+     * @param <T>     The desired output type.
      * @return A deferred result that will perform the request.
      */
-    protected <T> DeferredResult<T> makeDeferredRequest(Function<SafaUser, T> request, long timeout) {
+    protected <T> DeferredResult<T> makeDeferredRequest(ThrowingFunction<SafaUser, T> request, long timeout) {
 
         ExecutorDelegate executorDelegate = serviceProvider.getExecutorDelegate();
         SafaUserService safaUserService = serviceProvider.getSafaUserService();
@@ -196,7 +196,7 @@ public abstract class BaseController {
 
         SafaUser user = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            T result = request.apply(user);
+            T result = request.apply(user, SafaError::new);
             output.setResult(result);
         });
 

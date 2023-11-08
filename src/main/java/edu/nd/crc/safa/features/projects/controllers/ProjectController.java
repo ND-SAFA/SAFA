@@ -6,7 +6,6 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -26,6 +25,7 @@ import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -160,6 +160,6 @@ public class ProjectController extends BaseController {
     public void deleteProject(@PathVariable UUID projectId) throws SafaError, IOException {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId).get();
-        getServiceProvider().getProjectService().deleteProjectAsUser(project, getCurrentUser());
+        getServiceProvider().getProjectService().deleteProject(user, project);
     }
 }

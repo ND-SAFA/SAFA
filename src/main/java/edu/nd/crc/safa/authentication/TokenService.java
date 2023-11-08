@@ -23,7 +23,6 @@ public class TokenService {
 
     public String createTokenForUsername(String userName, long expirationDelta) {
         Date exp = new Date(System.currentTimeMillis() + expirationDelta);
-
         return createTokenForUsername(userName, exp);
     }
 
@@ -32,11 +31,11 @@ public class TokenService {
         Claims claims = Jwts.claims().setSubject(userName);
 
         return Jwts
-                .builder()
-                .setClaims(claims)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(exp)
-                .compact();
+            .builder()
+            .setClaims(claims)
+            .signWith(key, SignatureAlgorithm.HS512)
+            .setExpiration(exp)
+            .compact();
     }
 
     public Claims getTokenClaims(String token) {

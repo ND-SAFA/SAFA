@@ -41,7 +41,7 @@ public class GithubGraphQlController extends BaseController {
      * Get a specific repo by owner and name.
      *
      * @param owner The owner of the project.
-     * @param repo The name of the project.
+     * @param repo  The name of the project.
      * @return The repo.
      */
     @GetMapping(AppRoutes.Integrations.Github.Repos.BY_OWNER_AND_NAME)

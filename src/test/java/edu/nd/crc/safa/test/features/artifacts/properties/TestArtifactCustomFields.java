@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.test.features.artifacts.properties;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -13,8 +13,8 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;

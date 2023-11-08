@@ -13,13 +13,19 @@ import lombok.NoArgsConstructor;
  * The response from the TGEN summarization endpoint.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
 @NoArgsConstructor
+@Data
 public class SummaryResponse implements ITGenResponse {
     /**
      * The content sent to summarize.
      */
     private List<GenerationArtifact> artifacts;
+    /**
+     * The project summary used in context to summarize artifacts.
+     */
     private String summary;
+    /**
+     * The logs associated with job.
+     */
     private List<String> logs;
 }

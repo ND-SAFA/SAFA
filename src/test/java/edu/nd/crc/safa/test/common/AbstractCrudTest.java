@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.google.errorprone.annotations.ForOverride;
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractCrudTest<T extends IAppEntity> extends ApplicationBaseTest {
@@ -21,7 +22,9 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     protected UUID entityId;
 
     protected ProjectVersion setupProject() throws Exception {
-        return creationService.createProjectWithNewVersion(projectName);
+        return this.rootBuilder
+            .log("Creating project and initial version under root user.")
+            .actions(a -> a.createProjectWithVersion(getCurrentUser())).get();
     }
 
     @Test
@@ -29,44 +32,53 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         // Step - Setup project
         this.projectVersion = this.setupProject();
         this.project = this.projectVersion.getProject();
-        notificationService.createNewConnection(defaultUser).subscribeToTopic(defaultUser, getTopicId());
+        this.dbEntityBuilder.setProject(projectName, this.project);
+
+        this.rootBuilder
+            .log("Root User: Subscribing to entity topic.")
+            .notifications(n -> n.initializeUser(getCurrentUser(), getToken(getCurrentUser())).subscribe(getCurrentUser(), getTopic()));
+
+        // Verifies any messages related to subscribing to topic (e.g. active members).
+        onPostSubscribe();
 
         // Step - Create entity and retrieve message
         this.entityId = createEntity();
         assertThat(entityId).isNotNull();
 
         // VP - Verify created entity
-        T entity = getEntity(projectVersion, currentUser, entityId);
+        T entity = getEntity(projectVersion, getCurrentUser(), entityId);
         verifyCreatedEntity(entity);
 
-        // VP - Verify creation message
-        // TODO - fails due to intercepting a notification that's not meant for it
-        //EntityChangeMessage creationMessage = notificationService.getNextMessage(defaultUser);
-        //verifyCreationMessage(creationMessage);
+        List<EntityChangeMessage> creationMessages = this.rootBuilder.notifications(n -> n.getMessages(getCurrentUser())).get();
+        this.verifyCreationMessages(creationMessages);
 
         // Step - Update entity and retrieve message
         updateEntity();
 
+        List<EntityChangeMessage> updateMessages =
+            this.rootBuilder.notifications(n -> n.getMessages(getCurrentUser())).get();
+
+
         // Step - Verify updated entity
-        T updatedEntity = getEntity(projectVersion, currentUser, entityId);
+        T updatedEntity = getEntity(projectVersion, getCurrentUser(), entityId);
         verifyUpdatedEntity(updatedEntity);
 
         // VP - Verify update message
-        // TODO - fails due to intercepting a notification that's not meant for it
-        //EntityChangeMessage updateMessage = notificationService.getNextMessage(defaultUser);
-        //verifyUpdateMessage(updateMessage);
+        this.verifyUpdateMessages(updateMessages);
 
         // Step - Delete entity
         deleteEntity(updatedEntity);
 
+        List<EntityChangeMessage> deletedMessages =
+            this.rootBuilder.notifications(n -> n.getMessages(getCurrentUser())).get();
+
+
         // VP - Verify entity deleted
-        List<T> entitiesWithId = getEntities(projectVersion, currentUser, entityId);
+        List<T> entitiesWithId = getEntities(projectVersion, getCurrentUser(), entityId);
         assertThat(entitiesWithId).isEmpty();
 
         // VP - Verify deletion message
-        // TODO - fails due to intercepting a notification that's not meant for it
-        //EntityChangeMessage deleteMessage = notificationService.getNextMessage(defaultUser);
-        //verifyDeletionMessage(deleteMessage);
+        verifyDeletionMessages(deletedMessages);
     }
 
     private T getEntity(ProjectVersion projectVersion, SafaUser user, UUID entityId) {
@@ -77,10 +89,14 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         return this.getAppService().getAppEntitiesByIds(projectVersion, user, List.of(entityId));
     }
 
+    @ForOverride
+    protected void onPostSubscribe() throws Exception {
+    }
+
     /**
      * @return {@link UUID} of topic to receive messages for entity changes.
      */
-    protected abstract UUID getTopicId();
+    protected abstract List<String> getTopic();
 
     /**
      * @return {@link IAppEntityService} Service for retrieving app entities being tested.
@@ -105,9 +121,9 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Verifies the correctness of message received after entity is created.
      *
-     * @param creationMessage {@link EntityChangeMessage} The message indicating entity was created.
+     * @param messages {@link EntityChangeMessage} The messages received after entity was created.
      */
-    protected abstract void verifyCreationMessage(EntityChangeMessage creationMessage);
+    protected abstract void verifyCreationMessages(List<EntityChangeMessage> messages);
 
     /**
      * Updates given app entity.
@@ -126,9 +142,9 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Verifies that message contains the update message for entity.
      *
-     * @param updateMessage Message indicating that entity was updated
+     * @param messages Messages received after updating entity.
      */
-    protected abstract void verifyUpdateMessage(EntityChangeMessage updateMessage);
+    protected abstract void verifyUpdateMessages(List<EntityChangeMessage> messages);
 
     /**
      * Deletes given entity.
@@ -141,7 +157,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Verifies content of message after entity is deleted.
      *
-     * @param deletionMessage Message received after entity was deleted.
+     * @param messages Messages received after entity deleted.
      */
-    protected abstract void verifyDeletionMessage(EntityChangeMessage deletionMessage);
+    protected abstract void verifyDeletionMessages(List<EntityChangeMessage> messages);
 }

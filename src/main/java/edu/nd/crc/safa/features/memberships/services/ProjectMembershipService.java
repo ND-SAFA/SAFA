@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
@@ -48,12 +49,25 @@ public class ProjectMembershipService implements IMembershipService {
         ProjectRole role = (ProjectRole) iRole;
 
         Optional<ProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
+            userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        return membershipOptional.orElseGet(() -> {
+        ProjectMembership membership = membershipOptional.orElseGet(() -> {
             ProjectMembership newMembership = new ProjectMembership(project, user, role);
             return userProjectMembershipRepo.save(newMembership);
         });
+
+        notificationService.broadcastChange(
+            EntityChangeBuilder
+                .create(user, project)
+                .withMembersUpdate(membership.getId())
+        );
+
+        notificationService.broadcastChange(
+            EntityChangeBuilder.create(user)
+                .withProjectUpdate(project)
+        );
+
+        return membership;
     }
 
     /**
@@ -67,9 +81,16 @@ public class ProjectMembershipService implements IMembershipService {
         ProjectRole role = (ProjectRole) iRole;
 
         Optional<ProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
+            userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
-        membershipOptional.ifPresent(userProjectMembershipRepo::delete);
+        if (membershipOptional.isPresent()) {
+            userProjectMembershipRepo.delete(membershipOptional.get());
+
+            notificationService.broadcastChange(
+                EntityChangeBuilder.create(user, project)
+                    .withMembersDelete(membershipOptional.get().getId())
+            );
+        }
     }
 
     /**
@@ -80,8 +101,8 @@ public class ProjectMembershipService implements IMembershipService {
         assert entity instanceof Project;
         Project project = (Project) entity;
         return userProjectMembershipRepo.findByProjectAndMember(project, user).stream()
-                .map(ProjectMembership::getRole)
-                .collect(Collectors.toUnmodifiableList());
+            .map(ProjectMembership::getRole)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -118,14 +139,14 @@ public class ProjectMembershipService implements IMembershipService {
         List<Project> projects = new ArrayList<>();
 
         this.userProjectMembershipRepo.findByMember(user)
-                .stream()
-                .map(ProjectMembership::getProject)
-                .forEach(projects::add);
+            .stream()
+            .map(ProjectMembership::getProject)
+            .forEach(projects::add);
 
         teamMembershipService.getEntitiesForUser(user)
-                .stream()
-                .flatMap(team -> projectService.getProjectsOwnedByTeam((Team) team).stream())
-                .forEach(projects::add);
+            .stream()
+            .flatMap(team -> projectService.getProjectsOwnedByTeam((Team) team).stream())
+            .forEach(projects::add);
 
         return projects;
     }

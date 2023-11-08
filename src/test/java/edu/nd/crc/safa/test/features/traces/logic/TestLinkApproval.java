@@ -11,10 +11,10 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
 import edu.nd.crc.safa.test.requests.FlatFileRequest;
-import edu.nd.crc.safa.test.services.CommonRequestService;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
+import edu.nd.crc.safa.test.services.requests.CommonProjectRequests;
 import edu.nd.crc.safa.test.verifiers.TraceTestVerifier;
 
 import org.json.JSONObject;
@@ -46,7 +46,7 @@ class TestLinkApproval extends GenerationalTest {
 
         // Step - Get generated links for project version
         ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
-        List<TraceAppEntity> generatedLinks = CommonRequestService.Project.getGeneratedLinks(projectVersion);
+        List<TraceAppEntity> generatedLinks = CommonProjectRequests.getGeneratedLinks(projectVersion);
 
 
         // VP - Verify that single generated link is returned.

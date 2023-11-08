@@ -100,7 +100,7 @@ public class ParseDataFileController extends BaseController {
                                                   @RequestBody ArtifactNameCheck artifactNameCheck) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         boolean artifactExists = checkArtifactNameService.doesArtifactExist(projectVersion, artifactNameCheck);
         Map<String, Boolean> response = new HashMap<>();
         response.put(ProjectVariables.ARTIFACT_EXISTS, artifactExists);

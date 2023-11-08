@@ -1,11 +1,10 @@
 package edu.nd.crc.safa.features.generation.common;
 
-import javax.annotation.Nullable;
-
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,9 +13,9 @@ import lombok.NoArgsConstructor;
  * The artifact representation for summarization.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class GenerationArtifact {
     /**
      * The identifier of the artifact.

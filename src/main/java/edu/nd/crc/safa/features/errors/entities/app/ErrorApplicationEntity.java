@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.errors.entities.app;
 
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
-import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.projects.entities.db.ProjectEntityType;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import lombok.Data;
 public class ErrorApplicationEntity {
     private String errorId;
     private String message;
-    private ProjectEntity activity;
+    private ProjectEntityType activity;
 
     public ErrorApplicationEntity(CommitError error) {
         this.message = error.getDescription();

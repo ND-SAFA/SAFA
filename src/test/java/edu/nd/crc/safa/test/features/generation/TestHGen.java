@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.generation.common.TraceLayer;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenResponse;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.test.services.CommonRequestService;
 import edu.nd.crc.safa.test.services.GenTestService;
 
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,8 @@ class TestHGen extends GenerationalTest {
         mockProjectSummaryResponse();
         mockHGenResponse();
 
-        JobAppEntity job = CommonRequestService.Gen.performHGen(getProjectVersion(), createHGenRequest());
+        JobAppEntity job = this.rootBuilder
+            .request(r -> r.generative().performHGen(getProjectVersion(), createHGenRequest())).get();
 
         refreshProject();
         verifyGeneratedArtifact();

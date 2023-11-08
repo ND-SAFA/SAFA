@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -29,6 +28,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
@@ -99,8 +99,9 @@ public class JobController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Jobs.Meta.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
+        SafaUser user = getCurrentUser();
         JobDbEntity job = jobService.getJobById(jobId);
-        if (job != null && !job.getUser().equals(getCurrentUser())) {
+        if (job != null && !job.getUser().equals(user)) {
             throw new MissingPermissionException(() -> "delete_job");
         }
 
@@ -111,8 +112,8 @@ public class JobController extends BaseController {
         }
         getServiceProvider().getNotificationService().broadcastChange(
             EntityChangeBuilder
-                .create(jobId)
-                .withJobDelete(jobId)
+                .create(user, jobDbEntity)
+                .withJobDelete(jobDbEntity)
         );
     }
 

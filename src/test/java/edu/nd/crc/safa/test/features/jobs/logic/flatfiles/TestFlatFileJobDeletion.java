@@ -8,13 +8,13 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.test.features.jobs.base.AbstractUpdateProjectViaFlatFileTest;
+import edu.nd.crc.safa.test.features.jobs.base.AbstractUpdateProjectViaFlatFileTestCommonRequests;
 import edu.nd.crc.safa.test.requests.RouteBuilder;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import org.junit.jupiter.api.Test;
 
-class TestFlatFileJobDeletion extends AbstractUpdateProjectViaFlatFileTest {
+class TestFlatFileJobDeletion extends AbstractUpdateProjectViaFlatFileTestCommonRequests {
 
     @Test
     void testDeleteJob() throws Exception {

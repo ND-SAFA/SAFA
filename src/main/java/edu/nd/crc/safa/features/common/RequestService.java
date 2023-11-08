@@ -6,10 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 @AllArgsConstructor
 @Service
 public class RequestService {
+    private static final Logger logger = LoggerFactory.getLogger(RequestService.class);
     private final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private final int DEFAULT_TIMEOUT = 60 * 60; // 1 Hour
     private final RestTemplate restTemplate;
@@ -57,10 +62,19 @@ public class RequestService {
                              Object payload,
                              Class<T> responseClass,
                              HttpMethod method) {
+        String requestLog = String.format("Starting request to %s", endpoint);
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         HttpEntity<Object> headerEntity = new HttpEntity<>(payload, headers);
-        return restTemplate.exchange(endpoint, method, headerEntity, responseClass).getBody();
+        logger.debug(requestLog);
+        String responseBody = restTemplate.exchange(endpoint, method, headerEntity, String.class).getBody();
+        if (JsonFileUtilities.isValid(responseBody)) {
+            return JsonFileUtilities.parse(responseBody, responseClass);
+        } else {
+            String error = String.format("Error occurred @ %s %s", method, endpoint);
+            logger.error(error);
+            throw new SafaError(responseBody);
+        }
     }
 
     @AllArgsConstructor

@@ -31,7 +31,7 @@ public class TestJobLogging extends ApplicationBaseTest {
 
     @BeforeEach
     public void setup() {
-        AuthorizationSetter.setSessionAuthorization(defaultUser, serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(currentUserName, serviceProvider);
     }
 
     @Test
@@ -40,47 +40,53 @@ public class TestJobLogging extends ApplicationBaseTest {
         JobDbEntity jobDbEntity = this.jobService.createNewJob(TestJob.class, "Job Name");
         TestJob job = new TestJob(jobDbEntity, serviceProvider);
         serviceProvider
-                .getJobService()
-                .executeJob(serviceProvider, job);
+            .getJobService()
+            .executeJob(serviceProvider, job);
 
         JobTestService.verifyJobWasCompleted(serviceProvider, jobDbEntity.getId(), 5);
 
         List<List<JobLogEntryAppEntity>> allLogs = SafaRequest
-                .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID)
-                .withJob(jobDbEntity)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID)
+            .withJob(jobDbEntity)
+            .getAsType(new TypeReference<>() {
+            });
 
         assertThat(allLogs.size()).isEqualTo(5);
 
         List<JobLogEntryAppEntity> step1Logs = SafaRequest
-                .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
-                .withJob(jobDbEntity)
-                .withStepNum(0)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
+            .withJob(jobDbEntity)
+            .withStepNum(0)
+            .getAsType(new TypeReference<>() {
+            });
 
         List<JobLogEntryAppEntity> step2Logs = SafaRequest
-                .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
-                .withJob(jobDbEntity)
-                .withStepNum(1)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
+            .withJob(jobDbEntity)
+            .withStepNum(1)
+            .getAsType(new TypeReference<>() {
+            });
 
         List<JobLogEntryAppEntity> step3Logs = SafaRequest
-                .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
-                .withJob(jobDbEntity)
-                .withStepNum(2)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
+            .withJob(jobDbEntity)
+            .withStepNum(2)
+            .getAsType(new TypeReference<>() {
+            });
 
         List<JobLogEntryAppEntity> step4Logs = SafaRequest
-                .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
-                .withJob(jobDbEntity)
-                .withStepNum(3)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
+            .withJob(jobDbEntity)
+            .withStepNum(3)
+            .getAsType(new TypeReference<>() {
+            });
 
         List<JobLogEntryAppEntity> step5Logs = SafaRequest
-                .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
-                .withJob(jobDbEntity)
-                .withStepNum(4)
-                .getAsType(new TypeReference<>() {});
+            .withRoute(AppRoutes.Jobs.Logs.BY_JOB_ID_AND_STEP_NUM)
+            .withJob(jobDbEntity)
+            .withStepNum(4)
+            .getAsType(new TypeReference<>() {
+            });
 
         assertThat(allLogs).isEqualTo(List.of(step1Logs, step2Logs, step3Logs, step4Logs, step5Logs));
 

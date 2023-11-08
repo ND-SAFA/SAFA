@@ -25,7 +25,7 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
     @BeforeEach
     public void setup() {
         GithubAccessCredentials credentials = new GithubAccessCredentials();
-        credentials.setUser(currentUser);
+        credentials.setUser(getCurrentUser());
         credentials.setAccessToken(accessToken);
         serviceProvider.getGithubAccessCredentialsRepository().save(credentials);
     }
@@ -75,7 +75,7 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
     }
 
     @Test
-    public void testGetRepository() throws Exception {
+    void testGetRepository() throws Exception {
         enqueueResponse("repository_response.json");
 
         GithubRepositoryDTO response = SafaRequest

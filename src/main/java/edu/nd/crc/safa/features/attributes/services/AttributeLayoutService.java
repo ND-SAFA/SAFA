@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 
 import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
@@ -24,6 +23,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -147,9 +147,10 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
 
         if (layout.isPresent()) {
             Project project = layout.get().getProject();
-            notificationService.broadcastChangeToUser(
-                EntityChangeBuilder.create(project.getProjectId()).withProjectUpdate(project.getProjectId()),
-                user
+            notificationService.broadcastChange(
+                EntityChangeBuilder
+                    .create(user, project)
+                    .withAttributeDelete(id)
             );
         }
     }
@@ -178,9 +179,10 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
         saveArtifactTypes(layout, appEntity.getArtifactTypes());
         savePositions(layout, appEntity.getPositions());
 
-        notificationService.broadcastChangeToUser(
-            EntityChangeBuilder.create(project.getProjectId()).withProjectUpdate(project.getProjectId()),
-            user
+        notificationService.broadcastChange(
+            EntityChangeBuilder
+                .create(user, project)
+                .withProjectUpdate()
         );
 
         return layout;
@@ -193,7 +195,7 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
      * @param positions The front-end position representations.
      */
     @Transactional
-    private void savePositions(AttributeLayout layout, List<AttributePositionAppEntity> positions) {
+    public void savePositions(AttributeLayout layout, List<AttributePositionAppEntity> positions) {
         positionRepo.deleteByLayout(layout);
         positions.stream()
             .map(position -> this.attributePositionFromAppEntity(layout.getProject(), layout, position))
@@ -207,7 +209,7 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
      * @param artifactTypes The names of the artifact types.
      */
     @Transactional
-    private void saveArtifactTypes(AttributeLayout layout, List<String> artifactTypes) {
+    public void saveArtifactTypes(AttributeLayout layout, List<String> artifactTypes) {
         typeToLayoutRepo.deleteByLayout(layout);
         artifactTypes.stream()
             .map(typeName -> artifactTypeService.findArtifactType(layout.getProject(), typeName))

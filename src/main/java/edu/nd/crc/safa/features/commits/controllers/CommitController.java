@@ -52,6 +52,6 @@ public class CommitController extends BaseController {
         ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectCommitAppEntity);
         projectCommitDefinition.setCommitVersion(projectVersion);
         ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
-        return projectChanger.commit(projectCommitDefinition);
+        return projectChanger.commit(user, projectCommitDefinition);
     }
 }

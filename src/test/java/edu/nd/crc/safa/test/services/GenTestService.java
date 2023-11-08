@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryResponse
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
+import edu.nd.crc.safa.test.services.requests.CommonProjectRequests;
 
 public class GenTestService {
     public static List<GenerationArtifact> asGenArtifacts(GenerationalTest test) {
@@ -59,7 +60,7 @@ public class GenTestService {
 
     public static void verifyJobAssociatedWithProject(GenerationalTest test, JobAppEntity serverJob) throws Exception {
         Project project = test.getProjectVersion().getProject();
-        List<JobAppEntity> jobs = CommonRequestService.Project.getProjectJobs(project);
+        List<JobAppEntity> jobs = CommonProjectRequests.getProjectJobs(project);
         assertEquals(1, jobs.size());
         JobAppEntity job = jobs.get(0);
         assertEquals(serverJob.getId(), job.getId());

@@ -8,7 +8,7 @@ import java.util.Set;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import org.json.JSONObject;
 

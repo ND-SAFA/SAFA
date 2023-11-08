@@ -9,10 +9,13 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
 import edu.nd.crc.safa.features.memberships.repositories.TeamMembershipRepository;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -35,7 +38,7 @@ public class TeamMembershipService implements IMembershipService {
         TeamRole role = (TeamRole) iRole;
 
         Optional<TeamMembership> membershipOptional =
-                teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
+            teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
 
         return membershipOptional.orElseGet(() -> {
             TeamMembership newMembership = new TeamMembership(user, team, role);
@@ -54,7 +57,7 @@ public class TeamMembershipService implements IMembershipService {
         TeamRole role = (TeamRole) iRole;
 
         Optional<TeamMembership> membershipOptional =
-                teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
+            teamMembershipRepo.findByUserAndTeamAndRole(user, team, role);
 
         membershipOptional.ifPresent(teamMembershipRepo::delete);
     }
@@ -68,8 +71,8 @@ public class TeamMembershipService implements IMembershipService {
         Team team = (Team) entity;
 
         return teamMembershipRepo.findByUserAndTeam(user, team).stream()
-                .map(TeamMembership::getRole)
-                .collect(Collectors.toUnmodifiableList());
+            .map(TeamMembership::getRole)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -99,5 +102,26 @@ public class TeamMembershipService implements IMembershipService {
     public Optional<IEntityMembership> getMembershipOptionalById(UUID membershipId) {
         // The map call forces it to understand that the type is indeed correct
         return teamMembershipRepo.findById(membershipId).map(m -> m);
+    }
+
+    /**
+     * Returns the team members of the project.
+     *
+     * @param project Project whose members are returned.
+     * @return List of team members with access to the project.
+     */
+    public List<MembershipAppEntity> getProjectMemberships(Project project) {
+        Team owningTeam = project.getOwningTeam();
+        List<IEntityMembership> teamMembers = this.getMembershipsForEntity(owningTeam);
+        return teamMembers
+            .stream()
+            .map(m -> {
+                MembershipAppEntity membershipAppEntity = new MembershipAppEntity();
+                membershipAppEntity.setEntityType(MembershipType.TEAM);
+                membershipAppEntity.setEntityId(owningTeam.getId());
+                membershipAppEntity.setEmail(m.getUser().getEmail());
+                membershipAppEntity.setRole(m.getRole().name());
+                return membershipAppEntity;
+            }).collect(Collectors.toList());
     }
 }

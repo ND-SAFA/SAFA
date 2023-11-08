@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Data
-public class CreateAccountRequest extends UserIdentifierDTO {
+public class CreateAccountRequest extends UserAppEntity {
     /**
      * User password to create account with.
      */

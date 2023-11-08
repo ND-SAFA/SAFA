@@ -13,6 +13,8 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
@@ -58,24 +60,36 @@ public class ProjectService {
     @Setter(onMethod = @__({@Autowired, @Lazy}))
     private PermissionService permissionService;
 
+    @Setter(onMethod = @__({@Autowired}))
+    private NotificationService notificationService;
+
     /**
      * Deletes given project and all related entities through cascade property.
      *
+     * @param user    The user initiating the deletion of the project.
      * @param project The project to delete.
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */
-    public void deleteProject(Project project) throws SafaError, IOException {
+    public void deleteProject(SafaUser user, Project project) throws SafaError, IOException {
+        permissionService.requireAnyPermission(
+            Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS), project, user
+        );
         this.jobService.removeProjectFromJobs(project);
         this.projectRepository.delete(project);
         FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
+        if (user != null) { // null in testing scenarios.
+            notificationService.broadcastChange(EntityChangeBuilder
+                .create(user, project)
+                .withProjectDelete());
+        }
     }
 
     /**
      * Creates a new project
      *
-     * @param name The name of the project
+     * @param name        The name of the project
      * @param description The description of the project
-     * @param owner The team that owns the project
+     * @param owner       The team that owns the project
      * @return The new project
      */
     public Project createProject(String name, String description, Team owner) {
@@ -86,9 +100,9 @@ public class ProjectService {
     /**
      * Creates a new project
      *
-     * @param name The name of the project
+     * @param name        The name of the project
      * @param description The description of the project
-     * @param owner The user that owns the project
+     * @param owner       The user that owns the project
      * @return The new project
      */
     public Project createProject(String name, String description, SafaUser owner) {
@@ -99,9 +113,9 @@ public class ProjectService {
     /**
      * Creates a new project
      *
-     * @param name The name of the project
+     * @param name        The name of the project
      * @param description The description of the project
-     * @param owner The organization that owns the project
+     * @param owner       The organization that owns the project
      * @return The new project
      */
     public Project createProject(String name, String description, Organization owner) {
@@ -113,7 +127,7 @@ public class ProjectService {
      * Creates a new project
      *
      * @param projectDefinition The definition of the project from the front end
-     * @param owner The user who will own the project
+     * @param owner             The user who will own the project
      * @return The new project
      */
     public Project createProject(ProjectAppEntity projectDefinition, SafaUser owner) {
@@ -124,7 +138,7 @@ public class ProjectService {
      * Creates a new project
      *
      * @param projectDefinition The definition of the project from the front end
-     * @param owner The organization who will own the project
+     * @param owner             The organization who will own the project
      * @return The new project
      */
     public Project createProject(ProjectAppEntity projectDefinition, Organization owner) {
@@ -135,25 +149,11 @@ public class ProjectService {
      * Creates a new project
      *
      * @param projectDefinition The definition of the project from the front end
-     * @param owner The team who will own the project
+     * @param owner             The team who will own the project
      * @return The new project
      */
     public Project createProject(ProjectAppEntity projectDefinition, Team owner) {
         return createProject(projectDefinition.getName(), projectDefinition.getDescription(), owner);
-    }
-
-    /**
-     * Deletes given project and all related entities through cascade property.
-     *
-     * @param project The project to delete.
-     * @param user The user who is creating the project (for permissions checks)
-     * @throws SafaError Throws error if error occurs while deleting flat files.
-     */
-    public void deleteProjectAsUser(Project project, SafaUser user) throws SafaError, IOException {
-        permissionService.requireAnyPermission(
-            Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS), project, user
-        );
-        deleteProject(project);
     }
 
     /**
@@ -248,7 +248,7 @@ public class ProjectService {
     /**
      * Converts a project to a project identifier front-end object
      *
-     * @param project The project
+     * @param project     The project
      * @param currentUser The user making the request (so that we can properly show permissions)
      * @return The project identifier
      */
@@ -274,7 +274,7 @@ public class ProjectService {
     /**
      * Converts a collection of projects to project identifiers
      *
-     * @param projects The projects
+     * @param projects    The projects
      * @param currentUser The user making the request (so that we can properly show permissions)
      * @return A list of project identifier objects
      */
@@ -289,9 +289,9 @@ public class ProjectService {
     /**
      * Get all permissions granted to the user via their membership(s) within the given team.
      *
-     * @param project The project the user is a part of. Note that the user can have permissions on a project even if
-     *                they do not have a direct project membership, as they could be a member of a team or an
-     *                organization that grants them project permissions.
+     * @param project     The project the user is a part of. Note that the user can have permissions on a project even
+     *                    if they do not have a direct project membership, as they could be a member of a team or an
+     *                    organization that grants them project permissions.
      * @param currentUser The user in question
      * @return A list of permissions the user has for the project
      */

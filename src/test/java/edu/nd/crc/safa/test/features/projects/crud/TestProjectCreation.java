@@ -47,7 +47,8 @@ public class TestProjectCreation extends ApplicationBaseTest {
 
         ProjectAppEntity createdProject =
             SafaRequest.withRoute(AppRoutes.Projects.CREATE_OR_UPDATE_PROJECT_META)
-                .postAndParseResponse(projectDefinition, new TypeReference<>(){});
+                .postAndParseResponse(projectDefinition, new TypeReference<>() {
+                });
 
         assertThat(createdProject.getId()).isNotNull();
 
@@ -61,7 +62,8 @@ public class TestProjectCreation extends ApplicationBaseTest {
 
         ProjectAppEntity createdProject =
             SafaRequest.withRoute(AppRoutes.Projects.CREATE_OR_UPDATE_PROJECT_META)
-                .postAndParseResponse(projectDefinition, new TypeReference<>(){});
+                .postAndParseResponse(projectDefinition, new TypeReference<>() {
+                });
 
         assertThat(createdProject.getId()).isNotNull();
 
@@ -76,11 +78,12 @@ public class TestProjectCreation extends ApplicationBaseTest {
     public void testCreateProjectWithNoId() throws Exception {
         ProjectAppEntity createdProject =
             SafaRequest.withRoute(AppRoutes.Projects.CREATE_OR_UPDATE_PROJECT_META)
-                .postAndParseResponse(projectDefinition, new TypeReference<>(){});
+                .postAndParseResponse(projectDefinition, new TypeReference<>() {
+                });
 
         assertThat(createdProject.getId()).isNotNull();
 
         Project project = projectService.getProjectById(createdProject.getId());
-        assertThat(project.getOwningTeam().getOrganization().getId()).isEqualTo(currentUser.getPersonalOrgId());
+        assertThat(project.getOwningTeam().getOrganization().getId()).isEqualTo(getCurrentUser().getPersonalOrgId());
     }
 }

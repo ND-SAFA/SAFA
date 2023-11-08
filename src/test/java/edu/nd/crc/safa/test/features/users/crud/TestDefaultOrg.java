@@ -19,7 +19,7 @@ import lombok.Data;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class TestDefaultOrg extends ApplicationBaseTest {
+class TestDefaultOrg extends ApplicationBaseTest {
 
     @Autowired
     private SafaUserService safaUserService;
@@ -28,33 +28,36 @@ public class TestDefaultOrg extends ApplicationBaseTest {
     private SafaUserRepository userRepository;
 
     @Test
-    public void testDefaultOrgDefaultValue() throws Exception {
+    void testDefaultOrgDefaultValue() throws Exception {
         OrganizationAppEntity personalOrg =
             SafaRequest.withRoute(AppRoutes.Organizations.SELF)
-                .getAsType(new TypeReference<>(){});
+                .getAsType(new TypeReference<>() {
+                });
 
-        assertThat(currentUser.getDefaultOrgId()).isEqualTo(personalOrg.getId());
+        assertThat(getCurrentUser().getDefaultOrgId()).isEqualTo(personalOrg.getId());
     }
 
     @Test
-    public void testUpdateDefaultOrg() throws Exception {
+    void testUpdateDefaultOrg() throws Exception {
         //TODO update this when we can give admin permissions in a better way
+        SafaUser currentUser = getCurrentUser();
         currentUser.setSuperuser(true);
-        currentUser = userRepository.save(currentUser);
+        setCurrentUser(userRepository.save(currentUser));
 
         OrganizationAppEntity newOrg =
             SafaRequest.withRoute(AppRoutes.Organizations.ROOT)
-                .postAndParseResponse(new OrganizationAppEntity("org name", "org desc"), new TypeReference<>(){});
+                .postAndParseResponse(new OrganizationAppEntity("org name", "org desc"), new TypeReference<>() {
+                });
 
         SafaRequest.withRoute(AppRoutes.Accounts.DEFAULT_ORG)
             .putWithJsonObject(new DefaultOrgDTO(newOrg.getId()));
 
-        SafaUser updatedUser = safaUserService.getUserById(currentUser.getUserId());
+        SafaUser updatedUser = safaUserService.getUserById(getCurrentUser().getUserId());
         assertThat(updatedUser.getDefaultOrgId()).isEqualTo(newOrg.getId());
     }
 
     @Test
-    public void testSetDefaultOrgWithBadId() throws Exception {
+    void testSetDefaultOrgWithBadId() throws Exception {
         SafaRequest.withRoute(AppRoutes.Accounts.DEFAULT_ORG)
             .putWithJsonObject(
                 new DefaultOrgDTO(UUID.randomUUID()),

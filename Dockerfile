@@ -1,5 +1,5 @@
 # Step 1 - Install necessary dependencies
-FROM public.ecr.aws/amazoncorretto/amazoncorretto:11 AS builder
+FROM public.ecr.aws/amazoncorretto/amazoncorretto:17 AS builder
 SHELL ["/bin/bash", "-c"]
 
 # Step 2 - Install gradle

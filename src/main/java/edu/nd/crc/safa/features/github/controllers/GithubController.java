@@ -63,12 +63,7 @@ public class GithubController extends BaseController {
             GithubIdentifier identifier = new GithubIdentifier(null, owner, repositoryName);
             CreateProjectViaGithubBuilder builder
                 = new CreateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
-
-            try {
-                return builder.perform();
-            } catch (Exception e) {
-                throw new SafaError("Failed to start job", e);
-            }
+            return builder.perform();
         });
     }
 
@@ -87,7 +82,6 @@ public class GithubController extends BaseController {
                                                             @PathVariable("repositoryName") String repositoryName,
                                                             @PathVariable("owner") String owner,
                                                             @RequestBody GithubImportDTO importSettings) {
-
         return makeDeferredRequest(user -> {
             checkCredentials(user);
             ProjectVersion projectVersion = getResourceBuilder()
@@ -98,12 +92,7 @@ public class GithubController extends BaseController {
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             UpdateProjectViaGithubBuilder builder
                 = new UpdateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
-
-            try {
-                return builder.perform();
-            } catch (Exception e) {
-                throw new SafaError("Failed to start job", e);
-            }
+            return builder.perform();
         });
     }
 
@@ -122,7 +111,6 @@ public class GithubController extends BaseController {
                                                                   @PathVariable("repositoryName") String repositoryName,
                                                                   @PathVariable("owner") String owner,
                                                                   @RequestBody GithubImportDTO importSettings) {
-
         return makeDeferredRequest(user -> {
             checkCredentials(user);
             ProjectVersion projectVersion = getResourceBuilder()
@@ -133,12 +121,7 @@ public class GithubController extends BaseController {
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             ImportIntoProjectViaGithubBuilder builder
                 = new ImportIntoProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
-
-            try {
-                return builder.perform();
-            } catch (Exception e) {
-                throw new SafaError("Failed to start job", e);
-            }
+            return builder.perform();
         });
     }
 

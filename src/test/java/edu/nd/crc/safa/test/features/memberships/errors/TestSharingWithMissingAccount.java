@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
+import edu.nd.crc.safa.test.services.requests.CommonProjectRequests;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * 1. User is not found
  * 2. User is already on the project
  */
-public class TestSharingWithMissingAccount extends AbstractSharingTest {
+class TestSharingWithMissingAccount extends AbstractSharingTest {
     String nonUserEmail = "non-existing@email.com";
 
     /**
@@ -24,9 +25,9 @@ public class TestSharingWithMissingAccount extends AbstractSharingTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    public void userNotFoundError() throws Exception {
+    void userNotFoundError() throws Exception {
         // Step - Share with non-existent user
-        JSONObject response = creationService.shareProject(
+        JSONObject response = CommonProjectRequests.shareProject(
             project,
             nonUserEmail,
             ProjectRole.VIEWER,

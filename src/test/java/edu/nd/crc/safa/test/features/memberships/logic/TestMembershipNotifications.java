@@ -1,12 +1,14 @@
 package edu.nd.crc.safa.test.features.memberships.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
+import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
 import org.junit.jupiter.api.Disabled;
@@ -26,41 +28,44 @@ class TestMembershipNotifications extends ApplicationBaseTest {
         String newMemberPassword = "password";
 
         // Step - Create project version to collaborate on
-        Project project = dbEntityBuilder.newProjectWithReturn(projectName);
-
-        // Step - Create two users
-        authorizationService.createUser(newMemberEmail, newMemberPassword);
-        authorizationService.loginUser(newMemberEmail, newMemberPassword, false);
-
-        // Step - Subscribe to project notifications
-        notificationService
-            .createNewConnection(defaultUser)
-            .subscribeToProject(defaultUser, project);
-
-        // Step - Add member to project
-        creationService.shareProject(project, newMemberEmail, ProjectRole.VIEWER, status().isOk());
-
-        // VP - Verify that single change was broadcast.
-        EntityChangeMessage addMemberMessage = notificationService.getNextMessage(defaultUser);
-        verifyMessageContent(addMemberMessage, Change.Action.UPDATE);
-
-        // Step - Remove member from project
-        authorizationService.removeMemberFromProject(project, newMemberEmail);
-
-        // VP - Verify that message is sent to update members after deletion
-        EntityChangeMessage removeMemberMessage = notificationService.getNextMessage(defaultUser);
-        verifyMessageContent(removeMemberMessage, Change.Action.DELETE);
+        this.rootBuilder
+            .build((s, b) -> b.project(getCurrentUser()).save("project"))
+            .and()
+            .notifications((s, n) -> n
+                .initializeUser(getCurrentUser(), getToken(getCurrentUser()))
+                .subscribeToProject(getCurrentUser(), s.getProject("project")))
+            .and()
+            .actions(a -> a.verifyActiveMembers(getCurrentUser(), List.of(currentUserName)))
+            .and()
+            .actions(a -> a
+                .createNewUser(newMemberEmail, newMemberPassword, false, this))
+            .and()
+            .request((s, r) -> r
+                .project()
+                .shareProject(s.getProject("project"), newMemberEmail, ProjectRole.VIEWER))
+            .and()
+            .notifications((s, n) -> n
+                .getEntityMessage(getCurrentUser()))
+            .map(m -> verifyMessageContent(m, NotificationAction.UPDATE))
+            .and()
+            .authorize((s, a) -> a
+                .removeMemberFromProject(s.getProject("project"), newMemberEmail))
+            .and()
+            .notifications((s, n) -> n
+                .getEntityMessage(getCurrentUser()))
+            .map(m -> verifyMessageContent(m, NotificationAction.DELETE));
     }
 
-    private void verifyMessageContent(EntityChangeMessage message,
-                                      Change.Action action) {
+    private TestMembershipNotifications verifyMessageContent(EntityChangeMessage message,
+                                                             NotificationAction action) {
         // VP - Verify that only one change was broadcast.
         assertThat(message.getChanges()).hasSize(1);
 
         // VP - Verify that membership notification is received.
         Change change = message.getChanges().get(0);
-        assertThat(change.getEntity()).isEqualTo(Change.Entity.MEMBERS);
+        assertThat(change.getEntity()).isEqualTo(NotificationEntity.MEMBERS);
         assertThat(change.getAction()).isEqualTo(action);
         assertThat(change.getEntityIds()).hasSize(1);
+        return this;
     }
 }

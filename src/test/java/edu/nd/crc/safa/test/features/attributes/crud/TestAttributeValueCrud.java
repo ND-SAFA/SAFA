@@ -1,8 +1,10 @@
 package edu.nd.crc.safa.test.features.attributes.crud;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,27 +15,25 @@ import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvid
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.test.builders.CommitBuilder;
+import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.features.attributes.AttributesForTesting;
+import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> {
 
+    private final AttributesForTesting attributesForTesting = new AttributesForTesting();
+    private final String artifactType = "Requirement";
     @Autowired
     AttributeSystemServiceProvider attributeServiceProvider;
-
     private CustomAttributeType currentType;
-
     private CustomAttribute currentAttribute;
-
     private UUID currentId;
-
-    private final AttributesForTesting attributesForTesting = new AttributesForTesting();
 
     @Override
     @Test
@@ -41,12 +41,14 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
         for (CustomAttributeType attributeType : CustomAttributeType.values()) {
             currentType = attributeType;
             super.testCrud();
+            this.rootBuilder.clear();
         }
     }
 
     @Override
-    protected UUID getTopicId() {
-        return projectVersion.getVersionId();
+    protected List<String> getTopic() {
+        String topic = TopicCreator.getVersionTopic(projectVersion.getVersionId());
+        return List.of(topic);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
             attributeServiceProvider, currentType);
 
         ArtifactAppEntity artifact = new ArtifactAppEntity(null,
-            "Requirements",
+            artifactType,
             "RE-20",
             "summary",
             "body",
@@ -87,14 +89,18 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     }
 
     @Override
-    protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        changeMessageVerifies.verifyArtifactMessage(creationMessage, currentId, Change.Action.UPDATE);
+    protected void verifyCreationMessages(List<EntityChangeMessage> creationMessages) {
+        assertThat(creationMessages).hasSize(2);
+        this.rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(creationMessages.get(0), artifactType)));
+        EntityChangeMessage artifactCreationMessage = creationMessages.get(1);
+        messageVerificationService.verifyArtifactMessage(artifactCreationMessage, currentId, NotificationAction.UPDATE);
     }
 
     @Override
     protected void updateEntity() throws Exception {
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
-            "Requirements",
+            artifactType,
             "RE-20",
             "summary",
             "body",
@@ -116,14 +122,15 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     }
 
     @Override
-    protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        changeMessageVerifies.verifyArtifactMessage(updateMessage, currentId, Change.Action.UPDATE);
+    protected void verifyUpdateMessages(List<EntityChangeMessage> updateMessages) {
+        assertThat(updateMessages).hasSize(1);
+        messageVerificationService.verifyArtifactMessage(updateMessages.get(0), currentId, NotificationAction.UPDATE);
     }
 
     @Override
     protected void deleteEntity(ArtifactAppEntity entity) throws Exception {
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
-            "Requirements",
+            artifactType,
             "RE-20",
             "summary",
             "body",
@@ -136,8 +143,10 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     }
 
     @Override
-    protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        changeMessageVerifies.verifyArtifactMessage(deletionMessage, currentId, Change.Action.DELETE);
+    protected void verifyDeletionMessages(List<EntityChangeMessage> deletionMessages) {
+        assertThat(deletionMessages).hasSize(2);
+        this.rootBuilder.verify(v -> v.notifications(n -> n
+            .verifyArtifactTypeMessage(deletionMessages.get(0), artifactType)));
+        messageVerificationService.verifyArtifactMessage(deletionMessages.get(1), currentId, NotificationAction.DELETE);
     }
-
 }

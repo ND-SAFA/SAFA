@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -108,7 +109,8 @@ public interface JsonFileUtilities {
      */
     static <T> T parse(String jsonString, Class<T> exportClass) {
         ObjectMapper objectMapper = ObjectMapperConfig.create();
-        return wrapReturnValue(() -> objectMapper.readValue(jsonString, exportClass));
+        JSONObject jsonObject = new JSONObject(jsonString);
+        return wrapReturnValue(() -> objectMapper.readValue(jsonObject.toString(), exportClass));
     }
 
     /**
@@ -121,8 +123,23 @@ public interface JsonFileUtilities {
      */
     static <T> T parse(String jsonString, TypeReference<T> exportClass) {
         ObjectMapper objectMapper = ObjectMapperConfig.create();
-        JSONObject jsonObject = jsonString.length() == 0 ? new JSONObject() : new JSONObject(jsonString);
+        JSONObject jsonObject = jsonString.isEmpty() ? new JSONObject() : new JSONObject(jsonString);
         return wrapReturnValue(() -> objectMapper.readValue(jsonObject.toString(), exportClass));
+    }
+
+    /**
+     * Attempts to parse json string and returns result.
+     *
+     * @param json The string to parse.
+     * @return True if valid JSON, false otherwise.
+     */
+    static boolean isValid(String json) {
+        try {
+            new JSONObject(json);
+        } catch (JSONException e) {
+            return false;
+        }
+        return true;
     }
 
     private static <T> T wrapReturnValue(ThrowingSupplier<T> supplier) {

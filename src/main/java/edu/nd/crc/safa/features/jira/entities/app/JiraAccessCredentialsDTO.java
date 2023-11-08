@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.features.jira.entities.app;
 
 import java.nio.charset.StandardCharsets;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**

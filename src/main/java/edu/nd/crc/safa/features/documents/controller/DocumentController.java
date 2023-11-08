@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -22,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -84,18 +84,17 @@ public class DocumentController extends BaseDocumentController {
             projectVersion,
             document,
             documentAppEntity.getArtifactIds());
-        List<UUID> affectedArtifactIds =
-            new ArrayList<>(documentAppEntity.getArtifactIds());
 
         // Generate layout
         Map<UUID, LayoutPosition> documentLayout = createDocumentLayout(projectVersion, documentAppEntity);
         documentAppEntity.setLayout(documentLayout);
 
         // Update version subscribers
-        notificationService.broadcastChange(
-            EntityChangeBuilder.create(project.getProjectId())
-                .withDocumentUpdate(List.of(document.getDocumentId()))
-                .withArtifactsUpdate(affectedArtifactIds)
+        this.documentService.broadcastDocumentChange(
+            user,
+            projectVersion,
+            document,
+            new ArrayList<>()
         );
 
         return documentAppEntity;
@@ -119,7 +118,7 @@ public class DocumentController extends BaseDocumentController {
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID versionId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         return this.documentService.getAppEntities(projectVersion, user);
     }
 
@@ -128,7 +127,7 @@ public class DocumentController extends BaseDocumentController {
                                              @PathVariable UUID documentId) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.VIEW, user).get();
+            .withPermission(ProjectPermission.VIEW, user).get();
         Document document = this.documentService.getDocumentById(documentId);
         return this.documentService.createDocumentAppEntity(document, projectVersion);
     }
@@ -158,7 +157,7 @@ public class DocumentController extends BaseDocumentController {
         // Step - Notify project users that document has been deleted.
         this.notificationService.broadcastChange(
             EntityChangeBuilder
-                .create(project)
+                .create(user, project)
                 .withDocumentDelete(documentId)
         );
     }

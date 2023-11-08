@@ -14,9 +14,9 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.test.builders.ProjectBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.builders.ProjectBuilder;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
     @Test
     void downloadAndReuploadFlatFiles() throws Exception {
-        AuthorizationSetter.setSessionAuthorization(defaultUser, this.serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(currentUserName, this.serviceProvider);
         // Step - Create project with artifacts from docs: artifact tree, safety case, fta
         ProjectVersion projectVersion = ProjectBuilder
             .withProject(projectName)
@@ -50,12 +50,12 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
         // Step - Create files with flat files downloaded
         String newVersionIdString = SafaRequest
-                .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
-                .withVersion(version)
-                .getFlatFileHelper()
-                .postWithFiles(projectFiles, new JSONObject())
-                .getJSONObject("projectVersion")
-                .getString("versionId");
+            .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+            .withVersion(version)
+            .getFlatFileHelper()
+            .postWithFiles(projectFiles, new JSONObject())
+            .getJSONObject("projectVersion")
+            .getString("versionId");
 
         // Step - Retrieve new project
         UUID newVersionId = UUID.fromString(newVersionIdString);

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.test.common;
 
+import edu.nd.crc.safa.features.users.entities.IUser;
+
 public interface IShareTest {
 
     /**
@@ -11,4 +13,9 @@ public interface IShareTest {
      * @return {@link String} Password of account who project is shared with.
      */
     String getShareePassword();
+
+    /**
+     * @return Returns the sharee user.
+     */
+    IUser getSharee();
 }

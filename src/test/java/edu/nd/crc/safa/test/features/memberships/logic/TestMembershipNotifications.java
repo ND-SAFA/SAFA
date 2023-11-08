@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.Test;
  * - member is added to the project
  * - member is deleted from a project
  */
-@Disabled("Disabled until notifications are updated")
 class TestMembershipNotifications extends ApplicationBaseTest {
 
     @Test

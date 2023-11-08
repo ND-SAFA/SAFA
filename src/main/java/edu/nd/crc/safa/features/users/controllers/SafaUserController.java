@@ -28,6 +28,7 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -241,6 +242,7 @@ public class SafaUserController extends BaseController {
     }
 
     @Data
+    @AllArgsConstructor
     public static class AccountVerificationDTO {
         private String token;
     }

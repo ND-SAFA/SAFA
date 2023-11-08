@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.users.controllers.SafaUserController;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.EmailVerificationToken;
@@ -44,8 +45,7 @@ public class TestVerifyAccount extends ApplicationBaseTest {
         String token = tokenEntry.getToken();
 
         new SafaRequest(AppRoutes.Accounts.VERIFY_ACCOUNT)
-            .withQueryParam("token", token)
-            .getWithoutBody(status().is2xxSuccessful());
+            .postWithJsonObject(new SafaUserController.AccountVerificationDTO(token));
 
         SafaUser user = safaUserService.getUserById(userIdentifier.getUserId());
         assertThat(user.isVerified()).isTrue();

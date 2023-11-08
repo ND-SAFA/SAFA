@@ -1,13 +1,10 @@
 import sys
 from typing import Any, List, Type
 
-import inquirer
-
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
 from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, EXIT_COMMAND, EXIT_MESSAGE, \
-    REQUIRED_FIELD_ERROR, \
-    SINGLETON_PROMPT_ID
+    REQUIRED_FIELD_ERROR
 
 
 def inquirer_selection(selections: List[str], message: str = None, allow_back: bool = DEFAULT_ALLOW_BACK):
@@ -22,9 +19,15 @@ def inquirer_selection(selections: List[str], message: str = None, allow_back: b
     other_commands = [EXIT_COMMAND]
     if allow_back:
         other_commands.insert(0, BACK_COMMAND)
-    prompts = [inquirer.List(SINGLETON_PROMPT_ID, message=message, choices=selections + other_commands)]
-    answers = inquirer.prompt(prompts)
-    selected_choice = answers[SINGLETON_PROMPT_ID]
+    all_commands = selections + other_commands
+    options = [f"{i}) {s}" for i, s in enumerate(all_commands)]
+    selections_message = f"{NEW_LINE.join(options)}\n>"
+    user_input = input(selections_message)
+    try:
+        selected_index = int(user_input)
+    except:
+        raise Exception("Expected an int.")
+    selected_choice = all_commands[int(selected_index)]
     if selected_choice == EXIT_COMMAND:
         logger.info(EXIT_MESSAGE)
         sys.exit()
@@ -46,7 +49,7 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
     message += f" - {annotation_name} -"
     if default_value is not None:
         message += f" ({default_value})"
-    user_value = inquirer.text(message=message)
+    user_value = input(message)
     if allow_back and user_value.lower() == BACK_COMMAND:
         return None
     if class_type is list:  # TODO: Support list of ints, bools, and floats.

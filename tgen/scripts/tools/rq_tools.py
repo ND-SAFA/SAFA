@@ -2,6 +2,7 @@ import os
 from typing import List, Optional
 
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
@@ -68,10 +69,10 @@ def select_navigation_items(items: List[str]):
     """
     folder_names = [os.path.basename(f) for f in items]
     folder_selected = inquirer_selection(folder_names, FOLDER_NAV_MESSAGE, allow_back=True)
-    folder_index = folder_names.index(folder_selected)
-    folder_selected_path = items[folder_index]
     if folder_selected is None:
         return None
+    folder_index = folder_names.index(folder_selected)
+    folder_selected_path = items[folder_index]
     return folder_selected_path
 
 
@@ -96,7 +97,11 @@ def run_rq(rq_path: str) -> None:
 
     ScriptDefinition.set_output_paths(rq_definition)
     rq_definition.set_default_values(use_os_values=True)
-    rq_definition.inquirer_variables()
+    try:
+        rq_definition.inquirer_variables()
+    except Exception:
+        logger.exception("Going back to menu...")
+        return
     final_rq_json = rq_definition.build_rq(error_on_fail=True)
 
     experiment_class = ScriptRunner.get_experiment_class(final_rq_json)

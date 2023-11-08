@@ -39,7 +39,10 @@ class RQVariable:
         :return: None
         """
         message = f"{self.name}"
-        self.__value = inquirer_value(message, self.type_class, default_value=self.__default_value)
+        value = inquirer_value(message, self.type_class, default_value=self.__default_value, allow_back=True)
+        if value is None:
+            raise Exception("Unable to retrieve value.")
+        self.__value = value
 
     def parse_value(self, variable_value: Any) -> Any:
         """

@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
-import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordChangeRequest;
@@ -31,14 +30,12 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -57,19 +54,13 @@ public class SafaUserController extends BaseController {
     private final SafaUserService safaUserService;
     private final EmailService emailService;
     private final EmailVerificationService emailVerificationService;
-    private final PermissionService permissionService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    @Value("${fend.base}")
-    private String fendBase;
-    @Value("${fend.reset-email-path}")
-    private String fendPath;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
                               ServiceProvider serviceProvider,
                               EmailService emailService,
                               EmailVerificationService emailVerificationService,
-                              PermissionService permissionService,
                               PasswordResetTokenRepository passwordResetTokenRepository) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
@@ -78,7 +69,6 @@ public class SafaUserController extends BaseController {
         this.safaUserService = serviceProvider.getSafaUserService();
         this.emailService = emailService;
         this.emailVerificationService = emailVerificationService;
-        this.permissionService = permissionService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
@@ -114,7 +104,7 @@ public class SafaUserController extends BaseController {
      * @return Created user entity
      */
     @PostMapping(AppRoutes.Accounts.CREATE_VERIFIED_ACCOUNT)
-    public UserIdentifierDTO createNewVerifiedUser(@RequestBody CreateAccountRequest newUser) {
+    public UserAppEntity createNewVerifiedUser(@RequestBody CreateAccountRequest newUser) {
         SafaUser currentUser = getCurrentUser();
         if (!currentUser.isSuperuser()) {
             throw new MissingPermissionException(() -> "safa.create_verified_account");
@@ -122,7 +112,7 @@ public class SafaUserController extends BaseController {
 
         SafaUser createdAccount = safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
         createdAccount = safaUserService.setAccountVerification(createdAccount, true);
-        return new UserIdentifierDTO(createdAccount);
+        return new UserAppEntity(createdAccount);
     }
 
     /**
@@ -130,9 +120,9 @@ public class SafaUserController extends BaseController {
      *
      * @param token The email verification token
      */
-    @GetMapping(AppRoutes.Accounts.VERIFY_ACCOUNT)
-    public void verifyAccount(@RequestParam("token") String token) {
-        emailVerificationService.verifyToken(token);
+    @PostMapping(AppRoutes.Accounts.VERIFY_ACCOUNT)
+    public void verifyAccount(@RequestBody AccountVerificationDTO token) {
+        emailVerificationService.verifyToken(token.getToken());
     }
 
     /**
@@ -246,7 +236,12 @@ public class SafaUserController extends BaseController {
     }
 
     @Data
-    private static class DefaultOrgDTO {
+    public static class DefaultOrgDTO {
         private UUID defaultOrgId;
+    }
+
+    @Data
+    public static class AccountVerificationDTO {
+        private String token;
     }
 }

@@ -5,7 +5,7 @@ from tgen.models.llm.anthropic_manager import AnthropicManager
 
 
 class DefaultLLMManager:
-    EFFICIENT = FunctionalWrapper(lambda: AnthropicManager(AnthropicArgs(model="claude-instant-1.1")))
+    EFFICIENT = FunctionalWrapper(lambda: AnthropicManager(AnthropicArgs(model="claude-instant-1.2")))
     BEST = FunctionalWrapper(lambda: AnthropicManager(AnthropicArgs(model="claude-2.0")))
 
 

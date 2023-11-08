@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict
@@ -6,6 +5,7 @@ from typing import Dict
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
     DEFAULT_ORPHAN_THRESHOLD
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
@@ -49,6 +49,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     The LLM manager to use to generate the artifact names and less complex tasks
     """
     hgen_llm_manager_efficient: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
+    """
+    The LLM manager to use to generate the inputs during step 2
+    """
+    inputs_llm_manager: AbstractLLMManager =  field(default_factory=lambda: OpenAIManager(OpenAIArgs(model=OPEN_AI_MODEL_DEFAULT)))
     """
     Max tokens to use for predictions.
     """
@@ -104,7 +108,7 @@ class HGenArgs(PipelineArgs, BaseObject):
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \
             if not self.export_dir.endswith(self.target_type) else self.export_dir
-        self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-4-0314'))
+        self.llm_managers[PredictionStep.FORMAT.value] = self.inputs_llm_manager
         for e in PredictionStep:
             if e.value not in self.max_tokens:
                 if e in [PredictionStep.NAME, PredictionStep.FORMAT]:

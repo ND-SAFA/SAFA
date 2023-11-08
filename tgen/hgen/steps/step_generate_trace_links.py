@@ -64,11 +64,8 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     export_dir=self._get_ranking_dir(state.export_dir),
                                     generate_explanations=args.generate_explanations,
                                     link_threshold=FIRST_PASS_LINK_THRESHOLD)
-        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
-        pipeline.run()
-        state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
-        pipeline_state: RankingState = pipeline.state
-        trace_predictions: List[EnumDict] = pipeline_state.selected_entries
+        selected_entries = self._run_embedding_pipeline(pipeline_args, state)
+        trace_predictions: List[EnumDict] = selected_entries
         return trace_predictions
 
     def _trace_artifacts_in_cluster_to_generated_parents(self, args: HGenArgs, state: HGenState) -> Tuple[List[Trace], List[Trace]]:
@@ -96,10 +93,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                           args.target_type, parent_ids)
             pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids, export_dir=cluster_dir,
                                         **pipeline_kwargs)
-            pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
-            pipeline.run()
-            state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
-            cluster_predictions = pipeline.state.selected_entries
+            cluster_predictions = self._run_embedding_pipeline(pipeline_args, state)
             parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
             for parent, parent_preds in parent2predictions.items():
                 parent_selected_traces = SelectByThreshold.select(parent_preds, FIRST_PASS_LINK_THRESHOLD)
@@ -108,8 +102,23 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 selected_traces.extend(parent_selected_traces)
             trace_predictions.extend(cluster_predictions)
         if args.generate_explanations:
-            selected_traces = self._generate_explanations(selected_traces, **pipeline_kwargs)
+            selected_traces = self._generate_explanations(selected_traces, state, **pipeline_kwargs)
         return trace_predictions, selected_traces
+
+    @staticmethod
+    def _run_embedding_pipeline(pipeline_args: RankingArgs, hgen_state: HGenState) -> List[Trace]:
+        """
+        Runs the embedding pipeline to obtain trace predictions
+        :param pipeline_args: The arguments to the ranking pipeline
+        :param hgen_state: The current hgen state
+        :return: The selected predictions from the pipeline
+        """
+        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=hgen_state.embedding_manager)
+        pipeline.run()
+        hgen_state.update_total_costs_from_state(pipeline.state)
+        hgen_state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
+        selected_predictions = pipeline.state.selected_entries
+        return selected_predictions
 
     @staticmethod
     def _create_traces_from_generation_predictions(id_to_related_children) -> List[EnumDict]:
@@ -126,17 +135,19 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return trace_predictions
 
     @staticmethod
-    def _generate_explanations(selected_traces: List[Trace], **pipeline_kwargs) -> List[Trace]:
+    def _generate_explanations(selected_traces: List[Trace], state: HGenState, **pipeline_kwargs) -> List[Trace]:
         """
         Generates explanations for each selected trace
         :param selected_traces: List of traces that have been selected
         :param pipeline_kwargs: Additional pipeline arguments
+        :param state: The current state of HGEN
         :return: The list of traces with explanations
         """
         pipeline_kwargs = DictUtil.update_kwarg_values(pipeline_kwargs, generate_explanations=True)
         pipeline_args = RankingArgs(run_name="explanations", parent_ids=[], children_ids=[],
                                     weight_of_explanation_scores=0,
                                     **pipeline_kwargs)
+        pipeline_args.update_llm_managers_with_state(state)
         pipeline_state = RankingState(candidate_entries=selected_traces)
         CreateExplanationsStep().run(pipeline_args, pipeline_state)
         selected_traces = pipeline_state.get_current_entries()

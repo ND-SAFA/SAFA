@@ -2,7 +2,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import Generic, List, Optional, Type, TypeVar
 
-from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
+from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE, EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
@@ -100,10 +100,21 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Runs steps with store.
         :return: None
         """
-        if self.summarizer_args:
-            self.run_summarizations()
+        self.run_setup_for_pipeline()
         for step in self.steps:
             self.run_step(step)
+        self._log_costs()
+
+    def run_setup_for_pipeline(self) -> None:
+        """
+        Runs anything that is needed before the pipeline begins
+        :return: None
+        """
+        self.args.update_llm_managers_with_state(self.state)
+        if self.summarizer_args:
+            self.summarizer_args: SummarizerArgs
+            self.summarizer_args.update_llm_managers_with_state(self.state)
+            self.run_summarizations()
 
     def run_summarizations(self) -> Summary:
         """
@@ -224,3 +235,18 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             print(f"Unknown input {choice}. Please try again\n")
             selected_options = AbstractPipeline._display_interactive_menu(menu_options)
         return selected_options
+
+    def _log_costs(self) -> None:
+        """
+        Logs the costs accumulated during the run
+        :return: None
+        """
+        total_cost = self.state.total_input_cost + self.state.total_output_cost
+        if total_cost > 0:
+            costs = {"Input": self.state.total_input_cost,
+                     "Output": self.state.total_output_cost,
+                     "Total": total_cost}
+            cost_msg = "{} Token Cost: ${}"
+            cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in costs.items()]
+            logger.log_with_title("COSTS FOR RUN: ", NEW_LINE.join(cost_msgs))
+

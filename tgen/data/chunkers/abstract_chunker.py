@@ -3,7 +3,7 @@ from typing import List, Type
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
-from tgen.models.llm.token_limits import TokenLimitCalculator
+from tgen.models.tokens.token_calculator import TokenCalculator
 
 
 class AbstractChunker(BaseObject, ABC):
@@ -36,7 +36,7 @@ class AbstractChunker(BaseObject, ABC):
         :param content: The content to check
         :return: True if the content exceeds the token limit for the model else False
         """
-        n_expected_tokens = TokenLimitCalculator.estimate_num_tokens(content, self.model_name)
+        n_expected_tokens = TokenCalculator.estimate_num_tokens(content, self.model_name)
         return n_expected_tokens > self.max_prompt_tokens
 
     @classmethod

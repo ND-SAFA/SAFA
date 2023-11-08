@@ -1,13 +1,14 @@
-import os
 from dataclasses import dataclass, field
 from typing import List, Dict
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, \
     DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
+from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.state.state import State
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 
 
@@ -75,3 +76,11 @@ class SummarizerArgs:
         self.export_dir = new_path
         if self.export_dir and not self.export_dir.endswith(self.summary_dirname):
             self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.summary_dirname)
+
+    def update_llm_managers_with_state(self, state: State) -> None:
+        """
+        Updates all the llm_managers to use the pipeline's state to save token counts
+        :param state: The pipeline state
+        :return: None
+        """
+        DataclassUtil.update_attr_of_type_with_vals(self, AbstractLLMManager, state=state)

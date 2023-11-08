@@ -1,12 +1,16 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Generic, Type, TypeVar
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dict_util import DictUtil
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.prompts.prompt_args import PromptArgs
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.tokens.token_costs import ModelTokenCost, OUTPUT_TOKENS, INPUT_TOKENS
+from tgen.prompts.prompt_args import PromptArgs
+from tgen.state.state import State
 
 AIObject = TypeVar("AIObject")
 
@@ -16,7 +20,7 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
     Interface for all AI utility classes.
     """
 
-    def __init__(self, llm_args: AbstractLLMArgs, prompt_args: PromptArgs):
+    def __init__(self, llm_args: AbstractLLMArgs, prompt_args: PromptArgs, state: State = None):
         """
         Initializes the manager with args used for each request and the prompt args used for creating dataset
         :param llm_args: args used for each request
@@ -24,6 +28,7 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         """
         self.llm_args = llm_args
         self.prompt_args = prompt_args
+        self.state = state if state else State()
 
     def make_completion_request(self, completion_type: LLMCompletionType,
                                 **params) -> SupportedLLMResponses:
@@ -35,7 +40,18 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         """
         completion_params = self.llm_args.to_params(TrainerTask.PREDICT, completion_type)
         completion_params.update(params)
+        input_content = EMPTY_STRING.join(DictUtil.get_kwarg_values(params, prompt=[]))
+        if input_content:
+            self.state.total_input_cost += ModelTokenCost.calculate_cost_for_content(content=input_content,
+                                                                                     model_name=self.llm_args.model,
+                                                                                     input_or_output=INPUT_TOKENS,
+                                                                                     raise_exception=False)
         llm_response = self.make_completion_request_impl(**completion_params)
+        output_content = self.extract_all_text_from_response(llm_response)
+        self.state.total_output_cost += ModelTokenCost.calculate_cost_for_content(content=output_content,
+                                                                                     model_name=self.llm_args.model,
+                                                                                     input_or_output=OUTPUT_TOKENS,
+                                                                                     raise_exception=False)
         translated_response = self.translate_to_response(completion_type, llm_response, **params)
         return translated_response
 
@@ -45,6 +61,15 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         Makes a completion request to model.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
+        """
+
+    @staticmethod
+    @abstractmethod
+    def extract_all_text_from_response(res) -> str:
+        """
+        Extracts all text across all batches from the response
+        :param res: The response
+        :return: All text across all batches from the response
         """
 
     @staticmethod

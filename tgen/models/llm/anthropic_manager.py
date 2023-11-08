@@ -114,6 +114,15 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         responses = [res for res in global_responses if res is not None]
         return responses
 
+    @staticmethod
+    def extract_all_text_from_response(res: AnthropicResponse) -> str:
+        """
+        Extracts all text across all batches from the response
+        :param res: The response
+        :return: All text across all batches from the response
+        """
+        return EMPTY_STRING.join([res["completion"] for res in res])
+
     def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[
         SupportedLLMResponses]:
         """

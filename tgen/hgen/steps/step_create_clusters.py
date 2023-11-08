@@ -28,6 +28,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
+        state.update_total_costs_from_state(clustering_pipeline.state)
 
         cluster_map = clustering_pipeline.state.final_cluster_map
 

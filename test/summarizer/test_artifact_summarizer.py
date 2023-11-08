@@ -22,7 +22,7 @@ class TestSummarizer(BaseTest):
     CONTENT = " ".join(CHUNKS)
     CODE_FILE_PATH = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
     CODE_CONTENT = FileUtil.read_file(CODE_FILE_PATH)
-    MODEL_NAME = "gpt-3.5-turbo"
+    MODEL_NAME = "gpt-4"
     MAX_COMPLETION_TOKENS = 500
 
     @mock_openai

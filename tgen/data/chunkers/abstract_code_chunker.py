@@ -6,7 +6,7 @@ from typing import List, Tuple, Type
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
-from tgen.models.llm.token_limits import TokenLimitCalculator
+from tgen.models.tokens.token_calculator import TokenCalculator
 
 
 class AbstractCodeChunker(AbstractChunker, ABC):
@@ -66,8 +66,8 @@ class AbstractCodeChunker(AbstractChunker, ABC):
         """
         i = 0
         for child in child_chunks:
-            parent_tokens = TokenLimitCalculator.estimate_num_tokens(self._get_node_content(p_chunk, lines), self.model_name)
-            c_tokens = TokenLimitCalculator.estimate_num_tokens(self._get_node_content(child, lines), self.model_name)
+            parent_tokens = TokenCalculator.estimate_num_tokens(self._get_node_content(p_chunk, lines), self.model_name)
+            c_tokens = TokenCalculator.estimate_num_tokens(self._get_node_content(child, lines), self.model_name)
             if (c_tokens + parent_tokens) > self.max_prompt_tokens:
                 break
             p_chunk.end_lineno = child.end_lineno

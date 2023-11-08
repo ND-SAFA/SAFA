@@ -4,6 +4,7 @@ import openai
 from openai.openai_object import OpenAIObject
 
 from tgen.common.constants import open_ai_constants
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
@@ -84,6 +85,15 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                                                   collect_results=True)
 
         return Res(choices=choices)
+
+    @staticmethod
+    def extract_all_text_from_response(res: OpenAIObject) -> str:
+        """
+        Extracts all text across all batches from the response
+        :param res: The response
+        :return: All text across all batches from the response
+        """
+        return EMPTY_STRING.join([res.message["content"] for res in res.choices])
 
     @staticmethod
     def translate_to_response(task: LLMCompletionType, res: OpenAIObject, **params) -> SupportedLLMResponses:

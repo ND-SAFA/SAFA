@@ -8,6 +8,7 @@ export const ARTIFACT_GENERATION_TYPES = {
   EPIC: "Epic",
   SUB_SYSTEM: "Sub-System",
   GRAPH_QL: "GraphQL API Documentation",
+  BUS_LOGIC: "Business Logic",
 };
 
 /**
@@ -29,4 +30,5 @@ export const ARTIFACT_GENERATION_OPTIONS =
         ARTIFACT_GENERATION_TYPES.EPIC,
         ARTIFACT_GENERATION_TYPES.SUB_SYSTEM,
         ARTIFACT_GENERATION_TYPES.GRAPH_QL,
+        ARTIFACT_GENERATION_TYPES.BUS_LOGIC,
       ];

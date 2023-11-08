@@ -137,7 +137,7 @@ class RQDefinition:
             default_values = {}
         if use_os_values:
             for env_key, env_value in os.environ.items():
-                default_values[env_key] = env_value
+                default_values[env_key] = os.path.expanduser(env_value)
 
         for variable in self.variables:
             if variable.name not in default_values:

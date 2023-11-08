@@ -36,16 +36,17 @@ class ClusteringAlgorithmManager:
         embedding_map = embedding_manager.create_embedding_map(subset_ids)
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
-        n_clusters = round(len(embeddings) * reduction_factor)
-
+        n_clusters = max(round(len(embeddings) * reduction_factor), 1)
         self.add_internal_kwargs(kwargs, n_clusters)
-        clustering_algo = self.method.value(**kwargs)
+        
         try:
+            clustering_algo = self.method.value(**kwargs)
             clustering_algo.fit(embeddings)
+            embedding_labels = clustering_algo.labels_
+            clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels, embedding_manager)
         except Exception:
             logger.exception(f"Clustering failed for {self.method.name}")
-        embedding_labels = clustering_algo.labels_ if hasattr(clustering_algo, "labels_") else [-1] * len(embeddings)
-        clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels, embedding_manager)
+            clusters = {}
         return clusters
 
     def add_internal_kwargs(self, kwargs: Dict, n_clusters: int) -> None:

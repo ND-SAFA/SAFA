@@ -39,5 +39,9 @@ class EmbeddingUtil:
         """
         source_matrix = np.asarray(source_embeddings)
         target_matrix = np.asarray(target_embeddings)
+        if source_matrix.shape[0] == 0:
+            raise Exception("Source matrix has no examples.")
+        if target_matrix.shape[0] == 0:
+            raise Exception("Target matrix has no examples.")
         cluster_similarities = cosine_similarity(source_matrix, target_matrix)
         return cluster_similarities

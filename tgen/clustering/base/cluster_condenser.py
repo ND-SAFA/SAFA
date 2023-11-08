@@ -67,6 +67,8 @@ class ClusterCondenser:
         """
         artifacts_to_add = []
         for a_id in new_cluster.artifact_id_set:
+            if a_id in source_cluster:
+                continue
             similarity = source_cluster.similarity_to_neighbors(a_id)
             if similarity >= 0.8:
                 artifacts_to_add.append(a_id)

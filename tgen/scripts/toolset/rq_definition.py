@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Tuple, Type
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.scripts.constants import MISSING_DEFINITION_ERROR, RQ_INQUIRER_CONFIRM_MESSAGE, RQ_VARIABLE_REGEX, \
     RQ_VARIABLE_START, \
     SUPPORTED_TYPES_RQ
@@ -226,6 +227,10 @@ class RQDefinition:
         :return: List of values.
         """
         values = []
+
+        if ReflectionUtil.is_primitive(rq_json):
+            return [rq_json]
+        
         for child_key, child_value in rq_json.items():
             if isinstance(child_value, list):
                 for i in child_value:

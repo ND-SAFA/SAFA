@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
-import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.EmailVerificationToken;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.EmailVerificationTokenRepository;
@@ -37,7 +37,7 @@ public class TestVerifyAccount extends ApplicationBaseTest {
         createAccountRequest.setEmail("test@example.com");
         createAccountRequest.setPassword("test123");
 
-        UserIdentifierDTO userIdentifier = new SafaRequest(AppRoutes.Accounts.CREATE_ACCOUNT)
+        UserAppEntity userIdentifier = new SafaRequest(AppRoutes.Accounts.CREATE_ACCOUNT)
             .postAndParseResponse(createAccountRequest, new TypeReference<>() {});
 
         EmailVerificationToken tokenEntry = tokenRepository.findByUserUserId(userIdentifier.getUserId());
@@ -57,7 +57,7 @@ public class TestVerifyAccount extends ApplicationBaseTest {
         createAccountRequest.setEmail("test@example.com");
         createAccountRequest.setPassword("test123");
 
-        UserIdentifierDTO userIdentifier = new SafaRequest(AppRoutes.Accounts.CREATE_ACCOUNT)
+        UserAppEntity userIdentifier = new SafaRequest(AppRoutes.Accounts.CREATE_ACCOUNT)
             .postAndParseResponse(createAccountRequest, new TypeReference<>() {});
 
         new SafaRequest(AppRoutes.Accounts.VERIFY_ACCOUNT)

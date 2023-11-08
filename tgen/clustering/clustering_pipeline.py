@@ -8,7 +8,7 @@ from tgen.clustering.steps.create_clusters_from_embeddings import CreateClusters
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
 from tgen.clustering.steps.link_orphans import LinkOrphans
 from tgen.common.util.base_object import BaseObject
-from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 
 
 class ClusteringPipeline(AbstractPipeline[ClusteringArgs, ClusteringState], BaseObject):

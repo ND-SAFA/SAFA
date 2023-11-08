@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from typing import List, Dict
 
-from tgen.state.state import State
+from tgen.pipeline.state import State
 from tgen.summarizer.summary import Summary
 
 

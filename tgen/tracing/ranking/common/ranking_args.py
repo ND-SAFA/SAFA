@@ -11,7 +11,7 @@ from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 
 

@@ -11,7 +11,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass

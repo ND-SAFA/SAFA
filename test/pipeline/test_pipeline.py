@@ -5,9 +5,9 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, AbstractPipeline
-from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.state.state import State
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep, AbstractPipeline
+from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
+from tgen.pipeline.state import State
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_HGEN_PATH, TEST_STATE_PATH, TEST_OUTPUT_DIR
 

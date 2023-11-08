@@ -7,3 +7,6 @@ class InteractiveModeOptions(Enum):
     SKIP_STEP = "Skip next step"
     QUIT = "Quit"
     LOAD_NEW_STATE = "Load new state"
+    TURN_OFF_INTERACTIVE = "Turn off interactive"
+    LOAD_EXTERNAL_STATE = "Load external state"
+    DO_NOT_RESUME = "Do not resume"

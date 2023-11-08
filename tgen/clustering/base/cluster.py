@@ -3,9 +3,9 @@ from typing import Any, Iterable, List, Tuple
 
 import numpy as np
 
+from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
-from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
@@ -26,7 +26,7 @@ class Cluster:
         self.__init_stats()
 
     @staticmethod
-    def get_cluster_id(method: SupportedClusteringMethod, index: int):
+    def get_cluster_id(method: SupportedClusteringMethods, index: int):
         """
         Creates generic cluster id.
         :param method: The method used to generate the cluster.

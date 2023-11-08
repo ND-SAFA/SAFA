@@ -315,3 +315,13 @@ class ReflectionUtil:
                 traceback.print_exc()
             return False
         return True
+
+    @staticmethod
+    def is_primitive(obj: Any) -> bool:
+        """
+        Checks if object is of type int, float, str or bool.
+        :param obj: The object to check if instance of primitive.
+        :return: True if obj is instance of primitive, false otherwise.
+        """
+        primitive_type_classes = [str, int, float, bool]
+        return any([isinstance(obj, t) for t in primitive_type_classes])

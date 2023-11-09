@@ -11,6 +11,7 @@ class RemoveUnwantedCharsStep(AbstractDataProcessingStep):
     def __init__(self, additional_unwanted_chars: Union[Dict[str, str], List[str]] = None):
         """
         Responsible for any non-printable or additional unwanted characters.
+        :param additional_unwanted_chars: Other unwanted character to remove.
         """
         if isinstance(additional_unwanted_chars, list):
             additional_unwanted_chars = {c: "" for c in additional_unwanted_chars}

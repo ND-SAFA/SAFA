@@ -100,7 +100,7 @@ def run_rq(rq_path: str) -> None:
     try:
         rq_definition.inquirer_variables()
     except Exception:
-        logger.exception("Going back to menu...")
+        logger.warning("Going back to menu...")
         return
     final_rq_json = rq_definition.build_rq(error_on_fail=True)
 

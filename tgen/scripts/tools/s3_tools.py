@@ -136,7 +136,8 @@ def display_items(items: List[Any], header: str, relative_path: str = None, prin
     :param items: The items to display.
     :param header: The header to display items under.
     :param relative_path: The path to display items from.
-    :return: None
+    :param print_message: Whether to print message.
+    :return: The message containing all items.
     """
     HEADER_BAR = "-" * 25
     header_message = " ".join([HEADER_BAR, header, HEADER_BAR])

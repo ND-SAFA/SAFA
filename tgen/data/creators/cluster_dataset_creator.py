@@ -31,10 +31,9 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
                  summarizer: ArtifactsSummarizer = None, **clustering_params):
         """
         Initializes with a dataset with artifacts to be clustered
-        :param trace_dataset: The dataset to perform clustering on
-        :param layer_id: ID to use for the new layer created from the clusters
-        :param artifact_df: The dataframe containing all artifacts to cluster from
+        :param prompt_dataset: The dataset to perform clustering on
         :param manual_clusters: Manually created clusters to use to create dataset
+        :param layer_id: ID to use for the new layer created from the clusters
         :param summarizer: Summarizes the cluster artifact content
         :param clustering_params: Any additional parameters necessary to create clusters
         """
@@ -90,8 +89,9 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
                                              layer_id: str) -> Tuple[Dict[str, str], Set[str], Dict[str, Dict]]:
         """
         Gets the mapping of cluster to content, all new positive trace links, and source layer ids to create the project dataframes
-        :param method_to_clusters: A dictionary mapping method name to the clusters it produced
+        :param clusters: The clusters to extract.
         :param artifact_df: The dataframe containing artifacts in the clusters
+        :param layer_id: Layer ID used to calcaluate run ID.
         :return:  mapping of cluster to content, all new positive trace links, and source layer ids to create the project dataframes
         """
         cluster_id_to_content = {}

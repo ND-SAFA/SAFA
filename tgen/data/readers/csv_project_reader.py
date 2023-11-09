@@ -37,6 +37,7 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     def read_project(self, n_threads: int = 1) -> TraceDataFramesTypes:
         """
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
+        :param n_threads: The number of threads to use to read in traces in project.
         :return: Artifact and Trace DataFrame
         """
         logger.info(f"Reading file: {self.get_full_project_path()}")

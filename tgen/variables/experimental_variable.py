@@ -10,6 +10,7 @@ class ExperimentalVariable(MultiVariable):
         A list of Variables to use in experiments
         :param values: a list of variables for experimenting
         :param experimental_param_name_to_val: Dictionary of experimental vars per value.
+        :param using_jobs: If using jobs will extract experimental params.
         """
         self.experimental_param2val = experimental_param_name_to_val
         if using_jobs:

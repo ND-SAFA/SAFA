@@ -1,9 +1,9 @@
 from typing import Dict, List
 
 from tgen.common.constants.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
-    DEFAULT_PACKAGE_ARTIFACT_TYPE, DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
-from tgen.common.util.file_util import FileUtil
+    DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
 from tgen.common.objects.trace import Trace
+from tgen.common.util.file_util import FileUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.tracing.code.package_tracer import PackageTracer
@@ -25,6 +25,7 @@ class CodeTracer:
     def trace(self, add_packages: bool = True):
         """
         Adds traces between code modules and optionally adds packages as artifacts.
+        :param add_packages: Whether to add package nodes to trace dataset.
         :return: None (dataset is modified)
         """
         self.add_code_traces()
@@ -34,6 +35,7 @@ class CodeTracer:
     def add_code_traces(self, rename_children: bool = DEFAULT_RENAME_CHILDREN) -> None:
         """
         Adds trace links between code files.
+        :param rename_children: Whether to rename the children to contain the layer id names might conflict.
         :return: None (modifies the trace dataset).
         """
         # TODO allow user to supply new name for child layer if renaming
@@ -52,7 +54,7 @@ class CodeTracer:
         links = header_links
         self.trace_dataset.trace_df.add_links(links)
 
-    def add_package_nodes(self, package_type: str = DEFAULT_PACKAGE_ARTIFACT_TYPE) -> None:
+    def add_package_nodes(self) -> None:
         """
         Extracts packages and adds them as artifacts.
         :return: None (artifact data frame is modified)

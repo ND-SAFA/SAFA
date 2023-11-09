@@ -1,11 +1,11 @@
 import os
 from typing import Dict, List, Optional, Tuple
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
 from tgen.data.github.gtraces.glink import GLink
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
 
 ARTIFACTS_TYPE = Dict[str, GCodeFile]
 LINKS_TYPE = Dict[str, GLink]
@@ -23,7 +23,8 @@ class CPPToHeaderLinkCreator:
     def __init__(self, cpp_file_paths: List[str], base_path: str):
         """
         Responsible for linking CPP files to their header file
-        :param cpp_file_paths: A list of cpp file paths to create links for
+        :param cpp_file_paths: A list of cpp file paths to create links for.
+        :param base_path: Path to base project.
         """
         self.cpp_file_paths = cpp_file_paths
         self.base_path = base_path
@@ -33,6 +34,7 @@ class CPPToHeaderLinkCreator:
     def create_links(self, verbose: bool = False) -> Tuple[ARTIFACTS_TYPE, LINKS_TYPE]:
         """
         Creates links between CPP files and the corresponding Header file
+        :param verbose: Whether to include all logs.
         :return a dictionary mapping id to artifact and a dictionary mapping id to link
         """
         if len(self._links) < 1:

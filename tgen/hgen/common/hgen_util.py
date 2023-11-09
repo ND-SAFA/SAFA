@@ -216,9 +216,10 @@ class HGenUtil:
                 len(content) > 1]
 
     @staticmethod
-    def convert_spaces_to_dashes(str2convert) -> str:
+    def convert_spaces_to_dashes(str2convert: str) -> str:
         """
         Converts the str to use dashes instead of spaces
+        :param str2convert: The string to process.
         :return: The str with dashes instead of spaces
         """
         return DASH.join(str2convert.split()).lower()

@@ -29,7 +29,7 @@ class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
         """
         Confusion matrix metric calculates the number of true and false positives and the true/false negatives.
         :param predictions: predicted labels
-        :param labels: ground truth labels.
+        :param references: ground truth labels.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Dictionary containing counts for the different results.

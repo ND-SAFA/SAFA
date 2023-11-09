@@ -38,14 +38,14 @@ class ClusteringAlgorithmManager:
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         n_clusters = max(round(len(embeddings) * reduction_factor), 1)
         self.add_internal_kwargs(kwargs, n_clusters)
-        
+
         try:
             clustering_algo = self.method.value(**kwargs)
             clustering_algo.fit(embeddings)
             embedding_labels = clustering_algo.labels_
             clusters = self.create_clusters_from_labels(artifact_ids, embedding_labels, embedding_manager)
-        except Exception:
-            logger.exception(f"Clustering failed for {self.method.name}")
+        except Exception as e:
+            logger.warning(f"Clustering failed for {self.method.name}: {str(e)}")
             clusters = {}
         return clusters
 

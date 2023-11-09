@@ -1,9 +1,9 @@
 from enum import Enum, auto
-from typing import List, Dict
+from typing import Dict, List
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
 
@@ -76,6 +76,7 @@ class MultiArtifactPrompt(Prompt):
         2. ID: BODY
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
         :param include_ids: If True, includes artifact ids
+        :param starting_num: Index to start counting from.
         :return: The formatted prompt
         """
         numbered_format = "{}. {}"
@@ -111,6 +112,7 @@ class MultiArtifactPrompt(Prompt):
         # ID
         body
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
+        :param prompt: Determines header level. 1 if prompt not defined and 2 otherwise.
         :param include_ids: If True, includes artifact ids
         :return: The formatted prompt
         """

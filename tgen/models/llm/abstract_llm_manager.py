@@ -8,7 +8,7 @@ from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.tokens.token_costs import ModelTokenCost, OUTPUT_TOKENS, INPUT_TOKENS
+from tgen.models.tokens.token_costs import INPUT_TOKENS, ModelTokenCost, OUTPUT_TOKENS
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.state.state import State
 
@@ -25,6 +25,7 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         Initializes the manager with args used for each request and the prompt args used for creating dataset
         :param llm_args: args used for each request
         :param prompt_args: args used for creating dataset
+        :param state: The state of the pipeline.
         """
         self.llm_args = llm_args
         self.prompt_args = prompt_args
@@ -49,9 +50,9 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         llm_response = self.make_completion_request_impl(**completion_params)
         output_content = self.extract_all_text_from_response(llm_response)
         self.state.total_output_cost += ModelTokenCost.calculate_cost_for_content(content=output_content,
-                                                                                     model_name=self.llm_args.model,
-                                                                                     input_or_output=OUTPUT_TOKENS,
-                                                                                     raise_exception=False)
+                                                                                  model_name=self.llm_args.model,
+                                                                                  input_or_output=OUTPUT_TOKENS,
+                                                                                  raise_exception=False)
         translated_response = self.translate_to_response(completion_type, llm_response, **params)
         return translated_response
 

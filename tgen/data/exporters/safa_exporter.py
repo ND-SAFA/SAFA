@@ -26,6 +26,8 @@ class SafaExporter(AbstractDatasetExporter):
         Initializes exporter for given trace dataset.
         :param export_path: Path to export project to.
         :param dataset_creator: The creator in charge of making the dataset to export
+        :param dataset: Built dataset to replace using creator.
+        :param artifact_types: The artifacts types to export.
         """
         super().__init__(export_path, dataset_creator, dataset)
         self.artifact_definitions = []

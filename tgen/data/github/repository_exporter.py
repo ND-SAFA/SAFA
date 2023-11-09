@@ -187,6 +187,7 @@ class RepositoryExporter:
     def __create_issue_2_code(self, commit2issue: GArtifactSet[GLink]):
         """
         Creates trace links between issues and code through the commits implementing issue.
+        :param commit2issue: Map of commits 2 related issues.
         :return: GArtifactSet containing links.
         """
         commit2files = {}
@@ -245,6 +246,7 @@ class RepositoryExporter:
         Removes commits whose body is less than minimum artifact length defined in constants.
         :param commit_artifact_set: The set of commits in repository.
         :param min_artifact_length: The minimum length of the artifacts to keep.
+        :param min_code_length: The min length of the code artifacts to keep.
         :return: Commits with equal or greater content length than minimum.
         """
         long_messages = [a for a in commit_artifact_set.artifacts if
@@ -256,6 +258,7 @@ class RepositoryExporter:
         """
         Removes redundant text and strips content.
         :param commit_artifact_set: The set of artifacts to clean.
+        :param data_cleaner: Cleans the artifact content.
         :return: The cleaned artifacts.
         """
         RepositoryExporter.__clean_content(commit_artifact_set, data_cleaner)

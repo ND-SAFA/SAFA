@@ -11,6 +11,7 @@ class SeparateJoinedWordsStep(AbstractDataProcessingStep):
     def __init__(self, deliminators: Iterable[str] = DELIMINATORS):
         """
         Handles separating all camelCase and snake_case words
+        :param deliminators: Deliminators used to split words.
         """
         self.deliminators = deliminators
         super().__init__(self.ORDER)
@@ -44,6 +45,7 @@ class SeparateJoinedWordsStep(AbstractDataProcessingStep):
         """
         Performs separation task on the word list
         :param word_list: the list of words to separate
+        :param separator_func: The function transforming single word in to many.
         :return: the separated word_list
         """
         separated_word_list = []

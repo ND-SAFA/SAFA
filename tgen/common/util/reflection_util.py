@@ -272,6 +272,7 @@ class ReflectionUtil:
         :param val: the value
         :param expected_type: expected type or typing generic
         :param param_name: the name of the parameter being tested
+        :param print_on_error: Whether to print exception if error occurs.
         :return: True if the type of val matches expected_type, False otherwise
         """
         try:

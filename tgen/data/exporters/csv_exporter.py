@@ -1,5 +1,5 @@
-from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.common.util.logging.logger_manager import logger
+from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 
 
 class CSVExporter(AbstractDatasetExporter):
@@ -15,6 +15,7 @@ class CSVExporter(AbstractDatasetExporter):
     def export(self, include_index: bool = True, **kwargs) -> None:
         """
         Exports entities as a project in a CSV format.
+        :param include_index: Whether to include index of data frame in export.
         :return: None
         """
         df = self.get_dataset().to_dataframe()

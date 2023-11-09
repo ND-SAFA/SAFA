@@ -34,7 +34,7 @@ class FMetric(AbstractTraceMetric):
         """
         Computes the max f1 and f2 scores for all thresholds for given predictions.
         :param predictions: predicted labels
-        :param labels: ground truth labels.
+        :param references: ground truth labels.
         :param kwargs: any other necessary params
         :return: Dictionary containing f1 and f2 scores.
         """

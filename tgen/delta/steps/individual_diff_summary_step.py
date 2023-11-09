@@ -4,10 +4,9 @@ from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
@@ -61,6 +60,7 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param args: The arguments for the delta summarizer
         :param filename2diffs: The dictionary containing filenames mapped to their diffs
         :param ids: The filename ids
+        :param include_original: Whether to include original artifacts in the prompt.
         :return: The artifacts df created from the file diffs
         """
         contents = []
@@ -85,6 +85,7 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         Parses the output to create dictionary mapping the filename to the diff summaries/related
         :param ids: The list of filenames
         :param output: The output from the model
+        :param questionnaire: The questionnaire used to build the prompt.
         :return: A dictionary mapping the filename to the diff summaries/related
         """
         no_res = IndividualDiffSummaryStep.NO_CHANGE_RESPONSE

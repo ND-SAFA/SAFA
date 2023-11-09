@@ -8,7 +8,7 @@ from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 
-from tgen.common.constants.other_constants import VSM_THRESHOLD_DEFAULT, VSM_SELECTION_THRESHOLDS
+from tgen.common.constants.other_constants import VSM_SELECTION_THRESHOLDS, VSM_THRESHOLD_DEFAULT
 from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.common.objects.trace import Trace
 from tgen.common.util.list_util import ListUtil
@@ -48,6 +48,8 @@ class VSMTrainer(AbstractTrainer):
         :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting
         :param vectorizer: vectorizer for assigning weights to words, must be one of sklearn.text.extraction
         :param metrics: A list of metric names to use for evaluation
+        :param steps: The data processing steps.
+        :param select_predictions: Whether to select the predictions of the algorithm.
         """
         if steps is None:
             steps = [RemoveNonAlphaCharsStep(), SeparateCamelCaseStep(), LemmatizeWordStep()]

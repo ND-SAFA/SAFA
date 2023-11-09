@@ -94,7 +94,9 @@ class AbstractCodeChunker(AbstractChunker, ABC):
 
     def _resize_node(self, node: ChunkedNode, lines: List[str]) -> ChunkedNode:
         """
-        Resizes the node to fit within the required number of tokens
+        Resizes the node to fit within the required number of tokens.
+        :param node: The node to resize.
+        :param lines: The lines of the code node.
         :return: The resized node
         """
         content = self._get_node_content(node, lines)

@@ -37,6 +37,7 @@ class PreTrainDataset(iDataset):
     def as_creator(self, project_path: str):
         """
         Pre train dataset cannot be converted to creator
+        :param project_path: Ignored.
         """
         raise NotImplementedError("Pre train dataset cannot be converted to creator.")
 

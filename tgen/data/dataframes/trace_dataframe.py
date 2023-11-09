@@ -80,6 +80,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param target: The id of the target
         :param label: The label of the link (1 if True link, 0 otherwise)
         :param score: The score of the generated links.
+        :param explanation: The explanation for generated trace link.
         :return: The newly added link
         """
         link_id = TraceDataFrame.generate_link_id(source, target)
@@ -120,6 +121,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param label: The label of the link (1 if True link, 0 otherwise)
         :param link_id: The id of the link
         :param score: The score of the generated link.
+        :param explanation: Explanation for generated trace link.
         :return: A dictionary mapping column names to the corresponding link information
         """
         dict_ = EnumDict({TraceKeys.LINK_ID: link_id} if link_id else {})
@@ -139,6 +141,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
 
     def get_label_count(self, label: int = 1) -> int:
         """
+        :param label: The label whose count is returned.
         :return: Returns the number of true positives in data frame.
         """
         label_counts = self[TraceKeys.LABEL].value_counts()

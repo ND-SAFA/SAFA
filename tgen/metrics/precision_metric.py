@@ -33,7 +33,8 @@ class ClassificationMetrics(AbstractTraceMetric):
         """
         Computes the Precision@K or the percentage of links that were correctly predicted
         :param predictions: predicted labels
-        :param labels: ground truth labels.
+        :param references: ground truth labels.
+        :param trace_matrix: Matrix used to calculate trace metrics.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Precision@K score.

@@ -77,6 +77,7 @@ class TraceDataset(iDataset):
         def encode(batch: Dict[str, List[Union[str, int]]]) -> Dict:
             """
             Encodes the batch.
+            :param batch: The batch of examples to encode into features.
             """
             features = []
             for source, target, label in zip(batch[CSVKeys.SOURCE], batch[CSVKeys.TARGET], batch[CSVKeys.LABEL]):
@@ -95,6 +96,7 @@ class TraceDataset(iDataset):
     def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
+        :param include_ids: Whether to include artifact ids in resulting data frame.
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}

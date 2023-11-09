@@ -182,6 +182,7 @@ class Cluster:
     def to_yaml(self, export_path: str = None, **kwargs) -> "Cluster":
         """
         Removes stats that take a while to be saved
+        :param export_path: Path to save yaml to.
         :return: The cluster cleaned up for efficient saving as yaml
         """
         if export_path:

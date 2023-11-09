@@ -44,6 +44,7 @@ class TraceMatrix:
         Calculates the average metric for each source artifact in project.
         :param metric: The metric to compute for each query in matrix.
         :param default_value: The value to use if there are no valid metric scores.
+        :param joining_function: The functions used to combine all metric values across queries. Average is default.
         :return: Average metric value.
         """
         if not joining_function:

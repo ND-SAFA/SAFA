@@ -1,10 +1,8 @@
-import re
-from collections import OrderedDict
-from typing import Dict, Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, PERIOD, SPACE, COMMA
-from tgen.common.constants.ranking_constants import RANKING_ID_TAG, RANKING_SCORE_TAG, RANKING_MAX_SCORE, RANKING_ARTIFACT_TAG, \
-    JUSTIFICATION_TAG, RANKING_MIN_SCORE
+from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, PERIOD, SPACE
+from tgen.common.constants.ranking_constants import JUSTIFICATION_TAG, RANKING_ARTIFACT_TAG, RANKING_ID_TAG, RANKING_MAX_SCORE, \
+    RANKING_MIN_SCORE, RANKING_SCORE_TAG
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -22,10 +20,12 @@ class ArtifactReasoning:
                  require_id: bool = True):
         """
         Stores the reasoning of the LLM for each artifact
+        :param index: The index associated with overall artifacts.
         :param artifact_dict: Contains the reasoning of the LLM for each artifact
         :param artifact_id: The id of the artifact
         :param score: The score given to the artifact evaluating relationship to parent
         :param explanation: The explanation of why that score was given
+        :param require_id: Whether to require artifact ids.
         """
         self.artifact_id = artifact_id
         if artifact_dict:
@@ -125,7 +125,6 @@ class ArtifactReasoning:
         line_parts = StrUtil.split_sentences_by_punctuation(line, COMMA)
         contains_score = [l for l in line_parts if len(StrUtil.find_floats(l)) > 0]
         return len(contains_score) > 0
-
 
     @staticmethod
     def _add_header_to_explanation(header: str, explanation: str) -> str:

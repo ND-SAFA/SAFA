@@ -28,9 +28,9 @@ class State(BaseObject):
 
     project_summary: Summary = None
 
-    total_input_cost: int = 0
+    total_input_cost: float = 0
 
-    total_output_cost: int = 0
+    total_output_cost: float = 0
 
     _CHECKPOINT_DIRNAME: str = "state_checkpoints"
 

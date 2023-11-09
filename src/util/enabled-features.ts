@@ -10,4 +10,5 @@ export const ENABLED_FEATURES = {
 
   ONBOARDING: true,
   BILLING_ONBOARDING: true,
+  ONBOARDING_MOCKED: true,
 };

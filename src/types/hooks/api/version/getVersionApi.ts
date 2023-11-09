@@ -57,5 +57,7 @@ export interface GetVersionApiHook {
    *
    * @param identifier - The project to load the current version of.
    */
-  handleLoadCurrent(identifier: IdentifierSchema): Promise<void>;
+  handleLoadCurrent(
+    identifier: Pick<IdentifierSchema, "projectId">
+  ): Promise<void>;
 }

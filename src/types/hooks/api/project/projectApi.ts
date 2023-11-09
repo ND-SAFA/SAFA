@@ -28,8 +28,9 @@ export interface ProjectApiHook {
    *
    * @param fileType - The file format to download.
    *        @default 'csv'
+   * @param versionId - The version to download, if different from the currently loaded version.
    */
-  handleDownload(fileType?: "csv" | "json"): Promise<void>;
+  handleDownload(fileType?: "csv" | "json", versionId?: string): Promise<void>;
   /**
    * Deletes a project, updates app state, and logs the status.
    *

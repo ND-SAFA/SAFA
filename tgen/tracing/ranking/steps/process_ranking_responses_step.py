@@ -1,9 +1,9 @@
-from typing import List, Set, Dict, Tuple
+from typing import List, Dict
 
 from tgen.common.constants.ranking_constants import DEFAULT_SCORE
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys

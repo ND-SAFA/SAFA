@@ -1,9 +1,9 @@
 import uuid
 from typing import Any, Dict, List
 
+from tgen.common.constants.deliminator_constants import SPACE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.str_util import StrUtil
-from tgen.common.constants.deliminator_constants import SPACE
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
 
@@ -20,6 +20,7 @@ class Prompt:
         :param value: The value of the prompt
         :param response_manager: Handles creating response instructions and parsing response
         :param prompt_id: Specify specific id for the prompt
+        :param allow_formatting: Whether to allow formatting the prompts.
         """
         self.value = value
         self.id = prompt_id if prompt_id is not None else str(uuid.uuid5(uuid.NAMESPACE_DNS, str(Prompt.SEED)))

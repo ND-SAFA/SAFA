@@ -31,7 +31,8 @@ class AverageTrueLinksMetric(AbstractTraceMetric):
         """
         Returns the average true links per query.
         :param predictions: predicted labels
-        :param labels: ground truth labels.
+        :param references: ground truth labels.
+        :param trace_matrix: Matrix used to calculate trace metrics.
         :param kwargs: any other necessary params
         :return: Average number of positive links.
         """

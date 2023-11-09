@@ -5,7 +5,7 @@ import pandas as pd
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.constants.dataset_constants import EXCLUDED_FILES
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat

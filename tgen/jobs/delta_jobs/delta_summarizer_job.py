@@ -9,6 +9,7 @@ class DeltaSummarizerJob(AbstractJob):
     def __init__(self, delta_args: DeltaArgs, job_args: JobArgs = None):
         """
         :param delta_args: The args to use for the delta summarizer
+        :param job_args: job args used to configure job params.
         """
         self.delta_args = delta_args
         self.delta_summarizer = DeltaSummarizer(self.delta_args)

@@ -29,11 +29,9 @@ from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
-from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
-from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 
 
 class TestMultiLayerHGenJob(BaseJobTest):
@@ -150,8 +148,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         divisor = 3 - self.clustering_calls
         n = math.floor(len(artifacts) / divisor)
         state.final_cluster_map = {i: [a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]] for i in range(divisor)}
-        cluster_dataset = ClusterDatasetCreator(args.dataset,
-                                                manual_clusters=state.final_cluster_map).create()
+        cluster_dataset = ClusterDatasetCreator(args.dataset, state.final_cluster_map).create()
         state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
         state.cluster_artifact_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
 

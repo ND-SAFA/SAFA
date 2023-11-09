@@ -6,7 +6,7 @@ from yaml.constructor import SafeConstructor
 
 from tgen.common.constants.path_constants import INPUTS_FOR_GENERATION_PATH
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
@@ -107,6 +107,7 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         Gets the path to the inputs for generation for a given target type
         :param target_type: The target type being generated
+        :param source_type: Artifact type of the starting artifacts.
         :return: The path to the save the inputs for generation for a given target type
         """
         file_name = f"{HGenUtil.convert_spaces_to_dashes(source_type)}-to-{HGenUtil.convert_spaces_to_dashes(target_type)}"

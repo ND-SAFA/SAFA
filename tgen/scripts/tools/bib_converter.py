@@ -55,7 +55,8 @@ def write_columns(df: pd.DataFrame):
 def read_aggregate_df(folder_path: str, column_sort: List[str]):
     """
     Reads files and aggregates them into single dataset, sorting at the end.
-    :param folder_path: The path to the folder to aggregate
+    :param folder_path: The path to the folder to aggregate.
+    :param column_sort: The sorting order of the columns.
     :return: DataFrame
     """
     result_files = list(filter(lambda f: f[0] != PERIOD, os.listdir(folder_path)))

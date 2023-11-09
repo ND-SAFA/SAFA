@@ -11,7 +11,7 @@ from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOu
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
@@ -46,6 +46,7 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         Evaluates dataset under role with given trainer.
         :param trainer: The trainer used to predict on the dataset.
         :param dataset_role: The role the dataset to predict should be found under.
+        :param evaluator_metric: The metric used to define which is the best run.
         """
         self.trainer = trainer
         self.dataset_role = dataset_role

@@ -10,7 +10,7 @@ from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 
 
 class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):

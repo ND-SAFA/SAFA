@@ -2,14 +2,22 @@ import os
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Generic, List, Optional, Type, TypeVar
-
 from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.pipeline.state import State
 from tgen.scripts.toolset.selector import inquirer_selection, inquirer_value
+from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
+from tgen.common.util.file_util import FileUtil
+from tgen.common.logging.logger_manager import logger
+from typing import Generic, List, Optional, Type, TypeVar
+
+from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
+from tgen.common.util.file_util import FileUtil
+from tgen.common.logging.logger_manager import logger
+from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
+from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
@@ -69,9 +77,11 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                  skip_summarization: bool = False, **summarizer_args_kwargs):
         """
         Constructs pipeline of steps.
+        :param args: The arguments to the pipeline.
         :param steps: Steps to perform in sequential order.
         :param summarizer_args: The args used to create project summary
         :param summarizer_args_kwargs: Keyword arguments to summarizer to customize default settings.
+        :param skip_summarization: Whether to skip summarization of artifacts.
         """
         self.args = args
         self.steps = [s() for s in steps]
@@ -104,7 +114,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :return: None
         """
         self.run_setup_for_pipeline()
-        self._run_interactive_mode()
+        if self.args.interactive_mode:
+            self._run_interactive_mode()
         for step in self.steps:
             self.run_step(step)
         self._log_costs()
@@ -319,6 +330,27 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         message = "Menu Options: " if not message else message
         choice = inquirer_selection(selections=[mo.value for mo in menu_options], message=message, allow_back=allow_back)
         return InteractiveModeOptions[choice.upper()] if choice else choice
+
+    @staticmethod
+    def _display_interactive_menu(menu_options: List[InteractiveModeOptions]) -> InteractiveModeOptions:
+        """
+        Displays an interactive menu for users to select which action they would like
+        :param menu_options: The different actions available to the user
+        :return: The selected option
+        """
+        possible_choices = [str(i + 1) for i in range(len(menu_options))]
+        menu = NEW_LINE.join([f"{i}) {option.value}" for i, option in zip(possible_choices, menu_options)])
+        print("Menu Options: ")
+        print(menu)
+        choice = input(f"Select an option ({F_SLASH.join(possible_choices)}): \n").strip()
+        try:
+            assert choice in possible_choices
+            choice = int(choice)
+            selected_options = menu_options[choice - 1]
+        except (TypeError, AssertionError):
+            print(f"Unknown input {choice}. Please try again\n")
+            selected_options = AbstractPipeline._display_interactive_menu(menu_options)
+        return selected_options
 
     def _log_costs(self) -> None:
         """

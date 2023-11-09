@@ -1,9 +1,12 @@
+from copy import deepcopy
 from enum import Enum, auto
-from typing import List, Dict
+from typing import Dict, List
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.constants.hgen_constants import MAX_ARTIFACTS_FOR_NO_SUMMARIES
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
 
@@ -27,26 +30,26 @@ class MultiArtifactPrompt(Prompt):
 
     def __init__(self, prompt_prefix: str = EMPTY_STRING,
                  build_method: BuildMethod = BuildMethod.NUMBERED,
-                 include_ids: bool = True,
-                 xml_tags: Dict = None,
                  data_type: DataType = DataType.ARTIFACT,
-                 starting_num: int = 1):
+                 starting_num: int = 1,
+                 include_ids: bool = True,
+                 **artifact_params):
         """
         Constructor for making a prompt containing many artifacts.
         :param prompt_prefix: The prefix to attach to prompt.
         :param build_method: The method to build the prompt (determines prompt format).
-        :param include_ids: If True, includes artifact ids
-        :param xml_tags: If building using XML, specify the names of the tags as such {outer_tag: [id_tag, body_tag]}
         :param data_type: Whether the data is coming from artifacts or traces
         :param starting_num: The number to start the artifacts at if using numbered build method
+        :param include_ids: Whether to include artifact IDs in prompt.
+        :param artifact_params: Parameters used to initialize artifact prompt
         """
         self.build_method = build_method
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.NUMBERED: self._build_as_numbered,
                               self.BuildMethod.MARKDOWN: self._build_as_markdown}
-        self.include_ids = include_ids
+        artifact_params = DictUtil.update_kwarg_values(artifact_params, include_id=include_ids)
+        self.artifact_params = artifact_params
         self.data_type = data_type
-        self.xml_tags = xml_tags
         self.starting_num = starting_num
         super().__init__(value=prompt_prefix)
 
@@ -60,34 +63,37 @@ class MultiArtifactPrompt(Prompt):
         """
         prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         if self.build_method in self.build_methods:
-            artifacts = self.build_methods[self.build_method](artifacts, include_ids=self.include_ids,
-                                                              xml_tags=self.xml_tags, starting_num=self.starting_num,
-                                                              prompt=prompt)
+            artifact_params = deepcopy(self.artifact_params)
+            if len(artifacts) > MAX_ARTIFACTS_FOR_NO_SUMMARIES:
+                artifact_params = DictUtil.update_kwarg_values(artifact_params, use_summary=True)
+            artifacts = self.build_methods[self.build_method](artifacts,
+                                                              starting_num=self.starting_num,
+                                                              prompt=prompt,
+                                                              artifact_params=artifact_params)
             return f"{prompt}{artifacts}"
         else:
             raise NameError(f"Unknown Build Method: {self.build_method}")
 
     @staticmethod
-    def _build_as_numbered(artifacts: List[EnumDict], include_ids: bool = False,
-                           starting_num: int = 1, **kwargs) -> str:
+    def _build_as_numbered(artifacts: List[EnumDict], artifact_params: Dict, starting_num: int = 1, **kwargs) -> str:
         """
         Formats the artifacts as follows:
         1. ID: BODY
         2. ID: BODY
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
+        :param artifact_params: Params to build artifact prompt with.
         :param include_ids: If True, includes artifact ids
+        :param starting_num: Index to start counting from.
         :return: The formatted prompt
         """
         numbered_format = "{}. {}"
-        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
-        formatted_artifacts = [numbered_format.format(i + starting_num, artifact_prompt.build(artifact=artifact))
+        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, **artifact_params)
+        formatted_artifacts = [numbered_format.format(i + starting_num, artifact_prompt.build(artifact=artifact, **kwargs))
                                for i, artifact in enumerate(artifacts)]
         return NEW_LINE.join(formatted_artifacts)
 
     @staticmethod
-    def _build_as_xml(artifacts: List[ArtifactPrompt], xml_tags: Dict,
-                      include_ids: bool = True,
-                      **kwargs):
+    def _build_as_xml(artifacts: List[ArtifactPrompt], artifact_params: Dict, **kwargs):
         """
         Formats the artifacts as follows:
         <artifact>
@@ -95,35 +101,34 @@ class MultiArtifactPrompt(Prompt):
             <body>BODY</body>
         <artifact>
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
-        :param xml_tags: Dictionary containing the parent artifact tag mapped to a list containing the id and boyd
-        :param include_ids: If True, includes artifact ids
+        :param artifact_params: Parameters used to initialize artifact prompt
         :return: The formatted prompt
         """
-        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.XML, xml_tags=xml_tags,
-                                         include_id=include_ids)
-        formatted_artifacts = [artifact_prompt.build(artifact=artifact) for artifact in artifacts]
+        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.XML, **artifact_params)
+        formatted_artifacts = [artifact_prompt.build(artifact=artifact, **kwargs) for artifact in artifacts]
         return NEW_LINE.join(formatted_artifacts)
 
     @staticmethod
-    def _build_as_markdown(artifacts: List[ArtifactPrompt], prompt: str, include_ids: bool = True, **kwargs):
+    def _build_as_markdown(artifacts: List[ArtifactPrompt], prompt: str, artifact_params: Dict, **kwargs):
         """
         Formats the artifacts as follows:
         # ID
         body
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
+        :param prompt: Determines header level. 1 if prompt not defined and 2 otherwise.
+        :param artifact_params: The parameters to pass into artifact prompt construction.
         :param include_ids: If True, includes artifact ids
         :return: The formatted prompt
         """
-        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.MARKDOWN,
-                                         include_id=include_ids)
         header_level = 1 if not prompt else 2
-        formatted_artifacts = [artifact_prompt.build(artifact=artifact, header_level=header_level) for artifact in artifacts]
+        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.MARKDOWN, **artifact_params)
+        formatted_artifacts = [artifact_prompt.build(artifact=artifact, header_level=header_level, **kwargs) for artifact in artifacts]
         return NEW_LINE.join(formatted_artifacts)
 
     def __repr__(self) -> str:
         """
         Returns a representation of the artifact prompt as a string
-        :return: The artifact promtp as a string
+        :return: The artifact prompt as a string
         """
         if self.build_method.XML:
             return "<artifact>{artifact}<artifact> <artifact>{artifact}<artifact> ..."

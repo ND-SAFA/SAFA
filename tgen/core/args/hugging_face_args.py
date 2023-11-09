@@ -9,7 +9,7 @@ from tgen.common.constants.hugging_face_constants import EVALUATION_STRATEGY_DEF
     METRIC_FOR_BEST_MODEL_DEFAULT, \
     MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
     SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
-    USE_BALANCED_BATCHES_DEFAULT
+    TRAIN_BATCH_SIZE_DEFAULT, USE_BALANCED_BATCHES_DEFAULT
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.enum_util import FunctionalWrapper
@@ -27,6 +27,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     full_determinism = True
     train_epochs_range: List = None
     num_train_epochs: int = N_EPOCHS_DEFAULT
+    train_batch_size = TRAIN_BATCH_SIZE_DEFAULT
     checkpoint_path: str = None
     evaluation_strategy: str = EVALUATION_STRATEGY_DEFAULT
     save_strategy: str = SAVE_STRATEGY_DEFAULT

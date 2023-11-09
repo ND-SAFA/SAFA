@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.abstract_data_processor import AbstractDataProcessor
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 
 
 class DataCleaner(AbstractDataProcessor):

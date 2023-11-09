@@ -28,7 +28,7 @@ class SpecificityMetric(AbstractTraceMetric):
         """
         Calculates specificity (the number of true negatives over all predicted negatives).
         :param predictions: predicted labels
-        :param labels: ground truth labels.
+        :param references: ground truth labels.
         :param kwargs: any other necessary params
         :return: The specificity
         """

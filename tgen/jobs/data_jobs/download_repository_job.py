@@ -4,7 +4,6 @@ from tgen.data.github.repository_downloader import RepositoryDownloader
 from tgen.data.github.repository_exporter import RepositoryExporter
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 
 
 class DownloadRepositoryJob(AbstractJob):
@@ -22,6 +21,7 @@ class DownloadRepositoryJob(AbstractJob):
         :param artifact_store_path: Path to store repository artifacts to.
         :param clone_path: Path to clone repository into.
         :param output_path: Path to save repository entities to.
+        :param load: Whether to load repository from checkpointed files.
         """
         super().__init__(job_args)
         self.repo_name = repo_name

@@ -1,13 +1,9 @@
 from dataclasses import dataclass
 
-from typing import List
-
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.param_specs import ParamSpecs
-from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -52,4 +48,5 @@ class PipelineArgs(BaseObject):
         :param state: The pipeline state
         :return: None
         """
+
         DataclassUtil.update_attr_of_type_with_vals(self, AbstractLLMManager, state=state)

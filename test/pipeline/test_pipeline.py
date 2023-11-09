@@ -36,7 +36,7 @@ class TestPipeline(BaseTest):
 
     @mock.patch.object(AbstractPipeline, "_load_new_state_from_user")
     @mock.patch("builtins.input")
-    @mock.patch.object(AbstractPipelineStep, "run")
+    @mock.patch.object(AbstractPipeline, "run_step")
     def test_run_interactive_mode(self, run_step_mock: mock.MagicMock, input_mock: mock.MagicMock,
                                   load_new_state_mock: mock.MagicMock):
         input_mock.side_effect = ["1", "2", "4", "3"]

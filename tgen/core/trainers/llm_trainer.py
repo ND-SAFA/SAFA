@@ -7,7 +7,7 @@ from openai.api_resources.fine_tune import FineTune
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -49,6 +49,7 @@ class LLMTrainer(AbstractTrainer):
     def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
         """
         Handles training of the model
+        :param completion_type: The type of completion task being performed.
         :return: The training response
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])

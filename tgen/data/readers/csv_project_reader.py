@@ -8,7 +8,7 @@ from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -37,6 +37,7 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     def read_project(self, n_threads: int = 1) -> TraceDataFramesTypes:
         """
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
+        :param n_threads: The number of threads to use to read in traces in project.
         :return: Artifact and Trace DataFrame
         """
         logger.info(f"Reading file: {self.get_full_project_path()}")

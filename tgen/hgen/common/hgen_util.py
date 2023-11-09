@@ -8,7 +8,7 @@ from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
@@ -85,7 +85,8 @@ class HGenUtil:
                                           summary_prompt: Prompt = None, artifact_type: str = None,
                                           combine_summary_and_task_prompts: bool = False,
                                           build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
-                                          id_to_context_artifacts: Dict[str, List[EnumDict]] = None
+                                          id_to_context_artifacts: Dict[str, List[EnumDict]] = None,
+                                          **multi_artifact_params
                                           ) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
@@ -115,7 +116,8 @@ class HGenUtil:
                                       data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                       xml_tags={
                                           HGenUtil.convert_spaces_to_dashes(artifact_type.lower()): ["id",
-                                                                                                     "description"]})
+                                                                                                     "description"]},
+                                      **multi_artifact_params)
         artifact_prompt = ContextPrompt(id_to_context_artifacts=id_to_context_artifacts, **artifact_prompt_kwargs) \
             if id_to_context_artifacts else MultiArtifactPrompt(**artifact_prompt_kwargs)
         prompts = [base_prompt, artifact_prompt]
@@ -216,9 +218,10 @@ class HGenUtil:
                 len(content) > 1]
 
     @staticmethod
-    def convert_spaces_to_dashes(str2convert) -> str:
+    def convert_spaces_to_dashes(str2convert: str) -> str:
         """
         Converts the str to use dashes instead of spaces
+        :param str2convert: The string to process.
         :return: The str with dashes instead of spaces
         """
         return DASH.join(str2convert.split()).lower()

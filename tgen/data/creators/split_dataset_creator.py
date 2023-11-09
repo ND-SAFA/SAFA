@@ -15,7 +15,9 @@ class SplitDatasetCreator(AbstractDatasetCreator):
                  data_cleaner: DataCleaner = None, split_strategy: str = SupportedSplitStrategy.SPLIT_BY_SOURCE):
         """
         Represents a dataset that is a split of the training dataset
-        :param val_percentage: the percent of links to use in this dataset
+        :param val_percentage: The percent of links to use in this dataset
+        :param data_cleaner: The data cleaner used to process artifact content.
+        :param split_strategy: Strategy determining how the artifacts are split.
         """
         if val_percentage > 1:
             raise ValueError("Validation percentage cannot be more than 1.")

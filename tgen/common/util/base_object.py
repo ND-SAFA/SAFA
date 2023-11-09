@@ -1,7 +1,6 @@
 import copy
 import traceback
 from abc import ABC
-from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Type, TypedDict, Union, get_args
@@ -10,7 +9,7 @@ from typing import Any, Dict, List, Optional, Type, TypedDict, Union, get_args
 from typing_extensions import get_args
 
 from tgen.common.util.enum_util import EnumUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.variables.definition_variable import DefinitionVariable

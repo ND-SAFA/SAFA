@@ -23,6 +23,7 @@ class AbstractProjectReader(BaseObject, ABC, Generic[ProjectData]):
         """
         Initialized project reader with overrides.
         :param overrides: The overrides to apply to project creator.
+        :param project_path: Path to directory containing project data.
         """
         self.project_path = project_path
         self.project_path = project_path

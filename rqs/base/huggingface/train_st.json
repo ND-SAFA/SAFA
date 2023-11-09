@@ -16,6 +16,7 @@
             "output_dir": "[OUTPUT_PATH]",
             "best_model_path": "[BEST_MODEL_PATH]",
             "num_train_epochs": "[EPOCHS_INT]",
+            "train_batch_size": "[BATCH_SIZE_INT]",
             "learning_rate": 5e-5,
             "skip_save": false,
             "load_best_model_at_end": true,

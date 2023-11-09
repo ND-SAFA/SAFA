@@ -40,6 +40,7 @@ class SelectQuestionPrompt(QuestionPrompt):
         :param response_tag: The tag to use for the response
         :param multiple_responses_allowed: If True, accepts multiple answers instead of a single category
         :param default_factory: Method to define a default if response is not as expected
+        :param categories_are_continuous: Whether categories contain continous variables.
         """
         expected_responses = None
         if isinstance(categories, list):

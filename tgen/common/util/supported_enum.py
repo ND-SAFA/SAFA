@@ -66,18 +66,22 @@ class SupportedEnum(Enum):
     def to_yaml(self, export_path: str = None) -> str:
         """
         Converts enum to name so it can be read from yaml
+        :param export_path: The path to store yamified value to.
         :return: The name of the enum
         """
         if export_path:
             return self
         return self.name
+
     @classmethod
     def from_yaml(cls, val: str) -> "SupportedEnum":
         """
-        Converts enum name to the correct supported enum after being read from yaml
+        Converts enum name to the correct supported enum after being read from yaml.
+        :param val: The yaml value to read into supported enum.
         :return: The supported enum obj
         """
         return cls[val]
+
     def __iter__(self):
         """
         Iterates through each enum.

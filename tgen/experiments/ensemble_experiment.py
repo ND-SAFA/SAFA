@@ -8,7 +8,7 @@ from sklearn.preprocessing import minmax_scale, scale
 from tgen.common.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.logging.logger_config import LoggerConfig
+from tgen.common.logging.logger_config import LoggerConfig
 from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
@@ -154,6 +154,7 @@ class EnsembleExperiment(Experiment):
     def set_cross_step_vars(steps: List[ExperimentStep]) -> None:
         """
         Sets the experimental variables to model path if empty, like due to the fact of using different jobs.
+        :param steps: The steps of the experiment.
         :return: None
         """
         for step in steps:

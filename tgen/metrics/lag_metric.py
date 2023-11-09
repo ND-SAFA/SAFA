@@ -35,7 +35,8 @@ class LagMetric(AbstractTraceMetric):
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the data.
         :param predictions: predicted references
-        :param labels: ground truth references.
+        :param references: ground truth references.
+        :param trace_matrix: Matrix used to calculate query-based trace metrics.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.

@@ -5,7 +5,7 @@ import pandas as pd
 
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
@@ -35,6 +35,7 @@ class EntityReader(Generic[EntityType]):
     def read_entities(self, summarizer: ArtifactsSummarizer = None) -> pd.DataFrame:
         """
         Reads original entities and applies any column conversion defined in definition.
+        :param summarizer: The summarizer to use if summarizing right after reding entities.
         :return: DataFrame containing processed entities.
         """
         parser, parser_params = self.get_parser()

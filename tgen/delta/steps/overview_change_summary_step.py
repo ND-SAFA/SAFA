@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -94,6 +94,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         """
         Creates a dataframe of artifacts representing the diff summary for each changed file
         :param state: The current state of the delta summarizer
+        :param include_impact: Whether to include the impact section of delta summarization.s
         :return: A dataframe of artifacts representing the diff summary for each changed file
         """
         artifacts = {}

@@ -1,7 +1,7 @@
 from typing import List, Tuple, Dict
 
 from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.duplicate_detector import DuplicateDetector
 from tgen.hgen.hgen_args import HGenArgs

@@ -6,7 +6,7 @@ from tgen.common.objects.trace import Trace
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs

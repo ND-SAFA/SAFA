@@ -1,11 +1,10 @@
 import re
 import uuid
-from copy import deepcopy
 
 from typing import List, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, SPACE, PERIOD
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD
+from tgen.common.logging.logger_manager import logger
 
 
 class StrUtil:

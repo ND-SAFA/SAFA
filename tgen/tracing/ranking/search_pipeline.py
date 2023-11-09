@@ -15,6 +15,7 @@ class SearchPipeline(AbstractPipeline[RankingArgs, RankingState]):
     def __init__(self, args: RankingArgs):
         """
         Ranks children artifacts from most to least related to source.
+        :param args: Arguments to the ranking pipeline.
         """
         summarizer_args = SummarizerArgs(
             project_summary_sections=[],

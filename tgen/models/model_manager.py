@@ -9,7 +9,7 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 from tgen.common.constants.deliminator_constants import PERIOD
 from tgen.common.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
@@ -27,6 +27,7 @@ class ModelManager(BaseObject):
         """
         Handles loading model and related functions
         :param model_path: The path to the saved model
+        :param model_output_path: Path to contain all output related to checkpoints and training and prediction.
         :param model_task: The task the model should perform (e.g. masked learning model or sequence classification)
         :param model_size: The size of the model
         :param model_architecture: Whether the model should be siamese or single
@@ -170,6 +171,7 @@ class ModelManager(BaseObject):
     def _freeze_layers(self, model: PreTrainedModel, layers_to_freeze: List[int]) -> None:
         """
         Freezes the layer corresponding with the given numbers.
+        :param model: The model whose layers get frozen.
         :param layers_to_freeze: Number of the layers to freeze. If negative number given, layer will be that many from end
         :return: None
         """

@@ -8,9 +8,9 @@ from transformers.trainer import Trainer
 from transformers.trainer_utils import EvalPrediction, PredictionOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.save_strategy.abstract_save_strategy import AbstractSaveStrategy
@@ -52,6 +52,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         :param save_strategy: The strategy used to save the best model
         :param: evaluation_roles: Defines the roles to evaluate the model on during prediction.
         :param kwargs: Any additional arguments given to the HF Trainer
+        :param evaluation_roles: The roles to evaluate before and after training.
         """
         if trainer_args.eager_load_data:
             trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
@@ -93,6 +94,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         self.model = self.model_manager.get_model()
         self._evaluate()
+        logger.info(f"Batch size: {self.args.train_batch_size}")
         hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
         train_output = TraceTrainOutput(train_output=hf_train_output)
         train_output.prediction_output = self._evaluate()

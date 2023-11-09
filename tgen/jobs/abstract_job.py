@@ -12,7 +12,7 @@ import wandb
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.random_util import RandomUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil

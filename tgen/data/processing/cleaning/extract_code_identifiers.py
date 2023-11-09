@@ -6,7 +6,7 @@ from comment_parser.comment_parser import UnsupportedError
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.common.constants.path_constants import JAVA_KEYWORDS_PATH
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
@@ -41,13 +41,12 @@ class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):
         """
         return [self.create_class_doc(s) for s in data_entries]
 
-    def create_class_doc(self, class_text):
+    def create_class_doc(self, class_text: str):
         """
         Extracts the identifiers from the given java class and cleans each identifier.
         Cleaning includes removing non-alphanumeric characters, splitting chained method calls,
         split camel case phrases, and stemming each word.
-        : param class_text - A string representing a compiling java class.
-        : param stop_at_index - Used for testing to stop the cleaning process before a certain step (e.g. Stemming)
+        :param class_text: A string representing a compiling java class.
         """
         class_doc = self.extract_java_identifiers(class_text)
         return class_doc

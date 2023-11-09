@@ -7,7 +7,7 @@ from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -42,7 +42,8 @@ class RankingJob(AbstractJob):
         :param artifact_df: DataFrame containing sources and targets.
         :param sorter: The sorting function to feed big claude with.
         :param select_top_predictions: Whether to select the top predictions
-        :param layer_ids
+        :param layer_ids: The layers to rank between.
+        :param ranking_pipeline: The pipeline used to rank children to each parent.
         """
         super().__init__()
         self.dataset_creator = dataset_creator

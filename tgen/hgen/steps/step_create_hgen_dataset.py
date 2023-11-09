@@ -60,6 +60,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
     def _create_layer_df_with_generated_artifacts(hgen_args: HGenArgs, target_layer_id: str) -> LayerDataFrame:
         """
         Creates a layer dataframe connecting the original lower-level artifacts with the newly generated upper-level artifacts
+        :param hgen_args: Arguments to hgen pipeline.
         :param target_layer_id: The id of the new target layer
         :return: The dataframe with the new layer ids added.
         """
@@ -93,7 +94,8 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
     def _get_target_layer_id(hgen_args: HGenArgs, original_dataset_complete: PromptDataset) -> str:
         """
         Gets the id of the new target layer
-        :param original_dataset_complete: The dataset containing source artifacts
+        :param hgen_args: Arguments to hgen pipeline.
+        :param original_dataset_complete: Dataset containing original and generated artifacts.
         :return: The id of the new target layer
         """
         layer_id = hgen_args.target_type

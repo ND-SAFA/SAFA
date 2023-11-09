@@ -35,7 +35,8 @@ class MapAtKMetric(AbstractTraceMetric):
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the data.
         :param predictions: predicted labels
-        :param labels: ground truth labels.
+        :param references: ground truth labels.
+        :param trace_matrix: The matrix used to calculate trace metrics.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.

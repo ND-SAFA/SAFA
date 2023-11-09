@@ -8,7 +8,7 @@ from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.common.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.jobs.components.job_result import JobResult
 
 pd.set_option('display.max_colwidth', None)
@@ -26,7 +26,7 @@ class ScriptOutputReader:
     PREDICTION_OUTPUT = "prediction_output"
 
     def __init__(self, experiment_path: str, experimental_vars_ignore: List[str] = None, metrics: List[str] = None,
-                 display_metrics: List[str] = None, export: bool = True):
+                 display_metrics: List[str] = None):
         """
         Initializes reader for experiment at path.
         :param experiment_path: Path to experiment to read.
@@ -47,7 +47,6 @@ class ScriptOutputReader:
 
         self.eval_df = None
         self.val_df = None
-        self.export = export
 
     def print_eval(self) -> None:
         """

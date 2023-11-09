@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Union
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
@@ -28,9 +28,9 @@ class State(BaseObject):
 
     project_summary: Summary = None
 
-    total_input_cost: int = 0
+    total_input_cost: float = 0
 
-    total_output_cost: int = 0
+    total_output_cost: float = 0
 
     _CHECKPOINT_DIRNAME: str = "state_checkpoints"
 

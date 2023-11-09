@@ -20,6 +20,7 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         Constructs project reader targeting given api.
         :param api_definition: The API payload containing artifacts and trace links.
+        :param project_path: Ignored. Used to fulfill API.
         :param overrides: The parameters to override.
         """
         super().__init__(project_path=project_path, overrides=overrides)

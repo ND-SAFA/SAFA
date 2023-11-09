@@ -1,4 +1,3 @@
-import os
 from collections.abc import Generator
 from copy import deepcopy
 from typing import List, Tuple
@@ -10,7 +9,7 @@ from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MU
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
@@ -173,7 +172,8 @@ class ProjectSummarizer(BaseObject):
     def _get_section_display_order(section_order: List[str], all_project_sections: List[str]) -> List[str]:
         """
         Gets the order in which the sections should appear
-        :param args: The arguments for the project summarizer
+        :param section_order: The order the sections should be displayed in. Can be subset of full sections to display.
+        :param all_project_sections: List of all sections to include.
         :return: The section ids in the order in which the sections should appear
         """
         ordered_sections = set(section_order)

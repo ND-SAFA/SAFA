@@ -24,7 +24,7 @@ from tgen.data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTI
     ISSUE_ARTIFACT_FILE, \
     PULL_ARTIFACT_FILE
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 
 
 class RepositoryDownloader:

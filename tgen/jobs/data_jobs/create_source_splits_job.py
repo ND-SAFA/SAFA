@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame

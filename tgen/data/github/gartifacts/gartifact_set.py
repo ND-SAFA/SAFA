@@ -8,7 +8,7 @@ from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 from tgen.data.github.gartifacts.supported_gartifacts import SupportedGArtifacts
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 
 T = TypeVar('T', bound="AbstractArtifact")
 

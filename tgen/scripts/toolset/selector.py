@@ -4,7 +4,7 @@ from typing import Any, List, Type
 import inquirer
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, EXIT_COMMAND, EXIT_MESSAGE, \
     REQUIRED_FIELD_ERROR, \
     SINGLETON_PROMPT_ID

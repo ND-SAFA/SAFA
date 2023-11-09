@@ -5,8 +5,8 @@ from typing import Generic, List, Optional, Type, TypeVar
 from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
-from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
+from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs

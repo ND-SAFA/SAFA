@@ -14,7 +14,7 @@ from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PAT
     ROOT_PATH_PARAM, \
     USER_SYM
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",

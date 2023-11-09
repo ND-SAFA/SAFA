@@ -9,7 +9,7 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 from tgen.common.constants.deliminator_constants import PERIOD
 from tgen.common.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 

@@ -5,7 +5,7 @@ from typing import Dict, Tuple, Union
 
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.constants.deliminator_constants import SPACE
 from tgen.data.clustering.iclustering import Clusters
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod

@@ -9,9 +9,9 @@ from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEI
     DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 
 

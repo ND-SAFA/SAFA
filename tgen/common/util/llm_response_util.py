@@ -1,4 +1,5 @@
 import html
+import logging
 import os
 import re
 from typing import Dict, List, Union, Set
@@ -6,11 +7,11 @@ from typing import Dict, List, Union, Set
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.path_constants import RESPONSES_DIRNAME
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trace_output.stage_eval import TracePredictions
 
@@ -69,8 +70,8 @@ class LLMResponseUtil:
                         content.append(c)
             assert len(content) > 0, f"Found no tags ({tag_name}) in:\n{res}"
         except Exception:
-            error = f"Unable to parse {tag_name}"
-            logger.warning(error)
+            error = f"{NEW_LINE}Unable to parse {tag_name}"
+            logger.log_without_spam(level=logging.ERROR, msg=error)
             if raise_exception:
                 raise Exception(error)
             content = [res] if return_res_on_failure else []

@@ -1,4 +1,3 @@
-import os
 from copy import deepcopy
 from typing import Dict, List, Set
 
@@ -6,7 +5,7 @@ from tqdm import tqdm
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -17,7 +16,7 @@ from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactConte
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.summarizer.summary import Summary
 
 

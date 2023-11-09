@@ -5,7 +5,7 @@ from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
 from tgen.data.github.gtraces.glink import GLink
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 
 ARTIFACTS_TYPE = Dict[str, GCodeFile]
 LINKS_TYPE = Dict[str, GLink]

@@ -6,7 +6,7 @@ from comment_parser.comment_parser import UnsupportedError
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.common.constants.path_constants import JAVA_KEYWORDS_PATH
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

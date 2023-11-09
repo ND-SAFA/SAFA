@@ -1,7 +1,7 @@
 from enum import Enum
 
-from tgen.common.constants.deliminator_constants import PERIOD, DASH, UNDERSCORE
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.constants.deliminator_constants import DASH, UNDERSCORE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.str_util import StrUtil
 from tgen.models.tokens.token_calculator import TokenCalculator
 

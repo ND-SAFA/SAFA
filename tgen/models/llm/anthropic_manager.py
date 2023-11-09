@@ -5,7 +5,7 @@ import anthropic
 from tgen.common.constants import anthropic_constants, environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.environment_constants import ANTHROPIC_KEY
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager

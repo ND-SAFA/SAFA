@@ -6,7 +6,7 @@ from datasets import load_metric
 from scipy.special import softmax
 
 from tgen.common.objects.trace import Trace
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_matrix import TraceMatrix

@@ -10,8 +10,8 @@ from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from tgen.common.constants import anthropic_constants, environment_constants, open_ai_constants
-from tgen.common.util.logging.logger_config import LoggerConfig
-from tgen.common.util.logging.logger_manager import LoggerManager
+from tgen.common.logging.logger_config import LoggerConfig
+from tgen.common.logging.logger_manager import LoggerManager
 from tgen.common.util.random_util import RandomUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame

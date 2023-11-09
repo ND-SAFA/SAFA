@@ -65,7 +65,7 @@ class MultiArtifactPrompt(Prompt):
         if self.build_method in self.build_methods:
             artifact_params = deepcopy(self.artifact_params)
             if len(artifacts) > MAX_ARTIFACTS_FOR_NO_SUMMARIES:
-                artifact_params = DictUtil.update_kwarg_values(artifact_params, use_summary=False)
+                artifact_params = DictUtil.update_kwarg_values(artifact_params, use_summary=True)
             artifacts = self.build_methods[self.build_method](artifacts,
                                                               starting_num=self.starting_num,
                                                               prompt=prompt,

@@ -5,8 +5,8 @@ from typing import Generic, List, Optional, Type, TypeVar
 from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
-from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
+from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
@@ -67,11 +67,11 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                  skip_summarization: bool = False, **summarizer_args_kwargs):
         """
         Constructs pipeline of steps.
-        :param args: The arguments to the pipeline.
+        :param args: The arguments to the pipeline
         :param steps: Steps to perform in sequential order.
         :param summarizer_args: The args used to create project summary
         :param summarizer_args_kwargs: Keyword arguments to summarizer to customize default settings.
-        :param skip_summarization: Whether to skip summarization of artifacts.
+        :param skip_summarization: If True, does not perform project or artifact summarization
         """
         self.args = args
         self.steps = [s() for s in steps]
@@ -202,7 +202,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
     def _load_new_state_from_user(state: State) -> Optional[State]:
         """
         Allows a user to select a path from which a new state will be loaded
-        :param state: The state of the pipeline to load.
+        :param state: The current state in the pipeline
         :return: The path selected by the user
         """
         load_path = input("Enter the path to the new state or press 'b' to go back to the menu: \n").strip()
@@ -252,3 +252,4 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             cost_msg = "{} Token Cost: ${}"
             cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in costs.items()]
             logger.log_with_title("COSTS FOR RUN: ", NEW_LINE.join(cost_msgs))
+

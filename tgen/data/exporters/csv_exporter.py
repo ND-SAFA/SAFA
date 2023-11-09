@@ -1,4 +1,4 @@
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 
 

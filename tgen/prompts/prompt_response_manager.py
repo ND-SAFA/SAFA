@@ -1,3 +1,4 @@
+import logging
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
@@ -6,7 +7,7 @@ import bs4
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 
@@ -177,7 +178,7 @@ class PromptResponseManager:
                     try:
                         formatted_val = self._format_value(tag, formatted_val)
                     except (TypeError, AssertionError, ValueError) as e:
-                        logger.exception(e)
+                        logger.log_without_spam(level=logging.ERROR, msg=e)
                         formatted_val = self._format_on_failure(tag, formatted_val, e)
                     if formatted_val is not None:
                         formatted_values.append(formatted_val)

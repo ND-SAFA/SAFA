@@ -11,7 +11,7 @@ from yaml.nodes import MappingNode, Node
 
 from tgen.common.constants.deliminator_constants import COLON
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 

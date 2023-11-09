@@ -11,7 +11,7 @@ from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOu
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs

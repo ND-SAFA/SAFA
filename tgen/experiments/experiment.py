@@ -4,8 +4,8 @@ from typing import List
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_config import LoggerConfig
-from tgen.common.util.logging.logger_manager import LoggerManager
+from tgen.common.logging.logger_config import LoggerConfig
+from tgen.common.logging.logger_manager import LoggerManager
 from tgen.common.util.status import Status
 from tgen.common.constants.experiment_constants import EXPERIMENT_ID_DEFAULT
 from tgen.experiments.experiment_step import ExperimentStep

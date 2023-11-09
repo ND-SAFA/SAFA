@@ -10,7 +10,7 @@ from transformers.trainer_utils import EvalPrediction, PredictionOutput
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.save_strategy.abstract_save_strategy import AbstractSaveStrategy

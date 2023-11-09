@@ -6,7 +6,7 @@ from openai.openai_object import OpenAIObject
 from tgen.common.constants import open_ai_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager

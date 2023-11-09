@@ -4,7 +4,7 @@ import pandas as pd
 
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader

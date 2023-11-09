@@ -2,7 +2,7 @@ from logging import Logger
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.prompt_util import PromptUtil
-
+from functools import lru_cache
 
 class TGenLogger(Logger):
     """
@@ -40,6 +40,18 @@ class TGenLogger(Logger):
         """
         step_formatted = TGenLogger.__create_step(step)
         self.info(step_formatted)
+
+    @lru_cache(maxsize=1)
+    def log_without_spam(self, level: int, msg: object, *args: object, **kwargs) -> None:
+        """
+        Logs a given message only once
+        :param level: The level of the log (e.g. warning, error, info...)
+        :param msg: The message to log
+        :param args: Additional arguments to the log func
+        :param kwargs: Additional parameters to the log func
+        :return: None
+        """
+        return self.log(level=level, msg=msg, *args, **kwargs)
 
     @staticmethod
     def __create_title(title: str, prefix: str = ""):

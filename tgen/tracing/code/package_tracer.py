@@ -5,7 +5,7 @@ from tgen.common.constants.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.objects.trace import Trace
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset

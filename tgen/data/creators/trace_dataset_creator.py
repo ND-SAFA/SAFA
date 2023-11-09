@@ -9,7 +9,7 @@ from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFA
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator

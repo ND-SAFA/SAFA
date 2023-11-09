@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.constants.threading_constants import THREAD_SLEEP
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 
 
 class ThreadUtil:

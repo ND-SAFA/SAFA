@@ -6,7 +6,7 @@ from tgen.clustering.methods.supported_clustering_methods import SupportedCluste
 from tgen.common.constants.clustering_constants import CLUSTER_METHOD_INIT_PARAMS, \
     DEFAULT_RANDOM_STATE, NO_CLUSTER_LABEL, N_CLUSTERS_PARAM, RANDOM_STATE_PARAM
 from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 

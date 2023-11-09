@@ -41,6 +41,7 @@ class PipelineArgs(BaseObject):
         self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset,
                                                                              self.dataset_creator)
         self.interactive_mode = self.interactive_mode or environment_constants.IS_INTERACTIVE
+        environment_constants.IS_INTERACTIVE = self.interactive_mode
 
     def update_llm_managers_with_state(self, state: State) -> None:
         """

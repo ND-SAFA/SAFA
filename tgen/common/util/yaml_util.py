@@ -192,7 +192,7 @@ class YamlUtil:
         elif isinstance(content, list) or isinstance(content, set):
             converted = [YamlUtil.convert_content_to_yaml_serializable(v, export_dir) for v in content]
         elif hasattr(content, "to_yaml"):
-            if key:
+            if key is not None:
                 export_dir = os.path.join(export_dir, str(key))
             yamified_content = content.to_yaml(export_path=export_dir)
             return yamified_content

@@ -115,7 +115,7 @@ class State(BaseObject):
         """
         step_index = step_names.index(step_to_delete_from) if step_to_delete_from else 0
         for i, step in enumerate(step_names[step_index:]):
-            delete_path = cls.get_path_to_state_checkpoint(load_dir, step, step_num=step_index+i)
+            delete_path = cls.get_path_to_state_checkpoint(load_dir, step, step_num=step_index+i+1)
             FileUtil.delete_file_safely(delete_path)
 
     @classmethod

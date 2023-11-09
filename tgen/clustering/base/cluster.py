@@ -1,4 +1,6 @@
+import os
 from copy import deepcopy
+from os.path import dirname
 from typing import Any, Iterable, List, Tuple
 
 import numpy as np
@@ -6,6 +8,7 @@ import numpy as np
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
@@ -19,7 +22,7 @@ class Cluster:
         Constructs empty cluster referencing embeddings in manager.
         :param embeddings_manager: The container for all embeddings relating to cluster.
         """
-        self.embeddings_manager = embeddings_manager
+        self.embedding_manager = embeddings_manager
         self.artifact_ids = []
         self.artifact_id_set = set()
         self.votes = 1
@@ -87,10 +90,10 @@ class Cluster:
         :param a_id: Artifact id to compare to cluster.
         :return: Average similarity.
         """
-        unique_artifacts_embeddings = [self.embeddings_manager.get_embedding(a) for a in self.artifact_id_set if a != a_id]
+        unique_artifacts_embeddings = [self.embedding_manager.get_embedding(a) for a in self.artifact_id_set if a != a_id]
         if len(unique_artifacts_embeddings) == 0:
             return 1
-        artifact_embedding = [self.embeddings_manager.get_embedding(a_id)]
+        artifact_embedding = [self.embedding_manager.get_embedding(a_id)]
         similarities = EmbeddingUtil.calculate_similarities(artifact_embedding, unique_artifacts_embeddings)[0]
         avg_sim = sum(similarities) / len(similarities)
         return avg_sim
@@ -110,7 +113,7 @@ class Cluster:
         Calculates all statistics for the cluster.
         :return: None, stats are set in place
         """
-        self.centroid = self.embeddings_manager.calculate_centroid(self.artifact_ids)
+        self.centroid = self.embedding_manager.calculate_centroid(self.artifact_ids)
         self.avg_similarity = self.__calculate_average_similarity()
         if len(self.artifact_id_set) > 1:
             self.similarity_matrix = self.__calculate_similarity_matrix()
@@ -134,7 +137,7 @@ class Cluster:
         Calculates the average similarity from the artifacts to the centroid.
         :return: Average similarity to centroid.
         """
-        artifact_embeddings = [self.embeddings_manager.get_embedding(a_id) for a_id in self.artifact_ids]
+        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
         similarities = EmbeddingUtil.calculate_similarities([self.centroid], artifact_embeddings)[0]
         return np.sum(similarities) / len(similarities)
 
@@ -143,7 +146,7 @@ class Cluster:
         Calculates the similarity scores between all artifacts in the cluster.
         :return: The similarity matrix.
         """
-        artifact_embeddings = [self.embeddings_manager.get_embedding(a_id) for a_id in self.artifact_ids]
+        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
         return similarity_matrix
 
@@ -188,7 +191,9 @@ class Cluster:
         if export_path:
             yaml_safe_cluster = deepcopy(self)
             yaml_safe_cluster.__init_stats()
-            yaml_safe_cluster.embeddings_manager = yaml_safe_cluster.embeddings_manager.to_yaml(export_path)
+            export_path = os.path.join(dirname(export_path), ReflectionUtil.extract_name_of_variable(f"{self.embedding_manager=}",
+                                                                                                     is_self_property=True))
+            yaml_safe_cluster.embedding_manager = yaml_safe_cluster.embedding_manager.to_yaml(export_path)
             return yaml_safe_cluster
         return self
 

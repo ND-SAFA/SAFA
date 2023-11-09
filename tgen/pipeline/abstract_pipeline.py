@@ -2,22 +2,17 @@ import os
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Generic, List, Optional, Type, TypeVar
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+
+from tgen.common.constants import environment_constants
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
+from tgen.common.logging.logger_manager import logger
+from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.pipeline.state import State
 from tgen.scripts.toolset.selector import inquirer_selection, inquirer_value
-from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
-from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
-from typing import Generic, List, Optional, Type, TypeVar
-
-from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
-from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
-from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
@@ -69,9 +64,8 @@ class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
 
 
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
-    INTERACTIVE_MODE_OPTIONS = [InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP, InteractiveModeOptions.NEXT_STEP,
-                                InteractiveModeOptions.LOAD_NEW_STATE,
-                                InteractiveModeOptions.TURN_OFF_INTERACTIVE]
+    INTERACTIVE_MODE_OPTIONS = [InteractiveModeOptions.NEXT_STEP, InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP,
+                                InteractiveModeOptions.LOAD_NEW_STATE, InteractiveModeOptions.TURN_OFF_INTERACTIVE]
 
     def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None,
                  skip_summarization: bool = False, **summarizer_args_kwargs):
@@ -155,6 +149,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         step.run(self.args, self.state, re_run=re_run)
         if step.get_step_name() == self.resume_interactive_mode_step:
             self.args.interactive_mode = True
+            environment_constants.IS_INTERACTIVE = True
         if self.args.interactive_mode:
             self._run_interactive_mode(step)
 
@@ -164,7 +159,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :param curr_step: The step the pipeline is currently at
         :return: The steps that are remaining in the pipeline
         """
-        next_index = self.steps.index(curr_step) + 1
+        next_index = self.steps.index(curr_step) + 1 if curr_step else 0
         return self.get_step_names(self.steps[next_index:])
 
     def get_step_names(self, steps: List[AbstractPipelineStep] = None) -> List[str]:
@@ -197,10 +192,14 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         else:
             next_step = self.get_next_step(curr_step)
             msg = f"Current step: {curr_step.get_step_name()}, "
-        logger.info(f"{msg}Next step: {next_step.get_step_name()}")
+        if next_step:
+            msg += f"Next step: {next_step.get_step_name()}"
+        if not next_step or next_step.get_step_name() not in self.state.completed_steps:
+            options.remove(InteractiveModeOptions.SKIP_STEP)
+        logger.info(f"{msg}")
         selected_option = self._display_interactive_menu(options)
         if selected_option == InteractiveModeOptions.LOAD_NEW_STATE:
-            selected_option = self._option_new_state(curr_step)
+            selected_option = self._option_new_state(curr_step, options)
         if selected_option == InteractiveModeOptions.RE_RUN:
             logger.log_with_title("Re-running step")
             self.run_step(curr_step, re_run=True)
@@ -212,9 +211,10 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             resume_interactive_mode_step = self._option_turn_off_interactive(curr_step)
             if not resume_interactive_mode_step:
                 selected_option = None
-            elif resume_interactive_mode_step != InteractiveModeOptions.DO_NOT_RESUME.value:
+            else:
                 self.resume_interactive_mode_step = resume_interactive_mode_step
                 self.args.interactive_mode = False
+                environment_constants.IS_INTERACTIVE = False
         if selected_option is None:
             self._run_interactive_mode(curr_step)
 
@@ -239,14 +239,16 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if next_index < len(self.steps):
             return self.steps[next_index]
 
-    def _option_new_state(self, curr_step: AbstractPipelineStep) -> INTERACTIVE_MODE_OPTIONS:
+    def _option_new_state(self, curr_step: AbstractPipelineStep,
+                          menu_options: List[InteractiveModeOptions]) -> INTERACTIVE_MODE_OPTIONS:
         """
         Runs the new state loading when the option is selected
         :param curr_step: The current step the user is one
+        :param menu_options: The current menu options
         :return: The selected next step
         """
         load_external_option = InteractiveModeOptions.LOAD_EXTERNAL_STATE.value
-        steps = self.get_remaining_steps(curr_step) + [load_external_option]
+        steps = self.get_step_names() + [load_external_option]
         step_to_load_from = inquirer_selection(selections=steps,
                                                message="What step state do you want to load from?",
                                                allow_back=True) if self.args.load_dir else load_external_option
@@ -254,21 +256,19 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             return None
         load_path = self._get_state_load_path(step_to_load_from)
         if load_path is None:
-            return self._option_new_state(curr_step) if self.args.load_dir else None
+            return self._option_new_state(curr_step, menu_options) if self.args.load_dir else None
         if not os.path.exists(load_path):
             logger.warning(f"File not found: {load_path}")
-            return AbstractPipeline._option_new_state(self.state)
+            return self._option_new_state(curr_step, menu_options)
         new_state = self.state.load_state_from_path(load_path)
         if isinstance(new_state, Exception):
             logger.warning(f"Loading state failed: {new_state}")
-            return AbstractPipeline._option_new_state(self.state)
+            return self._option_new_state(curr_step, menu_options)
         if new_state is None:
             return None
         self.state = new_state
-        self._mark_next_steps_as_incomplete(curr_step)
         self._optional_delete_old_state_files(step_to_load_from)
-        return AbstractPipeline._display_interactive_menu([o for o in self.INTERACTIVE_MODE_OPTIONS
-                                                           if o != InteractiveModeOptions.LOAD_NEW_STATE],
+        return self._display_interactive_menu([o for o in menu_options if o != InteractiveModeOptions.LOAD_NEW_STATE],
                                                           message="New state is reloaded - What would you like to do next?\n",
                                                           allow_back=True)
 
@@ -284,7 +284,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         else:
             load_step_num = self.get_step_names().index(step_to_load_from)
             load_path = self.state.get_path_to_state_checkpoint(self.args.load_dir, step_to_load_from,
-                                                                step_num=load_step_num)
+                                                                step_num=load_step_num+1)
         return load_path
 
     def _optional_delete_old_state_files(self, step_to_load_from: str) -> None:
@@ -293,7 +293,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :param step_to_load_from: The step that the state was just loaded from
         :return: None
         """
-        load_step_num = self.get_step_names().index(step_to_load_from)
+        load_step_num = self.get_step_names().index(step_to_load_from) if step_to_load_from in self.get_step_names() else -1
         if not self.args.load_dir or step_to_load_from == InteractiveModeOptions.LOAD_EXTERNAL_STATE.value \
                 or load_step_num + 1 >= len(self.steps):
             return
@@ -329,28 +329,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         message = "Menu Options: " if not message else message
         choice = inquirer_selection(selections=[mo.value for mo in menu_options], message=message, allow_back=allow_back)
-        return InteractiveModeOptions[choice.upper()] if choice else choice
-
-    @staticmethod
-    def _display_interactive_menu(menu_options: List[InteractiveModeOptions]) -> InteractiveModeOptions:
-        """
-        Displays an interactive menu for users to select which action they would like
-        :param menu_options: The different actions available to the user
-        :return: The selected option
-        """
-        possible_choices = [str(i + 1) for i in range(len(menu_options))]
-        menu = NEW_LINE.join([f"{i}) {option.value}" for i, option in zip(possible_choices, menu_options)])
-        print("Menu Options: ")
-        print(menu)
-        choice = input(f"Select an option ({F_SLASH.join(possible_choices)}): \n").strip()
-        try:
-            assert choice in possible_choices
-            choice = int(choice)
-            selected_options = menu_options[choice - 1]
-        except (TypeError, AssertionError):
-            print(f"Unknown input {choice}. Please try again\n")
-            selected_options = AbstractPipeline._display_interactive_menu(menu_options)
-        return selected_options
+        return EnumUtil.get_enum_from_value(InteractiveModeOptions, choice) if choice else choice
 
     def _log_costs(self) -> None:
         """

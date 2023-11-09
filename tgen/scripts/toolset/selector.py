@@ -1,8 +1,8 @@
 import sys
 from typing import Any, List, Type
 
-from tgen.common.logging.logger_manager import logger
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, EXIT_COMMAND, EXIT_MESSAGE, \
     REQUIRED_FIELD_ERROR
 
@@ -47,9 +47,10 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
     :return: The value after parsing user response.
     """
     annotation_name = class_type.__name__ if hasattr(class_type, "__name__") else repr(class_type)
-    message += f" - {annotation_name} -"
+    message += f" - {annotation_name}"
     if default_value is not None:
         message += f" ({default_value})"
+    message = message + ": "
     user_value = input(message)
     if allow_back and user_value.lower() == BACK_COMMAND:
         return None

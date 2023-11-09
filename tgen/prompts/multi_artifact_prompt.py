@@ -2,9 +2,9 @@ from copy import deepcopy
 from enum import Enum, auto
 from typing import Dict, List
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.hgen_constants import MAX_ARTIFACTS_FOR_NO_SUMMARIES
 from tgen.common.util.dict_util import DictUtil
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.prompts.artifact_prompt import ArtifactPrompt
@@ -40,6 +40,7 @@ class MultiArtifactPrompt(Prompt):
         :param build_method: The method to build the prompt (determines prompt format).
         :param data_type: Whether the data is coming from artifacts or traces
         :param starting_num: The number to start the artifacts at if using numbered build method
+        :param include_ids: Whether to include artifact IDs in prompt.
         :param artifact_params: Parameters used to initialize artifact prompt
         """
         self.build_method = build_method
@@ -80,6 +81,7 @@ class MultiArtifactPrompt(Prompt):
         1. ID: BODY
         2. ID: BODY
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
+        :param artifact_params: Params to build artifact prompt with.
         :param include_ids: If True, includes artifact ids
         :param starting_num: Index to start counting from.
         :return: The formatted prompt
@@ -114,6 +116,7 @@ class MultiArtifactPrompt(Prompt):
         body
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
         :param prompt: Determines header level. 1 if prompt not defined and 2 otherwise.
+        :param artifact_params: The parameters to pass into artifact prompt construction.
         :param include_ids: If True, includes artifact ids
         :return: The formatted prompt
         """

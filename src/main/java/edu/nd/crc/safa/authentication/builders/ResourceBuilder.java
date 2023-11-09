@@ -4,7 +4,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
@@ -16,6 +18,7 @@ import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -64,9 +67,7 @@ public class ResourceBuilder {
             throw new SafaItemNotFoundError("Unable to find project version with id: %s.", versionId);
         }
 
-        return new ObjectHolder<>(projectVersion,
-            (permission, user, value) -> getPermissionService().hasPermission(permission, value.getProject(), user)
-        );
+        return entityWithProjectHolder(projectVersion, ProjectVersion::getProject);
     }
 
     /**
@@ -99,9 +100,34 @@ public class ResourceBuilder {
      */
     public ObjectHolder<Document> fetchDocument(UUID documentId) {
         Document document = serviceProvider.getDocumentService().getDocumentById(documentId);
-        return new ObjectHolder<>(document,
-            (permission, user, value) -> getPermissionService().hasPermission(permission, value.getProject(), user)
-        );
+        return entityWithProjectHolder(document, Document::getProject);
+    }
+
+    /**
+     * Fetch a type by ID
+     *
+     * @param typeId The ID of the type
+     * @return The type in a holder that allows for easy permission checking
+     */
+    public ObjectHolder<ArtifactType> fetchType(UUID typeId) {
+        ArtifactType type = serviceProvider.getTypeService().getArtifactType(typeId);
+        if (type == null) {
+            throw new SafaItemNotFoundError("No type with id %s", typeId);
+        }
+
+        return entityWithProjectHolder(type, ArtifactType::getProject);
+    }
+
+    /**
+     * Fetch an artifact by ID
+     *
+     * @param artifactId The ID of the artifact
+     * @return The artifact in a holder that allows for easy permission checking
+     */
+    public ObjectHolder<Artifact> fetchArtifact(UUID artifactId) {
+        Artifact artifact = serviceProvider.getArtifactRepository().findById(artifactId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No artifact with ID %s found", artifactId));
+        return entityWithProjectHolder(artifact, Artifact::getProject);
     }
 
     /**
@@ -110,11 +136,26 @@ public class ResourceBuilder {
      *
      * @param value The entity
      * @param <T> The type of the entity
-     * @return And object holder for the entity
+     * @return An object holder for the entity
      */
     private <T extends IEntityWithMembership> ObjectHolder<T> membershipEntityHolder(T value) {
         return new ObjectHolder<>(value,
             (permission, user, lambdaVal) -> getPermissionService().hasPermission(permission, lambdaVal, user)
+        );
+    }
+
+    /**
+     * Utility function for creating object holders for entities that can easily be linked to a project
+     *
+     * @param value The entity
+     * @param projectRetriever A function that allows us to get the project for this entity
+     * @param <T> The type of the entity
+     * @return An object holder for the entity
+     */
+    private <T> ObjectHolder<T> entityWithProjectHolder(T value, Function<T, Project> projectRetriever) {
+        return new ObjectHolder<>(value,
+            (permission, user, lambdaVal) ->
+                getPermissionService().hasPermission(permission, projectRetriever.apply(lambdaVal), user)
         );
     }
 

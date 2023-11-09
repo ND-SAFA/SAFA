@@ -1,12 +1,7 @@
 package edu.nd.crc.safa.features.common;
 
-import java.util.Optional;
-import java.util.UUID;
-
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
@@ -46,16 +41,6 @@ public abstract class BaseController {
     private final ResourceBuilder resourceBuilder;
     @Getter(AccessLevel.PROTECTED)
     private final ServiceProvider serviceProvider;
-
-    protected Document getDocumentById(DocumentRepository documentRepository,
-                                       UUID documentId) throws SafaError {
-        Optional<Document> documentOptional = documentRepository.findById(documentId);
-        if (documentOptional.isPresent()) {
-            return documentOptional.get();
-        } else {
-            throw new SafaError("Could not find document with id: %s", documentId);
-        }
-    }
 
     @ExceptionHandler(FileSizeLimitExceededException.class)
     public SafaError handleFileSizeLimitExceeded(FileSizeLimitExceededException exception) {

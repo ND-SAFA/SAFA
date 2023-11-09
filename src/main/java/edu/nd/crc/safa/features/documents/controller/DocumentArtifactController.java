@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.AssertUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,7 +67,14 @@ public class DocumentArtifactController extends BaseDocumentController {
             .fetchVersion(versionId)
             .withPermission(ProjectPermission.EDIT_DATA, user)
             .get();
-        Document document = getDocumentById(getDocumentRepository(), documentId);
+        Document document = getResourceBuilder()
+            .fetchDocument(documentId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
+
+        AssertUtils.assertEqual(projectVersion.getProject().getId(), document.getProject().getId(),
+            "Document and version IDs do not match.");
+
         for (ArtifactAppEntity a : artifacts) {
             UUID artifactId = a.getId();
             Artifact artifact = getArtifactById(artifactId);
@@ -91,8 +99,20 @@ public class DocumentArtifactController extends BaseDocumentController {
             .fetchVersion(versionId)
             .withPermission(ProjectPermission.EDIT_DATA, user)
             .get();
-        Document document = getDocumentById(getDocumentRepository(), documentId);
-        Artifact artifact = getArtifactById(artifactId);
+        Document document = getResourceBuilder()
+            .fetchDocument(documentId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
+        Artifact artifact = getResourceBuilder()
+            .fetchArtifact(artifactId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
+
+        AssertUtils.assertEqual(projectVersion.getProject().getId(), document.getProject().getId(),
+            "Document and version IDs do not match.");
+        AssertUtils.assertEqual(projectVersion.getProject().getId(), artifact.getProject().getId(),
+            "Document and artifact IDs do not match.");
+
         Optional<DocumentArtifact> documentArtifactQuery =
             this.documentArtifactRepository.findByProjectVersionAndDocumentAndArtifact(projectVersion,
                 document,

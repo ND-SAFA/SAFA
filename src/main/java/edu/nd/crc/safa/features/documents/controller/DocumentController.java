@@ -144,12 +144,12 @@ public class DocumentController extends BaseDocumentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
         // Step - Retrieve document and associated project.
-        Document document = getDocumentById(getDocumentRepository(), documentId);
-        Project project = document.getProject();
-
-        // Step - Verify authorized user has permission to delete.
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        getResourceBuilder().setProject(project).withPermission(ProjectPermission.EDIT_DATA, user);
+        Document document = getResourceBuilder()
+            .fetchDocument(documentId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
+        Project project = document.getProject();
 
         // Step - Delete document.
         getDocumentRepository().delete(document);

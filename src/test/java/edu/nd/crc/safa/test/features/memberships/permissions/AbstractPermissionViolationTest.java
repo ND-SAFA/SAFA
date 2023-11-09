@@ -30,7 +30,7 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
     protected abstract Set<Permission> getExpectedPermissions();
 
     @Test
-    protected void attemptProjectEdit() throws Exception {
+    protected void attemptViolatingAction() throws Exception {
         // Step - Log in as other user
         authorizationService.loginUser(Sharee.email, Sharee.password, true, this);
 

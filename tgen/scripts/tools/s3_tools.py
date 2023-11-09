@@ -5,7 +5,7 @@ from typing import Any, List
 import boto3
 
 from tgen.common.util.file_util import FileUtil
-from tgen.scripts.constants import DEFAULT_CONFIG_PATH, DEFAULT_DATA_BUCKET, IGNORE_FILES
+from tgen.scripts.constants import DATA_PATH, DEFAULT_CONFIG_PATH, DEFAULT_DATA_BUCKET, IGNORE_FILES
 from tgen.scripts.toolset.confirm import confirm
 
 s3 = boto3.resource('s3')
@@ -92,7 +92,7 @@ def delete_folder(folder_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
     dir_path = os.path.dirname(folder_path)
 
 
-def download_folder(s3_folder: str, store_path: str, bucket_name: str = DEFAULT_DATA_BUCKET):
+def download_folder(s3_folder: str, store_path: str = DATA_PATH, bucket_name: str = DEFAULT_DATA_BUCKET):
     """
     Download the contents of a folder directory.
     :param s3_folder: The folder path in the s3 bucket.

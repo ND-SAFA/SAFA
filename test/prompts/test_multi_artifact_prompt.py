@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from test.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
+from tgen.common.constants.hgen_constants import MAX_ARTIFACTS_FOR_NO_SUMMARIES
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -9,7 +10,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 
 class TestMultiArtifactPrompt(BaseTest):
     ARTIFACTS = [EnumDict({ArtifactKeys.ID: "id1", ArtifactKeys.CONTENT: "content1", ArtifactKeys.SUMMARY: "summary1"}),
-                 EnumDict({ArtifactKeys.ID: "id2", ArtifactKeys.CONTENT: "content2",  ArtifactKeys.SUMMARY: "summary1"})]
+                 EnumDict({ArtifactKeys.ID: "id2", ArtifactKeys.CONTENT: "content2", ArtifactKeys.SUMMARY: "summary1"})]
     PROMPT = "This is a prompt"
 
     def test_build_numbered(self):
@@ -26,7 +27,6 @@ class TestMultiArtifactPrompt(BaseTest):
         expected_artifact_format = [f"1. {artifact1[ArtifactKeys.SUMMARY]}",
                                     f"2. {artifact2[ArtifactKeys.SUMMARY]}"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
-
 
     def test_build_markdown(self):
         artifact1, artifact2 = self.ARTIFACTS[0], self.ARTIFACTS[1]
@@ -69,3 +69,12 @@ class TestMultiArtifactPrompt(BaseTest):
         self.assertIn(artifact2[ArtifactKeys.CONTENT], prompt)
         self.assertNotIn(artifact1[ArtifactKeys.SUMMARY], prompt)
         self.assertNotIn(artifact2[ArtifactKeys.SUMMARY], prompt)
+
+        num_with_id = MultiArtifactPrompt(self.PROMPT, build_method=MultiArtifactPrompt.BuildMethod.NUMBERED, include_ids=True,
+                                          use_summary=False)
+        prompt = num_with_id._build([self.ARTIFACTS[i % 2] for i in range(MAX_ARTIFACTS_FOR_NO_SUMMARIES+1)])
+        # should use summary if more than 10 artifacts
+        self.assertIn(artifact1[ArtifactKeys.SUMMARY], prompt)
+        self.assertIn(artifact2[ArtifactKeys.SUMMARY], prompt)
+        self.assertNotIn(artifact1[ArtifactKeys.CONTENT], prompt)
+        self.assertNotIn(artifact2[ArtifactKeys.CONTENT], prompt)

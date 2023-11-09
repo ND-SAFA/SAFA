@@ -1,8 +1,8 @@
 import os
 from typing import List, Optional
 
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.logging.logger_manager import logger
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner

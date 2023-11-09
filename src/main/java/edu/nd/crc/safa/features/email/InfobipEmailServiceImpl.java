@@ -86,12 +86,15 @@ public class InfobipEmailServiceImpl implements EmailService {
         EmailSendResponse response = wrapSendEmail(() -> {
             String url = String.format(fendBase + verifyEmailUrl, token);
             String emailTemplate = getVerificationEmailTemplate();
-            String emailText = String.format(emailTemplate, url);
+
+            String[] parts = emailTemplate.split("\n", 2);
+            String emailSubject = parts[0];
+            String emailText = String.format(parts[1], url);
 
             return emailApi
                 .sendEmail(List.of(recipient))
                 .from(senderEmailAddress)
-                .subject("Verify your email")
+                .subject(emailSubject)
                 .html(emailText)
                 .execute();
         });

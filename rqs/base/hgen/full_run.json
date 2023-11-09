@@ -8,7 +8,7 @@
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
               "source_layer_id": "Code",
-              "target_type": "Featureg",
+              "target_type": "Features",
               "generate_trace_links": true,
               "dataset_creator": {
                 "object_type": "PROMPT",

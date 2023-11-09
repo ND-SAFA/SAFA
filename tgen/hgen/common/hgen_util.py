@@ -85,7 +85,8 @@ class HGenUtil:
                                           summary_prompt: Prompt = None, artifact_type: str = None,
                                           combine_summary_and_task_prompts: bool = False,
                                           build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
-                                          id_to_context_artifacts: Dict[str, List[EnumDict]] = None
+                                          id_to_context_artifacts: Dict[str, List[EnumDict]] = None,
+                                          **multi_artifact_params
                                           ) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
@@ -115,7 +116,8 @@ class HGenUtil:
                                       data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                       xml_tags={
                                           HGenUtil.convert_spaces_to_dashes(artifact_type.lower()): ["id",
-                                                                                                     "description"]})
+                                                                                                     "description"]},
+                                      **multi_artifact_params)
         artifact_prompt = ContextPrompt(id_to_context_artifacts=id_to_context_artifacts, **artifact_prompt_kwargs) \
             if id_to_context_artifacts else MultiArtifactPrompt(**artifact_prompt_kwargs)
         prompts = [base_prompt, artifact_prompt]
@@ -216,9 +218,10 @@ class HGenUtil:
                 len(content) > 1]
 
     @staticmethod
-    def convert_spaces_to_dashes(str2convert) -> str:
+    def convert_spaces_to_dashes(str2convert: str) -> str:
         """
         Converts the str to use dashes instead of spaces
+        :param str2convert: The string to process.
         :return: The str with dashes instead of spaces
         """
         return DASH.join(str2convert.split()).lower()

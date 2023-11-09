@@ -38,6 +38,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param project_reader: Project reader responsible for extracting project entities.
         :param data_cleaner: Data Cleaner containing list of data cleaning steps to perform on artifact tokens.
         :param remove_orphans: Whether to remove artifacts without a positive trace link.
+        :param allowed_missing_sources: Max number of allowed missing source artifacts.
+        :param allowed_missing_targets: Max number of allowed missing target artifacts.
+        :param allowed_orphans: Max number of allowed missing orphan artifacts.
         """
         super().__init__(data_cleaner)
         self.allowed_missing_sources = allowed_missing_sources
@@ -64,8 +67,10 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
     def export_as_safa(self, export_path: str):
         """
         Exports project as safa project to directory given.
-        :return:
+        :param export_path: Path to export
+        :return: Exception is thrown.
         """
+        raise NotImplementedError("export_as_safa not implemented for trace_dataset_creator.")
 
     def process_data(self):
         """

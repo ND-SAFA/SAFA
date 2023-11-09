@@ -1,16 +1,16 @@
-import os
 import uuid
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
-from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS, DEFAULT_BRANCHING_FACTOR
+from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
+from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -43,9 +43,10 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True,
-                                                                    id_to_context_artifacts=state.id_to_cluster_artifacts)
+                                                                    id_to_context_artifacts=state.id_to_cluster_artifacts,
+                                                                    use_summary=False)
         if state.id_to_cluster_artifacts:
-            n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, state)
+            n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
             prompt_builder.format_variables = {"n_targets": n_targets}
         if state.project_summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
@@ -62,21 +63,20 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.n_generations += 1
 
     @staticmethod
-    def _calculate_number_of_targets_per_cluster(artifact_ids: List, state: HGenState,
-                                                 branching_factor: int = DEFAULT_BRANCHING_FACTOR) -> List[int]:
+    def _calculate_number_of_targets_per_cluster(artifact_ids: List, args: HGenArgs, state: HGenState) -> List[int]:
         """
         Calculates the expected number of targets for each cluster based on the number of artifacts in each cluster
         :param artifact_ids: The ids of the artifact representing each cluster
+        :param args: Arguments to HGEN
         :param state: The current HGEN state
-        :param branching_factor: Determines the percentage of target artifacts per source artifacts
         :return: A list of the expected number of target artifacts for each cluster
         """
-        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(state.id_to_cluster_artifacts[i]),
-                                                                                    branching_factor) for i in artifact_ids]
+        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(state.id_to_cluster_artifacts[i]))
+                     for i in artifact_ids]
         return n_targets
 
     @staticmethod
-    def _calculate_proportion_of_artifacts(n_artifacts: int,  branching_factor: int) -> int:
+    def _calculate_proportion_of_artifacts(n_artifacts: int, branching_factor: int = DEFAULT_BRANCHING_FACTOR) -> int:
         """
         Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
         :param n_artifacts: Total number of artifacts
@@ -84,6 +84,23 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The number of artifacts equal to a proportion of the total
         """
         return max(round(n_artifacts * (1 / branching_factor)), 1)
+
+    @staticmethod
+    def _calculate_proportion_of_tokens(artifacts: List, args: HGenArgs,
+                                        token_to_target_ratio: float = DEFAULT_TOKEN_TO_TARGETS_RATIO) -> int:
+        """
+        Calculates how many artifacts to generate based on proportion of total artifact tokens
+        :param artifacts: List of artifact in the given cluster
+        :param args: The arguments to HGEN
+        :param token_to_target_ratio: The token to target token ratio.
+        :return: The number of artifacts equal to a proportion of the artifact tokens
+        """
+        model_name = args.llm_managers[PredictionStep.GENERATION.value].llm_args.model
+        contents = [artifact[ArtifactKeys.CONTENT] for artifact in artifacts]
+        token_counts = [TokenCalculator.estimate_num_tokens(content, model_name) for content in contents]
+        n_artifacts_proportion = GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(contents))
+        n_artifacts_tokens = max(round(sum(token_counts) / token_to_target_ratio), n_artifacts_proportion)
+        return n_artifacts_tokens
 
     @staticmethod
     def _map_generations_to_predicted_sources(generation_predictions: List, source_tag_id: str, target_tag_id: str,

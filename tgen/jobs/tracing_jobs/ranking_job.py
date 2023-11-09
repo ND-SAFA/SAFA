@@ -42,7 +42,8 @@ class RankingJob(AbstractJob):
         :param artifact_df: DataFrame containing sources and targets.
         :param sorter: The sorting function to feed big claude with.
         :param select_top_predictions: Whether to select the top predictions
-        :param layer_ids
+        :param layer_ids: The layers to rank between.
+        :param ranking_pipeline: The pipeline used to rank children to each parent.
         """
         super().__init__()
         self.dataset_creator = dataset_creator

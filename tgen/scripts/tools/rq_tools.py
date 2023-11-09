@@ -2,6 +2,7 @@ import os
 from typing import List, Optional
 
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
@@ -96,7 +97,11 @@ def run_rq(rq_path: str) -> None:
 
     ScriptDefinition.set_output_paths(rq_definition)
     rq_definition.set_default_values(use_os_values=True)
-    rq_definition.inquirer_variables()
+    try:
+        rq_definition.inquirer_variables()
+    except Exception:
+        logger.warning("Going back to menu...")
+        return
     final_rq_json = rq_definition.build_rq(error_on_fail=True)
 
     experiment_class = ScriptRunner.get_experiment_class(final_rq_json)

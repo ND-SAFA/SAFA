@@ -23,6 +23,11 @@ class AbstractProjectDataFrame(pd.DataFrame):
     def __init__(self, data=None, index: Axes = None, columns: Axes = None, dtype: Dtype = None, copy: bool = None):
         """
         Extends the pandas dataframe for all trace project information
+        :param data: The data used to initialize data frame.
+        :param index: The index of the datums.
+        :param columns: The columns of the data frame.
+        :param dtype: The type of data contained in each column.
+        :param copy: Whether to create a copy of the data frame.
         """
         if isinstance(data, pd.DataFrame) and not isinstance(data, self.__class__):
             data = data[[col.value for col in self.data_keys() if col.value in data.columns]]
@@ -113,6 +118,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
     def assert_columns(self, columns: List[str] = None) -> None:
         """
         Asserts that all columns are those expected in the DF
+        :param columns: The expected columns in data frame.
         :return: None
         """
         if self.columns.empty and columns is None:

@@ -35,6 +35,7 @@ class EntityReader(Generic[EntityType]):
     def read_entities(self, summarizer: ArtifactsSummarizer = None) -> pd.DataFrame:
         """
         Reads original entities and applies any column conversion defined in definition.
+        :param summarizer: The summarizer to use if summarizing right after reding entities.
         :return: DataFrame containing processed entities.
         """
         parser, parser_params = self.get_parser()

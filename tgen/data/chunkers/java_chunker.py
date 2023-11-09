@@ -2,10 +2,10 @@ from typing import List, Type
 
 import javalang
 import javalang.ast
-from javalang.tree import Declaration, Import, PackageDeclaration
 from javalang import tree as javatree
+from javalang.tree import Declaration, Import, PackageDeclaration
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, SEMI_COLON, BRACKET_OPEN, BRACKET_CLOSE
+from tgen.common.constants.deliminator_constants import BRACKET_CLOSE, BRACKET_OPEN, NEW_LINE, SEMI_COLON
 from tgen.data.chunkers.abstract_code_chunker import AbstractCodeChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 
@@ -72,6 +72,7 @@ class JavaChunker(AbstractCodeChunker):
         Creates a node that has children (body) from the parsed syntax tree
         :param parent_java_node: The parent java node object for classes, methods, and other nodes with children
         :param lines: The lines of the original file
+        :param children: The children of the node.
         :return: The node for chunking
         """
         children_nodes = [JavaChunker._create_chunked_node(c, lines) for c in children]
@@ -120,6 +121,7 @@ class JavaChunker(AbstractCodeChunker):
         """
         Gets the start lineno from the java_node position
         :param java_node: The java_node object for classes, methods, statements, ect.
+        :param lines: The lines of the java node.
         :return: The start lineno from the java_node position
         """
         start = java_node.position.line - 1  # index starting at 0

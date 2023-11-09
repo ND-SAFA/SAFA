@@ -16,6 +16,7 @@ class ClusteringJob(AbstractJob):
         :param dataset_creator: The creator used to get dataset to cluster.
         :param export_dir: Path to where clusters should be exported.
         :param add_to_dataset: Whether to add clusters to the dataset.
+        :param artifact_types: The artifact types to cluster.
         """
         super().__init__()
         self.dataset_creator = dataset_creator

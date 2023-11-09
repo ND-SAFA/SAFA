@@ -67,6 +67,7 @@ class TrainerDatasetManager(BaseObject):
         """
         Saves all dataset splits to the output dir
         :param output_dir: directory to save to
+        :param format_type: The type of format to save dataset splits.
         :return: the list of files that were saved
         """
         output_paths = []
@@ -174,7 +175,8 @@ class TrainerDatasetManager(BaseObject):
     def get_dataset_filename(self, dataset_role: DatasetRole, dataset_name: str = None) -> str:
         """
         Returns the filename associated with the dataset corresponding to the given role
-        :param dataset_role: the role of the dataset
+        :param dataset_role: the role of the dataset.
+        :param dataset_name: The name of the dataset to override.
         :return: the dataset filename
         """
         if not dataset_name:
@@ -185,6 +187,7 @@ class TrainerDatasetManager(BaseObject):
     def _prepare_datasets(self, train_dataset: iDataset, data_augmenter: DataAugmenter) -> iDataset:
         """
         Performs any necessary additional steps necessary to prepare each dataset
+        :param train_dataset: The dataset used to calculate the splits off of.
         :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: None
         """
@@ -224,6 +227,7 @@ class TrainerDatasetManager(BaseObject):
             -> Dict[DatasetRole, DATASET_TYPE]:
         """
         Creates the data from their corresponding creators
+        :param dataset_creators_map: Map of dataset role to dataset creator.
         :return: a dictionary mapping dataset role to the corresponding dataset
         """
         return {dataset_role: TrainerDatasetManager.__optional_create(dataset_creator)

@@ -7,8 +7,8 @@ import mock
 import numpy as np
 from bs4 import BeautifulSoup
 
-from test.hgen.hgen_test_utils import HGenTestConstants, get_name_responses, get_test_hgen_args, HGEN_PROJECT_SUMMARY, \
-    MISSING_PROJECT_SUMMARY_RESPONSES
+from test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, MISSING_PROJECT_SUMMARY_RESPONSES, get_name_responses, \
+    get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
@@ -105,7 +105,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         selected_sources = {trace[TraceKeys.SOURCE] for trace in state.selected_predictions}
         n_added_sources = len({trace[TraceKeys.SOURCE] for trace in state.trace_predictions
                                if trace[TraceKeys.SCORE] >= args.min_orphan_score_threshold}) - len(selected_sources)
-        n_orphans = n_artifacts-len(selected_sources)-n_added_sources
+        n_orphans = n_artifacts - len(selected_sources) - n_added_sources
         embedding_similarities = self._create_fake_embedding_scores(args, sim_mock, n_orphans)
         n_explanations = n_added_sources + len([s for s in embedding_similarities if s >= args.min_orphan_score_threshold])
         anthropic_manager.add_responses([RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
@@ -172,9 +172,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
             state.id_to_cluster_artifacts[n_clusters - 1].extend(added_clusters)
             n_artifacts_last_cluster += len(added_clusters)
 
-        cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters={i: [a[ArtifactKeys.ID] for a in artifacts]
-                                                                                       for i, artifacts in
-                                                                                       state.id_to_cluster_artifacts.items()}) \
-            .create()
+        manual_clusters = {i: [a[ArtifactKeys.ID] for a in artifacts] for i, artifacts in state.id_to_cluster_artifacts.items()}
+        cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters).create()
         state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
         return artifacts, n, n_artifacts_last_cluster,

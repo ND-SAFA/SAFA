@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from tgen.common.constants.other_constants import DEFAULT_CONTEXT_THRESHOLD
 from tgen.common.util.enum_util import EnumDict
@@ -25,7 +25,9 @@ class ContextPrompt(MultiArtifactPrompt):
                context_threshold: float = DEFAULT_CONTEXT_THRESHOLD, **kwargs) -> str:
         """
         Builds the artifacts prompt using the given build method
-        :param artifacts: The list of dictionaries containing the attributes representing each artifact
+        :param artifact: The artifact to include in prompt.
+        :param embedding_manager: The embedding manager used to calculate similar texts to include.
+        :param context_threshold: The similarity threshold for when to include similar content in context.
         :param kwargs: Ignored
         :return: The formatted prompt
         """
@@ -35,9 +37,9 @@ class ContextPrompt(MultiArtifactPrompt):
             assert embedding_manager is not None, "Must supply either a mapping of id to context or an embeddings manager to make one"
             embedding_manager.update_or_add_content(a_id, content=artifact[ArtifactKeys.CONTENT])
             sorted_entries = EmbeddingSorter.sort(parent_ids=[a_id],
-                                                           child_ids=[id_ for id_ in embedding_manager.get_all_ids()
-                                                                      if id_ != a_id],
-                                                           embedding_manager=embedding_manager, return_scores=True)
+                                                  child_ids=[id_ for id_ in embedding_manager.get_all_ids()
+                                                             if id_ != a_id],
+                                                  embedding_manager=embedding_manager, return_scores=True)
             embedding_manager.remove_from_content_map(a_id)
             sorted_ids, scores = sorted_entries[a_id]
             id_to_context_artifacts = {a_id: [EnumDict({ArtifactKeys.ID: id_,

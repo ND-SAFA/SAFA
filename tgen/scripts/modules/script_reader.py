@@ -26,7 +26,7 @@ class ScriptOutputReader:
     PREDICTION_OUTPUT = "prediction_output"
 
     def __init__(self, experiment_path: str, experimental_vars_ignore: List[str] = None, metrics: List[str] = None,
-                 display_metrics: List[str] = None, export: bool = True):
+                 display_metrics: List[str] = None):
         """
         Initializes reader for experiment at path.
         :param experiment_path: Path to experiment to read.
@@ -47,7 +47,6 @@ class ScriptOutputReader:
 
         self.eval_df = None
         self.val_df = None
-        self.export = export
 
     def print_eval(self) -> None:
         """

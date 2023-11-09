@@ -2,8 +2,8 @@ from typing import Callable, Dict, List, Union
 
 from git import Commit
 
-from tgen.common.util.override import overrides
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 
 EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
@@ -41,6 +41,7 @@ class GCommit(AbstractGithubArtifact):
     def as_dataframe_entry(self, dataset_type: str = "NL") -> Union[Dict, None]:
         """
         Exports commit for saving.
+        :param dataset_type: The type of dataset, either NL or PL.
         :return:
         """
         body = NEW_LINE.join(self.diffs) if dataset_type == "PL" else self.content

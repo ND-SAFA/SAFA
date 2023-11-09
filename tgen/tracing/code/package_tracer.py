@@ -23,6 +23,8 @@ class PackageTracer:
     def add_package_nodes(trace_dataset: TraceDataset, package_artifact_type: str = DEFAULT_PACKAGE_ARTIFACT_TYPE) -> None:
         """
         Extracts packages and adds them as artifacts.
+        :param trace_dataset: The trace dataset to add package nodes to.
+        :param package_artifact_type: The artifact type to represent packages.
         :return: None (artifact data frame is modified)
         """
         artifact_ids = trace_dataset.artifact_df.index

@@ -1,6 +1,6 @@
 from typing import Callable, List
 
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 
 
@@ -21,6 +21,7 @@ class BinaryChoiceQuestionPrompt(QuestionPrompt):
         :param question: The question being asked
         :param response_tag: The tag the model should enclose its response in
         :param default_factory: Method to define a default if response is not as expected
+        :param required: Whether to require all tags be present when parsing LLM response.
         """
         self.choices = choices
         response_instructions = f"{self.RESPONSE_INSTRUCTIONS1.format(*choices)} {self.RESPONSE_INSTRUCTIONS2}"

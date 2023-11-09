@@ -1,19 +1,16 @@
 import sys
 from typing import Any, List, Type
 
-import inquirer
-
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.logging.logger_manager import logger
 from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, EXIT_COMMAND, EXIT_MESSAGE, \
-    REQUIRED_FIELD_ERROR, \
-    SINGLETON_PROMPT_ID
+    REQUIRED_FIELD_ERROR
 
 
-def inquirer_selection(selections: List[str], message: str = None, allow_back: bool = DEFAULT_ALLOW_BACK):
+def inquirer_selection(commands: List[str], message: str = None, allow_back: bool = DEFAULT_ALLOW_BACK):
     """
     Prompts user to select an option.
-    :param selections: The options to select from.
+    :param commands: The options to select from.
     :param message: The message to display when selecting from options.
     :param allow_back: Allow the user to select command to move `back` in menu.
     :return: The selected option.
@@ -22,9 +19,16 @@ def inquirer_selection(selections: List[str], message: str = None, allow_back: b
     other_commands = [EXIT_COMMAND]
     if allow_back:
         other_commands.insert(0, BACK_COMMAND)
-    prompts = [inquirer.List(SINGLETON_PROMPT_ID, message=message, choices=selections + other_commands)]
-    answers = inquirer.prompt(prompts)
-    selected_choice = answers[SINGLETON_PROMPT_ID]
+    selections_prompt = create_selection_prompt(commands)
+    other_commands_prompt = create_selection_prompt(other_commands, len(commands))
+    selections_message = f"--- {message} ---\n{selections_prompt}\n\n{other_commands_prompt}\n>"
+    user_input = input(selections_message)
+    try:
+        selected_index = int(user_input)
+    except:
+        raise Exception("Expected an int.")
+    all_commands = commands + other_commands
+    selected_choice = all_commands[int(selected_index)]
     if selected_choice == EXIT_COMMAND:
         logger.info(EXIT_MESSAGE)
         sys.exit()
@@ -46,7 +50,7 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
     message += f" - {annotation_name} -"
     if default_value is not None:
         message += f" ({default_value})"
-    user_value = inquirer.text(message=message)
+    user_value = input(message)
     if allow_back and user_value.lower() == BACK_COMMAND:
         return None
     if class_type is list:  # TODO: Support list of ints, bools, and floats.
@@ -56,3 +60,15 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
             raise Exception(REQUIRED_FIELD_ERROR)
         user_value = default_value
     return class_type(user_value)
+
+
+def create_selection_prompt(selections: List[str], start: int = 0):
+    """
+    Creates a prompt containing all selections.
+    :param selections:
+    :param start:
+    :return:
+    """
+    options = [f"{i + start}) {s}" for i, s in enumerate(selections)]
+    selections_message = NEW_LINE.join(options)
+    return selections_message

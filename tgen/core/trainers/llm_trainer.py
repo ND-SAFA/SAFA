@@ -49,6 +49,7 @@ class LLMTrainer(AbstractTrainer):
     def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
         """
         Handles training of the model
+        :param completion_type: The type of completion task being performed.
         :return: The training response
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])

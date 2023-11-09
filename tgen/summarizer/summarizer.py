@@ -5,10 +5,8 @@ from typing import Optional
 import pandas as pd
 
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -22,8 +20,9 @@ class Summarizer:
 
     def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset):
         """
-        Responsiple for creating summaries of projects and artifacts
+        Responsible for creating summaries of projects and artifacts
         :param summarizer_args: Arguments necessary for the summarizer
+        :param dataset: The dataset to summarize.
         """
         self.args = summarizer_args
         self.dataset = dataset

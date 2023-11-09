@@ -1,7 +1,7 @@
 import collections
 import os
 from enum import Enum, EnumMeta
-from typing import Any, Dict, Iterable
+from typing import Any, Dict
 
 from tqdm import tqdm
 from yaml.constructor import ConstructorError
@@ -11,11 +11,10 @@ from yaml.nodes import MappingNode, Node
 
 from tgen.common.constants.deliminator_constants import COLON
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
-import numpy as np
+
 
 class CustomLoader(SafeLoader):
     __top_level_reached = False
@@ -133,7 +132,7 @@ class CustomDumper(Dumper):
             try:
                 converted_data = data.to_yaml()
                 node = super().represent_data(converted_data)
-                node.tag =  self.get_original_node_tag(data)
+                node.tag = self.get_original_node_tag(data)
                 return node
             except Exception:
                 pass
@@ -195,7 +194,8 @@ class YamlUtil:
         elif hasattr(content, "to_yaml"):
             if key:
                 export_dir = os.path.join(export_dir, str(key))
-            return content.to_yaml(export_path=export_dir)
+            yamified_content = content.to_yaml(export_path=export_dir)
+            return yamified_content
         else:
             return content
 

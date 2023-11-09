@@ -3,9 +3,9 @@ from typing import Any, Iterable, List, Tuple
 
 import numpy as np
 
+from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
-from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
@@ -26,7 +26,7 @@ class Cluster:
         self.__init_stats()
 
     @staticmethod
-    def get_cluster_id(method: SupportedClusteringMethod, index: int):
+    def get_cluster_id(method: SupportedClusteringMethods, index: int):
         """
         Creates generic cluster id.
         :param method: The method used to generate the cluster.
@@ -81,13 +81,15 @@ class Cluster:
         """
         return EmbeddingUtil.calculate_similarities([self.centroid], [cluster.centroid])[0][0]
 
-    def similarity_to_neighbors(self, a_id: str):
+    def similarity_to_neighbors(self, a_id: str) -> float:
         """
         Calculates the average similarity to the cluster's artifacts.
         :param a_id: Artifact id to compare to cluster.
         :return: Average similarity.
         """
         unique_artifacts_embeddings = [self.embeddings_manager.get_embedding(a) for a in self.artifact_id_set if a != a_id]
+        if len(unique_artifacts_embeddings) == 0:
+            return 1
         artifact_embedding = [self.embeddings_manager.get_embedding(a_id)]
         similarities = EmbeddingUtil.calculate_similarities(artifact_embedding, unique_artifacts_embeddings)[0]
         avg_sim = sum(similarities) / len(similarities)
@@ -177,14 +179,18 @@ class Cluster:
         values = [matrix[i][j] for i, j in indices]
         return values
 
-    def to_yaml(self, **kwargs) -> "Cluster":
+    def to_yaml(self, export_path: str = None, **kwargs) -> "Cluster":
         """
         Removes stats that take a while to be saved
+        :param export_path: Path to save yaml to.
         :return: The cluster cleaned up for efficient saving as yaml
         """
-        yaml_safe_cluster = deepcopy(self)
-        yaml_safe_cluster.__init_stats()
-        return yaml_safe_cluster
+        if export_path:
+            yaml_safe_cluster = deepcopy(self)
+            yaml_safe_cluster.__init_stats()
+            yaml_safe_cluster.embeddings_manager = yaml_safe_cluster.embeddings_manager.to_yaml(export_path)
+            return yaml_safe_cluster
+        return self
 
     def from_yaml(self, **kwargs) -> "Cluster":
         """

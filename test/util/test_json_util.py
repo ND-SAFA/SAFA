@@ -67,16 +67,15 @@ class TestJsonUtil(BaseTest):
                                iteration=1,
                                metrics=metrics)
         eval_prediction_output = TracePredictionOutput(metrics=metrics)
-        trace_train_output = TraceTrainOutput(global_step=1, training_loss=t_loss, metrics=[],
-                                              val_metrics=[stage_eval],
+        trace_train_output = TraceTrainOutput(global_step=1, training_loss=t_loss, metrics=[stage_eval],
                                               prediction_output=eval_prediction_output)
         output_json = JsonUtil.to_dict(trace_train_output)
         resulting_keys = list(output_json.keys())
-        expected_keys = ["global_step", "training_loss", "metrics", "val_metrics", "prediction_output", "training_time"]
+        expected_keys = ["global_step", "training_loss", "metrics", "prediction_output", "training_time"]
         self.assertSetEqual(set(expected_keys), set(resulting_keys))
         self.assertEqual(t_loss, output_json["training_loss"])
         # Verify evaluations
-        stage_evals_json = output_json["val_metrics"]
+        stage_evals_json = output_json["metrics"]
         self.assertEqual(1, len(stage_evals_json))
         # Verify metric
         stage_eval_json = stage_evals_json[0]

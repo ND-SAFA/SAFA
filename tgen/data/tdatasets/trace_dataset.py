@@ -3,14 +3,12 @@ from collections import Counter
 from copy import deepcopy
 from typing import Any, Callable, Dict, List, Tuple, Union
 
-import networkx as nx
 import numpy as np
 import pandas as pd
 from datasets import Dataset
 from sentence_transformers import InputExample
 from tqdm import tqdm
 
-from tgen.common.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.util.enum_util import EnumDict
@@ -79,6 +77,7 @@ class TraceDataset(iDataset):
         def encode(batch: Dict[str, List[Union[str, int]]]) -> Dict:
             """
             Encodes the batch.
+            :param batch: The batch of examples to encode into features.
             """
             features = []
             for source, target, label in zip(batch[CSVKeys.SOURCE], batch[CSVKeys.TARGET], batch[CSVKeys.LABEL]):
@@ -97,6 +96,7 @@ class TraceDataset(iDataset):
     def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
+        :param include_ids: Whether to include artifact ids in resulting data frame.
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
@@ -219,18 +219,6 @@ class TraceDataset(iDataset):
         :return: None
         """
         return
-
-    def construct_graph_from_traces(self) -> nx.Graph:
-        """
-        Constructs a graph using the artifacts as nodes and positive trace links as edges
-        :return: A graph representation of the dataset
-        """
-        G = nx.Graph()
-        G.add_nodes_from(self.artifact_df.index)
-        G.add_edges_from([(row[TraceKeys.SOURCE], row[TraceKeys.TARGET],
-                           {'weight': row[TraceKeys.LABEL]}) for i, row in self.trace_df.itertuples()
-                          if row[TraceKeys.LABEL] > TRACE_THRESHOLD])
-        return G
 
     def get_pos_link_ids(self, unique: bool = False) -> List[int]:
         """

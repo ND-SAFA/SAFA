@@ -30,6 +30,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Creates reader for project at path and column definitions given.
         :param project_path: Path to the project.
         :param conversions: Column definitions available to project.
+        :param overrides: Map of properties to override in project reader.
         """
         super().__init__(overrides, project_path)
         if conversions is None:
@@ -145,10 +146,12 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     def get_definition_reader(self, raise_exception: bool = True) -> AbstractProjectDefinition:
         """
         If tim.json file exists in project, then TimProjectDefinition is returned. Otherwise, StructuredProjectDefinition is returned.
+        :param raise_exception: Whether to
         :return: AbstractProjectDefinition corresponding to definition file found.
         """
         tim_path = os.path.join(self.get_full_project_path(), SafaKeys.TIM_FILE)
-        structure_definition_path = os.path.join(self.get_full_project_path(), StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
+        structure_definition_path = os.path.join(self.get_full_project_path(),
+                                                 StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
         if os.path.exists(tim_path):
             return TimProjectDefinition()
         elif os.path.exists(structure_definition_path):

@@ -16,6 +16,7 @@ class GCodeFile(AbstractGithubArtifact):
         """
         Initialized code artifact targeting file at path.
         :param file_path: The path to the code file to parse.
+        :param base_path: The base path of the project.
         """
         self.file_path = file_path
         self.base_path = base_path

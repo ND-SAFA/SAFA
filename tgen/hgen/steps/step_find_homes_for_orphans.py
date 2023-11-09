@@ -1,4 +1,4 @@
-from typing import List, Any, Dict, Set
+from typing import Any, Dict, List, Set
 
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
@@ -109,7 +109,8 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         Generates explanations for traces that are missing them
         :param pipeline_args: The arguments to the ranking pipeline
-        :param trace_selections: The current trace selections
+        :param trace_selections: The current trace selections.
+        :param state: The state of the hgen pipeline.
         :return: Trace selections with explanations
         """
         missing_explanations = [trace for trace in trace_selections if not trace.get(TraceKeys.EXPLANATION)]

@@ -17,6 +17,7 @@ class AbstractTrainer(BaseObject):
         """
         Initializes the trainer with a dataset manager used for training and predictions
         :param trainer_dataset_manager: The dataset manager used for training and predictions
+        :param trainer_args: The arguments to the trainer.
         """
         self.trainer_dataset_manager = trainer_dataset_manager
         self.trainer_args = trainer_args

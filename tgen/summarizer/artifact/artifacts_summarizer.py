@@ -33,7 +33,8 @@ class ArtifactsSummarizer(BaseObject):
                  nl_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.NL_BASE):
         """
         Initializes a summarizer for a specific model
-        :param summary_args: The args for the summary
+        :param summarizer_args: Arguments defining how and what to summarize.
+        :param project_summary: Default project summary to use.
         :param nl_summary_type: The default prompt to use for summarization.
         """
         self.llm_manager = summarizer_args.llm_manager_for_artifact_summaries

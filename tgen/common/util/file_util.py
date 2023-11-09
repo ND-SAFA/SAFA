@@ -18,7 +18,7 @@ from tgen.common.util.logging.logger_manager import logger
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
-                   "PL", "R", "PY", "JAVA", "VUE", "CC"]
+                   "PL", "R", "PY", "JAVA", "VUE", "CC", "SQL"]
 
 ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM, MODEL_PARAM]
 import numpy as np
@@ -65,6 +65,8 @@ class FileUtil:
     def create_dir_safely(output_path: str, *additional_path_parts) -> str:
         """
         Makes a directory, by first checking if the directory exists
+        :param output_path: Path to folder to create.
+        :param additional_path_parts: Additional path parts to include in output path.
         :return: the output path
         """
         if additional_path_parts:
@@ -456,6 +458,7 @@ class FileUtil:
         Saves yaml to given file
         :param content: The content of the file to create.
         :param output_file_path: The path to save the file to.
+        :param dumper: The object responsible for translating into yaml.
         """
         dumper = Dumper if dumper is None else dumper
         FileUtil.create_dir_safely(output_file_path)

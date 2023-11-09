@@ -27,6 +27,7 @@ class JobResult(BaseObject):
     def to_json(self, as_dict: bool = False) -> Union[str, Dict]:
         """
         Returns the job output as json
+        :param as_dict: Whether to return job result as JSON string or dictionary.
         :return: the output as json
         """
         obj = self.as_dict()
@@ -45,6 +46,7 @@ class JobResult(BaseObject):
     def from_dict(dict_: Dict) -> "JobResult":
         """
         Creates a JobResult from a dictionary
+        :param dict_: The dictionary used to initialize the job result.
         :return: a new JobResult
         """
         return JobResult.initialize_from_definition(dict_)
@@ -53,6 +55,7 @@ class JobResult(BaseObject):
     def from_json(json_input: str) -> "JobResult":
         """
         Creates a JobResult from json
+        :param json_input: The JSON String to parse as a job result.
         :return: a new JobResult
         """
         dict_ = json.loads(json_input)

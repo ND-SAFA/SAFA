@@ -4,8 +4,8 @@ import datasets
 from sklearn.metrics import precision_recall_curve
 
 from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
-from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.common.logging.logger_manager import logger
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Calculates the optimal threshold for predictions.
@@ -34,7 +34,7 @@ class PrecisionAtRecallMetric(AbstractTraceMetric):
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the dataset.
         :param predictions: predicted labels
-        :param labels: ground truth labels.
+        :param references: ground truth labels.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.

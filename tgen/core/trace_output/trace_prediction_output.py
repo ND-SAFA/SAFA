@@ -30,6 +30,8 @@ class TracePredictionOutput(AbstractTraceOutput):
         :param source_target_pairs: List of tuples containing the source and target artifact ids for each prediction.
         :param prediction_entries: List containing source artifact, target artifact, and similarity score between them.
         :param prediction_output: The output of the prediction job.
+        :param additional_output: Any additional output to store alongside the prediction output.
+        :param original_response: The original responses to the prediction job.
         """
         self.original_response = original_response
         self.predictions: TracePredictions = predictions
@@ -74,6 +76,7 @@ class TracePredictionOutput(AbstractTraceOutput):
         """
          Returns True if can use comparison metric to compare the two results
          :param other: other result
+         :param comparison_metric_name: The metric used to compare which is the best prediction output.
          :return: True if can use comparison metric to compare the two results else false
          """
         if not comparison_metric_name:
@@ -87,6 +90,7 @@ class TracePredictionOutput(AbstractTraceOutput):
         """
         Gets the values to use for comparison
         :param other: the other result
+        :param comparison_metric_name: The metric used to compare which is the best prediction output.
         :return: the values to use for comparison
         """
         if self._can_compare_with_metric(other, comparison_metric_name):

@@ -40,7 +40,10 @@ class RQVariable:
         :return: None
         """
         message = f"{self.name}"
-        self.__value = inquirer_value(message, self.type_class, default_value=self.__default_value)
+        value = inquirer_value(message, self.type_class, default_value=self.__default_value, allow_back=True)
+        if value is None:
+            raise Exception("Unable to retrieve value.")
+        self.__value = value
 
     def parse_value(self, variable_value: Any) -> Any:
         """
@@ -130,6 +133,7 @@ class RQDefinition:
         """
         Sets the default values for variable in map.
         :param default_values: Map of variable names to their default values.
+        :param use_os_values: Whether to use OS values as the default values.
         :return: None
         """
         if default_values is None and not use_os_values:
@@ -227,7 +231,7 @@ class RQDefinition:
 
         if ReflectionUtil.is_primitive(rq_json):
             return [rq_json]
-        
+
         for child_key, child_value in rq_json.items():
             if isinstance(child_value, list):
                 for i in child_value:

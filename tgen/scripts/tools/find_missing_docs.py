@@ -1,9 +1,8 @@
 import ast
-import json
 import os
 import sys
-from _ast import AST
-from typing import Dict, List
+from _ast import AST, ClassDef, FunctionDef, arg
+from typing import List
 
 from dotenv import load_dotenv
 
@@ -17,6 +16,118 @@ from tgen.common.util.file_util import FileUtil
 NodeType = AST
 EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
 DIRECTORY_PATHS = [os.path.join(ROOT_PATH, "tgen")]
+IGNORED_PARAM_NAMES = ["self", "cls", "_"]
+
+
+class DocNode:
+    def __init__(self, node, file_path: str):
+        """
+        Creates node in a file
+        :param node: The node.
+        :param file_path: Path to parent file.
+        """
+        self.node = node
+        self.file_path = file_path
+
+    def get_name(self) -> str:
+        """
+        :return: Name of node. Function name if function, class name if class.
+        """
+        return self.node.name
+
+    def get_type_name(self) -> str:
+        """
+        :return: The name of the type of node.
+        """
+        return type(self.node).__name__
+
+    def get_line_no(self):
+        """
+        :return: Line number starting node definition.
+        """
+        return self.node.lineno
+
+    def get_docstring(self):
+        """
+        :return: The docstring of node.
+        """
+        return ast.get_docstring(self.node)
+
+    def has_docstring(self):
+        """
+        :return: Whether this node contains a doc string.
+        """
+        return has_docstring(self.node)
+
+    def is_function(self) -> bool:
+        """
+        :return: Whether node is function definition.
+        """
+        return isinstance(self.node, FunctionDef)
+
+    def is_class(self) -> bool:
+        """
+        :return: Whether node is class definition.
+        """
+        return isinstance(self.node, ClassDef)
+
+    def get_errors(self) -> List[str]:
+        """
+        Gets errors occurring in node within a file.
+        :return: List of errors.
+        """
+        errors = []
+        doc_string = self.get_docstring()
+        if doc_string is None:
+            link = get_link(self.file_path, self.get_line_no())
+            errors.append(f"{link}: Missing docstring in '{self.get_name()}'.")
+
+        if doc_string and self.is_function():
+            for node_arg in self.node.args.args:
+                arg_name = node_arg.arg
+                if arg_name in IGNORED_PARAM_NAMES:
+                    continue
+                if in_docstring(node_arg, doc_string):
+                    continue
+                link = get_link(self.file_path, node_arg.lineno)
+                msg = f"{link}: Missing param `{node_arg.arg}` in '{self.get_name()}'."
+                errors.append(msg)
+        return errors
+
+
+class FileNode:
+    def __init__(self, file_path: str):
+        """
+        Creates node representing python file.
+        :param file_path: Path to file.
+        """
+        self.file_path = file_path
+        self.nodes = self.get_file_nodes(self.file_path)
+
+    @staticmethod
+    def get_file_nodes(file_path: str) -> List[DocNode]:
+        """
+        Reads nodes in file.
+        :param file_path: The path to file to read nodes from.
+        :return: List of nodes.
+        """
+        file_content = FileUtil.read_file(file_path)
+        tree = ast.parse(file_content, filename=file_path)
+        nodes = [DocNode(node, file_path) for node in ast.walk(tree)]
+        return nodes
+
+    def get_errors(self) -> List[str]:
+        """
+        Returns errors found in nodes of file.
+        :return: List of errors.
+        """
+        errors = []
+        for node in self.nodes:
+            if not node.has_docstring():
+                continue
+
+            errors.extend(node.get_errors())
+        return errors
 
 
 def print_missing_headers(throw_error: bool = False) -> None:
@@ -25,21 +136,26 @@ def print_missing_headers(throw_error: bool = False) -> None:
     :param throw_error: Whether to throw error if invalid functions/methods found.
     :return: None
     """
-    missing_map = {}
     for directory_path in DIRECTORY_PATHS:
-        path_map = calculate_missing_doc_map(directory_path)
-        path_map = {k: v for k, v in path_map.items() if len(v) > 0}
-        path_map = {get_display_name(k, directory_path): v for k, v in path_map.items()}
-        missing_map.update(path_map)
+        errors = calculate_missing_doc_map(directory_path)
 
-    if len(missing_map) > 0:
-        missing_header_message = json.dumps(missing_map, indent=4)
+    if len(errors) > 0:
+        print_errors(errors)
         if throw_error:
-            raise Exception(f"{missing_header_message}\nMissing docs.")
-        else:
-            print(missing_header_message)
+            raise Exception("Missing docs.")
     else:
         print("No missing docs :)")
+
+
+def print_errors(errors: List[str]):
+    """
+    Prints list of errors.
+    :param errors: The errors to print.
+    :return: None
+    """
+    for e in errors:
+        print(e)
+    print(f"{len(errors)} errors found.")
 
 
 def filter_files(file_path: str):
@@ -53,28 +169,38 @@ def filter_files(file_path: str):
     return os.path.isfile(file_path) and file_name.endswith(".py") and file_name != "__init__.py" and not is_exclude
 
 
-def calculate_missing_doc_map(directory_path: str) -> Dict[str, List[str]]:
+def calculate_missing_doc_map(directory_path: str) -> List[str]:
     """
     Creates a map from files to their descriptions of their missing doc functions.
     :param directory_path: The directory to traverse.
     :return: Map of file paths to their errors.
     """
-    missing_map = {}
     files = [f for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
     logger.info(f"Checking {len(files)} files in {directory_path}...")
+    errors = []
     for file_path in files:
-        file_content = FileUtil.read_file(file_path)
-        tree = ast.parse(file_content, filename=file_path)
+        file_node = FileNode(file_path)
+        file_errors = file_node.get_errors()
+        errors.extend(file_errors)
+    return errors
 
-        if file_path not in missing_map:
-            missing_map[file_path] = []
 
-        for node in ast.walk(tree):
-            if has_docstring(node) and ast.get_docstring(node) is None:
-                msg = f"Missing docstring in {type(node).__name__} '{node.name}' at line {node.lineno}."
-                missing_map[file_path].append(msg)
-
-    return missing_map
+def in_docstring(arg: arg, docstring: str):
+    """
+    Checks if arg contains doc in function docstring.
+    :param arg: Argument to function.
+    :param docstring: Docstring of function.
+    :return: True if arg contains doc.
+    """
+    arg_name = arg.arg
+    if arg_name in IGNORED_PARAM_NAMES:
+        return True
+    for line in docstring.splitlines():
+        query = f":param {arg_name}"
+        if query in line:
+            arg_doc = line[line.index(query):].strip()
+            return len(arg_doc) > 0
+    return False
 
 
 def has_docstring(node):
@@ -87,16 +213,14 @@ def has_docstring(node):
         or isinstance(node, ast.ClassDef) and (ast.get_docstring(node) is not None)
 
 
-def get_display_name(file_path: str, root_path: str):
+def get_link(file_path: str, line_number):
     """
     Gets the name to display for file path.
     :param file_path: The path to a python file.
-    :param root_path: THe path to the root of project.
-    :return: Relative file path to file with the directory name included.
+    :param line_number: The line the error occurred at.
+    :return: pycharm printable url.
     """
-    directory_name = os.path.basename(root_path)
-    relative_path = os.path.relpath(file_path, root_path)
-    display_path = os.path.join(directory_name, relative_path)
+    display_path = f"File \"{file_path}\", line {line_number}"
     return display_path
 
 

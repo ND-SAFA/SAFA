@@ -1,12 +1,13 @@
 import os
 
+import pandas as pd
+
 from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-import pandas as pd
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 
@@ -22,6 +23,7 @@ class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
         Creates reader for project at path and column definitions given.
         :param project_path: Path to the project.
         :param conversions: Column definitions available to project.
+        :param overrides: Dictionary of properties to override in project reader.
         """
         super().__init__(overrides, project_path)
         self.structured_project_reader = StructuredProjectReader(project_path, conversions)

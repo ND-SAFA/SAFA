@@ -8,7 +8,7 @@
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
               "source_layer_id": "Code",
-              "target_type": "Feature",
+              "target_type": "Business Logic",
               "generate_trace_links": true,
               "dataset_creator": {
                 "object_type": "PROMPT",
@@ -19,9 +19,7 @@
               }
             }
           },
-          "target_types": [
-            "Epic"
-          ]
+          "target_types": []
         }
       ]
     }

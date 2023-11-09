@@ -241,6 +241,7 @@ class PromptResponseManager:
         Returns the list of values converted to the expected type
         :param vals2convert: The list of values to convert
         :param tag: The tag used to output values
+        :param is_list: If true no exception is thrown if formatting error occurs.
         :return: The list of converted values
         """
         converted = []
@@ -258,6 +259,7 @@ class PromptResponseManager:
         """
         Parses the response if it fails in some way, may be overridden in child classes
         :param tag_id: The id of the tag that failed
+        :param val: The value of the prompt.
         :param e: The exception causing the failure
         :param no_exception: If True, no exception will be thrown
         :param return_none_on_fail: If True, returns None instead of the origin value

@@ -1,23 +1,23 @@
 import uuid
 from collections import Set
 from copy import deepcopy
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple
 
+from tgen.clustering.base.cluster import Cluster
+from tgen.common.constants.deliminator_constants import SPACE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.logging.logger_manager import logger
-from tgen.common.constants.deliminator_constants import SPACE
-from tgen.data.clustering.iclustering import Clusters
-from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
-from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+
+Clusters = Dict[str, Cluster]
 
 
 class ClusterDatasetCreator(AbstractDatasetCreator):
@@ -27,16 +27,13 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
 
     CLUSTER_CONTENT_FORMAT = "{}"
 
-    def __init__(self, prompt_dataset: PromptDataset, layer_id: str = None,
-                 cluster_methods: Union[Set[SupportedClusteringMethod], SupportedClusteringMethod] = SupportedClusteringMethod.MANUAL,
-                 manual_clusters: dict = None, summarizer: ArtifactsSummarizer = None, **clustering_params):
+    def __init__(self, prompt_dataset: PromptDataset, manual_clusters: Clusters, layer_id: str = None,
+                 summarizer: ArtifactsSummarizer = None, **clustering_params):
         """
         Initializes with a dataset with artifacts to be clustered
-        :param trace_dataset: The dataset to perform clustering on
-        :param layer_id: ID to use for the new layer created from the clusters
-        :param artifact_df: The dataframe containing all artifacts to cluster from
-        :param cluster_methods: The methods to use to create clusters
+        :param prompt_dataset: The dataset to perform clustering on
         :param manual_clusters: Manually created clusters to use to create dataset
+        :param layer_id: ID to use for the new layer created from the clusters
         :param summarizer: Summarizes the cluster artifact content
         :param clustering_params: Any additional parameters necessary to create clusters
         """
@@ -44,46 +41,31 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         assert prompt_dataset.artifact_df is not None, "Creator requires artifacts to be provided"
         self.trace_dataset = prompt_dataset.trace_dataset if prompt_dataset.trace_dataset is not None \
             else TraceDataset(prompt_dataset.artifact_df, TraceDataFrame(), LayerDataFrame())
-        self.cluster_methods = cluster_methods if isinstance(cluster_methods, Set) else {cluster_methods}
-        assert SupportedClusteringMethod.MANUAL not in self.cluster_methods or manual_clusters, \
-            "Must supply clusters for manual clustering"
-        if manual_clusters:
-            self.cluster_methods.add(SupportedClusteringMethod.MANUAL)
         self.manual_clusters = manual_clusters
         self.clustering_params = clustering_params
         self.layer_id = str(uuid.uuid4()) if layer_id is None else layer_id
         self.summarizer = summarizer
-        self.__method_to_clusters: Dict[SupportedClusteringMethod, Clusters] = {}
 
-    def get_clusters(self) -> Dict[SupportedClusteringMethod, Clusters]:
+    def get_clusters(self) -> Clusters:
         """
         Returns clusters of artifacts in the dataset for each clustering method
         :return: A dictionary mapping cluster_id to the list of artifact ids in the cluster
         """
-        if not self.__method_to_clusters:
-            for cluster_method in self.cluster_methods:
-                logger.info(f"\nCreating clusters of artifacts using {cluster_method.name.capitalize()}")
-                if cluster_method == SupportedClusteringMethod.MANUAL:
-                    clusters = self.manual_clusters
-                else:
-                    clusters = cluster_method.value(trace_dataset=self.trace_dataset, target_artifact_type=self.layer_id,
-                                                    **self.clustering_params)
-                self.__method_to_clusters[cluster_method] = clusters
-        return self.__method_to_clusters
+        return self.manual_clusters
 
     def get_name(self) -> str:
         """
         Returns the name of the dataset
         :return: The name of the dataset
         """
-        return f"cluster_dataset_of_{', '.join([cm.name.capitalize() for cm in self.cluster_methods])}"
+        return "Generic Cluster Dataset."
 
     def create(self) -> PromptDataset:
         """
         Creates an artifact dataframe where each cluster represents a single artifact
         :return: The new dataset where each cluster is a single artifact linked to the artifacts in the cluster
         """
-        cluster_id_to_content, source_layers, traces = ClusterDatasetCreator._extract_dataset_input_from_clusters(self.get_clusters(),
+        cluster_id_to_content, source_layers, traces = ClusterDatasetCreator._extract_dataset_input_from_clusters(self.manual_clusters,
                                                                                                                   self.trace_dataset
                                                                                                                   .artifact_df,
                                                                                                                   self.layer_id)
@@ -102,30 +84,31 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         return PromptDataset(artifact_df=new_artifact_df, trace_dataset=TraceDataset(artifact_df, trace_df, layer_df))
 
     @staticmethod
-    def _extract_dataset_input_from_clusters(method_to_clusters: Dict[SupportedClusteringMethod, Clusters],
+    def _extract_dataset_input_from_clusters(clusters: Clusters,
                                              artifact_df: ArtifactDataFrame,
                                              layer_id: str) -> Tuple[Dict[str, str], Set[str], Dict[str, Dict]]:
         """
         Gets the mapping of cluster to content, all new positive trace links, and source layer ids to create the project dataframes
-        :param method_to_clusters: A dictionary mapping method name to the clusters it produced
+        :param clusters: The clusters to extract.
         :param artifact_df: The dataframe containing artifacts in the clusters
+        :param layer_id: Layer ID used to calcaluate run ID.
         :return:  mapping of cluster to content, all new positive trace links, and source layer ids to create the project dataframes
         """
         cluster_id_to_content = {}
         traces = {}
         source_layers = set()
-        for clusters in method_to_clusters.values():
-            for cluster_id, artifacts in deepcopy(clusters).items():
-                if artifact_df.get_artifact(cluster_id) is not None:  # duplicated artifact id
-                    clusters.pop(cluster_id)
-                    cluster_id = f"{cluster_id} {layer_id}"
-                    clusters[cluster_id] = artifacts
-                artifact_content = []
-                for i, artifact_id in enumerate(artifacts):
-                    artifact = artifact_df.get_artifact(artifact_id)
-                    artifact_content.append(ClusterDatasetCreator.CLUSTER_CONTENT_FORMAT.format(artifact[ArtifactKeys.CONTENT]))
-                    traces = DataFrameUtil.append(traces, EnumDict({TraceKeys.SOURCE: artifact_id, TraceKeys.TARGET: cluster_id,
-                                                                    TraceKeys.LABEL: 1}))  # add link between artifact and cluster
-                    source_layers.add(artifact[ArtifactKeys.LAYER_ID])
-                cluster_id_to_content[cluster_id] = SPACE.join(artifact_content)  # combines the content of all artifacts in cluster
+        for cluster_id, artifacts in deepcopy(clusters).items():
+            if artifact_df.get_artifact(cluster_id) is not None:  # duplicated artifact id
+                clusters.pop(cluster_id)
+                cluster_id = f"{cluster_id} {layer_id}"
+                clusters[cluster_id] = artifacts
+            artifact_content = []
+            for i, artifact_id in enumerate(artifacts):
+                artifact = artifact_df.get_artifact(artifact_id)
+                artifact_content.append(ClusterDatasetCreator.CLUSTER_CONTENT_FORMAT.format(artifact[ArtifactKeys.CONTENT]))
+                traces = DataFrameUtil.append(traces, EnumDict({TraceKeys.SOURCE: artifact_id, TraceKeys.TARGET: cluster_id,
+                                                                TraceKeys.LABEL: 1}))  # add link between artifact and cluster
+                source_layers.add(artifact[ArtifactKeys.LAYER_ID])
+            cluster_id_to_content[cluster_id] = SPACE.join(artifact_content)  # combines the content of all artifacts in cluster
+
         return cluster_id_to_content, source_layers, traces

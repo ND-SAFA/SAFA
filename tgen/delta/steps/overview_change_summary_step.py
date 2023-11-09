@@ -94,6 +94,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         """
         Creates a dataframe of artifacts representing the diff summary for each changed file
         :param state: The current state of the delta summarizer
+        :param include_impact: Whether to include the impact section of delta summarization.s
         :return: A dataframe of artifacts representing the diff summary for each changed file
         """
         artifacts = {}

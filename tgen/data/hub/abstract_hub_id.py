@@ -28,6 +28,7 @@ class AbstractHubId(ABC):
 
     def get_project_path(self, data_dir: str) -> str:
         """
+        :param data_dir: Path to directory containing project data.
         :return: Returns the path to save and read definition from.
         """
         return data_dir

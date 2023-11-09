@@ -172,7 +172,8 @@ class ProjectSummarizer(BaseObject):
     def _get_section_display_order(section_order: List[str], all_project_sections: List[str]) -> List[str]:
         """
         Gets the order in which the sections should appear
-        :param args: The arguments for the project summarizer
+        :param section_order: The order the sections should be displayed in. Can be subset of full sections to display.
+        :param all_project_sections: List of all sections to include.
         :return: The section ids in the order in which the sections should appear
         """
         ordered_sections = set(section_order)

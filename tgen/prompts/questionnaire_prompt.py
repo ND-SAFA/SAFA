@@ -29,6 +29,7 @@ class QuestionnairePrompt(Prompt):
         :param response_manager: Manages the responses from the prompt
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
         :param use_multi_step_task_instructions: If True, uses default instructions for task involving multiple steps
+        :param prompt_id: Prompt ID to override.
         """
         if isinstance(question_prompts, Dict):
             starting_number = min(question_prompts.keys())
@@ -166,6 +167,7 @@ class QuestionnairePrompt(Prompt):
         Creates the default instructions for a multi-step task
         :param enumeration_chars: The enumeration chars being used
         :param question_prompts: The prompts making up the questionnaire
+        :param special_instructions: Additional instructions to append to base instructions.
         :return: The instructions for a multi-step task
         """
         n_questions = len(question_prompts)

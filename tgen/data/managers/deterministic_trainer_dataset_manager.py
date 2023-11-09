@@ -68,6 +68,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
             -> Tuple[Dict[DatasetRole, TrainerDatasetManager.DATASET_TYPE], bool]:
         """
         Creates the data from their corresponding creators so that splits are deterministic
+        :param dataset_creators_map: Map of role to dataset creator to make deterministic.
         :return: a dictionary mapping dataset role to the corresponding dataset and a bool which is True if the datasets are reloaded
         """
         deterministic_dataset_creators_map = {}

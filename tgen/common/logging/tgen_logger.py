@@ -58,6 +58,7 @@ class TGenLogger(Logger):
         """
         Logs the message as a new title in the logs.
         :param title: The title name.
+        :param prefix: Prefix to prepend title with.
         :return: Title formatted as markdown header.
         """
         title = prefix + f"{PromptUtil.as_markdown_header(title)}".strip()

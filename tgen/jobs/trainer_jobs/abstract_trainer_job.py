@@ -3,10 +3,10 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Type, Union
 
+from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.trainer_task import TrainerTask
@@ -29,6 +29,7 @@ class AbstractTrainerJob(AbstractJob, ABC):
         :param model_manager: the manages the model necessary for the job
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param trainer_args: other arguments needed for the trainer
+        :param task: The task being performed by the trainer.
         """
         super().__init__(job_args=job_args, model_manager=model_manager)
         self.task = task

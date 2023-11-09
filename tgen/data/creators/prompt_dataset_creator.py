@@ -29,9 +29,13 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
                  summarizer: ArtifactsSummarizer = None, ensure_code_is_summarized: bool = False):
         """
         Initializes creator with entities extracted from reader.
-        :param data_export_path: The path to where data files will be saved if specified.May be to a directory or specific file
         :param project_reader: Project reader responsible for extracting project entities.
         :param trace_dataset_creator: Data Creator responsible for making the trace dataset
+        :param data_export_path: The path to where data files will be saved if specified.May be to a directory or specific file
+        :param project_file_id: File used to load prompt dataset.
+        :param project_summary: Default project summary.
+        :param summarizer: Summarizer used to summarize artifact content.
+        :param ensure_code_is_summarized: Verifies that code is summarized and summarizes code that's not.
         """
         super().__init__()
         self.project_reader = project_reader
@@ -102,6 +106,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
     def read_project_summary(project_path: str) -> Optional[Summary]:
         """
         Reads the project summary if it exists
+        :param project_path: Path to directory containing project data.
         :return: The project summary
         """
         project_dir = FileUtil.get_directory_path(project_path)

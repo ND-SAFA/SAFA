@@ -11,7 +11,7 @@ class FilterMinLengthStep(AbstractDataProcessingStep):
     def __init__(self, min_length: int = MIN_LENGTH_DEFAULT):
         """
         Handles removing all words smaller than the min_length
-        min_length: the minimum length of word to allow
+        :param min_length: the minimum length of word to allow
         """
         super().__init__(self.ORDER)
         self.min_length = min_length

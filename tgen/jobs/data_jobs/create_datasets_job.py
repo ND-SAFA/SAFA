@@ -14,6 +14,8 @@ class CreateDatasetsJob(AbstractJob):
         Responsible for creating and saving new data
         :param job_args: the arguments for the job
         :param trainer_dataset_manager: manages all datasets for the trainer
+        :param export_path: The path to export the datasets to.
+        :param format_type: The format to export the data as.
         """
         if job_args is None:
             job_args = JobArgs()

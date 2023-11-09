@@ -31,6 +31,9 @@ class PositiveLinkIndices(AbstractTraceMetric):
     def _compute(self, predictions, references, trace_matrix: TraceMatrix, **kwargs) -> Dict:
         """
         Computes the true link indices metric.
+        :param predictions: Similarity scores for artifact pairs.
+        :param references: The actual labels for the artifact pairs.
+        :param trace_matrix: The matrix used to store and calculate trace metrics.
         """
 
         def compute_positive_link_indices(labels, preds) -> Dict:

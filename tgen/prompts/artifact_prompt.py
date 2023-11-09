@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Union, Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -30,6 +30,7 @@ class ArtifactPrompt(Prompt):
                  include_id: bool = True, xml_tags: Dict[str, List[str]] = None, use_summary: bool = True):
         """
         Constructor for making a prompt from an artifact
+        :param prompt_start: The prefix to the prompt.
         :param build_method: The method to build the prompt (determines prompt format)
         :param xml_tags: If building using XML, specify the names of the tags as such {outer_tag: [id_tag, body_tag]}
         :param use_summary: If True, won't use the artifact's summary when constructing
@@ -91,6 +92,7 @@ class ArtifactPrompt(Prompt):
         </artifact>
         :param artifact_id: The id of the artifact
         :param artifact_body: The body of the artifact
+        :param xml_tags: The tags defining how to wrap artifact id and content.
         :param include_id: If True, includes the id of the artifact
         :return: The formatted prompt
         """
@@ -114,6 +116,7 @@ class ArtifactPrompt(Prompt):
         :param artifact_body: The body of the artifact
         :param relation: The relationship of the artifact (parent or child) if provided
         :param include_id: Whether to include id or not
+        :param header_level: The header level used to print each artifact ID.
         :return: The formatted prompt
         """
         assert artifact_id or relation, \

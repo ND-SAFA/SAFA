@@ -17,6 +17,8 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     def __init__(self, args: RankingArgs, embedding_manager: EmbeddingsManager = None):
         """
         Ranks children artifacts from most to least related to source.
+        :param args: Arguments to ranking pipeline.
+        :param embedding_manager: Stores and computes artifact embeddings.
         """
         super().__init__(args, EmbeddingRankingPipeline.steps)
         self.state.embedding_manager = embedding_manager

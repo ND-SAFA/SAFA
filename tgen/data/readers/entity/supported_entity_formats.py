@@ -26,6 +26,8 @@ class SupportedEntityFormats:
     @classmethod
     def get_parser(cls, data_path: str, definition: Dict = None) -> AbstractEntityFormat:
         """
+        :param data_path: Path to folder containing project data.
+        :param definition: The project definition.
         :return: Returns the function that will read data into a data frame.
         """
         if definition and StructuredKeys.PARSER in definition:

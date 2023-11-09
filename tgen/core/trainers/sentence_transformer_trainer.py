@@ -46,6 +46,7 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         Evaluates dataset under role with given trainer.
         :param trainer: The trainer used to predict on the dataset.
         :param dataset_role: The role the dataset to predict should be found under.
+        :param evaluator_metric: The metric used to define which is the best run.
         """
         self.trainer = trainer
         self.dataset_role = dataset_role

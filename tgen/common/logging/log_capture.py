@@ -66,6 +66,7 @@ class LogCapture(logging.Handler):
     def register(self, logger=None):
         """
         Registers capture to root logger.
+        :param logger: The logger used to register handler with.
         :return:
         """
         if logger is None:

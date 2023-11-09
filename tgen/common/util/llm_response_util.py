@@ -2,7 +2,7 @@ import html
 import logging
 import os
 import re
-from typing import Dict, List, Union, Set
+from typing import Dict, List, Set, Union
 
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
@@ -106,7 +106,8 @@ class LLMResponseUtil:
     @staticmethod
     def _get_content(tag: Union[str, Tag]) -> str:
         """
-        Gets the content from the tag
+        Gets the content from the tag.
+        :param tag: The tag expected to contain LLM response.
         :return: The content
         """
         if isinstance(tag, str):

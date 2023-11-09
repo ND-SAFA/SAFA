@@ -1,19 +1,23 @@
 import sys
+from typing import _TypedDictMeta
 
-from typing import _type_check, _TypedDictMeta, TypedDict
-
-from tgen.common.util.enum_util import EnumUtil, EnumDict
+from tgen.common.util.enum_util import EnumDict
 
 
 class _TypedEnumDictMeta(_TypedDictMeta):
 
     def __new__(cls, name, bases, ns, keys):
-        """Create new typed dict class object based on the EnumDict.
+        """
+        Create new typed dict class object based on the EnumDict.
 
         This method is called when TypedEnumDict is subclassed,
         or when TypedEnumDict is instantiated. This way
         TypedEnumDict supports all three syntax forms described in its docstring.
         Subclasses and instances of TypedEnumDict return EnumDict.
+        :param name: The name of the dictionary.
+        :param bases: Ignored.
+        :param ns: TODO
+        :param keys: TODO
         """
         annotations = ns['__annotations__']
         updated_annotations = {}

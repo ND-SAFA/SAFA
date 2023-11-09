@@ -154,6 +154,7 @@ class EnsembleExperiment(Experiment):
     def set_cross_step_vars(steps: List[ExperimentStep]) -> None:
         """
         Sets the experimental variables to model path if empty, like due to the fact of using different jobs.
+        :param steps: The steps of the experiment.
         :return: None
         """
         for step in steps:

@@ -30,6 +30,7 @@ class HuggingFaceJob(AbstractTrainerJob):
         :param model_manager: the manages the model necessary for the job
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param trainer_args: other arguments needed for the trainer
+        :param task: Task performed by the trainer.
         """
         self.trainer = trainer
         super().__init__(job_args=job_args, model_manager=model_manager, trainer_dataset_manager=trainer_dataset_manager,

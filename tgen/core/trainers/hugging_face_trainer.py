@@ -52,6 +52,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         :param save_strategy: The strategy used to save the best model
         :param: evaluation_roles: Defines the roles to evaluate the model on during prediction.
         :param kwargs: Any additional arguments given to the HF Trainer
+        :param evaluation_roles: The roles to evaluate before and after training.
         """
         if trainer_args.eager_load_data:
             trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them

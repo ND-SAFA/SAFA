@@ -20,8 +20,9 @@ class Summarizer:
 
     def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset):
         """
-        Responsiple for creating summaries of projects and artifacts
+        Responsible for creating summaries of projects and artifacts
         :param summarizer_args: Arguments necessary for the summarizer
+        :param dataset: The dataset to summarize.
         """
         self.args = summarizer_args
         self.dataset = dataset

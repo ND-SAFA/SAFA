@@ -2,7 +2,7 @@ import uuid
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
-from tgen.common.constants.hgen_constants import TEMPERATURE_ON_RERUNS, DEFAULT_BRANCHING_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO
+from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
@@ -92,7 +92,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         Calculates how many artifacts to generate based on proportion of total artifact tokens
         :param artifacts: List of artifact in the given cluster
         :param args: The arguments to HGEN
-        :param state: The current state of HGEN
+        :param token_to_target_ratio: The token to target token ratio.
         :return: The number of artifacts equal to a proportion of the artifact tokens
         """
         model_name = args.llm_managers[PredictionStep.GENERATION.value].llm_args.model

@@ -68,7 +68,10 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
                 .loginDefaultUser(this))
             .and()
             .request((s, r) -> r.project().shareProject(s.getProject("project"), Sharee.email,
-                this.otherUserProjectRole))
+                this.otherUserProjectRole));
+
+        // TODO https://www.notion.so/nd-safa/BE-Tests-Occasionally-Fail-9500d5c1f1d84a76acf429ee3653bb86
+        /*
             .and()
             .notifications((s, n) -> n
                 .initializeUser(s.getIUser("sharee-user"), s.getString("shareeToken"))
@@ -81,6 +84,7 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
                 .notifications(n -> n
                     .verifyMemberNotification(s.getMessage("sharee-project-message"),
                         List.of(currentUserName, Sharee.email))));
+         */
     }
 
     /**

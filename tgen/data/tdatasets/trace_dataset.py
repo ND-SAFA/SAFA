@@ -275,7 +275,7 @@ class TraceDataset(iDataset):
         for step_id, result in augmentation_results.items():
             id_ = AbstractDataAugmentationStep.extract_unique_id_from_step_id(step_id)
             i = 0
-            for entry, reference_index in tqdm(list(result), desc="Adding augmentation links"):
+            for entry, reference_index in tqdm(list(result), desc="Adding augmentation links", ncols=TQDM_NCOLS):
                 i += 1
                 aug_source_id, aug_target_id = self._get_augmented_artifact_ids(augmented_tokens=entry,
                                                                                 orig_link_id=orig_link_ids[reference_index],
@@ -325,7 +325,8 @@ class TraceDataset(iDataset):
         assert has_link_info or link_id is not None, "Expected link id or feature info."
         if link_id:
             source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
-            label = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
+            link = self.trace_df.get_link(link_id)
+            label = link[TraceKeys.LABEL]
             source_text = ArtifactDataFrame.get_traceable_content(source_artifact)
             target_text = ArtifactDataFrame.get_traceable_content(target_artifact)
 

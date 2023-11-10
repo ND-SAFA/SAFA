@@ -103,7 +103,7 @@ class DataFrameUtil:
         return df_dict
 
     @staticmethod
-    def get_optional_value_from_df(row: pd.Series, col_name: Union[str, Enum], allow_empty: bool = True) -> Optional[Any]:
+    def get_optional_value_from_df(row: Union[pd.Series, Dict], col_name: Union[str, Enum], allow_empty: bool = True) -> Optional[Any]:
         """
         Returns the column value if exists, otherwise None is returned.
         :param row: The row in the dataframe.

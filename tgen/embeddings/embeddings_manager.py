@@ -36,6 +36,7 @@ class EmbeddingsManager:
         :param artifact_ids: The artifact ids to embed.
         :return: List of embeddings in same order as artifact ids.
         """
+        artifact_ids = self._get_default_artifact_ids(artifact_ids)
         embedding_map = self.create_embedding_map(subset_ids=artifact_ids, **kwargs)
         embeddings = [embedding_map[entry_id] for entry_id in artifact_ids]
         return embeddings
@@ -46,8 +47,7 @@ class EmbeddingsManager:
         :param subset_ids: The IDs of the set of the entries to use.
         :return: Map of id to embedding.
         """
-        if subset_ids is None:
-            subset_ids = self._content_map.keys()
+        subset_ids = self._get_default_artifact_ids(subset_ids)
         artifact_embeddings = self.get_embeddings(subset_ids, **kwargs)
         embedding_map = {a_id: a_embedding for a_id, a_embedding in zip(subset_ids, artifact_embeddings)}
 
@@ -244,6 +244,14 @@ class EmbeddingsManager:
         embeddings = [self.get_embedding(a_id) for a_id in cluster]
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
+
+    def _get_default_artifact_ids(self, artifact_ids: List[str] = None):
+        """
+        Returns the artifact ids if not None otherwise return list of all artifact ids.
+        :param artifact_ids: Inputted artifact ids to evaluate.
+        :return: The artifact ids.
+        """
+        return artifact_ids if artifact_ids is not None else self._content_map.keys()
 
     def __encode(self, subset_ids: Union[List[Any], Any], include_ids: bool = False, **kwargs) -> List:
         """

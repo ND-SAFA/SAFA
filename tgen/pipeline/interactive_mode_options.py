@@ -10,4 +10,5 @@ class InteractiveModeOptions(Enum):
     TURN_OFF_INTERACTIVE = "Turn off interactive"
     LOAD_EXTERNAL_STATE = "Load external state"
     DO_NOT_RESUME = "Do not resume"
+    DELETE_MODEL_OUTPUT = "Delete previous model output"
 

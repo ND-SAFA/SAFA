@@ -31,11 +31,3 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :return: the state class
         """
         return RankingState
-
-    def run(self) -> None:
-        """
-        Runs the pipeline to rank the artifacts
-        :return: a dictionary mapping the parent to its child rankings
-        and a dictionary mapping parent to the explanations for its links
-        """
-        super().run()

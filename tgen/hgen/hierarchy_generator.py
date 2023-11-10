@@ -72,13 +72,13 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         """
         return HGenState
 
-    def run(self) -> PromptDataset:
+    def run(self, **kwargs) -> PromptDataset:
         """
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
         self.summarizer_args = None
-        super().run()
+        super().run(**kwargs)
 
         dataset = self.state.final_dataset
         assert dataset is not None, f"Final dataset is not set."

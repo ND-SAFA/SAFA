@@ -178,7 +178,7 @@ class PromptResponseManager:
                     try:
                         formatted_val = self._format_value(tag, formatted_val)
                     except (TypeError, AssertionError, ValueError) as e:
-                        logger.log_without_spam(level=logging.ERROR, msg=e)
+                        logger.log_without_spam(level=logging.ERROR, msg=str(e))
                         formatted_val = self._format_on_failure(tag, formatted_val, e)
                     if formatted_val is not None:
                         formatted_values.append(formatted_val)
@@ -266,7 +266,7 @@ class PromptResponseManager:
         :return: Default value
         """
         assert no_exception or tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
-        logger.warning(f"Unexpected response for {tag_id}: {val} - {e}.")
+        logger.log_without_spam(level=logging.WARNING, msg=f"Unexpected response for {tag_id}: {val} - {e}.")
         if self.default_factory:
             return self.default_factory(tag_id, val)
         return val if not return_none_on_fail else None

@@ -34,7 +34,7 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
         """
         return DeltaState
 
-    def run(self) -> str:
+    def run(self, **kwargs) -> str:
         """
         Runs the delta summarizer to create a summary of the changes in a PR
         :return: The summary of the changes
@@ -44,5 +44,5 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
             FileUtil.create_dir_safely(export_path)
             self.state.export_dir = export_path
 
-        super().run()
+        super().run(**kwargs)
         return self.state.final_summary

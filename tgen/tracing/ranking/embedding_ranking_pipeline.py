@@ -30,10 +30,10 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         return RankingState
 
-    def run(self) -> None:
+    def run(self, **kwargs) -> None:
         """
 
         :return: List of parents mapped to their ranked children.
         """
         self.args.sorter = SupportedSorter.EMBEDDING.name
-        super().run()
+        super().run(**kwargs)

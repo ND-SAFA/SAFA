@@ -30,9 +30,3 @@ class SearchPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :return: The new state.
         """
         return RankingState
-
-    def run(self) -> None:
-        """
-        :return: List of parents mapped to their ranked children.
-        """
-        super().run()

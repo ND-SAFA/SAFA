@@ -26,6 +26,7 @@ from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
 from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
+from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
@@ -55,6 +56,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                                               args, state, anthropic_ai_manager)
         DetectDuplicateArtifactsStep().run(args, state)
         self.assert_find_homes_for_orphans(args, state, len(artifacts), anthropic_ai_manager)
+        self.assert_generate_explanations_step(args, state)
         CreateHGenDatasetStep().run(args, state)
         hgen = HierarchyGenerator(self.HGEN_ARGS)
         hgen.state = state
@@ -86,13 +88,18 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
             self.assertIn(new_name, state.all_artifacts_dataset.artifact_df)
             self.assertNotIn(cluster_id, state.all_artifacts_dataset.artifact_df)
             for i, artifact in enumerate(cluster_artifacts):
-                found = [p for p in state.trace_predictions if p[TraceKeys.child_label()] == artifact[ArtifactKeys.ID]
-                         and p[TraceKeys.parent_label()] == new_name]
-                self.assertEqual(len(found), 1)
+                found_pred = self.find_link(artifact, new_name, state.trace_predictions)
+                found_selected = self.find_link(artifact, new_name, state.selected_predictions)
+                self.assertEqual(len(found_pred), 1)
                 if i % 2 == 0:
-                    self.assertIn(TraceKeys.EXPLANATION, found[0])  # assert that this was a selected prediction
+                    self.assertEqual(len(found_selected), 1)  # assert that this was a selected prediction
                 else:
-                    self.assertNotIn(TraceKeys.EXPLANATION, found[0])
+                    self.assertEqual(len(found_selected), 0)
+
+    def find_link(self, artifact, new_name, trace_predictions):
+        found = [p for p in trace_predictions if p[TraceKeys.child_label()] == artifact[ArtifactKeys.ID]
+                 and p[TraceKeys.parent_label()] == new_name]
+        return found
 
     def assert_generation_prompts(self, prompt: str, return_value: str):
         n_artifacts = len(BeautifulSoup(prompt, features="lxml").findAll(self.HGEN_ARGS.source_type))
@@ -105,12 +112,18 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         selected_sources = {trace[TraceKeys.SOURCE] for trace in state.selected_predictions}
         n_added_sources = len({trace[TraceKeys.SOURCE] for trace in state.trace_predictions
                                if trace[TraceKeys.SCORE] >= args.min_orphan_score_threshold}) - len(selected_sources)
+        n_added_sources = max(n_added_sources, 0)
         n_orphans = n_artifacts - len(selected_sources) - n_added_sources
         embedding_similarities = self._create_fake_embedding_scores(args, sim_mock, n_orphans)
         n_explanations = n_added_sources + len([s for s in embedding_similarities if s >= args.min_orphan_score_threshold])
         anthropic_manager.add_responses([RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
                                          for _ in range(n_explanations)])
         FindHomesForOrphansStep().run(args, state)
+
+    def assert_generate_explanations_step(self, args, state):
+        GenerateExplanationsForLinksStep().run(args, state)
+        missing_explanation = [trace for trace in state.selected_predictions if not trace.get(TraceKeys.EXPLANATION)]
+        self.assertEqual(len(missing_explanation), 0)
 
     def _create_fake_embedding_scores(self, args, calculate_sim_mock, n_artifacts):
         threshold = int(args.link_selection_threshold * 10)

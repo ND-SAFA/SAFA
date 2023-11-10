@@ -10,6 +10,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
@@ -63,7 +64,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     children_ids=children_ids,
                                     dataset=state.all_artifacts_dataset,
                                     types_to_trace=(args.source_type, args.target_type),
-                                    export_dir=self._get_ranking_dir(state.export_dir),
+                                    export_dir=HGenUtil.get_ranking_dir(state.export_dir),
                                     generate_explanations=args.generate_explanations,
                                     link_threshold=FIRST_PASS_LINK_THRESHOLD)
         selected_entries = self._run_embedding_pipeline(pipeline_args, state)
@@ -90,10 +91,11 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             if len(parent_ids) == 0:
                 continue
             children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
-            cluster_dir = FileUtil.safely_join_paths(self._get_ranking_dir(state.export_dir), str(cluster_id))
+            cluster_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), str(cluster_id))
             run_name = f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
                                                                           args.target_type, parent_ids)
-            pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids, export_dir=cluster_dir,
+            pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids,
+                                        export_dir=cluster_dir,
                                         **pipeline_kwargs)
             cluster_predictions = self._run_embedding_pipeline(pipeline_args, state)
             parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
@@ -103,13 +105,6 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                     parent_selected_traces = sorted(parent_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[:1]
                 selected_traces.extend(parent_selected_traces)
             trace_predictions.extend(cluster_predictions)
-        if args.generate_explanations:
-            selected_traces = self._generate_explanations(selected_traces, state,
-                                                          export_dir=FileUtil.safely_join_paths(
-                                                              GenerateTraceLinksStep._get_ranking_dir(state.export_dir),
-                                                              "explanations"
-                                                          ),
-                                                          **pipeline_kwargs)
         return trace_predictions, selected_traces
 
     @staticmethod
@@ -142,25 +137,6 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return trace_predictions
 
     @staticmethod
-    def _generate_explanations(selected_traces: List[Trace], state: HGenState, **pipeline_kwargs) -> List[Trace]:
-        """
-        Generates explanations for each selected trace
-        :param selected_traces: List of traces that have been selected
-        :param pipeline_kwargs: Additional pipeline arguments
-        :param state: The current state of HGEN
-        :return: The list of traces with explanations
-        """
-        pipeline_kwargs = DictUtil.update_kwarg_values(pipeline_kwargs, generate_explanations=True)
-        pipeline_args = RankingArgs(run_name="explanations", parent_ids=[], children_ids=[],
-                                    weight_of_explanation_scores=0,
-                                    **pipeline_kwargs)
-        pipeline_args.update_llm_managers_with_state(state)
-        pipeline_state = RankingState(candidate_entries=selected_traces)
-        CreateExplanationsStep().run(pipeline_args, pipeline_state)
-        selected_traces = pipeline_state.get_current_entries()
-        return selected_traces
-
-    @staticmethod
     def _weight_scores_with_related_children_predictions(trace_predictions: List[EnumDict],
                                                          id_to_related_children: Dict[str, Set]) -> List[EnumDict]:
         """
@@ -178,11 +154,4 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                            trace[TraceKeys.SCORE], alpha)
         return trace_predictions
 
-    @staticmethod
-    def _get_ranking_dir(directory: str) -> str:
-        """
-        Get the directory for ranking job
-        :param directory: The main directory used by hgen
-        :return: The full path
-        """
-        return FileUtil.safely_join_paths(directory, "ranking")
+

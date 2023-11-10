@@ -70,9 +70,6 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
             if top_prediction[TraceKeys.SCORE] >= args.min_orphan_score_threshold:
                 trace_selections.append(top_prediction)
 
-        if args.generate_explanations:
-            trace_selections = FindHomesForOrphansStep._generate_missing_explanations(pipeline_args, trace_selections, state)
-
         return trace_selections
 
     @staticmethod
@@ -103,21 +100,3 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
             orphans.add(child)
 
         return orphans
-
-    @staticmethod
-    def _generate_missing_explanations(pipeline_args: RankingArgs, trace_selections: List[Trace], state: HGenState) -> List[Trace]:
-        """
-        Generates explanations for traces that are missing them
-        :param pipeline_args: The arguments to the ranking pipeline
-        :param trace_selections: The current trace selections.
-        :param state: The state of the hgen pipeline.
-        :return: Trace selections with explanations
-        """
-        missing_explanations = [trace for trace in trace_selections if not trace.get(TraceKeys.EXPLANATION)]
-        have_explanations = [trace for trace in trace_selections if trace.get(TraceKeys.EXPLANATION)]
-        pipeline_args.generate_explanations = True
-        pipeline_args.update_llm_managers_with_state(state)
-        pipeline_state = RankingState(candidate_entries=missing_explanations)
-        CreateExplanationsStep().run(pipeline_args, pipeline_state)
-        trace_selections = have_explanations + pipeline_state.get_current_entries()
-        return trace_selections

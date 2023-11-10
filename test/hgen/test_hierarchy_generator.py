@@ -30,6 +30,7 @@ from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
 from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
+from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
@@ -60,12 +61,14 @@ class TestHierarchyGenerator(BaseTest):
         self.assert_initialize_dataset_step()
         self.assert_generate_input_step()
         CreateClustersStep().run(self.HGEN_ARGS, self.HGEN_STATE)
-        self.assert_generate_artifact_content_step()
-        self.assert_refined_artifact_content_step()
-        self.assert_name_artifacts_step()
-        self.assert_generate_trace_links_step()
+        self.assert_generate_artifact_content_step(anthropic_ai_manager=anthropic_ai_manager)
+        self.assert_refined_artifact_content_step(anthropic_ai_manager=anthropic_ai_manager)
+        self.assert_name_artifacts_step(anthropic_ai_manager=anthropic_ai_manager)
+        self.assert_generate_trace_links_step(anthropic_ai_manager=anthropic_ai_manager)
         self.assert_detect_duplicates_step()
         self.assert_find_homes_for_orphans_step()
+        self.assert_generate_explanations_for_links_step(anthropic_ai_manager=anthropic_ai_manager)
+
         self.assert_create_dataset_step()
         self.assert_save_dataset_checkpoint()
         hgen._log_costs()
@@ -123,24 +126,22 @@ class TestHierarchyGenerator(BaseTest):
         self.assertEqual(openai_ai_manager.n_used, 1)
         self.assertEqual(anthropic_ai_manager.n_used, 1)
 
-    @mock_anthropic
     def assert_generate_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
         self.HGEN_ARGS.target_type = "User Story"
         response = get_generated_artifacts_response()
-        anthropic_ai_manager.set_responses(response)
+        anthropic_ai_manager.add_responses(response)
         step = GenerateArtifactContentStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         for i, us in enumerate(self.HGEN_STATE.generation_predictions.keys()):
             self.assertEqual(us, HGenTestConstants.user_stories[i])
             self.assertEqual(set(self.HGEN_STATE.generation_predictions[us]), set(HGenTestConstants.code_files[i]))
 
-    @mock_anthropic
     def assert_refined_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
         refined_user_stories1 = ["#1" + us for us in HGenTestConstants.user_stories]
         refined_user_stories2 = ["#2" + us for us in HGenTestConstants.user_stories]
         refine_response1 = [PromptUtil.create_xml("selected-artifacts", "1,5,6")]  # orig content no. 1 and refined us #1 no. 2,3
         refine_response2 = [PromptUtil.create_xml("selected-artifacts", "1,2,6")]  # orig content no. 1, refined no. 2 (#1) and 3 (#2)
-        anthropic_ai_manager.set_responses(get_generated_artifacts_response(contents=refined_user_stories1)
+        anthropic_ai_manager.add_responses(get_generated_artifacts_response(contents=refined_user_stories1)
                                            + refine_response1
                                            + get_generated_artifacts_response(contents=refined_user_stories2)
                                            + refine_response2
@@ -154,23 +155,21 @@ class TestHierarchyGenerator(BaseTest):
             self.assertIn(us, self.HGEN_STATE.refined_content)
             self.assertEqual(set(self.HGEN_STATE.refined_content[us]), set(HGenTestConstants.code_files[i]))
 
-    @mock_anthropic
     def assert_name_artifacts_step(self, anthropic_ai_manager: TestAIManager):
         names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.generation_predictions)
-        anthropic_ai_manager.set_responses(name_responses)
+        anthropic_ai_manager.add_responses(name_responses)
         NameArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         for name in expected_names:
             self.assertIn(name, list(self.HGEN_STATE.all_artifacts_dataset.artifact_df.index))
 
-    @mock_anthropic
     @mock.patch.object(EmbeddingUtil, "calculate_similarities")
-    def assert_generate_trace_links_step(self, anthropic_ai_manager: TestAIManager, sim_mock: MagicMock):
+    def assert_generate_trace_links_step(self, sim_mock: MagicMock, anthropic_ai_manager: TestAIManager, ):
         responses = deepcopy(MISSING_PROJECT_SUMMARY_RESPONSES)
         embedding_similarities = [0.8 for source in self.HGEN_STATE.source_dataset.artifact_df.index]
         new_artifact_names = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)
         responses.extend([RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
                           for _ in embedding_similarities] * len(new_artifact_names))
-        anthropic_ai_manager.set_responses(responses)
+        anthropic_ai_manager.add_responses(responses)
         anthropic_ai_manager.mock_summarization()
 
         sim_mock.return_value = [[np.float32(sim) for sim in embedding_similarities]]
@@ -206,6 +205,13 @@ class TestHierarchyGenerator(BaseTest):
         self.assertSize(1, new_link)
         self.assertEqual(new_link[0][TraceKeys.TARGET], expected_parent)
 
+    def assert_generate_explanations_for_links_step(self, anthropic_ai_manager):
+        missing_explanations = 1
+        anthropic_ai_manager.add_responses([RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
+                                            for _ in range(missing_explanations)])
+        GenerateExplanationsForLinksStep().run(self.HGEN_ARGS, self.HGEN_STATE)
+        missing_explanation = [trace for trace in self.HGEN_STATE.selected_predictions if not trace.get(TraceKeys.EXPLANATION)]
+        self.assertEqual(len(missing_explanation), 0)
 
     def assert_create_dataset_step(self):
         step = CreateHGenDatasetStep()
@@ -234,5 +240,3 @@ class TestHierarchyGenerator(BaseTest):
 
     def assert_find_homes_for_orphans_step(self):
         FindHomesForOrphansStep().run(self.HGEN_ARGS, self.HGEN_STATE)
-
-

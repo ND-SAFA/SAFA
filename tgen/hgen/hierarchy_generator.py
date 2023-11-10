@@ -13,6 +13,7 @@ from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
 from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
+from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
@@ -39,6 +40,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
              GenerateTraceLinksStep,
              DetectDuplicateArtifactsStep,
              FindHomesForOrphansStep,
+             GenerateExplanationsForLinksStep,
              CreateHGenDatasetStep]
 
     def __init__(self, args: HGenArgs):

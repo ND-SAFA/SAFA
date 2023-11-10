@@ -140,8 +140,8 @@ public class ResourceBuilder {
      */
     private <T extends IEntityWithMembership> ObjectHolder<T> membershipEntityHolder(T value) {
         return new ObjectHolder<>(value,
-            (permission, user, lambdaVal) -> getPermissionService().hasPermission(permission, lambdaVal, user)
-        );
+            (permissions, user, lambdaVal) -> getPermissionService().hasPermissions(permissions, lambdaVal, user),
+            (permissions, user, lambdaVal) -> getPermissionService().hasAnyPermission(permissions, lambdaVal, user));
     }
 
     /**
@@ -154,9 +154,10 @@ public class ResourceBuilder {
      */
     private <T> ObjectHolder<T> entityWithProjectHolder(T value, Function<T, Project> projectRetriever) {
         return new ObjectHolder<>(value,
-            (permission, user, lambdaVal) ->
-                getPermissionService().hasPermission(permission, projectRetriever.apply(lambdaVal), user)
-        );
+            (permissions, user, lambdaVal) ->
+                getPermissionService().hasPermissions(permissions, projectRetriever.apply(lambdaVal), user),
+            (permissions, user, lambdaVal) ->
+                getPermissionService().hasAnyPermission(permissions, projectRetriever.apply(lambdaVal), user));
     }
 
     /**
@@ -181,10 +182,14 @@ public class ResourceBuilder {
         private final Set<Permission> missingPermissions = new HashSet<>();
         private boolean allowed = true;
         private final CheckPermissionFunction<T> hasPermissionFunction;
+        private final CheckPermissionFunction<T> hasAnyPermissionFunction;
 
-        private ObjectHolder(T value, CheckPermissionFunction<T> hasPermissionFunction) {
+        private ObjectHolder(T value,
+                             CheckPermissionFunction<T> hasPermissionFunction,
+                             CheckPermissionFunction<T> hasAnyPermissionFunction) {
             this.value = value;
             this.hasPermissionFunction = hasPermissionFunction;
+            this.hasAnyPermissionFunction = hasAnyPermissionFunction;
         }
 
         /**
@@ -196,9 +201,41 @@ public class ResourceBuilder {
          * @throws SafaError If the user doesn't have the permission
          */
         public ObjectHolder<T> withPermission(Permission permission, SafaUser user) throws SafaError {
-            if (!hasPermissionFunction.hasPermission(permission, user, getValue())) {
+            if (!hasPermissionFunction.apply(Set.of(permission), user, getValue())) {
                 allowed = false;
                 missingPermissions.add(permission);
+            }
+            return this;
+        }
+
+        /**
+         * Check the user has the given permissions on the contained object.
+         *
+         * @param permissions Permissions to check
+         * @param user        The user to check permission for
+         * @return This
+         * @throws SafaError If the user doesn't have the permission
+         */
+        public ObjectHolder<T> withPermissions(Set<Permission> permissions, SafaUser user) throws SafaError {
+            if (!hasPermissionFunction.apply(permissions, user, getValue())) {
+                allowed = false;
+                missingPermissions.addAll(permissions);
+            }
+            return this;
+        }
+
+        /**
+         * Check the user has the given permissions on the contained object.
+         *
+         * @param permissions Permissions to check
+         * @param user        The user to check permissions for
+         * @return This
+         * @throws SafaError If the user doesn't have the permissions
+         */
+        public ObjectHolder<T> withAnyPermission(Set<Permission> permissions, SafaUser user) throws SafaError {
+            if (!hasAnyPermissionFunction.apply(permissions, user, getValue())) {
+                allowed = false;
+                missingPermissions.addAll(permissions);
             }
             return this;
         }
@@ -239,13 +276,13 @@ public class ResourceBuilder {
     @FunctionalInterface
     private interface CheckPermissionFunction<T> {
         /**
-         * Check that the user has a given permission for the held object and thrown an error if not.
+         * Check that the user has  given permissions for the held object and thrown an error if not.
          *
-         * @param permission The permission to check
-         * @param user       The user to check for
-         * @param value      The value of the object in the object holder
+         * @param permissions The permissions to check
+         * @param user        The user to check for
+         * @param value       The value of the object in the object holder
          */
-        boolean hasPermission(Permission permission, SafaUser user, T value) throws SafaError;
+        boolean apply(Set<Permission> permissions, SafaUser user, T value) throws SafaError;
     }
 
 }

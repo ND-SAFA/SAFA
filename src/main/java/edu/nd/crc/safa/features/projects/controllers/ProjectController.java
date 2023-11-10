@@ -5,6 +5,7 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertNull;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -17,6 +18,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -159,7 +161,10 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable UUID projectId) throws SafaError, IOException {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        Project project = getResourceBuilder().fetchProject(projectId).get();
+        Project project = getResourceBuilder()
+            .fetchProject(projectId)
+            .withAnyPermission(Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS), user)
+            .get();
         getServiceProvider().getProjectService().deleteProject(user, project);
     }
 }

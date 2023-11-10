@@ -67,7 +67,6 @@ public class GeneratedLinkController extends BaseController {
         ServiceProvider serviceProvider = this.getServiceProvider();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = this.getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.VIEW, user)
             .withPermission(ProjectPermission.EDIT_DATA, user)
             .get();
         List<TraceAppEntity> links = serviceProvider

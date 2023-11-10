@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class VersionController extends BaseController {
 
-    private VersionService versionService;
+    private final VersionService versionService;
 
     @Autowired
     public VersionController(ResourceBuilder resourceBuilder,

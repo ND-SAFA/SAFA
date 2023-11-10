@@ -5,6 +5,7 @@ from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
 from sentence_transformers.evaluation import SentenceEvaluator
 from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss
+from torch import Tensor, nn
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
@@ -25,6 +26,7 @@ from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
 
+NEG_LABEL = 0
 SEPARATOR_BAR = "-" * 50
 EmbeddingType = np.array  # TODO: Merge with embedding type.
 
@@ -85,7 +87,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL,
                  loss_function: SupportedLossFunctions = SupportedLossFunctions.COSINE,
-                 save_best_model: bool = DEFAULT_SAVE_BEST_MODEL, **kwargs):
+                 save_best_model: bool = DEFAULT_SAVE_BEST_MODEL, false_negative_weight: float = None, **kwargs):
         """
         Trainer for sentence transformer models. Provides API that allows training and prediction operations.
         :param trainer_args: The trainer arguments.
@@ -102,6 +104,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         self.min_eval_steps = max_steps_before_eval
         self.loss_function = loss_function
         self.save_best_model = save_best_model
+        self.false_negative_weight = false_negative_weight
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -110,20 +113,23 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        train_examples = self.to_input_examples(self.train_dataset)
+        train_examples = self.to_input_examples(self.train_dataset, use_scores=True)
         train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=self.args.train_batch_size)
-        train_loss = self.loss_function.value(self.model)
+        loss_function = self.loss_function.value(self.model)
+        if self.false_negative_weight:
+            loss_function.loss_fct = self.add_weight_to_false_negatives
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
         evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles)
 
         logger.log_title("Starting Training", prefix=NEW_LINE)
-        self.model.fit(train_objectives=[(train_dataloader, train_loss)],
+        self.model.fit(train_objectives=[(train_dataloader, loss_function)],
                        epochs=int(self.args.num_train_epochs),
                        warmup_steps=self.args.warmup_steps,
                        evaluation_steps=n_steps,
                        evaluator=evaluator,
                        output_path=self.args.output_dir,
-                       save_best_model=self.save_best_model)
+                       save_best_model=self.save_best_model,
+                       show_progress_bar=False)
         self.state.best_model_checkpoint = self.args.output_dir
         if self.args.load_best_model_at_end:
             self.model = SentenceTransformer(self.state.best_model_checkpoint)
@@ -143,11 +149,11 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         return PredictionOutput(scores, labels, prediction_metrics)
 
-    @staticmethod
-    def to_input_examples(dataset: Dataset) -> List[InputExample]:
+    def to_input_examples(self, dataset: Dataset, use_scores: bool = False) -> List[InputExample]:
         """
         Converts a huggingface dataset into a list of sentence transformer input examples.
         :param dataset: The huggingface dataset.
+        :param use_scores: Whether to use score over label for negative links.
         :return: List of input examples.
         """
         input_examples = []
@@ -155,12 +161,39 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
             source_text = i[CSVKeys.SOURCE]
             target_text = i[CSVKeys.TARGET]
             label = float(i[CSVKeys.LABEL])
+            score = i[CSVKeys.SCORE]
+            if use_scores and label == NEG_LABEL and score is not None:
+                label = float(score)
             input_examples.append(InputExample(texts=[source_text, target_text], label=label))
+        if use_scores:
+            self.replace_labels_with_scores(self.model, input_examples)
         return input_examples
 
+    @staticmethod
+    def replace_labels_with_scores(model: SentenceTransformer, input_examples: List[InputExample], label: int = NEG_LABEL):
+        """
+        Replaces the matching labels with model similarity score.
+        :param model: The model to create embeddings for artifacts for.
+        :param input_examples: The input examples to modify.
+        :param label: The label to replace with scores.
+        :return: None. Modified in place.
+        """
+        content_map = {}
+        for input_example in input_examples:
+            for t in input_example.texts:
+                if t not in content_map:
+                    content_map[t] = t
+        embeddings_manager = EmbeddingsManager(content_map, model=model)
+        embeddings_manager.create_artifact_embeddings()
+        for input_example in input_examples:
+            if input_example.label == label:
+                s_text, t_text = input_example.texts
+                s_embedding = embeddings_manager.get_embedding(s_text)
+                t_embedding = embeddings_manager.get_embedding(t_text)
+                input_example.label = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
+
     @classmethod
-    def calculate_similarities(cls, model: SentenceTransformer, input_examples: List[InputExample]) -> Tuple[
-        List[float], List[float]]:
+    def calculate_similarities(cls, model: SentenceTransformer, input_examples: List[InputExample]) -> Tuple[List[float], List[float]]:
         """
         Calculates the cosine similarity between the texts in each input example. TODO: Replace with embedding util.
         :param model: The model used to embed the test dataset.
@@ -194,3 +227,22 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         embedding_map = embeddings_manager.create_embedding_map()
         translated_embedding_map = {content_map[i]: v for i, v in embedding_map.items()}
         return translated_embedding_map
+
+    @staticmethod
+    def add_weight_to_false_negatives(output: Tensor, labels: Tensor, weight: float = 2, threshold: float = 0.5):
+        """
+        Adjusts the weight of the loss for false negatives.
+        :param output: The output of the model.
+        :param labels: The labels associated with input.
+        :param weight: The weight to multiple the original loss of false negatives by.
+        :param threshold: The threshold at which to consider a label a pos prediction.
+        :return: The loss.
+        """
+        default_loss = nn.MSELoss()
+        label_value = labels.item()
+        output_value = output.item()
+        loss = default_loss(output, labels)
+        if label_value == 1:
+            if output_value < threshold:
+                return loss * weight
+        return loss

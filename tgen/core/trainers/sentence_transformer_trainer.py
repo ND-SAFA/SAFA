@@ -17,6 +17,7 @@ from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.wandb.Wandb import Wandb
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -62,13 +63,17 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         :return: The score for this evaluation run.
         """
         validation_metrics = None
+        role2metrics = {}
         for eval_role in self.evaluation_roles:
             prediction_output: TracePredictionOutput = self.trainer.perform_prediction(eval_role)
             logger.info(SEPARATOR_BAR)
             metrics = prediction_output.metrics
-            self.metrics.append(metrics)
             if eval_role == DatasetRole.VAL:
                 validation_metrics = metrics
+            role2metrics[eval_role] = metrics
+            self.metrics.append(metrics)
+
+        Wandb.log(role2metrics)
         return validation_metrics[self.evaluator_metric]
 
 

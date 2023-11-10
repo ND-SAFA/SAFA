@@ -2,16 +2,15 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
+from tgen.common.constants.deliminator_constants import UNDERSCORE
+from tgen.common.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.status import Status
-from tgen.common.constants.deliminator_constants import UNDERSCORE
-from tgen.common.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
 from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.core.wandb.Wandb import Wandb
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
@@ -178,12 +177,10 @@ class ExperimentStep(BaseObject):
         :return: the updated jobs
         """
         for job in self.jobs:
-            run_name = Wandb.get_run_name(job.result.experimental_vars, str(job.id))
-            job_base_path = os.path.join(output_dir, run_name)
+            job_base_path = output_dir
             if isinstance(job, AbstractTrainerJob):
                 model_path = os.path.join(job_base_path, "models")
                 if hasattr(job, "trainer_args") and job.trainer_args is not None:
-                    setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
                     setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
                     setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 setattr(job.job_args, "output_dir", model_path)

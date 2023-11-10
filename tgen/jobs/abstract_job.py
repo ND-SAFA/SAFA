@@ -8,16 +8,16 @@ from inspect import getfullargspec
 from typing import Any, Dict, Type
 
 import torch
-import wandb
 
+from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.random_util import RandomUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.common.util.status import Status
-from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
+from tgen.core.wandb.Wandb import Wandb
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
@@ -59,7 +59,7 @@ class AbstractJob(threading.Thread, BaseObject):
         if self.save_job_output and self.job_args.output_dir:
             logger.info(f"Saving job output: {self.job_args.output_dir}")
             self.save(self.job_args.output_dir)
-            wandb.finish()
+            Wandb.finish()
         self.cleanup()
         return self.result
 

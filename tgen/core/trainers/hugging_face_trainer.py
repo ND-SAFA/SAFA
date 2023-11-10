@@ -2,6 +2,7 @@ import os
 from typing import Any, Dict, List, Optional, Union
 
 import torch
+import wandb
 from datasets import Dataset
 from transformers.integrations import WandbCallback
 from transformers.trainer import Trainer
@@ -19,6 +20,7 @@ from tgen.core.save_strategy.metric_save_strategy import MetricSaveStrategy
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
+from tgen.core.wandb.Wandb import Wandb
 from tgen.core.wandb.trace_callback import TraceCallback
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.data_key import DataKey
@@ -89,6 +91,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         Performs the model training.
         :return: a dictionary containing the results
         """
+        wandb.config.update({"epochs": self.args.num_train_epochs, "batch_size": self.args.train_batch_size})
         self.compute_metrics = self._compute_validation_metrics  # Will compute trace metrics alongside default eval metrics
         self.train_dataset = self._get_dataset(DatasetRole.TRAIN)
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
@@ -182,6 +185,8 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
             else:
                 logger.warning(f"No {dataset_role} dataset. Skipping evaluation.")
                 continue
+
+        Wandb.log({r: output.metrics for r, output in results.items()})
         return results
 
     @overrides(Trainer)

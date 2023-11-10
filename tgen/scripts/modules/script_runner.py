@@ -1,15 +1,14 @@
 import os
 from typing import Dict, Type
 
-from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
-from tgen.common.util.file_util import FileUtil
+from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM
 from tgen.common.logging.logger_config import LoggerConfig
 from tgen.common.logging.logger_manager import LoggerManager, logger
+from tgen.common.util.file_util import FileUtil
 from tgen.experiments.experiment import Experiment
 from tgen.scripts.modules.experiment_types import ExperimentTypes
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_reader import ScriptOutputReader
-from tgen.scripts.toolset.rq_definition import RQDefinition
 from tgen.testres.object_creator import ObjectCreator
 
 
@@ -32,8 +31,7 @@ class ScriptRunner:
         self.experiment_dir = None
         self.logging_dir = None
         self.experiment = None
-        os.environ[WANDB_PROJECT_PARAM] = RQDefinition.get_script_name(script_definition_path)
-        os.environ[WANDB_DIR_PARAM] = os.path.join(os.environ[OUTPUT_PATH_PARAM])
+        os.environ[WANDB_DIR_PARAM] = os.path.join(os.path.expanduser(os.environ[OUTPUT_PATH_PARAM]))
 
     def run(self) -> None:
         """

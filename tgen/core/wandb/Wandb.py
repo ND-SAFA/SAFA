@@ -1,9 +1,10 @@
 import os
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Tuple
 
-from tgen.common.constants.deliminator_constants import COMMA, UNDERSCORE, EMPTY_STRING, F_SLASH
-from tgen.common.constants.experiment_constants import BASE_EXPERIMENT_NAME
-from tgen.common.constants.script_constants import EXPERIMENTAL_VARS_IGNORE
+import wandb
+
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.dataset_role import DatasetRole
 
 GROUP_EXCLUDE = ["random_seed"]
 
@@ -13,84 +14,64 @@ class Wandb:
     Provides utility methods for setting up run for weights and biases.
     """
 
-    @staticmethod
-    def get_run_name(experimental_vars: Dict, default_value: str = None) -> str:
+    @classmethod
+    def init_wandb(cls, trainer_dataset_manager: TrainerDatasetManager, model_path: str) -> None:
         """
-        Returns the name of the run by parsing experimental variables.
-        :param experimental_vars: The variables used to identify this run.
-        :param default_value: The default value to use if no experimental vars found.
-        :return: String representing run name.
+        Initializes Weights and Biases run and configuration.
+        :param trainer_dataset_manager: The dataset manager used to set the train, val, and eval names.
+        :param model_name: Name of the model being trained.
+        :return: None
         """
-        clean_vars = Wandb.get_clean_vars(experimental_vars, default_value)
-        if isinstance(clean_vars, str):
-            return clean_vars
+        model_name = os.path.basename(model_path)
+        train_name, val_name, eval_name = Wandb.get_project_names(trainer_dataset_manager)
+        run_name = f"{train_name} @ {model_name}"
+        project_name = os.environ.get("WANDB_PROJECT", eval_name)
+        config = {"train_project": train_name, "val_project": val_name, "eval_project": eval_name, "model": model_path}
+        wandb.init(
+            project=f"{project_name}",
+            name=run_name,
+            config=config
+        )
 
-        return Wandb.display_vars(clean_vars)
+    @classmethod
+    def log(cls, role2metrics: Dict[DatasetRole, Dict]) -> None:
+        """
+        Logs the current metrics at given stpe prefixed with dataset role name.
+        :param role2metrics: Map of role to metrics.
+        :return: None
+        """
+        global_metrics = {}
+        for dataset_role, metrics in role2metrics.items():
+            named_metrics = {f"{dataset_role.name.lower()}_{k}": v for k, v in metrics.items()}
+            global_metrics.update(named_metrics)
+        wandb.log(global_metrics)
 
-    @staticmethod
-    def get_clean_vars(experimental_vars: Dict, default_value: str = None) -> Union[Dict, str]:
+    @classmethod
+    def finish(cls) -> None:
         """
-        Cleans experimental variables to be presented on wandb.
-        :param experimental_vars: The experimental variables to clean.
-        :param default_value: The default value to return if not experimental vars found.
-        :return: Cleaned experimental variables.
+        Finishes the wandb run.
+        :return: None
         """
-        if default_value is None:
-            default_value = {}
-        if experimental_vars is None or len(experimental_vars) == 0:
-            return BASE_EXPERIMENT_NAME
-        if isinstance(experimental_vars, str):
-            return experimental_vars
+        wandb.finish()
 
-        vars = {k: Wandb.clean_var(v) for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}
-        if not vars:
-            return default_value
-        return vars
-
-    @staticmethod
-    def clean_var(v: str) -> Union[str, float, int]:
+    @classmethod
+    def get_project_names(cls, trainer_dataset_manager: TrainerDatasetManager) -> Tuple[Any, Any, Any]:
         """
-        Cleans the given variable to fix nicely with WandB.
-        :param v: The variable to clean.
-        :return: The cleaned variable.
+        Calculates the name of the run identifying the training, validation, and evaluation projects.
+        :return: The run name
         """
-        if isinstance(v, str) and F_SLASH in v:
-            v = os.path.split(v)[1]
-        if isinstance(v, float):
-            v = round(v, 2)
-        return v
-
-    @staticmethod
-    def get_group(experimental_vars: Dict) -> Optional[str]:
-        """
-        Returns the name to group run with its random seed counterparts.
-        :param experimental_vars: The experimental variables to find group for.
-        :param delimiter: The delimiter used to combine groups into identifier.
-        :return: Returns the first group property contained in experimental vars, None otherwise.
-        """
-        group_vars = {k: v for k, v in experimental_vars.items() if k not in GROUP_EXCLUDE}
-        return Wandb.display_vars(group_vars)
+        train_name = cls.get_project_name(trainer_dataset_manager, DatasetRole.TRAIN)
+        eval_name = cls.get_project_name(trainer_dataset_manager, DatasetRole.EVAL)
+        split_size = trainer_dataset_manager.get_split_size(DatasetRole.VAL)
+        val_name = split_size if split_size else cls.get_project_name(trainer_dataset_manager, DatasetRole.VAL)
+        return train_name, val_name, eval_name
 
     @staticmethod
-    def display_vars(experimental_vars, default_value: Optional[str] = None) -> str:
+    def get_project_name(trainer_dataset_creator: TrainerDatasetManager, dataset_role: DatasetRole) -> str:
         """
-        Stringifies experiment variables into their display name.
-        :param experimental_vars: The variables to summary and display.
-        :param default_value: The value to use if experimental vars are empty.
-        :return: String of experimental vars.
+        Gets the name of the project associated with given role.
+        :param trainer_dataset_creator: Holds the creators containing the project names.
+        :param dataset_role: The role of the creator whose project name is retrieved.
+        :return: The name of the project at given role.
         """
-        clean_vars = [f"{Wandb.get_key_display_name(k)}={v}" for k, v in experimental_vars.items()]
-        return default_value if len(clean_vars) == 0 else COMMA.join(clean_vars)
-
-    @staticmethod
-    def get_key_display_name(key_name: str):
-        """
-        :param key_name: The name whose display identifier is returned.
-        :return: Returns the initials of each word in given key name.
-        """
-        if UNDERSCORE in key_name:
-            group_parts = key_name.split(UNDERSCORE)
-            group_parts = [g[0] for g in group_parts]
-        else:
-            group_parts = [key_name[0]]
-        return EMPTY_STRING.join(group_parts)
+        return trainer_dataset_creator.get_creator(dataset_role).get_name()

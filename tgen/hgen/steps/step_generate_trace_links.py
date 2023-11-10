@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List, Set, Tuple
 
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
@@ -33,6 +34,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         if not args.generate_trace_links:
             state.trace_predictions = self._create_traces_from_generation_predictions(state.id_to_related_children)
+            state.selected_predictions = state.trace_predictions
             return
 
         logger.info(f"Predicting links between {args.target_type} and {args.source_layer_id}\n")
@@ -102,7 +104,12 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 selected_traces.extend(parent_selected_traces)
             trace_predictions.extend(cluster_predictions)
         if args.generate_explanations:
-            selected_traces = self._generate_explanations(selected_traces, state, **pipeline_kwargs)
+            selected_traces = self._generate_explanations(selected_traces, state,
+                                                          export_dir=os.path.join(
+                                                              GenerateTraceLinksStep._get_ranking_dir(state.export_dir),
+                                                              "explanations"
+                                                          ),
+                                                          **pipeline_kwargs)
         return trace_predictions, selected_traces
 
     @staticmethod

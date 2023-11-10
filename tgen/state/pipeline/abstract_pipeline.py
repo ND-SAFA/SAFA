@@ -1,16 +1,19 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Generic, List, Optional, Type, TypeVar
+from typing import Generic, List, Optional, Type, TypeVar, Dict
 
 from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
+
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
+import pandas as pd
 
 StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)
@@ -105,7 +108,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.run_setup_for_pipeline()
         for step in self.steps:
             self.run_step(step)
-        self._log_costs()
+        self._log_costs(save=True)
 
     def run_setup_for_pipeline(self) -> None:
         """
@@ -239,16 +242,29 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             selected_options = AbstractPipeline._display_interactive_menu(menu_options)
         return selected_options
 
-    def _log_costs(self) -> None:
+    def _log_costs(self, save: bool = False) -> None:
         """
         Logs the costs accumulated during the run
+        :param save: If True, saves the data to a csv
         :return: None
         """
         total_cost = self.state.total_input_cost + self.state.total_output_cost
         if total_cost > 0:
-            costs = {"Input": self.state.total_input_cost,
-                     "Output": self.state.total_output_cost,
-                     "Total": total_cost}
+            total_costs = {"Total Input Cost": self.state.total_input_cost,
+                           "Total Output Cost": self.state.total_output_cost,
+                           "Total Cost": total_cost}
             cost_msg = "{} Token Cost: ${}"
-            cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in costs.items()]
+            cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in total_costs.items()]
             logger.log_with_title("COSTS FOR RUN: ", NEW_LINE.join(cost_msgs))
+            if save and self.args.export_dir:
+                total_costs.update(self.get_input_output_counts())
+                df = pd.DataFrame({k: [v] for k, v in total_costs.items()})
+                df.to_csv(os.path.join(self.args.export_dir, "costs4run.csv"))
+
+    @abstractmethod
+    def get_input_output_counts(self) -> Dict[str, int]:
+        """
+        Gets the number of inputs and outputs to the pipeline
+        :return: The number of inputs and outputs to the pipeline
+        """
+

@@ -85,3 +85,11 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         save_path = PipelineUtil.save_dataset_checkpoint(dataset, self.args.export_dir, filename=SAVE_DATASET_DIRNAME)
         PipelineUtil.save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         return dataset
+
+    def get_input_output_counts(self) -> Dict[str, int]:
+        """
+        Gets the number of input and generated artifacts
+        :return: The number of input and generated artifacts
+        """
+        return {"N Input Artifact": len(self.state.source_dataset.artifact_df),
+                "N Output Artifacts": len(self.state.refined_content)}

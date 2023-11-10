@@ -64,7 +64,7 @@ class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
 
 
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
-    INTERACTIVE_MODE_OPTIONS = [InteractiveModeOptions.NEXT_STEP, InteractiveModeOptions.RE_RUN, InteractiveModeOptions.SKIP_STEP,
+    INTERACTIVE_MODE_OPTIONS = [InteractiveModeOptions.NEXT_STEP, InteractiveModeOptions.RE_RUN,
                                 InteractiveModeOptions.LOAD_NEW_STATE, InteractiveModeOptions.TURN_OFF_INTERACTIVE]
 
     def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None,
@@ -194,8 +194,6 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             msg = f"Current step: {curr_step.get_step_name()}, "
         if next_step:
             msg += f"Next step: {next_step.get_step_name()}"
-        if not next_step or next_step.get_step_name() not in self.state.completed_steps:
-            options.remove(InteractiveModeOptions.SKIP_STEP)
         logger.info(f"{msg}")
         selected_option = self._display_interactive_menu(options)
         if selected_option == InteractiveModeOptions.LOAD_NEW_STATE:
@@ -203,10 +201,6 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if selected_option == InteractiveModeOptions.RE_RUN:
             logger.log_with_title("Re-running step")
             self.run_step(curr_step, re_run=True)
-        elif selected_option == InteractiveModeOptions.SKIP_STEP:
-            logger.log_with_title("Skipping next step")
-            if next_step:
-                self.state.mark_step_as_complete(next_step.get_step_name())
         elif selected_option == InteractiveModeOptions.TURN_OFF_INTERACTIVE:
             resume_interactive_mode_step = self._option_turn_off_interactive(curr_step)
             if not resume_interactive_mode_step:

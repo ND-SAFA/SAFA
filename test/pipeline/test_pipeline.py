@@ -34,58 +34,50 @@ class TestPipeline(BaseTest):
                     success = False
                 self.menu_options_printed = success
 
-    @mock.patch.object(AbstractPipeline, "_load_new_state_from_user")
+    @mock.patch.object(AbstractPipeline, "_option_new_state")
     @mock.patch("builtins.input")
     @mock.patch.object(AbstractPipeline, "run_step")
     def test_run_interactive_mode(self, run_step_mock: mock.MagicMock, input_mock: mock.MagicMock,
                                   load_new_state_mock: mock.MagicMock):
-        input_mock.side_effect = ["1", "2", "4", "3"]
+        interactive_mode_options = HierarchyGenerator.INTERACTIVE_MODE_OPTIONS
+        re_run = interactive_mode_options.index(InteractiveModeOptions.RE_RUN)
+        load_state = interactive_mode_options.index(InteractiveModeOptions.LOAD_NEW_STATE)
+        next_step = interactive_mode_options.index(InteractiveModeOptions.NEXT_STEP)
+        input_mock.side_effect = [str(command + 1) for command in [re_run, load_state, next_step]]
         test_summary = "this worked"
-        load_new_state_mock.return_value = HGenState(project_summary=test_summary, completed_steps={step.get_step_name(): 1
-                                                                                                    for step in HierarchyGenerator.steps})
 
         pipeline = self.get_pipeline()
         pipeline._run_interactive_mode(pipeline.steps[self.curr_step_index])
         self.assertEqual(run_step_mock.call_count, 1)
 
         pipeline = self.get_pipeline()
-        self.assertFalse(pipeline.state.step_is_complete(pipeline.steps[self.curr_step_index + 1]))
         pipeline._run_interactive_mode(pipeline.steps[self.curr_step_index])
-        self.assertTrue(pipeline.state.step_is_complete(pipeline.steps[self.curr_step_index + 1].get_step_name()))
-
-        pipeline = self.get_pipeline()
-        pipeline._run_interactive_mode(pipeline.steps[self.curr_step_index])
-        self.assertEqual(pipeline.state.project_summary, test_summary)
-        self.assertTrue(pipeline.state.step_is_complete(pipeline.steps[self.curr_step_index].get_step_name()))
-        self.assertFalse(pipeline.state.step_is_complete(pipeline.steps[len(HierarchyGenerator.steps)-1].get_step_name()))
+        self.assertEqual(load_new_state_mock.call_count, 1)
 
     @mock.patch("builtins.input")
     @mock.patch.object(State, "load_state_from_path")
     def test_load_new_state_from_user(self, load_state_from_user_mock: mock.MagicMock, input_mock: mock.MagicMock):
-        input_mock.side_effect = ["bad_path", TEST_OUTPUT_DIR, TEST_STATE_PATH, "b"]
+        input_mock.side_effect = ["1", "bad_path", TEST_OUTPUT_DIR, TEST_STATE_PATH, "3"]
         test_summary = "this worked"
         load_state_from_user_mock.side_effect = lambda path, raise_exception=False: self.fake_load_state_from_path(test_summary, path,
                                                                                                                    raise_exception)
         pipeline = self.get_pipeline()
 
-        state: HGenState = pipeline._load_new_state_from_user(HGenState())
-        self.assertEqual(input_mock.call_count, 3)
-        self.assertEqual(state.project_summary, test_summary)
-
-        state: None = pipeline._load_new_state_from_user(HGenState())
-        self.assertIsNone(state)
+        pipeline._option_new_state(curr_step=GenerateArtifactContentStep,
+                                                      menu_options=self.menu_options)
+        self.assertEqual(input_mock.call_count, 5)
+        self.assertEqual(pipeline.state.project_summary, test_summary)
 
     @mock.patch("builtins.input")
     @mock.patch("builtins.print")
     def test_display_interactive_menu(self, print_mock: mock.MagicMock, input_mock: mock.MagicMock):
         print_mock.side_effect = self.fake_print
-        input_mock.side_effect = ["two", "3", "2"]  # ensure that bad input is handled okay
+        input_mock.side_effect = ["two"]  # ensure that bad input is handled okay
         pipeline = self.get_pipeline()
 
         selection = pipeline._display_interactive_menu(self.menu_options)
-        self.assertEqual(selection, self.menu_options[1])
+        self.assertEqual(selection, None)
         self.assertTrue(self.menu_options_printed)
-        self.assertEqual(input_mock.call_count, 3)
         self.menu_options_printed = False
 
     def get_pipeline(self):

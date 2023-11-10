@@ -166,7 +166,7 @@ class YamlUtil:
         return FileUtil.read_yaml(path2yaml, loader=CustomLoader)
 
     @staticmethod
-    def write(content: Dict, output_path: str) -> None:
+    def write(content: Any, output_path: str) -> None:
         """
         Writes the yaml file.
         TODO: Handle case where value is dictionary, since it does not call its members `to_yaml` function.

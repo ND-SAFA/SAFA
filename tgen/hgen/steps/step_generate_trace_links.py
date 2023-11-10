@@ -105,7 +105,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             trace_predictions.extend(cluster_predictions)
         if args.generate_explanations:
             selected_traces = self._generate_explanations(selected_traces, state,
-                                                          export_dir=os.path.join(
+                                                          export_dir=FileUtil.safely_join_paths(
                                                               GenerateTraceLinksStep._get_ranking_dir(state.export_dir),
                                                               "explanations"
                                                           ),

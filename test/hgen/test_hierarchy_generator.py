@@ -197,14 +197,15 @@ class TestHierarchyGenerator(BaseTest):
                                   TraceKeys.parent_label(): dup_artifact_id,
                                   TraceKeys.SCORE: 0.6,
                                   TraceKeys.EXPLANATION: "Explanation"})
-        self.HGEN_STATE.selected_predictions.append(deepcopy(original_link))
+        self.HGEN_STATE.trace_predictions.append(deepcopy(original_link))
         DetectDuplicateArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
-        self.assertNotIn(dup_artifact_id, self.HGEN_STATE.new_artifact_dataset.artifact_df)
-        self.assertNotIn(dup_artifact_id, self.HGEN_STATE.all_artifacts_dataset.artifact_df)
-        new_link = [trace for trace in self.HGEN_STATE.selected_predictions if trace[TraceKeys.child_label()] == dup_linked_artifact
-                    and trace[TraceKeys.parent_label()] == expected_parent]
-        self.assertSize(1, new_link)
+        self.assertNotIn(dup_artifact_id, self.HGEN_STATE.selected_artifacts_dataset.artifact_df)
+        self.assertNotIn(dup_artifact_id, self.HGEN_STATE.selected_artifacts_dataset.artifact_df)
         self.assertNotIn(original_link, self.HGEN_STATE.selected_predictions)
+        new_link = [trace for trace in self.HGEN_STATE.trace_predictions if trace[TraceKeys.child_label()] == dup_linked_artifact]
+        self.assertSize(1, new_link)
+        self.assertEqual(new_link[0][TraceKeys.TARGET], expected_parent)
+
 
     def assert_create_dataset_step(self):
         step = CreateHGenDatasetStep()

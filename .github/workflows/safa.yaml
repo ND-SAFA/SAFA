@@ -29,6 +29,7 @@ jobs:
         run: ./gradlew checkstyleMain
 
       - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: test-report
           path: build/reports/tests/test/

@@ -7,15 +7,15 @@ import java.util.Set;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.test.features.memberships.permissions.AbstractPermissionViolationTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
-import org.json.JSONObject;
+import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TestRemoveFromDocumentPermissionViolation extends AbstractPermissionViolationTest {
+public class TestDocumentArtifactPermissions extends AbstractPermissionViolationTest {
 
     private Document document;
     private Artifact artifact;
@@ -39,18 +39,28 @@ public class TestRemoveFromDocumentPermissionViolation extends AbstractPermissio
                 .getArtifact(projectName, artifactName);
     }
 
-    @Override
-    protected JSONObject performViolatingAction() {
-        return SafaRequest
-            .withRoute(AppRoutes.DocumentArtifact.REMOVE_ARTIFACT_FROM_DOCUMENT)
-            .withVersion(projectVersion)
-            .withDocument(document)
-            .withArtifactId(artifact.getArtifactId())
-            .deleteWithJsonObject(status().is4xxClientError());
+    @Test
+    public void testAddToDocument() {
+        test(
+            () -> SafaRequest
+                .withRoute(AppRoutes.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
+                .withVersion(projectVersion)
+                .withDocument(document)
+                .postWithJsonObject(new JSONArray(), status().is4xxClientError()),
+            Set.of(ProjectPermission.EDIT_DATA)
+        );
     }
 
-    @Override
-    protected Set<Permission> getExpectedPermissions() {
-        return Set.of(ProjectPermission.EDIT_DATA);
+    @Test
+    public void testRemoveFromDocument() {
+        test(
+            () -> SafaRequest
+                .withRoute(AppRoutes.DocumentArtifact.REMOVE_ARTIFACT_FROM_DOCUMENT)
+                .withVersion(projectVersion)
+                .withDocument(document)
+                .withArtifactId(artifact.getArtifactId())
+                .deleteWithJsonObject(status().is4xxClientError()),
+            Set.of(ProjectPermission.EDIT_DATA)
+        );
     }
 }

@@ -1,9 +1,11 @@
 from abc import ABC
 from typing import List
 
+from tqdm import tqdm
+
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
@@ -26,7 +28,7 @@ class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):
         traces = {col: [] for col in TraceDataFrame.required_column_names()}
         artifacts = {col: [] for col in ArtifactDataFrame.required_column_names()}
         artifact_ids = set()
-        for link_id in slice_link_ids:
+        for link_id in tqdm(slice_link_ids, desc="Creating data slices"):
             trace_link = trace_dataset.trace_df.get_link(link_id)
             source = trace_dataset.artifact_df.get_artifact(trace_link[TraceKeys.SOURCE])
             target = trace_dataset.artifact_df.get_artifact(trace_link[TraceKeys.TARGET])

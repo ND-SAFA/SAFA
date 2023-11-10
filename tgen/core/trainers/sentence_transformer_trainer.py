@@ -9,14 +9,15 @@ from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -40,16 +41,16 @@ class SupportedLossFunctions(SupportedEnum):
 
 
 class SentenceTransformerEvaluator(SentenceEvaluator):
-    def __init__(self, trainer: HuggingFaceTrainer, dataset_role: DatasetRole = DatasetRole.VAL,
+    def __init__(self, trainer: HuggingFaceTrainer, evaluation_roles: List[DatasetRole],
                  evaluator_metric: str = DEFAULT_EVAL_METRIC):
         """
         Evaluates dataset under role with given trainer.
         :param trainer: The trainer used to predict on the dataset.
-        :param dataset_role: The role the dataset to predict should be found under.
+        :param evaluation_roles: The role the dataset to predict should be found under.
         :param evaluator_metric: The metric used to define which is the best run.
         """
         self.trainer = trainer
-        self.dataset_role = dataset_role
+        self.evaluation_roles = evaluation_roles
         self.evaluator_metric = evaluator_metric
         self.metrics = []
 
@@ -60,11 +61,15 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         :param kwargs: Ignored.
         :return: The score for this evaluation run.
         """
-        prediction_output: TracePredictionOutput = self.trainer.perform_prediction(self.dataset_role)
-        logger.info(SEPARATOR_BAR)
-        metrics = prediction_output.metrics
-        self.metrics.append(metrics)
-        return metrics[self.evaluator_metric]
+        validation_metrics = None
+        for eval_role in self.evaluation_roles:
+            prediction_output: TracePredictionOutput = self.trainer.perform_prediction(eval_role)
+            logger.info(SEPARATOR_BAR)
+            metrics = prediction_output.metrics
+            self.metrics.append(metrics)
+            if eval_role == DatasetRole.VAL:
+                validation_metrics = metrics
+        return validation_metrics[self.evaluator_metric]
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -104,7 +109,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=self.args.train_batch_size)
         train_loss = self.loss_function.value(self.model)
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
-        evaluator = SentenceTransformerEvaluator(self)
+        evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles)
 
         logger.log_title("Starting Training", prefix=NEW_LINE)
         self.model.fit(train_objectives=[(train_dataloader, train_loss)],
@@ -140,7 +145,12 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param dataset: The huggingface dataset.
         :return: List of input examples.
         """
-        input_examples = [example for input_batch in dataset for example in input_batch.values()]
+        input_examples = []
+        for i in dataset:
+            source_text = i[CSVKeys.SOURCE]
+            target_text = i[CSVKeys.TARGET]
+            label = float(i[CSVKeys.LABEL])
+            input_examples.append(InputExample(texts=[source_text, target_text], label=label))
         return input_examples
 
     @classmethod

@@ -1,24 +1,23 @@
 import random
 from collections import Counter
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 from datasets import Dataset
-from sentence_transformers import InputExample
 from tqdm import tqdm
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.logging_constants import TQDM_NCOLS
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.csv_keys import CSVKeys
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, StructuredKeys, TraceKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -67,32 +66,6 @@ class TraceDataset(iDataset):
             self.__trace_matrix = TraceMatrix(self.trace_df, randomize=self.randomize)
         return self.__trace_matrix
 
-    def to_hf_dataset(self, model_manager: ModelManager) -> Dataset:
-        """
-        Converts trace links in data to Huggingface (HF) dataset.
-        :param model_manager: The model generator determining architecture and feature function for trace links.
-        :return: A HF dataset.
-        """
-
-        def encode(batch: Dict[str, List[Union[str, int]]]) -> Dict:
-            """
-            Encodes the batch.
-            :param batch: The batch of examples to encode into features.
-            """
-            features = []
-            for source, target, label in zip(batch[CSVKeys.SOURCE], batch[CSVKeys.TARGET], batch[CSVKeys.LABEL]):
-                feature = self._get_feature_entry(model_manager.arch_type, model_manager.get_feature,
-                                                  source_text=source, target_text=target, label=label)
-                features.append(feature)
-            return pd.DataFrame(features).to_dict()
-
-        logger.info("Transforming to HF dataset...")
-        hf_dataset = Dataset.from_pandas(self.to_dataframe(include_ids=False))
-        logger.info("Dataframe has been created....")
-        hf_dataset.set_transform(encode)
-        logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
-        return hf_dataset
-
     def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
@@ -105,15 +78,44 @@ class TraceDataset(iDataset):
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])
             label = link[TraceKeys.LABEL]
-            new_row = [source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT], label] if not include_ids else \
-                [source[ArtifactKeys.ID], source[ArtifactKeys.CONTENT], target[ArtifactKeys.ID], target[ArtifactKeys.CONTENT], label]
+            source_text = ArtifactDataFrame.get_traceable_content(source)
+            target_text = ArtifactDataFrame.get_traceable_content(target)
+            new_row = [source_text, target_text, label] if not include_ids else \
+                [source[ArtifactKeys.ID], source_text, target[ArtifactKeys.ID], target_text, label]
             link_ids_to_rows[index] = new_row
 
         data = [link_ids_to_rows[link_id] for link_id in self.get_ordered_link_ids()]
-        cols = [CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL] if not include_ids else [CSVKeys.SOURCE_ID, CSVKeys.SOURCE,
-                                                                                        CSVKeys.TARGET_ID, CSVKeys.TARGET,
-                                                                                        CSVKeys.LABEL]
-        return pd.DataFrame(data, columns=cols)
+        cols = [CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL] if not include_ids else [
+            CSVKeys.SOURCE_ID, CSVKeys.SOURCE,
+            CSVKeys.TARGET_ID, CSVKeys.TARGET,
+            CSVKeys.LABEL]
+        new_data = pd.DataFrame(data, columns=cols)
+        return new_data
+
+    def to_hf_dataset(self, model_manager: ModelManager) -> Dataset:
+        """
+        Converts trace links in data to Huggingface (HF) dataset.
+        :param model_manager: The model generator determining architecture and feature function for trace links.
+        :return: A HF dataset.
+        """
+
+        def encode(link_entry: Dict) -> Dict:
+            """
+            Encodes the batch.
+            :param link_entry: The current entry in the dataset to convert.
+            """
+            features = []
+            for link_id in link_entry[StructuredKeys.Trace.LINK_ID.value]:
+                feature = self._get_feature_entry(model_manager.arch_type, model_manager.get_feature, link_id=link_id)
+                features.append(feature)
+            return pd.DataFrame(features).to_dict()
+
+        logger.info("Converting trace data frame to hugging face dataset.")
+        trace_ids = [{StructuredKeys.Trace.LINK_ID.value: link_id} for link_id in self.trace_df.index]
+        hf_dataset = Dataset.from_list(trace_ids)
+        hf_dataset.set_transform(encode)
+        logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
+        return hf_dataset
 
     def get_link_source_target_artifact(self, link_id: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
@@ -140,11 +142,12 @@ class TraceDataset(iDataset):
         source = self.artifact_df.add_artifact(source_id, source_tokens)
         target = self.artifact_df.add_artifact(target_id, target_tokens)
         new_link = self.trace_df.add_link(source_id, target_id, int(is_true_link))
+        new_link_id = new_link[TraceKeys.LINK_ID]
         if is_true_link:
-            self._pos_link_ids.append(new_link[TraceKeys.LINK_ID])
+            self._pos_link_ids.append(new_link_id)
         else:
-            self._neg_link_ids.append(new_link[TraceKeys.LINK_ID])
-        return new_link[TraceKeys.LINK_ID]
+            self._neg_link_ids.append(new_link_id)
+        return new_link_id
 
     def augment_pos_links(self, augmenter: DataAugmenter) -> None:
         """
@@ -255,8 +258,10 @@ class TraceDataset(iDataset):
         """
         source_target_pairs = []
         for link_id in self._pos_link_ids:
-            source, target = self.get_link_source_target_artifact(link_id)
-            source_target_pairs.append((source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT]))
+            source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
+            source_text = ArtifactDataFrame.get_traceable_content(source_artifact)
+            target_text = ArtifactDataFrame.get_traceable_content(target_artifact)
+            source_target_pairs.append((source_text, target_text))
         return self._pos_link_ids, source_target_pairs
 
     def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
@@ -270,7 +275,7 @@ class TraceDataset(iDataset):
         for step_id, result in augmentation_results.items():
             id_ = AbstractDataAugmentationStep.extract_unique_id_from_step_id(step_id)
             i = 0
-            for entry, reference_index in result:
+            for entry, reference_index in tqdm(list(result), desc="Adding augmentation links"):
                 i += 1
                 aug_source_id, aug_target_id = self._get_augmented_artifact_ids(augmented_tokens=entry,
                                                                                 orig_link_id=orig_link_ids[reference_index],
@@ -297,7 +302,9 @@ class TraceDataset(iDataset):
         new_id = TraceDataFrame.generate_link_id(aug_source_id, aug_target_id)
         if self.trace_df.get_link(new_id) is not None:
             source, target = self.get_link_source_target_artifact(new_id)
-            if source[ArtifactKeys.CONTENT] != aug_source_tokens or target[ArtifactKeys.CONTENT] != aug_target_tokens:
+            source_text = ArtifactDataFrame.get_traceable_content(source)
+            target_text = ArtifactDataFrame.get_traceable_content(target)
+            if source_text != aug_source_tokens or target_text != aug_target_tokens:
                 aug_source_id += str(entry_num)
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id
@@ -319,11 +326,11 @@ class TraceDataset(iDataset):
         if link_id:
             source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
             label = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
-            source_text = source_artifact[ArtifactKeys.CONTENT]
-            target_text = target_artifact[ArtifactKeys.CONTENT]
+            source_text = ArtifactDataFrame.get_traceable_content(source_artifact)
+            target_text = ArtifactDataFrame.get_traceable_content(target_artifact)
 
         if arch_type == ModelArchitectureType.SIAMESE:
-            entry = InputExample(texts=[source_text, target_text], label=float(label))
+            entry = {CSVKeys.SOURCE: source_text, CSVKeys.TARGET: target_text, CSVKeys.LABEL: label}
         else:
             feature = feature_func(text=source_text,
                                    text_pair=target_text,

@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Type
 from typeguard import check_type
 
 from tgen.common.constants.deliminator_constants import PERIOD, UNDERSCORE
+from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.str_util import StrUtil
 from tgen.variables.undetermined_variable import UndeterminedVariable
 
@@ -19,6 +20,17 @@ class ParamScope(Enum):
 
 
 class ReflectionUtil:
+
+    @staticmethod
+    def has_constructor_param(class_type: Type, param: str) -> bool:
+        """
+        Checks whether param of given name is accepted in type constructor.
+        :param class_type: The class type whose constructor is checked.
+        :param param: The param name to check for.
+        :return: True if constructor accepts param of given name.
+        """
+        constructor_param_names = ParamSpecs.create_from_method(class_type.__init__).param_names
+        return param in constructor_param_names
 
     @staticmethod
     def get_target_class_from_type(target_class: Type) -> Type:

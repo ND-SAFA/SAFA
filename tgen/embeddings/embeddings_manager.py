@@ -30,6 +30,20 @@ class EmbeddingsManager:
         self.__model = model
         self.__state_changed_since_last_save = False
 
+    @staticmethod
+    def create_from_content(content_list: List[str], **kwargs) -> "EmbeddingsManager":
+        """
+        Creates embeddings manager mapping content in list to its embeddings.
+        :param content_list: The content list to create embeddings for.
+        :param kwargs: Keyword arguments passed to embeddings manager.
+        :return: EmbeddingsManager.
+        """
+        content_list = list(set(content_list))
+        content_map = {c: c for c in content_list}
+        embeddings_manager = EmbeddingsManager(content_map, **kwargs)
+        embeddings_manager.create_artifact_embeddings()
+        return embeddings_manager
+
     def create_artifact_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:
         """
         Creates list of embeddings for each artifact.

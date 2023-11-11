@@ -10,7 +10,7 @@ from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.core.wandb.Wandb import Wandb
+from tgen.core.wandb.WBManager import WBManager
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
@@ -48,7 +48,7 @@ class AbstractTrainerJob(AbstractJob, ABC):
             CreateDatasetsJob(self.trainer_dataset_manager, self.job_args).run()
         if self.task == TrainerTask.TRAIN:
             trainer = self.get_trainer(**kwargs)
-            Wandb.init_wandb(self.trainer_dataset_manager, trainer.model_manager.model_path)
+            WBManager.init_wandb(self.trainer_dataset_manager, trainer.model_manager.model_path, run_suffix=self.job_args.run_suffix)
             output = trainer.perform_training()
         elif self.task == TrainerTask.PREDICT:
             output = self.get_trainer(**kwargs).perform_prediction()

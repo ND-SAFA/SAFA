@@ -1,38 +1,31 @@
 from typing import List, Tuple
 
-import numpy as np
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
 from sentence_transformers.evaluation import SentenceEvaluator
-from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss
+from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss, MultipleNegativesRankingLoss
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.hugging_face_constants import DEFAULT_EVAL_METRIC, DEFAULT_MAX_STEPS_BEFORE_EVAL, NEG_LINK, SEPARATOR_BAR
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
-from tgen.core.wandb.Wandb import Wandb
+from tgen.core.wandb.WBManager import WBManager
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
-
-NEG_LABEL = 0
-SEPARATOR_BAR = "-" * 50
-EmbeddingType = np.array  # TODO: Merge with embedding type.
-
-DEFAULT_EVAL_METRIC = "f2"
-DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
-DEFAULT_SAVE_BEST_MODEL = True
 
 
 class SupportedLossFunctions(SupportedEnum):
@@ -41,10 +34,11 @@ class SupportedLossFunctions(SupportedEnum):
     """
     COSINE = CosineSimilarityLoss
     CONTRASTIVE = ContrastiveLoss
+    MNRL = MultipleNegativesRankingLoss
 
 
 class SentenceTransformerEvaluator(SentenceEvaluator):
-    def __init__(self, trainer: HuggingFaceTrainer, evaluation_roles: List[DatasetRole],
+    def __init__(self, trainer: "SentenceTransformerTrainer", evaluation_roles: List[DatasetRole],
                  evaluator_metric: str = DEFAULT_EVAL_METRIC):
         """
         Evaluates dataset under role with given trainer.
@@ -56,6 +50,7 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         self.evaluation_roles = evaluation_roles
         self.evaluator_metric = evaluator_metric
         self.metrics = []
+        self.current_loss = 0
 
     def __call__(self, model: SentenceTransformer, **kwargs) -> float:
         """
@@ -67,6 +62,9 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         validation_metrics = None
         role2metrics = {}
         for eval_role in self.evaluation_roles:
+            if not self.trainer.has_dataset(eval_role):
+                logger.warning(f"Skipping evaluation on {eval_role} dataset. Defined in evaluation roles but empty.")
+                continue
             prediction_output: TracePredictionOutput = self.trainer.perform_prediction(eval_role)
             logger.info(SEPARATOR_BAR)
             metrics = prediction_output.metrics
@@ -74,9 +72,18 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
                 validation_metrics = metrics
             role2metrics[eval_role] = metrics
             self.metrics.append(metrics)
-
-        Wandb.log(role2metrics)
+        loss = self.update_loss()
+        WBManager.log(role2metrics, {"loss": loss})
         return validation_metrics[self.evaluator_metric]
+
+    def update_loss(self):
+        """
+        Updates the current loss.
+        :return: The loss occurring since last session.
+        """
+        loss = self.trainer.total_loss - self.current_loss
+        self.current_loss = self.trainer.total_loss
+        return loss
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -85,9 +92,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     """
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
-                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL,
-                 loss_function: SupportedLossFunctions = SupportedLossFunctions.COSINE,
-                 save_best_model: bool = DEFAULT_SAVE_BEST_MODEL, false_negative_weight: float = None, **kwargs):
+                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL, false_negative_weight: float = None, **kwargs):
         """
         Trainer for sentence transformer models. Provides API that allows training and prediction operations.
         :param trainer_args: The trainer arguments.
@@ -102,9 +107,9 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
-        self.loss_function = loss_function
-        self.save_best_model = save_best_model
         self.false_negative_weight = false_negative_weight
+        self.losses = []
+        self.total_loss = 0
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -113,27 +118,35 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        train_examples = self.to_input_examples(self.train_dataset, use_scores=True)
-        train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=self.args.train_batch_size)
-        loss_function = self.loss_function.value(self.model)
-        if self.false_negative_weight:
-            loss_function.loss_fct = self.add_weight_to_false_negatives
-        n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
-        evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles)
+        if self.trainer_args.st_loss_function.upper() == "MNRL":
+            self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager, use_pos_ids=True)
+            logger.info("Using only positive links in training dataset.")
+        train_examples = self.to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
+        train_dataloader = DataLoader(train_examples, shuffle=self.trainer_args.shuffle, batch_size=self.args.train_batch_size)
 
-        logger.log_title("Starting Training", prefix=NEW_LINE)
+        loss_function = self._create_loss_function()
+        n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
+
+        evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
+
+        logger.log_title("Training...", prefix=NEW_LINE)
         self.model.fit(train_objectives=[(train_dataloader, loss_function)],
                        epochs=int(self.args.num_train_epochs),
                        warmup_steps=self.args.warmup_steps,
                        evaluation_steps=n_steps,
                        evaluator=evaluator,
                        output_path=self.args.output_dir,
-                       save_best_model=self.save_best_model,
-                       show_progress_bar=False)
+                       save_best_model=self.trainer_args.save_best_model,
+                       show_progress_bar=True)
         self.state.best_model_checkpoint = self.args.output_dir
         if self.args.load_best_model_at_end:
             self.model = SentenceTransformer(self.state.best_model_checkpoint)
-        return TrainOutput(metrics=evaluator.metrics, training_loss=None, global_step=None)
+
+        metrics = {
+            "records": evaluator.metrics,
+            "losses": self.losses
+        }
+        return TrainOutput(metrics=metrics, training_loss=self.total_loss, global_step=None)
 
     @overrides(HuggingFaceTrainer)
     def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:
@@ -149,11 +162,41 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         return PredictionOutput(scores, labels, prediction_metrics)
 
-    def to_input_examples(self, dataset: Dataset, use_scores: bool = False) -> List[InputExample]:
+    def _create_loss_function(self):
+        """
+        Creates the loss function from its defined class.
+        :return: The loss function.
+        """
+        loss_function_name = self.trainer_args.st_loss_function
+        loss_function_kwargs = {}
+        loss_function_class = SupportedLossFunctions.get_value(loss_function_name)
+        if ReflectionUtil.has_constructor_param(loss_function_class, "loss_fct"):
+            loss_function_kwargs["loss_fct"] = self._calculate_loss
+        loss_function = loss_function_class(self.model, **loss_function_kwargs)
+        logger.info(f"Created loss function {loss_function_name}.")
+        return loss_function
+
+    def _calculate_loss(self, output: Tensor, labels: Tensor):
+        """
+        Calculates the loss between batch of predictions and their labels.
+        :param output: Batch prediction output containing similarity scores between pairs.
+        :param labels: The labels associated with the pairs.
+        :return: The loss between the predictions and actual labels.
+        """
+        default_loss = nn.MSELoss()
+        loss = default_loss(output, labels)
+        loss_value = loss.item()
+        self.total_loss += loss_value
+        self.losses.append(loss_value)
+        return loss
+
+    @classmethod
+    def to_input_examples(cls, dataset: Dataset, use_scores: bool = False, model: SentenceTransformer = None) -> List[InputExample]:
         """
         Converts a huggingface dataset into a list of sentence transformer input examples.
         :param dataset: The huggingface dataset.
         :param use_scores: Whether to use score over label for negative links.
+         :param model: If use_scores, the model used to embed artifacts.
         :return: List of input examples.
         """
         input_examples = []
@@ -161,16 +204,14 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
             source_text = i[CSVKeys.SOURCE]
             target_text = i[CSVKeys.TARGET]
             label = float(i[CSVKeys.LABEL])
-            score = i[CSVKeys.SCORE]
-            if use_scores and label == NEG_LABEL and score is not None:
-                label = float(score)
             input_examples.append(InputExample(texts=[source_text, target_text], label=label))
         if use_scores:
-            self.replace_labels_with_scores(self.model, input_examples)
+            assert model, f"Model is required to be defined if use_scores is True. Received {model}."
+            cls.replace_labels_with_scores(model, input_examples)
         return input_examples
 
     @staticmethod
-    def replace_labels_with_scores(model: SentenceTransformer, input_examples: List[InputExample], label: int = NEG_LABEL):
+    def replace_labels_with_scores(model: SentenceTransformer, input_examples: List[InputExample], label: int = NEG_LINK):
         """
         Replaces the matching labels with model similarity score.
         :param model: The model to create embeddings for artifacts for.
@@ -178,19 +219,19 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param label: The label to replace with scores.
         :return: None. Modified in place.
         """
-        content_map = {}
-        for input_example in input_examples:
-            for t in input_example.texts:
-                if t not in content_map:
-                    content_map[t] = t
-        embeddings_manager = EmbeddingsManager(content_map, model=model)
-        embeddings_manager.create_artifact_embeddings()
-        for input_example in input_examples:
-            if input_example.label == label:
-                s_text, t_text = input_example.texts
-                s_embedding = embeddings_manager.get_embedding(s_text)
-                t_embedding = embeddings_manager.get_embedding(t_text)
-                input_example.label = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
+        matching_examples = [input_example for input_example in input_examples if input_example.label == label]
+        content = ListUtil.flatten([input_example.texts for input_example in matching_examples])
+
+        embeddings_manager = EmbeddingsManager.create_from_content(content, model=model)
+
+        for input_example in matching_examples:
+            s_text, t_text = input_example.texts
+            s_embedding = embeddings_manager.get_embedding(s_text)
+            t_embedding = embeddings_manager.get_embedding(t_text)
+            score = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
+            input_example.label = score
+
+        logger.info(f"Adding scores to {len(matching_examples)} input examples.")
 
     @classmethod
     def calculate_similarities(cls, model: SentenceTransformer, input_examples: List[InputExample]) -> Tuple[List[float], List[float]]:
@@ -206,10 +247,9 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         labels = []
         for example in input_examples:
             source_text, target_text = example.texts
-            source_embedding = embedding_map[source_text]
-            target_embedding = embedding_map[target_text]
-
-            score = EmbeddingUtil.calculate_similarity(source_embedding, target_embedding)
+            s_embedding = embedding_map[source_text]
+            t_embedding = embedding_map[target_text]
+            score = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
             scores.append(score)
             labels.append(example.label)
         return scores, labels
@@ -227,22 +267,3 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         embedding_map = embeddings_manager.create_embedding_map()
         translated_embedding_map = {content_map[i]: v for i, v in embedding_map.items()}
         return translated_embedding_map
-
-    @staticmethod
-    def add_weight_to_false_negatives(output: Tensor, labels: Tensor, weight: float = 2, threshold: float = 0.5):
-        """
-        Adjusts the weight of the loss for false negatives.
-        :param output: The output of the model.
-        :param labels: The labels associated with input.
-        :param weight: The weight to multiple the original loss of false negatives by.
-        :param threshold: The threshold at which to consider a label a pos prediction.
-        :return: The loss.
-        """
-        default_loss = nn.MSELoss()
-        label_value = labels.item()
-        output_value = output.item()
-        loss = default_loss(output, labels)
-        if label_value == 1:
-            if output_value < threshold:
-                return loss * weight
-        return loss

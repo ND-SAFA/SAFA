@@ -93,10 +93,11 @@ class TraceDataset(iDataset):
         new_data = pd.DataFrame(data, columns=cols)
         return new_data
 
-    def to_hf_dataset(self, model_manager: ModelManager) -> Dataset:
+    def to_hf_dataset(self, model_manager: ModelManager, use_pos_ids: bool = False) -> Dataset:
         """
         Converts trace links in data to Huggingface (HF) dataset.
         :param model_manager: The model generator determining architecture and feature function for trace links.
+        :param use_pos_ids: Whether to only use positive ids.
         :return: A HF dataset.
         """
 
@@ -112,7 +113,8 @@ class TraceDataset(iDataset):
             return pd.DataFrame(features).to_dict()
 
         logger.info("Converting trace data frame to hugging face dataset.")
-        trace_ids = [{StructuredKeys.Trace.LINK_ID.value: link_id} for link_id in self.get_ordered_link_ids()]
+        link_ids = set(self._pos_link_ids) if use_pos_ids else self.get_ordered_link_ids()
+        trace_ids = [{StructuredKeys.Trace.LINK_ID.value: link_id} for link_id in link_ids]
         hf_dataset = Dataset.from_list(trace_ids)
         hf_dataset.set_transform(encode)
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")

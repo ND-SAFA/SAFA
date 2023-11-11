@@ -7,12 +7,15 @@
           "task": "TRAIN",
           "trainer": "ST",
           "job_args": {
-            "random_seed": 812
+            "random_seed": 812,
+            "run_suffix": "[RUN_ID]"
           },
           "model_manager": {
             "model_path": "[BASE_MODEL]"
           },
           "trainer_args": {
+            "st_loss_function": "[LOSS_FUNCTION]",
+            "use_scores": "[USE_SCORES_BOOL]",
             "output_dir": "[OUTPUT_PATH]",
             "best_model_path": "[MODEL_PATH]/[BEST_MODEL_NAME]",
             "num_train_epochs": "[EPOCHS_INT]",
@@ -47,7 +50,8 @@
             "augmenter": {
               "steps": [
                 {
-                  "object_type": "RESAMPLE"
+                  "object_type": "RESAMPLE",
+                  "resample_rate": 1
                 }
               ]
             }

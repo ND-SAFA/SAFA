@@ -3,7 +3,8 @@ from typing import Callable, Dict, List
 from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
 
-from tgen.common.constants.hugging_face_constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_STEPS_DEFAULT, \
+from tgen.common.constants.hugging_face_constants import DEFAULT_SAVE_BEST_MODEL, EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, \
+    EVAL_STEPS_DEFAULT, \
     GRADIENT_ACCUMULATION_DEFAULT, \
     GREATER_IS_BETTER_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, LOGGING_STEPS_DEFAULT, LOGGING_STRATEGY_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, \
@@ -54,6 +55,8 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     eval_on_each_epoch: bool = EVAL_ON_EPOCH_DEFAULT
     save_random_model: bool = SAVE_RANDOM_MODEL_DEFAULT
     best_model_path: str = None
+    do_training_eval = True
+    save_best_model = DEFAULT_SAVE_BEST_MODEL
 
     # GAN
     n_hidden_layers_g: int = 1
@@ -68,6 +71,10 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     warmup_proportion: float = 0.1
     apply_balance: bool = True  # Replicate labeled data to balance poorly represented data,
     shuffle: bool = True
+
+    # Sentence-BERT
+    use_scores: bool = False
+    st_loss_function = "cosine"
 
     # Misc
     multi_gpu: bool = MULTI_GPU_DEFAULT

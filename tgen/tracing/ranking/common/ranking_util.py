@@ -269,6 +269,7 @@ class RankingUtil:
     def get_input_output_counts(state: RankingState) -> Dict[str, int]:
         """
         Gets the number of selected traces for the pipeline
+        :param state: The current state of the pipeline
         :return:  Gets the number of selected traces for the pipeline
         """
         try:

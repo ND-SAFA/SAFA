@@ -53,7 +53,8 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
                                          do_resummarize_artifacts=False,
                                          project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
                                          )
-        super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
+        super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args,
+                         skip_summarization=not args.create_project_summary)
         self.args = args
 
     def _get_new_project_summary_sections(self, target_type: str) -> Dict:

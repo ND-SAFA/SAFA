@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args, \
-    HGEN_PROJECT_SUMMARY, MISSING_PROJECT_SUMMARY_RESPONSES
+    MISSING_PROJECT_SUMMARY_RESPONSES
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -23,7 +23,6 @@ from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep

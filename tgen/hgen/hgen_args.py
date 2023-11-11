@@ -97,6 +97,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     Threshold for which generated artifacts are deemed duplicates.
     """
     duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
+    """
+    If True, creates a project summary, else False
+    """
+    create_project_summary: bool = True
 
     def __post_init__(self) -> None:
         """

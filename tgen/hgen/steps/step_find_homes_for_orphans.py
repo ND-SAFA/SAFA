@@ -61,7 +61,8 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     types_to_trace=(args.source_type, args.target_type),
                                     generate_explanations=False,
                                     selection_method=None)
-        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
+        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager,
+                                            skip_summarization=not args.create_project_summary)
         pipeline.run()
 
         orphan2predictions = RankingUtil.group_trace_predictions(pipeline.state.selected_entries, TraceKeys.child_label())

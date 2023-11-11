@@ -1,26 +1,23 @@
-import os
 from typing import Dict, List, Set, Tuple
+
+from tgen.common.logging.logger_manager import logger
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
 from tgen.common.objects.trace import Trace
-from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
-from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
-from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 
 
 class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -67,7 +64,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     export_dir=HGenUtil.get_ranking_dir(state.export_dir),
                                     generate_explanations=args.generate_explanations,
                                     link_threshold=FIRST_PASS_LINK_THRESHOLD)
-        selected_entries = self._run_embedding_pipeline(pipeline_args, state)
+        selected_entries = self._run_embedding_pipeline(pipeline_args, state, skip_summarization=not args.create_project_summary)
         trace_predictions: List[EnumDict] = selected_entries
         return trace_predictions
 
@@ -97,7 +94,8 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids,
                                         export_dir=cluster_dir,
                                         **pipeline_kwargs)
-            cluster_predictions = self._run_embedding_pipeline(pipeline_args, state)
+            cluster_predictions = self._run_embedding_pipeline(pipeline_args, state,
+                                                               skip_summarization=not args.create_project_summary)
             parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
             for parent, parent_preds in parent2predictions.items():
                 parent_selected_traces = SelectByThreshold.select(parent_preds, FIRST_PASS_LINK_THRESHOLD)
@@ -108,14 +106,16 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return trace_predictions, selected_traces
 
     @staticmethod
-    def _run_embedding_pipeline(pipeline_args: RankingArgs, hgen_state: HGenState) -> List[Trace]:
+    def _run_embedding_pipeline(pipeline_args: RankingArgs, hgen_state: HGenState, skip_summarization: bool) -> List[Trace]:
         """
         Runs the embedding pipeline to obtain trace predictions
         :param pipeline_args: The arguments to the ranking pipeline
         :param hgen_state: The current hgen state
+        :param skip_summarization: Whether to skip summarization of artifacts.
         :return: The selected predictions from the pipeline
         """
-        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=hgen_state.embedding_manager)
+        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=hgen_state.embedding_manager,
+                                            skip_summarization=skip_summarization)
         pipeline.run()
         hgen_state.update_total_costs_from_state(pipeline.state)
         hgen_state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
@@ -153,5 +153,3 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 trace[TraceKeys.SCORE] = MathUtil.calculate_weighted_score(RELATED_CHILDREN_SCORE,
                                                                            trace[TraceKeys.SCORE], alpha)
         return trace_predictions
-
-

@@ -3,7 +3,7 @@ from typing import List, Tuple
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
 from sentence_transformers.evaluation import SentenceEvaluator
-from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss, MultipleNegativesRankingLoss
+from sentence_transformers.losses import CosineSimilarityLoss, MultipleNegativesRankingLoss, OnlineContrastiveLoss
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
@@ -33,8 +33,11 @@ class SupportedLossFunctions(SupportedEnum):
     Enumerates the different loss functions available for sentence embedding models.
     """
     COSINE = CosineSimilarityLoss
-    CONTRASTIVE = ContrastiveLoss
+    CONTRASTIVE = OnlineContrastiveLoss
     MNRL = MultipleNegativesRankingLoss
+
+    def is_name(self, n: str):
+        return n.upper() == self.name.upper()
 
 
 class SentenceTransformerEvaluator(SentenceEvaluator):
@@ -118,7 +121,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        if self.trainer_args.st_loss_function.upper() == "MNRL":
+        if SupportedLossFunctions.MNRL.is_name(self.trainer_args.st_loss_function):
             self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager, use_pos_ids=True)
             logger.info("Using only positive links in training dataset.")
         train_examples = self.to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)

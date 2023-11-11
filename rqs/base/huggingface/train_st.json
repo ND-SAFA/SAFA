@@ -48,12 +48,7 @@
               }
             },
             "augmenter": {
-              "steps": [
-                {
-                  "object_type": "RESAMPLE",
-                  "resample_rate": 1
-                }
-              ]
+              "steps": []
             }
           }
         }

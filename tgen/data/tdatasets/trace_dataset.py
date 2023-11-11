@@ -205,6 +205,7 @@ class TraceDataset(iDataset):
         if len(self._pos_link_ids) > 0:
             if augmenter:
                 self.augment_pos_links(augmenter)
+                self.balance_links()
 
     def prepare_for_testing(self) -> None:
         """
@@ -345,6 +346,15 @@ class TraceDataset(iDataset):
         from tgen.data.readers.structured_project_reader import StructuredProjectReader
         SafaExporter(project_path, dataset=self).export()
         return TraceDatasetCreator(project_reader=StructuredProjectReader(project_path=FileUtil.collapse_paths(project_path)))
+
+    def balance_links(self) -> None:
+        """
+        Balances the positive and negative links.
+        :return: None.
+        """
+        n_links = min(len(self._neg_link_ids), len(self._pos_link_ids))
+        self._neg_link_ids = random.sample(self._neg_link_ids, n_links)
+        self._pos_link_ids = random.sample(self._pos_link_ids, n_links)
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

@@ -40,8 +40,8 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param trace_selections:  List of selected trace links.
         :return: None. Selections are added to list.
         """
-        all_children_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.source_layer_id).index)
-        all_parent_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.target_type).index)
+        all_children_ids = list(state.selected_artifacts_dataset.artifact_df.get_type(args.source_layer_id).index)
+        all_parent_ids = list(state.selected_artifacts_dataset.artifact_df.get_type(args.target_type).index)
 
         child2predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label())
         child2selected = RankingUtil.group_trace_predictions(trace_selections, TraceKeys.child_label())
@@ -54,14 +54,15 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         run_name = "Placing Orphans in Homes"
         export_dir = FileUtil.safely_join_paths(args.export_dir, "orphan_ranking")
         pipeline_args = RankingArgs(run_name=run_name,
-                                    dataset=state.all_artifacts_dataset,
+                                    dataset=state.selected_artifacts_dataset,
                                     parent_ids=all_parent_ids,
                                     children_ids=list(orphans),
                                     export_dir=export_dir,
                                     types_to_trace=(args.source_type, args.target_type),
                                     generate_explanations=False,
                                     selection_method=None)
-        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager)
+        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager,
+                                            skip_summarization=not args.create_project_summary)
         pipeline.run()
 
         orphan2predictions = RankingUtil.group_trace_predictions(pipeline.state.selected_entries, TraceKeys.child_label())
@@ -69,9 +70,6 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
             top_prediction = sorted(orphan_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[0]
             if top_prediction[TraceKeys.SCORE] >= args.min_orphan_score_threshold:
                 trace_selections.append(top_prediction)
-
-        if args.generate_explanations:
-            trace_selections = FindHomesForOrphansStep._generate_missing_explanations(pipeline_args, trace_selections, state)
 
         return trace_selections
 
@@ -103,21 +101,3 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
             orphans.add(child)
 
         return orphans
-
-    @staticmethod
-    def _generate_missing_explanations(pipeline_args: RankingArgs, trace_selections: List[Trace], state: HGenState) -> List[Trace]:
-        """
-        Generates explanations for traces that are missing them
-        :param pipeline_args: The arguments to the ranking pipeline
-        :param trace_selections: The current trace selections.
-        :param state: The state of the hgen pipeline.
-        :return: Trace selections with explanations
-        """
-        missing_explanations = [trace for trace in trace_selections if not trace.get(TraceKeys.EXPLANATION)]
-        have_explanations = [trace for trace in trace_selections if trace.get(TraceKeys.EXPLANATION)]
-        pipeline_args.generate_explanations = True
-        pipeline_args.update_llm_managers_with_state(state)
-        pipeline_state = RankingState(candidate_entries=missing_explanations)
-        CreateExplanationsStep().run(pipeline_args, pipeline_state)
-        trace_selections = have_explanations + pipeline_state.get_current_entries()
-        return trace_selections

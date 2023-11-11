@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Type
+from typing import Type, Dict
 
 from tgen.common.util.file_util import FileUtil
 from tgen.delta.delta_args import DeltaArgs
@@ -16,9 +16,9 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
     Responsible for generating summaries of PR changes
     """
     steps = [
-             IndividualDiffSummaryStep,
-             OverviewChangeSummaryStep,
-             ImpactAnalysisStep]
+        IndividualDiffSummaryStep,
+        OverviewChangeSummaryStep,
+        ImpactAnalysisStep]
 
     def __init__(self, args: DeltaArgs):
         """
@@ -46,3 +46,11 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
 
         super().run()
         return self.state.final_summary
+
+    def get_input_output_counts(self) -> Dict[str, int]:
+        """
+        Gets the number of change diffs
+        :return: the number of change diffs
+        """
+        n_change_diffs = sum([len(diffs) for diffs in self.args.change_type_to_diffs.values()])
+        return {"N Change Diffs": n_change_diffs}

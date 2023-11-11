@@ -238,3 +238,12 @@ class HGenUtil:
             return input_string
         first_letters = [word[0] for word in words]
         return ''.join(first_letters).upper()
+
+    @staticmethod
+    def get_ranking_dir(directory: str) -> str:
+        """
+        Get the directory for ranking job
+        :param directory: The main directory used by hgen
+        :return: The full path
+        """
+        return FileUtil.safely_join_paths(directory, "ranking")

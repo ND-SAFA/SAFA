@@ -1,9 +1,9 @@
 from copy import deepcopy
 
 from test.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
-from tgen.common.constants.hgen_constants import MAX_ARTIFACTS_FOR_NO_SUMMARIES
+from tgen.common.constants.hgen_constants import MAX_TOKENS_FOR_NO_SUMMARIES
 from tgen.common.util.enum_util import EnumDict
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
@@ -72,7 +72,7 @@ class TestMultiArtifactPrompt(BaseTest):
 
         num_with_id = MultiArtifactPrompt(self.PROMPT, build_method=MultiArtifactPrompt.BuildMethod.NUMBERED, include_ids=True,
                                           use_summary=False)
-        prompt = num_with_id._build([self.ARTIFACTS[i % 2] for i in range(MAX_ARTIFACTS_FOR_NO_SUMMARIES+1)])
+        prompt = num_with_id._build([self.ARTIFACTS[i % 2] for i in range(MAX_TOKENS_FOR_NO_SUMMARIES + 1)])
         # should use summary if more than 10 artifacts
         self.assertIn(artifact1[ArtifactKeys.SUMMARY], prompt)
         self.assertIn(artifact2[ArtifactKeys.SUMMARY], prompt)

@@ -1,7 +1,8 @@
-from tgen.common.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER, OPEN_AI_MODEL_DEFAULT, \
+import tiktoken
+
+from tgen.common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
     TOKENS_2_WORDS_CONVERSION
 from tgen.models.tokens.token_limits import ModelTokenLimits
-import tiktoken
 
 
 class TokenCalculator:
@@ -18,7 +19,7 @@ class TokenCalculator:
         return model_token_limit - max_completion_tokens - MAX_TOKENS_BUFFER
 
     @staticmethod
-    def estimate_num_tokens(content: str, model_name: str) -> int:
+    def estimate_num_tokens(content: str, model_name: str = None) -> int:
         """
         Approximates the number of tokens that some content will be tokenized into by a given model by trying to tokenize
             and giving a rough estimate using a words to tokens conversion if that fails
@@ -27,7 +28,7 @@ class TokenCalculator:
         :return: The approximate number of tokens
         """
         try:
-            if not ModelTokenLimits.is_open_ai_model(model_name):
+            if not model_name or not ModelTokenLimits.is_open_ai_model(model_name):
                 model_name = OPEN_AI_MODEL_DEFAULT  # titoken only works with open ai models so use default for approximation
             encoding = tiktoken.encoding_for_model(model_name)
             num_tokens = len(encoding.encode(content))

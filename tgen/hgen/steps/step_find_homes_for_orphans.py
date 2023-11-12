@@ -6,12 +6,10 @@ from tgen.common.util.file_util import FileUtil
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
-from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
-from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 
 
 class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):

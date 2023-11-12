@@ -7,9 +7,9 @@ from tgen.clustering.base.cluster_condenser import ClusterCondenser
 from tgen.clustering.base.cluster_type import MethodClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.common.constants.clustering_constants import MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING, MAX_CLUSTER_SIZE, MIN_CLUSTER_SIZE, \
-    MIN_PAIRWISE_AVG_PERCENTILE
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.common.constants.clustering_constants import MAX_CLUSTER_SIZE, MIN_CLUSTER_SIZE, MIN_PAIRWISE_AVG_PERCENTILE, \
+    MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):

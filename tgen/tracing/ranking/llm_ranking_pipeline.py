@@ -1,6 +1,6 @@
-from typing import Type, Dict
+from typing import Dict, Type
 
-from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

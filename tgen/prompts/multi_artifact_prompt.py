@@ -3,10 +3,12 @@ from enum import Enum, auto
 from typing import Dict, List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.common.constants.hgen_constants import MAX_ARTIFACTS_FOR_NO_SUMMARIES
+from tgen.common.constants.hgen_constants import MAX_TOKENS_FOR_NO_SUMMARIES
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
+from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
 
@@ -64,7 +66,8 @@ class MultiArtifactPrompt(Prompt):
         prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         if self.build_method in self.build_methods:
             artifact_params = deepcopy(self.artifact_params)
-            if len(artifacts) > MAX_ARTIFACTS_FOR_NO_SUMMARIES:
+            artifact_tokens = [TokenCalculator.estimate_num_tokens(artifact[ArtifactKeys.CONTENT]) for artifact in artifacts]
+            if sum(artifact_tokens) > MAX_TOKENS_FOR_NO_SUMMARIES:
                 artifact_params = DictUtil.update_kwarg_values(artifact_params, use_summary=True)
             artifacts = self.build_methods[self.build_method](artifacts,
                                                               starting_num=self.starting_num,

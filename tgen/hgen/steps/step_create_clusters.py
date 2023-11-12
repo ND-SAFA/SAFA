@@ -1,5 +1,3 @@
-import os
-
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
@@ -8,7 +6,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):

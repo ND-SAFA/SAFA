@@ -4,7 +4,7 @@ from tgen.common.constants.ranking_constants import PRE_SORTED_SCORE
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

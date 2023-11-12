@@ -4,12 +4,11 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, AbstractPipeline
-from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
+from tgen.pipeline.abstract_pipeline import AbstractPipeline, AbstractPipelineStep
+from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.state.state import State
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.paths import TEST_HGEN_PATH, TEST_STATE_PATH, TEST_OUTPUT_DIR
+from tgen.testres.paths.paths import TEST_HGEN_PATH, TEST_OUTPUT_DIR, TEST_STATE_PATH
 
 
 class TestPipeline(BaseTest):
@@ -42,7 +41,8 @@ class TestPipeline(BaseTest):
         input_mock.side_effect = ["1", "2", "4", "3"]
         test_summary = "this worked"
         load_new_state_mock.return_value = HGenState(project_summary=test_summary, completed_steps={step.get_step_name(): 1
-                                                                                                    for step in HierarchyGenerator.steps})
+                                                                                                    for step in
+                                                                                                    HierarchyGenerator.steps})
 
         pipeline = self.get_pipeline()
         pipeline._run_interactive_mode(pipeline.steps[self.curr_step_index])
@@ -57,7 +57,7 @@ class TestPipeline(BaseTest):
         pipeline._run_interactive_mode(pipeline.steps[self.curr_step_index])
         self.assertEqual(pipeline.state.project_summary, test_summary)
         self.assertTrue(pipeline.state.step_is_complete(pipeline.steps[self.curr_step_index].get_step_name()))
-        self.assertFalse(pipeline.state.step_is_complete(pipeline.steps[len(HierarchyGenerator.steps)-1].get_step_name()))
+        self.assertFalse(pipeline.state.step_is_complete(pipeline.steps[len(HierarchyGenerator.steps) - 1].get_step_name()))
 
     @mock.patch("builtins.input")
     @mock.patch.object(State, "load_state_from_path")

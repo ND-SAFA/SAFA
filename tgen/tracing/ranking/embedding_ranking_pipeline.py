@@ -1,7 +1,7 @@
 from typing import Dict
 
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

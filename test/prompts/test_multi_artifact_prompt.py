@@ -73,7 +73,7 @@ class TestMultiArtifactPrompt(BaseTest):
         num_with_id = MultiArtifactPrompt(self.PROMPT, build_method=MultiArtifactPrompt.BuildMethod.NUMBERED, include_ids=True,
                                           use_summary=False)
         prompt = num_with_id._build([self.ARTIFACTS[i % 2] for i in range(MAX_TOKENS_FOR_NO_SUMMARIES + 1)])
-        # should use summary if more than 10 artifacts
+        # should use summary if more than 65K tokens are used os using 65K artifacts.
         self.assertIn(artifact1[ArtifactKeys.SUMMARY], prompt)
         self.assertIn(artifact2[ArtifactKeys.SUMMARY], prompt)
         self.assertNotIn(artifact1[ArtifactKeys.CONTENT], prompt)

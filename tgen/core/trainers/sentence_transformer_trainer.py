@@ -124,6 +124,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         if SupportedLossFunctions.MNRL.is_name(self.trainer_args.st_loss_function):
             self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager, use_pos_ids=True)
             logger.info("Using only positive links in training dataset.")
+        if SupportedLossFunctions.CONTRASTIVE.is_name():
+            pass
         train_examples = self.to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_dataloader = DataLoader(train_examples, shuffle=self.trainer_args.shuffle, batch_size=self.args.train_batch_size)
 

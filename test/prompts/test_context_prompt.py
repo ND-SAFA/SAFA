@@ -13,7 +13,7 @@ from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
 
-class TestMultiArtifactPrompt(BaseTest):
+class TestContextPrompt(BaseTest):
     ARTIFACTS = [EnumDict({ArtifactKeys.ID: "id1", ArtifactKeys.CONTENT: "content1"}),
                  EnumDict({ArtifactKeys.ID: "id2", ArtifactKeys.CONTENT: "content2"})]
     PROMPT = "This is a prompt"

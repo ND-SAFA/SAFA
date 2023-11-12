@@ -3,12 +3,12 @@ from abc import ABC, abstractmethod
 from typing import Dict, Generic, List, Optional, Type, TypeVar
 
 import pandas as pd
-from tgen.state.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
+from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
+from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
@@ -84,6 +84,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if skip_summarization:
             self.summarizer_args = None
         self.state: StateType = self.init_state()
+        self.artifact_summaries_costs = 0
+        self.project_summary_costs = 0
         if self.args.export_dir:
             os.makedirs(self.args.export_dir, exist_ok=True)
             self.state.export_dir = self.args.export_dir
@@ -117,8 +119,9 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.args.update_llm_managers_with_state(self.state)
         if self.summarizer_args:
             self.summarizer_args: SummarizerArgs
-            self.summarizer_args.update_llm_managers_with_state(self.state)
             self.run_summarizations()
+            self.project_summary_costs = self.summarizer_args.llm_manager_for_project_summary.state.get_total_costs()
+            self.artifact_summaries_costs = self.summarizer_args.llm_manager_for_artifact_summaries.state.get_total_costs()
 
     def run_summarizations(self) -> Summary:
         """

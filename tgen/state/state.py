@@ -5,9 +5,9 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
@@ -171,6 +171,13 @@ class State(BaseObject):
         """
         self.total_input_cost += other_state.total_input_cost
         self.total_output_cost += other_state.total_output_cost
+
+    def get_total_costs(self) -> int:
+        """
+        Gets the combined cost of input and output tokens
+        :return: The combined cost of input and output tokens
+        """
+        return self.total_output_cost + self.total_input_cost
 
     @staticmethod
     def _is_a_path_variable(varname: str) -> bool:

@@ -3,6 +3,7 @@ from typing import Dict, List
 
 import pandas as pd
 
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
@@ -55,6 +56,7 @@ class SafaExporter(AbstractDatasetExporter):
         self.artifact_type_to_artifacts = self.create_artifact_definitions()
         self.create_trace_definitions()
         self.create_tim()
+        logger.info(f"Exported SAFA dataset to {self.export_path}")
 
     def create_artifact_definitions(self) -> Dict[str, ArtifactDataFrame]:
         """

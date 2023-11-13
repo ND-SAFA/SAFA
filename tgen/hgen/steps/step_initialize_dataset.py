@@ -34,7 +34,8 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param layer_id: ID of the layer to construct a dataset for
         :return: The trace dataset
         """
+        artifact_types = original_artifact_df.get_artifact_types()
+        if layer_id not in artifact_types:
+            raise NameError(f"source_layer_id ({layer_id}) does not match any of {artifact_types}.")
         layer_artifact_df = original_artifact_df.get_type(layer_id)
-        if len(layer_artifact_df) == 0:
-            raise NameError(f"source_layer_id: {layer_id} does not match any artifacts in the dataset")
         return PromptDataset(artifact_df=layer_artifact_df)

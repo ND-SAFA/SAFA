@@ -1,5 +1,7 @@
 import os
 
+from tgen.scripts.util import bool_constructor
+
 """
 RQ DEFINITION
 """
@@ -27,7 +29,14 @@ DEFAULT_VALUE_MESSAGE = "Default value used."
 MISSING_PARAM_ERROR = "`{}` is missing a description.."
 PARAM_DOCSTRING_QUERY = ":param {}:"
 TOOL_MISSING_DOCSTRING_ERROR = "Tool {} does not have a doc-string."
-SUPPORTED_TYPES_RQ = [int, float, str, bool, list]
+
+SUPPORTED_TYPES_RQ = {
+    int: int,
+    float: float,
+    str: str,
+    bool: bool_constructor,
+    list: list
+}
 RQ_VARIABLE_START = "["
 RQ_VARIABLE_REGEX = r'\[([^\[\]]+)\]'
 RQ_NAV_MESSAGE = "Select RQ to run"

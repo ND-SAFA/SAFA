@@ -3,11 +3,23 @@ import uuid
 from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
+import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 from tgen.common.constants.environment_constants import IS_TEST
+from tgen.common.logging.logger_manager import logger
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.supported_enum import SupportedEnum
+from tgen.data.keys.structure_keys import ArtifactKeys
+
+
+class EmbeddingsManagerObjects(SupportedEnum):
+    EMBEDDINGS = "embeddings"
+    CONTENT_MAP = "content_map"
+    ORDERED_IDS = "ordered_ids"
+
 
 EmbeddingType = np.array
 
@@ -26,7 +38,7 @@ class EmbeddingsManager:
         self._content_map = content_map
         self._embedding_map = {}
         self.__ordered_ids = []
-        self.__saved_embeddings_path = None
+        self._base_path = None
         self.__model = model
         self.__state_changed_since_last_save = False
 
@@ -188,7 +200,11 @@ class EmbeddingsManager:
         embedding_map_var = ReflectionUtil.extract_name_of_variable(f"{self._embedding_map=}", is_self_property=True)
         model_var = ReflectionUtil.extract_name_of_variable(f"{self.__model=}", is_self_property=True,
                                                             class_attr=EmbeddingsManager)
-        replacements = {embedding_map_var: {}, model_var: None}
+        content_map_var = ReflectionUtil.extract_name_of_variable(f"{self._content_map=}", is_self_property=True,
+                                                                  class_attr=EmbeddingsManager)
+        ordered_ids_var = ReflectionUtil.extract_name_of_variable(f"{self.__ordered_ids=}", is_self_property=True,
+                                                                  class_attr=EmbeddingsManager)
+        replacements = {embedding_map_var: {}, model_var: None, content_map_var: {}, ordered_ids_var: []}
         yaml_embeddings_manager.__dict__ = {k: (replacements[k] if k in replacements else v) for k, v in
                                             self.__dict__.items()}
         return yaml_embeddings_manager
@@ -198,10 +214,13 @@ class EmbeddingsManager:
         Loads any saved embeddings into the object after being reloaded from yaml
         :return: None
         """
-        if self.__saved_embeddings_path and self.__ordered_ids:
-            file_path = FileUtil.expand_paths(self.__saved_embeddings_path)
-            self._embedding_map = self.load_embeddings_from_file(file_path=file_path,
+        if self._base_path and self.__ordered_ids:
+            object_paths = self.get_object_paths()
+            ordered_ids = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.ORDERED_IDS])
+            self.__set_embedding_order(ordered_ids)
+            self._embedding_map = self.load_embeddings_from_file(file_path=object_paths[EmbeddingsManagerObjects.EMBEDDINGS],
                                                                  ordered_ids=self.__ordered_ids)
+            self._content_map = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.CONTENT_MAP])
 
     @staticmethod
     def load_embeddings_from_file(file_path: str, ordered_ids: List[Any]) -> Dict[Any, EmbeddingType]:
@@ -216,26 +235,78 @@ class EmbeddingsManager:
             embeddings), "The ordered ids must correspond to the embeddings but they are different lengths."
         return {a_id: embedding for a_id, embedding in zip(ordered_ids, embeddings)}
 
+    @staticmethod
+    def load_content_map_from_file(file_path: str) -> Dict[Any, str]:
+        """
+        Loads content map data frame into a dictionary.
+        :param file_path: The path to find CSV at.
+        :return: Map of artifact ID to its content.
+        """
+        content_df = pd.read_csv(file_path)
+        content_map = {content_row[ArtifactKeys.ID.value]: content_row[ArtifactKeys.CONTENT.value]
+                       for _, content_row in content_df.iterrows()}
+        return content_map
+
     def save_embeddings_to_file(self, dir_path: str) -> None:
         """
         Stores the current embeddings to a file
         :param dir_path: The path to directory to save to
         :return: None
         """
-        file_path = self.get_save_path(dir_path)
-        FileUtil.save_numpy(list(self._embedding_map.values()), file_path)
+
+        base_path = os.path.join(dir_path, str(uuid.uuid4()))
+        FileUtil.create_dir_safely(base_path)
+        self._base_path = FileUtil.collapse_paths(base_path)
+        object_paths = self.get_object_paths()
+        logger.info(f"Saving embedding manager state to: {base_path}")
+
+        ordered_ids_path = object_paths[EmbeddingsManagerObjects.ORDERED_IDS]
+        content_map_path = object_paths[EmbeddingsManagerObjects.CONTENT_MAP]
+        embedding_map_path = object_paths[EmbeddingsManagerObjects.EMBEDDINGS]
+
         self.__set_embedding_order()
-        self.__saved_embeddings_path = FileUtil.collapse_paths(file_path)
+        self.save_content_to_csv(ordered_ids_path, self.__ordered_ids)
+        self.save_content_to_csv(content_map_path, self._content_map)
+        FileUtil.save_numpy(list(self._embedding_map.values()), embedding_map_path)
+
         self.__state_changed_since_last_save = False
 
+    def get_object_paths(self) -> Dict[EmbeddingsManagerObjects, str]:
+        """
+        :return: Returns map of embedding object to its path.
+        """
+        base_path = FileUtil.expand_paths(self._base_path)
+        return {object_type: self.get_save_path(base_path, object_type) for object_type in EmbeddingsManagerObjects}
+
     @staticmethod
-    def get_save_path(dir_path: str) -> str:
+    def save_content_to_csv(output_path: str, content: Union[Dict, List]) -> None:
+        """
+        Saves content map as CSV file at given path.
+        :param output_path: The path to store the CSV file to.
+        :param content: The map being stored.
+        :return: None
+        """
+        df_kwargs = {}
+        if isinstance(content, dict):
+            entries = [EnumDict({ArtifactKeys.ID: content_id, ArtifactKeys.CONTENT: content}) for content_id, content in
+                       content.items()]
+        else:
+            entries = content
+            df_kwargs["columns"] = [ArtifactKeys.ID.value]
+        pd.DataFrame(entries, **df_kwargs).to_csv(output_path, index=False)
+
+    @staticmethod
+    def get_save_path(base_path: str, object_type: EmbeddingsManagerObjects) -> str:
         """
         Creates a unique path to save the embeddings to
-        :param dir_path: Path to the directory to save to
+        :param base_path: Path to the directory to save to
+        :param object_type: The type of content to be saved. One of embeddings or content_map.
         :return: The path containing the filename to save to
         """
-        return FileUtil.add_ext(os.path.join(dir_path, f"embeddings_{uuid.uuid4()}"), FileUtil.NUMPY_EXT)
+        ext = FileUtil.NUMPY_EXT if object_type == EmbeddingsManagerObjects.EMBEDDINGS else FileUtil.CSV_EXT
+        object_name = object_type.name.lower()
+        save_path = FileUtil.add_ext(os.path.join(base_path, f"{object_name}"), ext)
+        return save_path
 
     def embeddings_need_saved(self, export_path: str) -> bool:
         """
@@ -243,14 +314,14 @@ class EmbeddingsManager:
         :param export_path: The path to save the embeddings to
         :return: True if the embeddings need re-saved
         """
-        return not self.__saved_embeddings_path or self.__state_changed_since_last_save \
-            or FileUtil.collapse_paths(export_path) != FileUtil.get_directory_path(self.__saved_embeddings_path)
+        need_save = not self._base_path or self.__state_changed_since_last_save \
+                    or FileUtil.collapse_paths(export_path) != os.path.dirname(self._base_path)
+        return need_save
 
     def calculate_centroid(self, cluster: List[str]):
         """
         Calculates the embedding pointing at the center of the cluster.
         :param cluster: The artifacts whose embeddings are used to calculate the centroid.
-        :param embedding_manager: Contains the artifacts embeddings.
         :return: Embedding pointing at center of cluster.
         """
         if len(cluster) == 0:
@@ -285,9 +356,11 @@ class EmbeddingsManager:
         embeddings = self.get_model().encode(artifact_contents, show_progress_bar=True)
         return embeddings if return_as_list else embeddings[0]
 
-    def __set_embedding_order(self) -> None:
+    def __set_embedding_order(self, ordered_ids: List[Any] = None) -> None:
         """
         Stores the current order of the embeddings as a list of ids in the same order as their saved embeddings
+        :param ordered_ids: If provided, saves the order to match, other it is based on this order
         :return: None
         """
-        self.__ordered_ids = list(self._embedding_map.keys())
+        ordered_ids = list(self._embedding_map.keys()) if not ordered_ids else ordered_ids
+        self.__ordered_ids = ordered_ids

@@ -7,7 +7,7 @@ from tgen.common.constants.clustering_constants import DEFAULT_ADD_CLUSTERS_TO_D
     DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
     DEFAULT_MIN_ORPHAN_SIMILARITY, DEFAULT_REDUCTION_FACTOR
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_EMBEDDING_MODEL
-from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass

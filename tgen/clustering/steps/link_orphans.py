@@ -7,7 +7,7 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):

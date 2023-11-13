@@ -12,7 +12,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -27,7 +27,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         original_artifact_df, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
 
-        final_artifact_df = state.all_artifacts_dataset.artifact_df
+        final_artifact_df = state.selected_artifacts_dataset.artifact_df
         new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, args.target_type)
         new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(state, final_artifact_df, new_layer_df)
 

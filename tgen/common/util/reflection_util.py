@@ -260,12 +260,14 @@ class ReflectionUtil:
             return
 
     @staticmethod
-    def extract_name_of_variable(var_as_string: str, is_self_property: bool = False, class_attr: Any = None) -> str:
+    def extract_name_of_variable(var_as_string: str, is_self_property: bool = False, class_attr: Any = None,
+                                 nested_var: str = None) -> str:
         """
         After calling f"{var=}" on object, this method will extract the actual variable name
         :param var_as_string: Call f"{var=}" on object and pass it in
         :param is_self_property: If True,the variable is a property of self
         :param class_attr: If given, variable is an attribute of the class
+        :param nested_var: If given, variable is nested inside another variable in the main class
         :return: The name of the variable as a string
         """
         var_name = var_as_string.split('=')[0]
@@ -273,6 +275,8 @@ class ReflectionUtil:
             var_name = var_name.split("self.")[-1]
         elif class_attr:
             var_name = var_name.split(f"{class_attr.__name__}.")[-1]
+        if nested_var:
+            var_name = var_name.split(f"{nested_var}.")[-1]
         if var_name.startswith("__") and class_attr:
             var_name = f"_{class_attr.__name__}{var_name}"
         return var_name

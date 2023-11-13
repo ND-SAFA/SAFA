@@ -240,6 +240,10 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         if self.index.duplicated(keep='first').any():
             return self.remove_duplicate_indices().to_dict(orient, into, index)
+        if orient == "with_id_col":
+            dict_ = super().to_dict("series", into, index)
+            dict_[self.index_name() if self.index_name() else "index"] = self.index
+            return dict_
         return super().to_dict(orient, into, index)
 
     def update_value(self, column2update: Union[str, Enum], id2update: Union[str, int], new_value: Any) -> None:

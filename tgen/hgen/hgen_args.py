@@ -12,7 +12,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 class PredictionStep(Enum):
@@ -52,7 +52,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The LLM manager to use to generate the inputs during step 2
     """
-    inputs_llm_manager: AbstractLLMManager =  field(default_factory=lambda: OpenAIManager(OpenAIArgs(model=OPEN_AI_MODEL_DEFAULT)))
+    inputs_llm_manager: AbstractLLMManager = field(default_factory=lambda: OpenAIManager(OpenAIArgs(model=OPEN_AI_MODEL_DEFAULT)))
     """
     Max tokens to use for predictions.
     """
@@ -97,6 +97,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     Threshold for which generated artifacts are deemed duplicates.
     """
     duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
+    """
+    If True, creates a project summary, else False
+    """
+    create_project_summary: bool = True
 
     def __post_init__(self) -> None:
         """

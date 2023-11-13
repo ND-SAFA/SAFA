@@ -1,10 +1,12 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Generic, List, Optional, Type, TypeVar
+from typing import Dict, Generic, List, Optional, Type, TypeVar
+
+import pandas as pd
 
 from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
-from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
@@ -67,11 +69,11 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                  skip_summarization: bool = False, **summarizer_args_kwargs):
         """
         Constructs pipeline of steps.
-        :param args: The arguments to the pipeline
+        :param args: The arguments to the pipeline.
         :param steps: Steps to perform in sequential order.
         :param summarizer_args: The args used to create project summary
         :param summarizer_args_kwargs: Keyword arguments to summarizer to customize default settings.
-        :param skip_summarization: If True, does not perform project or artifact summarization
+        :param skip_summarization: Whether to skip summarization of artifacts.
         """
         self.args = args
         self.steps = [s() for s in steps]
@@ -82,6 +84,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if skip_summarization:
             self.summarizer_args = None
         self.state: StateType = self.init_state()
+        self.artifact_summaries_costs = 0
+        self.project_summary_costs = 0
         if self.args.export_dir:
             os.makedirs(self.args.export_dir, exist_ok=True)
             self.state.export_dir = self.args.export_dir
@@ -105,7 +109,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.run_setup_for_pipeline()
         for step in self.steps:
             self.run_step(step)
-        self._log_costs()
+        self._log_costs(save=True)
 
     def run_setup_for_pipeline(self) -> None:
         """
@@ -115,8 +119,9 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.args.update_llm_managers_with_state(self.state)
         if self.summarizer_args:
             self.summarizer_args: SummarizerArgs
-            self.summarizer_args.update_llm_managers_with_state(self.state)
             self.run_summarizations()
+            self.project_summary_costs = self.summarizer_args.llm_manager_for_project_summary.state.get_total_costs()
+            self.artifact_summaries_costs = self.summarizer_args.llm_manager_for_artifact_summaries.state.get_total_costs()
 
     def run_summarizations(self) -> Summary:
         """
@@ -202,7 +207,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
     def _load_new_state_from_user(state: State) -> Optional[State]:
         """
         Allows a user to select a path from which a new state will be loaded
-        :param state: The current state in the pipeline
+        :param state: The state of the pipeline to load.
         :return: The path selected by the user
         """
         load_path = input("Enter the path to the new state or press 'b' to go back to the menu: \n").strip()
@@ -239,17 +244,28 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             selected_options = AbstractPipeline._display_interactive_menu(menu_options)
         return selected_options
 
-    def _log_costs(self) -> None:
+    def _log_costs(self, save: bool = False) -> None:
         """
         Logs the costs accumulated during the run
+        :param save: If True, saves the data to a csv
         :return: None
         """
         total_cost = self.state.total_input_cost + self.state.total_output_cost
         if total_cost > 0:
-            costs = {"Input": self.state.total_input_cost,
-                     "Output": self.state.total_output_cost,
-                     "Total": total_cost}
+            total_costs = {"Total Input Cost": self.state.total_input_cost,
+                           "Total Output Cost": self.state.total_output_cost,
+                           "Total Cost": total_cost}
             cost_msg = "{} Token Cost: ${}"
-            cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in costs.items()]
+            cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in total_costs.items()]
             logger.log_with_title("COSTS FOR RUN: ", NEW_LINE.join(cost_msgs))
+            if save and self.args.export_dir:
+                total_costs.update(self.get_input_output_counts())
+                df = pd.DataFrame({k: [v] for k, v in total_costs.items()})
+                df.to_csv(os.path.join(self.args.export_dir, "costs4run.csv"))
 
+    @abstractmethod
+    def get_input_output_counts(self) -> Dict[str, int]:
+        """
+        Gets the number of inputs and outputs to the pipeline
+        :return: The number of inputs and outputs to the pipeline
+        """

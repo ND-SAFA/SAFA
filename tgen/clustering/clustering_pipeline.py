@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Dict, Type
 
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
@@ -8,7 +8,7 @@ from tgen.clustering.steps.create_clusters_from_embeddings import CreateClusters
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
 from tgen.clustering.steps.link_orphans import LinkOrphans
 from tgen.common.util.base_object import BaseObject
-from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 
 
 class ClusteringPipeline(AbstractPipeline[ClusteringArgs, ClusteringState], BaseObject):
@@ -28,3 +28,10 @@ class ClusteringPipeline(AbstractPipeline[ClusteringArgs, ClusteringState], Base
         :return: Returns the state of the clustering pipeline.
         """
         return ClusteringState
+
+    def get_input_output_counts(self) -> Dict[str, int]:
+        """
+        Returns an empty dict because there are no inputs or outputs to the LLM
+        :return: An empty dict because there are no inputs or outputs to the LLM
+        """
+        return {}

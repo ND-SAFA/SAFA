@@ -42,7 +42,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     private static MockMvc mockMvc;
     @Getter
     private static Cookie authorizationToken = null;
-    private MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+    private final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
 
     public SafaRequest(String path) {
         super(path);
@@ -252,18 +252,28 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             request = request.cookie(authorizationToken);
         }
 
-        MvcResult result = mockMvc
+        request.params(queryParams);
+
+        MvcResult requestResult = mockMvc
             .perform(request)
+            .andDo(result -> {
+                if (!result.getRequest().isAsyncStarted()) {
+                    resultMatcher.match(result);
+                }
+            })
             .andReturn();
 
-        String response = mockMvc
-            .perform(asyncDispatch(result))
-            .andExpect(resultMatcher)
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+        if (requestResult.getRequest().isAsyncStarted()) {
+            if (requestResult.getRequest().getAsyncContext() != null) {
+                requestResult.getRequest().getAsyncContext().setTimeout(30000L);
+            }
+            mockMvc.perform(asyncDispatch(requestResult))
+                .andExpect(resultMatcher);
+        }
 
-        return ResponseParser.jsonCreator(response);
+        MockHttpServletResponse response = requestResult.getResponse();
+        String content = response.getContentAsString();
+        return ResponseParser.jsonCreator(content);
     }
 
     private String stringify(Object body) {

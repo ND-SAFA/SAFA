@@ -10,30 +10,32 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
 /**
- * Represents list of tokens used to reset user password
+ * Represent a token for user email verification
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "password_reset_token")
-public class PasswordResetToken {
+@Table(name = "email_verification_token")
+public class EmailVerificationToken {
 
     /**
      * Uniquely identifies the user token.
      */
+    @JdbcTypeCode(SqlTypes.BINARY)
     @Id
     @GeneratedValue
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "id", columnDefinition = "VARCHAR(36)")
+    @Column
     private UUID id;
 
     /**
@@ -57,9 +59,9 @@ public class PasswordResetToken {
     @NonNull
     private Date expirationDate;
 
-    public PasswordResetToken(@NonNull SafaUser user,
-                              @NonNull String token,
-                              @NonNull Date expirationDate) {
+    public EmailVerificationToken(@NonNull SafaUser user,
+                                  @NonNull String token,
+                                  @NonNull Date expirationDate) {
         this.user = user;
         this.token = token;
         this.expirationDate = expirationDate;

@@ -51,10 +51,14 @@ public class SafaUser implements Serializable, IUser {
     @Column
     private boolean superuser;
 
+    @Column
+    private boolean verified;
+
     public SafaUser(String email, String password) {
         this.email = email;
         this.password = password;
         this.superuser = false;
+        this.verified = false;
     }
 
     @Override

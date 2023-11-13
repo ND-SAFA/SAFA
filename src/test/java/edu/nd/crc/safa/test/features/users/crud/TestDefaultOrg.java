@@ -8,7 +8,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
@@ -24,9 +23,6 @@ class TestDefaultOrg extends ApplicationBaseTest {
     @Autowired
     private SafaUserService safaUserService;
 
-    @Autowired
-    private SafaUserRepository userRepository;
-
     @Test
     void testDefaultOrgDefaultValue() throws Exception {
         OrganizationAppEntity personalOrg =
@@ -39,10 +35,9 @@ class TestDefaultOrg extends ApplicationBaseTest {
 
     @Test
     void testUpdateDefaultOrg() throws Exception {
-        //TODO update this when we can give admin permissions in a better way
-        SafaUser currentUser = getCurrentUser();
-        currentUser.setSuperuser(true);
-        setCurrentUser(userRepository.save(currentUser));
+        rootBuilder.getCommonRequestService().user()
+            .makeUserSuperuser(getCurrentUser())
+            .activateSuperuser();
 
         OrganizationAppEntity newOrg =
             SafaRequest.withRoute(AppRoutes.Organizations.ROOT)

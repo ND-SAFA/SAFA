@@ -1,19 +1,23 @@
 package edu.nd.crc.safa.features.permissions.entities;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public enum ProjectPermission implements Permission {
-    DELETE("project.delete"),
-    EDIT("project.edit"),
-    EDIT_DATA("project.edit_data"),
-    EDIT_INTEGRATIONS("project.edit_integrations"),
-    EDIT_MEMBERS("project.edit_members"),
-    EDIT_VERSIONS("project.edit_versions"),
-    GENERATE("project.generate"),
-    VIEW("project.view");
+    DELETE("project.delete", List.of()),
+    EDIT("project.edit", List.of()),
+    EDIT_DATA("project.edit_data", List.of()),
+    EDIT_INTEGRATIONS("project.edit_integrations", List.of()),
+    EDIT_MEMBERS("project.edit_members", List.of()),
+    EDIT_VERSIONS("project.edit_versions", List.of()),
+    GENERATE("project.generate", List.of()),
+    VIEW("project.view", List.of());
 
-    @Getter
     private final String name;
+
+    private final List<AdditionalPermissionCheck> additionalChecks;
 }

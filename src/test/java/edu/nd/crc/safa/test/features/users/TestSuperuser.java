@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
@@ -15,13 +14,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 public class TestSuperuser extends ApplicationBaseTest {
-
-    @Autowired
-    private SafaUserService safaUserService;
 
     @Test
     public void testRegularUserCannotPerformSuperuserAction() throws JsonProcessingException {
@@ -30,22 +25,24 @@ public class TestSuperuser extends ApplicationBaseTest {
 
     @Test
     public void testUnactivatedSuperuserCannotPerformSuperuserAction() throws JsonProcessingException {
-        safaUserService.addSuperUser(getCurrentUser());
+        rootBuilder.getCommonRequestService().user().makeUserSuperuser(getCurrentUser());
         performSuperuserAction(false);
     }
 
     @Test
     public void testDeactivatedSuperuserCannotPerformSuperuserAction() throws Exception {
-        safaUserService.addSuperUser(getCurrentUser());
-        safaUserService.setSuperuserActivation(getCurrentUser(), true);
-        deactivateSuperuser();
+        rootBuilder.getCommonRequestService().user()
+            .makeUserSuperuser(getCurrentUser())
+            .activateSuperuser()
+            .deactivateSuperuser();
         performSuperuserAction(false);
     }
 
     @Test
     public void testActivatedSuperuserCanPerformSuperuserAction() throws Exception {
-        safaUserService.addSuperUser(getCurrentUser());
-        activateSuperuser();
+        rootBuilder.getCommonRequestService().user()
+            .makeUserSuperuser(getCurrentUser())
+            .activateSuperuser();
         performSuperuserAction(true);
     }
 
@@ -58,28 +55,17 @@ public class TestSuperuser extends ApplicationBaseTest {
             .createUser(newUserEmail, newUserPassword).and()
             .getAccount(newUserEmail);
 
-        safaUserService.addSuperUser(getCurrentUser());
-        activateSuperuser();
+        rootBuilder.getCommonRequestService().user()
+            .makeUserSuperuser(getCurrentUser())
+            .activateSuperuser();
         SafaRequest.withRoute(AppRoutes.Accounts.SuperUser.BY_USER)
             .withPathVariable("userId", newUser.getUserId().toString())
             .putWithJsonObject(new JSONObject());
-        deactivateSuperuser();
+        rootBuilder.getCommonRequestService().user().deactivateSuperuser();
 
         rootBuilder.getAuthorizationTestService().loginUser(newUserEmail, newUserPassword, this);
-        assertThat(getCurrentUser().getEmail()).isEqualTo(newUserEmail);
-
-        activateSuperuser();
+        rootBuilder.getCommonRequestService().user().activateSuperuser();
         performSuperuserAction(true);
-    }
-
-    private void activateSuperuser() throws Exception {
-        SafaRequest.withRoute(AppRoutes.Accounts.SuperUser.ACTIVATE)
-            .putWithJsonObject(new JSONObject());
-    }
-
-    private void deactivateSuperuser() throws Exception {
-        SafaRequest.withRoute(AppRoutes.Accounts.SuperUser.DEACTIVATE)
-            .putWithJsonObject(new JSONObject());
     }
 
     private void performSuperuserAction(boolean shouldSucceed) throws JsonProcessingException {

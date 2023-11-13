@@ -113,6 +113,11 @@ public class JiraController extends BaseController {
                                                            @PathVariable UUID orgId,
                                                            @PathVariable("id") Long jiraProjectId) throws Exception {
         SafaUser principal = safaUserService.getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, principal)
+            .withPermission(ProjectPermission.EDIT_INTEGRATIONS, principal)
+            .get();
 
         Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
@@ -126,8 +131,6 @@ public class JiraController extends BaseController {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, principal).get();
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, orgId);
         UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
             getServiceProvider(),
@@ -146,6 +149,11 @@ public class JiraController extends BaseController {
         @PathVariable("id") Long jiraProjectId) throws Exception {
 
         SafaUser principal = safaUserService.getCurrentUser();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, principal)
+            .withPermission(ProjectPermission.EDIT_INTEGRATIONS, principal)
+            .get();
 
         Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
@@ -159,8 +167,6 @@ public class JiraController extends BaseController {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, principal).get();
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, orgId);
         ImportIntoProjectViaJiraBuilder updateProjectViaJira = new ImportIntoProjectViaJiraBuilder(
             getServiceProvider(),

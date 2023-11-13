@@ -5,6 +5,7 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertNull;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -17,6 +18,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -98,9 +100,14 @@ public class ProjectController extends BaseController {
     public ProjectAppEntity updateProject(@RequestBody @Valid ProjectAppEntity projectAppEntity) throws SafaError {
         assertNotNull(projectAppEntity.getProjectId(), "Missing project ID");
 
+        SafaUser user = getCurrentUser();
+
         // Step - Finding project identifier
         UUID projectId = projectAppEntity.getProjectId();
-        Project project = getServiceProvider().getProjectRepository().findByProjectId(projectId);
+        Project project = getResourceBuilder()
+            .fetchProject(projectId)
+            .withPermission(ProjectPermission.EDIT, user)
+            .get();
 
         // Step - Update meta information
         project.updateFromAppEntity(projectAppEntity);
@@ -120,16 +127,16 @@ public class ProjectController extends BaseController {
      */
     private Project createProjectFromAppEntity(ProjectAppEntity projectAppEntity) {
         ProjectService projectService = getServiceProvider().getProjectService();
+        SafaUser user = getCurrentUser();
 
         if (projectAppEntity.getTeamId() != null) {
             Team team = teamService.getTeamById(projectAppEntity.getTeamId());
-            return projectService.createProject(projectAppEntity, team);
+            return projectService.createProjectAsUser(projectAppEntity, team, user);
         } else if (projectAppEntity.getOrgId() != null) {
             Organization organization = organizationService.getOrganizationById(projectAppEntity.getOrgId());
-            return projectService.createProject(projectAppEntity, organization);
+            return projectService.createProjectAsUser(projectAppEntity, organization, user);
         } else {
-            SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-            return projectService.createProject(projectAppEntity, user);
+            return projectService.createProjectAsUser(projectAppEntity, user, user);
         }
     }
 
@@ -154,8 +161,10 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable UUID projectId) throws SafaError, IOException {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        Project project = getResourceBuilder().fetchProject(projectId)
-            .withPermission(ProjectPermission.DELETE, user).get();
+        Project project = getResourceBuilder()
+            .fetchProject(projectId)
+            .withAnyPermission(Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS), user)
+            .get();
         getServiceProvider().getProjectService().deleteProject(user, project);
     }
 }

@@ -26,7 +26,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Organization {
+public class Organization implements IEntityWithMembership {
     @JdbcTypeCode(SqlTypes.BINARY)
     @Id
     @GeneratedValue

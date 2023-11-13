@@ -1,18 +1,29 @@
 package edu.nd.crc.safa.authentication.builders;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
+import lombok.AccessLevel;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,17 +32,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ResourceBuilder {
-    private final ProjectRepository projectRepository;
-    private final ProjectVersionRepository projectVersionRepository;
-    private final PermissionService permissionService;
-
-    @Autowired
-    public ResourceBuilder(ProjectRepository projectRepository,
-                           ProjectVersionRepository projectVersionRepository,
-                           PermissionService permissionService) {
-        this.projectRepository = projectRepository;
-        this.projectVersionRepository = projectVersionRepository;
-        this.permissionService = permissionService;
+    private final ServiceProvider serviceProvider;
+    
+    public ResourceBuilder() {
+        serviceProvider = ServiceProvider.getInstance();
     }
 
     /**
@@ -42,11 +46,12 @@ public class ResourceBuilder {
      * @throws SafaError If no project with that ID is found
      */
     public ObjectHolder<Project> fetchProject(UUID projectId) throws SafaError {
-        Project project = this.projectRepository.findByProjectId(projectId);
+        Project project = serviceProvider.getProjectRepository().findByProjectId(projectId);
         if (project == null) {
-            throw new SafaError("Unable to find project with ID: %s.", projectId);
+            throw new SafaItemNotFoundError("Unable to find project with ID: %s.", projectId);
         }
-        return new ProjectHolder(project);
+
+        return membershipEntityHolder(project);
     }
 
     /**
@@ -57,21 +62,111 @@ public class ResourceBuilder {
      * @throws SafaError If no version with that ID is found
      */
     public ObjectHolder<ProjectVersion> fetchVersion(UUID versionId) throws SafaError {
-        ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
+        ProjectVersion projectVersion = serviceProvider.getProjectVersionRepository().findByVersionId(versionId);
         if (projectVersion == null) {
-            throw new SafaError("Unable to find project version with id: %s.", versionId);
+            throw new SafaItemNotFoundError("Unable to find project version with id: %s.", versionId);
         }
-        return new ProjectVersionHolder(projectVersion);
+
+        return entityWithProjectHolder(projectVersion, ProjectVersion::getProject);
     }
 
     /**
-     * Specify a project so that we can check permissions on it
+     * Fetch a team by ID.
      *
-     * @param project The project
-     * @return A holder for the project
+     * @param teamId The ID of the team
+     * @return The team in a holder that allows for easy permission checking
      */
-    public ObjectHolder<Project> setProject(Project project) {
-        return new ProjectHolder(project);
+    public ObjectHolder<Team> fetchTeam(UUID teamId) {
+        Team team = serviceProvider.getTeamService().getTeamById(teamId);
+        return membershipEntityHolder(team);
+    }
+
+    /**
+     * Fetch an organization by ID.
+     *
+     * @param organizationId The ID of the organization
+     * @return The organization in a holder that allows for easy permission checking
+     */
+    public ObjectHolder<Organization> fetchOrganization(UUID organizationId) {
+        Organization organization = serviceProvider.getOrganizationService().getOrganizationById(organizationId);
+        return membershipEntityHolder(organization);
+    }
+
+    /**
+     * Fetch a document by ID
+     *
+     * @param documentId The ID of the document
+     * @return The document in a holder that allows for easy permission checking
+     */
+    public ObjectHolder<Document> fetchDocument(UUID documentId) {
+        Document document = serviceProvider.getDocumentService().getDocumentById(documentId);
+        return entityWithProjectHolder(document, Document::getProject);
+    }
+
+    /**
+     * Fetch a type by ID
+     *
+     * @param typeId The ID of the type
+     * @return The type in a holder that allows for easy permission checking
+     */
+    public ObjectHolder<ArtifactType> fetchType(UUID typeId) {
+        ArtifactType type = serviceProvider.getTypeService().getArtifactType(typeId);
+        if (type == null) {
+            throw new SafaItemNotFoundError("No type with id %s", typeId);
+        }
+
+        return entityWithProjectHolder(type, ArtifactType::getProject);
+    }
+
+    /**
+     * Fetch an artifact by ID
+     *
+     * @param artifactId The ID of the artifact
+     * @return The artifact in a holder that allows for easy permission checking
+     */
+    public ObjectHolder<Artifact> fetchArtifact(UUID artifactId) {
+        Artifact artifact = serviceProvider.getArtifactRepository().findById(artifactId)
+            .orElseThrow(() -> new SafaItemNotFoundError("No artifact with ID %s found", artifactId));
+        return entityWithProjectHolder(artifact, Artifact::getProject);
+    }
+
+    /**
+     * Utility function for creating object holders for entities that have memberships directly (rather
+     * than simply referencing other objects that have memberships)
+     *
+     * @param value The entity
+     * @param <T> The type of the entity
+     * @return An object holder for the entity
+     */
+    private <T extends IEntityWithMembership> ObjectHolder<T> membershipEntityHolder(T value) {
+        return new ObjectHolder<>(value,
+            (permissions, user, lambdaVal) -> getPermissionService().hasPermissions(permissions, lambdaVal, user),
+            (permissions, user, lambdaVal) -> getPermissionService().hasAnyPermission(permissions, lambdaVal, user));
+    }
+
+    /**
+     * Utility function for creating object holders for entities that can easily be linked to a project
+     *
+     * @param value The entity
+     * @param projectRetriever A function that allows us to get the project for this entity
+     * @param <T> The type of the entity
+     * @return An object holder for the entity
+     */
+    private <T> ObjectHolder<T> entityWithProjectHolder(T value, Function<T, Project> projectRetriever) {
+        return new ObjectHolder<>(value,
+            (permissions, user, lambdaVal) ->
+                getPermissionService().hasPermissions(permissions, projectRetriever.apply(lambdaVal), user),
+            (permissions, user, lambdaVal) ->
+                getPermissionService().hasAnyPermission(permissions, projectRetriever.apply(lambdaVal), user));
+    }
+
+    /**
+     * Utility function to get the permission service to make lines shorter
+     *
+     * @return The permission service
+     */
+    private PermissionService getPermissionService() {
+        return serviceProvider.getPermissionService();
     }
 
     /**
@@ -79,13 +174,22 @@ public class ResourceBuilder {
      *
      * @param <T> The type being held
      */
-    public abstract static class ObjectHolder<T> {
+    public static class ObjectHolder<T> {
 
-        @Getter
-        private T value;
+        @Getter(AccessLevel.PROTECTED)
+        private final T value;
 
-        public ObjectHolder(T value) {
+        private final Set<Permission> missingPermissions = new HashSet<>();
+        private boolean allowed = true;
+        private final CheckPermissionFunction<T> hasPermissionFunction;
+        private final CheckPermissionFunction<T> hasAnyPermissionFunction;
+
+        private ObjectHolder(T value,
+                             CheckPermissionFunction<T> hasPermissionFunction,
+                             CheckPermissionFunction<T> hasAnyPermissionFunction) {
             this.value = value;
+            this.hasPermissionFunction = hasPermissionFunction;
+            this.hasAnyPermissionFunction = hasAnyPermissionFunction;
         }
 
         /**
@@ -97,7 +201,42 @@ public class ResourceBuilder {
          * @throws SafaError If the user doesn't have the permission
          */
         public ObjectHolder<T> withPermission(Permission permission, SafaUser user) throws SafaError {
-            this.requirePermission(permission, user);
+            if (!hasPermissionFunction.apply(Set.of(permission), user, getValue())) {
+                allowed = false;
+                missingPermissions.add(permission);
+            }
+            return this;
+        }
+
+        /**
+         * Check the user has the given permissions on the contained object.
+         *
+         * @param permissions Permissions to check
+         * @param user        The user to check permission for
+         * @return This
+         * @throws SafaError If the user doesn't have the permission
+         */
+        public ObjectHolder<T> withPermissions(Set<Permission> permissions, SafaUser user) throws SafaError {
+            if (!hasPermissionFunction.apply(permissions, user, getValue())) {
+                allowed = false;
+                missingPermissions.addAll(permissions);
+            }
+            return this;
+        }
+
+        /**
+         * Check the user has the given permissions on the contained object.
+         *
+         * @param permissions Permissions to check
+         * @param user        The user to check permissions for
+         * @return This
+         * @throws SafaError If the user doesn't have the permissions
+         */
+        public ObjectHolder<T> withAnyPermission(Set<Permission> permissions, SafaUser user) throws SafaError {
+            if (!hasAnyPermissionFunction.apply(permissions, user, getValue())) {
+                allowed = false;
+                missingPermissions.addAll(permissions);
+            }
             return this;
         }
 
@@ -107,37 +246,43 @@ public class ResourceBuilder {
          * @return The value
          */
         public T get() {
+            if (!allowed) {
+                throw new MissingPermissionException(missingPermissions, true);
+            }
             return value;
         }
 
         /**
-         * Check that the user has a given permission for the held object and thrown an error if not.
+         * Get the contained value only if all permission checks passed.
+         * Otherwise, return an empty optional.
          *
-         * @param permission The permission to check
-         * @param user       The user to check for
+         * @return The value if allowed, or an empty optional
          */
-        protected abstract void requirePermission(Permission permission, SafaUser user) throws SafaError;
+        public Optional<T> getOptional() {
+            if (!allowed) {
+                return Optional.empty();
+            } else {
+                return Optional.of(value);
+            }
+        }
+
     }
 
-    private class ProjectHolder extends ObjectHolder<Project> {
-        public ProjectHolder(Project project) {
-            super(project);
-        }
-
-        @Override
-        protected void requirePermission(Permission permission, SafaUser user) {
-            permissionService.requirePermission(permission, getValue(), user);
-        }
+    /**
+     * Functional interface for checking if a user has a permission associated with some object
+     *
+     * @param <T> The type of the object
+     */
+    @FunctionalInterface
+    private interface CheckPermissionFunction<T> {
+        /**
+         * Check that the user has  given permissions for the held object and thrown an error if not.
+         *
+         * @param permissions The permissions to check
+         * @param user        The user to check for
+         * @param value       The value of the object in the object holder
+         */
+        boolean apply(Set<Permission> permissions, SafaUser user, T value) throws SafaError;
     }
 
-    private class ProjectVersionHolder extends ObjectHolder<ProjectVersion> {
-        public ProjectVersionHolder(ProjectVersion projectVersion) {
-            super(projectVersion);
-        }
-
-        @Override
-        protected void requirePermission(Permission permission, SafaUser user) {
-            permissionService.requirePermission(permission, getValue().getProject(), user);
-        }
-    }
 }

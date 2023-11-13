@@ -9,8 +9,9 @@ import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
-public enum TeamRole {
+public enum TeamRole implements IRole {
     NONE(Set.of()),
     VIEWER(Set.of(
         ProjectPermission.VIEW, TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS
@@ -23,13 +24,13 @@ public enum TeamRole {
         ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_MEMBERS, ProjectPermission.DELETE,
         TeamPermission.VIEW, TeamPermission.EDIT, TeamPermission.EDIT_MEMBERS, TeamPermission.DELETE,
         TeamPermission.VIEW_PROJECTS, TeamPermission.CREATE_PROJECTS, TeamPermission.DELETE_PROJECTS,
-        ProjectPermission.EDIT_DATA, ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS
+        ProjectPermission.EDIT_DATA, ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS,
+        ProjectPermission.GENERATE
     )),
     GENERATOR(Set.of(
         ProjectPermission.GENERATE, ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_DATA,
         TeamPermission.VIEW, TeamPermission.VIEW_PROJECTS
     ));
 
-    @Getter
     private final Set<Permission> grants;
 }

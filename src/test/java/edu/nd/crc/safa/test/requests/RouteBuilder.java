@@ -6,6 +6,7 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -102,6 +103,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withJob(JobAppEntity job) {
+        this.path = this.path.replace("{jobId}", job.getId().toString());
+        return (T) this;
+    }
+
     public T withStepNum(int stepNum) {
         this.path = this.path.replace("{stepNum}", Integer.toString(stepNum));
         return (T) this;
@@ -154,6 +160,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
 
     public T withMembershipId(UUID membershipId) {
         this.path = this.path.replace("{membershipId}", membershipId.toString());
+        return (T) this;
+    }
+
+    public T withPathVariable(String name, String value) {
+        this.path = this.path.replace(String.format("{%s}", name), value);
         return (T) this;
     }
 

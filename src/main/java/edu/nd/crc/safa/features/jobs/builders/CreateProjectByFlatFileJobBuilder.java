@@ -50,7 +50,7 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
         ProjectOwner owner =
             ProjectOwner.fromUUIDs(getServiceProvider(), teamId, orgId, user);
         ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), owner, this.projectName,
-            this.projectDescription);
+            this.projectDescription, getUser());
         Project project = commit.getCommitVersion().getProject();
         String uploadLocation = FlatFileUtility.uploadFlatFiles(this.getServiceProvider(), project, this.files);
 

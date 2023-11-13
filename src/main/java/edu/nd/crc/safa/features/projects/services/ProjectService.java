@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
@@ -20,6 +21,8 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -54,6 +57,9 @@ public class ProjectService {
     @Setter(onMethod = @__({@Autowired}))
     private JobService jobService;
 
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
+    private PermissionService permissionService;
+
     @Setter(onMethod = @__({@Autowired}))
     private NotificationService notificationService;
 
@@ -65,6 +71,9 @@ public class ProjectService {
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */
     public void deleteProject(SafaUser user, Project project) throws SafaError, IOException {
+        permissionService.requireAnyPermission(
+            Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS), project, user
+        );
         this.jobService.removeProjectFromJobs(project);
         this.projectRepository.delete(project);
         FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
@@ -148,6 +157,84 @@ public class ProjectService {
     }
 
     /**
+     * Creates a new project
+     *
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The team that owns the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(String name, String description, Team owner, SafaUser user) {
+        permissionService.requirePermission(TeamPermission.CREATE_PROJECTS, owner, user);
+        return createProject(name, description, owner);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The user that owns the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(String name, String description, SafaUser owner, SafaUser user) {
+        Team personalTeam = teamService.getPersonalTeam(owner);
+        return createProjectAsUser(name, description, personalTeam, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The organization that owns the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(String name, String description, Organization owner, SafaUser user) {
+        Team orgTeam = teamService.getFullOrganizationTeam(owner);
+        return createProjectAsUser(name, description, orgTeam, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The user who will own the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(ProjectAppEntity projectDefinition, SafaUser owner, SafaUser user) {
+        return createProjectAsUser(projectDefinition.getName(), projectDefinition.getDescription(), owner, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The organization who will own the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(ProjectAppEntity projectDefinition, Organization owner, SafaUser user) {
+        return createProjectAsUser(projectDefinition.getName(), projectDefinition.getDescription(), owner, user);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The team who will own the project
+     * @param user The user who is creating the project (for permissions checks)
+     * @return The new project
+     */
+    public Project createProjectAsUser(ProjectAppEntity projectDefinition, Team owner, SafaUser user) {
+        return createProjectAsUser(projectDefinition.getName(), projectDefinition.getDescription(), owner, user);
+    }
+
+    /**
      * Return the list of projects that are owned by the specified team. This does not include
      * projects that are shared with the team.
      *
@@ -166,8 +253,8 @@ public class ProjectService {
      * @return The project identifier
      */
     public ProjectIdAppEntity getIdAppEntity(Project project, SafaUser currentUser) {
-        List<ProjectMembership> projectMemberships =
-            projectMembershipService.getProjectMembers(project);
+        List<IEntityMembership> projectMemberships =
+            projectMembershipService.getMembershipsForEntity(project);
 
         List<MembershipAppEntity> membershipAppEntities =
             projectMemberships
@@ -193,7 +280,9 @@ public class ProjectService {
      */
     public List<ProjectIdAppEntity> getIdAppEntities(Collection<Project> projects, SafaUser currentUser) {
         return projects.stream()
-            .map(project -> getIdAppEntity(project, currentUser))
+            .filter(project -> permissionService.hasAnyPermission(
+                Set.of(TeamPermission.VIEW_PROJECTS, ProjectPermission.VIEW), project, currentUser
+            )).map(project -> getIdAppEntity(project, currentUser))
             .collect(Collectors.toUnmodifiableList());
     }
 
@@ -208,7 +297,7 @@ public class ProjectService {
      */
     public List<Permission> getUserPermissions(Project project, SafaUser currentUser) {
 
-        Stream<Permission> permissions = projectMembershipService.getUserRoles(currentUser, project)
+        Stream<Permission> permissions = projectMembershipService.getRolesForUser(currentUser, project)
             .stream()
             .flatMap(role -> role.getGrants().stream());
 

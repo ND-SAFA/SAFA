@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -165,7 +166,7 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
         if (documentOptional.isPresent()) {
             return documentOptional.get();
         } else {
-            throw new IllegalArgumentException("Could not find document with id:" + documentId);
+            throw new SafaItemNotFoundError("Could not find document with id:" + documentId);
         }
     }
 

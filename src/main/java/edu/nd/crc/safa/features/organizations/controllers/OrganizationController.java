@@ -13,6 +13,8 @@ import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipServi
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
+import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -29,13 +31,16 @@ public class OrganizationController extends BaseController {
 
     private final OrganizationService organizationService;
     private final OrganizationMembershipService organizationMembershipService;
+    private final PermissionService permissionService;
 
     public OrganizationController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
                                   OrganizationService organizationService,
-                                  OrganizationMembershipService organizationMembershipService) {
+                                  OrganizationMembershipService organizationMembershipService,
+                                  PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
         this.organizationService = organizationService;
         this.organizationMembershipService = organizationMembershipService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -47,10 +52,12 @@ public class OrganizationController extends BaseController {
     public List<OrganizationAppEntity> getUserOrganizations() {
         SafaUser user = getCurrentUser();
 
-        List<OrganizationMembership> orgMemberships = organizationMembershipService.getAllMembershipsByUser(user);
+        List<OrganizationMembership> orgMemberships =
+            organizationMembershipService.getOrganizationMembershipsForUser(user);
 
         return orgMemberships.stream()
             .map(OrganizationMembership::getOrganization)
+            .filter(org -> permissionService.hasPermission(OrganizationPermission.VIEW, org, user))
             .map(org -> organizationService.getAppEntity(org, user))
             .collect(Collectors.toUnmodifiableList());
     }
@@ -65,7 +72,11 @@ public class OrganizationController extends BaseController {
     @GetMapping(AppRoutes.Organizations.BY_ID)
     public OrganizationAppEntity getOrganization(@PathVariable UUID orgId) {
         SafaUser user = getCurrentUser();
-        return organizationService.getAppEntity(organizationService.getOrganizationById(orgId), user);
+        Organization org = getResourceBuilder()
+            .fetchOrganization(orgId)
+            .withPermission(OrganizationPermission.VIEW, user)
+            .get();
+        return organizationService.getAppEntity(org, user);
     }
 
     /**
@@ -76,6 +87,7 @@ public class OrganizationController extends BaseController {
     @GetMapping(AppRoutes.Organizations.SELF)
     public OrganizationAppEntity getPersonalOrganization() {
         SafaUser user = getCurrentUser();
+        // No permission check because users can always see their own personal org
         return organizationService.getAppEntity(organizationService.getPersonalOrganization(user), user);
     }
 
@@ -89,6 +101,7 @@ public class OrganizationController extends BaseController {
     @PostMapping(AppRoutes.Organizations.ROOT)
     public OrganizationAppEntity createNewOrganization(@RequestBody OrganizationAppEntity newOrgEntity) {
         SafaUser user = getCurrentUser();
+        permissionService.requireSuperuser(user);
         Organization orgDefinition = new Organization(newOrgEntity.getName(), newOrgEntity.getDescription(),
             user, "free", false);
         Organization newOrg = organizationService.createNewOrganization(orgDefinition);
@@ -107,7 +120,10 @@ public class OrganizationController extends BaseController {
     public OrganizationAppEntity updateOrganization(@PathVariable UUID orgId,
                                                     @RequestBody OrganizationAppEntity orgEntity) {
         SafaUser user = getCurrentUser();
-        Organization currentOrg = organizationService.getOrganizationById(orgId);
+        Organization currentOrg = getResourceBuilder()
+            .fetchOrganization(orgId)
+            .withPermission(OrganizationPermission.EDIT, user)
+            .get();
         currentOrg.setFromAppEntity(orgEntity);
         return organizationService.getAppEntity(organizationService.updateOrganization(currentOrg), user);
     }
@@ -119,6 +135,11 @@ public class OrganizationController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Organizations.BY_ID)
     public void deleteOrganization(@PathVariable UUID orgId) {
-        organizationService.deleteOrganizationById(orgId);
+        SafaUser user = getCurrentUser();
+        Organization org = getResourceBuilder()
+            .fetchOrganization(orgId)
+            .withPermission(OrganizationPermission.DELETE, user)
+            .get();
+        organizationService.deleteOrganization(org);
     }
 }

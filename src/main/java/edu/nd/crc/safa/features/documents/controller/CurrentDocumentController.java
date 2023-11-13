@@ -7,6 +7,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,7 +41,11 @@ public class CurrentDocumentController extends BaseDocumentController {
     @PostMapping(AppRoutes.Documents.SET_CURRENT_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setCurrentDocument(@PathVariable UUID documentId) {
-        Document document = getDocumentById(getDocumentRepository(), documentId);
+        SafaUser user = getCurrentUser();
+        Document document = getResourceBuilder()
+            .fetchDocument(documentId)
+            .withPermission(ProjectPermission.VIEW, user)
+            .get();
         this.currentDocumentService.setCurrentDocumentForCurrentUser(document);
     }
 

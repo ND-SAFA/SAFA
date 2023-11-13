@@ -168,7 +168,7 @@ public class NotificationTestService {
     private <T> T getNextMessage(UUID clientId, Class<T> classType) throws JsonProcessingException,
         InterruptedException {
         String response = this.server.getMessage(clientId, MAX_POLL_TIME);
-        assert response != null;
+        assert response != null : "No message for client: " + clientId;
         return MappingTestService.toClass(response, classType);
     }
 

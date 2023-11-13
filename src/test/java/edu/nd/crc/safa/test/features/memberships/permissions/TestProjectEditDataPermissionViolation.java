@@ -3,30 +3,27 @@ package edu.nd.crc.safa.test.features.memberships.permissions;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
-import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
 
 /**
  * Responsible for verifying that violating a permission returns a 403 response.
  */
-public class TestViewPermissionViolation extends AbstractPermissionViolationTest {
+public class TestProjectEditDataPermissionViolation extends AbstractPermissionViolationTest {
 
-    @Override
-    protected JSONObject performViolatingAction() throws Exception {
-        CommitBuilder commitBuilder = CommitBuilder
-            .withVersion(projectVersion)
-            .withAddedArtifact(Constants.artifact); // attempt to edit project
-        return commitService.commitWithStatus(commitBuilder, status().is4xxClientError());
-    }
-
-    @Override
-    protected Permission getExpectedPermission() {
-        return ProjectPermission.EDIT;
+    @Test
+    public void testEditProjectData() {
+        test(() -> {
+            CommitBuilder commitBuilder = CommitBuilder
+                .withVersion(projectVersion)
+                .withAddedArtifact(Constants.artifact); // attempt to edit project
+            return commitService.commitWithStatus(commitBuilder, status().is4xxClientError());
+        }, Set.of(ProjectPermission.EDIT_DATA));
     }
 
     static class Constants {

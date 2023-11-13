@@ -40,7 +40,9 @@ public class HGenController extends BaseController {
         SafaUser currentUser = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
-            .withPermission(ProjectPermission.VIEW, currentUser).get();
+            .withPermission(ProjectPermission.EDIT_DATA, currentUser)
+            .withPermission(ProjectPermission.GENERATE, currentUser)
+            .get();
         HGenJobBuilder jobBuilder = new HGenJobBuilder(getServiceProvider(), projectVersion, request, currentUser);
         return jobBuilder.perform();
     }

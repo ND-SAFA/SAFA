@@ -124,7 +124,7 @@ public abstract class CommitJob extends AbstractJob {
      */
     protected void createProjectAndCommit(ProjectOwner owner, String name, String description) {
         ProjectCommitDefinition commit = CommitJobUtility.createProject(this.getServiceProvider(), owner, name,
-            description);
+            description, getUser());
         setProjectCommitDefinition(commit);
         setCreatedProjectVersion(commit.getCommitVersion());
     }

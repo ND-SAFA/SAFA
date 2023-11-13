@@ -20,6 +20,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -98,7 +99,12 @@ public class JobController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Jobs.Meta.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
-        SafaUser user = this.getServiceProvider().getSafaUserService().getCurrentUser();
+        SafaUser user = getCurrentUser();
+        JobDbEntity job = jobService.getJobById(jobId);
+        if (job != null && !job.getUser().equals(user)) {
+            throw new MissingPermissionException(() -> "delete_job");
+        }
+
         JobDbEntity jobDbEntity = this.jobService.deleteJob(jobId);
         if (jobDbEntity != null) {
             UUID taskId = jobDbEntity.getTaskId();
@@ -128,8 +134,10 @@ public class JobController extends BaseController {
         @RequestParam(required = false, defaultValue = "false") boolean summarize)
         throws Exception {
         SafaUser user = safaUserService.getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
         UpdateProjectByFlatFileJobBuilder jobBuilder =
             new UpdateProjectByFlatFileJobBuilder(
                 user,
@@ -210,8 +218,11 @@ public class JobController extends BaseController {
         // Step - Check permissions and retrieve persistent properties
         UUID versionId = request.getProjectVersion().getVersionId();
         SafaUser user = safaUserService.getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .withPermission(ProjectPermission.GENERATE, user)
+            .get();
         request.setProjectVersion(projectVersion);
 
         // Step - Create and start job.

@@ -9,7 +9,7 @@ import java.util.List;
  *
  * <pre>
  * {@code
- *      () -> 'new.permission'
+ *      throw new MissingPermissionException((SimplePermission) () -> "new.permission");
  * }
  * </pre>
  */

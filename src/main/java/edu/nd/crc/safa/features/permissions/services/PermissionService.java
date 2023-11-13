@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -134,7 +135,7 @@ public class PermissionService {
      */
     public void requireSuperuser(SafaUser user) {
         if (!isSuperuser(user)) {
-            throw new MissingPermissionException(() -> "safa.superuser");
+            throw new MissingPermissionException((SimplePermission) () -> "safa.superuser");
         }
     }
 

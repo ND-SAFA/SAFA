@@ -8,6 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
+import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.test.features.memberships.permissions.AbstractPermissionViolationTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
@@ -39,7 +40,7 @@ public class TestOrganizationPermissions extends AbstractPermissionViolationTest
         test(
             () -> SafaRequest.withRoute(AppRoutes.Organizations.ROOT)
                 .postWithJsonObject(orgDefinition, status().is4xxClientError()),
-            Set.of(() -> "safa.superuser")
+            Set.of((SimplePermission) () -> "safa.superuser")
         );
     }
 

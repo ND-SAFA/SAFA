@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -50,12 +51,14 @@ public class CreateProjectViaJsonJob extends CommitJob {
 
     @IJobStep(value = "Generating Trace Links", position = 2)
     public void generateLinks(JobLogger logger) {
-        TGenRequestAppEntity request = this.tgenRequestAppEntity;
+        getServiceProvider().getPermissionService()
+            .requirePermission(ProjectPermission.GENERATE, getProjectVersion().getProject(), getUser());
+
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommitDefinition());
 
         List<TraceAppEntity> generatedTraces = this.getServiceProvider()
             .getTraceGenerationService()
-            .generateTraceLinks(request, projectAppEntity);
+            .generateTraceLinks(this.tgenRequestAppEntity, projectAppEntity);
         getProjectCommitDefinition().addTraces(ModificationType.ADDED, generatedTraces);
         logger.log("Links generated: %s", generatedTraces.size());
     }

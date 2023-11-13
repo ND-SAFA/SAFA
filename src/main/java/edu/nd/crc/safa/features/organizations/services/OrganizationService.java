@@ -6,10 +6,11 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
@@ -20,6 +21,8 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.repositories.OrganizationRepository;
 import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -34,6 +37,7 @@ public class OrganizationService {
     private final OrganizationRepository organizationRepo;
     private final TeamService teamService;
     private final OrganizationMembershipService organizationMembershipService;
+    private final PermissionService permissionService;
 
     /**
      * Create a new organization. This will also create a new team for the organization.
@@ -122,8 +126,8 @@ public class OrganizationService {
      * @return The organization front-end object
      */
     public OrganizationAppEntity getAppEntity(Organization organization, SafaUser currentUser) {
-        List<OrganizationMembership> memberships =
-            organizationMembershipService.getAllMembershipsByOrganization(organization);
+        List<IEntityMembership> memberships =
+            organizationMembershipService.getMembershipsForEntity(organization);
 
         List<MembershipAppEntity> membershipAppEntities =
             memberships
@@ -137,10 +141,21 @@ public class OrganizationService {
             .map(Permission::getName)
             .collect(Collectors.toUnmodifiableList());
 
-        List<TeamAppEntity> teams =
-            teamService.getAppEntities(teamService.getAllTeamsByOrganization(organization), currentUser);
+        List<Team> teams = teamService.getAllTeamsByOrganization(organization)
+            .stream()
+            .filter(team ->
+                permissionService.hasAnyPermission(
+                    Set.of(OrganizationPermission.VIEW_TEAMS, TeamPermission.VIEW),
+                    team,
+                    currentUser
+                )
+            )
+            .collect(Collectors.toUnmodifiableList());
 
-        return new OrganizationAppEntity(organization, membershipAppEntities, teams, permissions);
+
+        List<TeamAppEntity> teamAppEntities = teamService.getAppEntities(teams, currentUser);
+
+        return new OrganizationAppEntity(organization, membershipAppEntities, teamAppEntities, permissions);
     }
 
     /**
@@ -164,18 +179,18 @@ public class OrganizationService {
      * @return A list of permissions the user has from the organization
      */
     public List<Permission> getUserPermissions(Organization organization, SafaUser currentUser) {
-        return organizationMembershipService.getUserRoles(currentUser, organization)
+        return organizationMembershipService.getRolesForUser(currentUser, organization)
             .stream()
             .flatMap(role -> role.getGrants().stream())
             .collect(Collectors.toUnmodifiableList());
     }
 
     /**
-     * Delete an organization based on its id.
+     * Delete an organization.
      *
-     * @param id The id of the org to delete.
+     * @param organization The org to delete.
      */
-    public void deleteOrganizationById(UUID id) {
-        organizationRepo.deleteById(id);
+    public void deleteOrganization(Organization organization) {
+        organizationRepo.delete(organization);
     }
 }

@@ -24,7 +24,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Team {
+public class Team implements IEntityWithMembership {
 
     @Id
     @JdbcTypeCode(SqlTypes.BINARY)

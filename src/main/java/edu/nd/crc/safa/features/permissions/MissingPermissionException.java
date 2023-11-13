@@ -1,5 +1,9 @@
 package edu.nd.crc.safa.features.permissions;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
@@ -12,14 +16,19 @@ import lombok.Getter;
 public class MissingPermissionException extends SafaError {
 
     @JsonIgnore
-    private final Permission missingPermission;
+    private final Set<Permission> missingPermissions;
 
-    public MissingPermissionException(Permission missingPermission) {
-        super("Missing permission: " + missingPermission.getName());
-        this.missingPermission = missingPermission;
+    public MissingPermissionException(Set<Permission> missingPermissions, boolean needAll) {
+        super("Missing permissions. User must have " + (needAll ? "all" : "any") + " of these permissions: "
+            + missingPermissions);
+        this.missingPermissions = missingPermissions;
     }
 
-    public String getPermission() {
-        return missingPermission.getName();
+    public MissingPermissionException(Permission missingPermission) {
+        this(Set.of(missingPermission), true);
+    }
+
+    public List<String> getPermissions() {
+        return missingPermissions.stream().map(Permission::getName).collect(Collectors.toUnmodifiableList());
     }
 }

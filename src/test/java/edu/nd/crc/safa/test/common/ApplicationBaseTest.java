@@ -212,4 +212,9 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         setToken(user, token);
         this.currentUser = user;
     }
+
+    public void setCurrentUser(SafaUser user) {
+        setToken(user, getToken(user));
+        this.currentUser = user;
+    }
 }

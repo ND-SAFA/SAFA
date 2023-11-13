@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.List;
+import java.util.Set;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
@@ -9,7 +10,10 @@ import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -36,6 +40,14 @@ public abstract class GenerationJob extends CommitJob {
      */
     @IJobStep(value = "Retrieving Project", position = 1)
     public void retrieveProject() {
+        PermissionService permissionService = getServiceProvider().getPermissionService();
+        Project project = getProjectVersion().getProject();
+        permissionService.requirePermissions(
+            Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE),
+            project,
+            getUser()
+        );
+
         ProjectRetrievalService projectRetrievalService = this.getServiceProvider().getProjectRetrievalService();
         this.projectAppEntity = projectRetrievalService.getProjectAppEntity(
             this.getJobDbEntity().getUser(),

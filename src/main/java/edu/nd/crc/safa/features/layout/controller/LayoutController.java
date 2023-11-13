@@ -33,8 +33,10 @@ public class LayoutController extends BaseController {
     public LayoutGenerationResponseDTO resetLayout(@PathVariable UUID versionId,
                                                    @RequestBody LayoutGenerationRequestDTO layoutGeneration) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
         LayoutManager layoutManager = new LayoutManager(getServiceProvider(), projectVersion, user);
         ProjectVersionChangeBuilder notificationBuilder = EntityChangeBuilder.create(user, projectVersion);
         LayoutGenerationResponseDTO response = new LayoutGenerationResponseDTO();

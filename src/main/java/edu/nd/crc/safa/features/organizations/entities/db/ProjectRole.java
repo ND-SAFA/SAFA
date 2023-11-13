@@ -8,8 +8,9 @@ import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
-public enum ProjectRole {
+public enum ProjectRole implements IRole {
     NONE(Set.of()),
     VIEWER(Set.of(
         ProjectPermission.VIEW
@@ -30,6 +31,5 @@ public enum ProjectRole {
         ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE
     ));
 
-    @Getter
     private final Set<Permission> grants;
 }

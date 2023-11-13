@@ -1,15 +1,18 @@
 package edu.nd.crc.safa.features.memberships.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
 import edu.nd.crc.safa.features.memberships.repositories.OrganizationMembershipRepository;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
+import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
-import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -17,20 +20,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class OrganizationMembershipService {
+public class OrganizationMembershipService implements IMembershipService {
 
     private final OrganizationMembershipRepository orgMembershipRepo;
 
     /**
-     * Applies a role to a user within an organization. If the user already has this
-     * role in this organization, this function does nothing.
-     *
-     * @param user         The user to get the new role
-     * @param organization The organization the role applies to
-     * @param role         The role
-     * @return The new membership, or the existing membership if the user already had that role
+     * {@inheritDoc}
      */
-    public OrganizationMembership addUserRole(SafaUser user, Organization organization, OrganizationRole role) {
+    @Override
+    public OrganizationMembership addUserRole(SafaUser user, IEntityWithMembership entity, IRole iRole) {
+        assert entity instanceof Organization;
+        assert iRole instanceof OrganizationRole;
+        Organization organization = (Organization) entity;
+        OrganizationRole role = (OrganizationRole) iRole;
+
         Optional<OrganizationMembership> membershipOptional =
                 orgMembershipRepo.findByUserAndOrganizationAndRole(user, organization, role);
 
@@ -41,14 +44,15 @@ public class OrganizationMembershipService {
     }
 
     /**
-     * Removes a role from a user within an organization. If the user didn't already have this
-     * role in this organization, this function does nothing.
-     *
-     * @param user The user to remove the role from
-     * @param organization The organization the role applies to
-     * @param role The role
+     * {@inheritDoc}
      */
-    public void removeUserRole(SafaUser user, Organization organization, OrganizationRole role) {
+    @Override
+    public void removeUserRole(SafaUser user, IEntityWithMembership entity, IRole iRole) {
+        assert entity instanceof Organization;
+        assert iRole instanceof OrganizationRole;
+        Organization organization = (Organization) entity;
+        OrganizationRole role = (OrganizationRole) iRole;
+
         Optional<OrganizationMembership> membershipOptional =
                 orgMembershipRepo.findByUserAndOrganizationAndRole(user, organization, role);
 
@@ -56,60 +60,55 @@ public class OrganizationMembershipService {
     }
 
     /**
-     * Get the list of roles the user has within the organization.
-     *
-     * @param user The user in question
-     * @param organization The organization to check within
-     * @return The roles the user has in that organization
+     * {@inheritDoc}
      */
-    public List<OrganizationRole> getUserRoles(SafaUser user, Organization organization) {
+    @Override
+    public List<IRole> getRolesForUser(SafaUser user, IEntityWithMembership entity) {
+        assert entity instanceof Organization;
+        Organization organization = (Organization) entity;
         return orgMembershipRepo.findByUserAndOrganization(user, organization).stream()
                 .map(OrganizationMembership::getRole)
                 .collect(Collectors.toUnmodifiableList());
     }
 
     /**
-     * Search for an organization membership by its ID.
-     *
-     * @param membershipId The ID of the membership
-     * @return The membership, if it exists
+     * {@inheritDoc}
      */
-    public Optional<OrganizationMembership> getMembershipOptionalById(UUID membershipId) {
-        return orgMembershipRepo.findById(membershipId);
+    @Override
+    public Optional<IEntityMembership> getMembershipOptionalById(UUID membershipId) {
+        // The map call forces it to understand that the type is indeed correct
+        return orgMembershipRepo.findById(membershipId).map(m -> m);
     }
 
     /**
-     * Search for an organization membership by its ID. Throw an exception
-     * if it's not found.
-     *
-     * @param membershipId The ID of the membership
-     * @return The membership, if it exists
-     * @throws SafaItemNotFoundError If the membership could not be found
+     * {@inheritDoc}
      */
-    public OrganizationMembership getMembershipById(UUID membershipId) {
-        return getMembershipOptionalById(membershipId)
-            .orElseThrow(() -> new SafaItemNotFoundError("No membership found with the specified ID"));
+    @Override
+    public List<IEntityMembership> getMembershipsForUser(SafaUser user) {
+        // Remaking the list forces it to understand that the type is indeed correct
+        return new ArrayList<>(getOrganizationMembershipsForUser(user));
     }
 
     /**
-     * Get all organization memberships for a given user.
+     * Get the list of organization memberships for the given user. This function differs
+     * from {@link #getMembershipsForUser(SafaUser)} in that it specifically returns a list of
+     * {@link OrganizationMembership} objects.
      *
      * @param user The user
-     * @return A list of memberships for that user. Note that the same organization may appear
-     *         multiple times in this list if the user has multiple roles within that organization.
+     * @return The memberships for this user
      */
-    public List<OrganizationMembership> getAllMembershipsByUser(SafaUser user) {
+    public List<OrganizationMembership> getOrganizationMembershipsForUser(SafaUser user) {
         return orgMembershipRepo.findByUser(user);
     }
 
     /**
-     * Get all user memberships for a given organization.
-     *
-     * @param organization The organization
-     * @return A list of memberships for that organization. Note that the same user may
-     *         appear multiple times in this list if they have multiple roles within this organization.
+     * {@inheritDoc}
      */
-    public List<OrganizationMembership> getAllMembershipsByOrganization(Organization organization) {
-        return orgMembershipRepo.findByOrganization(organization);
+    @Override
+    public List<IEntityMembership> getMembershipsForEntity(IEntityWithMembership entity) {
+        assert entity instanceof Organization;
+        Organization organization = (Organization) entity;
+        // Remaking the list forces it to understand that the type is indeed correct
+        return new ArrayList<>(orgMembershipRepo.findByOrganization(organization));
     }
 }

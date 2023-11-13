@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -17,8 +18,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -30,8 +32,9 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Table(name = "user_project_membership")
 @NoArgsConstructor
-@Data
-public class ProjectMembership implements Serializable, EntityMembership {
+@Getter
+@Setter
+public class ProjectMembership implements Serializable, IEntityMembership {
 
     @Id
     @GeneratedValue
@@ -70,22 +73,17 @@ public class ProjectMembership implements Serializable, EntityMembership {
     }
 
     @Override
-    public String getEmail() {
-        return member.getEmail();
-    }
-
-    @Override
-    public String getRoleAsString() {
-        return role.name();
-    }
-
-    @Override
     public MembershipType getMembershipType() {
         return MembershipType.PROJECT;
     }
 
     @Override
-    public UUID getEntityId() {
-        return project.getProjectId();
+    public SafaUser getUser() {
+        return member;
+    }
+
+    @Override
+    public IEntityWithMembership getEntity() {
+        return project;
     }
 }

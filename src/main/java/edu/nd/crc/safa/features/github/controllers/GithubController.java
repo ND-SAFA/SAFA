@@ -84,8 +84,11 @@ public class GithubController extends BaseController {
                                                             @RequestBody GithubImportDTO importSettings) {
         return makeDeferredRequest(user -> {
             checkCredentials(user);
-            ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            ProjectVersion projectVersion = getResourceBuilder()
+                .fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT_DATA, user)
+                .withPermission(ProjectPermission.EDIT_INTEGRATIONS, user)
+                .get();
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             UpdateProjectViaGithubBuilder builder
                 = new UpdateProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);
@@ -110,8 +113,11 @@ public class GithubController extends BaseController {
                                                                   @RequestBody GithubImportDTO importSettings) {
         return makeDeferredRequest(user -> {
             checkCredentials(user);
-            ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+            ProjectVersion projectVersion = getResourceBuilder()
+                .fetchVersion(versionId)
+                .withPermission(ProjectPermission.EDIT_DATA, user)
+                .withPermission(ProjectPermission.EDIT_INTEGRATIONS, user)
+                .get();
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             ImportIntoProjectViaGithubBuilder builder
                 = new ImportIntoProjectViaGithubBuilder(getServiceProvider(), identifier, importSettings, user);

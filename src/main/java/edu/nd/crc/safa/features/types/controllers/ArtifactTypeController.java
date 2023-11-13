@@ -8,7 +8,6 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
@@ -49,7 +48,7 @@ public class ArtifactTypeController extends BaseController {
 
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_DATA, user).get();
         TypeService typeService = getServiceProvider().getTypeService();
         artifactType = typeService.createArtifactType(project, artifactType.getName(), artifactType.getColor(), user);
         return new TypeAppEntity(artifactType);
@@ -69,7 +68,7 @@ public class ArtifactTypeController extends BaseController {
                                             @RequestBody ArtifactType artifactTypeObj) throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         Project project = getResourceBuilder().fetchProject(projectId)
-                .withPermission(ProjectPermission.EDIT, user).get();
+                .withPermission(ProjectPermission.EDIT_DATA, user).get();
         TypeService typeService = getServiceProvider().getTypeService();
         artifactTypeObj = typeService.updateArtifactType(project, artifactTypeObj, user);
         return new TypeAppEntity(artifactTypeObj);
@@ -83,17 +82,11 @@ public class ArtifactTypeController extends BaseController {
      */
     @DeleteMapping(AppRoutes.ArtifactType.DELETE_ARTIFACT_TYPE)
     public void deleteArtifactType(@PathVariable UUID typeId) throws SafaError {
-        TypeService typeService = getServiceProvider().getTypeService();
-        ArtifactType type = typeService.getArtifactType(typeId);
-
-        if (type == null) {
-            throw new SafaItemNotFoundError("No type with id %s", typeId);
-        }
-
-        Project project = type.getProject();
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        getResourceBuilder().setProject(project).withPermission(ProjectPermission.EDIT, user);
 
-        typeService.deleteArtifactType(type, user);
+        ArtifactType type = getResourceBuilder().fetchType(typeId)
+            .withPermission(ProjectPermission.EDIT_DATA, user).get();
+
+        getServiceProvider().getTypeService().deleteArtifactType(type, user);
     }
 }

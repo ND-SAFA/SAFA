@@ -4,7 +4,9 @@ import static edu.nd.crc.safa.utilities.AssertUtils.assertEqual;
 import static edu.nd.crc.safa.utilities.AssertUtils.assertNotNull;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -15,6 +17,9 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
+import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
+import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,12 +35,15 @@ public class TeamController extends BaseController {
 
     private final OrganizationService organizationService;
     private final TeamService teamService;
+    private final PermissionService permissionService;
 
     public TeamController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
-                          OrganizationService organizationService, TeamService teamService) {
+                          OrganizationService organizationService, TeamService teamService,
+                          PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
         this.organizationService = organizationService;
         this.teamService = teamService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -46,8 +54,19 @@ public class TeamController extends BaseController {
      */
     @GetMapping(AppRoutes.Organizations.Teams.ROOT)
     public List<TeamAppEntity> getOrganizationTeams(@PathVariable UUID orgId) {
+        SafaUser user = getCurrentUser();
         Organization organization = organizationService.getOrganizationById(orgId);
-        List<Team> orgTeams = teamService.getAllTeamsByOrganization(organization);
+        List<Team> orgTeams = teamService.getAllTeamsByOrganization(organization)
+            .stream()
+            .filter(team ->
+                permissionService.hasAnyPermission(
+                    Set.of(OrganizationPermission.VIEW_TEAMS, TeamPermission.VIEW),
+                    team,
+                    user
+                )
+            )
+            .collect(Collectors.toUnmodifiableList());
+
         return teamService.getAppEntities(orgTeams, getCurrentUser());
     }
 
@@ -62,9 +81,12 @@ public class TeamController extends BaseController {
      */
     @GetMapping(AppRoutes.Organizations.Teams.SELF)
     public TeamAppEntity getFullOrgTeam(@PathVariable UUID orgId) {
+        SafaUser user = getCurrentUser();
         Organization organization = organizationService.getOrganizationById(orgId);
         Team orgTeam = teamService.getFullOrganizationTeam(organization);
-        return teamService.getAppEntity(orgTeam, getCurrentUser());
+        permissionService.requireAnyPermission(
+            Set.of(OrganizationPermission.VIEW_TEAMS, TeamPermission.VIEW), orgTeam, user);
+        return teamService.getAppEntity(orgTeam, user);
     }
 
     /**
@@ -76,8 +98,11 @@ public class TeamController extends BaseController {
      */
     @GetMapping(AppRoutes.Organizations.Teams.BY_ID)
     public TeamAppEntity getTeam(@PathVariable UUID orgId, @PathVariable UUID teamId) {
+        SafaUser user = getCurrentUser();
         Team team = teamService.getTeamById(teamId);
         assertEqual(team.getOrganization().getId(), orgId, "No team with the specified ID found under this org");
+        permissionService.requireAnyPermission(
+            Set.of(OrganizationPermission.VIEW_TEAMS, TeamPermission.VIEW), team, user);
         return teamService.getAppEntity(team, getCurrentUser());
     }
 
@@ -91,7 +116,10 @@ public class TeamController extends BaseController {
     @PostMapping(AppRoutes.Organizations.Teams.ROOT)
     public TeamAppEntity createTeam(@PathVariable UUID orgId, @RequestBody TeamAppEntity teamAppEntity) {
         SafaUser user = getCurrentUser();
-        Organization organization = organizationService.getOrganizationById(orgId);
+        Organization organization = getResourceBuilder()
+            .fetchOrganization(orgId)
+            .withPermission(OrganizationPermission.CREATE_TEAMS, user)
+            .get();
         assertNotNull(teamAppEntity.getName(), "Missing team name.");
         Team newTeam = teamService.createNewTeam(teamAppEntity.getName(), organization, false, user);
         return teamService.getAppEntity(newTeam, user);
@@ -108,7 +136,10 @@ public class TeamController extends BaseController {
     @PutMapping(AppRoutes.Organizations.Teams.BY_ID)
     public TeamAppEntity modifyTeam(@PathVariable UUID orgId, @PathVariable UUID teamId,
                                     @RequestBody TeamAppEntity teamAppEntity) {
-        Team team = teamService.getTeamById(teamId);
+        Team team = getResourceBuilder()
+            .fetchTeam(teamId)
+            .withPermission(TeamPermission.EDIT, getCurrentUser())
+            .get();
         assertEqual(team.getOrganization().getId(), orgId, "No team with the specified ID found under this org");
         team.setFromAppEntity(teamAppEntity);
         team = teamService.updateTeam(team);
@@ -125,6 +156,13 @@ public class TeamController extends BaseController {
     public void deleteTeam(@PathVariable UUID orgId, @PathVariable UUID teamId) {
         Team team = teamService.getTeamById(teamId);
         assertEqual(team.getOrganization().getId(), orgId, "No team with the specified ID found under this org");
+
+        permissionService.requireAnyPermission(
+            Set.of(OrganizationPermission.DELETE_TEAMS, TeamPermission.DELETE),
+            team,
+            getCurrentUser()
+        );
+
         teamService.deleteTeam(team);
     }
 }

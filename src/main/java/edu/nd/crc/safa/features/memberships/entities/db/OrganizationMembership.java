@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.memberships.entities.db;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -29,7 +30,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrganizationMembership implements EntityMembership {
+public class OrganizationMembership implements IEntityMembership {
 
     @Id
     @JdbcTypeCode(SqlTypes.BINARY)
@@ -60,22 +61,12 @@ public class OrganizationMembership implements EntityMembership {
     }
 
     @Override
-    public String getEmail() {
-        return user.getEmail();
-    }
-
-    @Override
-    public String getRoleAsString() {
-        return role.name();
-    }
-
-    @Override
     public MembershipType getMembershipType() {
         return MembershipType.ORGANIZATION;
     }
 
     @Override
-    public UUID getEntityId() {
-        return organization.getId();
+    public IEntityWithMembership getEntity() {
+        return organization;
     }
 }

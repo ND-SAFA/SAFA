@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import edu.nd.crc.safa.features.memberships.entities.db.TeamMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.TeamAppEntity;
@@ -97,7 +97,7 @@ public class TeamService {
      * @return The team front-end object
      */
     public TeamAppEntity getAppEntity(Team team, SafaUser currentUser) {
-        List<TeamMembership> teamMemberships = teamMembershipService.getTeamMemberships(team);
+        List<IEntityMembership> teamMemberships = teamMembershipService.getMembershipsForEntity(team);
 
         List<MembershipAppEntity> teamMembershipAppEntities =
             teamMemberships
@@ -142,7 +142,7 @@ public class TeamService {
      */
     public List<Permission> getUserPermissions(Team team, SafaUser currentUser) {
 
-        Stream<Permission> teamPermissions = teamMembershipService.getUserRoles(currentUser, team)
+        Stream<Permission> teamPermissions = teamMembershipService.getRolesForUser(currentUser, team)
             .stream()
             .flatMap(role -> role.getGrants().stream());
 

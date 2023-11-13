@@ -64,8 +64,10 @@ public class DocumentController extends BaseDocumentController {
                                                     @RequestBody @Valid DocumentAppEntity documentAppEntity)
         throws SafaError {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT, user).get();
+        ProjectVersion projectVersion = getResourceBuilder()
+            .fetchVersion(versionId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
         Project project = projectVersion.getProject();
 
         // Create or update: document base entity
@@ -142,12 +144,12 @@ public class DocumentController extends BaseDocumentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
         // Step - Retrieve document and associated project.
-        Document document = getDocumentById(getDocumentRepository(), documentId);
-        Project project = document.getProject();
-
-        // Step - Verify authorized user has permission to delete.
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        getResourceBuilder().setProject(project).withPermission(ProjectPermission.EDIT, user);
+        Document document = getResourceBuilder()
+            .fetchDocument(documentId)
+            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .get();
+        Project project = document.getProject();
 
         // Step - Delete document.
         getDocumentRepository().delete(document);

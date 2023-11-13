@@ -22,8 +22,8 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         if args.generate_trace_links and args.min_orphan_score_threshold is not None:
-            state.selected_prediction = self.place_orphans_in_homes(args, state, trace_predictions=state.trace_predictions,
-                                                                    trace_selections=state.selected_predictions)
+            state.selected_predictions = self.place_orphans_in_homes(args, state, trace_predictions=state.trace_predictions,
+                                                                     trace_selections=state.selected_predictions)
 
     @staticmethod
     def place_orphans_in_homes(args: HGenArgs,

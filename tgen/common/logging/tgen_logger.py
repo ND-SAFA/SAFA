@@ -1,8 +1,9 @@
+from functools import lru_cache
 from logging import Logger
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.prompt_util import PromptUtil
-from functools import lru_cache
+
 
 class TGenLogger(Logger):
     """
@@ -20,7 +21,9 @@ class TGenLogger(Logger):
         """
         message = EMPTY_STRING if message is None else message
         title = TGenLogger.__create_title(title) if not formatting else formatting.format(title)
-        msg = f"{title}\n{message}"
+        msg = f"{title}"
+        if len(message) > 0:
+            msg += f"\n{message}"
         self.info(msg)
 
     def log_title(self, title: str, **kwargs) -> None:

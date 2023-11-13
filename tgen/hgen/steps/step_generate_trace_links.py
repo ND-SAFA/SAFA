@@ -1,10 +1,8 @@
 from typing import Dict, List, Set, Tuple
 
-from tgen.common.logging.logger_manager import logger
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
-
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -14,6 +12,7 @@ from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
@@ -43,7 +42,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
             trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
                                                                                       state.id_to_related_children)
-        selected_predictions = SelectByThreshold.select(trace_predictions, args.link_selection_threshold)
+            selected_predictions = SelectByThreshold.select(trace_predictions, args.link_selection_threshold)
         state.selected_predictions = selected_predictions
         state.trace_predictions = trace_predictions
 
@@ -81,6 +80,11 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         pipeline_kwargs = dict(dataset=state.all_artifacts_dataset, selection_method=None,
                                types_to_trace=(args.source_type, args.target_type), generate_explanations=False)
+
+        new_artifact_map = state.new_artifact_dataset.artifact_df.to_map()
+        state.embedding_manager.update_or_add_contents(new_artifact_map)
+        state.embedding_manager.create_artifact_embeddings()
+
         for cluster_id in state.cluster_dataset.artifact_df.index:
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations if

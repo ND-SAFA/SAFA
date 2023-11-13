@@ -201,7 +201,9 @@ class State(BaseObject):
         :param param_specs: Specifies the expected types
         :return: The value as correct type or raises exception
         """
-        expected_param_type = param_specs.param_types.get(name)
+        if name not in param_specs.param_names:
+            raise Exception(f"Unknown parameter {name} in {cls.__name__}")
+        expected_param_type = param_specs.param_types.get(name, Any)
         if isinstance(val, AbstractDatasetCreator) and not ReflectionUtil.is_type(val, expected_param_type, name,
                                                                                   print_on_error=False):
             val = val.create()

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set, Union
 
+from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -53,8 +54,8 @@ class HGenState(State):
     """
     Optional Step 7 - generate trace links between source and target artifacts
     """
-    trace_predictions: List[EnumDict] = None  # list of traces between source and target artifacts
-    selected_predictions: List[EnumDict] = None  # met the criteria required to count as a trace
+    trace_predictions: List[Trace] = None  # list of traces between source and target artifacts
+    selected_predictions: List[Trace] = None  # met the criteria required to count as a trace
 
     """
     Step 8 - remove duplicate artifacts

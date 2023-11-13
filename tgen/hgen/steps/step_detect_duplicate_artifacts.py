@@ -1,14 +1,14 @@
-from typing import List, Dict, Set
+from typing import Dict, List, Set
 
+from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD
 from tgen.common.logging.logger_manager import logger
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
-
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.duplicate_detector import DuplicateDetector
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingSorter
 
 
@@ -66,7 +66,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                      embedding_manager=state.embedding_manager,
                                                                      return_scores=True)[child]
                 top_parent, top_parent_score = sorted_parents[0], sorted_scores[0]
-                if top_parent_score < args.link_selection_threshold:
+                if top_parent_score < FIRST_PASS_LINK_THRESHOLD:
                     continue  # discard trace entirely
                 trace[TraceKeys.parent_label()] = top_parent
             pair = (trace[TraceKeys.parent_label()], child)
@@ -77,4 +77,3 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                     selected_predictions.append(trace)
         state.trace_predictions = trace_predictions
         state.selected_predictions = selected_predictions
-

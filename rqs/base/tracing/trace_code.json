@@ -6,6 +6,7 @@
           "object_type": "TRACE_CODE",
           "export_dir": "[OUTPUT_PATH]/code-traces/[CURRENT_PROJECT]",
           "add_packages": "[ADD_PACKAGES_BOOL]",
+          "extensions": "[FILE_EXTENSIONS]",
           "dataset_creator": {
             "object_type": "TRACE",
             "project_reader": {

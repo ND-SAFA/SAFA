@@ -13,8 +13,8 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
     USER_SYM
-from tgen.common.util.json_util import JsonUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.json_util import JsonUtil
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
@@ -131,7 +131,7 @@ class FileUtil:
         if exclude is None:
             exclude = [".DS_Store"]
         if exclude_ext is None:
-            exclude_ext = []
+            exclude_ext = [".png", ".jpg", ".bin", ".ttf"]
         if os.path.isfile(data_path):
             files = [data_path]
         elif os.path.isdir(data_path):

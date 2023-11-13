@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.permissions.entities;
+package edu.nd.crc.safa.features.permissions.checks;
 
 /**
  * Interface for additional checks that can be tied to permissions

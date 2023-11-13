@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.permissions.entities;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+
 /**
  * <p>A permission is effectively just a string that is associated with
  * a user within some context, such as a project or organization. If

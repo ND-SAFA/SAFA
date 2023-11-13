@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.permissions.entities;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

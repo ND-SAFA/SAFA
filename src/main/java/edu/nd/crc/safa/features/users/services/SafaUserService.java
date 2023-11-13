@@ -159,10 +159,7 @@ public class SafaUserService {
      */
     public void setSuperuserActivation(SafaUser user, boolean activation) {
         if (activation && !user.isSuperuser()) {
-            // We should not be able to get here. It shouldn't cause an issue though
-            // since the actual permission checks will check both activation and superuser
-            // status, so just issue a warning so that we can track the issue if it ever occurs
-            logger.warn("Setting superuser activation on user who is not superuser - " + user.getEmail());
+            throw new SafaError("Setting superuser activation on user who is not superuser - " + user.getEmail());
         }
 
         if (user.isSuperuserActive() != activation) {

@@ -10,6 +10,7 @@ import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.EmailService;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
@@ -22,16 +23,16 @@ import edu.nd.crc.safa.features.users.entities.db.PasswordResetToken;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.PasswordResetTokenRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.users.services.EmailVerificationService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,24 +52,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SafaUserController extends BaseController {
 
-    private static final Logger log = LoggerFactory.getLogger(SafaUserController.class);
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
     private final SafaUserService safaUserService;
     private final EmailService emailService;
     private final PermissionService permissionService;
+    private final EmailVerificationService emailVerificationService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    @Value("${fend.base}")
-    private String fendBase;
-    @Value("${fend.reset-email-path}")
-    private String fendPath;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
                               ServiceProvider serviceProvider,
                               EmailService emailService,
                               PermissionService permissionService,
+                              EmailVerificationService emailVerificationService,
                               PasswordResetTokenRepository passwordResetTokenRepository) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
@@ -77,6 +75,7 @@ public class SafaUserController extends BaseController {
         this.safaUserService = serviceProvider.getSafaUserService();
         this.emailService = emailService;
         this.permissionService = permissionService;
+        this.emailVerificationService = emailVerificationService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
@@ -90,9 +89,47 @@ public class SafaUserController extends BaseController {
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
     public UserAppEntity createNewUser(@RequestBody CreateAccountRequest newUser) {
         // Step - Create user
-        return new UserAppEntity(getServiceProvider()
+        SafaUser createdAccount = getServiceProvider()
             .getSafaUserService()
-            .createUser(newUser.getEmail(), newUser.getPassword()));
+            .createUser(newUser.getEmail(), newUser.getPassword());
+
+        emailVerificationService.sendVerificationEmail(createdAccount);
+
+        return new UserAppEntity(createdAccount);
+    }
+
+    /**
+     * <p>Creates new account with given email and password.
+     * Error is thrown is email is already associated with another account.</p>
+     *
+     * <p>The created account will be automatically verified and will not send
+     * a verification email.</p>
+     *
+     * <p>This action can only be done by a superuser</p>
+     *
+     * @param newUser User to create containing email and password.
+     * @return Created user entity
+     */
+    @PostMapping(AppRoutes.Accounts.CREATE_VERIFIED_ACCOUNT)
+    public UserAppEntity createNewVerifiedUser(@RequestBody CreateAccountRequest newUser) {
+        SafaUser currentUser = getCurrentUser();
+        if (!currentUser.isSuperuser()) {
+            throw new MissingPermissionException(() -> "safa.create_verified_account");
+        }
+
+        SafaUser createdAccount = safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
+        createdAccount = safaUserService.setAccountVerification(createdAccount, true);
+        return new UserAppEntity(createdAccount);
+    }
+
+    /**
+     * Verify a user's email from an email verification token
+     *
+     * @param token The email verification token
+     */
+    @PostMapping(AppRoutes.Accounts.VERIFY_ACCOUNT)
+    public void verifyAccount(@RequestBody AccountVerificationDTO token) {
+        emailVerificationService.verifyToken(token.getToken());
     }
 
     /**
@@ -127,16 +164,7 @@ public class SafaUserController extends BaseController {
         String token = tokenService.createTokenForUsername(username, expirationDate);
         PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser, token, expirationDate);
 
-        try {
-            emailService.send(
-                "Requested password reset token",
-                this.buildResetURL(token),
-                user.getEmail()
-            );
-        } catch (Exception e) {
-            log.error("Error occurred while trying to send email to {} " + e, user.getEmail());
-            throw new SafaError("Could not send email");
-        }
+        emailService.sendPasswordReset(user.getEmail(), token);
 
         // Just in case the user had a previous forget token they never clicked on
         this.passwordResetTokenRepository.deleteByUser(retrievedUser);
@@ -257,12 +285,15 @@ public class SafaUserController extends BaseController {
         safaUserService.setSuperuserActivation(currentUser, false);
     }
 
-    private String buildResetURL(String token) {
-        return String.format(fendBase + fendPath, token);
+    @Data
+    public static class DefaultOrgDTO {
+        private UUID defaultOrgId;
     }
 
     @Data
-    private static class DefaultOrgDTO {
-        private UUID defaultOrgId;
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AccountVerificationDTO {
+        private String token;
     }
 }

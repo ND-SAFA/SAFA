@@ -167,4 +167,16 @@ public class SafaUserService {
             safaUserRepository.save(user);
         }
     }
+
+    /**
+     * Mark an account as (un)verified.
+     *
+     * @param user The account
+     * @param verified Whether the account is verified
+     * @return The updated account
+     */
+    public SafaUser setAccountVerification(SafaUser user, boolean verified) {
+        user.setVerified(verified);
+        return safaUserRepository.save(user);
+    }
 }

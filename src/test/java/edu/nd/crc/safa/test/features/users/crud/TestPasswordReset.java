@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.users.entities.app.PasswordForgottenRequest;
 import edu.nd.crc.safa.features.users.entities.app.ResetPasswordRequestDTO;
 import edu.nd.crc.safa.features.users.entities.db.PasswordResetToken;
@@ -20,18 +19,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class TestPasswordReset extends ApplicationBaseTest {
     private final String testEmail = "abc@test.com";
     private final String testPassword = "password123";
-
-    @MockBean
-    private EmailService emailService;
 
     @Autowired
     private PasswordResetTokenRepository tokenRepository;
@@ -45,14 +39,7 @@ public class TestPasswordReset extends ApplicationBaseTest {
     private AutoCloseable closeable;
 
     @BeforeEach
-    @Override
-    public void initTestResources() throws Exception {
-        super.initTestResources();
-        Mockito.doNothing().when(emailService).send(
-            Mockito.anyString(),
-            Mockito.anyString(),
-            Mockito.anyString());
-
+    public void testSetup() throws Exception {
         tokenRepository.deleteAll();
         closeable = MockitoAnnotations.openMocks(this);
     }

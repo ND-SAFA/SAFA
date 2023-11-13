@@ -1,0 +1,1 @@
+UPDATE organization SET payment_tier = 'FREE' WHERE TRUE;

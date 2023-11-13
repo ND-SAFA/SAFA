@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.permissions.entities.OrganizationPermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
@@ -103,7 +104,7 @@ public class OrganizationController extends BaseController {
         SafaUser user = getCurrentUser();
         permissionService.requireSuperuser(user);
         Organization orgDefinition = new Organization(newOrgEntity.getName(), newOrgEntity.getDescription(),
-            user, "free", false);
+            user, PaymentTier.FREE, false);
         Organization newOrg = organizationService.createNewOrganization(orgDefinition);
         return organizationService.getAppEntity(newOrg, user);
     }

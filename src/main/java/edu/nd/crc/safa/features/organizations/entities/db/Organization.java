@@ -7,6 +7,8 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -46,7 +48,8 @@ public class Organization implements IEntityWithMembership {
     private SafaUser owner;
 
     @Column
-    private String paymentTier;
+    @Enumerated(EnumType.STRING)
+    private PaymentTier paymentTier;
 
     @Column
     private boolean personalOrg;
@@ -55,7 +58,7 @@ public class Organization implements IEntityWithMembership {
     @Column
     private UUID fullOrgTeamId;
 
-    public Organization(String name, String description, SafaUser owner, String paymentTier, boolean personalOrg) {
+    public Organization(String name, String description, SafaUser owner, PaymentTier paymentTier, boolean personalOrg) {
         this.name = name;
         this.description = description;
         this.owner = owner;

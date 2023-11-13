@@ -22,6 +22,7 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
@@ -436,7 +437,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     }
 
     public Organization newOrganization(String name, String description) {
-        return organizationService.createNewOrganization(new Organization(name, description, currentUser, "free", false));
+        return organizationService.createNewOrganization(new Organization(name, description, currentUser, PaymentTier.FREE, false));
     }
 
     public Team newTeam(String name, Organization organization) {

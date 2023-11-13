@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
@@ -15,6 +16,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
+import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -29,10 +31,12 @@ import org.springframework.stereotype.Service;
 public class PermissionService {
 
     private final Map<Class<? extends IEntityWithMembership>, ConfigForType> configForTypeMap;
+    private final ServiceProvider serviceProvider;
 
     public PermissionService(@Lazy OrganizationMembershipService orgMembershipService,
                              @Lazy ProjectMembershipService projectMembershipService,
-                             @Lazy TeamMembershipService teamMembershipService) {
+                             @Lazy TeamMembershipService teamMembershipService,
+                             @Lazy ServiceProvider serviceProvider) {
         configForTypeMap = Map.of(
             Organization.class, new ConfigForType(orgMembershipService::getRolesForUser,
                 entity -> null),
@@ -41,6 +45,7 @@ public class PermissionService {
             Project.class, new ConfigForType(projectMembershipService::getRolesForUser,
                 entity -> ((Project) entity).getOwningTeam())
         );
+        this.serviceProvider = serviceProvider;
     }
 
     /**
@@ -52,7 +57,9 @@ public class PermissionService {
      * @return Whether the user has the given permission
      */
     public boolean hasPermission(Permission permission, IEntityWithMembership entity, SafaUser user) {
-        return checkPermission(permission, getUserPermissions(user, entity), user);
+        PermissionCheckContext context = createContext(entity, user);
+        Set<Permission> userPermissions = getUserPermissions(user, entity);
+        return checkPermission(permission, userPermissions, user, context);
     }
 
     /**
@@ -64,7 +71,9 @@ public class PermissionService {
      * @return Whether the user has the given permissions
      */
     public boolean hasPermissions(Set<Permission> permissions, IEntityWithMembership entity, SafaUser user) {
-        return checkPermissionsAllMatch(permissions, getUserPermissions(user, entity), user);
+        PermissionCheckContext context = createContext(entity, user);
+        Set<Permission> userPermissions = getUserPermissions(user, entity);
+        return checkPermissionsAllMatch(permissions, userPermissions, user, context);
     }
 
     /**
@@ -76,7 +85,24 @@ public class PermissionService {
      * @return Whether the user has any of the given permissions
      */
     public boolean hasAnyPermission(Set<Permission> permissions, IEntityWithMembership entity, SafaUser user) {
-        return checkPermissionsAnyMatch(permissions, getUserPermissions(user, entity), user);
+        PermissionCheckContext context = createContext(entity, user);
+        Set<Permission> userPermissions = getUserPermissions(user, entity);
+        return checkPermissionsAnyMatch(permissions, userPermissions, user, context);
+    }
+
+    /**
+     * Create a permission check context object for a given entity
+     *
+     * @param entity The entity to put in the context
+     * @param user The user to put in the context
+     * @return The constructed context
+     */
+    private PermissionCheckContext createContext(IEntityWithMembership entity, SafaUser user) {
+        return PermissionCheckContext.builder()
+            .add(user)
+            .add(entity)
+            .add(serviceProvider)
+            .get();
     }
 
     /**
@@ -196,14 +222,12 @@ public class PermissionService {
      * @param requiredPermissions All permissions that are required
      * @param userPermissions All permissions that the user has
      * @param user The user to check. If the user is a superuser, the function always returns true
+     * @param context The permission check context so that we can do additional checks on the permission
      * @return Whether the user has all required permissions
      */
     private boolean checkPermissionsAllMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
-                                             SafaUser user) {
-        if (isSuperuser(user)) {
-            return true;
-        }
-        return userPermissions.containsAll(requiredPermissions);
+                                             SafaUser user, PermissionCheckContext context) {
+        return requiredPermissions.stream().allMatch(perm -> checkPermission(perm, userPermissions, user, context));
     }
 
     /**
@@ -212,14 +236,12 @@ public class PermissionService {
      * @param requiredPermissions Set of permissions to check
      * @param userPermissions All permissions that the user has
      * @param user The user to check. If the user is a superuser, the function always returns true
+     * @param context The permission check context so that we can do additional checks on the permission
      * @return Whether the user has any of the required permissions
      */
     private boolean checkPermissionsAnyMatch(Set<Permission> requiredPermissions, Set<Permission> userPermissions,
-                                             SafaUser user) {
-        if (isSuperuser(user)) {
-            return true;
-        }
-        return requiredPermissions.stream().anyMatch(userPermissions::contains);
+                                             SafaUser user, PermissionCheckContext context) {
+        return requiredPermissions.stream().anyMatch(perm -> checkPermission(perm, userPermissions, user, context));
     }
 
     /**
@@ -228,13 +250,20 @@ public class PermissionService {
      * @param requiredPermission The required permission
      * @param userPermissions All permissions that the user has
      * @param user The user to check. If the user is a superuser, the function always returns true
+     * @param context The permission check context so that we can do additional checks on the permission
      * @return Whether the user has the required permission
      */
-    private boolean checkPermission(Permission requiredPermission, Set<Permission> userPermissions, SafaUser user) {
+    private boolean checkPermission(Permission requiredPermission, Set<Permission> userPermissions,
+                                    SafaUser user, PermissionCheckContext context) {
         if (isSuperuser(user)) {
             return true;
         }
-        return userPermissions.contains(requiredPermission);
+
+        if (!userPermissions.contains(requiredPermission)) {
+            return false;
+        }
+
+        return requiredPermission.getAdditionalCheck().doCheck(context);
     }
 
     /**

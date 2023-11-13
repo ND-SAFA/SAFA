@@ -1,8 +1,7 @@
 package edu.nd.crc.safa.features.permissions.entities;
 
-import java.util.List;
-
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.NoAdditionalPermissionCheck;
 
 /**
  * A simple permission is a permission that is just a name
@@ -18,7 +17,7 @@ import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
 @FunctionalInterface
 public interface SimplePermission extends Permission {
     @Override
-    default List<AdditionalPermissionCheck> getAdditionalChecks() {
-        return List.of();
+    default AdditionalPermissionCheck getAdditionalCheck() {
+        return new NoAdditionalPermissionCheck();
     }
 }

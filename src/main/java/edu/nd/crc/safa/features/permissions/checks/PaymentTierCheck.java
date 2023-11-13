@@ -28,7 +28,7 @@ public class PaymentTierCheck implements AdditionalPermissionCheck {
         if (org == null) {
             return false;
         }
-        
+
         return supportedTiers.contains(org.getPaymentTier());
     }
 }

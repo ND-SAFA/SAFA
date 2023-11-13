@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.features.permissions.entities;
 
-import java.util.List;
-
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
 
 /**
@@ -38,9 +36,9 @@ public interface Permission {
     String getName();
 
     /**
-     * Get any additional checks associated with this permission.
+     * Get additional check associated with this permission.
      *
-     * @return All additional checks for this permission.
+     * @return Additional check for this permission.
      */
-    List<AdditionalPermissionCheck> getAdditionalChecks();
+    AdditionalPermissionCheck getAdditionalCheck();
 }

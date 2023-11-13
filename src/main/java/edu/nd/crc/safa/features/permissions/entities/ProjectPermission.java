@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.features.permissions.entities;
 
-import java.util.List;
+import java.util.Set;
 
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.NoAdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.PaymentTierCheck;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,16 +13,17 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ProjectPermission implements Permission {
-    DELETE("project.delete", List.of()),
-    EDIT("project.edit", List.of()),
-    EDIT_DATA("project.edit_data", List.of()),
-    EDIT_INTEGRATIONS("project.edit_integrations", List.of()),
-    EDIT_MEMBERS("project.edit_members", List.of()),
-    EDIT_VERSIONS("project.edit_versions", List.of()),
-    GENERATE("project.generate", List.of()),
-    VIEW("project.view", List.of());
+    DELETE("project.delete", new NoAdditionalPermissionCheck()),
+    EDIT("project.edit", new NoAdditionalPermissionCheck()),
+    EDIT_DATA("project.edit_data", new NoAdditionalPermissionCheck()),
+    EDIT_INTEGRATIONS("project.edit_integrations", new NoAdditionalPermissionCheck()),
+    EDIT_MEMBERS("project.edit_members", new NoAdditionalPermissionCheck()),
+    EDIT_VERSIONS("project.edit_versions", new NoAdditionalPermissionCheck()),
+    GENERATE("project.generate",
+        new PaymentTierCheck(Set.of(PaymentTier.AS_NEEDED, PaymentTier.RECURRING, PaymentTier.UNLIMITED))),
+    VIEW("project.view", new NoAdditionalPermissionCheck());
 
     private final String name;
 
-    private final List<AdditionalPermissionCheck> additionalChecks;
+    private final AdditionalPermissionCheck additionalCheck;
 }

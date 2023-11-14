@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List, Type, Set
 
 import numpy as np
 
@@ -164,3 +164,15 @@ class TraceDataFrame(AbstractProjectDataFrame):
         for i, row in self.itertuples():
             t_map[i] = row
         return t_map
+
+    def get_orphans(self, artifact_role: TraceKeys = TraceKeys.child_label()) -> Set[Any]:
+        """
+        Returns all orphans that are of the given role (parent or child)
+        :param artifact_role: The role of the artifact as either a parent (target) or child (source)
+        :return: Ids of all orphans that are of the given role (parent or child)
+        """
+        linked_artifacts = {trace[artifact_role] for i, trace in self.itertuples()
+                            if trace[TraceKeys.LABEL] == 1}
+        orphans = {trace[artifact_role] for i, trace in self.itertuples()
+                   if trace[artifact_role] not in linked_artifacts}
+        return orphans

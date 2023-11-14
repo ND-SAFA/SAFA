@@ -48,8 +48,9 @@ class EmbeddingsManager:
         :param artifact_ids: The artifact ids to embed.
         :return: List of embeddings in same order as artifact ids.
         """
-        embedding_map = self.create_embedding_map(subset_ids=artifact_ids, **kwargs)
-        embeddings = [embedding_map[entry_id] for entry_id in artifact_ids]
+        subset_ids = list(self._content_map.keys()) if not artifact_ids else artifact_ids
+        embedding_map = self.create_embedding_map(subset_ids=subset_ids, **kwargs)
+        embeddings = [embedding_map[entry_id] for entry_id in subset_ids]
         return embeddings
 
     def create_embedding_map(self, subset_ids: List[str] = None, **kwargs) -> Dict[str, EmbeddingType]:

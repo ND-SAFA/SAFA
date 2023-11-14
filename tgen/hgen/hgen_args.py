@@ -82,6 +82,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     perform_clustering: bool = True
     """
+    If True, adds already linked artifacts to the cluster that their parent is in
+    """
+    add_linked_artifacts_to_cluster: bool = False # TODO change to default to false
+    """
     The llm manager to use for each prediction step
     """
     llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)

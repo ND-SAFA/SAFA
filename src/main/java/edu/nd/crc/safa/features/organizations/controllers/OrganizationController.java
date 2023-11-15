@@ -104,7 +104,7 @@ public class OrganizationController extends BaseController {
         SafaUser user = getCurrentUser();
         permissionService.requireSuperuser(user);
         Organization orgDefinition = new Organization(newOrgEntity.getName(), newOrgEntity.getDescription(),
-            user, PaymentTier.FREE, false);
+            user, PaymentTier.AS_NEEDED, false);
         Organization newOrg = organizationService.createNewOrganization(orgDefinition);
         return organizationService.getAppEntity(newOrg, user);
     }

@@ -77,7 +77,7 @@ public class SafaUserService {
         safaUser = this.safaUserRepository.save(safaUser);  // Save once so it gets an id
 
         Organization personalOrg =
-            organizationService.createNewOrganization(new Organization(email, "", safaUser, PaymentTier.FREE, true));
+            organizationService.createNewOrganization(new Organization(email, "", safaUser, PaymentTier.AS_NEEDED, true));
         safaUser.setPersonalOrgId(personalOrg.getId());
         safaUser.setDefaultOrgId(personalOrg.getId());
         safaUser = this.safaUserRepository.save(safaUser);  // Save again so it gets the org id

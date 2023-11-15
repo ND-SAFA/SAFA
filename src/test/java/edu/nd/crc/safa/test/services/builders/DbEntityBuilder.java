@@ -437,7 +437,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     }
 
     public Organization newOrganization(String name, String description) {
-        return organizationService.createNewOrganization(new Organization(name, description, currentUser, PaymentTier.FREE, false));
+        return organizationService.createNewOrganization(new Organization(name, description, currentUser, PaymentTier.AS_NEEDED, false));
     }
 
     public Team newTeam(String name, Organization organization) {

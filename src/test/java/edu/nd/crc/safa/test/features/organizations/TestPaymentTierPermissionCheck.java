@@ -46,7 +46,7 @@ public class TestPaymentTierPermissionCheck extends ApplicationBaseTest {
     public void testTierCheckFail() {
         // TODO endpoint to set payment tier
         Organization defaultOrg = serviceProvider.getOrganizationService().getOrganizationById(getCurrentUser().getDefaultOrgId());
-        defaultOrg.setPaymentTier(PaymentTier.FREE);
+        defaultOrg.setPaymentTier(PaymentTier.AS_NEEDED);
         serviceProvider.getOrganizationService().updateOrganization(defaultOrg);
 
         HGenRequest body = new HGenRequest();

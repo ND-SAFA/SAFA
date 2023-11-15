@@ -19,8 +19,7 @@ public enum ProjectPermission implements Permission {
     EDIT_INTEGRATIONS("project.edit_integrations", new NoAdditionalPermissionCheck()),
     EDIT_MEMBERS("project.edit_members", new NoAdditionalPermissionCheck()),
     EDIT_VERSIONS("project.edit_versions", new NoAdditionalPermissionCheck()),
-    GENERATE("project.generate",
-        new PaymentTierCheck(Set.of(PaymentTier.AS_NEEDED, PaymentTier.RECURRING, PaymentTier.UNLIMITED))),
+    GENERATE("project.generate", new PaymentTierCheck(Set.of(PaymentTier.RECURRING, PaymentTier.UNLIMITED))),
     VIEW("project.view", new NoAdditionalPermissionCheck());
 
     private final String name;

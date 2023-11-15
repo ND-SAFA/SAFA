@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.utilities.exception;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 public class ExternalAPIException extends RuntimeException {
@@ -17,7 +16,7 @@ public class ExternalAPIException extends RuntimeException {
         this.message = message;
     }
 
-    public ExternalAPIException(String message, HttpStatus status, String message1) {
+    public ExternalAPIException(String message, HttpStatusCode status, String message1) {
         super(message);
         this.status = status;
         this.message = message1;

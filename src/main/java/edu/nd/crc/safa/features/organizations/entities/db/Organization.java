@@ -18,10 +18,12 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
+import org.hibernate.type.descriptor.jdbc.VarcharJdbcType;
 
 @Entity
 @Table(name = "organization")
@@ -49,6 +51,7 @@ public class Organization implements IEntityWithMembership {
 
     @Column
     @Enumerated(EnumType.STRING)
+    @JdbcType(VarcharJdbcType.class)
     private PaymentTier paymentTier;
 
     @Column

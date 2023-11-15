@@ -11,7 +11,7 @@
       <q-bar class="bg-neutral q-mt-md">
         <q-space />
 
-        <text-button v-close-popup text icon="cancel">
+        <text-button text icon="cancel" @click="handleClose">
           Skip Onboarding
         </text-button>
       </q-bar>
@@ -57,15 +57,41 @@
               <flex-box t="4">
                 <text-button
                   text
-                  large
                   color="gradient"
                   class="bd-gradient"
                   icon="generate-artifacts"
+                  :disabled="error"
                   @click="handleGenerate"
                 >
                   Generate Documentation
                 </text-button>
               </flex-box>
+              <q-banner v-if="error" rounded class="bg-background q-mt-md">
+                <template #avatar>
+                  <icon
+                    variant="error"
+                    color="secondary"
+                    size="md"
+                    class="q-mr-sm"
+                  />
+                </template>
+                <typography
+                  value="
+                  On no! It looks like there was an issue with importing from GitHub.
+                  You can schedule a call with us below to ensure your data gets uploaded properly.
+                "
+                />
+                <template #action>
+                  <text-button
+                    text
+                    color="secondary"
+                    icon="calendar"
+                    @click="handleScheduleCall"
+                  >
+                    Schedule a Call
+                  </text-button>
+                </template>
+              </q-banner>
             </flex-box>
           </template>
           <template v-if="!!recentJob" #4>
@@ -113,10 +139,10 @@
             <flex-box column align="center" t="2">
               <text-button
                 text
-                large
                 color="gradient"
                 class="bd-gradient"
                 icon="download"
+                :loading="projectApiStore.saveProjectLoading"
                 @click="handleExportProject"
               >
                 Export as CSV
@@ -128,7 +154,6 @@
               </flex-box>
               <text-button
                 text
-                large
                 color="gradient"
                 class="bd-gradient"
                 icon="view-tree"
@@ -155,8 +180,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { StepperStep } from "@/types";
-import { ARTIFACT_GENERATION_TYPES, ENABLED_FEATURES } from "@/util";
+import { LocalStorageKeys, StepperStep } from "@/types";
+import {
+  ARTIFACT_GENERATION_TYPES,
+  ENABLED_FEATURES,
+  ONBOARDING_STEPS,
+} from "@/util";
 import {
   createProjectApiStore,
   getVersionApiStore,
@@ -183,46 +212,12 @@ import {
   GitHubProjectInput,
 } from "@/components/integrations";
 
-const stepMap = {
-  connect: {
-    title: "Connect GitHub",
-    caption: "Connect your GitHub account to get started.",
-    index: 0,
-    number: 1,
-  },
-  code: {
-    title: "Select Repository",
-    caption: "Select code from GitHub to import.",
-    index: 1,
-    number: 2,
-  },
-  generate: {
-    title: "Generate Documentation",
-    caption: ENABLED_FEATURES.BILLING_ONBOARDING
-      ? "Review costs and generate documentation for your code."
-      : "Generate documentation for your code.",
-    index: 2,
-    number: 3,
-  },
-  job: {
-    title: "Await Generation",
-    caption: "Wait for data generation to complete.",
-    index: 3,
-    number: 4,
-  },
-  view: {
-    title: "View Documentation",
-    caption: "Export generated data, or view the data within SAFA.",
-    index: 4,
-    number: 5,
-  },
-};
-
 const open = ref(false);
+const error = ref(false);
 
 const step = ref(1);
 const steps = ref<StepperStep[]>(
-  Object.values(stepMap).map((step) => ({ ...step, done: false }))
+  Object.values(ONBOARDING_STEPS).map((step) => ({ ...step, done: false }))
 );
 
 const generationTypes = ref([
@@ -233,7 +228,9 @@ const generationTypes = ref([
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 
 const recentJob = computed(() =>
-  steps.value[stepMap.generate.index].done ? jobStore.jobs[0] : undefined
+  steps.value[ONBOARDING_STEPS.generate.index].done
+    ? jobStore.jobs[0]
+    : undefined
 );
 const jobProgressDisplay = computed(() =>
   recentJob.value
@@ -244,17 +241,32 @@ const jobProgressDisplay = computed(() =>
 );
 
 /**
+ * Close the popup and mark onboarding as complete.
+ */
+function handleClose() {
+  open.value = false;
+  localStorage.setItem(LocalStorageKeys.onboarding, "true");
+}
+
+/**
+ * Schedule a call with the SAFA team.
+ */
+function handleScheduleCall() {
+  // TODO
+}
+
+/**
  * Generate documentation for the selected project.
  * - Moves from Generate Documentation step if a project is created.
  */
 function handleGenerate() {
   if (ENABLED_FEATURES.ONBOARDING_MOCKED) {
-    steps.value[stepMap.generate.index].done = true;
-    step.value = stepMap.job.number;
+    steps.value[ONBOARDING_STEPS.generate.index].done = true;
+    step.value = ONBOARDING_STEPS.job.number;
 
     setTimeout(() => {
-      steps.value[stepMap.job.index].done = true;
-      step.value = stepMap.view.number;
+      steps.value[ONBOARDING_STEPS.job.index].done = true;
+      step.value = ONBOARDING_STEPS.view.number;
     }, 2000);
 
     return;
@@ -262,11 +274,10 @@ function handleGenerate() {
 
   createProjectApiStore.handleGitHubImport({
     onSuccess: () => {
-      steps.value[stepMap.generate.index].done = true;
-      step.value = stepMap.job.number;
+      steps.value[ONBOARDING_STEPS.generate.index].done = true;
+      step.value = ONBOARDING_STEPS.job.number;
     },
-    // onError: () => {},
-    // onComplete: () => {},
+    onError: () => (error.value = true),
   });
 }
 
@@ -286,6 +297,7 @@ async function handleExportProject() {
   );
 
   logStore.onSuccess("Your data is being exported.");
+  handleClose();
 }
 
 /**
@@ -298,11 +310,14 @@ async function handleViewProject() {
     projectId: recentJob.value.completedEntityId,
   });
 
-  open.value = false;
+  handleClose();
 }
 
 // Preload GitHub projects if credentials are already set.
 onMounted(() => {
+  const storedOnboardingComplete =
+    localStorage.getItem(LocalStorageKeys.onboarding) === "true";
+
   if (integrationsStore.validGitHubCredentials) {
     gitHubApiStore.handleLoadProjects();
   }
@@ -325,10 +340,10 @@ watch(
   () => integrationsStore.validGitHubCredentials,
   (valid) => {
     if (valid) {
-      steps.value[stepMap.connect.index].done = true;
+      steps.value[ONBOARDING_STEPS.connect.index].done = true;
 
-      if (step.value === stepMap.connect.number) {
-        step.value = stepMap.code.number;
+      if (step.value === ONBOARDING_STEPS.connect.number) {
+        step.value = ONBOARDING_STEPS.code.number;
       }
 
       gitHubApiStore.handleLoadProjects();
@@ -341,10 +356,10 @@ watch(
   () => !!integrationsStore.gitHubProject,
   (valid) => {
     if (valid) {
-      steps.value[stepMap.code.index].done = true;
+      steps.value[ONBOARDING_STEPS.code.index].done = true;
 
-      if (step.value === stepMap.code.number) {
-        step.value = stepMap.generate.number;
+      if (step.value === ONBOARDING_STEPS.code.number) {
+        step.value = ONBOARDING_STEPS.generate.number;
       }
     }
   }
@@ -356,10 +371,10 @@ watch(
   (status) => {
     if (status !== "COMPLETED") return;
 
-    steps.value[stepMap.generate.index].done = true;
+    steps.value[ONBOARDING_STEPS.generate.index].done = true;
 
-    if (step.value === stepMap.generate.number) {
-      step.value = stepMap.job.number;
+    if (step.value === ONBOARDING_STEPS.generate.number) {
+      step.value = ONBOARDING_STEPS.job.number;
     }
   }
 );

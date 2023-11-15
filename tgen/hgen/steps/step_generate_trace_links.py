@@ -1,8 +1,9 @@
 from typing import Dict, List, Set, Tuple
 
+from tgen.common.logging.logger_manager import logger
+
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
-from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -16,7 +17,6 @@ from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
@@ -82,7 +82,9 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map()
         state.embedding_manager.update_or_add_contents(new_artifact_map)
-        state.embedding_manager.create_artifact_embeddings()
+        subset_ids = list({a[ArtifactKeys.ID] for artifacts in state.id_to_cluster_artifacts.values() for a in artifacts})
+        subset_ids += list(state.new_artifact_dataset.artifact_df.index)
+        state.embedding_manager.create_artifact_embeddings(artifact_ids=subset_ids)
         pipeline_kwargs = dict(dataset=state.all_artifacts_dataset, selection_method=None,
                                types_to_trace=(args.source_type, args.target_type), generate_explanations=False,
                                embeddings_manager=state.embedding_manager)
@@ -123,7 +125,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         ranking_state = RankingState()
         pipeline = SortChildrenStep()
-        pipeline.run(ranking_args, ranking_state)
+        pipeline.run(ranking_args, ranking_state, verbose=False)
         selected_predictions = ranking_state.get_current_entries()
         return selected_predictions
 

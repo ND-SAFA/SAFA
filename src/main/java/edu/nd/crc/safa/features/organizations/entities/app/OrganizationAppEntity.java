@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ public class OrganizationAppEntity {
     private String name;
     private String description;
     private boolean personalOrg;
-    private String paymentTier;
+    private PaymentTier paymentTier;
     private List<MembershipAppEntity> members;
     private List<TeamAppEntity> teams;
     private List<String> permissions;

@@ -22,6 +22,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -102,7 +103,7 @@ public class JobController extends BaseController {
         SafaUser user = getCurrentUser();
         JobDbEntity job = jobService.getJobById(jobId);
         if (job != null && !job.getUser().equals(user)) {
-            throw new MissingPermissionException(() -> "delete_job");
+            throw new MissingPermissionException((SimplePermission) () -> "delete_job");
         }
 
         JobDbEntity jobDbEntity = this.jobService.deleteJob(jobId);

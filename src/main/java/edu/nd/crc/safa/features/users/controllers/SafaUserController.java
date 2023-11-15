@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
+import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordChangeRequest;
@@ -109,7 +110,7 @@ public class SafaUserController extends BaseController {
     public UserAppEntity createNewVerifiedUser(@RequestBody CreateAccountRequest newUser) {
         SafaUser currentUser = getCurrentUser();
         if (!currentUser.isSuperuser()) {
-            throw new MissingPermissionException(() -> "safa.create_verified_account");
+            throw new MissingPermissionException((SimplePermission) () -> "safa.create_verified_account");
         }
 
         SafaUser createdAccount = safaUserService.createUser(newUser.getEmail(), newUser.getPassword());

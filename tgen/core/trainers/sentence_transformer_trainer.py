@@ -19,6 +19,7 @@ from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.trainers.st.custom_sentence_transformer import CustomSentenceTransformer
 from tgen.core.wandb.WBManager import WBManager
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -124,8 +125,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         if SupportedLossFunctions.MNRL.is_name(self.trainer_args.st_loss_function):
             self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager, use_pos_ids=True)
             logger.info("Using only positive links in training dataset.")
-        if SupportedLossFunctions.CONTRASTIVE.is_name():
-            pass
+
         train_examples = self.to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_dataloader = DataLoader(train_examples, shuffle=self.trainer_args.shuffle, batch_size=self.args.train_batch_size)
 
@@ -135,17 +135,20 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
 
         logger.log_title("Training...", prefix=NEW_LINE)
-        self.model.fit(train_objectives=[(train_dataloader, loss_function)],
-                       epochs=int(self.args.num_train_epochs),
-                       warmup_steps=self.args.warmup_steps,
-                       evaluation_steps=n_steps,
-                       evaluator=evaluator,
-                       output_path=self.args.output_dir,
-                       save_best_model=self.trainer_args.save_best_model,
-                       show_progress_bar=True)
+        model: CustomSentenceTransformer = self.model
+        model.fit(train_objectives=[(train_dataloader, loss_function)],
+                  epochs=int(self.args.num_train_epochs),
+                  warmup_steps=self.args.warmup_steps,
+                  evaluation_steps=n_steps,
+                  evaluator=evaluator,
+                  output_path=self.args.output_dir,
+                  save_best_model=self.trainer_args.save_best_model,
+                  show_progress_bar=True,
+                  accumulation_steps=self.args.gradient_accumulation_steps
+                  )
         self.state.best_model_checkpoint = self.args.output_dir
         if self.args.load_best_model_at_end:
-            self.model = SentenceTransformer(self.state.best_model_checkpoint)
+            self.model = CustomSentenceTransformer(self.state.best_model_checkpoint)
 
         metrics = {
             "records": evaluator.metrics,

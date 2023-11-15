@@ -26,8 +26,8 @@
             "save_strategy": "epoch",
             "evaluation_strategy": "epoch",
             "eval_steps": 1,
-            "gradient_accumulation_steps": 4,
-            "do_training_eval": false
+            "gradient_accumulation_steps": "[GRADIENT_ACCUMULATION_STEPS_INT]",
+            "do_training_eval": "[DO_TRAINING_EVAL_BOOL]"
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

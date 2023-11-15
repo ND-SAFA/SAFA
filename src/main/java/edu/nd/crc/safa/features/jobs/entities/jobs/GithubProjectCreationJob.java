@@ -418,10 +418,6 @@ public class GithubProjectCreationJob extends CommitJob {
             } catch (ExternalAPIException | NullPointerException e) {
                 locationLogBuilder.append("**ERROR**: Failed to retrieve files: `")
                     .append(e.getMessage()).append("`\n\n");
-                if (response != null) {
-                    locationLogBuilder.append("Errors from GitHub response: `")
-                        .append(response.getErrors()).append("`\n\n");
-                }
             } finally {
                 logger.log(locationLogBuilder.toString());
             }

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlFileContentsResponse;
@@ -20,6 +21,7 @@ import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileType;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
 import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
@@ -150,18 +152,28 @@ public class GithubGraphQlService {
         while (!locations.isEmpty()) {
             String currentLocation = locations.poll();
 
-            GithubGraphQlTreeObjectsResponse response = getGithubTreeObjects(user, owner, name, currentLocation);
-            List<GithubRepositoryFileDTO> locationFiles = GithubRepositoryFileDTO.fromGithubGraphQlResponse(response);
+            GithubGraphQlTreeObjectsResponse response = null;
+            try {
+                response = getGithubTreeObjects(user, owner, name, currentLocation);
+                List<GithubRepositoryFileDTO> locationFiles =
+                    GithubRepositoryFileDTO.fromGithubGraphQlResponse(response);
 
-            for (GithubRepositoryFileDTO file : locationFiles) {
-                if (file.getType() == GithubRepositoryFileType.FILE) {
-                    addFileContents(file, branch, user, owner, name);
-                    files.add(file);
-                } else if (file.getType() == GithubRepositoryFileType.FOLDER) {
-                    locations.add(branch + file.getPath());
-                } else if (file.getType() == GithubRepositoryFileType.SUBMODULE) {
-                    logger.warning("Submodule found at " + file.getPath() + " but submodules are not supported");
+                for (GithubRepositoryFileDTO file : locationFiles) {
+                    if (file.getType() == GithubRepositoryFileType.FILE) {
+                        addFileContents(file, branch, user, owner, name);
+                        files.add(file);
+                    } else if (file.getType() == GithubRepositoryFileType.FOLDER) {
+                        locations.add(branch + file.getPath());
+                    } else if (file.getType() == GithubRepositoryFileType.SUBMODULE) {
+                        logger.warning("Submodule found at " + file.getPath() + " but submodules are not supported");
+                    }
                 }
+            } catch (ExternalAPIException | NullPointerException e) {
+                logger.log(Level.SEVERE,
+                    String.format("Failed to retrieve files in %s/%s/%s", owner, name, currentLocation), e);
+                //if (response != null) {
+                //    logger.severe("Errors:" + response.getErrors());
+                //}
             }
         }
 
@@ -180,9 +192,16 @@ public class GithubGraphQlService {
     private void addFileContents(GithubRepositoryFileDTO file, String branch,
                                  SafaUser user, String owner, String name) {
         String location = branch + file.getPath();
-        GithubGraphQlFileContentsResponse contentsResponse = getGithubFileContents(user, owner, name, location);
-        String content = contentsResponse.getData().getRepository().getObject().getText();
-        file.setContents(content);
+
+        try {
+            GithubGraphQlFileContentsResponse contentsResponse = getGithubFileContents(user, owner, name, location);
+            String content = contentsResponse.getData().getRepository().getObject().getText();
+            file.setContents(content);
+        } catch (ExternalAPIException | NullPointerException e) {
+            logger.log(Level.SEVERE,
+                String.format("Failed to retrieve contents of %s/%s/%s", owner, name, location), e);
+            file.setContents("<failed to retrieve from GitHub>");
+        }
     }
 
     /**

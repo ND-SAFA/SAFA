@@ -201,7 +201,7 @@ class EmbeddingsManager:
         Loads any saved embeddings into the object after being reloaded from yaml
         :return: None
         """
-        if self._base_path and self.__ordered_ids:
+        if self._base_path:
             object_paths = self.get_object_paths()
             ordered_ids = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.ORDERED_IDS])
             self.__set_embedding_order(ordered_ids)
@@ -230,8 +230,11 @@ class EmbeddingsManager:
         :return: Map of artifact ID to its content.
         """
         content_df = pd.read_csv(file_path)
-        content_map = {content_row[ArtifactKeys.ID.value]: content_row[ArtifactKeys.CONTENT.value]
-                       for _, content_row in content_df.iterrows()}
+        if ArtifactKeys.CONTENT.value in content_df.columns:
+            content_map = {content_row[ArtifactKeys.ID.value]: content_row[ArtifactKeys.CONTENT.value]
+                           for _, content_row in content_df.iterrows()}
+        else:
+            content_map = list(content_df[ArtifactKeys.ID.value])
         return content_map
 
     def save_embeddings_to_file(self, dir_path: str) -> None:
@@ -301,8 +304,7 @@ class EmbeddingsManager:
         :param export_path: The path to save the embeddings to
         :return: True if the embeddings need re-saved
         """
-        need_save = not self._base_path or self.__state_changed_since_last_save \
-                    or FileUtil.collapse_paths(export_path) != os.path.dirname(self._base_path)
+        need_save = not self._base_path or self.__state_changed_since_last_save
         return need_save
 
     def calculate_centroid(self, cluster: List[str]):

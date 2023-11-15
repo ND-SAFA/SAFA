@@ -35,7 +35,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     steps = [InitializeDatasetStep,
              GenerateInputsStep,
              CreateClustersStep,
-             AddLinkedArtifactsToClustersStep,
              GenerateArtifactContentStep,
              RefineGenerationsStep,
              NameArtifactsStep,

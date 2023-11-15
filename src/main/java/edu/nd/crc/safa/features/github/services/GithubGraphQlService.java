@@ -1,11 +1,6 @@
 package edu.nd.crc.safa.features.github.services;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlPaginateBranchesResponse;
@@ -15,12 +10,9 @@ import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlTreeObjectsResp
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.GithubGraphQlQueries;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileType;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
 import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
@@ -86,8 +78,7 @@ public class GithubGraphQlService {
      * (with no path)</p>
      *
      * <p>In order to get all files in a repository, this function must be called
-     * repeatedly, once for the top level and again for every item with type "tree".
-     * You can also just call {@link #getFilesInRepo(SafaUser, String, String, String)}</p>
+     * repeatedly, once for the top level and again for every item with type "tree".</p>
      *
      * @param user The user making the request.
      * @param owner The owner of the repository.
@@ -103,54 +94,6 @@ public class GithubGraphQlService {
             "repoOwner", owner,
             "repoName", name,
             "location", location);
-    }
-
-    /**
-     * Get all files in a repository at a specific branch. This differs from
-     * {@link #getGithubTreeObjects(SafaUser, String, String, String)} in that it recursively gets
-     * all files, rather than just getting ones in a single directory.
-     *
-     * @param user The user making the request.
-     * @param owner The owner of the repository.
-     * @param name The name of the repository.
-     * @param branch The branch to get files from.
-     * @return The files in the repository.
-     */
-    public List<GithubRepositoryFileDTO> getFilesInRepo(SafaUser user, String owner, String name, String branch) {
-        List<GithubRepositoryFileDTO> files = new ArrayList<>();
-
-        Queue<String> locations = new LinkedList<>();
-        branch = branch + ":";
-        locations.add(branch);
-
-        while (!locations.isEmpty()) {
-            String currentLocation = locations.poll();
-
-            GithubGraphQlTreeObjectsResponse response = null;
-            try {
-                response = getGithubTreeObjects(user, owner, name, currentLocation);
-                List<GithubRepositoryFileDTO> locationFiles =
-                    GithubRepositoryFileDTO.fromGithubGraphQlResponse(response);
-
-                for (GithubRepositoryFileDTO file : locationFiles) {
-                    if (file.getType() == GithubRepositoryFileType.FILE) {
-                        files.add(file);
-                    } else if (file.getType() == GithubRepositoryFileType.FOLDER) {
-                        locations.add(branch + file.getPath());
-                    } else if (file.getType() == GithubRepositoryFileType.SUBMODULE) {
-                        logger.warning("Submodule found at " + file.getPath() + " but submodules are not supported");
-                    }
-                }
-            } catch (ExternalAPIException | NullPointerException e) {
-                logger.log(Level.SEVERE,
-                    String.format("Failed to retrieve files in %s/%s/%s", owner, name, currentLocation), e);
-                if (response != null) {
-                    logger.severe("Errors:" + response.getErrors());
-                }
-            }
-        }
-
-        return files;
     }
 
     /**

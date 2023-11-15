@@ -4,8 +4,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.function.Predicate;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -17,11 +19,13 @@ import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlTreeObjectsResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileType;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
@@ -37,6 +41,7 @@ import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectOwner;
+import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -380,40 +385,75 @@ public class GithubProjectCreationJob extends CommitJob {
 
     protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        GithubGraphQlService githubService = getServiceProvider().getGithubGraphQlService();
-        List<GithubRepositoryFileDTO> files = githubService.getFilesInRepo(this.user,
-            this.githubIdentifier.getRepositoryOwner(),
-            this.githubIdentifier.getRepositoryName(),
-            this.githubProject.getBranch());
+        GithubGraphQlService githubGraphQlService = getServiceProvider().getGithubGraphQlService();
 
-        for (GithubRepositoryFileDTO file : files) {
+        String branch = githubProject.getBranch() + ":";
+        String owner = githubIdentifier.getRepositoryOwner();
+        String name = githubIdentifier.getRepositoryName();
+        Queue<String> locations = new LinkedList<>();
+        locations.add(branch);
 
-            String path = file.getPath();
-            if (shouldSkipFile(path)) {
-                logger.log("%s will not be imported due to inclusion/exclusion criteria.", path);
-                continue;
+        while (!locations.isEmpty()) {
+            String currentLocation = locations.poll();
+
+            GithubGraphQlTreeObjectsResponse response = null;
+            StringBuilder locationLogBuilder = new StringBuilder();
+            try {
+                locationLogBuilder.append("## Retrieving files from *").append(currentLocation).append("*\n\n");
+                response = githubGraphQlService.getGithubTreeObjects(user, owner, name, currentLocation);
+                List<GithubRepositoryFileDTO> locationFiles =
+                    GithubRepositoryFileDTO.fromGithubGraphQlResponse(response);
+
+                for (GithubRepositoryFileDTO file : locationFiles) {
+                    if (file.getType() == GithubRepositoryFileType.FILE) {
+                        processFile(file, artifacts, locationLogBuilder);
+                    } else if (file.getType() == GithubRepositoryFileType.FOLDER) {
+                        locations.add(branch + file.getPath());
+                    } else if (file.getType() == GithubRepositoryFileType.SUBMODULE) {
+                        locationLogBuilder.append("**WARNING**: Submodule found at `")
+                            .append(file.getPath())
+                            .append("` but submodules are not supported\n\n");
+                    }
+                }
+            } catch (ExternalAPIException | NullPointerException e) {
+                locationLogBuilder.append("**ERROR**: Failed to retrieve files: `")
+                    .append(e.getMessage()).append("`\n\n");
+                if (response != null) {
+                    locationLogBuilder.append("Errors from GitHub response: `")
+                        .append(response.getErrors()).append("`\n\n");
+                }
+            } finally {
+                logger.log(locationLogBuilder.toString());
             }
-            logger.log("Importing %s.", path);
-
-            String type = githubProject.getArtifactType().getName();
-            String summary = "";
-            String body = file.isBinary() ? "<binary file>" : file.getContents();
-
-            Map<String, JsonNode> attributes = getAttributes(file.getPath());
-
-            ArtifactAppEntity artifact = new ArtifactAppEntity(
-                null,
-                type,
-                path,
-                summary,
-                body,
-                attributes
-            );
-
-            artifacts.add(artifact);
         }
 
         return artifacts;
+    }
+
+    private void processFile(GithubRepositoryFileDTO file, List<ArtifactAppEntity> artifacts, StringBuilder logger) {
+        String path = file.getPath();
+        if (shouldSkipFile(path)) {
+            logger.append('`').append(path).append("` will not be imported due to inclusion/exclusion criteria.\n\n");
+            return;
+        }
+        logger.append("Importing *").append(path).append("*\n\n");
+
+        String type = githubProject.getArtifactType().getName();
+        String summary = "";
+        String body = file.isBinary() ? "<binary file>" : file.getContents();
+
+        Map<String, JsonNode> attributes = getAttributes(file.getPath());
+
+        ArtifactAppEntity artifact = new ArtifactAppEntity(
+            null,
+            type,
+            path,
+            summary,
+            body,
+            attributes
+        );
+
+        artifacts.add(artifact);
     }
 
     protected Map<String, JsonNode> getAttributes(String filePath) {

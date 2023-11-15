@@ -8,6 +8,7 @@
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
               "source_layer_id": "[SOURCE_LAYER_ID]",
+              "source_type": "[SOURCE_LAYER_ID]",
               "target_type": "[TARGET_TYPE]",
               "create_project_summary": "[CREATE_PROJECT_SUMMARY_BOOL]",
               "generate_trace_links": true,

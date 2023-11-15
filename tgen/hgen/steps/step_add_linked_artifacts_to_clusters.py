@@ -1,13 +1,8 @@
-from typing import Set
-
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.link_orphans import LinkOrphans
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -51,6 +46,6 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
             new_clusters = {c_id for c_id, c_artifacts in clustering_state.final_cluster_map.items()
                             if c_id not in state.id_to_cluster_artifacts}
             state.id_to_cluster_artifacts = {c_id: [state.original_dataset.artifact_df.get_artifact(a_id)
-                                                          for a_id in artifact_ids]
+                                                    for a_id in artifact_ids]
                                              for c_id, artifact_ids in clustering_state.final_cluster_map.items()
                                              if c_id not in new_clusters}

@@ -65,7 +65,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     export_dir=HGenUtil.get_ranking_dir(state.export_dir),
                                     generate_explanations=args.generate_explanations,
                                     link_threshold=FIRST_PASS_LINK_THRESHOLD)
-        selected_entries = self._run_embedding_pipeline(pipeline_args, state, skip_summarization=not args.create_project_summary)
+        selected_entries = self._run_embedding_pipeline(pipeline_args)
         trace_predictions: List[EnumDict] = selected_entries
         return trace_predictions
 

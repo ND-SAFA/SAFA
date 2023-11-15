@@ -7,7 +7,6 @@ query ($repoName: String!, $repoOwner: String!, $location: String!) {
                     type
                     object {
                         ... on Blob {
-                            text
                             isBinary
                         }
                     }

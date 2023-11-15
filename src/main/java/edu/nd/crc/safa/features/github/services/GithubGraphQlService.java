@@ -144,9 +144,9 @@ public class GithubGraphQlService {
             } catch (ExternalAPIException | NullPointerException e) {
                 logger.log(Level.SEVERE,
                     String.format("Failed to retrieve files in %s/%s/%s", owner, name, currentLocation), e);
-                //if (response != null) {
-                //    logger.severe("Errors:" + response.getErrors());
-                //}
+                if (response != null) {
+                    logger.severe("Errors:" + response.getErrors());
+                }
             }
         }
 

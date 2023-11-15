@@ -1,15 +1,18 @@
 package edu.nd.crc.safa.utilities.graphql.services;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
+import edu.nd.crc.safa.utilities.exception.RateLimitedException;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
@@ -18,6 +21,7 @@ import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,8 @@ import reactor.core.publisher.Mono;
 @Service
 @AllArgsConstructor
 public class GraphQlService {
+
+    private static final Logger logger = Logger.getLogger(GraphQlService.class.getName());
 
     private static final int NUM_RETRIES = 3;
 
@@ -129,12 +135,7 @@ public class GraphQlService {
         addVariables(graphQLRequestBody, variables);
 
         Mono<T> request = createRequest(url, authorization, graphQLRequestBody, responseClass)
-            .retry(retries)
-            .onErrorMap(ex -> ex instanceof WebClientResponseException, ex -> {
-                WebClientResponseException responseException = (WebClientResponseException) ex;
-                return new ExternalAPIException(responseException.getMessage(), responseException.getStatusCode(),
-                    responseException.getResponseBodyAsString());
-            });
+            .retry(retries);
         T response = request.block();
         resolveErrors(response);
         return response;
@@ -204,7 +205,34 @@ public class GraphQlService {
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .bodyValue(graphQLRequestBody)
             .retrieve()
-            .bodyToMono(responseClass);
+            .toEntity(responseClass)
+            .doOnSuccess(response -> checkRateLimit(url, response.getHeaders()))
+            .mapNotNull(HttpEntity::getBody)
+            .onErrorMap(ex -> ex instanceof WebClientResponseException, ex -> {
+                WebClientResponseException responseException = (WebClientResponseException) ex;
+                return new ExternalAPIException(responseException.getMessage(), responseException.getStatusCode(),
+                    responseException.getResponseBodyAsString());
+            });
+    }
+
+    private void checkRateLimit(String url, HttpHeaders headers) {
+        List<String> values = headers.get("X-RateLimit-Remaining");
+        if (values != null && !values.isEmpty()) {
+            int remaining = Integer.parseInt(values.get(0));
+
+            if (remaining == 0) {
+                List<String> resetValues = headers.get("X-RateLimit-Reset");
+                if (resetValues != null && !resetValues.isEmpty()) {
+                    long resetTimestamp = Long.parseLong(resetValues.get(0));
+                    throw new RateLimitedException(Instant.ofEpochSecond(resetTimestamp));
+                } else {
+                    throw new RateLimitedException();
+                }
+            }
+            if (remaining < 100) {
+                logger.warning(String.format("Remaining calls to %s: %d", url, remaining));
+            }
+        }
     }
 
     @Data

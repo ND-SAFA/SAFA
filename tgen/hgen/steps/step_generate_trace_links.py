@@ -104,8 +104,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids,
                                         export_dir=cluster_dir,
                                         **pipeline_kwargs)
-            cluster_predictions = self._run_embedding_pipeline(pipeline_args, state,
-                                                               skip_summarization=not args.create_project_summary)
+            cluster_predictions = self._run_embedding_pipeline(pipeline_args)
             parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
             for parent, parent_preds in parent2predictions.items():
                 parent_selected_traces = SelectByThreshold.select(parent_preds, FIRST_PASS_LINK_THRESHOLD)
@@ -116,21 +115,15 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return trace_predictions, selected_traces
 
     @staticmethod
-    def _run_embedding_pipeline(pipeline_args: RankingArgs, hgen_state: HGenState, skip_summarization: bool) -> List[Trace]:
+    def _run_embedding_pipeline(ranking_args: RankingArgs) -> List[Trace]:
         """
         Runs the embedding pipeline to obtain trace predictions
-        :param pipeline_args: The arguments to the ranking pipeline
-        :param hgen_state: The current hgen state
-        :param skip_summarization: Whether to skip summarization of artifacts.
+        :param ranking_args: The arguments to the ranking pipeline
         :return: The selected predictions from the pipeline
         """
-        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=hgen_state.embedding_manager,
-                                            skip_summarization=skip_summarization)
         ranking_state = RankingState()
         pipeline = SortChildrenStep()
-        pipeline.run(pipeline_args, ranking_state)
-        #hgen_state.update_total_costs_from_state(pipeline.state)
-        #hgen_state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
+        pipeline.run(ranking_args, ranking_state)
         selected_predictions = ranking_state.get_current_entries()
         return selected_predictions
 

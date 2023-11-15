@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type, Set
+from typing import Any, Dict, List, Set, Type
 
 import numpy as np
 
@@ -124,10 +124,10 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param explanation: Explanation for generated trace link.
         :return: A dictionary mapping column names to the corresponding link information
         """
-        dict_ = EnumDict({TraceKeys.LINK_ID: link_id} if link_id else {})
-        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id, TraceKeys.LABEL: label, TraceKeys.SCORE: score,
-                      TraceKeys.EXPLANATION: explanation})
-        return dict_
+        dict_ = {TraceKeys.LINK_ID: link_id} if link_id else {}
+        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id,
+                      TraceKeys.LABEL: label, TraceKeys.SCORE: score, TraceKeys.EXPLANATION: explanation})
+        return EnumDict(dict_)
 
     @staticmethod
     def generate_link_id(source_id: Any, target_id: Any) -> int:

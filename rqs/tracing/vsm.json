@@ -1,0 +1,31 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "VSM",
+          "job_args": {
+            "random_seed": 42,
+            "output_dir": "[OUTPUT_DIR]/vsm/[CURRENT_PROJECT]"
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
+            },
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

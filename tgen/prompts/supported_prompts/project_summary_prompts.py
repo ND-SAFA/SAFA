@@ -45,6 +45,12 @@ ENTITIES_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
 
 
 def subsection_formatter(t, v):
+    """
+    Formats the expected sub-systems section.
+    :param t: Ignored.
+    :param v: The dictionary mapping tag to response.
+    :return: The title and description of the subsection parsed.
+    """
     name_query = v["name"]
     descr_query = v["descr"]
     if len(name_query) == 0 or len(descr_query) == 0:

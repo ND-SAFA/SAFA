@@ -44,6 +44,7 @@ public class GithubRepositoryFileDTO {
             file.setType(entry.getType());
 
             if (entry.getObject() != null) {
+                file.setContents(entry.getObject().getText());
                 file.setBinary(entry.getObject().isBinary());
             }
 

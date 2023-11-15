@@ -35,6 +35,8 @@ public class GithubGraphQlTreeObjectsResponse extends GraphQlResponse<GithubGrap
 
     @Data
     public static class TreeObject {
+        private String text;
+
         @JsonProperty("isBinary")  // Come on jackson why do I have to do this
         private boolean isBinary;
     }

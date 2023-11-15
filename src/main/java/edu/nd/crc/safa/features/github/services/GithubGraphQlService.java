@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlFileContentsResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlPaginateBranchesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
@@ -90,8 +89,6 @@ public class GithubGraphQlService {
      * repeatedly, once for the top level and again for every item with type "tree".
      * You can also just call {@link #getFilesInRepo(SafaUser, String, String, String)}</p>
      *
-     * <p>Additionally, this query will not get the contents of the file. </p>
-     *
      * @param user The user making the request.
      * @param owner The owner of the repository.
      * @param name The name of the repository.
@@ -109,32 +106,9 @@ public class GithubGraphQlService {
     }
 
     /**
-     * <p>Get the contents of a file at a specified path.</p>
-     *
-     * <p>The format for the path is {@code "branch:path"} where {@code path} is
-     * the path within the repo.</p>
-     *
-     * @param user The user making the request.
-     * @param owner The owner of the repository.
-     * @param name The name of the repository.
-     * @param location The location of the file to get.
-     * @return The file with its contents.
-     */
-    public GithubGraphQlFileContentsResponse getGithubFileContents(SafaUser user, String owner,
-                                                                   String name, String location) {
-        return makeGraphQlRequest(user,
-            GithubGraphQlQueries.GET_FILE_CONTENTS,
-            GithubGraphQlFileContentsResponse.class,
-            "repoOwner", owner,
-            "repoName", name,
-            "location", location);
-    }
-
-    /**
      * Get all files in a repository at a specific branch. This differs from
      * {@link #getGithubTreeObjects(SafaUser, String, String, String)} in that it recursively gets
-     * all files, rather than just getting ones in a single directory, and it will also get the contents
-     * of all of the files.
+     * all files, rather than just getting ones in a single directory.
      *
      * @param user The user making the request.
      * @param owner The owner of the repository.
@@ -160,7 +134,6 @@ public class GithubGraphQlService {
 
                 for (GithubRepositoryFileDTO file : locationFiles) {
                     if (file.getType() == GithubRepositoryFileType.FILE) {
-                        addFileContents(file, branch, user, owner, name);
                         files.add(file);
                     } else if (file.getType() == GithubRepositoryFileType.FOLDER) {
                         locations.add(branch + file.getPath());
@@ -178,30 +151,6 @@ public class GithubGraphQlService {
         }
 
         return files;
-    }
-
-    /**
-     * Add file contents to a file response object.
-     *
-     * @param file The file
-     * @param branch The branch we're retrieving from
-     * @param user The user doing the action
-     * @param owner The owner of the repository to retrieve from
-     * @param name The name of the repository
-     */
-    private void addFileContents(GithubRepositoryFileDTO file, String branch,
-                                 SafaUser user, String owner, String name) {
-        String location = branch + file.getPath();
-
-        try {
-            GithubGraphQlFileContentsResponse contentsResponse = getGithubFileContents(user, owner, name, location);
-            String content = contentsResponse.getData().getRepository().getObject().getText();
-            file.setContents(content);
-        } catch (ExternalAPIException | NullPointerException e) {
-            logger.log(Level.SEVERE,
-                String.format("Failed to retrieve contents of %s/%s/%s", owner, name, location), e);
-            file.setContents("<failed to retrieve from GitHub>");
-        }
     }
 
     /**

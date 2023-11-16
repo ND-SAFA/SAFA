@@ -10,6 +10,8 @@ from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEI
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
+
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
@@ -87,6 +89,10 @@ class RankingArgs(PipelineArgs):
      *applicable only for LLMPipeline*
      """
     weight_of_embedding_scores: float = DEFAULT_EMBEDDINGS_SCORE_WEIGHT
+    """
+    - embeddings_manager: If provided, will be used in the sorting step if using an embedding sorter
+    """
+    embeddings_manager: EmbeddingsManager = None
 
     def save(self, obj: Any, file_name: str) -> str:
         """

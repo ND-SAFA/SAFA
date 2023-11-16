@@ -8,7 +8,7 @@
           "trainer": "ST",
           "job_args": {
             "random_seed": 812,
-            "run_suffix": "[RUN_ID]"
+            "output_dir": "[OUTPUT_DIR]/train-st/[TRAIN_PROJECT]"
           },
           "model_manager": {
             "model_path": "[BASE_MODEL]"

@@ -7,7 +7,8 @@
           "task": "PREDICT",
           "trainer": "ST",
           "job_args": {
-            "random_seed": 812
+            "random_seed": 812,
+            "output_dir": "[OUTPUT_DIR]/predict-st/[CURRENT_PROJECT]"
           },
           "model_manager": {
             "model_path": "[BASE_MODEL]"
@@ -19,7 +20,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[EVAL_PROJECT]"
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
               }
             }
           }

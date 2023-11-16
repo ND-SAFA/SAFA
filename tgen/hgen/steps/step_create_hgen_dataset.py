@@ -1,5 +1,5 @@
 import uuid
-from typing import Tuple, Union
+from typing import Tuple, Union, Set
 
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
@@ -7,7 +7,7 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
@@ -28,7 +28,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         original_artifact_df, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
 
         final_artifact_df = state.selected_artifacts_dataset.artifact_df
-        new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, args.target_type)
+        new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, state, final_artifact_df)
         new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(state, final_artifact_df, new_layer_df)
 
         final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
@@ -38,6 +38,18 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                 project_summary=args.dataset.project_summary)
 
         state.final_dataset = dataset
+
+    @staticmethod
+    def _get_layers_traced(final_artifact_df: ArtifactDataFrame, hgen_state: HGenState) -> Set[str]:
+        """
+        Gets all layers that were traced to the generated layer.
+        :param final_artifact_df: The combined artifact dataframe containing all artifacts (used/generated) in hgen.
+        :param hgen_state: The current state of hgen.
+        :return: A set of the layer id for all layers that were traced to the generated layer.
+        """
+        layers_traced = {final_artifact_df.get_artifact(trace[TraceKeys.child_label()])[ArtifactKeys.LAYER_ID]
+                         for trace in hgen_state.trace_predictions}
+        return layers_traced
 
     @staticmethod
     def _get_original_dataframes(original_dataset_complete: Union[PromptDataset, TraceDataset]) \
@@ -57,14 +69,21 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return original_artifact_df, original_layer_df, original_trace_df
 
     @staticmethod
-    def _create_layer_df_with_generated_artifacts(hgen_args: HGenArgs, target_layer_id: str) -> LayerDataFrame:
+    def _create_layer_df_with_generated_artifacts(hgen_args: HGenArgs, hgen_state: HGenState,
+                                                  final_artifact_df: ArtifactDataFrame) -> LayerDataFrame:
         """
         Creates a layer dataframe connecting the original lower-level artifacts with the newly generated upper-level artifacts
         :param hgen_args: Arguments to hgen pipeline.
-        :param target_layer_id: The id of the new target layer
+        :param hgen_state: The current state of hgen.
+        :param final_artifact_df: The complete artifact dataframe from all artifacts used/created in hgen.
         :return: The dataframe with the new layer ids added.
         """
-        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [hgen_args.source_layer_id], LayerKeys.TARGET_TYPE: [target_layer_id]})
+        layers_traced = CreateHGenDatasetStep._get_layers_traced(final_artifact_df, hgen_state)
+        layer_df_map = {}
+        for layer_id in layers_traced:
+            DataFrameUtil.append(layer_df_map, {LayerKeys.SOURCE_TYPE: layer_id,
+                                                LayerKeys.TARGET_TYPE: hgen_args.target_type})
+        layer_df = LayerDataFrame(layer_df_map)
         return layer_df
 
     @staticmethod

@@ -36,7 +36,7 @@ class ApiExporter(AbstractDatasetExporter):
         dataset = self.get_dataset()
         links = dataset.trace_df.to_dict(orient="records")
         self.true_links: List[Dict] = [t for t in links if not np.isnan(t["score"]) and t["score"] > 0]
-        artifacts: List[Artifact] = dataset.artifact_df.reset_index().to_dict("records")
+        artifacts: List[Artifact] = dataset.artifact_df.to_dict("records", index=True)
 
         layers = []
         for i, layer_row in dataset.layer_df.itertuples():

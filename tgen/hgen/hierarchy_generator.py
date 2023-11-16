@@ -8,6 +8,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
+from tgen.hgen.steps.step_add_linked_artifacts_to_clusters import AddLinkedArtifactsToClustersStep
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
@@ -51,10 +52,9 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         summarizer_args = SummarizerArgs(do_resummarize_project=False,
                                          summarize_code_only=True,
                                          do_resummarize_artifacts=False,
-                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
+                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS if args.create_project_summary else [],
                                          )
-        super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args,
-                         skip_summarization=not args.create_project_summary)
+        super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
 
     def _get_new_project_summary_sections(self, target_type: str) -> Dict:
@@ -80,7 +80,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
-        self.summarizer_args = None
         super().run()
 
         dataset = self.state.final_dataset

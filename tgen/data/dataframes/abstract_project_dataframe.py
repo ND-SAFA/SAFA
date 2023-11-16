@@ -240,11 +240,15 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         if self.index.duplicated(keep='first').any():
             return self.remove_duplicate_indices().to_dict(orient, into, index)
-        if orient == "with_id_col":
-            dict_ = super().to_dict("series", into, index)
-            dict_[self.index_name() if self.index_name() else "index"] = self.index
-            return dict_
-        return super().to_dict(orient, into, index)
+        dict_ = super().to_dict(orient, into, index)
+        if index:
+            index_name = self.index_name() if self.index_name() else "index"
+            if orient == "list":
+                dict_[index_name] = self.index
+            elif orient == "records":
+                for i, d in zip(self.index, dict_):
+                    d[index_name] = i
+        return dict_
 
     def update_value(self, column2update: Union[str, Enum], id2update: Union[str, int], new_value: Any) -> None:
         """

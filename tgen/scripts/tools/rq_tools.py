@@ -16,8 +16,7 @@ def find_and_run_rq() -> None:
     Navigates and runs RQ.
     :return: None
     """
-    base_rq_path = os.path.join(get_rq_path(), "base")
-    rq_path = navigate_to_rq(base_rq_path)
+    rq_path = navigate_to_rq(get_rq_path())
     run_rq(rq_path)
 
 

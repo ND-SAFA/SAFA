@@ -6,6 +6,7 @@
           "object_type": "HUGGING_FACE",
           "task": "TRAIN",
           "job_args": {
+            "output_dir": "[OUTPUT_DIR]/train-deterministic/[DATASET]",
             "random_seed": {
               "*": [
                 812

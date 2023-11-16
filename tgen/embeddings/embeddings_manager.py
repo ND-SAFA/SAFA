@@ -65,9 +65,9 @@ class EmbeddingsManager:
         :param artifact_ids: The artifact ids to embed.
         :return: List of embeddings in same order as artifact ids.
         """
-        artifact_ids = self._get_default_artifact_ids(artifact_ids)
-        embedding_map = self.create_embedding_map(subset_ids=artifact_ids, **kwargs)
-        embeddings = [embedding_map[entry_id] for entry_id in artifact_ids]
+        subset_ids = list(self._content_map.keys()) if not artifact_ids else artifact_ids
+        embedding_map = self.create_embedding_map(subset_ids=subset_ids, **kwargs)
+        embeddings = [embedding_map[entry_id] for entry_id in subset_ids]
         return embeddings
 
     def create_embedding_map(self, subset_ids: List[str] = None, **kwargs) -> Dict[str, EmbeddingType]:
@@ -217,7 +217,7 @@ class EmbeddingsManager:
         Loads any saved embeddings into the object after being reloaded from yaml
         :return: None
         """
-        if self._base_path and self.__ordered_ids:
+        if self._base_path:
             object_paths = self.get_object_paths()
             ordered_ids = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.ORDERED_IDS])
             self.__set_embedding_order(ordered_ids)
@@ -246,8 +246,11 @@ class EmbeddingsManager:
         :return: Map of artifact ID to its content.
         """
         content_df = pd.read_csv(file_path)
-        content_map = {content_row[ArtifactKeys.ID.value]: content_row[ArtifactKeys.CONTENT.value]
-                       for _, content_row in content_df.iterrows()}
+        if ArtifactKeys.CONTENT.value in content_df.columns:
+            content_map = {content_row[ArtifactKeys.ID.value]: content_row[ArtifactKeys.CONTENT.value]
+                           for _, content_row in content_df.iterrows()}
+        else:
+            content_map = list(content_df[ArtifactKeys.ID.value])
         return content_map
 
     def save_embeddings_to_file(self, dir_path: str) -> None:
@@ -317,8 +320,7 @@ class EmbeddingsManager:
         :param export_path: The path to save the embeddings to
         :return: True if the embeddings need re-saved
         """
-        need_save = not self._base_path or self.__state_changed_since_last_save \
-                    or FileUtil.collapse_paths(export_path) != os.path.dirname(self._base_path)
+        need_save = not self._base_path or self.__state_changed_since_last_save
         return need_save
 
     def calculate_centroid(self, cluster: List[str]):

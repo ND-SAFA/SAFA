@@ -1,0 +1,35 @@
+description:
+- A Feature in a software development project refers to a distinct, standalone functionality
+  or behavior that the software is expected to perform. It is a high-level requirement
+  that adds value to the end user. Unlike other software artifacts like user stories
+  or tasks, a feature is broader in scope and often encompasses multiple user stories
+  or tasks. It is usually defined from the perspective of the end user and is often
+  described in a language that the user can understand.
+example:
+- For a banking software application, a feature could be "Fund Transfer". This feature
+  allows users to transfer funds from their account to another account. It includes
+  sub-features or tasks such as entering the amount to be transferred, entering the
+  recipient's account details, confirming the transfer, and receiving a confirmation
+  message.
+format:
+- 'Feature Name: [Brief, descriptive name of the feature]
+
+
+  User Role: [Who will be using this feature]
+
+
+  Description: [A detailed description of the feature, its purpose, and how it should
+  work]
+
+  Notes: [Any additional information or context about the feature]'
+questions:
+- - What are the main classes/modules in the codebase and what are their responsibilities?
+  - Are there any major subsystems or component areas that can be identified?
+  - What are the key functions/methods that seem to carry out the core logic?
+  - Are there any particularly complex sections of code that warrant further investigation?
+  - What are the main inputs/outputs or data structures used throughout the code?
+  - Are there any config files or external dependencies that would provide insight?
+  - What testing code is available and what components are tested?
+  - Are there any obvious gaps in functionality or missing components?
+  - Are there logging/tracing statements that reveal workflow?
+  - Are there any clear architectural patterns or styles that can be recognized?

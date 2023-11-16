@@ -5,7 +5,9 @@
         {
           "object_type": "HUGGING_FACE",
           "task": "PRE_TRAIN",
-          "job_args": {},
+          "job_args": {
+            "output_dir": "[OUTPUT_DIR]/pretrain/[CURRENT_PROJECT]"
+          },
           "model_manager": {
             "model_path": "[MODEL]"
           },

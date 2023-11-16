@@ -4,7 +4,7 @@
       "jobs": [
         {
           "object_type": "CREATE_DATASETS",
-          "export_path": "[DATA_PATH]/[CURRENT_PROJECT]/safa",
+          "export_path": "[OUTPUT_PATH]/safa-exports/[CURRENT_PROJECT]",
           "format_type": "SAFA",
           "job_args": {
           },

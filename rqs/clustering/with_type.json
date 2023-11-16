@@ -4,7 +4,7 @@
       "jobs": [
         {
           "object_type": "CLUSTERING",
-          "export_dir": "[DATA_PATH]/[CURRENT_PROJECT]/clusters",
+          "export_dir": "[DATA_PATH]/clustering/[CURRENT_PROJECT]",
           "artifact_types": [
             "Vue"
           ],

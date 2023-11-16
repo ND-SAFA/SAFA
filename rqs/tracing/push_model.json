@@ -6,7 +6,8 @@
           "object_type": "HUGGING_FACE",
           "task": "PUSH",
           "job_args": {
-            "random_seed": 42
+            "random_seed": 42,
+            "output_dir": "[OUTPUT_DIR]/push/[MODEL_NAME]"
           },
           "model_manager": {
             "model_path": "[INPUT_MODEL]"

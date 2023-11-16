@@ -33,7 +33,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         logger.info(f"Removing: {len(duplicate_artifact_ids)} duplicates.")
 
-        selected_artifacts_df = ArtifactDataFrame(state.all_artifacts_dataset.artifact_df.to_dict("with_id_col"))
+        selected_artifacts_df = ArtifactDataFrame(state.all_artifacts_dataset.artifact_df.to_dict("list", index=True))
         selected_artifacts_df.remove_rows(duplicate_artifact_ids)
         state.selected_artifacts_dataset = PromptDataset(artifact_df=selected_artifacts_df,
                                                          project_summary=state.all_artifacts_dataset.project_summary)

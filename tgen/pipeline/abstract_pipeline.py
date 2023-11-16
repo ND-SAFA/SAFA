@@ -22,22 +22,25 @@ title_format_for_logs = "---{}---"
 
 class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
 
-    def run(self, args: ArgType, state: State, re_run: bool = False) -> bool:
+    def run(self, args: ArgType, state: State, re_run: bool = False, verbose: bool = True) -> bool:
         """
         Runs the step operations, modifying state in some way.
         :param args: The pipeline arguments and configuration.
         :param state: The current state of the pipeline results.
         :param re_run: If True, will run even if the step is already completed
+        :param verbose: If True, prints logs
         :return: None
         """
         step_ran = False
         if re_run or not state.step_is_complete(self.get_step_name()):
-            logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
+            if verbose:
+                logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
             self._run(args, state)
             step_ran = True
         if step_ran:
             state.on_step_complete(step_name=self.get_step_name())
-            logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
+            if verbose:
+                logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
         return step_ran
 
     @abstractmethod

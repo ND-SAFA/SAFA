@@ -14,7 +14,7 @@
               }
             }
           },
-          "export_path": "[DATA_PATH]/[CURRENT_PROJECT]/exported"
+          "export_path": "[OUTPUT_PATH]/export-dataset/[CURRENT_PROJECT]"
         }
       ]
     }

@@ -40,7 +40,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The type of source artifacts for which higher-level artifacts will be generated
     """
-    source_type: str = "code"
+    source_type: str = None
     """
     The LLM manager to use to generate the new artifact content and other more complex tasks
     """
@@ -82,6 +82,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     perform_clustering: bool = True
     """
+    If True, adds already linked artifacts to the cluster that their parent is in
+    """
+    add_linked_artifacts_to_cluster: bool = False # TODO change to default to false
+    """
     The llm manager to use for each prediction step
     """
     llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)
@@ -108,6 +112,9 @@ class HGenArgs(PipelineArgs, BaseObject):
         :return: None
         """
         super().__post_init__()
+        if not self.source_type:
+            is_code = self.source_layer_id in self.dataset.artifact_df.get_code_layers()
+            self.source_type = "code" if is_code else self.source_layer_id
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \

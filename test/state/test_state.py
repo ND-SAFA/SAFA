@@ -12,7 +12,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
-from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
 from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep

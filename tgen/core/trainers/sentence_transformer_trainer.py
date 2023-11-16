@@ -20,7 +20,7 @@ from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.custom_sentence_transformer import CustomSentenceTransformer
 from tgen.core.trainers.st.sentence_transformer_evaluator import SentenceTransformerEvaluator
 from tgen.core.trainers.st.st_metrics import STMetrics
-from tgen.core.trainers.st.training_data import STTrainingParams
+from tgen.core.trainers.st.st_training_manager import STTrainingParams
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -54,7 +54,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     """
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
-                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL, false_negative_weight: float = None, **kwargs):
+                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL, **kwargs):
         """
         Trainer for sentence transformer models. Provides API that allows training and prediction operations.
         :param trainer_args: The trainer arguments.
@@ -69,7 +69,6 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
-        self.false_negative_weight = false_negative_weight
         self.losses = []
         self.total_loss = 0
         self.loss_function = None

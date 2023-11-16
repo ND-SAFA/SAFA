@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.core.trainers.st.constants import DEFAULT_BEST_SCORE, STARTING_STEP, TRAINING_SECTION_KEY
-from tgen.core.trainers.st.training_data import STTrainingManager, STTrainingParams
+from tgen.core.trainers.st.st_training_manager import STTrainingManager, STTrainingParams
 from tgen.core.wandb.WBManager import WBManager
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,7 @@ class CustomSentenceTransformer(SentenceTransformer):
     ):
         """
         Train the model with the given training objective
+        :param train_objectives: List of objectives each containing data and a model.
         :param training_params: The training parameters to run loop on.
         """
 
@@ -161,7 +162,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         :param training_manager: State of the training loop.
         :return: None
         """
-        if training_manager.params.should_save_final_model():
+        if training_manager.params.can_save_best_model():
             self.save(training_manager.params.output_path)
 
         if training_manager.params.checkpoint_path is not None:

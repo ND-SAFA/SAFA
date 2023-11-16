@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Tuple
 
 import wandb
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
@@ -58,6 +59,9 @@ class WBManager:
         :param run_suffix: Suffix to run name.
         :return: None
         """
+        wandb_mode = os.environ.get("WANDB_MODE", EMPTY_STRING).lower()
+        if wandb_mode == "offline":
+            return
         model_name = os.path.basename(model_path)
         train_name, val_name, eval_name = WBManager.get_project_names(trainer_dataset_manager)
         run_name = f"{train_name} @ {model_name}"
@@ -107,6 +111,7 @@ class WBManager:
     def get_project_names(cls, trainer_dataset_manager: "TrainerDatasetManager") -> Tuple[Any, Any, Any]:
         """
         Calculates the name of the run identifying the training, validation, and evaluation projects.
+        :param trainer_dataset_manager: The dataset manager containing the datasets whose projects names are extracted.
         :return: The run name
         """
         train_name = cls.get_project_name(trainer_dataset_manager, DatasetRole.TRAIN)

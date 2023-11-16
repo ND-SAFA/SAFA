@@ -12,7 +12,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 
-from tgen.core.trainers.st.constants import STARTING_STEP
+from tgen.core.trainers.st.constants import FIT_PARAMETERS_KEY, LOSS_FUNCTIONS_SECTION_KEY, STARTING_STEP
 
 ModelType = nn.Module
 TrainingObjective = Tuple[DataLoader, ModelType]
@@ -63,7 +63,12 @@ class STTrainingParams:
     callback: Callable[[float, int, int], None] = None
     steps_per_epoch: int = None
 
-    def to_dict(self, steps_per_epoch: int) -> Dict:
+    def to_model_card_params(self, steps_per_epoch: int) -> Dict:
+        """
+        Converts training parameters to dictionary needed for model card.
+        :param steps_per_epoch:
+        :return: Params as dictionary.
+        """
         return {
             "evaluator": fullname(self.evaluator),
             "epochs": self.epochs,
@@ -78,15 +83,26 @@ class STTrainingParams:
         }
 
     def is_checkpoint_time(self):
+        """
+        :return: Whether training loop should save a checkpoint of the model.
+        """
         return self.checkpoint_path is not None and self.checkpoint_save_steps is not None and self.checkpoint_save_steps > 0 and \
             self.global_step % self.checkpoint_save_steps == 0
 
-    def should_save_final_model(self):
+    def can_save_best_model(self):
+        """
+        :return: Whether best model can be saved.
+        """
         return self.evaluator is None and self.output_path is not None
 
 
 class STTrainingManager:
     def __init__(self, training_objectives: Iterable[TrainingObjective], params: STTrainingParams):
+        """
+        Constructs training manager with given objectives and parameteres.
+        :param training_objectives: The training objectives defining data and model to train.
+        :param params: The training parameters.
+        """
         loss_models = [loss_model for _, loss_model in training_objectives]
         dataloaders = [dataloader for dataloader, _ in training_objectives]
         self.models: List[ModelType] = loss_models
@@ -96,6 +112,10 @@ class STTrainingManager:
         self.optimizers, self.schedulers = self.initialize_optimizers_schedulers()
 
     def initialize_optimizers_schedulers(self) -> Tuple[List[Optimizer], List[_LRScheduler]]:
+        """
+        Creates the optimizers and schedulers for this training session.
+        :return:
+        """
         optimizers = []
         schedulers = []
         for loss_model in self.models:
@@ -104,15 +124,11 @@ class STTrainingManager:
             no_decay = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
             optimizer_grouped_parameters = [
                 {
-                    "params": [
-                        p for n, p in param_optimizer if not any(nd in n for nd in no_decay)
-                    ],
+                    "params": [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
                     "weight_decay": self.params.weight_decay,
                 },
                 {
-                    "params": [
-                        p for n, p in param_optimizer if any(nd in n for nd in no_decay)
-                    ],
+                    "params": [p for n, p in param_optimizer if any(nd in n for nd in no_decay)],
                     "weight_decay": 0.0,
                 },
             ]
@@ -130,6 +146,10 @@ class STTrainingManager:
         return optimizers, schedulers
 
     def get_model_card_training_info(self):
+        """
+        Creates the model card information containing the training configuration.
+        :return: String representing the model card information.
+        """
         info_loss_functions = []
         for dataloader, loss in zip(self.data_loaders, self.models):
             info_loss_functions.extend(
@@ -137,13 +157,12 @@ class STTrainingManager:
             )
         info_loss_functions = "\n\n".join([text for text in info_loss_functions])
 
-        params_dict = self.params.to_dict(self.get_epoch_steps())
+        params_dict = self.params.to_model_card_params(self.get_epoch_steps())
         info_fit_parameters = json.dumps(params_dict, indent=4, sort_keys=True)
-        return ModelCardTemplate.__TRAINING_SECTION__.replace(
-            "{LOSS_FUNCTIONS}", info_loss_functions
-        ).replace(
-            "{FIT_PARAMETERS}", info_fit_parameters
-        )
+        return ModelCardTemplate \
+            .__TRAINING_SECTION__ \
+            .replace(LOSS_FUNCTIONS_SECTION_KEY, info_loss_functions) \
+            .replace(FIT_PARAMETERS_KEY, info_fit_parameters)
 
     def get_training_iterator(self) -> List[Tuple[int, int]]:
         """

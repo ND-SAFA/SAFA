@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List
+from typing import Dict, List
 from unittest import TestCase
 
 import numpy as np
@@ -23,8 +23,8 @@ class TestSentenceTransformerTrainer(TestCase):
         """
         n_epochs = 2
         trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": n_epochs})
-        training_output = trainer.perform_training()
-        self.assert_valid_metrics(self, training_output.metrics, n_epochs)
+        training_metrics = trainer.perform_training().metrics["records"]
+        self.assert_valid_metrics(self, training_metrics, n_epochs)
 
     def test_prediction(self):
         """
@@ -48,11 +48,10 @@ class TestSentenceTransformerTrainer(TestCase):
         """
         Tests that there is zero loss for negative links.
         """
-        trainer = self.create_trainer(trainer_kwargs={"use_scores": True},
-                                      trainer_args_kwargs={"train_batch_size": 2, "shuffle": False},
+        trainer = self.create_trainer(trainer_args_kwargs={"train_batch_size": 2, "shuffle": False, "use_scores": True},
                                       # shuffle allows constant pos indices
                                       trainer_dataset_manager_kwargs=self.get_cat_dataset_definition())
-        self.assertTrue(trainer.use_scores)
+        self.assertTrue(trainer.trainer_args.use_scores)
 
         train_dataset = trainer.trainer_dataset_manager[DatasetRole.TRAIN]
         link_ids = train_dataset.get_ordered_link_ids()
@@ -66,7 +65,8 @@ class TestSentenceTransformerTrainer(TestCase):
 
     @staticmethod
     def create_trainer(model_manager_kwargs: Dict = None, trainer_dataset_manager_kwargs: Dict = None,
-                       trainer_args_kwargs: Dict = None, trainer_kwargs: Dict = None, save_best_model: bool = False):
+                       trainer_args_kwargs: Dict = None, trainer_kwargs: Dict = None,
+                       save_best_model: bool = False) -> SentenceTransformerTrainer:
         """
         Creates trainer with given customizations.
         :param model_manager_kwargs: Keyword arguments passed to model manager.
@@ -95,7 +95,7 @@ class TestSentenceTransformerTrainer(TestCase):
         return trainer
 
     @staticmethod
-    def assert_valid_metrics(tc: TestCase, metrics: List[Any], n_expected: int) -> None:
+    def assert_valid_metrics(tc: TestCase, metrics: List[Dict[DatasetRole, Dict]], n_expected: int) -> None:
         """
         Asserts that metrics have a certain number and that MAP is greater than or equal to 0.5
         :param tc: The test case used to make assertions.
@@ -104,8 +104,9 @@ class TestSentenceTransformerTrainer(TestCase):
         :return: None
         """
         tc.assertEqual(n_expected, len(metrics))
-        for m in metrics:
-            tc.assertGreaterEqual(m["map"], 0.5)
+        for role2metrics in metrics:
+            for dataset_role, m in role2metrics.items():
+                tc.assertGreaterEqual(m["map"], 0.5)
 
     @staticmethod
     def get_cat_dataset_definition():

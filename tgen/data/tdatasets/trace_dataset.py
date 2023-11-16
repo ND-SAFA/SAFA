@@ -6,8 +6,6 @@ from typing import Any, Callable, Dict, List, Tuple
 import numpy as np
 import pandas as pd
 from datasets import Dataset
-from sentence_transformers import InputExample
-from tgen.common.logging.logger_manager import logger
 from tqdm import tqdm
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -133,7 +131,12 @@ class TraceDataset(iDataset):
         target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])
         return source, target
 
-    def _add_link_id(self, link_id: int):
+    def _add_link_id(self, link_id: int) -> None:
+        """
+        Adds link with given id to set of positive / negative links.
+        :param link_id: ID of link to add.
+        :return: None
+        """
         link = self.trace_df.get_link(link_id)
         is_true_link = link[TraceKeys.LABEL] == 1
         if is_true_link:

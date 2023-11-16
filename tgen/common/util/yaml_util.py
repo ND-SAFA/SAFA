@@ -1,5 +1,6 @@
 import collections
 import os
+import timeit
 from enum import Enum, EnumMeta
 from typing import Any, Dict
 
@@ -18,6 +19,7 @@ from tgen.common.util.reflection_util import ReflectionUtil
 
 class CustomLoader(SafeLoader):
     __top_level_reached = False
+    __time_to_load = {}
 
     def construct_custom(self, _, node: Node) -> Any:
         """
@@ -27,6 +29,7 @@ class CustomLoader(SafeLoader):
         :return: The created object
         """
         try:
+            start = timeit.timeit()
             class_path = node.tag.split(COLON)[-1]
             cls = ReflectionUtil.get_cls_from_path(class_path)
             if ReflectionUtil.is_function(cls) or "builtins" in class_path:
@@ -56,6 +59,8 @@ class CustomLoader(SafeLoader):
                 data.__dict__.update(state)
             if hasattr(data, "from_yaml"):
                 data.from_yaml()
+            end = timeit.timeit()
+            self.__time_to_load[cls] = end-start
             return data
         except Exception as e:
             logger.error(f"Problem loading node {node.tag}")

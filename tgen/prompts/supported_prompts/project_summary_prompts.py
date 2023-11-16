@@ -1,4 +1,4 @@
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TAG, PS_ENTITIES_TAG, PS_FEATURE_TAG, PS_NOTES_TAG, \
     PS_OVERVIEW_TAG, PS_SUBSYSTEM_TAG
 from tgen.prompts.prompt import Prompt
@@ -43,6 +43,22 @@ ENTITIES_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                                                                                        "inside of a set of {}"))
 ])
 
+
+def subsection_formatter(t, v):
+    """
+    Formats the expected sub-systems section.
+    :param t: Ignored.
+    :param v: The dictionary mapping tag to response.
+    :return: The title and description of the subsection parsed.
+    """
+    name_query = v["name"]
+    descr_query = v["descr"]
+    if len(name_query) == 0 or len(descr_query) == 0:
+        return EMPTY_STRING
+    content_items = [name_query[0], descr_query[0]]
+    return NEW_LINE.join(content_items)
+
+
 SUBSYSTEM_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
     QuestionnairePrompt(instructions="Create a set of sub-systems that group the similar features. "
                                      "Similar features will use related domain entities and work to accomplish shared goals. "
@@ -59,7 +75,7 @@ SUBSYSTEM_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                                                           response_instructions_format="Enclose each sub-system in {} "
                                                                                        "with the name of the subsystem inside of "
                                                                                        "{} and the description inside of {}.",
-                                                          entry_formatter=lambda t, v: NEW_LINE.join([v["name"][0], v["descr"][0]])))
+                                                          entry_formatter=subsection_formatter))
 ])
 
 DATA_FLOW_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[

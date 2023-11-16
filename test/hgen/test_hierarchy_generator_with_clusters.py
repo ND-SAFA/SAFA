@@ -76,11 +76,10 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                                          anthropic_ai_manager: TestAIManager,
                                          calculate_sim: MagicMock = None):
         embedding_similarities = self._create_fake_embedding_scores(args, calculate_sim, n_artifacts_per_cluster)
-        mock_project_summary_responses = deepcopy(MISSING_PROJECT_SUMMARY_RESPONSES)
 
         mock_explanations = [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
                              for sim in embedding_similarities if sim >= args.link_selection_threshold] * len(expected_names)
-        anthropic_ai_manager.add_responses(mock_project_summary_responses + mock_explanations)
+        anthropic_ai_manager.add_responses(mock_explanations)
         anthropic_ai_manager.mock_summarization()
         GenerateTraceLinksStep().run(args, state)
         for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
@@ -116,7 +115,8 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         n_orphans = n_artifacts - len(selected_sources) - n_added_sources
         embedding_similarities = self._create_fake_embedding_scores(args, sim_mock, n_orphans)
         n_explanations = n_added_sources + len([s for s in embedding_similarities if s >= args.min_orphan_score_threshold])
-        anthropic_manager.add_responses([RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
+        anthropic_manager.add_responses(
+                                        [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
                                          for _ in range(n_explanations)])
         FindHomesForOrphansStep().run(args, state)
 

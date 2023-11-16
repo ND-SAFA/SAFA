@@ -1,5 +1,6 @@
 from unittest import mock
 
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -9,6 +10,7 @@ from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.state.state import State
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_HGEN_PATH, TEST_OUTPUT_DIR, TEST_STATE_PATH
+from tgen.testres.testprojects.safa_test_project import SafaTestProject
 
 
 class TestPipeline(BaseTest):
@@ -89,5 +91,7 @@ class TestPipeline(BaseTest):
         self.menu_options_printed = False
 
     def get_pipeline(self):
-        args = HGenArgs(source_layer_id="source", target_type="target", dataset=TraceDatasetCreator(TEST_HGEN_PATH))
+        args = HGenArgs(source_layer_id="source", target_type="target",
+                        dataset_creator=PromptDatasetCreator(
+                            trace_dataset_creator=TraceDatasetCreator(SafaTestProject.get_project_reader())))
         return HierarchyGenerator(args)

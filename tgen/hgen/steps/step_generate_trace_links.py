@@ -1,8 +1,9 @@
 from typing import Dict, List, Set, Tuple
 
+from tgen.common.logging.logger_manager import logger
+
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
-from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -14,9 +15,10 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
+from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
 class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -63,7 +65,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     export_dir=HGenUtil.get_ranking_dir(state.export_dir),
                                     generate_explanations=args.generate_explanations,
                                     link_threshold=FIRST_PASS_LINK_THRESHOLD)
-        selected_entries = self._run_embedding_pipeline(pipeline_args, state, skip_summarization=not args.create_project_summary)
+        selected_entries = self._run_embedding_pipeline(pipeline_args)
         trace_predictions: List[EnumDict] = selected_entries
         return trace_predictions
 
@@ -78,28 +80,33 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         trace_predictions, selected_traces = [], []
         generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
-        pipeline_kwargs = dict(dataset=state.all_artifacts_dataset, selection_method=None,
-                               types_to_trace=(args.source_type, args.target_type), generate_explanations=False)
-
-        new_artifact_map = state.new_artifact_dataset.artifact_df.to_map()
+        new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map()
         state.embedding_manager.update_or_add_contents(new_artifact_map)
-        state.embedding_manager.create_artifact_embeddings()
+        subset_ids = list({a[ArtifactKeys.ID] for artifacts in state.id_to_cluster_artifacts.values() for a in artifacts})
+        subset_ids += list(state.new_artifact_dataset.artifact_df.index)
+        state.embedding_manager.create_artifact_embeddings(artifact_ids=subset_ids)
+        pipeline_kwargs = dict(dataset=state.all_artifacts_dataset, selection_method=None,
+                               types_to_trace=(args.source_type, args.target_type), generate_explanations=False,
+                               embeddings_manager=state.embedding_manager)
 
+        orphans = state.original_dataset.trace_dataset.trace_df.get_orphans() if state.original_dataset.trace_dataset else set()
         for cluster_id in state.cluster_dataset.artifact_df.index:
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations if
                           generation in generation2id]  # ignores if dup deleted already
             if len(parent_ids) == 0:
                 continue
-            children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]]
+            children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]
+                            if a[ArtifactKeys.ID] in state.source_dataset.artifact_df
+                            or a[ArtifactKeys.ID] in orphans
+                            ]
             cluster_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), str(cluster_id))
             run_name = f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
                                                                           args.target_type, parent_ids)
             pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids,
                                         export_dir=cluster_dir,
                                         **pipeline_kwargs)
-            cluster_predictions = self._run_embedding_pipeline(pipeline_args, state,
-                                                               skip_summarization=not args.create_project_summary)
+            cluster_predictions = self._run_embedding_pipeline(pipeline_args)
             parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
             for parent, parent_preds in parent2predictions.items():
                 parent_selected_traces = SelectByThreshold.select(parent_preds, FIRST_PASS_LINK_THRESHOLD)
@@ -110,20 +117,16 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return trace_predictions, selected_traces
 
     @staticmethod
-    def _run_embedding_pipeline(pipeline_args: RankingArgs, hgen_state: HGenState, skip_summarization: bool) -> List[Trace]:
+    def _run_embedding_pipeline(ranking_args: RankingArgs) -> List[Trace]:
         """
         Runs the embedding pipeline to obtain trace predictions
-        :param pipeline_args: The arguments to the ranking pipeline
-        :param hgen_state: The current hgen state
-        :param skip_summarization: Whether to skip summarization of artifacts.
+        :param ranking_args: The arguments to the ranking pipeline
         :return: The selected predictions from the pipeline
         """
-        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=hgen_state.embedding_manager,
-                                            skip_summarization=skip_summarization)
-        pipeline.run()
-        hgen_state.update_total_costs_from_state(pipeline.state)
-        hgen_state.all_artifacts_dataset.project_summary = pipeline.state.project_summary
-        selected_predictions = pipeline.state.selected_entries
+        ranking_state = RankingState()
+        pipeline = SortChildrenStep()
+        pipeline.run(ranking_args, ranking_state, verbose=False)
+        selected_predictions = ranking_state.get_current_entries()
         return selected_predictions
 
     @staticmethod

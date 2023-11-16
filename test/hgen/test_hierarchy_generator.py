@@ -163,7 +163,7 @@ class TestHierarchyGenerator(BaseTest):
 
     @mock.patch.object(EmbeddingUtil, "calculate_similarities")
     def assert_generate_trace_links_step(self, sim_mock: MagicMock, anthropic_ai_manager: TestAIManager, ):
-        responses = deepcopy(MISSING_PROJECT_SUMMARY_RESPONSES)
+        responses = []
         embedding_similarities = [0.8 for source in self.HGEN_STATE.source_dataset.artifact_df.index]
         new_artifact_names = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)
         responses.extend([RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)

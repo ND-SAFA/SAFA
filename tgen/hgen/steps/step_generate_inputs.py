@@ -110,5 +110,5 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param source_type: Artifact type of the starting artifacts.
         :return: The path to the save the inputs for generation for a given target type
         """
-        file_name = f"{HGenUtil.convert_spaces_to_dashes(source_type)}-to-{HGenUtil.convert_spaces_to_dashes(target_type)}"
+        file_name = f"{HGenUtil.convert_spaces_to_dashes(target_type)}"
         return os.path.join(INPUTS_FOR_GENERATION_PATH, f"{file_name}.yaml")

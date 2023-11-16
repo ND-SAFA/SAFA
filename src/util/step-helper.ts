@@ -17,22 +17,34 @@ export const ONBOARDING_STEPS = {
     number: 2,
   },
   generate: {
-    title: "Generate Documentation",
+    title: ENABLED_FEATURES.GENERATE_ONBOARDING
+      ? "Generate Documentation"
+      : "Import Code",
     caption: ENABLED_FEATURES.BILLING_ONBOARDING
       ? "Review costs and generate documentation for your code."
-      : "Generate documentation for your code.",
+      : ENABLED_FEATURES.GENERATE_ONBOARDING
+      ? "Generate documentation for your code."
+      : "Import your code from GitHub.",
     index: 2,
     number: 3,
   },
   job: {
-    title: "Await Generation",
-    caption: "Wait for data generation to complete.",
+    title: ENABLED_FEATURES.GENERATE_ONBOARDING
+      ? "Await Generation"
+      : "Await Upload",
+    caption: ENABLED_FEATURES.GENERATE_ONBOARDING
+      ? "Wait for data generation to complete."
+      : "Wait for your upload to complete.",
     index: 3,
     number: 4,
   },
   view: {
-    title: "View Documentation",
-    caption: "Export generated data or view within SAFA.",
+    title: ENABLED_FEATURES.GENERATE_ONBOARDING
+      ? "View Documentation"
+      : "Generate Documentation",
+    caption: ENABLED_FEATURES.GENERATE_ONBOARDING
+      ? "Export generated data or view within SAFA."
+      : "Generate documentation for your code.",
     index: 4,
     number: 5,
   },

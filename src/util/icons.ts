@@ -212,6 +212,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-map-legend";
     case "changelog":
       return "mdi-file-document-multiple";
+    case "security":
+      return "mdi-shield-lock";
     default:
       return "";
   }

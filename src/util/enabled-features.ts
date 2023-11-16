@@ -9,6 +9,6 @@ export const ENABLED_FEATURES = {
   ACTIVE_USERS: false,
 
   ONBOARDING: true,
-  BILLING_ONBOARDING: true,
-  ONBOARDING_MOCKED: true,
+  GENERATE_ONBOARDING: false,
+  BILLING_ONBOARDING: false,
 };

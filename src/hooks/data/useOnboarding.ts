@@ -1,11 +1,7 @@
 import { defineStore } from "pinia";
 
 import { JobSchema, LocalStorageKeys } from "@/types";
-import {
-  ARTIFACT_GENERATION_TYPES,
-  ENABLED_FEATURES,
-  ONBOARDING_STEPS,
-} from "@/util";
+import { ARTIFACT_GENERATION_TYPES, ONBOARDING_STEPS } from "@/util";
 import {
   createProjectApiStore,
   getVersionApiStore,
@@ -41,7 +37,7 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     steps: Object.values(ONBOARDING_STEPS).map((step) => ({
       ...step,
-      done: false,
+      done: true,
     })),
     /**
      * The types of artifacts that will be generated.
@@ -125,16 +121,6 @@ export const useOnboarding = defineStore("useOnboarding", {
      * - Moves from Generate Documentation step if a project is created.
      */
     async handleGenerate(): Promise<void> {
-      if (ENABLED_FEATURES.ONBOARDING_MOCKED) {
-        this.handleNextStep("generate");
-
-        setTimeout(() => {
-          this.handleNextStep("job");
-        }, 2000);
-
-        return;
-      }
-
       await createProjectApiStore.handleGitHubImport({
         onSuccess: () => {
           this.handleNextStep("generate");

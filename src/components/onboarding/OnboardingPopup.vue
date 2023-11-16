@@ -38,7 +38,45 @@
           color="gradient"
         >
           <template #1>
+            <typography
+              el="p"
+              value="
+                To import code, you will need to connect to our GitHub integration,
+                and be a contributor on the repository.
+                Your organization will also need to approve our integration.
+              "
+            />
+
             <git-hub-authentication inactive />
+
+            <q-banner rounded class="bg-background q-mt-md">
+              <template #avatar>
+                <icon
+                  variant="security"
+                  color="secondary"
+                  size="md"
+                  class="q-mr-sm"
+                />
+              </template>
+              <typography
+                value="
+                  We take security seriously.
+                  Our integration will only use read access from the repository you select,
+                  and does not train on any data you import.
+                  We are currently working on our SOC II compliance.
+                "
+              />
+              <template #action>
+                <text-button
+                  text
+                  color="secondary"
+                  icon="changelog"
+                  @click="handleViewSecurityPractices"
+                >
+                  Security Practices
+                </text-button>
+              </template>
+            </q-banner>
           </template>
           <template #2>
             <git-hub-project-input />
@@ -51,14 +89,16 @@
                 icon="project-add"
                 color="primary"
               />
-              <typography el="div" value="Generating Documents:" />
-              <attribute-chip
-                v-for="type in onboardingStore.generationTypes"
-                :key="type"
-                :value="type"
-                icon="create-artifact"
-                color="primary"
-              />
+              <template v-if="ENABLED_FEATURES.GENERATE_ONBOARDING">
+                <typography el="div" value="Generating Documents:" />
+                <attribute-chip
+                  v-for="type in onboardingStore.generationTypes"
+                  :key="type"
+                  :value="type"
+                  icon="create-artifact"
+                  color="primary"
+                />
+              </template>
               <!-- TODO: confirm data generation cost estimate, pay with stripe -->
               <flex-box t="4">
                 <text-button
@@ -69,7 +109,7 @@
                   :disabled="onboardingStore.error"
                   @click="onboardingStore.handleGenerate"
                 >
-                  Generate Documentation
+                  {{ onboardingStore.steps[2].title }}
                 </text-button>
               </flex-box>
               <q-banner
@@ -108,8 +148,8 @@
             <typography
               el="p"
               value="
-                You will receive an email when generation completes.
-                This process takes a few minutes for 20 code files, and around 30 minutes for 100 code files.
+                You will receive an email when the import completes.
+                This process takes a less than 10 minutes for a few dozen code files, to around 30 minutes for a few hundred code files.
               "
             />
             <!-- TODO: handle errors with followup call -->
@@ -146,7 +186,12 @@
             </flex-box>
           </template>
           <template #5>
-            <flex-box column align="center" t="2">
+            <flex-box
+              v-if="ENABLED_FEATURES.GENERATE_ONBOARDING"
+              column
+              align="center"
+              t="2"
+            >
               <text-button
                 text
                 color="gradient"
@@ -172,6 +217,10 @@
                 View in SAFA
               </text-button>
             </flex-box>
+            <typography
+              v-else
+              value="Now that your data has been imported, our team will follow up soon with the generated documentation!"
+            />
           </template>
         </stepper>
       </div>
@@ -190,7 +239,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { ENABLED_FEATURES } from "@/util";
+import { ENABLED_FEATURES, SECURITY_LINK } from "@/util";
 import {
   gitHubApiStore,
   integrationsStore,
@@ -215,6 +264,13 @@ import {
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 const uploadedJob = computed(() => onboardingStore.uploadedJob);
+
+/**
+ * Opens the security practices link in a new tab.
+ */
+function handleViewSecurityPractices() {
+  window.open(SECURITY_LINK);
+}
 
 // Preload GitHub projects if credentials are already set.
 onMounted(async () => {

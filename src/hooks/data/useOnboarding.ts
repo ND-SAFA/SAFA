@@ -81,8 +81,10 @@ export const useOnboarding = defineStore("useOnboarding", {
     /**
      * Reloads the GitHub projects and jobs for the onboarding workflow.
      */
-    async handleReload(): Promise<void> {
-      if (onboardingStore.isComplete) {
+    async handleReload(open?: boolean): Promise<void> {
+      if (open) {
+        this.open = true;
+      } else if (onboardingStore.isComplete) {
         return;
       }
 

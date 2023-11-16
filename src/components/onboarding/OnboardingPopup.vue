@@ -225,7 +225,11 @@ onMounted(async () => {
 watch(
   () => userLoggedIn.value,
   (userLoggedIn) => {
-    if (userLoggedIn && ENABLED_FEATURES.ONBOARDING) {
+    if (
+      userLoggedIn &&
+      !onboardingStore.isComplete &&
+      ENABLED_FEATURES.ONBOARDING
+    ) {
       onboardingStore.open = true;
     }
   }

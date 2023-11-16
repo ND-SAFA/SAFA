@@ -4,7 +4,7 @@
     rounded
     size="sm"
     indeterminate
-    color="primary"
+    class="nav-gradient"
     data-cy="app-loading"
   />
 </template>

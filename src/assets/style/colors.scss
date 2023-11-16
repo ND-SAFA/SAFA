@@ -77,6 +77,14 @@ $color-linear-gradient: linear-gradient(
   circle {
     stroke: url(#color-gradient-full);
   }
+  .q-linear-progress__model {
+    &:before, &:after {
+      border: 1px solid transparent !important;
+      background-image: $color-linear-gradient;
+      background-clip: content-box, border-box !important;
+      background-origin: border-box !important;
+    }
+  }
 }
 
 // Background Palette Tags

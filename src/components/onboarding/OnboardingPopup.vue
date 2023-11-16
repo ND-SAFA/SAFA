@@ -35,6 +35,7 @@
           vertical
           :steps="onboardingStore.steps"
           hide-actions
+          color="gradient"
         >
           <template #1>
             <git-hub-authentication inactive />
@@ -158,7 +159,7 @@
               </text-button>
               <flex-box align="center" justify="center" full-width>
                 <separator style="width: 40px" />
-                <typography el="div" class="q-ma-sm" value="OR" />
+                <typography secondary el="div" class="q-ma-sm" value="OR" />
                 <separator style="width: 40px" />
               </flex-box>
               <text-button

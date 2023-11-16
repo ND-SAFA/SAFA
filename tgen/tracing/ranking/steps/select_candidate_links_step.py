@@ -1,5 +1,3 @@
-
-
 from tgen.common.logging.logger_manager import logger
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs

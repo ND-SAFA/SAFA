@@ -23,6 +23,7 @@ from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.summarizer.summarizer_args import SummarizerArgs
 
 
@@ -75,12 +76,13 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         """
         return HGenState
 
-    def run(self) -> PromptDataset:
+    def run(self, **kwargs) -> PromptDataset:
         """
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
-        super().run()
+        self.summarizer_args = None
+        super().run(**kwargs)
 
         dataset = self.state.final_dataset
         assert dataset is not None, f"Final dataset is not set."

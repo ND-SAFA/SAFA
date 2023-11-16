@@ -8,7 +8,7 @@ from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.state.state import State
+from tgen.pipeline.state import State
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 
 

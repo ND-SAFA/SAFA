@@ -10,7 +10,7 @@ from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.tokens.token_costs import INPUT_TOKENS, ModelTokenCost, OUTPUT_TOKENS
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.state.state import State
+from tgen.pipeline.state import State
 
 AIObject = TypeVar("AIObject")
 

@@ -105,6 +105,20 @@ class State(BaseObject):
             return False
 
     @classmethod
+    def delete_state_files(cls, load_dir: str, step_names: List[str], step_to_delete_from: str = None) -> "State":
+        """
+        Deletes all state files starting at the step to delete from
+        :param load_dir: The directory to delete the state from
+        :param step_names: The names of the steps
+        :param step_to_delete_from: The name of the step, from which all later states will be deleted
+        :return: None
+        """
+        step_index = step_names.index(step_to_delete_from) if step_to_delete_from else 0
+        for i, step in enumerate(step_names[step_index:]):
+            delete_path = cls.get_path_to_state_checkpoint(load_dir, step, step_num=step_index+i+1)
+            FileUtil.delete_file_safely(delete_path)
+
+    @classmethod
     def collapse_or_expand_paths(cls, as_dict: Dict, collapse: bool = True) -> Dict:
         """
         Collapses or expands all path variables in the dictionary of vars

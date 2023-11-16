@@ -34,7 +34,7 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         return RankingState
 
-    def run(self) -> None:
+    def run(self, **kwargs) -> None:
         """
 
         :return: List of parents mapped to their ranked children.

@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 
+from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.state.state import State
+from tgen.pipeline.state import State
 
 
 @dataclass
@@ -39,6 +40,8 @@ class PipelineArgs(BaseObject):
         """
         self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset,
                                                                              self.dataset_creator)
+        self.interactive_mode = self.interactive_mode or environment_constants.IS_INTERACTIVE
+        environment_constants.IS_INTERACTIVE = self.interactive_mode
 
     def update_llm_managers_with_state(self, state: State) -> None:
         """
@@ -46,4 +49,5 @@ class PipelineArgs(BaseObject):
         :param state: The pipeline state
         :return: None
         """
+
         DataclassUtil.update_attr_of_type_with_vals(self, AbstractLLMManager, state=state)

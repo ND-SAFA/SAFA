@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict
+from typing import Dict, List, Union
 
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
     DEFAULT_ORPHAN_THRESHOLD
@@ -32,7 +32,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The layer of the source artifacts for which higher-level artifacts will be generated
     """
-    source_layer_id: str = required_field(field_name="source_layer_id")
+    source_layer_id: Union[str, List[str]] = required_field(field_name="source_layer_id")
     """
     The type of higher-level artifact that will be generated
     """
@@ -84,7 +84,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, adds already linked artifacts to the cluster that their parent is in
     """
-    add_linked_artifacts_to_cluster: bool = False # TODO change to default to false
+    add_linked_artifacts_to_cluster: bool = False  # TODO change to default to false
     """
     The llm manager to use for each prediction step
     """

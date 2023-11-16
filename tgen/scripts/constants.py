@@ -1,6 +1,6 @@
 import os
 
-from tgen.scripts.util import bool_constructor
+from tgen.scripts.util import bool_constructor, list_constructor
 
 """
 RQ DEFINITION
@@ -35,7 +35,7 @@ SUPPORTED_TYPES_RQ = {
     float: float,
     str: str,
     bool: bool_constructor,
-    list: list
+    list: list_constructor
 }
 RQ_VARIABLE_START = "["
 RQ_VARIABLE_REGEX = r'\[([^\[\]]+)\]'

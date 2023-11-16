@@ -1,9 +1,0 @@
-{
-    "artifacts": [
-        {
-            "type": "code",
-            "fileName": "code.csv"
-        }
-    ],
-    "traces": []
-}

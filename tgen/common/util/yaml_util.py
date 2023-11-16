@@ -60,7 +60,7 @@ class CustomLoader(SafeLoader):
             if hasattr(data, "from_yaml"):
                 data.from_yaml()
             end = timeit.timeit()
-            self.__time_to_load[cls] = end-start
+            self.__time_to_load[class_path] = max(end-start, self.__time_to_load.get(class_path, 0))
             return data
         except Exception as e:
             logger.error(f"Problem loading node {node.tag}")

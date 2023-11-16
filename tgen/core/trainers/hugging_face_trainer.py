@@ -8,6 +8,7 @@ from transformers.trainer import Trainer
 from transformers.trainer_utils import EvalPrediction, PredictionOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.script_constants import DISPLAY_METRICS
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
@@ -97,7 +98,6 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         self.model = self.model_manager.get_model()
         if self.trainer_args.do_training_eval:
             self._evaluate()
-        logger.info(f"Batch size: {self.args.train_batch_size}")
         hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
         train_output = TraceTrainOutput(train_output=hf_train_output)
         if self.trainer_args.do_training_eval:
@@ -116,7 +116,8 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if not self.has_dataset(dataset_role):
             raise Exception(f"Trainer does not have dataset for {dataset_role}.")
         output = self.predict(dataset_role)
-        logger.log_with_title(f"{dataset_role.name} Metrics", repr(output.metrics))
+        display_metrics = {k: output.metrics[k] for k in DISPLAY_METRICS if k in output.metrics}
+        logger.log_with_title(f"{dataset_role.name.title()} Metrics", display_metrics)
         trace_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role]
         prediction_entries = trace_dataset.trace_df.get_links()
 

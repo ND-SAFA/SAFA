@@ -72,6 +72,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         self.false_negative_weight = false_negative_weight
         self.losses = []
         self.total_loss = 0
+        self.loss_function = None
+        self.params = None
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -87,14 +89,14 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         train_examples = self.to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_dataloader = DataLoader(train_examples, shuffle=self.trainer_args.shuffle, batch_size=self.args.train_batch_size)
 
-        loss_function = self._create_loss_function()
+        self.loss_function = self._create_loss_function()
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
 
         evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
 
         logger.log_title("Training...", prefix=NEW_LINE)
         model: CustomSentenceTransformer = self.model
-        training_params = STTrainingParams(
+        self.params = STTrainingParams(
             epochs=int(self.args.num_train_epochs),
             warmup_steps=self.args.warmup_steps,
             evaluation_steps=n_steps,
@@ -103,7 +105,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
             save_best_model=self.trainer_args.save_best_model,
             accumulation_steps=self.args.gradient_accumulation_steps
         )
-        model.fit(train_objectives=[(train_dataloader, loss_function)], training_params=training_params)
+        model.fit(train_objectives=[(train_dataloader, self.loss_function)], training_params=self.params)
         self.state.best_model_checkpoint = self.args.output_dir
         if self.args.load_best_model_at_end:
             self.model = CustomSentenceTransformer(self.state.best_model_checkpoint)
@@ -123,6 +125,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         input_examples = self.to_input_examples(dataset)
         scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
+        prediction_metrics["loss"] = self._calculate_loss(Tensor(scores), Tensor(labels)).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def _create_loss_function(self):
@@ -185,7 +188,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         matching_examples = [input_example for input_example in input_examples if input_example.label == label]
         content = ListUtil.flatten([input_example.texts for input_example in matching_examples])
 
-        embeddings_manager = EmbeddingsManager.create_from_content(content, model=model)
+        embeddings_manager = EmbeddingsManager.create_from_content(content, model=model, show_progress_bar=False)
 
         for input_example in matching_examples:
             s_text, t_text = input_example.texts

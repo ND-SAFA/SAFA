@@ -47,7 +47,7 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
 
         self.metrics.append(role2metrics)
         loss = self.update_loss()
-        WBManager.log(role2metrics, {"loss": loss})
+        WBManager.log(role2metrics, {"loss": loss}, step=self.trainer.params.global_step)
         return validation_metrics[self.evaluator_metric]
 
     def update_loss(self):

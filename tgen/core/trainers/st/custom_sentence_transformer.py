@@ -70,7 +70,7 @@ class CustomSentenceTransformer(SentenceTransformer):
             features = list(map(lambda batch: batch_to_device(batch, self._target_device), features))
 
             loss_value = loss_model(features, labels)
-            WBManager.log(metrics={"loss": loss_value.item()}, step=training_step)
+            WBManager.log(metrics={"training_loss": loss_value.item()}, step=training_manager.params.global_step)
             loss_value /= training_manager.params.accumulation_steps
             loss_value.backward()
 

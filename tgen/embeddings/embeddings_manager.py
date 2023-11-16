@@ -358,6 +358,8 @@ class EmbeddingsManager:
         artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
         if include_ids:
             artifact_contents = [f"{a_id}: {content}" for a_id, content in zip(subset_ids, artifact_contents)]
+        if not self.show_progress_bar:
+            logger.info("Calculating embeddings for artifacts...")
         embeddings = self.get_model().encode(artifact_contents, show_progress_bar=self.show_progress_bar)
         return embeddings if return_as_list else embeddings[0]
 

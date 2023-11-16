@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Tuple
 
 import wandb
 
+from tgen.common.logging.logger_manager import logger
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
 GROUP_EXCLUDE = ["random_seed"]
@@ -32,6 +33,7 @@ class WBManager:
             args_config = cls.create_config_dict(args, ARGS_PARAMS)
             obj.update(args_config)
         wandb.config.update(obj)
+        logger.info(f"Configuration Update: {obj}")
 
     @staticmethod
     def create_config_dict(obj: Any, props: List[str]):

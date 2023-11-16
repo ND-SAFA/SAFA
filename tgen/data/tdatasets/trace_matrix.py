@@ -90,9 +90,9 @@ class TraceMatrix:
         :param link_ids: If provided, specifies the order of the predicted_scores
         :return: None
         """
+        logger.info("Filling Trace Matrix...")
         link_ids = trace_df.index if link_ids is None else link_ids
         predicted_scores = [None for link in range(len(link_ids))] if predicted_scores is None else predicted_scores
-        logger.info("Filling Trace Matrix...")
         for i, link_id in enumerate(link_ids):
             link = trace_df.get_link(link_id)
             self.add_link(link, predicted_scores[i])

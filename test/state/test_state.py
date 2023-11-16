@@ -18,7 +18,7 @@ from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactConte
 from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
-from tgen.state.state import State
+from tgen.pipeline.state import State
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic

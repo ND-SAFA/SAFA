@@ -1,11 +1,13 @@
 import os
 import re
-from typing import Any, Dict, List, Tuple, Type
+from typing import Any, Dict, List, Tuple, Type, Optional
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.yaml_util import YamlUtil
 from tgen.scripts.constants import MISSING_DEFINITION_ERROR, RQ_INQUIRER_CONFIRM_MESSAGE, RQ_VARIABLE_REGEX, \
     RQ_VARIABLE_START, \
     SUPPORTED_TYPES_RQ
@@ -25,6 +27,13 @@ class RQVariable:
         self.__value = None
         self.__default_value = None
 
+    def has_value(self) -> bool:
+        """
+        Returns if the variable has a value other than default
+        :return: True if the variable has a value other than default
+        """
+        return self.__value is not None
+
     def get_value(self) -> Any:
         """
         :return: Returns the value of the variable.
@@ -34,16 +43,20 @@ class RQVariable:
             value = os.path.expanduser(value)
         return value
 
-    def inquirer_value(self) -> None:
+    def inquirer_value(self) -> bool:
         """
         Prompts user to enter valid value for variable.
-        :return: None
+        :return: Whether the user input was successful or not
         """
         message = f"{self.name}"
-        value = inquirer_value(message, self.type_constructor, default_value=self.__default_value, allow_back=True)
-        if value is None:
-            raise Exception("Unable to retrieve value.")
-        self.__value = value
+        try:
+            value = inquirer_value(message, self.type_class, default_value=self.__default_value, allow_back=True)
+            self.__value = value
+        except Exception as e:
+            logger.warning(e)
+            return False
+        assert value is not None
+        return True
 
     def parse_value(self, variable_value: Any) -> Any:
         """
@@ -63,6 +76,14 @@ class RQVariable:
         """
         typed_default_value = self.type_constructor(default_value)
         self.__default_value = typed_default_value
+
+    def set_value(self, value: Any) -> None:
+        """
+        Sets the value of teh variable
+        :param value: The value to set
+        :return: None
+        """
+        self.__value = value
 
     def has_valid_value(self, throw_error: bool = False) -> bool:
         """
@@ -106,6 +127,8 @@ class RQVariable:
 
 
 class RQDefinition:
+    OUTPUT_DIR = "output_dir"
+
     def __init__(self, rq_path: str):
         """
         Defines proxy API for RQ at path.
@@ -118,16 +141,15 @@ class RQDefinition:
         self.rq_json = JsonUtil.read_json_file(rq_path)
         self.variables = self.extract_variables(self.rq_json)
 
-    def build_rq(self, error_on_fail: bool = True) -> Dict:
+    def build_rq(self) -> Dict:
         """
         Builds the RQ JSON with all variables filled in.
-        :param error_on_fail: Whether to throw an error if a variable does not have a valid value.
         :return: RQ Json.
         """
-        self.has_all_variable(throw_error=error_on_fail)
         variable_replacements = self.__get_variable_replacements()
-        built_rq = FileUtil.expand_paths(self.rq_json, variable_replacements)
-        return built_rq
+        built_rq_json = FileUtil.expand_paths(self.rq_json, variable_replacements)
+        self.save_rq_variables()
+        return built_rq_json
 
     def set_default_values(self, default_values: Dict = None, use_os_values: bool = False) -> None:
         """
@@ -150,16 +172,77 @@ class RQDefinition:
             default_value = default_values[variable.name]
             variable.set_default_value(default_value)
 
+    def fill_variables(self) -> None:
+        """
+        Ensures all variables have been filled in either by reloading a previous config or by prompting the user
+        :return: None
+        """
+        load_rq_path = self.get_rq_save_path()
+        if FileUtil.safely_check_path_exists(load_rq_path):
+            should_reload = confirm(f"Do you want to reload variables from the last run of {self.script_name}?")
+            if should_reload:
+                try:
+                    variables_map = self.read_rq_variables()
+                    for v in self.variables:
+                        if v.name in variables_map:
+                            v.set_value(variables_map[v.name].get_value())
+                except Exception:
+                    logger.exception(f"Unable to reload previous rq config from {load_rq_path}")
+        self.inquirer_variables()
+
     def inquirer_variables(self) -> None:
         """
         Prompts user to fill in any missing variables in RQ definition.
-        :param default_values: Dictionary of default values to allow user to select from.
         :return: None
         """
         for variable in self.variables:
-            variable.inquirer_value()
-        if not self.confirm():
+            if not variable.has_value():
+                success = variable.inquirer_value()
+                if not success:
+                    self.inquirer_variables()
+        if not self.has_all_variable():
             self.inquirer_variables()
+        if not self.confirm():
+            self.clear_variable_values()
+            self.inquirer_variables()
+
+    def read_rq_variables(self) -> Dict[str, RQVariable]:
+        """
+        Reads the rq variables from a yaml file
+        :return: Mapping of variable name to variable if successfully reloaded
+        """
+        try:
+            load_rq_path = self.get_rq_save_path()
+            assert load_rq_path
+            variables = YamlUtil.read(load_rq_path)
+            return variables
+        except Exception:
+            return {}
+
+    def save_rq_variables(self) -> bool:
+        """
+        Saves the rq variables to a yaml file
+        :return: Whether the rq successfully saved
+        """
+        try:
+            save_rq_path = self.get_rq_save_path()
+            assert save_rq_path
+            variables_map = {v.name: v for v in self.variables}
+            YamlUtil.write(variables_map, save_rq_path)
+            return True
+        except Exception:
+            return False
+
+    def get_rq_save_path(self) -> Optional[str]:
+        """
+        Returns the path at which the rq config should be saved
+        :return: The path at which the rq config should be saved
+        """
+        if self.OUTPUT_DIR not in self.rq_json:
+            return
+        output_dir = FileUtil.expand_paths(self.rq_json[self.OUTPUT_DIR])
+        save_rq_path = os.path.join(output_dir, "rq_config.yaml")
+        return save_rq_path
 
     def confirm(self, title: str = RQ_INQUIRER_CONFIRM_MESSAGE) -> bool:
         """
@@ -173,15 +256,25 @@ class RQDefinition:
         variable_values_message = NEW_LINE.join(variable_messages)
         return confirm(f"\n{title}\n{variable_values_message}")
 
-    def has_all_variable(self, throw_error: bool = True):
+    def has_all_variable(self):
         """
         Checks is all variables have valid values.
-        :param throw_error: Whether to throw error
+        :return: True if all variables are valid else False
+        """
+        has_all_variables = True
+        for variable in self.variables:
+            if not variable.has_valid_value(throw_error=False):
+                variable.set_value(None)
+                has_all_variables = False
+        return has_all_variables
+
+    def clear_variable_values(self):
+        """
+        Resets all variable values to None.
         :return:
         """
         for variable in self.variables:
-            variable.has_valid_value(throw_error=True)
-        return True
+            variable.set_value(None)
 
     def __get_variable_replacements(self) -> Dict:
         """
@@ -197,7 +290,7 @@ class RQDefinition:
         :return: List of variables
         """
         json_values = cls.get_json_values(rq_definition)
-        values = [v for v in json_values if isinstance(v, str) and RQ_VARIABLE_START in v]  # extract values containing variables
+        values = [v for v in json_values if cls.is_variable(v)]  # extract values containing variables
 
         seen_variables = set()
         variables: List[RQVariable] = []
@@ -208,6 +301,15 @@ class RQDefinition:
                 variables.append(variable)
                 seen_variables.add(variable.name)
         return variables
+
+    @classmethod
+    def is_variable(cls, json_value: Any) -> bool:
+        """
+        Determines if the json value is a variable
+        :param json_value: The json value
+        :return: True if it is a variable, else False
+        """
+        return isinstance(json_value, str) and RQ_VARIABLE_START in json_value
 
     @classmethod
     def create_variables_from_string(cls, input_string: str) -> List[RQVariable]:

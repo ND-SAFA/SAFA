@@ -29,7 +29,7 @@ class ScriptDefinition:
 
         ScriptDefinition.set_output_paths(rq_definition)
         rq_definition.set_default_values(use_os_values=True)
-        rq_definition_json = rq_definition.build_rq(error_on_fail=True)
+        rq_definition_json = rq_definition.build_rq()
 
         return rq_definition_json
 

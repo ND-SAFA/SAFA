@@ -13,6 +13,8 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
     USER_SYM
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.json_util import JsonUtil
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import JsonUtil
 
@@ -146,7 +148,7 @@ class FileUtil:
                 all_files.extend(FileUtil.get_file_list(file, exclude=exclude, exclude_ext=exclude_ext))
             files = all_files
         else:
-            raise Exception("Unable to read pretraining data file path " + data_path)
+            raise Exception("Unable to get files from path " + data_path)
         return files
 
     @staticmethod
@@ -362,9 +364,23 @@ class FileUtil:
         :param kwargs: Additional parameters
         :return: The list of directories at the path
         """
-        function_kwargs = {"add_base_path": True}
-        function_kwargs.update(kwargs)
-        return FileUtil.ls_filter(path, f=lambda f: os.path.isdir(f), **function_kwargs)
+        function_kwargs = DictUtil.update_kwarg_values(kwargs, add_base_path=True, replace_existing=False)
+        files = FileUtil.ls_filter(path, f=lambda f: os.path.isdir(f), **function_kwargs)
+        return files
+
+    @staticmethod
+    def ls_files(path: str, with_ext: str = None, **kwargs):
+        """
+        Gets the directories at the current path
+        :param path: Path to the directory
+        :param with_ext: If provided, will only return files that end in the given extension
+        :param kwargs: Additional parameters
+        :return: The list of directories at the path
+        """
+        files = FileUtil.ls_filter(path, f=lambda f: not os.path.isdir(f), **kwargs)
+        if with_ext:
+            files = [f for f in files if f.endswith(with_ext)]
+        return files
 
     @staticmethod
     def ls_filter(base_path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base_path: bool = False) -> List[str]:

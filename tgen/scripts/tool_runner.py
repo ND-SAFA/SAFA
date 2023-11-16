@@ -8,6 +8,7 @@ load_dotenv()
 root_path = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(root_path)
 
+from tgen.common.constants import environment_constants
 from tgen.scripts.tools.find_missing_docs import print_missing_headers
 from tgen.scripts.tools.rq_tools import RQ_TOOLS
 from tgen.scripts.toolset.tool import Tool
@@ -58,4 +59,5 @@ TOOLS = {
 }
 
 if __name__ == "__main__":
+    environment_constants.IS_INTERACTIVE = True
     tool_runner_loop(TOOLS)

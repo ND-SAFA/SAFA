@@ -12,7 +12,7 @@ from tqdm import tqdm
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.core.trainers.st.constants import DEFAULT_BEST_SCORE, STARTING_STEP, TRAINING_SECTION_KEY
 from tgen.core.trainers.st.st_training_manager import STTrainingManager, STTrainingParams
-from tgen.core.wandb.WBManager import WBManager
+from tgen.core.wb.wb_manager import WBManager
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ from sentence_transformers.evaluation import SentenceEvaluator
 from tgen.common.constants.hugging_face_constants import DEFAULT_EVAL_METRIC, SEPARATOR_BAR
 from tgen.common.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.core.wandb.WBManager import WBManager
+from tgen.core.wb.wb_manager import WBManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
 

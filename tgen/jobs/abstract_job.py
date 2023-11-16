@@ -17,7 +17,7 @@ from tgen.common.util.override import overrides
 from tgen.common.util.random_util import RandomUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.common.util.status import Status
-from tgen.core.wandb.WBManager import WBManager
+from tgen.core.wb.wb_manager import WBManager
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager

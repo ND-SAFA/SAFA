@@ -20,8 +20,8 @@ from tgen.core.save_strategy.metric_save_strategy import MetricSaveStrategy
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
-from tgen.core.wandb.WBManager import WBManager
-from tgen.core.wandb.trace_callback import TraceCallback
+from tgen.core.wb.trace_callback import TraceCallback
+from tgen.core.wb.wb_manager import WBManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.dataset_role import DatasetRole

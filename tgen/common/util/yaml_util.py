@@ -11,8 +11,8 @@ from yaml.loader import SafeLoader
 from yaml.nodes import MappingNode, Node
 
 from tgen.common.constants.deliminator_constants import COLON
-from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 
@@ -60,7 +60,7 @@ class CustomLoader(SafeLoader):
             if hasattr(data, "from_yaml"):
                 data.from_yaml()
             end = timeit.timeit()
-            self.__time_to_load[class_path] = max(end-start, self.__time_to_load.get(class_path, 0))
+            self.__time_to_load[class_path] = max(end - start, self.__time_to_load.get(class_path, 0))
             return data
         except Exception as e:
             logger.error(f"Problem loading node {node.tag}")
@@ -126,6 +126,7 @@ class CustomLoader(SafeLoader):
 
 
 class CustomDumper(Dumper):
+    _time_to_save = {}
 
     def represent_data(self, data) -> Node:
         """
@@ -133,6 +134,7 @@ class CustomDumper(Dumper):
         :param data: The data to represent
         :return: The data in a yaml form (node)
         """
+        start = timeit.timeit()
         if hasattr(data, "to_yaml"):
             try:
                 converted_data = data.to_yaml()
@@ -147,6 +149,8 @@ class CustomDumper(Dumper):
         # if isinstance(data, np.ndarray):
         #     data = ListUtil.convert_numpy_array_to_native_types(data)
         node = super().represent_data(data)
+        end = timeit.timeit()
+        self._time_to_save[node.tag] = max(end - start, self._time_to_save.get(node.tag, 0))
         return node
 
     def get_original_node_tag(self, data) -> "str":

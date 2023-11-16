@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import List, Union
 
 from tgen.common.util.pipeline_util import PipelineUtil
@@ -19,11 +18,10 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The state of HGEN.
         :return: The original dataset and a dataset with only the source layer
         """
-        original_dataset_complete = deepcopy(args.dataset)
+        original_dataset_complete = args.dataset
         PipelineUtil.save_dataset_checkpoint(original_dataset_complete, state.export_dir, filename="initial_dataset_with_sources")
 
         source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df, args.source_layer_id)
-        original_dataset_complete = args.dataset
 
         state.source_dataset = source_layer_only_dataset
         state.original_dataset = original_dataset_complete

@@ -169,8 +169,10 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Generating Trace Links", position = 4)
     public void generatingTraces(JobLogger logger) {
-        getServiceProvider().getPermissionService()
-            .requirePermission(ProjectPermission.GENERATE, getProjectVersion().getProject(), getUser());
+        if (flatFileParser.getTGenRequestAppEntity().size() > 0) {
+            getServiceProvider().getPermissionService()
+                .requirePermission(ProjectPermission.GENERATE, getProjectVersion().getProject(), getUser());
+        }
 
         ProjectCommitDefinition projectCommitDefinition = getProjectCommitDefinition();
 

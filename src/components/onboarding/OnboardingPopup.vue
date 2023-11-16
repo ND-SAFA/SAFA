@@ -1,7 +1,7 @@
 <template>
   <q-dialog
     v-if="userLoggedIn"
-    v-model="open"
+    v-model="onboardingStore.open"
     persistent
     maximized
     transition-show="slide-up"
@@ -11,7 +11,7 @@
       <q-bar class="bg-neutral q-mt-md">
         <q-space />
 
-        <text-button text icon="cancel" @click="handleClose">
+        <text-button text icon="cancel" @click="onboardingStore.handleClose">
           Skip Onboarding
         </text-button>
       </q-bar>
@@ -30,7 +30,12 @@
           value="Follow the onboarding steps below to generate documentation for your code."
         />
 
-        <stepper v-model="step" vertical :steps="steps" hide-actions>
+        <stepper
+          v-model="onboardingStore.step"
+          vertical
+          :steps="onboardingStore.steps"
+          hide-actions
+        >
           <template #1>
             <git-hub-authentication inactive />
           </template>
@@ -47,7 +52,7 @@
               />
               <typography el="div" value="Generating Documents:" />
               <attribute-chip
-                v-for="type in generationTypes"
+                v-for="type in onboardingStore.generationTypes"
                 :key="type"
                 :value="type"
                 icon="create-artifact"
@@ -60,13 +65,17 @@
                   color="gradient"
                   class="bd-gradient"
                   icon="generate-artifacts"
-                  :disabled="error"
-                  @click="handleGenerate"
+                  :disabled="onboardingStore.error"
+                  @click="onboardingStore.handleGenerate"
                 >
                   Generate Documentation
                 </text-button>
               </flex-box>
-              <q-banner v-if="error" rounded class="bg-background q-mt-md">
+              <q-banner
+                v-if="onboardingStore.error"
+                rounded
+                class="bg-background q-mt-md"
+              >
                 <template #avatar>
                   <icon
                     variant="error"
@@ -86,7 +95,7 @@
                     text
                     color="secondary"
                     icon="calendar"
-                    @click="handleScheduleCall"
+                    @click="onboardingStore.handleScheduleCall"
                   >
                     Schedule a Call
                   </text-button>
@@ -94,7 +103,7 @@
               </q-banner>
             </flex-box>
           </template>
-          <template v-if="!!recentJob" #4>
+          <template v-if="!!uploadedJob" #4>
             <typography
               el="p"
               value="
@@ -105,24 +114,24 @@
             <!-- TODO: handle errors with followup call -->
             <list-item
               dense
-              :title="recentJob.name"
-              :subtitle="jobProgressDisplay"
+              :title="uploadedJob.name"
+              :subtitle="onboardingStore.uploadProgress"
             >
               <template #icon>
                 <q-circular-progress
-                  v-if="recentJob.status === 'IN_PROGRESS'"
+                  v-if="uploadedJob.status === 'IN_PROGRESS'"
                   color="gradient"
                   indeterminate
                   size="md"
                 />
                 <icon
-                  v-else-if="recentJob.status === 'COMPLETED'"
+                  v-else-if="uploadedJob.status === 'COMPLETED'"
                   variant="job-complete"
                   color="primary"
                   size="md"
                 />
                 <icon
-                  v-else-if="recentJob.status === 'FAILED'"
+                  v-else-if="uploadedJob.status === 'FAILED'"
                   variant="job-fail"
                   color="error"
                   size="md"
@@ -143,7 +152,7 @@
                 class="bd-gradient"
                 icon="download"
                 :loading="projectApiStore.saveProjectLoading"
-                @click="handleExportProject"
+                @click="onboardingStore.handleExportProject"
               >
                 Export as CSV
               </text-button>
@@ -157,7 +166,7 @@
                 color="gradient"
                 class="bd-gradient"
                 icon="view-tree"
-                @click="handleViewProject"
+                @click="onboardingStore.handleViewProject"
               >
                 View in SAFA
               </text-button>
@@ -179,21 +188,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-import { LocalStorageKeys, StepperStep } from "@/types";
+import { computed, onMounted, watch } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import {
-  ARTIFACT_GENERATION_TYPES,
-  ENABLED_FEATURES,
-  ONBOARDING_STEPS,
-} from "@/util";
-import {
-  createProjectApiStore,
-  getVersionApiStore,
   gitHubApiStore,
   integrationsStore,
-  jobApiStore,
-  jobStore,
-  logStore,
+  onboardingStore,
   projectApiStore,
   sessionStore,
 } from "@/hooks";
@@ -212,117 +212,12 @@ import {
   GitHubProjectInput,
 } from "@/components/integrations";
 
-const open = ref(false);
-const error = ref(false);
-
-const step = ref(1);
-const steps = ref<StepperStep[]>(
-  Object.values(ONBOARDING_STEPS).map((step) => ({ ...step, done: false }))
-);
-
-const generationTypes = ref([
-  ARTIFACT_GENERATION_TYPES.USER_STORY,
-  ARTIFACT_GENERATION_TYPES.SUB_SYSTEM,
-]);
-
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
-
-const recentJob = computed(() =>
-  steps.value[ONBOARDING_STEPS.generate.index].done
-    ? jobStore.jobs[0]
-    : undefined
-);
-const jobProgressDisplay = computed(() =>
-  recentJob.value
-    ? `Step ${recentJob.value.currentStep + 1} of ${
-        recentJob.value.steps.length
-      }: ${recentJob.value.steps[recentJob.value.currentStep]}`
-    : ""
-);
-
-/**
- * Close the popup and mark onboarding as complete.
- */
-function handleClose() {
-  open.value = false;
-  localStorage.setItem(LocalStorageKeys.onboarding, "true");
-}
-
-/**
- * Schedule a call with the SAFA team.
- */
-function handleScheduleCall() {
-  // TODO
-}
-
-/**
- * Generate documentation for the selected project.
- * - Moves from Generate Documentation step if a project is created.
- */
-function handleGenerate() {
-  if (ENABLED_FEATURES.ONBOARDING_MOCKED) {
-    steps.value[ONBOARDING_STEPS.generate.index].done = true;
-    step.value = ONBOARDING_STEPS.job.number;
-
-    setTimeout(() => {
-      steps.value[ONBOARDING_STEPS.job.index].done = true;
-      step.value = ONBOARDING_STEPS.view.number;
-    }, 2000);
-
-    return;
-  }
-
-  createProjectApiStore.handleGitHubImport({
-    onSuccess: () => {
-      steps.value[ONBOARDING_STEPS.generate.index].done = true;
-      step.value = ONBOARDING_STEPS.job.number;
-    },
-    onError: () => (error.value = true),
-  });
-}
-
-/**
- * Export the selected project as a CSV.
- */
-async function handleExportProject() {
-  if (!recentJob.value?.completedEntityId) return;
-
-  await getVersionApiStore.handleLoadCurrent({
-    projectId: recentJob.value.completedEntityId,
-  });
-
-  await projectApiStore.handleDownload(
-    "csv",
-    recentJob.value.completedEntityId
-  );
-
-  logStore.onSuccess("Your data is being exported.");
-  handleClose();
-}
-
-/**
- * View the selected project in SAFA.
- */
-async function handleViewProject() {
-  if (!recentJob.value?.completedEntityId) return;
-
-  await getVersionApiStore.handleLoadCurrent({
-    projectId: recentJob.value.completedEntityId,
-  });
-
-  handleClose();
-}
+const uploadedJob = computed(() => onboardingStore.uploadedJob);
 
 // Preload GitHub projects if credentials are already set.
-onMounted(() => {
-  const storedOnboardingComplete =
-    localStorage.getItem(LocalStorageKeys.onboarding) === "true";
-
-  if (integrationsStore.validGitHubCredentials) {
-    gitHubApiStore.handleLoadProjects();
-  }
-
-  jobApiStore.handleReload();
+onMounted(async () => {
+  await onboardingStore.handleReload();
 });
 
 // Open the popup when the user logs in, if they have not already completed it.
@@ -330,7 +225,7 @@ watch(
   () => userLoggedIn.value,
   (userLoggedIn) => {
     if (userLoggedIn && ENABLED_FEATURES.ONBOARDING) {
-      open.value = true;
+      onboardingStore.open = true;
     }
   }
 );
@@ -339,15 +234,10 @@ watch(
 watch(
   () => integrationsStore.validGitHubCredentials,
   (valid) => {
-    if (valid) {
-      steps.value[ONBOARDING_STEPS.connect.index].done = true;
+    if (!valid) return;
 
-      if (step.value === ONBOARDING_STEPS.connect.number) {
-        step.value = ONBOARDING_STEPS.code.number;
-      }
-
-      gitHubApiStore.handleLoadProjects();
-    }
+    onboardingStore.handleNextStep("connect");
+    gitHubApiStore.handleLoadProjects();
   }
 );
 
@@ -355,27 +245,19 @@ watch(
 watch(
   () => !!integrationsStore.gitHubProject,
   (valid) => {
-    if (valid) {
-      steps.value[ONBOARDING_STEPS.code.index].done = true;
+    if (!valid) return;
 
-      if (step.value === ONBOARDING_STEPS.code.number) {
-        step.value = ONBOARDING_STEPS.generate.number;
-      }
-    }
+    onboardingStore.handleNextStep("code");
   }
 );
 
 // Move from Await Generation step if the job completes.
 watch(
-  () => recentJob.value?.status,
+  () => uploadedJob.value?.status,
   (status) => {
     if (status !== "COMPLETED") return;
 
-    steps.value[ONBOARDING_STEPS.generate.index].done = true;
-
-    if (step.value === ONBOARDING_STEPS.generate.number) {
-      step.value = ONBOARDING_STEPS.job.number;
-    }
+    onboardingStore.handleNextStep("job");
   }
 );
 </script>

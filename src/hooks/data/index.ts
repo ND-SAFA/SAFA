@@ -15,3 +15,4 @@ export { default as membersStore } from "./useMembers";
 export { default as searchStore } from "./useSearch";
 export { default as orgStore } from "./useOrg";
 export { default as teamStore } from "./useTeam";
+export { default as onboardingStore } from "./useOnboarding";

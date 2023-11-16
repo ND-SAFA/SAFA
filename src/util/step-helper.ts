@@ -32,7 +32,7 @@ export const ONBOARDING_STEPS = {
   },
   view: {
     title: "View Documentation",
-    caption: "Export generated data, or view the data within SAFA.",
+    caption: "Export generated data or view within SAFA.",
     index: 4,
     number: 5,
   },

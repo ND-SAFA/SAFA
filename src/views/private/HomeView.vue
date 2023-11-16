@@ -31,24 +31,17 @@
             <flex-box column>
               <text-button
                 text
-                label="Create New Project"
-                icon="add"
-                color="primary"
-                @click="handleOpenStandard"
-              />
-              <text-button
-                text
-                label="Bulk Upload Project"
-                icon="upload"
-                color="primary"
-                @click="handleOpenBulk"
-              />
-              <text-button
-                text
-                label="Import GitHub Repo"
+                label="Import From GitHub"
                 icon="integrate"
                 color="primary"
                 @click="handleOpenImport"
+              />
+              <text-button
+                text
+                label="Upload From Files"
+                icon="upload"
+                color="primary"
+                @click="handleOpenBulk"
               />
             </flex-box>
           </flex-box>
@@ -87,12 +80,6 @@ import {
 const { smallWindow } = useScreen();
 
 const displayProjects = computed(() => projectStore.allProjects.length > 0);
-
-function handleOpenStandard() {
-  navigateTo(Routes.PROJECT_CREATOR, {
-    [QueryParams.TAB]: "standard" as CreatorTab,
-  });
-}
 
 function handleOpenBulk() {
   navigateTo(Routes.PROJECT_CREATOR, {

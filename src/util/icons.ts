@@ -208,6 +208,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-network";
     case "disconnected":
       return "mdi-network-off";
+    case "onboarding":
+      return "mdi-map-legend";
+    case "changelog":
+      return "mdi-file-document-multiple";
     default:
       return "";
   }

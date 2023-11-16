@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List, Set, Type
 
 import numpy as np
 
@@ -124,10 +124,10 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param explanation: Explanation for generated trace link.
         :return: A dictionary mapping column names to the corresponding link information
         """
-        dict_ = EnumDict({TraceKeys.LINK_ID: link_id} if link_id else {})
-        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id, TraceKeys.LABEL: label, TraceKeys.SCORE: score,
-                      TraceKeys.EXPLANATION: explanation})
-        return dict_
+        dict_ = {TraceKeys.LINK_ID: link_id} if link_id else {}
+        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id,
+                      TraceKeys.LABEL: label, TraceKeys.SCORE: score, TraceKeys.EXPLANATION: explanation})
+        return EnumDict(dict_)
 
     @staticmethod
     def generate_link_id(source_id: Any, target_id: Any) -> int:
@@ -164,3 +164,15 @@ class TraceDataFrame(AbstractProjectDataFrame):
         for i, row in self.itertuples():
             t_map[i] = row
         return t_map
+
+    def get_orphans(self, artifact_role: TraceKeys = TraceKeys.child_label()) -> Set[Any]:
+        """
+        Returns all orphans that are of the given role (parent or child)
+        :param artifact_role: The role of the artifact as either a parent (target) or child (source)
+        :return: Ids of all orphans that are of the given role (parent or child)
+        """
+        linked_artifacts = {trace[artifact_role] for i, trace in self.itertuples()
+                            if trace[TraceKeys.LABEL] == 1}
+        orphans = {trace[artifact_role] for i, trace in self.itertuples()
+                   if trace[artifact_role] not in linked_artifacts}
+        return orphans

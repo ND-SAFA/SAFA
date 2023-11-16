@@ -8,16 +8,19 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
+from tgen.hgen.steps.step_add_linked_artifacts_to_clusters import AddLinkedArtifactsToClustersStep
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
 from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
+from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
@@ -39,6 +42,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
              GenerateTraceLinksStep,
              DetectDuplicateArtifactsStep,
              FindHomesForOrphansStep,
+             GenerateExplanationsForLinksStep,
              CreateHGenDatasetStep]
 
     def __init__(self, args: HGenArgs):
@@ -49,7 +53,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         summarizer_args = SummarizerArgs(do_resummarize_project=False,
                                          summarize_code_only=True,
                                          do_resummarize_artifacts=False,
-                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
+                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS if args.create_project_summary else [],
                                          )
         super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
@@ -85,3 +89,11 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         save_path = PipelineUtil.save_dataset_checkpoint(dataset, self.args.export_dir, filename=SAVE_DATASET_DIRNAME)
         PipelineUtil.save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         return dataset
+
+    def get_input_output_counts(self) -> Dict[str, int]:
+        """
+        Gets the number of input and generated artifacts
+        :return: The number of input and generated artifacts
+        """
+        return {"N Input Artifact": len(self.state.source_dataset.artifact_df),
+                "N Output Artifacts": len(self.state.refined_content)}

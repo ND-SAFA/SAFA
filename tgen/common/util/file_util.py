@@ -30,6 +30,7 @@ class FileUtil:
     CSV_EXT = "csv"
     YAML_EXT = "yaml"
     NUMPY_EXT = "npy"
+    HEADER_EXT = ".h"
 
     @staticmethod
     def get_directory_path(file_path: str) -> str:

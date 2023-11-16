@@ -21,6 +21,7 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the current pipeline.
         :return: NOne
         """
+        state.embedding_manager = args.embeddings_manager if args.embeddings_manager else state.embedding_manager
         state.artifact_map = args.dataset.artifact_df.to_map()
         use_sorter = args.sorter is not None
         use_pre_ranked = args.pre_sorted_parent2children is not None

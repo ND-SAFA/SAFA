@@ -1,4 +1,4 @@
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Dict
 
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
@@ -17,7 +17,7 @@ class DuplicateDetector:
         self.embeddings_manager = embeddings_manager
         self.duplicate_similarity_threshold = duplicate_similarity_threshold
 
-    def get_duplicates(self, artifact_ids: List[str]) -> Tuple[Set[str], Set[Tuple]]:
+    def get_duplicates(self, artifact_ids: List[str]) -> Tuple[Set[str], Dict[str, Set[str]]]:
         """
         Returns the list of duplicate artifact ids and the list of unique artifact ids.
         :param artifact_ids: The artifacts ids to compare.
@@ -27,27 +27,44 @@ class DuplicateDetector:
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
         similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, self.duplicate_similarity_threshold)
         dup_counter, dup_pairs = DuplicateDetector.count_duplicates(artifact_ids, similar_indices)
-        duplicate_artifact_ids = self.find_most_duplicated_artifacts(dup_counter, dup_pairs)
-        return duplicate_artifact_ids, dup_pairs
+        dup_map = self.create_duplicate_map(dup_pairs)
+        duplicate_artifact_ids = self.find_most_duplicated_artifacts(dup_counter, dup_map)
+        return duplicate_artifact_ids, dup_map
 
     @staticmethod
-    def find_most_duplicated_artifacts(dup_counter: CountMap, dup_pairs: Set[ArtifactPair]) -> Set[str]:
+    def find_most_duplicated_artifacts(dup_counter: CountMap, dup_map: Dict[str, Set[str]]) -> Set[str]:
         """
         Finds the most duplicated artifacts from the counter.
         :param dup_counter: Contains the number of duplicates each artifact was flagged.
-        :param dup_pairs: Set of duplicate artifact id pairs.
+        :param dup_map: Map of duplicate artifact name to a set of all artifact it is duplicated with
         :return: List of most duplicated artifacts.
         """
 
         most_to_least_overlapping_dups = [d[0] for d in sorted(dup_counter.items(), key=lambda x: x[1], reverse=True)]
-        fixed_dups = set()
         duplicate_artifact_ids: Set[str] = set()
         for dup_art in most_to_least_overlapping_dups:
-            for dup_pair in dup_pairs:
-                if dup_art in dup_pair and dup_pair not in fixed_dups:
-                    fixed_dups.add(dup_pair)
-                    duplicate_artifact_ids.add(dup_art)
+            if len(dup_map[dup_art].difference(duplicate_artifact_ids)) == 0:
+                continue
+            can_remove = DuplicateDetector._can_be_removed(dup_art, duplicate_artifact_ids, dup_map)
+            if can_remove:
+                duplicate_artifact_ids.add(dup_art)
         return duplicate_artifact_ids
+
+    @staticmethod
+    def _can_be_removed(dup_art: str, removed_duplicate_artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]]) -> bool:
+        """
+        Determines whether the duplicate can be removed without eliminating its whole cluster
+        :param dup_art: The duplicate artifact under consideration
+        :param removed_duplicate_artifact_ids: Duplicates that were already removed
+        :param duplicate_map: Maps duplicate id to all artifacts it was duplicated with
+        :return: True if the duplicate can be removed else False
+        """
+        already_removed = duplicate_map[dup_art].intersection(removed_duplicate_artifact_ids)
+        for other_dup in already_removed:
+            if len(duplicate_map[other_dup].difference(removed_duplicate_artifact_ids)) == 1:
+                # removing the dup_art will eliminate this whole group
+                return False
+        return True
 
     @classmethod
     def count_duplicates(cls, artifact_ids: List[str], duplicate_indices: List[MatrixIndex]) -> Tuple[CountMap, Set[ArtifactPair]]:
@@ -69,3 +86,15 @@ class DuplicateDetector:
             dup_pairs.add((source_artifact_id, target_artifact_id))
         return dup_counter, dup_pairs
 
+    @staticmethod
+    def create_duplicate_map(duplicate_pairs: Set[Tuple]) -> Dict:
+        """
+        Creates a map of an artifact id to a set of its potential dups
+        :param duplicate_pairs: A list of tuples containing pairs of artifacts flagged as dups
+        :return: A map of an artifact id to a set of its potential dups
+        """
+        duplicate_map = {}
+        for (a1, a2) in duplicate_pairs:
+            DictUtil.set_or_append_item(duplicate_map, a1, a2, iterable_type=set)
+            DictUtil.set_or_append_item(duplicate_map, a2, a1, iterable_type=set)
+        return duplicate_map

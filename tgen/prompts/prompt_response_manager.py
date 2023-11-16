@@ -6,8 +6,8 @@ from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 import bs4
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 
@@ -172,7 +172,10 @@ class PromptResponseManager:
                 if isinstance(val, dict):
                     formatted_val = self._format_response(val)
                     if self.entry_formatter:
-                        formatted_val = self.entry_formatter(tag, formatted_val)
+                        try:
+                            formatted_val = self.entry_formatter(tag, formatted_val)
+                        except Exception:
+                            logger.exception("Received exception while attempting to format response.")
                     formatted_values.append(formatted_val)
                 else:
                     try:

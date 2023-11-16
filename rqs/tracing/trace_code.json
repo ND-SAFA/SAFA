@@ -1,0 +1,20 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "TRACE_CODE",
+          "export_dir": "[OUTPUT_PATH]/code-traces/[CURRENT_PROJECT]",
+          "add_packages": "[ADD_PACKAGES_BOOL]",
+          "dataset_creator": {
+            "object_type": "TRACE",
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

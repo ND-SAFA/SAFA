@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from tgen.common.constants.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
     DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.file_util import FileUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -45,6 +46,10 @@ class CodeTracer:
         header_files = FileUtil.filter_by_ext(artifact_ids, HEADER_EXTENSIONS)
         implementation_files = FileUtil.filter_by_ext(artifact_ids, C_IMPLEMENTATION_EXTENSIONS)
         header_links = CodeTracer.trace_by_base_names(header_files, implementation_files)
+
+        logger.info(f"{len(header_files)} header files found.")
+        logger.info(f"{len(implementation_files)} files found.")
+        logger.info(f"{len(header_links)} links found between header and implementation files.")
 
         if rename_children:
             self._rename_child_files(implementation_files, header_files)

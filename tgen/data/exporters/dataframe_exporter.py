@@ -1,5 +1,6 @@
 import os
 
+from tgen.common.logging.logger_manager import logger
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.keys.csv_keys import CSVKeys
 
@@ -25,3 +26,4 @@ class DataFrameExporter(AbstractDatasetExporter):
         for dataframe_name in self.PROJECT_DATAFRAMES:
             df = getattr(dataset, dataframe_name)
             df.to_csv(os.path.join(self.export_path, f"{dataframe_name}{CSVKeys.EXT}"))
+        logger.info(f"Exported DataFrame dataset to {self.export_path}")

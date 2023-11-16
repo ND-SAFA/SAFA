@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from tgen.common.util.dataclass_util import required_field
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.pipeline.state import State

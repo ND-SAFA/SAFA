@@ -157,7 +157,7 @@ class HGenUtil:
                                              ArtifactKeys.LAYER_ID: [target_layer_id for _ in generation_predictions]})
         if generate_names:
             try:
-                use_content_as_names = {i: HGenUtil.format_names(content, hgen_args.target_type)
+                use_content_as_names = {i: content
                                         for i, content in enumerate(new_artifact_df[ArtifactKeys.CONTENT])
                                         if len(content.split()) <= 5}
 
@@ -167,9 +167,7 @@ class HGenUtil:
                     logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
                     name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
                                          f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
-                                         PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
-                                                               value_formatter=lambda tag, val:
-                                                               HGenUtil.format_names(val, hgen_args.target_type))
+                                         PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS)
                                          )
                     artifact_prompt = ArtifactPrompt(include_id=False)
                     prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
@@ -183,7 +181,7 @@ class HGenUtil:
                                                      export_path=predictions_path)
                     assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
                     names = [name if i not in use_content_as_names else use_content_as_names[i] for i, name in enumerate(names)]
-                names = [HGenUtil.format_names(n, index=i) for i, n in enumerate(names)]
+                names = [HGenUtil.format_names(n, index=i, target_type=target_layer_id) for i, n in enumerate(names)]
                 new_artifact_df.index = pd.Index(names, name=new_artifact_df.index_name())
             except Exception:
                 logger.exception("Unable to generate names for the artifacts")
@@ -192,7 +190,7 @@ class HGenUtil:
         return new_artifact_df, name_2_related_children
 
     @staticmethod
-    def format_names(name: str, target_type: str = None, index: int = None) -> str:
+    def format_names(name: str, target_type: str, index: int) -> str:
         """
         Formats the names with the initials of the target type
         :param name: The name of the artifact
@@ -200,12 +198,9 @@ class HGenUtil:
         :param index: The index of the artifact with the corresponding name
         :return: The formatted name with the initials of the target type
         """
-        ext = EMPTY_STRING
-        if target_type:
-            ext = SPACE + HGenUtil.get_initials(target_type)
-        if index is not None:
-            ext += f"{index + 1}"
-        return f"{PromptUtil.strip_new_lines_and_extra_space(name)}{ext}"
+        initials = HGenUtil.get_initials(target_type)
+        id_format = f"[{initials}{index+1}]"
+        return f"{id_format} {PromptUtil.strip_new_lines_and_extra_space(name)}"
 
     @staticmethod
     def parse_generated_artifacts(res: str) -> List[str]:
@@ -238,3 +233,12 @@ class HGenUtil:
             return input_string
         first_letters = [word[0] for word in words]
         return ''.join(first_letters).upper()
+
+    @staticmethod
+    def get_ranking_dir(directory: str) -> str:
+        """
+        Get the directory for ranking job
+        :param directory: The main directory used by hgen
+        :return: The full path
+        """
+        return FileUtil.safely_join_paths(directory, "ranking")

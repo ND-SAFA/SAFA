@@ -1,7 +1,10 @@
+from typing import Dict
+
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
@@ -30,3 +33,16 @@ class SearchPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :return: The new state.
         """
         return RankingState
+
+    def run(self) -> None:
+        """
+        :return: List of parents mapped to their ranked children.
+        """
+        super().run()
+
+    def get_input_output_counts(self) -> Dict[str, int]:
+        """
+        Gets the number of selected traces for the pipeline
+        :return:  Gets the number of selected traces for the pipeline
+        """
+        return RankingUtil.get_input_output_counts(self.state)

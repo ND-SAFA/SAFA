@@ -57,6 +57,11 @@ class HGenState(State):
     selected_predictions: List[EnumDict] = None  # met the criteria required to count as a trace
 
     """
-    Step 8 - Dataset Construction
+    Step 8 - remove duplicate artifacts
+    """
+    selected_artifacts_dataset: PromptDataset = None  # contains all artifacts except those that were duplicated
+
+    """
+    Step Final - Dataset Construction
     """
     final_dataset: PromptDataset = None  # The final dataset with generated artifacts.

@@ -7,16 +7,15 @@ from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFA
     ALLOWED_ORPHANS_DEFAULT, \
     NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.util.thread_util import ThreadUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -191,7 +190,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         if trace_df is None:
             trace_df = TraceDataFrame()
-
         negative_links: Dict[int, Dict[TraceKeys, Any]] = {}
 
         for _, row in layer_mapping_df.itertuples():
@@ -203,26 +201,18 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             assert len(source_artifact_ids) > 0, f"Expected at least one source artifact of type {source_type}"
             assert len(target_artifact_ids) > 0, f"Expected at least one target artifact of type {target_type}"
 
-            def create_target_links(artifact_id) -> None:
-                """
-                Create negative links for artifact against target artifacts.
-                :param artifact_id: The id of the artifact to link to targets.
-                :return:  None
-                """
-                artifact = artifact_df.get_artifact(artifact_id)
-                for target_artifact_id in target_artifact_ids:
-                    target_artifact = artifact_df.get_artifact(target_artifact_id)
-                    trace_link_id = TraceDataFrame.generate_link_id(artifact_id, target_artifact_id)
-                    if trace_link_id not in trace_df.index and artifact_id != target_artifact_id:
-                        negative_links[trace_link_id] = trace_df.link_as_dict(source_id=artifact[ArtifactKeys.ID],
-                                                                              target_id=target_artifact[ArtifactKeys.ID],
-                                                                              label=0)
+            layer_link_map = {TraceDataFrame.generate_link_id(s_id, t_id): (s_id, t_id)
+                              for s_id in source_artifact_ids for t_id in target_artifact_ids}
+            negative_link_ids = set(layer_link_map.keys()).difference(set(trace_df.index))
+            for link_id in negative_link_ids:
+                s_id, t_id = layer_link_map[link_id]
+                negative_links[link_id] = trace_df.link_as_dict(source_id=s_id, target_id=t_id, label=0)
 
-            title = f"Generating negative links between {source_type}({len(source_artifact_ids)}) -> {target_type}({len(target_artifact_ids)})"
-            ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         all_links = trace_df.to_dict(orient="index")
         all_links.update(negative_links)
+        logger.info("Adding negative links to trace data frame...")
         trace_df = TraceDataFrame.from_dict(all_links, orient="index")
+        logger.info("Done.")
         return trace_df
 
     @staticmethod

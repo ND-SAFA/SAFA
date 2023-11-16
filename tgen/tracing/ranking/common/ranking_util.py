@@ -264,3 +264,17 @@ class RankingUtil:
                 else f"# Project Summary\n{project_summary}"
             prompt = Prompt(context_formatted, allow_formatting=False)
             prompt_builder.add_prompt(prompt)
+
+    @staticmethod
+    def get_input_output_counts(state: RankingState) -> Dict[str, int]:
+        """
+        Gets the number of selected traces for the pipeline
+        :param state: The current state of the pipeline
+        :return:  Gets the number of selected traces for the pipeline
+        """
+        try:
+            n_traces = len(state.get_current_entries())
+        except Exception:
+            n_traces = 0
+        return {"N Selected Traces": n_traces}
+

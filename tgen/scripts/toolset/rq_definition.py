@@ -23,7 +23,7 @@ class RQVariable:
         :param variable_definition: The variable definition containing name and optionally the type to cast into.
         """
         self.definition = variable_definition
-        self.name, self.type_class = RQVariable.get_variable_type(variable_definition)
+        self.name, self.type_constructor, self.type_class = RQVariable.get_variable_type(variable_definition)
         self.__value = None
         self.__default_value = None
 
@@ -64,7 +64,7 @@ class RQVariable:
         :param variable_value: The variable value.
         :return: Value of variable.
         """
-        typed_value = self.type_class(variable_value)
+        typed_value = self.type_constructor(variable_value)
         self.__value = typed_value
         return typed_value
 
@@ -74,7 +74,7 @@ class RQVariable:
         :param default_value: Default value to set.
         :return: None
         """
-        typed_default_value = self.type_class(default_value)
+        typed_default_value = self.type_constructor(default_value)
         self.__default_value = typed_default_value
 
     def set_value(self, value: Any) -> None:
@@ -103,7 +103,7 @@ class RQVariable:
         return result
 
     @classmethod
-    def get_variable_type(cls, variable_definition: str, default_type: Type = str) -> Tuple[str, Type]:
+    def get_variable_type(cls, variable_definition: str, default_type: Type = str) -> Tuple[str, Type, Type]:
         """
         Extracts variable name and its associated type class.
         :param variable_definition: The variable name.
@@ -111,12 +111,12 @@ class RQVariable:
         :return: Name and type class of variable.
         """
 
-        supported_type_map = {f"_{t.__name__.upper()}": t for t in SUPPORTED_TYPES_RQ}
-        for type_class_key, type_class in supported_type_map.items():
+        for type_class, type_class_constructor in SUPPORTED_TYPES_RQ.items():
+            type_class_key = f"_{type_class.__name__.upper()}"
             if variable_definition.endswith(type_class_key):
                 variable_name = variable_definition.split(type_class_key)[0]
-                return variable_name, type_class
-        return variable_definition, default_type
+                return variable_name, type_class_constructor, type_class
+        return variable_definition, default_type, default_type
 
     def __repr__(self):
         """

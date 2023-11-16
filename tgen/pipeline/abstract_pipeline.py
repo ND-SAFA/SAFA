@@ -26,22 +26,25 @@ title_format_for_logs = "---{}---"
 
 class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
 
-    def run(self, args: ArgType, state: State, re_run: bool = False) -> bool:
+    def run(self, args: ArgType, state: State, re_run: bool = False, verbose: bool = True) -> bool:
         """
         Runs the step operations, modifying state in some way.
         :param args: The pipeline arguments and configuration.
         :param state: The current state of the pipeline results.
         :param re_run: If True, will run even if the step is already completed
+        :param verbose: If True, prints logs
         :return: None
         """
         step_ran = False
         if re_run or not state.step_is_complete(self.get_step_name()):
-            logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
+            if verbose:
+                logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
             self._run(args, state)
             step_ran = True
         if step_ran:
             state.on_step_complete(step_name=self.get_step_name())
-            logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
+            if verbose:
+                logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
         return step_ran
 
     @abstractmethod
@@ -89,6 +92,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if skip_summarization:
             self.summarizer_args = None
         self.state: StateType = self.init_state()
+        self.artifact_summaries_costs = 0
+        self.project_summary_costs = 0
         if self.args.export_dir:
             os.makedirs(self.args.export_dir, exist_ok=True)
             self.state.export_dir = self.args.export_dir
@@ -127,7 +132,6 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.args.update_llm_managers_with_state(self.state)
         if self.summarizer_args:
             self.summarizer_args: SummarizerArgs
-            self.summarizer_args.update_llm_managers_with_state(self.state)
             self.run_summarizations()
         if self.args.interactive_mode:
             self._run_interactive_mode()
@@ -393,16 +397,17 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         choice = inquirer_selection(selections=[mo.value for mo in menu_options], message=message, allow_back=allow_back)
         return EnumUtil.get_enum_from_value(InteractiveModeOptions, choice) if choice else choice
 
-    def _log_costs(self) -> None:
+    def _log_costs(self, save: bool = False) -> None:
         """
         Logs the costs accumulated during the run
+        :param save: If True, saves the data to a csv
         :return: None
         """
         total_cost = self.state.total_input_cost + self.state.total_output_cost
         if total_cost > 0:
-            costs = {"Input": self.state.total_input_cost,
-                     "Output": self.state.total_output_cost,
-                     "Total": total_cost}
+            total_costs = {"Total Input Cost": self.state.total_input_cost,
+                           "Total Output Cost": self.state.total_output_cost,
+                           "Total Cost": total_cost}
             cost_msg = "{} Token Cost: ${}"
-            cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in costs.items()]
+            cost_msgs = [cost_msg.format(name, "%.2f" % cost) for name, cost in total_costs.items()]
             logger.log_with_title("COSTS FOR RUN: ", NEW_LINE.join(cost_msgs))

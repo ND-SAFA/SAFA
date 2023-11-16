@@ -40,8 +40,8 @@ class TestSentenceTransformerTrainer(TestCase):
         Tests ability to define loss functions on sentence transformer trainer.
         """
         for loss_function in SupportedLossFunctions:
-            trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": 1}, trainer_kwargs={"loss_function": loss_function})
-            training_metrics = trainer.perform_training().metrics
+            trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": 1, "st_loss_function": loss_function.name})
+            training_metrics = trainer.perform_training().metrics["records"]
             self.assert_valid_metrics(self, training_metrics, 1)
 
     def test_zero_loss(self) -> None:
@@ -88,7 +88,8 @@ class TestSentenceTransformerTrainer(TestCase):
         trainer_args_kwargs["save_best_model"] = save_best_model
 
         model_manager = ModelManager(SMALL_EMBEDDING_MODEL, **model_manager_kwargs)
-        trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager(**trainer_dataset_manager_kwargs)
+        trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager(val_percentage=0.4,
+                                                                                     **trainer_dataset_manager_kwargs)
         trainer_args_kwargs = HuggingFaceArgs(TEST_OUTPUT_DIR, **trainer_args_kwargs)
         trainer = SentenceTransformerTrainer(trainer_args_kwargs, model_manager, trainer_dataset_manager, **trainer_kwargs)
         return trainer

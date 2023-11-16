@@ -90,7 +90,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         Performs the model training.
         :return: a dictionary containing the results
         """
-        WBManager.update_config({"epochs": self.args.num_train_epochs, "batch_size": self.args.train_batch_size})
+        WBManager.update_config(args=self.trainer_args)
         self.compute_metrics = self._compute_validation_metrics  # Will compute trace metrics alongside default eval metrics
         self.train_dataset = self._get_dataset(DatasetRole.TRAIN)
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)

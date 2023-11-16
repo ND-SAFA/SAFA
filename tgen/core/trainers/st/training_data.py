@@ -1,23 +1,47 @@
 import json
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Tuple, Type
+from typing import Callable, Dict, Iterable, List, Tuple, Type
 
 import torch
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.evaluation import SentenceEvaluator
 from sentence_transformers.model_card_templates import ModelCardTemplate
-from sentence_transformers.util import batch_to_device, fullname
+from sentence_transformers.util import fullname
 from torch import nn
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
+
+from tgen.core.trainers.st.constants import STARTING_STEP
 
 ModelType = nn.Module
 TrainingObjective = Tuple[DataLoader, ModelType]
 
 
 @dataclass
-class TrainingDataParams:
+class STTrainingParams:
+    """
+    :param evaluator: An evaluator (sentence_transformers.evaluation) evaluates the model performance during training on held-out dev data. It is used to determine the best model that is saved to disc.
+    :param epochs: Number of epochs for training
+    :param steps_per_epoch: Number of training steps per epoch. If set to None (default), one epoch is equal the DataLoader size from train_objectives.
+    :param scheduler: Learning rate scheduler. Available schedulers: constantlr, warmupconstant, warmuplinear, warmupcosine, warmupcosinewithhardrestarts
+    :param warmup_steps: Behavior depends on the scheduler. For WarmupLinear (default), the learning rate is increased from o up to the maximal learning rate. After these many training steps, the learning rate is decreased linearly back to zero.
+    :param optimizer_class: Optimizer
+    :param optimizer_params: Optimizer parameters
+    :param weight_decay: Weight decay for model parameters
+    :param evaluation_steps: If > 0, evaluate the model using evaluator after each number of training steps
+    :param output_path: Storage path for the model and evaluation files
+    :param save_best_model: If true, the best model (according to evaluator) is stored at output_path
+    :param max_grad_norm: Used for gradient normalization.
+    :param use_amp: Use Automatic Mixed Precision (AMP). Only for Pytorch >= 1.6.0
+    :param callback: Callback function that is invoked after each evaluation.
+            It must accept the following three parameters in this order:
+            `score`, `epoch`, `steps`
+    :param show_progress_bar: If True, output a tqdm progress bar
+    :param checkpoint_path: Folder to save checkpoints during training
+    :param checkpoint_save_steps: Will save a checkpoint after so many steps
+    :param checkpoint_save_total_limit: Total number of checkpoints to stor
+"""
     epochs: int
     weight_decay: float = 0.01
     optimizer_class: Type[Optimizer] = torch.optim.AdamW
@@ -34,6 +58,10 @@ class TrainingDataParams:
     checkpoint_save_steps: int = 500
     checkpoint_save_total_limit: int = 0
     output_path: str = None
+    evaluation_steps: int = 0
+    save_best_model: bool = True
+    callback: Callable[[float, int, int], None] = None
+    steps_per_epoch: int = None
 
     def to_dict(self, steps_per_epoch: int) -> Dict:
         return {
@@ -57,8 +85,8 @@ class TrainingDataParams:
         return self.evaluator is None and self.output_path is not None
 
 
-class TrainingData:
-    def __init__(self, training_objectives: Iterable[TrainingObjective], params: TrainingDataParams):
+class STTrainingManager:
+    def __init__(self, training_objectives: Iterable[TrainingObjective], params: STTrainingParams):
         loss_models = [loss_model for _, loss_model in training_objectives]
         dataloaders = [dataloader for dataloader, _ in training_objectives]
         self.models: List[ModelType] = loss_models
@@ -117,42 +145,35 @@ class TrainingData:
             "{FIT_PARAMETERS}", info_fit_parameters
         )
 
-    def perform_training_step(self, training_step: int, target_device: str):
-        if self.data_iterators is None:
-            self.initialize_data_iterators()
+    def get_training_iterator(self) -> List[Tuple[int, int]]:
+        """
+        Returns the list of epoch and training step tuples for entire training loop.
+        :return: List of tuples containing epoch and training step.
+        """
+        steps_per_epoch = self.get_epoch_steps()
+        training_iterations = [(epoch + STARTING_STEP, step + STARTING_STEP)
+                               for epoch in range(self.params.epochs) for step in range(steps_per_epoch)]
+        return training_iterations
 
-        for train_idx in range(len(self.models)):
-            loss_model = self.models[train_idx]
-            optimizer = self.optimizers[train_idx]
-            scheduler = self.schedulers[train_idx]
-            data_iterator = self.data_iterators[train_idx]
-
-            data = next(data_iterator)
-
-            features, labels = data
-            labels = labels.to(target_device)
-            features = list(map(lambda batch: batch_to_device(batch, target_device), features))
-
-            loss_value = loss_model(features, labels)
-            loss_value /= self.params.accumulation_steps
-            loss_value.backward()
-
-            if training_step % self.params.accumulation_steps == 0:
-                torch.nn.utils.clip_grad_norm_(loss_model.parameters(), self.params.max_grad_norm)
-                optimizer.step()
-                optimizer.zero_grad()
-
-            scheduler.step()
-
-        self.params.global_step += 1
-
-    def initialize_data_iterators(self):
+    def initialize_data_iterators(self) -> None:
+        """
+        Constructs an iterator for each data loader.
+        :return: None.
+        """
         self.data_iterators = [iter(dl) for dl in self.data_loaders]
 
     def get_epoch_steps(self) -> int:
+        """
+        :return: Returns the number of training steps per epoch.
+        """
+        if self.params.steps_per_epoch:
+            return self.params.steps_per_epoch
         steps_per_epoch = min([len(dataloader) for dataloader in self.data_loaders])
         return steps_per_epoch
 
     def get_total_steps(self):
+        """
+        :return: Returns the total number of training steps in the training loop configuration.
+        """
         n_epoch_steps = self.get_epoch_steps()
         return n_epoch_steps * self.params.epochs

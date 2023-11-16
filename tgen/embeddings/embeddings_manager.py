@@ -26,15 +26,18 @@ EmbeddingType = np.array
 
 class EmbeddingsManager:
 
-    def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None):
+    def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None,
+                 show_progress_bar: bool = True):
         """
         Initializes the embedding manager with the content used to create embeddings
         :param content_map: Maps id to the corresponding content
         :param model_name: Name of model to use for creating embeddings
         :param model: The model to use to embed artifacts.
+        :param show_progress_bar: Whether to show progress bar when calculating batches.
         """
         assert model_name is not None or model is not None, f"Expected model or model name to be defined but got None for both."
         self.model_name = model_name
+        self.show_progress_bar = show_progress_bar
         self._content_map = content_map
         self._embedding_map = {}
         self.__ordered_ids = []
@@ -353,7 +356,7 @@ class EmbeddingsManager:
         artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
         if include_ids:
             artifact_contents = [f"{a_id}: {content}" for a_id, content in zip(subset_ids, artifact_contents)]
-        embeddings = self.get_model().encode(artifact_contents, show_progress_bar=True)
+        embeddings = self.get_model().encode(artifact_contents, show_progress_bar=self.show_progress_bar)
         return embeddings if return_as_list else embeddings[0]
 
     def __set_embedding_order(self, ordered_ids: List[Any] = None) -> None:

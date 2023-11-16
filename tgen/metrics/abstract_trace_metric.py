@@ -2,11 +2,12 @@ from abc import ABC, abstractmethod
 
 import datasets
 from datasets import MetricInfo
+from evaluate import EvaluationModule
 
 from tgen.common.util.base_object import BaseObject
 
 
-class AbstractTraceMetric(datasets.Metric, BaseObject, ABC):
+class AbstractTraceMetric(EvaluationModule, BaseObject, ABC):
 
     @abstractmethod
     def _info(self) -> MetricInfo:

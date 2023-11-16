@@ -1,15 +1,14 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
-from sentence_transformers.evaluation import SentenceEvaluator
 from sentence_transformers.losses import CosineSimilarityLoss, MultipleNegativesRankingLoss, OnlineContrastiveLoss
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.hugging_face_constants import DEFAULT_EVAL_METRIC, DEFAULT_MAX_STEPS_BEFORE_EVAL, NEG_LINK, SEPARATOR_BAR
+from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL, NEG_LINK
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
@@ -17,10 +16,11 @@ from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.custom_sentence_transformer import CustomSentenceTransformer
-from tgen.core.wandb.WBManager import WBManager
+from tgen.core.trainers.st.sentence_transformer_evaluator import SentenceTransformerEvaluator
+from tgen.core.trainers.st.st_metrics import STMetrics
+from tgen.core.trainers.st.training_data import STTrainingParams
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -37,57 +37,15 @@ class SupportedLossFunctions(SupportedEnum):
     CONTRASTIVE = OnlineContrastiveLoss
     MNRL = MultipleNegativesRankingLoss
 
-    def is_name(self, n: str):
+    def is_name(self, n: Union[str, "SupportedLossFunctions"]):
+        """
+        Checks if given name matches that of loss function.
+        :param n: Either name or supported loss function.
+        :return: True if names match.
+        """
+        if isinstance(n, SupportedLossFunctions):
+            n = n.name
         return n.upper() == self.name.upper()
-
-
-class SentenceTransformerEvaluator(SentenceEvaluator):
-    def __init__(self, trainer: "SentenceTransformerTrainer", evaluation_roles: List[DatasetRole],
-                 evaluator_metric: str = DEFAULT_EVAL_METRIC):
-        """
-        Evaluates dataset under role with given trainer.
-        :param trainer: The trainer used to predict on the dataset.
-        :param evaluation_roles: The role the dataset to predict should be found under.
-        :param evaluator_metric: The metric used to define which is the best run.
-        """
-        self.trainer = trainer
-        self.evaluation_roles = evaluation_roles
-        self.evaluator_metric = evaluator_metric
-        self.metrics = []
-        self.current_loss = 0
-
-    def __call__(self, model: SentenceTransformer, **kwargs) -> float:
-        """
-        Evaluates the model on the evaluation dataset.
-        :param model: The model to evaluate.
-        :param kwargs: Ignored.
-        :return: The score for this evaluation run.
-        """
-        validation_metrics = None
-        role2metrics = {}
-        for eval_role in self.evaluation_roles:
-            if not self.trainer.has_dataset(eval_role):
-                logger.warning(f"Skipping evaluation on {eval_role} dataset. Defined in evaluation roles but empty.")
-                continue
-            prediction_output: TracePredictionOutput = self.trainer.perform_prediction(eval_role)
-            logger.info(SEPARATOR_BAR)
-            metrics = prediction_output.metrics
-            if eval_role == DatasetRole.VAL:
-                validation_metrics = metrics
-            role2metrics[eval_role] = metrics
-            self.metrics.append(metrics)
-        loss = self.update_loss()
-        WBManager.log(role2metrics, {"loss": loss})
-        return validation_metrics[self.evaluator_metric]
-
-    def update_loss(self):
-        """
-        Updates the current loss.
-        :return: The loss occurring since last session.
-        """
-        loss = self.trainer.total_loss - self.current_loss
-        self.current_loss = self.trainer.total_loss
-        return loss
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -136,24 +94,21 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
 
         logger.log_title("Training...", prefix=NEW_LINE)
         model: CustomSentenceTransformer = self.model
-        model.fit(train_objectives=[(train_dataloader, loss_function)],
-                  epochs=int(self.args.num_train_epochs),
-                  warmup_steps=self.args.warmup_steps,
-                  evaluation_steps=n_steps,
-                  evaluator=evaluator,
-                  output_path=self.args.output_dir,
-                  save_best_model=self.trainer_args.save_best_model,
-                  show_progress_bar=True,
-                  accumulation_steps=self.args.gradient_accumulation_steps
-                  )
+        training_params = STTrainingParams(
+            epochs=int(self.args.num_train_epochs),
+            warmup_steps=self.args.warmup_steps,
+            evaluation_steps=n_steps,
+            evaluator=evaluator,
+            output_path=self.args.output_dir,
+            save_best_model=self.trainer_args.save_best_model,
+            accumulation_steps=self.args.gradient_accumulation_steps
+        )
+        model.fit(train_objectives=[(train_dataloader, loss_function)], training_params=training_params)
         self.state.best_model_checkpoint = self.args.output_dir
         if self.args.load_best_model_at_end:
             self.model = CustomSentenceTransformer(self.state.best_model_checkpoint)
 
-        metrics = {
-            "records": evaluator.metrics,
-            "losses": self.losses
-        }
+        metrics = STMetrics(records=evaluator.metrics, losses=self.losses)
         return TrainOutput(metrics=metrics, training_loss=self.total_loss, global_step=None)
 
     @overrides(HuggingFaceTrainer)
@@ -271,7 +226,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :return: Map from content to embedding.
         """
         content_map = {i: c for i, c in enumerate(content)}
-        embeddings_manager = EmbeddingsManager(content_map, model=model)
+        embeddings_manager = EmbeddingsManager(content_map, model=model, show_progress_bar=False)
         embedding_map = embeddings_manager.create_embedding_map()
         translated_embedding_map = {content_map[i]: v for i, v in embedding_map.items()}
         return translated_embedding_map

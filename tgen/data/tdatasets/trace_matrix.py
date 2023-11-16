@@ -4,9 +4,8 @@ from copy import deepcopy
 from typing import Callable, Iterable, List, Union
 
 import numpy as np
-from tqdm import tqdm
 
-from tgen.common.constants.logging_constants import TQDM_NCOLS
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -93,7 +92,8 @@ class TraceMatrix:
         """
         link_ids = trace_df.index if link_ids is None else link_ids
         predicted_scores = [None for link in range(len(link_ids))] if predicted_scores is None else predicted_scores
-        for i, link_id in tqdm(enumerate(link_ids), desc="Filling trace matrix", total=len(link_ids), ncols=TQDM_NCOLS):
+        logger.info("Filling Trace Matrix...")
+        for i, link_id in enumerate(link_ids):
             link = trace_df.get_link(link_id)
             self.add_link(link, predicted_scores[i])
 

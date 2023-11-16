@@ -1,16 +1,18 @@
 import logging
-from typing import Callable, Dict, Iterable, List, Tuple, Type
+from typing import Iterable, List, Tuple
 
 import torch
 from sentence_transformers import SentenceTransformer
-from sentence_transformers.evaluation import SentenceEvaluator
+from sentence_transformers.util import batch_to_device
 from torch import nn
 from torch.nn import Module
-from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from tgen.core.trainers.st.training_data import TrainingData, TrainingDataParams
+from tgen.common.constants.logging_constants import TQDM_NCOLS
+from tgen.core.trainers.st.constants import DEFAULT_BEST_SCORE, STARTING_STEP, TRAINING_SECTION_KEY
+from tgen.core.trainers.st.training_data import STTrainingManager, STTrainingParams
+from tgen.core.wandb.WBManager import WBManager
 
 logger = logging.getLogger(__name__)
 
@@ -19,131 +21,101 @@ class CustomSentenceTransformer(SentenceTransformer):
     def fit(
             self,
             train_objectives: Iterable[Tuple[DataLoader, nn.Module]],
-            evaluator: SentenceEvaluator = None,
-            epochs: int = 1,
-            steps_per_epoch=None,
-            scheduler: str = "WarmupLinear",
-            warmup_steps: int = 10000,
-            optimizer_class: Type[Optimizer] = torch.optim.AdamW,
-            optimizer_params: Dict[str, object] = {"lr": 2e-5},
-            weight_decay: float = 0.01,
-            evaluation_steps: int = 0,
-            output_path: str = None,
-            save_best_model: bool = True,
-            max_grad_norm: float = 1,
-            use_amp: bool = False,
-            callback: Callable[[float, int, int], None] = None,
-            show_progress_bar: bool = True,
-            checkpoint_path: str = None,
-            checkpoint_save_steps: int = 500,
-            checkpoint_save_total_limit: int = 0,
-            accumulation_steps: int = 1
+            training_params: STTrainingParams,
+            *args, **kwargs
     ):
         """
         Train the model with the given training objective
-        Each training objective is sampled in turn for one batch.
-        We sample only as many batches from each objective as there are in the smallest one
-        to make sure of equal training with each dataset.
-
-        :param train_objectives: Tuples of (DataLoader, LossFunction). Pass more than one for multi-task learning
-        :param evaluator: An evaluator (sentence_transformers.evaluation) evaluates the model performance during training on held-out dev data. It is used to determine the best model that is saved to disc.
-        :param epochs: Number of epochs for training
-        :param steps_per_epoch: Number of training steps per epoch. If set to None (default), one epoch is equal the DataLoader size from train_objectives.
-        :param scheduler: Learning rate scheduler. Available schedulers: constantlr, warmupconstant, warmuplinear, warmupcosine, warmupcosinewithhardrestarts
-        :param warmup_steps: Behavior depends on the scheduler. For WarmupLinear (default), the learning rate is increased from o up to the maximal learning rate. After these many training steps, the learning rate is decreased linearly back to zero.
-        :param optimizer_class: Optimizer
-        :param optimizer_params: Optimizer parameters
-        :param weight_decay: Weight decay for model parameters
-        :param evaluation_steps: If > 0, evaluate the model using evaluator after each number of training steps
-        :param output_path: Storage path for the model and evaluation files
-        :param save_best_model: If true, the best model (according to evaluator) is stored at output_path
-        :param max_grad_norm: Used for gradient normalization.
-        :param use_amp: Use Automatic Mixed Precision (AMP). Only for Pytorch >= 1.6.0
-        :param callback: Callback function that is invoked after each evaluation.
-                It must accept the following three parameters in this order:
-                `score`, `epoch`, `steps`
-        :param show_progress_bar: If True, output a tqdm progress bar
-        :param checkpoint_path: Folder to save checkpoints during training
-        :param checkpoint_save_steps: Will save a checkpoint after so many steps
-        :param checkpoint_save_total_limit: Total number of checkpoints to store
+        :param training_params: The training parameters to run loop on.
         """
 
-        # Prepare optimizers
-        training_params = TrainingDataParams(evaluator=evaluator,
-                                             epochs=epochs,
-                                             scheduler_name=scheduler,
-                                             warmup_steps=warmup_steps,
-                                             optimizer_class=optimizer_class,
-                                             optimizer_params=optimizer_params,
-                                             weight_decay=weight_decay,
-                                             output_path=output_path,
-                                             max_grad_norm=max_grad_norm,
-                                             use_amp=use_amp,
-                                             checkpoint_path=checkpoint_path,
-                                             checkpoint_save_steps=checkpoint_save_steps,
-                                             checkpoint_save_total_limit=checkpoint_save_total_limit,
-                                             accumulation_steps=accumulation_steps
-                                             )
-        for dataloader, _ in train_objectives:  # Use smart batching
-            dataloader.collate_fn = self.smart_batching_collate
+        training_manager = STTrainingManager(training_objectives=train_objectives, params=training_params)
+        steps_per_epoch = training_manager.get_epoch_steps()
 
-        training_data = TrainingData(training_objectives=train_objectives, params=training_params)
-        loss_models = training_data.models
+        self.on_pre_training(training_manager)
 
-        # Add info to model card
-        model_card_text = training_data.get_model_card_training_info()
-        self._model_card_text = None
-        self._model_card_vars["{TRAINING_SECTION}"] = model_card_text
+        for epoch, training_step in tqdm(training_manager.get_training_iterator(), "Training model...", ncols=TQDM_NCOLS):
+            if training_step == STARTING_STEP:
+                self.on_pre_epoch(training_manager)
 
-        self.best_score = -9999999
-
-        self.to(self._target_device)
-        for loss_model in loss_models:
-            loss_model.to(self._target_device)
-
-        if steps_per_epoch is None:
-            steps_per_epoch = training_data.get_epoch_steps()
-
-        training_iterations = [(epoch + 1, step + 1) for epoch in range(epochs) for step in range(steps_per_epoch)]
-
-        for epoch, training_step in tqdm(training_iterations, "Training model..."):
-            if training_step == 1:
-                self.pre_epoch(training_data)
-
-            self.pre_step(training_data)
-
-            training_data.perform_training_step(training_step, self._target_device)
-
-            if evaluation_steps > 0 and training_step % evaluation_steps == 0:
-                self._eval_during_training(evaluator, output_path, save_best_model, epoch, training_step, callback)
-                self._init_loss_models(loss_models)
-
-            self.post_step(training_data)
+            self.on_pre_step(epoch, training_step, training_manager)
+            self.perform_training_step(training_manager, training_step)
+            self.on_post_step(epoch, training_step, training_manager)
 
             if training_step == steps_per_epoch:
-                self._eval_during_training(evaluator, output_path, save_best_model, epoch, -1, callback)
-                self.post_epoch(training_data)
+                self.on_post_epoch(epoch, training_manager)
 
-        self.post_training(training_data)
+        self.on_post_training(training_manager)
 
-    def pre_step(self, training_data: TrainingData) -> None:
+    def perform_training_step(self, training_manager: STTrainingManager, training_step: int) -> None:
         """
-        Handler called before each training step
+        Performs a training step.
+        :param training_manager: Manager containing models, objectives, and data.
+        :param training_step: The current training step.
+        :return:
+        """
+        if training_manager.data_iterators is None:
+            training_manager.initialize_data_iterators()
+
+        for train_idx in range(len(training_manager.models)):
+            loss_model = training_manager.models[train_idx]
+            optimizer = training_manager.optimizers[train_idx]
+            scheduler = training_manager.schedulers[train_idx]
+            data_iterator = training_manager.data_iterators[train_idx]
+
+            data = next(data_iterator)
+
+            features, labels = data
+            labels = labels.to(self._target_device)
+            features = list(map(lambda batch: batch_to_device(batch, self._target_device), features))
+
+            loss_value = loss_model(features, labels)
+            WBManager.log(metrics={"loss": loss_value.item()}, step=training_step)
+            loss_value /= training_manager.params.accumulation_steps
+            loss_value.backward()
+
+            if training_step % training_manager.params.accumulation_steps == 0:
+                torch.nn.utils.clip_grad_norm_(loss_model.parameters(), training_manager.params.max_grad_norm)
+                optimizer.step()
+                optimizer.zero_grad()
+
+            scheduler.step()
+
+        training_manager.params.global_step += 1
+
+    def on_pre_step(self, epoch: int, training_step: int, training_data: STTrainingManager) -> None:
+        """
+        Handler called before each training step.
+        :param epoch: The epoch of the training session.
+        :param training_step: The current training step in epoch.
+        :param training_data: The training data containing state of training loop.
         :return:  None
         """
 
-    def post_step(self, training_data: TrainingData) -> None:
+    def on_post_step(self, epoch: int, training_step: int, training_data: STTrainingManager) -> None:
         """
         Called after each training step.
-        :param training_data: Data representing state of current training.
+         :param epoch: The epoch of the training session.
+        :param training_step: The current training step in epoch.
+        :param training_data: The training data containing state of training loop.
         :return: None
         """
+        params = training_data.params
+        evaluation_steps = params.evaluation_steps
+        if evaluation_steps > 0 and training_step % evaluation_steps == 0:
+            self._eval_during_training(params.evaluator,
+                                       params.output_path,
+                                       params.save_best_model,
+                                       epoch,
+                                       training_step,
+                                       params.callback)
+            self._init_loss_models(training_data.models)
         if training_data.params.is_checkpoint_time():
             self._save_checkpoint(training_data.params.checkpoint_path,
                                   training_data.params.checkpoint_save_total_limit,
                                   training_data.params.global_step)
 
-    def pre_epoch(self, training_data: TrainingData) -> None:
+    def on_pre_epoch(self, training_data: STTrainingManager) -> None:
         """
         Called before each epoch.
         :param training_data: Data representing state of current training.
@@ -152,26 +124,50 @@ class CustomSentenceTransformer(SentenceTransformer):
         self._init_loss_models(training_data.models)
         training_data.initialize_data_iterators()
 
-    def post_epoch(self, training_data: TrainingData) -> None:
+    def on_post_epoch(self, epoch: int, training_data: STTrainingManager) -> None:
         """
         Called after each epoch.
+        :param epoch: The epoch of the training loop.
         :param training_data: Data representing state of current training.
         :return: None
         """
+        params = training_data.params
+        self._eval_during_training(params.evaluator,
+                                   params.output_path,
+                                   params.save_best_model,
+                                   epoch,
+                                   -1,
+                                   params.callback)
 
-    def post_training(self, training_data: TrainingData) -> None:
+    def on_pre_training(self, training_manager: STTrainingManager) -> None:
+        """
+        Handler called before training begins.
+        :param training_manager: The state of the training loop.
+        :return:None
+        """
+        model_card_text = training_manager.get_model_card_training_info()
+        self._model_card_text = None
+        self._model_card_vars[TRAINING_SECTION_KEY] = model_card_text
+        self.best_score = DEFAULT_BEST_SCORE
+        self.to(self._target_device)
+        for loss_model in training_manager.models:
+            loss_model.to(self._target_device)
+        for dataloader in training_manager.data_loaders:  # Use smart batching
+            dataloader.collate_fn = self.smart_batching_collate
+
+    def on_post_training(self, training_manager: STTrainingManager) -> None:
         """
         Called after all training steps have been completed.
-        :param training_data: Data representing state of current training.
+        :param training_manager: State of the training loop.
         :return: None
         """
-        if training_data.params.should_save_final_model():
-            self.save(training_data.params.output_path)
+        if training_manager.params.should_save_final_model():
+            self.save(training_manager.params.output_path)
 
-        if training_data.params.checkpoint_path is not None:
-            self._save_checkpoint(training_data.params.checkpoint_path,
-                                  training_data.params.checkpoint_save_total_limit,
-                                  training_data.params.global_step)
+        if training_manager.params.checkpoint_path is not None:
+            self._save_checkpoint(training_manager.params.checkpoint_path,
+                                  training_manager.params.checkpoint_save_total_limit,
+                                  training_manager.params.global_step)
 
     @staticmethod
     def _init_loss_models(loss_models: List[Module]) -> None:

@@ -1,12 +1,13 @@
 import os
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import wandb
 
-from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
 GROUP_EXCLUDE = ["random_seed"]
+ARGS_PARAMS = ["num_train_epochs", "train_batch_size", "st_loss_function", "metric_for_best_model", "gradient_accumulation_steps",
+               "use_scores"]
 
 
 class WBManager:
@@ -16,18 +17,38 @@ class WBManager:
     HAS_INITIALIZED = False
 
     @classmethod
-    def update_config(cls, obj: Dict) -> None:
+    def update_config(cls, obj: Dict = None, args: Any = None) -> None:
         """
         Updates the configuration of Weights and Biases run.
         :param obj: The new properties to add or override in config.
+        :param args: Arguments to add to config.
         :return: None
         """
         if not cls.HAS_INITIALIZED:
             return
+        if obj is None:
+            obj = {}
+        if args:
+            args_config = cls.create_config_dict(args, ARGS_PARAMS)
+            obj.update(args_config)
         wandb.config.update(obj)
 
+    @staticmethod
+    def create_config_dict(obj: Any, props: List[str]):
+        """
+        Adds the properties from args to a dictionary.
+        :param obj: The object to extract the properties from.
+        :param props: The properties to extract.
+        :return: The dictionary containing properties specified.
+        """
+        config = {}
+        for prop in props:
+            if hasattr(obj, prop) and getattr(obj, prop) is not None:
+                config[prop] = getattr(obj, prop)
+        return config
+
     @classmethod
-    def init_wandb(cls, trainer_dataset_manager: TrainerDatasetManager, model_path: str, run_suffix=None) -> None:
+    def init_wandb(cls, trainer_dataset_manager: "TrainerDatasetManager", model_path: str, run_suffix=None) -> None:
         """
         Initializes Weights and Biases run and configuration.
         :param trainer_dataset_manager: The dataset manager used to set the train, val, and eval names.
@@ -50,22 +71,26 @@ class WBManager:
         cls.HAS_INITIALIZED = True
 
     @classmethod
-    def log(cls, role2metrics: Dict[DatasetRole, Dict], other_metrics: Dict = None) -> None:
+    def log(cls, role2metrics: Dict[DatasetRole, Dict] = None, metrics: Dict = None, step: int = None) -> None:
         """
         Logs the current metrics at given stpe prefixed with dataset role name.
         :param role2metrics: Map of role to metrics.
+        :param metrics: Any other metrics to append to flattened log.
+        :param step: The current step to log this to.
         :return: None
         """
         if not cls.HAS_INITIALIZED:
             return
-        if other_metrics is None:
-            other_metrics = {}
+        if metrics is None:
+            metrics = {}
+        if role2metrics is None:
+            role2metrics = {}
         global_metrics = {}
         for dataset_role, metrics in role2metrics.items():
             named_metrics = {f"{dataset_role.name.lower()}_{k}": v for k, v in metrics.items()}
             global_metrics.update(named_metrics)
-        global_metrics.update(other_metrics)
-        wandb.log(global_metrics)
+        global_metrics.update(metrics)
+        wandb.log(global_metrics, step=step)
 
     @classmethod
     def finish(cls) -> None:
@@ -77,7 +102,7 @@ class WBManager:
         cls.HAS_INITIALIZED = False
 
     @classmethod
-    def get_project_names(cls, trainer_dataset_manager: TrainerDatasetManager) -> Tuple[Any, Any, Any]:
+    def get_project_names(cls, trainer_dataset_manager: "TrainerDatasetManager") -> Tuple[Any, Any, Any]:
         """
         Calculates the name of the run identifying the training, validation, and evaluation projects.
         :return: The run name
@@ -89,7 +114,7 @@ class WBManager:
         return train_name, val_name, eval_name
 
     @staticmethod
-    def get_project_name(trainer_dataset_creator: TrainerDatasetManager, dataset_role: DatasetRole) -> str:
+    def get_project_name(trainer_dataset_creator: "TrainerDatasetManager", dataset_role: DatasetRole) -> str:
         """
         Gets the name of the project associated with given role.
         :param trainer_dataset_creator: Holds the creators containing the project names.

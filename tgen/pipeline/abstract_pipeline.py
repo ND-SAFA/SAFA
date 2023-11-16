@@ -236,7 +236,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         curr_step = self.get_current_step()
         if curr_step is None:
-            next_step = self.get_next_step(self.steps[0])
+            next_step = self.steps[0]
             exclude_options.add(InteractiveModeOptions.RE_RUN.name)
             msg = EMPTY_STRING
         else:
@@ -353,21 +353,23 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                                                                 step_num=load_step_num + 1)
         return load_path
 
-    def _optional_delete_old_state_files(self, step_to_load_from: str) -> None:
+    def _optional_delete_old_state_files(self, step_to_load_from: str) -> bool:
         """
         Allows the user to delete all the state files that are now outdated
         :param step_to_load_from: The step that the state was just loaded from
-        :return: None
+        :return: Whether they were deleted or not
         """
         load_step_num = self.get_step_names().index(step_to_load_from) if step_to_load_from in self.get_step_names() else -1
         if not self.args.load_dir or step_to_load_from == InteractiveModeOptions.LOAD_EXTERNAL_STATE.value \
                 or load_step_num + 1 >= len(self.steps):
-            return
-        should_delete = confirm("Delete old state files?: ")
+            should_delete = False
+        else:
+            should_delete = confirm("Delete old state files?: ")
         if should_delete:
             step_names = self.get_step_names()
             self.state.delete_state_files(self.args.load_dir, step_names=step_names,
                                           step_to_delete_from=step_names[load_step_num + 1])
+        return should_delete
 
     def _option_turn_off_interactive(self, curr_step: AbstractPipelineStep) -> Optional[str]:
         """
@@ -390,6 +392,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         Displays an interactive menu for users to select which action they would like
         :param menu_options: The different actions available to the user
+        :param message: The message to display at the top of the menu
         :param allow_back: If True, allows user to go to previous menu
         :return: The selected option
         """

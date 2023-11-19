@@ -10,9 +10,8 @@ from tgen.core.trainers.sentence_transformer_trainer import SentenceTransformerT
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager
-from tgen.scripts.tools.bib_converter import ROOT_PATH
 from tgen.testres.dataset_creator_tutil import DatasetCreatorTUtil
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
 
 
@@ -119,7 +118,7 @@ class TestSentenceTransformerTrainer(TestCase):
                 "object_type": "TRACE",
                 "project_reader": {
                     "object_type": "STRUCTURE",
-                    "project_path": os.path.join(ROOT_PATH, "tgen", "testres", "data", "cats")
+                    "project_path": os.path.join(TEST_DATA_DIR, "cats")
                 }
             },
             "val_dataset_creator": {

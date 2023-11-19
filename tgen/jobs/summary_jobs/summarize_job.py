@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
@@ -47,6 +48,10 @@ class SummarizeJob(AbstractJob):
         else:
             dataset = Summarizer(self.args, dataset=dataset).summarize()
             summary = dataset.project_summary.to_string()
+
+        if self.export_dir:
+            exporter = SafaExporter(self.export_dir, dataset=dataset)
+            exporter.export()
 
         artifacts = dataset.artifact_df.to_artifacts()
         return SummaryResponse(summary=summary, artifacts=artifacts)

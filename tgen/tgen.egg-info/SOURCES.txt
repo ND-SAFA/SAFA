@@ -217,7 +217,7 @@ tgen/train/trace_output/trace_prediction_output.py
 tgen/train/trace_output/trace_train_output.py
 tgen/train/vsm/__init__.py
 tgen/train/vsm/vsm_trainer.py
-tgen/train/wandb/Wandb.py
+tgen/train/wandb/WBManager.py
 tgen/train/wandb/__init__.py
 tgen/train/wandb/trace_callback.py
 tgen/util/__init__.py

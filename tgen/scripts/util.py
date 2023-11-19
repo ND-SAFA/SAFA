@@ -1,3 +1,8 @@
+from typing import List
+
+from tgen.common.constants.deliminator_constants import COMMA
+
+
 class CustomReprFunc:
 
     def __init__(self, f, custom_repr):
@@ -51,3 +56,14 @@ def bool_constructor(s: str):
     :return: The boolean constructed.
     """
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
+
+
+@set_repr(lambda f: "list")
+def list_constructor(s: str, delimiter: str = COMMA) -> List[str]:
+    """
+    Constructs a list from a string by splitting the string on delimiter.
+    :param s: The string to convert to list.
+    :param delimiter: The delimiter to use to create list.
+    :return: The list of strings.
+    """
+    return s.split(delimiter)

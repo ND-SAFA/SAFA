@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from tgen.common.util.base_object import BaseObject
 from tgen.common.constants.job_constants import SAVE_DATASET_SPLITS_DEFAULT, SAVE_OUTPUT_DEFAULT
+from tgen.common.util.base_object import BaseObject
 
 
 @dataclass
@@ -23,6 +23,10 @@ class JobArgs(BaseObject):
     Sets the random seed for a job
     """
     random_seed: int = None
+    """
+    Suffix to run name in weights and biases.
+    """
+    run_suffix: str = None
 
     def as_kwargs(self) -> Dict[str, Any]:
         """

@@ -7,7 +7,7 @@
           "task": "TRAIN",
           "job_args": {
             "random_seed": 812,
-            "export_dir": "[OUTPUT_DIR]/train/[TRAIN_PROJECT]"
+            "export_dir": "[OUTPUT_PATH]/train/[TRAIN_PROJECT]"
           },
           "model_manager": {
             "model_path": "[BASE_MODEL]"

@@ -1,70 +1,31 @@
 from typing import List, Tuple
 
-import numpy as np
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
-from sentence_transformers.evaluation import SentenceEvaluator
-from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss
+from torch import Tensor, nn
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL, NEG_LINK
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
-from tgen.common.util.supported_enum import SupportedEnum
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.trainers.st.custom_sentence_transformer import CustomSentenceTransformer
+from tgen.core.trainers.st.sentence_transformer_evaluator import SentenceTransformerEvaluator
+from tgen.core.trainers.st.st_loss_functions import SupportedLossFunctions
+from tgen.core.trainers.st.st_metrics import STMetrics
+from tgen.core.trainers.st.st_training_manager import STTrainingParams
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
-
-SEPARATOR_BAR = "-" * 50
-EmbeddingType = np.array  # TODO: Merge with embedding type.
-
-DEFAULT_EVAL_METRIC = "f2"
-DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
-DEFAULT_SAVE_BEST_MODEL = True
-
-
-class SupportedLossFunctions(SupportedEnum):
-    """
-    Enumerates the different loss functions available for sentence embedding models.
-    """
-    COSINE = CosineSimilarityLoss
-    CONTRASTIVE = ContrastiveLoss
-
-
-class SentenceTransformerEvaluator(SentenceEvaluator):
-    def __init__(self, trainer: HuggingFaceTrainer, dataset_role: DatasetRole = DatasetRole.VAL,
-                 evaluator_metric: str = DEFAULT_EVAL_METRIC):
-        """
-        Evaluates dataset under role with given trainer.
-        :param trainer: The trainer used to predict on the dataset.
-        :param dataset_role: The role the dataset to predict should be found under.
-        :param evaluator_metric: The metric used to define which is the best run.
-        """
-        self.trainer = trainer
-        self.dataset_role = dataset_role
-        self.evaluator_metric = evaluator_metric
-        self.metrics = []
-
-    def __call__(self, model: SentenceTransformer, **kwargs) -> float:
-        """
-        Evaluates the model on the evaluation dataset.
-        :param model: The model to evaluate.
-        :param kwargs: Ignored.
-        :return: The score for this evaluation run.
-        """
-        prediction_output: TracePredictionOutput = self.trainer.perform_prediction(self.dataset_role)
-        logger.info(SEPARATOR_BAR)
-        metrics = prediction_output.metrics
-        self.metrics.append(metrics)
-        return metrics[self.evaluator_metric]
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -73,9 +34,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     """
 
     def __init__(self, trainer_args: HuggingFaceArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
-                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL,
-                 loss_function: SupportedLossFunctions = SupportedLossFunctions.COSINE,
-                 save_best_model: bool = DEFAULT_SAVE_BEST_MODEL, **kwargs):
+                 max_steps_before_eval: int = DEFAULT_MAX_STEPS_BEFORE_EVAL, **kwargs):
         """
         Trainer for sentence transformer models. Provides API that allows training and prediction operations.
         :param trainer_args: The trainer arguments.
@@ -90,8 +49,10 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
-        self.loss_function = loss_function
-        self.save_best_model = save_best_model
+        self.losses = []
+        self.total_loss = 0
+        self.loss_function = None
+        self.params = None
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -100,24 +61,36 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        train_examples = self.to_input_examples(self.train_dataset)
-        train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=self.args.train_batch_size)
-        train_loss = self.loss_function.value(self.model)
-        n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
-        evaluator = SentenceTransformerEvaluator(self)
+        if SupportedLossFunctions.MNRL.is_name(self.trainer_args.st_loss_function):
+            self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager, use_pos_ids=True)
+            logger.info("Using only positive links in training dataset.")
 
-        logger.log_title("Starting Training", prefix=NEW_LINE)
-        self.model.fit(train_objectives=[(train_dataloader, train_loss)],
-                       epochs=int(self.args.num_train_epochs),
-                       warmup_steps=self.args.warmup_steps,
-                       evaluation_steps=n_steps,
-                       evaluator=evaluator,
-                       output_path=self.args.output_dir,
-                       save_best_model=self.save_best_model)
+        train_examples = self.to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
+        train_dataloader = DataLoader(train_examples, shuffle=self.trainer_args.shuffle, batch_size=self.args.train_batch_size)
+
+        self.loss_function = self._create_loss_function()
+        n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
+
+        evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
+
+        logger.log_title("Training...", prefix=NEW_LINE)
+        model: CustomSentenceTransformer = self.model
+        self.params = STTrainingParams(
+            epochs=int(self.args.num_train_epochs),
+            warmup_steps=self.args.warmup_steps,
+            evaluation_steps=n_steps,
+            evaluator=evaluator,
+            output_path=self.args.output_dir,
+            save_best_model=self.trainer_args.save_best_model,
+            accumulation_steps=self.args.gradient_accumulation_steps
+        )
+        model.fit(train_objectives=[(train_dataloader, self.loss_function)], training_params=self.params)
         self.state.best_model_checkpoint = self.args.output_dir
         if self.args.load_best_model_at_end:
-            self.model = SentenceTransformer(self.state.best_model_checkpoint)
-        return TrainOutput(metrics=evaluator.metrics, training_loss=None, global_step=None)
+            self.model = CustomSentenceTransformer(self.state.best_model_checkpoint)
+
+        metrics = STMetrics(records=evaluator.metrics, losses=self.losses)
+        return TrainOutput(metrics=metrics, training_loss=self.total_loss, global_step=self.params.global_step)
 
     @overrides(HuggingFaceTrainer)
     def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:
@@ -131,21 +104,78 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         input_examples = self.to_input_examples(dataset)
         scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
+        prediction_metrics["loss"] = self._calculate_loss(Tensor(scores), Tensor(labels)).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
+    def _create_loss_function(self):
+        """
+        Creates the loss function from its defined class.
+        :return: The loss function.
+        """
+        loss_function_name = self.trainer_args.st_loss_function
+        loss_function_kwargs = {}
+        loss_function_class = SupportedLossFunctions.get_value(loss_function_name)
+        if ReflectionUtil.has_constructor_param(loss_function_class, "loss_fct"):
+            loss_function_kwargs["loss_fct"] = self._calculate_loss
+        loss_function = loss_function_class(self.model, **loss_function_kwargs)
+        logger.info(f"Created loss function {loss_function_name}.")
+        return loss_function
+
+    def _calculate_loss(self, output: Tensor, labels: Tensor):
+        """
+        Calculates the loss between batch of predictions and their labels.
+        :param output: Batch prediction output containing similarity scores between pairs.
+        :param labels: The labels associated with the pairs.
+        :return: The loss between the predictions and actual labels.
+        """
+        default_loss = nn.MSELoss()
+        loss = default_loss(output, labels)
+        loss_value = loss.item()
+        self.total_loss += loss_value
+        self.losses.append(loss_value)
+        return loss
+
     @staticmethod
-    def to_input_examples(dataset: Dataset) -> List[InputExample]:
+    def to_input_examples(dataset: Dataset, use_scores: bool = False, model: SentenceTransformer = None) -> List[InputExample]:
         """
         Converts a huggingface dataset into a list of sentence transformer input examples.
         :param dataset: The huggingface dataset.
+        :param use_scores: Whether to use score over label for negative links.
+        :param model: If use_scores, the model used to embed artifacts.
         :return: List of input examples.
         """
-        input_examples = [example for input_batch in dataset for example in input_batch.values()]
+        input_examples = []
+        for i in dataset:
+            source_text = i[CSVKeys.SOURCE]
+            target_text = i[CSVKeys.TARGET]
+            label = float(i[CSVKeys.LABEL])
+            input_examples.append(InputExample(texts=[source_text, target_text], label=label))
+        if use_scores:
+            assert model, f"Model is required to be defined if use_scores is True. Received {model}."
+            SentenceTransformerTrainer.replace_labels_with_scores(model, input_examples)
         return input_examples
 
-    @classmethod
-    def calculate_similarities(cls, model: SentenceTransformer, input_examples: List[InputExample]) -> Tuple[
-        List[float], List[float]]:
+    @staticmethod
+    def replace_labels_with_scores(model: SentenceTransformer, input_examples: List[InputExample], label: int = NEG_LINK):
+        """
+        Replaces the matching labels with model similarity score.
+        :param model: The model to create embeddings for artifacts for.
+        :param input_examples: The input examples to modify.
+        :param label: The label to replace with scores.
+        :return: None. Modified in place.
+        """
+        examples_with_label = [input_example for input_example in input_examples if input_example.label == label]
+        content = ListUtil.flatten([input_example.texts for input_example in examples_with_label])
+
+        embeddings_manager = EmbeddingsManager.create_from_content(content, model=model, show_progress_bar=False)
+
+        for input_example in examples_with_label:
+            input_example.label = SentenceTransformerTrainer.get_input_example_score(embeddings_manager, input_example)
+
+        logger.info(f"Adding scores to {len(examples_with_label)} input examples.")
+
+    @staticmethod
+    def calculate_similarities(model: SentenceTransformer, input_examples: List[InputExample]) -> Tuple[List[float], List[float]]:
         """
         Calculates the cosine similarity between the texts in each input example. TODO: Replace with embedding util.
         :param model: The model used to embed the test dataset.
@@ -153,29 +183,25 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :return: Prediction output containing scores as predictions and labels as label ids.
         """
         unique_content = list(set(ListUtil.flatten([e.texts for e in input_examples])))
-        embedding_map = cls.create_embedding_map(model, unique_content)
+        embeddings_manager = EmbeddingsManager.create_from_content(unique_content, model=model, show_progress_bar=False)
         scores = []
         labels = []
         for example in input_examples:
-            source_text, target_text = example.texts
-            source_embedding = embedding_map[source_text]
-            target_embedding = embedding_map[target_text]
-
-            score = EmbeddingUtil.calculate_similarity(source_embedding, target_embedding)
+            score = SentenceTransformerTrainer.get_input_example_score(embeddings_manager, example)
             scores.append(score)
             labels.append(example.label)
         return scores, labels
 
     @staticmethod
-    def create_embedding_map(model: SentenceTransformer, content: List[str]):
+    def get_input_example_score(embeddings_manager: EmbeddingsManager, input_example: InputExample) -> float:
         """
-        Creates embedding map using the embedding manager.
-        :param model: The model used to embed the content.
-        :param content: List of content to embed.
-        :return: Map from content to embedding.
+        Calculates the similarity score between the two texts in the input example.
+        :param embeddings_manager: The embeddings manager containing embedding to text.
+        :param input_example: The input example containing texts to compare.
+        :return: The similarity score between texts.
         """
-        content_map = {i: c for i, c in enumerate(content)}
-        embeddings_manager = EmbeddingsManager(content_map, model=model)
-        embedding_map = embeddings_manager.create_embedding_map()
-        translated_embedding_map = {content_map[i]: v for i, v in embedding_map.items()}
-        return translated_embedding_map
+        s_text, t_text = input_example.texts
+        s_embedding = embeddings_manager.get_embedding(s_text)
+        t_embedding = embeddings_manager.get_embedding(t_text)
+        score = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
+        return score

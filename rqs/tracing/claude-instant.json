@@ -8,7 +8,7 @@
           "trainer_args": {
             "object_type": "ANTHROPIC",
             "model": "claude-instant-v1",
-            "output_dir": "[OUTPUT_DIR]/llm-predict/[CURRENT_PROJECT]"
+            "output_dir": "[OUTPUT_PATH]/llm-predict/[CURRENT_PROJECT]"
           },
           "llm_manager": {
             "object_type": "ANTHROPIC",

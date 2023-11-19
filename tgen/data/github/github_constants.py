@@ -32,4 +32,3 @@ ISSUE2CODE_EXPORT_FILE = "issue2code.csv"
 CODE2CODE_EXPORT_FILE = to_csv(CODE2CODE_ARTIFACT_FILE)
 
 # Parsing
-ALLOWED_CODE_EXTENSIONS = [".c", ".java", ".cs", ".py", ".cpp", ".hpp", ".PHP", ".swift", ".vb"]

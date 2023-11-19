@@ -71,7 +71,8 @@ class TestHuggingFaceTrainer(BaseTraceTest):
         test_trace_trainer.train_dataset = train_dataset
 
     def get_custom_trace_trainer(self, dataset_container_args: Dict = None, **kwargs):
-        trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager(kwargs=dataset_container_args)
+        dataset_container_args = dataset_container_args if dataset_container_args else {}
+        trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager(**dataset_container_args)
         model_manager = ObjectCreator.create(ModelManager)
         model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())

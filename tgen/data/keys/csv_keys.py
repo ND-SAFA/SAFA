@@ -10,4 +10,5 @@ class CSVKeys:
     TARGET = "target"
     TEXT = "text"
     LABEL = "label"
+    SCORE = "score"
     EXT = ".csv"

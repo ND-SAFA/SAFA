@@ -1,9 +1,12 @@
 from typing import List, Optional, Set
 
+from tqdm import tqdm
+
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, DEFAULT_CLUSTER_MIN_VOTES, \
     DEFAULT_CLUSTER_SIMILARITY_THRESHOLD
+from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
@@ -40,7 +43,7 @@ class ClusterCondenser:
         :param clusters: List of clusters to add.
         :return: None
         """
-        for c in clusters:
+        for c in tqdm(clusters, desc="Condensing clusters...", ncols=TQDM_NCOLS):
             self.add(c)
 
     def add(self, cluster: Cluster) -> Optional[ClusterType]:

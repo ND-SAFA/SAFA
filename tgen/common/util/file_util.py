@@ -13,10 +13,11 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
     USER_SYM
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.logging.logger_manager import logger
 
+EXCLUDE_EXTENSIONS = [".png", ".jpg", ".reg"]
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
                    "PL", "R", "PY", "JAVA", "VUE", "CC", "SQL"]
@@ -78,17 +79,21 @@ class FileUtil:
         return output_path
 
     @staticmethod
-    def read_file(file_path: str, raise_exception: bool = True) -> Optional[str]:
+    def read_file(file_path: str, raise_exception: bool = True, encoding: str = "utf-8") -> Optional[str]:
         """
         Reads file at given path if exists.
         :param file_path: Path of the file to read.
         :param raise_exception: If True, raises an exception if reading fails
+        :param encoding: The encoding to use when reading the file
+        :param encoding: The encoding the read the file in.
         :return: The content of the file.
         """
         try:
-            with open(file_path) as file:
+            with open(file_path, encoding=encoding) as file:
                 file_content = file.read()
                 return file_content
+        except UnicodeDecodeError as e:
+            return FileUtil.read_file(file_path, raise_exception=raise_exception, encoding="windows-1252")
         except Exception as e:
             logger.exception(f"Failed reading file: {file_path}")
             if raise_exception:
@@ -133,7 +138,7 @@ class FileUtil:
         if exclude is None:
             exclude = [".DS_Store"]
         if exclude_ext is None:
-            exclude_ext = []
+            exclude_ext = EXCLUDE_EXTENSIONS
         if os.path.isfile(data_path):
             files = [data_path]
         elif os.path.isdir(data_path):

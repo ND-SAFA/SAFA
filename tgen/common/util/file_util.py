@@ -85,6 +85,7 @@ class FileUtil:
         Reads file at given path if exists.
         :param file_path: Path of the file to read.
         :param raise_exception: If True, raises an exception if reading fails
+        :param encoding: The encoding to use when reading the file
         :return: The content of the file.
         """
         try:

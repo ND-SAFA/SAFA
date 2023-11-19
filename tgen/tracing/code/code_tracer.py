@@ -48,7 +48,7 @@ class CodeTracer:
         header_links = CodeTracer.trace_by_base_names(header_files, implementation_files)
 
         logger.info(f"{len(header_files)} header files found.")
-        logger.info(f"{len(implementation_files)} files found.")
+        logger.info(f"{len(implementation_files)} implementation files found.")
         logger.info(f"{len(header_links)} links found between header and implementation files.")
 
         if rename_children:

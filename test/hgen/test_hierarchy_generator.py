@@ -190,7 +190,7 @@ class TestHierarchyGenerator(BaseTest):
         expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[0]
         self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
         self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_linked_artifact, content[0], self.HGEN_ARGS.source_layer_id)
+        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_linked_artifact, content[0], self.HGEN_ARGS.source_layer_id[0])
         original_link = EnumDict({TraceKeys.child_label(): dup_linked_artifact,
                                   TraceKeys.parent_label(): dup_artifact_id,
                                   TraceKeys.SCORE: 0.6,
@@ -205,9 +205,6 @@ class TestHierarchyGenerator(BaseTest):
         self.assertEqual(new_link[0][TraceKeys.TARGET], expected_parent)
 
     def assert_generate_explanations_for_links_step(self, anthropic_ai_manager):
-        missing_explanations = 1
-        anthropic_ai_manager.add_responses([RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
-                                            for _ in range(missing_explanations)])
         GenerateExplanationsForLinksStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         missing_explanation = [trace for trace in self.HGEN_STATE.selected_predictions if not trace.get(TraceKeys.EXPLANATION)]
         self.assertEqual(len(missing_explanation), 0)
@@ -233,7 +230,7 @@ class TestHierarchyGenerator(BaseTest):
             q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df, layer)
             self.assertEqual(len(q), 1)
         q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df,
-                                   {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id,
+                                   {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id[0],
                                     LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)
 

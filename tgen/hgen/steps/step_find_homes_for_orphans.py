@@ -44,10 +44,9 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         child2predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label())
         child2selected = RankingUtil.group_trace_predictions(trace_selections, TraceKeys.child_label())
 
-        orphans = FindHomesForOrphansStep.find_orphan_artifacts(all_children_ids, child2predictions, child2selected, trace_selections,
-                                                                args.min_orphan_score_threshold)
+        orphans = FindHomesForOrphansStep.find_orphan_artifacts(all_children_ids, child2predictions, child2selected, trace_selections)
         if not orphans:
-            return
+            return trace_selections
 
         run_name = "Placing Orphans in Homes"
         export_dir = FileUtil.safely_join_paths(args.export_dir, "orphan_ranking")
@@ -73,8 +72,7 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     @staticmethod
     def find_orphan_artifacts(children_ids: List[Any], child2predictions: Dict[Any, List[Trace]],
-                              child2selected: Dict[Any, List[Trace]], trace_selections: List[Trace],
-                              min_score: float) -> Set[str]:
+                              child2selected: Dict[Any, List[Trace]], trace_selections: List[Trace]) -> Set[str]:
         """
         Finds the orphan artifacts using the trace predictions and selections to establish which artifacts have trace links.
         :param children_ids: List of children artifact ids.
@@ -93,9 +91,8 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 continue
             if len(predicted_child_links) > 0:
                 top_prediction = sorted(predicted_child_links, key=lambda t: t[TraceKeys.SCORE], reverse=True)[0]
-                if top_prediction[TraceKeys.SCORE] >= min_score:
-                    trace_selections.append(top_prediction)
-                    continue
+                trace_selections.append(top_prediction)
+                continue
             orphans.add(child)
 
         return orphans

@@ -15,7 +15,7 @@ from tgen.pipeline.abstract_pipeline import AbstractPipelineStep, AbstractPipeli
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.pipeline.state import State
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.paths import TEST_HGEN_PATH, TEST_OUTPUT_DIR, TEST_STATE_PATH
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_STATE_PATH
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
 
 

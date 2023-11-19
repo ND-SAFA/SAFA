@@ -95,13 +95,19 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return self.get_artifact(trace[TraceKeys.SOURCE]), self.get_artifact(trace[TraceKeys.TARGET])
 
-    def get_type(self, type_name: str) -> "ArtifactDataFrame":
+    def get_type(self, artifact_types: Union[str, List[str]]) -> "ArtifactDataFrame":
         """
         Returns data frame with artifacts of given type.
-        :param type_name: The type to filter by.
+        :param artifact_types: The type to filter by.
         :return: Artifacts in data frame of given type.
         """
-        return self.filter_by_row(lambda r: r[ArtifactKeys.LAYER_ID.value] == type_name)
+        if isinstance(artifact_types, str):
+            artifact_types = [artifact_types]
+        all_types_df = ArtifactDataFrame()
+        for type_name in artifact_types:
+            curr_type_df = self.filter_by_row(lambda r: r[ArtifactKeys.LAYER_ID.value] == type_name)
+            all_types_df = ArtifactDataFrame.concat(all_types_df, curr_type_df)
+        return all_types_df
 
     def get_type_counts(self) -> Dict[str, str]:
         """

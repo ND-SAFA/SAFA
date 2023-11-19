@@ -7,9 +7,9 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
     USE_PROJECT_SUMMARY_SECTIONS
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
@@ -58,7 +58,8 @@ class ProjectSummarizer(BaseObject):
         Creates the project summary from the project artifacts.
         :return: The summary of the project.
         """
-        logger.log_title("Creating project specification.")
+        if self.args.project_summary_sections:
+            logger.log_title(f"Creating project specification: {self.args.project_summary_sections}")
         self.artifact_df.summarize_content(ArtifactsSummarizer(self.args, project_summary=self.project_summary))
         if FileUtil.safely_check_path_exists(self.get_save_path()) and self.reload_existing:
             logger.info(f"Loading previous project summary from {self.get_save_path()}")

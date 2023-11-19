@@ -20,7 +20,7 @@ class ClusteringArgs(PipelineArgs):
     :param cluster_intersection_threshold: Percentage of intersection between sets to consider them the same.
     :param dataset_creator: The creator used to get the dataset.
     :param dataset: The dataset to cluster.
-
+    :param cluster_seeds: The centroids for clusters in a project.
     """
     cluster_methods: List[SupportedClusteringMethods] = field(default_factory=lambda: DEFAULT_CLUSTERING_METHODS)
     clustering_method_args: Dict = field(default_factory=dict)
@@ -31,6 +31,7 @@ class ClusteringArgs(PipelineArgs):
     create_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY
+    cluster_seeds: List[str] = None
 
     def __post_init__(self) -> None:
         """

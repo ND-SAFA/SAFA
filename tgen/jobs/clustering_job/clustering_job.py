@@ -29,6 +29,7 @@ class ClusteringJob(AbstractJob):
         """
         Runs clustering pipeline on dataset and exports the results
         """
+        self.kwargs["cluster_seeds"] = ["Pumping medicine", "Fault Identification and Recovery", "Control Loop"]
         args = ClusteringArgs(dataset_creator=self.dataset_creator, create_dataset=self.add_to_dataset,
                               artifact_types=self.artifact_types, export_dir=self.export_dir,
                               **self.kwargs)

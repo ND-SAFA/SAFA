@@ -36,17 +36,19 @@ class TestLogging(BaseTest):
     def test_log_once(self, log_mock: MagicMock = None):
         msg_1 = "Unable to parse"
         msg_2 = "This is a new problem"
+        msg_3 = "Another one"
         logger.log_without_spam(level=logging.WARNING, msg=msg_1)
         logger.log_without_spam(level=logging.WARNING, msg=msg_1)
         logger.log_without_spam(level=logging.WARNING, msg=msg_1)
         logger.log(level=logging.WARNING, msg=msg_2)
         logger.log(level=logging.WARNING, msg=msg_2)
+        logger.log_without_spam(level=logging.WARNING, msg=msg_3)
         logger.log_without_spam(level=logging.WARNING, msg=msg_1)
         logger.log_without_spam(level=logging.WARNING, msg=msg_2)
-        logger.log_without_spam(level=logging.WARNING, msg=msg_1)
+        logger.log_without_spam(level=logging.WARNING, msg=msg_3)
         msgs = [call[0][1] for call in log_mock.call_args_list]
-        self.assertSize(5, msgs)
-        self.assertListEqual([msg_1, msg_2, msg_2, msg_2, msg_1], msgs)
+        self.assertSize(6, msgs)
+        self.assertListEqual([msg_1, msg_2, msg_2, msg_3, msg_2, msg_3], msgs)
 
     def get_log_baseFilename(self):
         file_handler = None

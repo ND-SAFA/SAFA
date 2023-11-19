@@ -5,7 +5,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.state.state import State
+from tgen.pipeline.state import State
 
 
 @dataclass

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from tgen.clustering.base.cluster_type import ClusterMapType, MethodClusterMapType
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.state.state import State
+from tgen.pipeline.state import State
 
 
 @dataclass

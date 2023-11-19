@@ -29,7 +29,7 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
     REVERSE_CATEGORIES
-from tgen.state.state_manager import StateManager
+from tgen.pipeline.state_manager import StateManager
 
 
 class LLMTrainer(AbstractTrainer):

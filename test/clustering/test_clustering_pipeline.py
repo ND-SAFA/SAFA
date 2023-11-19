@@ -19,8 +19,18 @@ class TestClusteringPipeline(TestCase):
         state: ClusteringState = pipeline.state
         clusters: ClusterMapType = state.final_cluster_map
 
-        self.assertEqual(2, len(clusters))
-        self.assertIn("A1", clusters[0])
-        self.assertIn("A2", clusters[0])
-        self.assertIn("A3", clusters[1])
-        self.assertIn("A4", clusters[1])
+        ClusteringTestUtil.verify_clusters(self, clusters, [["A1", "A2"], ["A3", "A4"]])
+
+    def test_seeds(self):
+        """
+        Tests ability to cluster around starting sentences.
+        """
+        seeds = ["animals", "cars"]
+
+        args = ClusteringTestUtil.create_default_args(cluster_seeds=seeds)
+        pipeline: ClusteringPipeline = ClusteringPipeline(args, skip_summarization=True)
+        pipeline.run()
+
+        state: ClusteringState = pipeline.state
+        clusters: ClusterMapType = state.final_cluster_map
+        ClusteringTestUtil.verify_clusters(self, clusters, {"animals": ["A1", "A2"], "cars": ["A3", "A4"]})

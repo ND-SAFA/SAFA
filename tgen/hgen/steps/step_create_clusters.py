@@ -7,6 +7,7 @@ from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.summarizer.summary import SummarySectionKeys
 
 
 class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -18,6 +19,12 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: Current state of the hgen pipeline.
         :return: None
         """
+        clustering_pipeline_kwargs = {}
+        if args.seed_project_summary_section:
+            section_id = args.seed_project_summary_section
+            section_chunks = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
+            clustering_pipeline_kwargs["cluster_seeds"] = section_chunks
+            print("hi")
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
         cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path)
         if not args.perform_clustering:
@@ -35,6 +42,9 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         source_artifact_df = state.source_dataset.artifact_df
         state.id_to_cluster_artifacts = self._replace_ids_with_artifacts(cluster_map, source_artifact_df)
+
+    def cluster_seed_seeds(self, args: HGenArgs, state: HGenState):
+        pass
 
     @staticmethod
     def _replace_ids_with_artifacts(cluster_map: ClusterMapType, artifact_df: ArtifactDataFrame):

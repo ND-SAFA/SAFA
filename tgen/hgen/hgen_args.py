@@ -84,7 +84,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, adds already linked artifacts to the cluster that their parent is in
     """
-    add_linked_artifacts_to_cluster: bool = False # TODO change to default to false
+    add_linked_artifacts_to_cluster: bool = False  # TODO change to default to false
     """
     The llm manager to use for each prediction step
     """
@@ -105,6 +105,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     If True, creates a project summary, else False
     """
     create_project_summary: bool = True
+    """
+    The section of the project summary to use as seeds for clustering.
+    """
+    seed_project_summary_section: str = None
 
     def __post_init__(self) -> None:
         """

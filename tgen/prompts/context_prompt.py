@@ -40,7 +40,7 @@ class ContextPrompt(MultiArtifactPrompt):
                                                   child_ids=[id_ for id_ in embedding_manager.get_all_ids()
                                                              if id_ != a_id],
                                                   embedding_manager=embedding_manager, return_scores=True)
-            embedding_manager.remove_from_content_map(a_id)
+            embedding_manager.remove_artifacts(a_id)
             sorted_ids, scores = sorted_entries[a_id]
             id_to_context_artifacts = {a_id: [EnumDict({ArtifactKeys.ID: id_,
                                                         ArtifactKeys.CONTENT: embedding_manager.get_content(id_)})

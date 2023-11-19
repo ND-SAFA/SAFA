@@ -22,6 +22,7 @@ class EmbeddingsManagerObjects(SupportedEnum):
 
 
 EmbeddingType = np.array
+IdType = Union[int, str]
 
 
 class EmbeddingsManager:
@@ -143,17 +144,20 @@ class EmbeddingsManager:
         if create_embedding:
             return self.create_embedding_map(list(content_map.keys()))
 
-    def remove_from_content_map(self, a_id: Any) -> None:
+    def remove_artifacts(self, a_ids: Union[IdType, List[IdType]]) -> None:
         """
-        Removes existing id and content from map
-        :param a_id: The id to remove
+        Removes artifacts with ids from embeddings manager.
+        :param a_ids: IDs of the artifact to remove.
         :return: None
         """
-        if a_id in self._content_map:
-            self._content_map.pop(a_id)
-        if a_id in self._embedding_map:
-            self._embedding_map.pop(a_id)
-            self.__state_changed_since_last_save = a_id in self.__ordered_ids
+        if isinstance(a_ids, str):
+            a_ids = [a_ids]
+        for a_id in a_ids:
+            if a_id in self._content_map:
+                self._content_map.pop(a_id)
+            if a_id in self._embedding_map:
+                self._embedding_map.pop(a_id)
+                self.__state_changed_since_last_save = a_id in self.__ordered_ids
 
     def get_model(self) -> SentenceTransformer:
         """

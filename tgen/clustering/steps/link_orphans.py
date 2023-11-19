@@ -23,7 +23,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         clusters: List[Cluster] = list(cluster_map.values())
 
         seen_artifacts = self.collect_seen_artifacts(clusters)
-        all_artifacts = set(state.embedding_manager.get_all_ids())
+        all_artifacts = set(args.dataset.artifact_df.index)
         orphan_artifact_id_set = all_artifacts.difference(seen_artifacts)
 
         self.place_orphans_in_homes(clusters, orphan_artifact_id_set, state.embedding_manager)

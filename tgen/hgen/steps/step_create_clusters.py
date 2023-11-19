@@ -24,9 +24,9 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             section_id = args.seed_project_summary_section
             section_chunks = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             clustering_pipeline_kwargs["cluster_seeds"] = section_chunks
-            print("hi")
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
-        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path)
+        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
+                                      **clustering_pipeline_kwargs)
         if not args.perform_clustering:
             state.embedding_manager = EmbeddingsManager(content_map={}, model_name=cluster_args.embedding_model)
             return

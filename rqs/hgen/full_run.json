@@ -11,7 +11,7 @@
               "target_type": "[TARGET_TYPE_1]",
               "create_project_summary": "[CREATE_PROJECT_SUMMARY_BOOL]",
               "generate_trace_links": true,
-              "interactive_mode": true,
+              "interactive_mode": "[IS_INTERACTIVE_BOOL]",
               "seed_project_summary_section": "[SEED_SECTION]",
               "dataset_creator": {
                 "object_type": "PROMPT",

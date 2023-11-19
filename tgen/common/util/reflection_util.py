@@ -2,6 +2,7 @@ import builtins
 import importlib
 import traceback
 import typing
+from copy import deepcopy
 from enum import Enum
 from typing import Any, Dict, List, Optional, Type
 
@@ -147,15 +148,18 @@ class ReflectionUtil:
         return instance
 
     @staticmethod
-    def copy_attributes(instance: Any, other: Any, param_scope: ParamScope = ParamScope.PUBLIC) -> None:
+    def copy_attributes(instance: Any, other: Any, param_scope: ParamScope = ParamScope.PUBLIC, fields: List[str] = None) -> None:
         """
         Copies attributes in instance to the other.
         :param instance: The instance whose values are moved to the other.
         :param other: The object whose values are getting set.
         :param param_scope: The scope of the attributes to copy over. Defaults to public
+        :param fields: The fields to copy over.
         :return: None
         """
         values = ReflectionUtil.get_fields(instance, param_scope)
+        if fields:
+            values = {field: field_value for field, field_value in values.items() if field in fields}
         ReflectionUtil.set_attributes(other, values)
 
     @staticmethod

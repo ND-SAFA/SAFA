@@ -8,7 +8,7 @@ import numpy as np
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
-from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 
@@ -190,7 +190,6 @@ class Cluster:
         """
         if export_path:
             yaml_safe_cluster = deepcopy(self)
-            yaml_safe_cluster.__init_stats()
             export_path = os.path.join(dirname(export_path), ReflectionUtil.extract_name_of_variable(f"{self.embedding_manager=}",
                                                                                                      is_self_property=True))
             yaml_safe_cluster.embedding_manager = yaml_safe_cluster.embedding_manager.to_yaml(export_path)
@@ -217,6 +216,17 @@ class Cluster:
         """
         for a in self.artifact_ids:
             yield a
+
+    def __deepcopy__(self, memo):
+        """
+        Copies the cluster with the minimal properties need to recreate stastics and overall state of current cluster.
+        :param memo: Ignored.
+        :return: The copy of the cluster.
+        """
+        c = Cluster(self.embedding_manager)
+        keep_props = ["artifact_ids", "artifact_id_set", "votes"]
+        ReflectionUtil.copy_attributes(self, c, ParamScope.PRIVATE, fields=keep_props)
+        return c
 
     def __contains__(self, item: Any) -> bool:
         """

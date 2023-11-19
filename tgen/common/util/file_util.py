@@ -13,9 +13,8 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
     USER_SYM
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.json_util import JsonUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.json_util import JsonUtil
 
 EXCLUDE_EXTENSIONS = [".png", ".jpg", ".reg"]
@@ -86,6 +85,7 @@ class FileUtil:
         :param file_path: Path of the file to read.
         :param raise_exception: If True, raises an exception if reading fails
         :param encoding: The encoding to use when reading the file
+        :param encoding: The encoding the read the file in.
         :return: The content of the file.
         """
         try:

@@ -113,8 +113,8 @@ class HGenArgs(PipelineArgs, BaseObject):
         """
         super().__post_init__()
         if not self.source_type:
-            is_code = self.source_layer_id in self.dataset.artifact_df.get_code_layers()
-            self.source_type = "code" if is_code else self.source_layer_id
+            is_code = all([layer_id in self.dataset.artifact_df.get_code_layers() for layer_id in self.source_layer_id])
+            self.source_type = "code" if is_code else self.source_layer_id[0]
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \

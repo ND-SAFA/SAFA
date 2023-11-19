@@ -1,6 +1,5 @@
 import collections
 import os
-import timeit
 from enum import Enum, EnumMeta
 from typing import Any, Dict
 
@@ -29,7 +28,7 @@ class CustomLoader(SafeLoader):
         :return: The created object
         """
         try:
-            start = timeit.timeit()
+            # start = timeit.timeit()
             class_path = node.tag.split(COLON)[-1]
             cls = ReflectionUtil.get_cls_from_path(class_path)
             if ReflectionUtil.is_function(cls) or "builtins" in class_path:
@@ -59,8 +58,8 @@ class CustomLoader(SafeLoader):
                 data.__dict__.update(state)
             if hasattr(data, "from_yaml"):
                 data.from_yaml()
-            end = timeit.timeit()
-            self.__time_to_load[class_path] = max(end - start, self.__time_to_load.get(class_path, 0))
+            # end = timeit.timeit()
+            # self.__time_to_load[class_path] = max(end - start, self.__time_to_load.get(class_path, 0))
             return data
         except Exception as e:
             logger.error(f"Problem loading node {node.tag}")
@@ -134,23 +133,17 @@ class CustomDumper(Dumper):
         :param data: The data to represent
         :return: The data in a yaml form (node)
         """
-        start = timeit.timeit()
         if hasattr(data, "to_yaml"):
             try:
                 converted_data = data.to_yaml()
-                node = super().represent_data(converted_data)
-                node.tag = self.get_original_node_tag(data)
-                return node
+                if type(data) != type(converted_data):
+                    node = super().represent_data(converted_data)
+                    node.tag = self.get_original_node_tag(data)
+                    return node
+                data = converted_data
             except Exception:
                 pass
-        # TODO deal with numpy types in yaml saving
-        # if hasattr(data, "item"):
-        #     data = data.item()
-        # if isinstance(data, np.ndarray):
-        #     data = ListUtil.convert_numpy_array_to_native_types(data)
         node = super().represent_data(data)
-        end = timeit.timeit()
-        self._time_to_save[node.tag] = max(end - start, self._time_to_save.get(node.tag, 0))
         return node
 
     def get_original_node_tag(self, data) -> "str":

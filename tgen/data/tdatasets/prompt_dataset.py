@@ -130,7 +130,8 @@ class PromptDataset(iDataset):
         """
         from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
         from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-        PromptDatasetExporter(export_path=project_path, trace_dataset_exporter_type=SafaExporter, dataset=self).export()
+        if not os.path.exists(project_path):
+            PromptDatasetExporter(export_path=project_path, trace_dataset_exporter_type=SafaExporter, dataset=self).export()
         collapsed_path = FileUtil.collapse_paths(project_path)
         if self.trace_dataset is not None:
             prompt_creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(StructuredProjectReader(collapsed_path)))

@@ -105,7 +105,7 @@ class STTrainingManager:
         """
         loss_models = [loss_model for _, loss_model in training_objectives]
         dataloaders = [dataloader for dataloader, _ in training_objectives]
-        self.models: List[ModelType] = loss_models
+        self.loss_functions: List[ModelType] = loss_models
         self.data_loaders: List[DataLoader] = dataloaders
         self.data_iterators = None
         self.params = params
@@ -118,7 +118,7 @@ class STTrainingManager:
         """
         optimizers = []
         schedulers = []
-        for loss_model in self.models:
+        for loss_model in self.loss_functions:
             param_optimizer = list(loss_model.named_parameters())
 
             no_decay = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
@@ -151,7 +151,7 @@ class STTrainingManager:
         :return: String representing the model card information.
         """
         info_loss_functions = []
-        for dataloader, loss in zip(self.data_loaders, self.models):
+        for dataloader, loss in zip(self.data_loaders, self.loss_functions):
             info_loss_functions.extend(
                 ModelCardTemplate.get_train_objective_info(dataloader, loss)
             )

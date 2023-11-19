@@ -58,8 +58,8 @@ class CustomSentenceTransformer(SentenceTransformer):
         if training_manager.data_iterators is None:
             training_manager.initialize_data_iterators()
 
-        for train_idx in range(len(training_manager.models)):
-            loss_model = training_manager.models[train_idx]
+        for train_idx in range(len(training_manager.loss_functions)):
+            loss_function = training_manager.loss_functions[train_idx]
             optimizer = training_manager.optimizers[train_idx]
             scheduler = training_manager.schedulers[train_idx]
             data_iterator = training_manager.data_iterators[train_idx]
@@ -70,13 +70,13 @@ class CustomSentenceTransformer(SentenceTransformer):
             labels = labels.to(self._target_device)
             features = list(map(lambda batch: batch_to_device(batch, self._target_device), features))
 
-            loss_value = loss_model(features, labels)
+            loss_value = loss_function(features, labels)
             WBManager.log(metrics={"training_loss": loss_value.item()}, step=training_manager.params.global_step)
             loss_value /= training_manager.params.accumulation_steps
             loss_value.backward()
 
             if training_step % training_manager.params.accumulation_steps == 0:
-                torch.nn.utils.clip_grad_norm_(loss_model.parameters(), training_manager.params.max_grad_norm)
+                torch.nn.utils.clip_grad_norm_(loss_function.parameters(), training_manager.params.max_grad_norm)
                 optimizer.step()
                 optimizer.zero_grad()
 
@@ -110,7 +110,7 @@ class CustomSentenceTransformer(SentenceTransformer):
                                        epoch,
                                        training_step,
                                        params.callback)
-            self._init_loss_models(training_data.models)
+
         if training_data.params.is_checkpoint_time():
             self._save_checkpoint(training_data.params.checkpoint_path,
                                   training_data.params.checkpoint_save_total_limit,
@@ -122,7 +122,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         :param training_data: Data representing state of current training.
         :return: None
         """
-        self._init_loss_models(training_data.models)
+        self._init_loss_models(training_data.loss_functions)
         training_data.initialize_data_iterators()
 
     def on_post_epoch(self, epoch: int, training_data: STTrainingManager) -> None:
@@ -151,7 +151,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         self._model_card_vars[TRAINING_SECTION_KEY] = model_card_text
         self.best_score = DEFAULT_BEST_SCORE
         self.to(self._target_device)
-        for loss_model in training_manager.models:
+        for loss_model in training_manager.loss_functions:
             loss_model.to(self._target_device)
         for dataloader in training_manager.data_loaders:  # Use smart batching
             dataloader.collate_fn = self.smart_batching_collate

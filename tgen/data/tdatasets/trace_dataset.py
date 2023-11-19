@@ -144,22 +144,6 @@ class TraceDataset(iDataset):
         else:
             self._neg_link_ids.append(link_id)
 
-    def augment_pos_links(self, augmenter: DataAugmenter) -> None:
-        """
-        Augments the positive links to balance the data using the given augmentation steps
-        :param augmenter: the augmentation to use for augmentation
-        :return: None
-        """
-
-        augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
-                                                        exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: augmenter.run(data, n_total_expected=len(self._neg_link_ids),
-                                                        include_all_but_step_type=SourceTargetSwapStep)]
-        for run in augmentation_runs:
-            pos_links, data_entries = self._get_data_entries_for_augmentation()
-            augmentation_results = run(data_entries)
-            self._create_links_from_augmentation(augmentation_results, pos_links)
-
     def get_ordered_link_ids(self) -> List[int]:
         """
         Gets link ids in the order that they are given in the trainer dataset
@@ -247,6 +231,62 @@ class TraceDataset(iDataset):
         """
         return list(self.trace_df.filter_by_row(lambda row: row[TraceKeys.LABEL.value] == label).index)
 
+    def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
+                            is_true_link: bool) -> int:
+        """
+        Adds a link to the dataset
+        :param source_id: the id of the source artifact
+        :param target_id: the id of the target artifact
+        :param source_tokens: the content of the source artifact
+        :param target_tokens: the content of the target artifact
+        :param is_true_link: True if the artifact are positively linked else False
+        :return: the new link id
+        """
+        source = self.artifact_df.add_artifact(source_id, source_tokens)
+        target = self.artifact_df.add_artifact(target_id, target_tokens)
+        new_link = self.trace_df.add_link(source_id, target_id, int(is_true_link))
+        if is_true_link:
+            self._pos_link_ids.append(new_link[TraceKeys.LINK_ID])
+        else:
+            self._neg_link_ids.append(new_link[TraceKeys.LINK_ID])
+        return new_link[TraceKeys.LINK_ID]
+
+    def augment_pos_links(self, augmenter: DataAugmenter) -> None:
+        """
+        Augments the positive links to balance the data using the given augmentation steps
+        :param augmenter: the augmentation to use for augmentation
+        :return: None
+        """
+
+        augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
+                                                        exclude_all_but_step_type=SourceTargetSwapStep),
+                             lambda data: augmenter.run(data, n_total_expected=len(self._neg_link_ids),
+                                                        include_all_but_step_type=SourceTargetSwapStep)]
+        for run in augmentation_runs:
+            pos_links, data_entries = self._get_data_entries_for_augmentation()
+            augmentation_results = run(data_entries)
+            self._create_links_from_augmentation(augmentation_results, pos_links)
+
+    def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
+                                        orig_link_ids: List[int]) -> None:
+        """
+        Creates new trace links from the results of an augmentation step
+        :param augmentation_results: the augmentation step id mapped to its results
+        :param orig_link_ids: a list of all the original link ids (pre-augmentation) that the step was run on
+        :return: None
+        """
+        for step_id, result in augmentation_results.items():
+            id_ = AbstractDataAugmentationStep.extract_unique_id_from_step_id(step_id)
+            i = 0
+            for entry, reference_index in result:
+                i += 1
+                aug_source_id, aug_target_id = self._get_augmented_artifact_ids(augmented_tokens=entry,
+                                                                                orig_link_id=orig_link_ids[reference_index],
+                                                                                aug_step_id=id_, entry_num=i)
+                aug_source_tokens, aug_target_tokens = entry
+                self.create_and_add_link(source_id=aug_source_id, target_id=aug_target_id,
+                                         source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:
         """
         Gets the data entries (link source, target, token pairs) for the augmentation
@@ -269,10 +309,16 @@ class TraceDataset(iDataset):
         :return: None
         """
         for step_id, result in augmentation_results.items():
-            for entry, reference_index in tqdm(list(result), desc="Adding augmentation links", ncols=TQDM_NCOLS):
-                # TODO: Create new augmented artifacts
-                original_link_id = orig_link_ids[reference_index]
-                self._add_link_id(original_link_id)
+            id_ = AbstractDataAugmentationStep.extract_unique_id_from_step_id(step_id)
+            i = 0
+            for entry, reference_index in result:
+                i += 1
+                aug_source_id, aug_target_id = self._get_augmented_artifact_ids(augmented_tokens=entry,
+                                                                                orig_link_id=orig_link_ids[reference_index],
+                                                                                aug_step_id=id_, entry_num=i)
+                aug_source_tokens, aug_target_tokens = entry
+                self.create_and_add_link(source_id=aug_source_id, target_id=aug_target_id,
+                                         source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
 
     def _get_feature_entry(self, arch_type: ModelArchitectureType, feature_func: Callable,
                            link_id: int = None,
@@ -360,6 +406,29 @@ class TraceDataset(iDataset):
         n_links = min(len(self._neg_link_ids), len(self._pos_link_ids))
         self._neg_link_ids = random.sample(self._neg_link_ids, n_links)
         self._pos_link_ids = random.sample(self._pos_link_ids, n_links)
+
+    def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link_id: int, aug_step_id: str,
+                                    entry_num: int) -> Tuple[str, str]:
+        """
+        Gets the augmented artifact ids for the new augmented source and target artifact
+        :param augmented_tokens: the augmented tokens for source and target
+        :param orig_link_id: id of the original link (pre-augmentation)
+        :param aug_step_id: the unique id of the augmentation step
+        :param entry_num: the number for the augmented data entry
+        :return: the augmented source and target ids
+        """
+        orig_link = self.trace_df.get_link(orig_link_id)
+        aug_source_tokens, aug_target_tokens = augmented_tokens
+        aug_source_id, aug_target_id = ("%s%s" % (link_id, aug_step_id) for link_id in
+                                        [orig_link[TraceKeys.SOURCE], orig_link[TraceKeys.TARGET]])
+
+        new_id = TraceDataFrame.generate_link_id(aug_source_id, aug_target_id)
+        if self.trace_df.get_link(new_id) is not None:
+            source, target = self.get_link_source_target_artifact(new_id)
+            if source[ArtifactKeys.CONTENT] != aug_source_tokens or target[ArtifactKeys.CONTENT] != aug_target_tokens:
+                aug_source_id += str(entry_num)
+                aug_target_id += str(entry_num)
+        return aug_source_id, aug_target_id
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

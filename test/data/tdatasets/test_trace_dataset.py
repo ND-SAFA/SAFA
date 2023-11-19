@@ -1,7 +1,6 @@
 import os
 import uuid
 from collections import Counter
-from unittest import skip
 from unittest.mock import patch
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -41,7 +40,6 @@ class TestTraceDataset(BaseTraceTest):
                     "attention_mask": 4}
     FEATURE_KEYS = DataKey.get_feature_entry_keys()
 
-    @skip
     @patch.object(SimpleWordReplacementStep, "_get_word_pos")
     @patch.object(SimpleWordReplacementStep, "_get_synonyms")
     def test_augment_pos_links(self, get_synonym_mock, get_word_pos_mock):
@@ -98,7 +96,6 @@ class TestTraceDataset(BaseTraceTest):
                 self.fail("Expected number of links (%d) does not match actual (%d) for %s" % (
                     expected, actual, str(type(steps[i]))))
 
-    @skip
     def test_add_link(self):
         trace_dataset = self.get_trace_dataset()
         source_tokens, target_tokens = "s_token", "t_token"
@@ -106,7 +103,7 @@ class TestTraceDataset(BaseTraceTest):
         true_source_id, true_target_id = "source_id1", "target_id1"
 
         trace_dataset.trace_df.add_link(source=true_source_id, target=true_target_id, )
-        trace_dataset._add_link_id(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
+        trace_dataset.create_and_add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
         true_link_id = TraceDataFrame.generate_link_id(true_source_id, true_target_id)
         self.assertIn(true_link_id, trace_dataset.trace_df.index)
         self.assertNotIn(true_link_id, trace_dataset.get_neg_link_ids())
@@ -122,7 +119,6 @@ class TestTraceDataset(BaseTraceTest):
         self.assertIn(false_link_id, trace_dataset.get_neg_link_ids())
         self.assertNotIn(false_link_id, trace_dataset.get_pos_link_ids())
 
-    @skip
     def test_get_augmented_artifact_ids(self):
         trace_dataset = self.get_trace_dataset()
         augmented_tokens = ("s_token_aug", "t_token_aug")
@@ -162,7 +158,6 @@ class TestTraceDataset(BaseTraceTest):
             target_body = TestDataManager.get_artifact_body(link[TraceKeys.TARGET])
             self.assertIn((source_body, target_body), data_entries)
 
-    @skip
     def test_create_links_from_augmentation(self):
         ids = ['id1', 'id2']
         orig_links = self.positive_links
@@ -187,6 +182,7 @@ class TestTraceDataset(BaseTraceTest):
                     self.assertIn(id_, target_content)
                     self.assertIn(index, trace_dataset.get_pos_link_ids())
                     n_augmented_links[i] += 1
+
         for count in n_augmented_links:
             self.assertEqual(count, len(orig_links))
 
@@ -230,7 +226,6 @@ class TestTraceDataset(BaseTraceTest):
             self.assertEqual(new_length, len(link_ids))
             self.assertEqual(new_length, len(set(link_ids)))  # no duplicates
 
-    @skip
     def test_augmented_links_for_training(self):
         trace_dataset_aug = self.get_trace_dataset()
         data_augmenter = DataAugmenter([SimpleWordReplacementStep(1, 0.15)])

@@ -5,25 +5,21 @@ from copy import deepcopy
 from os.path import splitext
 from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union
 
+import numpy as np
 import yaml
 from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
+from tgen.common.constants.artifact_constants import CODE_EXTENSIONS
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
     USER_SYM
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.json_util import JsonUtil
-
-CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
-                   "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
-                   "PL", "R", "PY", "JAVA", "VUE", "CC", "SQL"]
 
 ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM, MODEL_PARAM]
-import numpy as np
 
 
 class FileUtil:

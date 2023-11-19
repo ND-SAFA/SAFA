@@ -2,13 +2,14 @@ import os
 import re
 from typing import Dict, Union
 
+from tgen.common.constants.artifact_constants import ALLOWED_CODE_EXTENSIONS
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
 from tgen.data.github.gartifacts.gcommit import GCommit
 from tgen.data.github.gartifacts.gissue import GIssue
-from tgen.data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE2CODE_EXPORT_FILE, \
+from tgen.data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE2CODE_EXPORT_FILE, \
     CODE_ARTIFACT_FILE, \
     CODE_EXPORT_FILE, COMMIT2ISSUE_EXPORT_FILE, COMMITDIFF2ISSUE_EXPORT_FILE, COMMIT_ARTIFACT_FILE, \
     COMMIT_DIFF_EXPORT_FILE, COMMIT_EXPORT_FILE, ISSUE2CODE_EXPORT_FILE, ISSUE_ARTIFACT_FILE, \

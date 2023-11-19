@@ -43,9 +43,6 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         source_artifact_df = state.source_dataset.artifact_df
         state.id_to_cluster_artifacts = self._replace_ids_with_artifacts(cluster_map, source_artifact_df)
 
-    def cluster_seed_seeds(self, args: HGenArgs, state: HGenState):
-        pass
-
     @staticmethod
     def _replace_ids_with_artifacts(cluster_map: ClusterMapType, artifact_df: ArtifactDataFrame):
         """

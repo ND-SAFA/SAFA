@@ -46,7 +46,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         return ArtifactKeys
 
     @staticmethod
-    def get_traceable_content(artifact: EnumDict) -> str:
+    def get_summary_or_content(artifact: EnumDict) -> str:
         """
         Returns the summary if it exists else the content.
         :param artifact: The artifact whose summary or content is extracted.

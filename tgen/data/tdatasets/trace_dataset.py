@@ -79,8 +79,8 @@ class TraceDataset(iDataset):
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])
             label = link[TraceKeys.LABEL]
-            source_text = ArtifactDataFrame.get_traceable_content(source)
-            target_text = ArtifactDataFrame.get_traceable_content(target)
+            source_text = ArtifactDataFrame.get_summary_or_content(source)
+            target_text = ArtifactDataFrame.get_summary_or_content(target)
             new_row = [source_text, target_text, label] if not include_ids else \
                 [source[ArtifactKeys.ID], source_text, target[ArtifactKeys.ID], target_text, label]
             link_ids_to_rows[index] = new_row
@@ -295,8 +295,8 @@ class TraceDataset(iDataset):
         source_target_pairs = []
         for link_id in self._pos_link_ids:
             source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
-            source_text = ArtifactDataFrame.get_traceable_content(source_artifact)
-            target_text = ArtifactDataFrame.get_traceable_content(target_artifact)
+            source_text = ArtifactDataFrame.get_summary_or_content(source_artifact)
+            target_text = ArtifactDataFrame.get_summary_or_content(target_artifact)
             source_target_pairs.append((source_text, target_text))
         return self._pos_link_ids, source_target_pairs
 
@@ -342,8 +342,8 @@ class TraceDataset(iDataset):
             score = DataFrameUtil.get_optional_value_from_df(link, TraceKeys.SCORE)
             label = link[TraceKeys.LABEL]
 
-            source_text = ArtifactDataFrame.get_traceable_content(source_artifact)
-            target_text = ArtifactDataFrame.get_traceable_content(target_artifact)
+            source_text = ArtifactDataFrame.get_summary_or_content(source_artifact)
+            target_text = ArtifactDataFrame.get_summary_or_content(target_artifact)
 
         if arch_type == ModelArchitectureType.SIAMESE:
             entry = {CSVKeys.SOURCE: source_text, CSVKeys.TARGET: target_text, CSVKeys.LABEL: label, CSVKeys.SCORE: score}
@@ -404,8 +404,8 @@ class TraceDataset(iDataset):
         :return: None.
         """
         n_links = min(len(self._neg_link_ids), len(self._pos_link_ids))
-        self._neg_link_ids = random.sample(self._neg_link_ids, n_links)
-        self._pos_link_ids = random.sample(self._pos_link_ids, n_links)
+        self._neg_link_ids = TraceDataset._resize_data(self._neg_link_ids, n_links)
+        self._pos_link_ids = TraceDataset._resize_data(self._pos_link_ids, n_links)
 
     def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link_id: int, aug_step_id: str,
                                     entry_num: int) -> Tuple[str, str]:

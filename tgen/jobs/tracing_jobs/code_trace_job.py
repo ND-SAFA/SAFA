@@ -1,5 +1,6 @@
 import os
 
+from tgen.common.util.file_util import FileUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -8,17 +9,20 @@ from tgen.tracing.code.code_tracer import CodeTracer
 
 
 class TraceCodeJob(AbstractJob):
-    def __init__(self, dataset_creator: TraceDatasetCreator, export_dir: str, add_packages: bool = True):
+    def __init__(self, dataset_creator: TraceDatasetCreator, export_dir: str, add_packages: bool = True,
+                 extensions: str = None):
         """
         Creates code tracer for a defined dataset.
         :param dataset_creator: The creator used to generate the dataset.
         :param export_dir: The path to the directory to export dataset to.
         :param add_packages: Whether to add packages as artifacts.
+        :param extensions: The file extensions to keep.
         """
         super().__init__()
         self.dataset_creator = dataset_creator
         self.export_dir = export_dir
         self.add_packages = add_packages
+        self.extensions = extensions.split(",") if extensions else None
 
     def _run(self):
         """
@@ -26,6 +30,11 @@ class TraceCodeJob(AbstractJob):
         :return: None (datasets with changes are exported).
         """
         trace_dataset = self.dataset_creator.create()
+        if self.extensions:
+            artifact_names = [f for f in trace_dataset.artifact_df.index
+                              if FileUtil.get_file_ext(f) in self.extensions]
+            trace_dataset.artifact_df = trace_dataset.artifact_df.filter_by_index(artifact_names)
+
         code_tracer = CodeTracer(trace_dataset)
         code_tracer.trace(add_packages=self.add_packages)
 

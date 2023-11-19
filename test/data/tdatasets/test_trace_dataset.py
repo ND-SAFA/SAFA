@@ -4,6 +4,7 @@ from collections import Counter
 from unittest.mock import patch
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
@@ -100,6 +101,8 @@ class TestTraceDataset(BaseTraceTest):
         source_tokens, target_tokens = "s_token", "t_token"
 
         true_source_id, true_target_id = "source_id1", "target_id1"
+
+        trace_dataset.trace_df.add_link(source=true_source_id, target=true_target_id, )
         trace_dataset.create_and_add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
         true_link_id = TraceDataFrame.generate_link_id(true_source_id, true_target_id)
         self.assertIn(true_link_id, trace_dataset.trace_df.index)
@@ -179,6 +182,7 @@ class TestTraceDataset(BaseTraceTest):
                     self.assertIn(id_, target_content)
                     self.assertIn(index, trace_dataset.get_pos_link_ids())
                     n_augmented_links[i] += 1
+
         for count in n_augmented_links:
             self.assertEqual(count, len(orig_links))
 
@@ -222,7 +226,7 @@ class TestTraceDataset(BaseTraceTest):
             self.assertEqual(new_length, len(link_ids))
             self.assertEqual(new_length, len(set(link_ids)))  # no duplicates
 
-    def test_prepare_for_training(self):
+    def test_augmented_links_for_training(self):
         trace_dataset_aug = self.get_trace_dataset()
         data_augmenter = DataAugmenter([SimpleWordReplacementStep(1, 0.15)])
         trace_dataset_aug.prepare_for_training(data_augmenter)
@@ -235,12 +239,12 @@ class TestTraceDataset(BaseTraceTest):
 
     def test_get_feature_entry_siamese(self):
         trace_dataset, test_link, source_text, target_text = self.get_single_testing_link()
-
         input_example = trace_dataset._get_feature_entry(ModelArchitectureType.SIAMESE, None, link_id=test_link[TraceKeys.LINK_ID])
-        feature_s_text, feature_t_text = input_example.texts
+        feature_s_text = input_example[CSVKeys.SOURCE]
+        feature_t_text = input_example[CSVKeys.TARGET]
         self.assertEqual(source_text, feature_s_text)
         self.assertEqual(target_text, feature_t_text)
-        self.assertEqual(test_link[TraceKeys.LABEL], input_example.label)
+        self.assertEqual(test_link[TraceKeys.LABEL], input_example[CSVKeys.LABEL])
 
     def test_get_feature_entry_single(self):
         trace_dataset, test_link, source_text, target_text = self.get_single_testing_link()

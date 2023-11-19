@@ -7,7 +7,7 @@
           "task": "PUSH",
           "job_args": {
             "random_seed": 812,
-            "output_dir": "[OUTPUT_DIR]/push/[EXPORT_MODEL_NAME]"
+            "output_dir": "[OUTPUT_PATH]/push/[EXPORT_MODEL_NAME]"
           },
           "model_manager": {
             "model_path": "[MODEL_PATH]",

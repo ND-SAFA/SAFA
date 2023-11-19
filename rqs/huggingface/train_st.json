@@ -8,12 +8,14 @@
           "trainer": "ST",
           "job_args": {
             "random_seed": 812,
-            "output_dir": "[OUTPUT_DIR]/train-st/[TRAIN_PROJECT]"
+            "output_dir": "[OUTPUT_PATH]/train-st/[TRAIN_PROJECT]"
           },
           "model_manager": {
             "model_path": "[BASE_MODEL]"
           },
           "trainer_args": {
+            "st_loss_function": "[LOSS_FUNCTION]",
+            "use_scores": "[USE_SCORES_BOOL]",
             "output_dir": "[OUTPUT_PATH]",
             "best_model_path": "[MODEL_PATH]/[BEST_MODEL_NAME]",
             "num_train_epochs": "[EPOCHS_INT]",
@@ -23,7 +25,9 @@
             "load_best_model_at_end": true,
             "save_strategy": "epoch",
             "evaluation_strategy": "epoch",
-            "eval_steps": 1
+            "eval_steps": 1,
+            "gradient_accumulation_steps": "[GRADIENT_ACCUMULATION_STEPS_INT]",
+            "do_training_eval": "[DO_TRAINING_EVAL_BOOL]"
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
@@ -46,11 +50,7 @@
               }
             },
             "augmenter": {
-              "steps": [
-                {
-                  "object_type": "RESAMPLE"
-                }
-              ]
+              "steps": []
             }
           }
         }

@@ -26,21 +26,38 @@ EmbeddingType = np.array
 
 class EmbeddingsManager:
 
-    def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None):
+    def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None,
+                 show_progress_bar: bool = True):
         """
         Initializes the embedding manager with the content used to create embeddings
         :param content_map: Maps id to the corresponding content
         :param model_name: Name of model to use for creating embeddings
         :param model: The model to use to embed artifacts.
+        :param show_progress_bar: Whether to show progress bar when calculating batches.
         """
         assert model_name is not None or model is not None, f"Expected model or model name to be defined but got None for both."
         self.model_name = model_name
+        self.show_progress_bar = show_progress_bar
         self._content_map = content_map
         self._embedding_map = {}
         self.__ordered_ids = []
         self._base_path = None
         self.__model = model
         self.__state_changed_since_last_save = False
+
+    @staticmethod
+    def create_from_content(content_list: List[str], **kwargs) -> "EmbeddingsManager":
+        """
+        Creates embeddings manager mapping content in list to its embeddings.
+        :param content_list: The content list to create embeddings for.
+        :param kwargs: Keyword arguments passed to embeddings manager.
+        :return: EmbeddingsManager.
+        """
+        content_list = list(set(content_list))
+        content_map = {c: c for c in content_list}
+        embeddings_manager = EmbeddingsManager(content_map, **kwargs)
+        embeddings_manager.create_artifact_embeddings()
+        return embeddings_manager
 
     def create_artifact_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:
         """
@@ -59,8 +76,7 @@ class EmbeddingsManager:
         :param subset_ids: The IDs of the set of the entries to use.
         :return: Map of id to embedding.
         """
-        if subset_ids is None:
-            subset_ids = self._content_map.keys()
+        subset_ids = self._get_default_artifact_ids(subset_ids)
         artifact_embeddings = self.get_embeddings(subset_ids, **kwargs)
         embedding_map = {a_id: a_embedding for a_id, a_embedding in zip(subset_ids, artifact_embeddings)}
 
@@ -319,6 +335,14 @@ class EmbeddingsManager:
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
 
+    def _get_default_artifact_ids(self, artifact_ids: List[str] = None):
+        """
+        Returns the artifact ids if not None otherwise return list of all artifact ids.
+        :param artifact_ids: Inputted artifact ids to evaluate.
+        :return: The artifact ids.
+        """
+        return artifact_ids if artifact_ids is not None else self._content_map.keys()
+
     def __encode(self, subset_ids: Union[List[Any], Any], include_ids: bool = False, **kwargs) -> List:
         """
         Encodes the artifacts corresponding to the ids in the list
@@ -334,7 +358,9 @@ class EmbeddingsManager:
         artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
         if include_ids:
             artifact_contents = [f"{a_id}: {content}" for a_id, content in zip(subset_ids, artifact_contents)]
-        embeddings = self.get_model().encode(artifact_contents, show_progress_bar=True)
+        if not self.show_progress_bar:
+            logger.info("Calculating embeddings for artifacts...")
+        embeddings = self.get_model().encode(artifact_contents, show_progress_bar=self.show_progress_bar)
         return embeddings if return_as_list else embeddings[0]
 
     def __set_embedding_order(self, ordered_ids: List[Any] = None) -> None:

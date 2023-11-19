@@ -1,10 +1,10 @@
 import os
 
+from tgen.common.constants.artifact_constants import ALLOWED_CODE_EXTENSIONS
+from tgen.common.util.file_util import FileUtil
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
-from tgen.data.github.github_constants import ALLOWED_CODE_EXTENSIONS
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.common.util.file_util import FileUtil
 
 
 class TestGCodeFile(BaseTest):

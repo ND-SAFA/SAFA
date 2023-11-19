@@ -1,24 +1,24 @@
 import random
 from collections import Counter
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 from datasets import Dataset
-from sentence_transformers import InputExample
-from tgen.common.logging.logger_manager import logger
 from tqdm import tqdm
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.logging_constants import TQDM_NCOLS
+from tgen.common.logging.logger_manager import logger
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.csv_keys import CSVKeys
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, StructuredKeys, TraceKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -67,32 +67,6 @@ class TraceDataset(iDataset):
             self.__trace_matrix = TraceMatrix(self.trace_df, randomize=self.randomize)
         return self.__trace_matrix
 
-    def to_hf_dataset(self, model_manager: ModelManager) -> Dataset:
-        """
-        Converts trace links in data to Huggingface (HF) dataset.
-        :param model_manager: The model generator determining architecture and feature function for trace links.
-        :return: A HF dataset.
-        """
-
-        def encode(batch: Dict[str, List[Union[str, int]]]) -> Dict:
-            """
-            Encodes the batch.
-            :param batch: The batch of examples to encode into features.
-            """
-            features = []
-            for source, target, label in zip(batch[CSVKeys.SOURCE], batch[CSVKeys.TARGET], batch[CSVKeys.LABEL]):
-                feature = self._get_feature_entry(model_manager.arch_type, model_manager.get_feature,
-                                                  source_text=source, target_text=target, label=label)
-                features.append(feature)
-            return pd.DataFrame(features).to_dict()
-
-        logger.info("Transforming to HF dataset...")
-        hf_dataset = Dataset.from_pandas(self.to_dataframe(include_ids=False))
-        logger.info("Dataframe has been created....")
-        hf_dataset.set_transform(encode)
-        logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
-        return hf_dataset
-
     def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
@@ -105,17 +79,48 @@ class TraceDataset(iDataset):
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])
             label = link[TraceKeys.LABEL]
-            new_row = [source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT], label] if not include_ids else \
-                [source[ArtifactKeys.ID], source[ArtifactKeys.CONTENT], target[ArtifactKeys.ID], target[ArtifactKeys.CONTENT], label]
+            source_text = ArtifactDataFrame.get_summary_or_content(source)
+            target_text = ArtifactDataFrame.get_summary_or_content(target)
+            new_row = [source_text, target_text, label] if not include_ids else \
+                [source[ArtifactKeys.ID], source_text, target[ArtifactKeys.ID], target_text, label]
             link_ids_to_rows[index] = new_row
 
         data = [link_ids_to_rows[link_id] for link_id in self.get_ordered_link_ids()]
-        cols = [CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL] if not include_ids else [CSVKeys.SOURCE_ID, CSVKeys.SOURCE,
-                                                                                        CSVKeys.TARGET_ID, CSVKeys.TARGET,
-                                                                                        CSVKeys.LABEL]
-        return pd.DataFrame(data, columns=cols)
+        cols = [CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL] if not include_ids else [
+            CSVKeys.SOURCE_ID, CSVKeys.SOURCE,
+            CSVKeys.TARGET_ID, CSVKeys.TARGET,
+            CSVKeys.LABEL]
+        new_data = pd.DataFrame(data, columns=cols)
+        return new_data
 
-    def get_link_source_target_artifact(self, link_id: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def to_hf_dataset(self, model_manager: ModelManager, use_pos_ids: bool = False) -> Dataset:
+        """
+        Converts trace links in data to Huggingface (HF) dataset.
+        :param model_manager: The model generator determining architecture and feature function for trace links.
+        :param use_pos_ids: Whether to only use positive ids.
+        :return: A HF dataset.
+        """
+
+        def encode(link_entry: Dict) -> Dict:
+            """
+            Encodes the batch.
+            :param link_entry: The current entry in the dataset to convert.
+            """
+            features = []
+            for link_id in link_entry[StructuredKeys.Trace.LINK_ID.value]:
+                feature = self._get_feature_entry(model_manager.arch_type, model_manager.get_feature, link_id=link_id)
+                features.append(feature)
+            return pd.DataFrame(features).to_dict()
+
+        logger.info("Converting trace data frame to hugging face dataset.")
+        link_ids = set(self._pos_link_ids) if use_pos_ids else self.get_ordered_link_ids()
+        trace_ids = [{StructuredKeys.Trace.LINK_ID.value: link_id} for link_id in link_ids]
+        hf_dataset = Dataset.from_list(trace_ids)
+        hf_dataset.set_transform(encode)
+        logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
+        return hf_dataset
+
+    def get_link_source_target_artifact(self, link_id: int) -> Tuple[EnumDict, EnumDict]:
         """
         Gets the source and target artifact making up the given link
         :param link_id: The id of the link to get the source and target of
@@ -126,41 +131,18 @@ class TraceDataset(iDataset):
         target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])
         return source, target
 
-    def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
-                            is_true_link: bool) -> int:
+    def _add_link_id(self, link_id: int) -> None:
         """
-        Adds a link to the dataset
-        :param source_id: the id of the source artifact
-        :param target_id: the id of the target artifact
-        :param source_tokens: the content of the source artifact
-        :param target_tokens: the content of the target artifact
-        :param is_true_link: True if the artifact are positively linked else False
-        :return: the new link id
-        """
-        source = self.artifact_df.add_artifact(source_id, source_tokens)
-        target = self.artifact_df.add_artifact(target_id, target_tokens)
-        new_link = self.trace_df.add_link(source_id, target_id, int(is_true_link))
-        if is_true_link:
-            self._pos_link_ids.append(new_link[TraceKeys.LINK_ID])
-        else:
-            self._neg_link_ids.append(new_link[TraceKeys.LINK_ID])
-        return new_link[TraceKeys.LINK_ID]
-
-    def augment_pos_links(self, augmenter: DataAugmenter) -> None:
-        """
-        Augments the positive links to balance the data using the given augmentation steps
-        :param augmenter: the augmentation to use for augmentation
+        Adds link with given id to set of positive / negative links.
+        :param link_id: ID of link to add.
         :return: None
         """
-
-        augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
-                                                        exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: augmenter.run(data, n_total_expected=len(self._neg_link_ids),
-                                                        include_all_but_step_type=SourceTargetSwapStep)]
-        for run in augmentation_runs:
-            pos_links, data_entries = self._get_data_entries_for_augmentation()
-            augmentation_results = run(data_entries)
-            self._create_links_from_augmentation(augmentation_results, pos_links)
+        link = self.trace_df.get_link(link_id)
+        is_true_link = link[TraceKeys.LABEL] == 1
+        if is_true_link:
+            self._pos_link_ids.append(link_id)
+        else:
+            self._neg_link_ids.append(link_id)
 
     def get_ordered_link_ids(self) -> List[int]:
         """
@@ -212,6 +194,7 @@ class TraceDataset(iDataset):
         if len(self._pos_link_ids) > 0:
             if augmenter:
                 self.augment_pos_links(augmenter)
+                self.balance_links()
 
     def prepare_for_testing(self) -> None:
         """
@@ -248,6 +231,62 @@ class TraceDataset(iDataset):
         """
         return list(self.trace_df.filter_by_row(lambda row: row[TraceKeys.LABEL.value] == label).index)
 
+    def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
+                            is_true_link: bool) -> int:
+        """
+        Adds a link to the dataset
+        :param source_id: the id of the source artifact
+        :param target_id: the id of the target artifact
+        :param source_tokens: the content of the source artifact
+        :param target_tokens: the content of the target artifact
+        :param is_true_link: True if the artifact are positively linked else False
+        :return: the new link id
+        """
+        source = self.artifact_df.add_artifact(source_id, source_tokens)
+        target = self.artifact_df.add_artifact(target_id, target_tokens)
+        new_link = self.trace_df.add_link(source_id, target_id, int(is_true_link))
+        if is_true_link:
+            self._pos_link_ids.append(new_link[TraceKeys.LINK_ID])
+        else:
+            self._neg_link_ids.append(new_link[TraceKeys.LINK_ID])
+        return new_link[TraceKeys.LINK_ID]
+
+    def augment_pos_links(self, augmenter: DataAugmenter) -> None:
+        """
+        Augments the positive links to balance the data using the given augmentation steps
+        :param augmenter: the augmentation to use for augmentation
+        :return: None
+        """
+
+        augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
+                                                        exclude_all_but_step_type=SourceTargetSwapStep),
+                             lambda data: augmenter.run(data, n_total_expected=len(self._neg_link_ids),
+                                                        include_all_but_step_type=SourceTargetSwapStep)]
+        for run in augmentation_runs:
+            pos_links, data_entries = self._get_data_entries_for_augmentation()
+            augmentation_results = run(data_entries)
+            self._create_links_from_augmentation(augmentation_results, pos_links)
+
+    def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
+                                        orig_link_ids: List[int]) -> None:
+        """
+        Creates new trace links from the results of an augmentation step
+        :param augmentation_results: the augmentation step id mapped to its results
+        :param orig_link_ids: a list of all the original link ids (pre-augmentation) that the step was run on
+        :return: None
+        """
+        for step_id, result in augmentation_results.items():
+            id_ = AbstractDataAugmentationStep.extract_unique_id_from_step_id(step_id)
+            i = 0
+            for entry, reference_index in result:
+                i += 1
+                aug_source_id, aug_target_id = self._get_augmented_artifact_ids(augmented_tokens=entry,
+                                                                                orig_link_id=orig_link_ids[reference_index],
+                                                                                aug_step_id=id_, entry_num=i)
+                aug_source_tokens, aug_target_tokens = entry
+                self.create_and_add_link(source_id=aug_source_id, target_id=aug_target_id,
+                                         source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:
         """
         Gets the data entries (link source, target, token pairs) for the augmentation
@@ -255,8 +294,10 @@ class TraceDataset(iDataset):
         """
         source_target_pairs = []
         for link_id in self._pos_link_ids:
-            source, target = self.get_link_source_target_artifact(link_id)
-            source_target_pairs.append((source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT]))
+            source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
+            source_text = ArtifactDataFrame.get_summary_or_content(source_artifact)
+            target_text = ArtifactDataFrame.get_summary_or_content(target_artifact)
+            source_target_pairs.append((source_text, target_text))
         return self._pos_link_ids, source_target_pairs
 
     def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
@@ -279,31 +320,9 @@ class TraceDataset(iDataset):
                 self.create_and_add_link(source_id=aug_source_id, target_id=aug_target_id,
                                          source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
 
-    def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link_id: int, aug_step_id: str,
-                                    entry_num: int) -> Tuple[str, str]:
-        """
-        Gets the augmented artifact ids for the new augmented source and target artifact
-        :param augmented_tokens: the augmented tokens for source and target
-        :param orig_link_id: id of the original link (pre-augmentation)
-        :param aug_step_id: the unique id of the augmentation step
-        :param entry_num: the number for the augmented data entry
-        :return: the augmented source and target ids
-        """
-        orig_link = self.trace_df.get_link(orig_link_id)
-        aug_source_tokens, aug_target_tokens = augmented_tokens
-        aug_source_id, aug_target_id = ("%s%s" % (link_id, aug_step_id) for link_id in
-                                        [orig_link[TraceKeys.SOURCE], orig_link[TraceKeys.TARGET]])
-
-        new_id = TraceDataFrame.generate_link_id(aug_source_id, aug_target_id)
-        if self.trace_df.get_link(new_id) is not None:
-            source, target = self.get_link_source_target_artifact(new_id)
-            if source[ArtifactKeys.CONTENT] != aug_source_tokens or target[ArtifactKeys.CONTENT] != aug_target_tokens:
-                aug_source_id += str(entry_num)
-                aug_target_id += str(entry_num)
-        return aug_source_id, aug_target_id
-
-    def _get_feature_entry(self, arch_type: ModelArchitectureType, feature_func: Callable, link_id: int = None,
-                           source_text: str = None, target_text: str = None, label: int = None) -> Dict[str, any]:
+    def _get_feature_entry(self, arch_type: ModelArchitectureType, feature_func: Callable,
+                           link_id: int = None,
+                           source_text: str = None, target_text: str = None, label: int = None, score: float = None) -> Dict[str, any]:
         """
         Gets a representational dictionary of the feature to be used in the data
         :param arch_type: The model architecture determining features.
@@ -312,18 +331,22 @@ class TraceDataset(iDataset):
         :param source_text: ID of the source artifact.
         :param target_text: ID of the target artifact.
         :param label: Label of trace link.
+        :param score: Score of the trace link.
         :return: feature name, value mappings
         """
         has_link_info = all([a is not None for a in [source_text, target_text, label]])
         assert has_link_info or link_id is not None, "Expected link id or feature info."
         if link_id:
             source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
-            label = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
-            source_text = source_artifact[ArtifactKeys.CONTENT]
-            target_text = target_artifact[ArtifactKeys.CONTENT]
+            link = self.trace_df.get_link(link_id)
+            score = DataFrameUtil.get_optional_value_from_df(link, TraceKeys.SCORE)
+            label = link[TraceKeys.LABEL]
+
+            source_text = ArtifactDataFrame.get_summary_or_content(source_artifact)
+            target_text = ArtifactDataFrame.get_summary_or_content(target_artifact)
 
         if arch_type == ModelArchitectureType.SIAMESE:
-            entry = InputExample(texts=[source_text, target_text], label=float(label))
+            entry = {CSVKeys.SOURCE: source_text, CSVKeys.TARGET: target_text, CSVKeys.LABEL: label, CSVKeys.SCORE: score}
         else:
             feature = feature_func(text=source_text,
                                    text_pair=target_text,
@@ -374,6 +397,38 @@ class TraceDataset(iDataset):
         from tgen.data.readers.structured_project_reader import StructuredProjectReader
         SafaExporter(project_path, dataset=self).export()
         return TraceDatasetCreator(project_reader=StructuredProjectReader(project_path=FileUtil.collapse_paths(project_path)))
+
+    def balance_links(self) -> None:
+        """
+        Balances the positive and negative links.
+        :return: None.
+        """
+        n_links = min(len(self._neg_link_ids), len(self._pos_link_ids))
+        self._neg_link_ids = TraceDataset._resize_data(self._neg_link_ids, n_links)
+        self._pos_link_ids = TraceDataset._resize_data(self._pos_link_ids, n_links)
+
+    def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link_id: int, aug_step_id: str,
+                                    entry_num: int) -> Tuple[str, str]:
+        """
+        Gets the augmented artifact ids for the new augmented source and target artifact
+        :param augmented_tokens: the augmented tokens for source and target
+        :param orig_link_id: id of the original link (pre-augmentation)
+        :param aug_step_id: the unique id of the augmentation step
+        :param entry_num: the number for the augmented data entry
+        :return: the augmented source and target ids
+        """
+        orig_link = self.trace_df.get_link(orig_link_id)
+        aug_source_tokens, aug_target_tokens = augmented_tokens
+        aug_source_id, aug_target_id = ("%s%s" % (link_id, aug_step_id) for link_id in
+                                        [orig_link[TraceKeys.SOURCE], orig_link[TraceKeys.TARGET]])
+
+        new_id = TraceDataFrame.generate_link_id(aug_source_id, aug_target_id)
+        if self.trace_df.get_link(new_id) is not None:
+            source, target = self.get_link_source_target_artifact(new_id)
+            if source[ArtifactKeys.CONTENT] != aug_source_tokens or target[ArtifactKeys.CONTENT] != aug_target_tokens:
+                aug_source_id += str(entry_num)
+                aug_target_id += str(entry_num)
+        return aug_source_id, aug_target_id
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

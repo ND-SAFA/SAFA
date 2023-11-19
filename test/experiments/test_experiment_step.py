@@ -3,10 +3,9 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from tgen.common.constants.deliminator_constants import PERIOD
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.status import Status
-from tgen.common.constants.deliminator_constants import PERIOD
-from tgen.common.constants.experiment_constants import BASE_EXPERIMENT_NAME
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
@@ -126,7 +125,7 @@ class TestExperimentStep(BaseExperimentTest):
         job1.model_manager = ModelManager("bert-base-uncased")
         experiment_step = ExperimentStep([job1, job2])
         experiment_step.update_output_path(output_dir)
-        self.assertEqual(job1.model_manager.output_dir, os.path.join(output_dir, BASE_EXPERIMENT_NAME, "models"))
+        self.assertEqual(job1.model_manager.output_dir, os.path.join(output_dir, "models"))
 
     @staticmethod
     def get_experiment_step(train=True) -> ExperimentStep:

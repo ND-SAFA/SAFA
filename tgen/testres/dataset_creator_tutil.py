@@ -1,15 +1,19 @@
-from typing import Dict, List
+from typing import List
 
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.testres.object_creator import ObjectCreator
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
+EVAL_CREATOR_PARAM = "eval_dataset_creator"
+VAL_CREATOR_PARAM = "val_dataset_creator"
+
 
 class DatasetCreatorTUtil:
 
     @staticmethod
-    def create_trainer_dataset_manager(additional_roles: List[DatasetRole] = None, kwargs: Dict = None) -> TrainerDatasetManager:
+    def create_trainer_dataset_manager(additional_roles: List[DatasetRole] = None, val_percentage: float = 0.3,
+                                       **kwargs) -> TrainerDatasetManager:
         """
         Creates dataset manager containing datasets in roles.
         :param additional_roles: Additional dataset roles to include.
@@ -21,14 +25,14 @@ class DatasetCreatorTUtil:
         if kwargs is None:
             kwargs = {}
         trainer_dataset_manager_definition = {**kwargs}
-        if DatasetRole.EVAL in additional_roles:
-            trainer_dataset_manager_definition["eval_dataset_creator"] = {
+        if DatasetRole.EVAL in additional_roles and EVAL_CREATOR_PARAM not in trainer_dataset_manager_definition:
+            trainer_dataset_manager_definition[EVAL_CREATOR_PARAM] = {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **ObjectCreator.dataset_creator_definition
             }
-        if DatasetRole.VAL in additional_roles:
-            trainer_dataset_manager_definition["val_dataset_creator"] = {
+        if DatasetRole.VAL in additional_roles and VAL_CREATOR_PARAM not in trainer_dataset_manager_definition:
+            trainer_dataset_manager_definition[VAL_CREATOR_PARAM] = {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
-                "val_percentage": .3
+                "val_percentage": val_percentage
             }
         return ObjectCreator.create(TrainerDatasetManager, **trainer_dataset_manager_definition)

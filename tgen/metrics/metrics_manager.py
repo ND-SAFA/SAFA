@@ -2,11 +2,11 @@ import warnings
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
-from datasets import load_metric
+from evaluate import load
 from scipy.special import softmax
 
-from tgen.common.objects.trace import Trace
 from tgen.common.logging.logger_manager import logger
+from tgen.common.objects.trace import Trace
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
@@ -54,7 +54,7 @@ class MetricsManager:
         scores = list(map(lambda p: 1 if p >= 0.5 else 0, self.trace_matrix.scores))
         labels = self.trace_matrix.labels
         for metric_path in metric_paths:
-            metric = load_metric(metric_path, keep_in_memory=True)
+            metric = load(metric_path, keep_in_memory=True)
             args = {"trace_matrix": self.trace_matrix} if metric.name in trace_matrix_metrics else {}
             metric_name = get_metric_name(metric)
             try:

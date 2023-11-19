@@ -1,3 +1,5 @@
+import numpy as np
+
 MAX_SEQ_LENGTH_DEFAULT = 512
 N_EPOCHS_DEFAULT = 3
 TRAIN_BATCH_SIZE_DEFAULT = 8
@@ -21,3 +23,10 @@ SMALL_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TEXT_PARAM = "text"
 INPUT_IDS_PARAM = "input_ids"
 TRAIN_PARAM = "train"
+POS_LINK = 1
+NEG_LINK = 0
+SEPARATOR_BAR = "-" * 50
+EmbeddingType = np.array  # TODO: Merge with embedding type.
+DEFAULT_EVAL_METRIC = "f2"
+DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
+DEFAULT_SAVE_BEST_MODEL = True

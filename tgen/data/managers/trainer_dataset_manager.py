@@ -252,6 +252,19 @@ class TrainerDatasetManager(BaseObject):
         if not isinstance(index_value, DatasetRole):
             raise Exception(f"Expected index to be data role but got {index_value}")
 
+    def get_split_size(self, dataset_role: DatasetRole) -> Optional[float]:
+        """
+        Returns the size of the split at the given dataset role.
+        :param dataset_role: The role of the split size to return.
+        :return: The split size if role is split dataset creator else None.
+        """
+        for role, creator in self._dataset_creators.items():
+            if role != dataset_role:
+                continue
+            if isinstance(creator, SplitDatasetCreator):
+                return creator.val_percentage
+        return None
+
     def __getitem__(self, dataset_role: DatasetRole) -> Optional[DATASET_TYPE]:
         """
         Returns the data corresponding to role.

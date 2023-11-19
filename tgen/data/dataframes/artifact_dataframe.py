@@ -45,6 +45,18 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return ArtifactKeys
 
+    @staticmethod
+    def get_summary_or_content(artifact: EnumDict) -> str:
+        """
+        Returns the summary if it exists else the content.
+        :param artifact: The artifact whose summary or content is extracted.
+        :return: The traceable string.
+        """
+        artifact_summary = DataFrameUtil.get_optional_value_from_df(artifact, StructuredKeys.Artifact.SUMMARY)
+        if artifact_summary is None:
+            return artifact[StructuredKeys.Artifact.CONTENT]
+        return artifact_summary
+
     def add_artifacts(self, artifacts: List[Artifact]) -> None:
         """
         Adds artifacts to data frame.

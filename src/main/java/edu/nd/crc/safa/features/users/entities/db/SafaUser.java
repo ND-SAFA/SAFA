@@ -52,9 +52,6 @@ public class SafaUser implements Serializable, IUser {
     private boolean superuser;
 
     @Column
-    private boolean superuserActive;
-
-    @Column
     private boolean verified;
 
     public SafaUser(String email, String password) {

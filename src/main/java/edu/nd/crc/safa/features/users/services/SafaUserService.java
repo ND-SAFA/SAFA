@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.authentication.SafaUserDetails;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
@@ -75,8 +76,8 @@ public class SafaUserService {
 
         safaUser = this.safaUserRepository.save(safaUser);  // Save once so it gets an id
 
-        Organization personalOrg =
-            organizationService.createNewOrganization(new Organization(email, "", safaUser, "free", true));
+        Organization personalOrg = organizationService.createNewOrganization(
+            new Organization(email, "", safaUser, PaymentTier.AS_NEEDED, true));
         safaUser.setPersonalOrgId(personalOrg.getId());
         safaUser.setDefaultOrgId(personalOrg.getId());
         safaUser = this.safaUserRepository.save(safaUser);  // Save again so it gets the org id

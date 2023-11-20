@@ -1,14 +1,18 @@
 package edu.nd.crc.safa.utilities.graphql.services;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
+import edu.nd.crc.safa.utilities.exception.RateLimitedException;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
@@ -17,15 +21,21 @@ import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
 public class GraphQlService {
+
+    private static final Logger logger = Logger.getLogger(GraphQlService.class.getName());
+
+    private static final int NUM_RETRIES = 3;
 
     private final WebClient webClient;
 
@@ -80,7 +90,7 @@ public class GraphQlService {
     }
 
     /**
-     * Performs a request against the GitHub GraphQL endpoint. Users should be aware of if their query
+     * Performs a request against a GraphQL endpoint. Users should be aware of if their query
      * will require pagination or not, and if so, they should call {@link Paginatable#paginate(SafaUser)}
      * to make sure pagination is handled. When in doubt, perform the pagination, unless you are already
      * within a pagination loop.
@@ -97,12 +107,48 @@ public class GraphQlService {
     public <T extends GraphQlResponse<?>> T makeGraphQlRequest(String url, String queryLocation,
                                                                String authorization, Class<T> responseClass,
                                                                String... variables)  {
+        return makeGraphQlRequest(url, queryLocation, authorization, responseClass, NUM_RETRIES, variables);
+    }
+
+    /**
+     * Performs a request against a GraphQL endpoint. Users should be aware of if their query
+     * will require pagination or not, and if so, they should call {@link Paginatable#paginate(SafaUser)}
+     * to make sure pagination is handled. When in doubt, perform the pagination, unless you are already
+     * within a pagination loop.
+     *
+     * @param url The url to send the request to.
+     * @param queryLocation Location relative to {@code src/main/resources/graphql} of the query definition.
+     * @param authorization The authorization header to send with the request.
+     *                      Can be null if no authorization is needed.
+     * @param responseClass The class that represents the schema that will be returned by the query.
+     * @param retries The number of times to retry the query before giving up
+     * @param variables Variables to be passed to the query.
+     * @param <T> The query return type.
+     * @return The result of the query.
+     */
+    public <T extends GraphQlResponse<?>> T makeGraphQlRequest(String url, String queryLocation,
+                                                               String authorization, Class<T> responseClass,
+                                                               int retries, String... variables)  {
 
         GraphqlRequestBody graphQLRequestBody = new GraphqlRequestBody();
         graphQLRequestBody.setQuery(loadQueryFromFile(queryLocation));
         addVariables(graphQLRequestBody, variables);
 
-        return createRequest(url, authorization, graphQLRequestBody, responseClass).block();
+        Mono<T> request = createRequest(url, authorization, graphQLRequestBody, responseClass)
+            .retry(retries);
+        T response = request.block();
+        resolveErrors(response);
+        return response;
+    }
+
+    private <T extends GraphQlResponse<?>> void resolveErrors(T response) {
+        if (response != null && response.getData() == null
+            && response.getErrors() != null && !response.getErrors().isEmpty()) {
+
+            // TODO this could probably be more robust
+            throw new SafaError("The following errors were returned when trying to make the request: "
+                + response.getErrors());
+        }
     }
 
     /**
@@ -159,7 +205,34 @@ public class GraphQlService {
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .bodyValue(graphQLRequestBody)
             .retrieve()
-            .bodyToMono(responseClass);
+            .toEntity(responseClass)
+            .doOnSuccess(response -> checkRateLimit(url, response.getHeaders()))
+            .mapNotNull(HttpEntity::getBody)
+            .onErrorMap(ex -> ex instanceof WebClientResponseException, ex -> {
+                WebClientResponseException responseException = (WebClientResponseException) ex;
+                return new ExternalAPIException(responseException.getMessage(), responseException.getStatusCode(),
+                    responseException.getResponseBodyAsString());
+            });
+    }
+
+    private void checkRateLimit(String url, HttpHeaders headers) {
+        List<String> values = headers.get("X-RateLimit-Remaining");
+        if (values != null && !values.isEmpty()) {
+            int remaining = Integer.parseInt(values.get(0));
+
+            if (remaining == 0) {
+                List<String> resetValues = headers.get("X-RateLimit-Reset");
+                if (resetValues != null && !resetValues.isEmpty()) {
+                    long resetTimestamp = Long.parseLong(resetValues.get(0));
+                    throw new RateLimitedException(Instant.ofEpochSecond(resetTimestamp));
+                } else {
+                    throw new RateLimitedException();
+                }
+            }
+            if (remaining < 100) {
+                logger.warning(String.format("Remaining calls to %s: %d", url, remaining));
+            }
+        }
     }
 
     @Data

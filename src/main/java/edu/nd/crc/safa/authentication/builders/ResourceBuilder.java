@@ -24,6 +24,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,9 +34,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResourceBuilder {
     private final ServiceProvider serviceProvider;
-    
-    public ResourceBuilder() {
-        serviceProvider = ServiceProvider.getInstance();
+
+    @Autowired
+    public ResourceBuilder(ServiceProvider serviceProvider) {
+        this.serviceProvider = serviceProvider;
     }
 
     /**

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -125,6 +127,11 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
             .get();
         this.currentUser.setPassword(defaultUserPassword);
         setAuthorization(this.currentUser);
+
+        // TODO endpoint to set payment tier
+        Organization defaultOrg = serviceProvider.getOrganizationService().getOrganizationById(currentUser.getDefaultOrgId());
+        defaultOrg.setPaymentTier(PaymentTier.UNLIMITED);
+        serviceProvider.getOrganizationService().updateOrganization(defaultOrg);
     }
 
     /**

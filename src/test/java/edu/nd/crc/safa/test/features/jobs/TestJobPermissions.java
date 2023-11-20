@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.test.features.memberships.permissions.AbstractPermissionViolationTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
@@ -46,7 +47,7 @@ public class TestJobPermissions extends AbstractPermissionViolationTest {
             () -> SafaRequest.withRoute(AppRoutes.Jobs.Meta.DELETE_JOB)
                 .withJob(job)
                 .deleteWithJsonObject(status().is4xxClientError()),
-            Set.of(() -> "delete_job")
+            Set.of((SimplePermission) () -> "delete_job")
         );
     }
 

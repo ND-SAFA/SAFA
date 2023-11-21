@@ -4,12 +4,11 @@ from os.path import dirname
 from typing import Any, Iterable, List, Tuple
 
 import numpy as np
-from
 
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
-from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
 

@@ -36,7 +36,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
                         embeddings_manager: EmbeddingsManager, min_cluster_similarity: float, orphan_cluster_ratio: float = 0.4):
         """
         Attempts to create clusters from the orphan artifacts.
-        :param  args: The arguments to the clustering pipeline
+        :param args: The arguments to the clustering pipeline
         :param cluster_map: The cluster map to add new clusters to.
         :param orphan_artifact_id_set:Set of orphan artifact ids.
         :param embeddings_manager: Embeddings manager containing orphan artifact embeddings.

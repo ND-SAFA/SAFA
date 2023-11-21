@@ -48,8 +48,8 @@ class ProjectSummarizer(BaseObject):
         self.args = summarizer_args
         self.project_summary_versions = project_summary_versions
         self.dataset = dataset
-        self.artifact_df = dataset.artifact_df if dataset else None
-        assert self.project_summary_versions or self.artifact_df, "Must supply existing project summaries or artifacts to create one"
+        assert self.project_summary_versions or self.dataset, \
+            "Must supply existing project summaries or artifacts to create one"
 
         self.llm_manager: AbstractLLMManager = summarizer_args.llm_manager_for_project_summary
         self.n_tokens = n_tokens
@@ -79,7 +79,7 @@ class ProjectSummarizer(BaseObject):
             prompt_builder = self._create_prompt_builder(section_id, section_prompt)
             task_tag = section_prompt.get_response_tags_for_question(-1)
             task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
-            dataset = self.dataset if self.artifact_df is not None \
+            dataset = self.dataset if self.dataset  \
                 else self._create_dataset_from_project_summaries(self.project_summary_versions, section_id)
             section_body, section_title = self._generate_section(prompt_builder, task_tag, dataset=dataset,
                                                                  multi_line_items=section_id in MULTI_LINE_ITEMS)
@@ -101,14 +101,14 @@ class ProjectSummarizer(BaseObject):
         """
         assert isinstance(section_prompt, QuestionnairePrompt), f"Expected section {section_id} prompt " \
                                                                 f"to be a {QuestionnairePrompt.__class__.__name__}"
-        content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.artifact_df \
+        content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.dataset \
             else SupportedPrompts.PROJECT_SUMMARY_CONTEXT_VERSIONS.value
-        prompt_prefix = BODY_ARTIFACT_TITLE if self.artifact_df else BODY_VERSION_TITLE
+        prompt_prefix = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
         artifacts_prompt = MultiArtifactPrompt(prompt_prefix=prompt_prefix,
                                                build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
-                                               if self.artifact_df else {"versions": ["id", "body"]},
-                                               include_ids=self.artifact_df is not None)
+                                               if self.dataset else {"versions": ["id", "body"]},
+                                               include_ids=self.dataset is not None)
         prompt_builder = PromptBuilder(prompts=[content_prompt,
                                                 artifacts_prompt,
                                                 section_prompt])
@@ -124,6 +124,7 @@ class ProjectSummarizer(BaseObject):
         Has the LLM generate the section corresponding using the prompt builder
         :param prompt_builder: Contains prompts necessary for generating section
         :param task_tag: The tag used to retrieve the generations from the parsed response
+        :param dataset: The dataset that will be provided to the model when generating
         :param multi_line_items: If True, expects each item in the body to span multiple lines
         :return: The section body and section title (if one was generated)
         """

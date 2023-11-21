@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum SafaApplicationPermission implements Permission {
+public enum SafaApplicationPermission implements SimplePermission {
     SUPERUSER("safa.superuser"),
     SUPERUSER_ACTIVATION("safa.active_superuser");
 

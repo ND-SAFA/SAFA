@@ -34,7 +34,7 @@ class TestPreTrainProjectReader(BaseTest):
         pre_train_reader = PreTrainProjectReader(TestMLMPreTrainDatasetCreator.PRETRAIN_DIR)
         llm_manager = OpenAIManager(OpenAIArgs())
         pre_train_reader.set_summarizer(
-            ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager, summarize_code_only=False)))
+            ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager, summarize_code_only=False))
         training_examples = pre_train_reader.read_project()
         expected_lines = TestMLMPreTrainDatasetCreator.FILE1_LINES + TestMLMPreTrainDatasetCreator.FILE2_LINES
         for i, example in enumerate(training_examples):

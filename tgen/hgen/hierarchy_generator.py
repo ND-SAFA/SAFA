@@ -48,7 +48,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         Initializes the generator with necessary trainer information
         :param args: The arguments required for the hierarchy generation
         """
-        summarizer_args = SummarizerArgs(do_resummarize_project=False,
+        summarizer_args = SummarizerArgs(
                                          summarize_code_only=True,
                                          do_resummarize_artifacts=False,
                                          project_summary_sections=self.PROJECT_SUMMARY_SECTIONS if args.create_project_summary else [],

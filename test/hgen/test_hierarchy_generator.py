@@ -190,7 +190,8 @@ class TestHierarchyGenerator(BaseTest):
         expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[0]
         self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
         self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_linked_artifact, content[0], self.HGEN_ARGS.source_layer_id[0])
+        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_linked_artifact, content[0],
+                                                                       self.HGEN_ARGS.source_layer_id[0])
         original_link = EnumDict({TraceKeys.child_label(): dup_linked_artifact,
                                   TraceKeys.parent_label(): dup_artifact_id,
                                   TraceKeys.SCORE: 0.6,

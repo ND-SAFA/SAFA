@@ -24,7 +24,7 @@ class TestSummarizer(BaseTest):
     """
     @mock_anthropic
     def test_with_no_resummarize_and_no_summaries(self, ai_manager: TestAIManager):
-        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=False)
 
         ai_manager.set_responses(MockResponses.project_summary_responses)
         summarizer = self.get_summarizer(args)
@@ -33,14 +33,14 @@ class TestSummarizer(BaseTest):
 
     @mock_anthropic
     def test_with_no_resummarize_with_project_summary(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=False)
 
         summarizer = self.get_summarizer(args, with_project_summary=True)
         self._assert_summarization(summarizer, self.N_ARTIFACTS, ai_manager)
 
     @mock_anthropic
     def test_with_no_resummarize_with_artifact_summaries(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=False)
 
         ai_manager.set_responses(MockResponses.project_summary_responses)
         summarizer = self.get_summarizer(args, with_artifact_summaries=True)
@@ -48,7 +48,7 @@ class TestSummarizer(BaseTest):
 
     @mock_anthropic
     def test_with_no_resummarize_with_all_summarized(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=False, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=False)
 
         summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
         self._assert_summarization(summarizer, 0, ai_manager)
@@ -59,7 +59,7 @@ class TestSummarizer(BaseTest):
     """
     @mock_anthropic
     def test_with_resummarize_artifacts_and_no_summaries(self, ai_manager: TestAIManager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=True)
 
         ai_manager.set_responses(MockResponses.project_summary_responses)
         summarizer = self.get_summarizer(args)
@@ -68,14 +68,14 @@ class TestSummarizer(BaseTest):
 
     @mock_anthropic
     def test_with_resummarize_artifacts_with_project_summary(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=True)
 
         summarizer = self.get_summarizer(args, with_project_summary=True)
         self._assert_summarization(summarizer, 2*self.N_ARTIFACTS, ai_manager)
 
     @mock_anthropic
     def test_with_resummarize_artifacts_with_artifact_summaries(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=True)
 
         ai_manager.set_responses(MockResponses.project_summary_responses)
         summarizer = self.get_summarizer(args, with_artifact_summaries=True)
@@ -83,46 +83,10 @@ class TestSummarizer(BaseTest):
 
     @mock_anthropic
     def test_with_resummarize_artifacts_with_all_summarized(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=False)
+        args = SummarizerArgs(do_resummarize_artifacts=True)
 
         summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
         self._assert_summarization(summarizer, self.N_ARTIFACTS, ai_manager)
-
-    """
-    RE_SUMMARIZE ARTIFACTS + PROJECT SO ARTIFACTS AND PROJECT ARE ALWAYS SUMMARIZED AT LEAST ONCE
-    """
-    @mock_anthropic
-    def test_with_resummarize_all_and_no_summaries(self, ai_manager: TestAIManager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
-
-        ai_manager.set_responses(MockResponses.project_summary_responses + MockResponses.project_summary_responses)
-        summarizer = self.get_summarizer(args)
-        n_expected_summarizations = 2*self.N_ARTIFACTS + 2*self.N_PROJECT_SECTIONS
-        self._assert_summarization(summarizer, n_expected_summarizations, ai_manager)
-
-    @mock_anthropic
-    def test_with_resummarize_all_with_project_summary(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
-
-        ai_manager.set_responses(MockResponses.project_summary_responses)
-        summarizer = self.get_summarizer(args, with_project_summary=True)
-        self._assert_summarization(summarizer, 2*self.N_ARTIFACTS + self.N_PROJECT_SECTIONS, ai_manager)
-
-    @mock_anthropic
-    def test_with_resummarize_all_with_artifact_summaries(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
-
-        ai_manager.set_responses(MockResponses.project_summary_responses + MockResponses.project_summary_responses)
-        summarizer = self.get_summarizer(args, with_artifact_summaries=True)
-        self._assert_summarization(summarizer, 2*self.N_PROJECT_SECTIONS+self.N_ARTIFACTS, ai_manager)
-
-    @mock_anthropic
-    def test_with_resummarize_all_with_all_summarized(self, ai_manager):
-        args = SummarizerArgs(do_resummarize_artifacts=True, do_resummarize_project=True)
-
-        ai_manager.set_responses(MockResponses.project_summary_responses)
-        summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
-        self._assert_summarization(summarizer, self.N_ARTIFACTS+self.N_PROJECT_SECTIONS, ai_manager)
 
     def _assert_summarization(self, summarizer: Summarizer, expected_summarization_calls: int, ai_manager: TestAIManager):
         ai_manager.mock_summarization()
@@ -131,27 +95,6 @@ class TestSummarizer(BaseTest):
         self.assertFalse(DataFrameUtil.contains_empty_string(dataset.artifact_df[ArtifactKeys.SUMMARY]))
         self.assertFalse(DataFrameUtil.contains_na(dataset.artifact_df[ArtifactKeys.SUMMARY]))
         self.assertIsInstance(dataset.project_summary, Summary)
-
-    def test_load_artifacts_from_file(self):
-        summarizer = self.get_summarizer(SummarizerArgs(export_dir=TEST_OUTPUT_DIR), with_artifact_summaries=True)
-        summarizer._save_artifact_summaries(summarizer.dataset.artifact_df)
-        artifacts_in_dataframe = list(summarizer.dataset.artifact_df.index)
-        removed_artifact_id = artifacts_in_dataframe[0]
-        changed_artifact_id = artifacts_in_dataframe[1]
-        new_artifact_id = "new_a_id"
-        summarizer.dataset.artifact_df[ArtifactKeys.SUMMARY] = [EMPTY_STRING for _ in summarizer.dataset.artifact_df.index]
-        summarizer.dataset.artifact_df.remove_row(removed_artifact_id)
-        summarizer.dataset.artifact_df.update_value(ArtifactKeys.CONTENT, changed_artifact_id, "changed content")
-        summarizer.dataset.artifact_df.add_artifact(new_artifact_id, "new content", "some layer")
-        summarizer._load_artifacts_from_file()
-        self.assertNotIn(removed_artifact_id, summarizer.dataset.artifact_df)
-        self.assertIn(new_artifact_id, summarizer.dataset.artifact_df)
-        changed_artifact = summarizer.dataset.artifact_df.get_artifact(changed_artifact_id)
-        self.assertEqual(changed_artifact[ArtifactKeys.CONTENT], "changed content")
-        self.assertFalse(changed_artifact[ArtifactKeys.SUMMARY])
-        for id_, artifact in summarizer.dataset.artifact_df.itertuples():
-            if id_ != changed_artifact_id and id_ != new_artifact_id:
-                self.assertTrue(artifact[ArtifactKeys.SUMMARY])
 
     def get_summarizer(self, summarizer_args: SummarizerArgs,
                        with_artifact_summaries: bool = False, with_project_summary: bool = False) -> Summarizer:

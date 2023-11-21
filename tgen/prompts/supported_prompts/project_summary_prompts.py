@@ -6,12 +6,21 @@ from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
-PROJECT_SUMMARY_CONTEXT_PROMPT = Prompt((
+PROJECT_SUMMARY_CONTEXT_PROMPT_ARTIFACTS = Prompt((
     "# Goal\n"
     "You are creating an complete document detailing the software system below."
     "The document is being created one section at a time by answering the questions at the bottom. "
     f"The goal is to read through all the artifacts and the current document progress "
     f"to accurately and exhaustively answer the questions."
+))
+
+PROJECT_SUMMARY_CONTEXT_PROMPT_VERSIONS = Prompt((
+    "# Goal\n"
+    "You are creating an complete document detailing the software system below."
+    "The document is being created one section at a time by answering the questions at the bottom. "
+    "Currently, there are several versions of this section, creating by examining different subsets of the system."
+    f"The goal is to read through all the versions that have been created, condense repeated or overlapping portions, and "
+    f"organize them into a cohesive final section that accurately and exhaustively answer the questions."
 ))
 
 OVERVIEW_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[

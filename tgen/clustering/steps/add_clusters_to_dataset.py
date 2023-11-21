@@ -10,7 +10,7 @@ from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class AddClustersToDataset(AbstractPipelineStep[ClusteringArgs, ClusteringState]):

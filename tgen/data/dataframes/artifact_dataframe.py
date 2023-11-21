@@ -57,6 +57,19 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
             return artifact[StructuredKeys.Artifact.CONTENT]
         return artifact_summary
 
+    def get_summaries_or_contents(self, artifact_ids: List[Any] = None) -> List[str]:
+        """
+        Returns the summary for each artifact if it exists else the content.
+        :param artifact_ids: The list of artifact ids whose summary or content is return.
+        :return: The list of contents or summaries.
+        """
+        artifact_df = self.filter_by_index(artifact_ids) if artifact_ids else self
+        contents = []
+        for _, artifact in artifact_df.itertuples():
+            content = self.get_summary_or_content(artifact)
+            contents.append(content)
+        return contents
+
     def add_artifacts(self, artifacts: List[Artifact]) -> None:
         """
         Adds artifacts to data frame.

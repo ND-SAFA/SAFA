@@ -16,7 +16,7 @@ from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactConte
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.summarizer.summary import Summary
 
 

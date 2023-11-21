@@ -33,6 +33,17 @@ class ReflectionUtil:
         return param in constructor_param_names
 
     @staticmethod
+    def get_constructor_params(class_type: Type, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Checks whether param of given name is accepted in type constructor.
+        :param class_type: The class type whose constructor is checked.
+        :param params: The param names to check for.
+        :return: All params that would be in the constructor.
+        """
+        constructor_param_names = ParamSpecs.create_from_method(class_type.__init__).param_names
+        return {name: val for name, val in params.items() if name in constructor_param_names}
+
+    @staticmethod
     def get_target_class_from_type(target_class: Type) -> Type:
         """
         Gets the target class from the given type (i.e. if Union[someclass] will return someclass

@@ -1,70 +1,21 @@
 import os
 from abc import ABC, abstractmethod
-from copy import deepcopy
-from typing import Generic, List, Optional, Type, TypeVar, Tuple, Set
+from typing import Generic, List, Optional, Type, Tuple, Set
 
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.file_util import FileUtil
+from tgen.pipeline.abstract_pipeline_step import ArgType, StateType
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.pipeline.state import State
 from tgen.scripts.toolset.confirm import confirm
 from tgen.scripts.toolset.selector import inquirer_selection, inquirer_value
-from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
-
-StateType = TypeVar("StateType", bound=State)
-ArgType = TypeVar("ArgType", bound=PipelineArgs)
-
-title_format_for_logs = "---{}---"
-
-
-class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
-
-    def run(self, args: ArgType, state: State, re_run: bool = False, verbose: bool = True) -> bool:
-        """
-        Runs the step operations, modifying state in some way.
-        :param args: The pipeline arguments and configuration.
-        :param state: The current state of the pipeline results.
-        :param re_run: If True, will run even if the step is already completed
-        :param verbose: If True, prints logs
-        :return: None
-        """
-        step_ran = False
-        if re_run or not state.step_is_complete(self.get_step_name()):
-            if verbose:
-                logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
-            self._run(args, state)
-            step_ran = True
-        if step_ran:
-            state.on_step_complete(step_name=self.get_step_name())
-            if verbose:
-                logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
-        return step_ran
-
-    @abstractmethod
-    def _run(self, args: ArgType, state: State) -> None:
-        """
-        Runs the step operations, modifying state in some way.
-        :param args: The pipeline arguments and configuration.
-        :param state: The current state of the pipeline results.
-        :return: None
-        """
-        if state.step_is_complete(self.get_step_name()):
-            return
-
-    @classmethod
-    def get_step_name(cls) -> str:
-        """
-        Returns the name of the step class
-        :return: The name of the step class
-        """
-        return cls.__name__
 
 
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
@@ -84,7 +35,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         self.args = args
         self.steps = [s() for s in steps]
-        self.summarizer_args = SummarizerArgs(do_resummarize_project=False,
+        self.summarizer_args = SummarizerArgs(
                                               summarize_code_only=True,
                                               do_resummarize_artifacts=False,
                                               **summarizer_args_kwargs) if not summarizer_args else summarizer_args
@@ -141,6 +92,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Runs the summarizer to create pipeline project summary and summarize artifacts
         :return: The project summary
         """
+        from tgen.summarizer.summarizer import Summarizer
         self.summarizer_args.update_export_dir(self.state.export_dir)
         dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
         if not self.args.dataset.project_summary:

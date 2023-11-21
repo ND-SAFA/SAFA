@@ -3,11 +3,12 @@ from typing import Dict, List, Optional, Set, Union
 import pandas as pd
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.model_constants import get_efficient_default_llm_manager
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -18,7 +19,6 @@ from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, \
     NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
-from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
 
 
@@ -29,20 +29,26 @@ class ArtifactsSummarizer(BaseObject):
     """
     SUMMARY_TAG = "summary"
 
-    def __init__(self, summarizer_args: SummarizerArgs, project_summary: Summary = None,
+    def __init__(self, llm_manager_for_artifact_summaries: AbstractLLMManager = None,
+                 summarize_code_only: bool = True,
+                 project_summary: Summary = None,
+                 code_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.CODE_BASE,
                  nl_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.NL_BASE):
         """
         Initializes a summarizer for a specific model
-        :param summarizer_args: Arguments defining how and what to summarize.
+        :param llm_manager_for_artifact_summaries: LLM manager used for the individual artifact summaries.
+        :param summarize_code_only: If True, only summarizes code content
         :param project_summary: Default project summary to use.
-        :param nl_summary_type: The default prompt to use for summarization.
+        :param code_summary_type: The default prompt to use for summarization of code.
+        :param nl_summary_type: The default prompt to use for summarization of natural language.
         """
-        self.llm_manager = summarizer_args.llm_manager_for_artifact_summaries
+        self.llm_manager = llm_manager_for_artifact_summaries if llm_manager_for_artifact_summaries \
+            else get_efficient_default_llm_manager()
         self.args_for_summarizer_model = self.llm_manager.llm_args
-        self.code_or_above_limit_only = summarizer_args.summarize_code_only
+        self.code_or_above_limit_only = summarize_code_only
         self.prompt_args = self.llm_manager.prompt_args
         self.project_summary = project_summary
-        code_prompts = summarizer_args.code_summary_type.value
+        code_prompts = code_summary_type.value
         nl_prompts = nl_summary_type.value
         if self.project_summary:
             project_summary = self.project_summary.to_string([PS_ENTITIES_TITLE])

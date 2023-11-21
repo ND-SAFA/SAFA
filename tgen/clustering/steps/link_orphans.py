@@ -7,7 +7,7 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
@@ -27,15 +27,16 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         orphan_artifact_id_set = all_artifacts.difference(seen_artifacts)
 
         self.place_orphans_in_homes(clusters, orphan_artifact_id_set, state.embedding_manager)
-        self.cluster_orphans(cluster_map, orphan_artifact_id_set, state.embedding_manager, args.min_orphan_similarity)
+        self.cluster_orphans(args, cluster_map, orphan_artifact_id_set, state.embedding_manager, args.min_orphan_similarity)
         for a in orphan_artifact_id_set:
             self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
 
     @classmethod
-    def cluster_orphans(cls, cluster_map: ClusterMapType, orphan_artifact_id_set: Set[str], embeddings_manager: EmbeddingsManager,
-                        min_cluster_similarity: float, orphan_cluster_ratio: float = 0.4):
+    def cluster_orphans(cls, args: ClusteringArgs, cluster_map: ClusterMapType, orphan_artifact_id_set: Set[str],
+                        embeddings_manager: EmbeddingsManager, min_cluster_similarity: float, orphan_cluster_ratio: float = 0.4):
         """
         Attempts to create clusters from the orphan artifacts.
+        :param  args: The arguments to the clustering pipeline
         :param cluster_map: The cluster map to add new clusters to.
         :param orphan_artifact_id_set:Set of orphan artifact ids.
         :param embeddings_manager: Embeddings manager containing orphan artifact embeddings.
@@ -47,7 +48,8 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         if len(orphan_artifact_id_set) == 0:
             return
         cluster_manager = ClusteringAlgorithmManager(SupportedClusteringMethods.SPECTRAL)
-        orphan_cluster_map = cluster_manager.cluster(embeddings_manager, orphan_cluster_ratio, subset_ids=list(orphan_artifact_id_set))
+        orphan_cluster_map = cluster_manager.cluster(embeddings_manager, orphan_cluster_ratio, min_cluster_size=args.cluster_min_size,
+                                                     max_cluster_size=args.cluster_max_size, subset_ids=list(orphan_artifact_id_set))
         clusters = [c for c in orphan_cluster_map.values() if c.avg_similarity >= min_cluster_similarity]
         for c in clusters:
             cls.add_cluster(cluster_map, c)

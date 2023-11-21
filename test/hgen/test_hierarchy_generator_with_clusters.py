@@ -112,12 +112,10 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         n_added_sources = len({trace[TraceKeys.SOURCE] for trace in state.trace_predictions
                                if trace[TraceKeys.SCORE] >= args.min_orphan_score_threshold}) - len(selected_sources)
         n_added_sources = max(n_added_sources, 0)
-        n_orphans = n_artifacts - len(selected_sources) - n_added_sources
-        embedding_similarities = self._create_fake_embedding_scores(args, sim_mock, n_orphans)
-        n_explanations = n_orphans
+        n_orphans = n_artifacts - len(selected_sources) - n_added_sources -1
         anthropic_manager.add_responses(
                                         [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
-                                         for _ in range(n_explanations)])
+                                         for _ in range(n_orphans)])
         FindHomesForOrphansStep().run(args, state)
 
     def assert_generate_explanations_step(self, args, state):

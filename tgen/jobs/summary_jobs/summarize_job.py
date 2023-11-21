@@ -42,12 +42,10 @@ class SummarizeJob(AbstractJob):
         """
         dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
 
-        if self.is_subset and not dataset.project_summary:
-            summary = None
-            dataset.artifact_df.summarize_content(ArtifactsSummarizer(self.args))
-        else:
-            dataset = Summarizer(self.args, dataset=dataset).summarize()
-            summary = dataset.project_summary.to_string()
+        self.args.no_project_summary = self.is_subset and not dataset.project_summary
+
+        dataset = Summarizer(self.args, dataset=dataset).summarize()
+        summary = dataset.project_summary.to_string()
 
         if self.export_dir:
             exporter = SafaExporter(self.export_dir, dataset=dataset)

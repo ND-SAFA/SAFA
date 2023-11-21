@@ -2,20 +2,20 @@ import uuid
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
-from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
-from tgen.common.util.file_util import FileUtil
+from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.models.tokens.token_calculator import TokenCalculator
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -76,14 +76,14 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return n_targets
 
     @staticmethod
-    def _calculate_proportion_of_artifacts(n_artifacts: int, branching_factor: int = DEFAULT_BRANCHING_FACTOR) -> int:
+    def _calculate_proportion_of_artifacts(n_artifacts: int, reduction_factor: float = DEFAULT_REDUCTION_FACTOR) -> int:
         """
         Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
         :param n_artifacts: Total number of artifacts
-        :param branching_factor: Determines the proportion (e.g. branching_factor = 2 would be 50% of artifacts)
+        :param reduction_factor: Determines the proportion of generated artifacts = n_artifacts * reduction_factor
         :return: The number of artifacts equal to a proportion of the total
         """
-        return max(round(n_artifacts * (1 / branching_factor)), 1)
+        return max(round(n_artifacts * reduction_factor), 1)
 
     @staticmethod
     def _calculate_proportion_of_tokens(artifacts: List, args: HGenArgs,

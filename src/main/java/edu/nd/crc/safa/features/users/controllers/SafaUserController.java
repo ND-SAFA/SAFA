@@ -269,7 +269,7 @@ public class SafaUserController extends BaseController {
     public void activateSuperuser() {
         SafaUser currentUser = getCurrentUser();
         permissionService.requireSuperuser(currentUser);
-        safaUserService.setSuperuserActivation(currentUser, true);
+        permissionService.setActiveSuperuser(currentUser, true);
     }
 
     /**
@@ -283,7 +283,7 @@ public class SafaUserController extends BaseController {
     @PutMapping(AppRoutes.Accounts.SuperUser.DEACTIVATE)
     public void deactivateSuperuser() {
         SafaUser currentUser = getCurrentUser();
-        safaUserService.setSuperuserActivation(currentUser, false);
+        permissionService.setActiveSuperuser(currentUser, false);
     }
 
     @Data

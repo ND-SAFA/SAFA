@@ -153,23 +153,6 @@ public class SafaUserService {
     }
 
     /**
-     * Sets the activation of the superuser status for a given user
-     *
-     * @param user       The user to update
-     * @param activation Whether the user's superuser powers should be active
-     */
-    public void setSuperuserActivation(SafaUser user, boolean activation) {
-        if (activation && !user.isSuperuser()) {
-            throw new SafaError("Setting superuser activation on user who is not superuser - " + user.getEmail());
-        }
-
-        if (user.isSuperuserActive() != activation) {
-            user.setSuperuserActive(activation);
-            safaUserRepository.save(user);
-        }
-    }
-
-    /**
      * Mark an account as (un)verified.
      *
      * @param user The account

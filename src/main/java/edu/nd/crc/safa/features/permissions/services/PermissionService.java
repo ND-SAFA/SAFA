@@ -1,9 +1,12 @@
 package edu.nd.crc.safa.features.permissions.services;
 
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -19,8 +22,10 @@ import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.SafaApplicationPermission;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.utilities.ExpiringValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +36,7 @@ import org.springframework.stereotype.Service;
 public class PermissionService {
 
     private final Map<Class<? extends IEntityWithMembership>, ConfigForType> configForTypeMap;
+    private final Map<UUID, ExpiringValue<Boolean>> isSuperuserActiveMap;
     private final ServiceProvider serviceProvider;
 
     public PermissionService(@Lazy OrganizationMembershipService orgMembershipService,
@@ -45,6 +51,7 @@ public class PermissionService {
             Project.class, new ConfigForType(projectMembershipService::getRolesForUser,
                 entity -> ((Project) entity).getOwningTeam())
         );
+        this.isSuperuserActiveMap = new HashMap<>();
         this.serviceProvider = serviceProvider;
     }
 
@@ -112,7 +119,35 @@ public class PermissionService {
      * @return Whether the user is an active superuser
      */
     public boolean isActiveSuperuser(SafaUser user) {
-        return isSuperuser(user) && user.isSuperuserActive();
+        return isSuperuser(user) && getSuperuserActiveValue(user).getAndRefresh();
+    }
+
+    /**
+     * Set whether the current user's superuser powers are active. This will throw an exception if the
+     * user is not a superuser. Superuser activation is automatically disabled after 1 hour without being used.
+     *
+     * @param user The user to act on
+     * @param active Whether the user's superuser powers should be active
+     */
+    public void setActiveSuperuser(SafaUser user, boolean active) {
+        if (active && !user.isSuperuser()) {
+            throw new SafaError("Setting superuser activation on user who is not superuser - " + user.getEmail());
+        }
+        ExpiringValue<Boolean> superuserActive = getSuperuserActiveValue(user);
+        superuserActive.set(active);
+    }
+
+    /**
+     * Get the current superuser activity value for the given user, or create it if it doesn't exist
+     *
+     * @param user The user
+     * @return The user's superuser activity status
+     */
+    private ExpiringValue<Boolean> getSuperuserActiveValue(SafaUser user) {
+        if (!isSuperuserActiveMap.containsKey(user.getUserId())) {
+            isSuperuserActiveMap.put(user.getUserId(), new ExpiringValue<>(false, Duration.ofHours(1)));
+        }
+        return isSuperuserActiveMap.get(user.getUserId());
     }
 
     /**

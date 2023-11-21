@@ -29,7 +29,8 @@ class CreateSeededClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]
 
         embedding_manager: EmbeddingsManager = state.embedding_manager
         cluster_map = self.cluster_with_centroids(embedding_manager, artifact_ids, seeds)
-        state.final_cluster_map = {t: Cluster.from_artifacts(artifacts, embedding_manager) for t, artifacts in cluster_map.items()}
+        state.final_cluster_map = {t: Cluster.from_artifacts(artifacts, embedding_manager)
+                                   for t, artifacts in cluster_map.items() if len(artifacts) > 0}
 
     def cluster_with_centroids(self, embedding_manager: EmbeddingsManager, artifact_ids: List[str], centroids: List[str]):
         """
@@ -54,12 +55,24 @@ class CreateSeededClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]
         :param similarity_matrix: Similarity between each artifact to each centroid.
         :return: Map of centroid to artifacts it contains.
         """
+        min_score = np.quantile(similarity_matrix, 0.10)
+        upper_threshold = np.quantile(similarity_matrix, 0.95)
+
         cluster_map = {t: [] for t in centroids}
         for i, a_id in enumerate(artifact_ids):
             cluster_similarities = similarity_matrix[i, :]
-            closest_cluster_index = np.argmax(cluster_similarities)
-            cluster_id = centroids[closest_cluster_index]
-            cluster_map[cluster_id].append(a_id)
+
+            assigned_clusters_indices = [i for i, score in enumerate(list(cluster_similarities)) if score >= upper_threshold]
+            if len(assigned_clusters_indices) == 0:
+                closest_cluster_index: int = np.argmax(cluster_similarities)
+                closest_cluster_similarity = cluster_similarities[closest_cluster_index]
+                if closest_cluster_similarity >= min_score:
+                    assigned_clusters_indices.append(closest_cluster_index)
+
+            assigned_centroids = [centroids[i] for i in assigned_clusters_indices]
+            print("hi")
+            for assigned_centroid_id in assigned_centroids:
+                cluster_map[assigned_centroid_id].append(a_id)
         return cluster_map
 
     @staticmethod

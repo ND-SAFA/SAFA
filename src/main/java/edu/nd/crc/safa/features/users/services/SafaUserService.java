@@ -11,8 +11,10 @@ import edu.nd.crc.safa.authentication.SafaUserDetails;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
+import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
@@ -40,6 +42,7 @@ public class SafaUserService {
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
     private final OrganizationService organizationService;
+    private final PermissionService permissionService;
     private final Predicate<String> httpThreadPredicate = Pattern
         .compile("https(?:-jsse)?-nio-\\S{1,20}-exec-\\d+")
         .asMatchPredicate();
@@ -162,5 +165,19 @@ public class SafaUserService {
     public SafaUser setAccountVerification(SafaUser user, boolean verified) {
         user.setVerified(verified);
         return safaUserRepository.save(user);
+    }
+
+    /**
+     * Create an app entity for a user object
+     *
+     * @param user The object to convert
+     * @return The converted app entity
+     */
+    public UserAppEntity toAppEntity(SafaUser user) {
+        UserAppEntity entity = new UserAppEntity(user);
+        if (permissionService.isSuperuser(user)) {
+            entity.getAdmin().setActive(permissionService.isActiveSuperuser(user));
+        }
+        return entity;
     }
 }

@@ -96,7 +96,7 @@ public class SafaUserController extends BaseController {
 
         emailVerificationService.sendVerificationEmail(createdAccount);
 
-        return new UserAppEntity(createdAccount);
+        return safaUserService.toAppEntity(createdAccount);
     }
 
     /**
@@ -120,7 +120,7 @@ public class SafaUserController extends BaseController {
 
         SafaUser createdAccount = safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
         createdAccount = safaUserService.setAccountVerification(createdAccount, true);
-        return new UserAppEntity(createdAccount);
+        return safaUserService.toAppEntity(createdAccount);
     }
 
     /**
@@ -206,7 +206,7 @@ public class SafaUserController extends BaseController {
         retrievedUser.setPassword(passwordEncoder.encode(newPassword));
         retrievedUser = this.safaUserRepository.save(retrievedUser);
         this.passwordResetTokenRepository.delete(passwordResetToken);
-        return new UserAppEntity(retrievedUser);
+        return safaUserService.toAppEntity(retrievedUser);
     }
 
     /**
@@ -229,12 +229,12 @@ public class SafaUserController extends BaseController {
 
         principal.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
         principal = this.safaUserRepository.save(principal);
-        return new UserAppEntity(principal);
+        return safaUserService.toAppEntity(principal);
     }
 
     @GetMapping(AppRoutes.Accounts.SELF)
     public UserAppEntity retrieveCurrentUser() {
-        return new UserAppEntity(safaUserService.getCurrentUser());
+        return safaUserService.toAppEntity(safaUserService.getCurrentUser());
     }
 
     @PutMapping(AppRoutes.Accounts.DEFAULT_ORG)

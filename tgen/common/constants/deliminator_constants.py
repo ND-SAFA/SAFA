@@ -6,6 +6,7 @@ EMPTY_STRING = ''
 TAB = "\t"
 PERIOD = "."
 COMMA = ","
+NONE = "none"
 UNDERSCORE = "_"
 F_SLASH = "/"
 B_SLASH = "\\"

@@ -52,10 +52,9 @@ class TestSummarizeJob(BaseJobTest):
             if resummarize:
                 summary = f"{self.RESUMMARIZED} {summary}"
             responses.append(PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, summary))
-        project_summary_components = MockResponses.project_summary_responses
-        if resummarize:
-            project_summary_components = [create(t, body_prefix=f"{self.RESUMMARIZED} ") for t in DEFAULT_PROJECT_SUMMARY_SECTIONS]
-        responses.extend(project_summary_components)
+        if not resummarize:
+            project_summary_components = MockResponses.project_summary_responses
+            responses.extend(project_summary_components)
         return responses
 
     def _assert_success(self, job: AbstractJob, job_result: JobResult, resummarized: bool = True):
@@ -72,10 +71,6 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertIn(self.CODE_SUMMARY, artifact[ArtifactKeys.SUMMARY])
             else:
                 self.assertIn(self.NL_SUMMARY, artifact[ArtifactKeys.SUMMARY])
-        if resummarized:
-            summary = job_result.body["summary"].replace(NEW_LINE, SPACE)
-            for ps_section_body in MOCK_PS_RES_MAP.values():
-                self.assertIn(f"{self.RESUMMARIZED} {ps_section_body}", summary)
 
     def _get_job(self) -> AbstractJob:
         return SummarizeJob(self.get_project().get_dataset(), summarize_code_only=False)

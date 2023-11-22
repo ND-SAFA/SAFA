@@ -39,8 +39,8 @@ class AbstractProjectReaderTest(BaseTest):
         """
         project_reader: AbstractProjectReader = test_project.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
-        project_reader.set_summarizer(ArtifactsSummarizer(
-            SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager, summarize_code_only=False)))
+        project_reader.set_summarizer(ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager,
+                                                          summarize_code_only=False))
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         summary_artifacts = test_project.get_artifact_entries()
         for row in summary_artifacts:

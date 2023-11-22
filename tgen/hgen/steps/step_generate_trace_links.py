@@ -12,7 +12,7 @@ from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
@@ -122,8 +122,8 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The selected predictions from the pipeline
         """
         ranking_state = RankingState()
-        pipeline = SortChildrenStep()
-        pipeline.run(ranking_args, ranking_state, verbose=False)
+        sort_children_step = SortChildrenStep()
+        sort_children_step.run(ranking_args, ranking_state, verbose=False)
         selected_predictions = ranking_state.get_current_entries()
         return selected_predictions
 

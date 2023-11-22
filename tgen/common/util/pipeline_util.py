@@ -1,18 +1,24 @@
 import os
 from datetime import datetime
+from functools import wraps
 from typing import Any, Type
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
+from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 import pandas as pd
+
+from tgen.pipeline.abstract_pipeline_step import title_format_for_logs
+from tgen.pipeline.state import State
 
 
 class PipelineUtil:
@@ -52,3 +58,39 @@ class PipelineUtil:
             exporter.export()
         logger.info(f"Dataset checkpoint saved to {full_export_path} ")
         return full_export_path
+
+
+def nested_pipeline(parent_pipeline_state: State) -> Any:
+    """
+    Decorator for using a different pipeline inside of a pipeline
+    :param parent_pipeline_state: The state of the pipeline calling the nested pipeline
+    :return: The result of the function
+    """
+    def decorator(func):
+        """
+        Logic for creating the decorator
+        :param func: Function containing the nested pipeline call
+        :return: Result of the function
+        """
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            """
+            Handles running the function and any pre or post processing actions
+            :param args: The arguments to the function
+            :param kwargs: The kwargs to the function
+            :return: The result of the function
+            """
+            result = None
+            try:
+                result = func(*args, **kwargs)
+                return result
+            finally:
+                parent_pipeline_name = ReflectionUtil.get_class_name(parent_pipeline_state)
+                parent_pipeline_name.replace(ReflectionUtil.get_class_name(State), EMPTY_STRING)
+                logger.log_with_title(f"Returning to {parent_pipeline_name}",
+                                      formatting=NEW_LINE + title_format_for_logs)
+            return result
+
+        return wrapper
+
+    return decorator

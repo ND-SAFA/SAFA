@@ -34,6 +34,17 @@ class ReflectionUtil:
         return param in constructor_param_names
 
     @staticmethod
+    def get_constructor_params(class_type: Type, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Checks whether param of given name is accepted in type constructor.
+        :param class_type: The class type whose constructor is checked.
+        :param params: The param names to check for.
+        :return: All params that would be in the constructor.
+        """
+        constructor_param_names = ParamSpecs.create_from_method(class_type.__init__).param_names
+        return {name: val for name, val in params.items() if name in constructor_param_names}
+
+    @staticmethod
     def get_target_class_from_type(target_class: Type) -> Type:
         """
         Gets the target class from the given type (i.e. if Union[someclass] will return someclass
@@ -346,3 +357,14 @@ class ReflectionUtil:
         """
         primitive_type_classes = [str, int, float, bool]
         return any([isinstance(obj, t) for t in primitive_type_classes])
+
+    @staticmethod
+    def get_class_name(obj: Any) -> str:
+        """
+        Returns the name of the class, separated by spaces
+        :param obj: The object to get the name of
+        :return: The name of the class, separated by spaces
+        """
+        from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
+        cls = obj.__class__ if not isinstance(obj, type) else obj
+        return SeparateCamelCaseStep().run([cls.__name__])[0]

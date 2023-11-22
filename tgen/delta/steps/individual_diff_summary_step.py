@@ -14,7 +14,7 @@ from tgen.delta.delta_util import get_prediction_output
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):

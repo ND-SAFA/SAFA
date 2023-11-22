@@ -6,9 +6,9 @@ from tgen.clustering.base.cluster_type import MethodClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
+from tgen.common.constants.clustering_constants import DEFAULT_MIN_CLUSTER_SIZE
 from tgen.common.constants.logging_constants import TQDM_NCOLS
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class CreateClustersFromEmbeddings(AbstractPipelineStep):
@@ -40,7 +40,9 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         # TODO: Add description including batch index
         for clustering_method in tqdm(args.cluster_methods, desc="Running Clustering Algorithms...", ncols=TQDM_NCOLS):
             cluster_manager = ClusteringAlgorithmManager(clustering_method)
-            clusters = cluster_manager.cluster(embeddings_manager, args.cluster_reduction_factor, subset_ids=batch_artifact_ids,
+            clusters = cluster_manager.cluster(state.embedding_manager, reduction_factor=args.cluster_reduction_factor,
+                                               min_cluster_size=args.cluster_min_size, max_cluster_size=args.cluster_max_size,
+                                               subset_ids=args.subset_ids,
                                                **args.clustering_method_args)
             clustering_method_name = cluster_manager.get_method_name()
             clusters = {f"{clustering_method_name}{k}": v for k, v in clusters.items()}

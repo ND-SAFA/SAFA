@@ -4,16 +4,18 @@ from typing import List, Dict
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, \
     DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
+from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.pipeline.state import State
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 
 
 @dataclass
-class SummarizerArgs:
+class SummarizerArgs(PipelineArgs):
     """
     LLM manager used for the individual artifact summaries
     """
@@ -39,17 +41,13 @@ class SummarizerArgs:
     """
     section_display_order: List[str] = field(default_factory=lambda: DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER)
     """
-    If True, resummarizes the project with the new artifact summaries
-    """
-    do_resummarize_project: bool = True
-    """
     Whether to summarize the artifacts after creating the project summary.
     """
     do_resummarize_artifacts: bool = True
     """
-    Path to save to
+    If True, a project summary will not be created
     """
-    export_dir: str = None
+    no_project_summary: bool = False
     """
     If True, only summarizes the code
     """

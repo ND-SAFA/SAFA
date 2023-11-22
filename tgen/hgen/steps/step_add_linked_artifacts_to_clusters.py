@@ -6,7 +6,7 @@ from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):

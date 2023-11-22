@@ -38,7 +38,7 @@ class TestPreTrainingTraceReader(BaseTest):
         reader: PreTrainTraceReader = self.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
         reader.set_summarizer(
-            ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager, summarize_code_only=False)))
+            ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager, summarize_code_only=False))
         artifact_df, trace_df, layer_mapping_df = reader.read_project()
         orig_lines = list(FileUtil.read_file(reader.data_file).split(os.linesep))
         summarized = [SUMMARY_FORMAT.format(line) for line in orig_lines]

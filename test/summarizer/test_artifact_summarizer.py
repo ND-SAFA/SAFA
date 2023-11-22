@@ -102,7 +102,7 @@ class TestSummarizer(BaseTest):
         internal_kwargs = {"summarize_code_only": False}
         internal_kwargs.update(kwargs)
         llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager, **internal_kwargs))
+        summarizer = ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager, **internal_kwargs)
         return summarizer
 
     @staticmethod

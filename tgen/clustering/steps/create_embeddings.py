@@ -4,7 +4,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class CreateEmbeddings(AbstractPipelineStep):

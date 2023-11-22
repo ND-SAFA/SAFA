@@ -63,9 +63,8 @@ class TestPromptDatasetCreator(BaseTest):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
-                                                          summarizer=ArtifactsSummarizer(
-                                                              SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager,
-                                                                             summarize_code_only=False)))
+                                                          summarizer=ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager,
+                                                                             summarize_code_only=False))
 
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=ArtifactTestProject.get_artifact_entries())
 
@@ -93,9 +92,8 @@ class TestPromptDatasetCreator(BaseTest):
         llm_manager = self.create_llm_manager()
         dataset_creator: PromptDatasetCreator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
                                                                                 summarizer=ArtifactsSummarizer(
-                                                                                    SummarizerArgs(
                                                                                         llm_manager_for_artifact_summaries=llm_manager,
-                                                                                        summarize_code_only=False)))
+                                                                                        summarize_code_only=False))
         artifact_entries = self.get_expected_bodies()
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=artifact_entries)
 
@@ -149,8 +147,6 @@ class TestPromptDatasetCreator(BaseTest):
                     self.assertIsNone(DataFrameUtil.get_optional_value(summary))
                 else:
                     self.assertIn("summary", summary.lower())
-        self.assertEqual(dataset1.project_summary, project_summary)
-        self.assertIsNone(dataset2.project_summary)
 
     @staticmethod
     def get_prompt_dataset_creator(ensure_code_is_summarized=False, **params):

@@ -1,11 +1,12 @@
 import os
 from copy import deepcopy
 from os.path import dirname
-from typing import Any, Iterable, List, Tuple
+from typing import Any, Iterable, List, Tuple, Dict
 
 import numpy as np
 
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
@@ -50,6 +51,21 @@ class Cluster:
         cluster.add_artifacts(artifact_ids)
         return cluster
 
+    @staticmethod
+    def from_artifact_map(artifact_map: Dict[Any, str], model_name: str = DEFAULT_EMBEDDING_MODEL,
+                          update_stats: bool = True) -> "Cluster":
+        """
+        Creates cluster containing given artifacts in the map.
+        :param artifact_map: The  id to content of artifacts to include in the cluster.
+        :param model_name: The name of the model to use in the embeddings manager
+         :param update_stats: If True, updates the cluster stats.
+        :return: The cluster.
+        """
+        embeddings_manager = EmbeddingsManager(artifact_map, model_name=model_name)
+        cluster = Cluster(embeddings_manager)
+        cluster.add_artifacts(list(artifact_map.keys()), update_stats=update_stats)
+        return cluster
+
     def add_vote(self) -> None:
         """
         Adds vote to cluster.
@@ -57,24 +73,28 @@ class Cluster:
         """
         self.votes += 1
 
-    def add_artifacts(self, artifact_ids: List[str]) -> None:
+    def add_artifacts(self, artifact_ids: List[str], update_stats: bool = True) -> None:
         """
         Adds multiple artifacts to cluster and updates its stats.
         :param artifact_ids: The artifact ids to add to the cluster.
+        :param update_stats: If True, updates the cluster stats.
         :return: None.
         """
         for artifact_id in artifact_ids:
             self._add_artifact(artifact_id)
-        self.__update_stats()
+        if update_stats:
+            self.__update_stats()
 
-    def add_artifact(self, artifact_id: str) -> None:
+    def add_artifact(self, artifact_id: str, update_stats: bool = True) -> None:
         """
         Adds an artifact to the cluster.
         :param artifact_id: ID of artifact to add to cluster.
-        :return: None
+        :param update_stats: If True, updates the cluster stats.
+        :return: None.
         """
         self._add_artifact(artifact_id)
-        self.__update_stats()
+        if update_stats:
+            self.__update_stats()
 
     def similarity_to(self, cluster: "Cluster") -> float:
         """

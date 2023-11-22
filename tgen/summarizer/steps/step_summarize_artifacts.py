@@ -15,5 +15,7 @@ class StepSummarizeArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerStat
         :return: None
         """
         params = SummarizerUtil.get_params_for_artifact_summarizer(args)
-        summarizer = ArtifactsSummarizer(**params)
-        state.dataset.artifact_df.summarize_content(summarizer, re_summarize=False)
+        re_summarize = not SummarizerUtil.needs_project_summary(state.dataset.project_summary, args)
+        project_summary = state.dataset.project_summary if re_summarize else None
+        summarizer = ArtifactsSummarizer(**params, project_summary=project_summary)
+        state.dataset.artifact_df.summarize_content(summarizer, re_summarize=re_summarize)

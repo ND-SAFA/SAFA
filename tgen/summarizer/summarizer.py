@@ -12,6 +12,7 @@ from tgen.summarizer.steps.step_resummarize_artifacts import StepResummarizeArti
 from tgen.summarizer.steps.step_summarize_artifacts import StepSummarizeArtifacts
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summarizer_state import SummarizerState
+from tgen.summarizer.summarizer_util import SummarizerUtil
 
 
 class Summarizer(AbstractPipeline):
@@ -36,8 +37,15 @@ class Summarizer(AbstractPipeline):
         :return: A dataset containing the summarized artifacts and project
         """
         self.state.dataset = self.dataset
+        if not SummarizerUtil.needs_project_summary(self.state.dataset.project_summary, self.args) or self.args.no_project_summary:
+            if self.args.do_resummarize_artifacts \
+                    or not self.state.dataset.artifact_df.is_summarized(code_only=self.args.summarize_code_only):
+                self.steps = [StepSummarizeArtifacts()]
+            else:
+                self.steps = []
         super().run(run_setup=False)
-        self.state: SummarizerState
+        if not self.state.summarized_dataset:
+            self.state.summarized_dataset = self.state.dataset
         return self.state.summarized_dataset
 
     def state_class(self) -> Type[State]:

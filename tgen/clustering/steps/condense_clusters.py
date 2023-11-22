@@ -33,7 +33,8 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         clusters = filter_clusters if filter_clusters else clusters
         min_pairwise_avg = self._calculate_min_pairwise_avg_threshold(filter_clusters)
         if min_pairwise_avg is not None:
-            clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filter_clusters))
+            if args.filter_by_cohesiveness:
+                clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filter_clusters))
             clusters = list(sorted(clusters, key=lambda v: v.avg_pairwise_sim, reverse=True))
         unique_cluster_map.add_all(clusters)
 

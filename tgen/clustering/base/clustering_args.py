@@ -33,6 +33,8 @@ class ClusteringArgs(PipelineArgs):
     create_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY
+    filter_by_cohesiveness: bool = True
+    add_orphans_to_best_home: bool = False
 
     def __post_init__(self) -> None:
         """

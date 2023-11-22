@@ -63,8 +63,6 @@ class ClusteringAlgorithmManager:
         :param max_cluster_size: The maximum number of artifacts in a cluster.
         :return: None, kwargs modified in place.
         """
-        kwargs = FileUtil.expand_paths(paths=kwargs, use_abs_paths=False,
-                                       replacements={"[MIN_CLUSTER_SIZE]": min_cluster_size, "[MAX_CLUSTER_SIZE]": max_cluster_size})
         internal_init_params = CLUSTER_METHOD_INIT_PARAMS.get(self.method, {})
         kwargs.update(internal_init_params)
 
@@ -74,6 +72,9 @@ class ClusteringAlgorithmManager:
             DictUtil.update_kwarg_values(kwargs, n_clusters=n_clusters)
         if RANDOM_STATE_PARAM in param_specs.param_names:
             DictUtil.update_kwarg_values(kwargs, random_state=DEFAULT_RANDOM_STATE)
+
+        kwargs = FileUtil.expand_paths(paths=kwargs, use_abs_paths=False,
+                                       replacements={"[MIN_CLUSTER_SIZE]": min_cluster_size, "[MAX_CLUSTER_SIZE]": max_cluster_size})
         return kwargs
 
     @staticmethod

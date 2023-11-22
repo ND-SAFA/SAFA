@@ -186,7 +186,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: The summaries
         """
         if re_summarize or not self.is_summarized():
-            missing_all = self[ArtifactKeys.SUMMARY].isna().all()
+            missing_all = self[ArtifactKeys.SUMMARY].isna().all() or re_summarize
             if missing_all:
                 summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
                 self[ArtifactKeys.SUMMARY] = summaries

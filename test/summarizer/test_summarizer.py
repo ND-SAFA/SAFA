@@ -71,7 +71,7 @@ class TestSummarizer(BaseTest):
         args = SummarizerArgs(do_resummarize_artifacts=True)
 
         summarizer = self.get_summarizer(args, with_project_summary=True)
-        self._assert_summarization(summarizer, 2*self.N_ARTIFACTS, ai_manager)
+        self._assert_summarization(summarizer, self.N_ARTIFACTS, ai_manager)
 
     @mock_anthropic
     def test_with_resummarize_artifacts_with_artifact_summaries(self, ai_manager):

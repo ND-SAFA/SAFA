@@ -614,10 +614,10 @@ class FileUtil:
         :param ext: The ext of the file if needed
         :return: The path
         """
+        paths = [p if p is None else str(p) for p in paths]
         is_none = [p for p in paths if not p]
         if len(is_none) > 0:
             return is_none[0]
-        paths = [str(p) for p in paths]
         full_path = os.path.join(*paths)
         if ext:
             full_path = FileUtil.add_ext(full_path, ext)

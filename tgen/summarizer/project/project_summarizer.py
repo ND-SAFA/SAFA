@@ -66,20 +66,23 @@ class ProjectSummarizer(BaseObject):
         Creates the project summary from the project artifacts.
         :return: The summary of the project.
         """
-        if not self.args.project_summary_sections or not SummarizerUtil.needs_project_summary(self.dataset, self.args):
-            return self.project_summary
 
-        logger.log_title(f"Creating project specification: {self.args.project_summary_sections}")
         if FileUtil.safely_check_path_exists(self.get_save_path()) and self.reload_existing:
             logger.info(f"Loading previous project summary from {self.get_save_path()}")
             self.project_summary = Summary.load_from_file(self.get_save_path())
+
+        if not self.args.project_summary_sections or not SummarizerUtil.needs_project_summary(self.project_summary, self.args):
+            return self.project_summary
+
+        logger.log_title(f"Creating project specification: "
+                         f"{SummarizerUtil.missing_project_summary_sections(self.project_summary, self.args)}")
 
         for section_id, section_prompt in self.get_generation_iterator():
             logger.log_step(f"Creating section: `{section_id}`")
             prompt_builder = self._create_prompt_builder(section_id, section_prompt)
             task_tag = section_prompt.get_response_tags_for_question(-1)
             task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
-            dataset = self.dataset if self.dataset  \
+            dataset = self.dataset if self.dataset \
                 else self._create_dataset_from_project_summaries(self.project_summary_versions, section_id)
             section_body, section_title = self._generate_section(prompt_builder, task_tag, dataset=dataset,
                                                                  multi_line_items=section_id in MULTI_LINE_ITEMS)
@@ -219,7 +222,7 @@ class ProjectSummarizer(BaseObject):
         :param curr_section: The section currently being built
         :return: A dataset using the project summaries' sections as artifacts
         """
-        versions = [summary[curr_section] for summary in project_summaries]
+        versions = [summary.to_string([curr_section]) for summary in project_summaries]
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [i for i in range(len(versions))],
                                          ArtifactKeys.CONTENT: versions,
                                          ArtifactKeys.LAYER_ID: ["summary_version" for _ in versions]})

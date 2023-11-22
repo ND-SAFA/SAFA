@@ -356,3 +356,14 @@ class ReflectionUtil:
         """
         primitive_type_classes = [str, int, float, bool]
         return any([isinstance(obj, t) for t in primitive_type_classes])
+
+    @staticmethod
+    def get_class_name(obj: Any) -> str:
+        """
+        Returns the name of the class, separated by spaces
+        :param obj: The object to get the name of
+        :return: The name of the class, separated by spaces
+        """
+        from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
+        cls = obj.__class__ if not isinstance(obj, type) else obj
+        return SeparateCamelCaseStep().run([cls.__name__])[0]

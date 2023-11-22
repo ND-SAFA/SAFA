@@ -6,6 +6,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
+from tgen.common.constants.clustering_constants import ADD_ORPHAN_TO_CLUSTER_THRESHOLD
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
@@ -26,7 +27,9 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         all_artifacts = set(state.embedding_manager.get_all_ids())
         orphan_artifact_id_set = all_artifacts.difference(seen_artifacts)
 
-        self.place_orphans_in_homes(clusters, orphan_artifact_id_set, state.embedding_manager)
+        adopted_orphans = self.place_orphans_in_homes(clusters, orphan_artifact_id_set, state.embedding_manager,
+                                                      add_to_best_home=args.add_orphans_to_best_home)
+        orphan_artifact_id_set = orphan_artifact_id_set.difference(adopted_orphans)
         self.cluster_orphans(args, cluster_map, orphan_artifact_id_set, state.embedding_manager, args.min_orphan_similarity)
         for a in orphan_artifact_id_set:
             self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
@@ -70,22 +73,29 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         return seen_artifacts
 
     @staticmethod
-    def place_orphans_in_homes(clusters: List[Cluster], orphan_artifacts: Set[str], embeddings_manager: EmbeddingsManager) -> None:
+    def place_orphans_in_homes(clusters: List[Cluster], orphan_artifacts: Set[str], embeddings_manager: EmbeddingsManager,
+                               add_to_best_home: bool = False) -> Set[str]:
         """
         Attempts to add orphans to clusters
         :param clusters: The list of clusters to place orphans into.
         :param orphan_artifacts: List of artifact ids that need clusters.
         :param embeddings_manager: Contains embeddings used to update cluster stats.
-        :return:
+        :param add_to_best_home: If True, will add the orphan to the best home regardless of the avg similarity.
+        :return: set of orphans that found homes.
         """
+        avg_similarity_threshold = 0 if add_to_best_home else ADD_ORPHAN_TO_CLUSTER_THRESHOLD
+        adopted_orphans = set()
         for artifact_id in orphan_artifacts:
-            accepting_clusters = LinkOrphans.get_clusters_accepting_orphan(artifact_id, clusters, embeddings_manager)
+            accepting_clusters = LinkOrphans.get_clusters_accepting_orphan(artifact_id, clusters, embeddings_manager,
+                                                                           avg_similarity_threshold=avg_similarity_threshold)
             for c in accepting_clusters:
                 c.add_artifact(artifact_id)
+                adopted_orphans.add(artifact_id)
+        return adopted_orphans
 
     @classmethod
     def get_clusters_accepting_orphan(cls, artifact_id: str, clusters: List[Cluster], embedding_manager: EmbeddingsManager,
-                                      avg_similarity_threshold: float = 0.75) -> List[Cluster]:
+                                      avg_similarity_threshold: float) -> List[Cluster]:
         """
         Places orphan in cluster in which its similarity to the cluster is about the same as the average cluster distance.
         :param artifact_id: The artifact ID of the orphan.

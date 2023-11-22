@@ -45,7 +45,7 @@ class SummarizeJob(AbstractJob):
         self.args.no_project_summary = self.is_subset and not dataset.project_summary
 
         dataset = Summarizer(self.args, dataset=dataset).summarize()
-        summary = dataset.project_summary.to_string()
+        summary = dataset.project_summary.to_string() if dataset.project_summary else None
 
         if self.export_dir:
             exporter = SafaExporter(self.export_dir, dataset=dataset)

@@ -4,8 +4,6 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
-from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.clustering.steps.condense_clusters import CondenseClusters
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.common.constants.clustering_constants import ADD_ORPHAN_TO_CLUSTER_THRESHOLD
@@ -63,7 +61,8 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         for c in clusters:
             cls.add_cluster(cluster_map, c)
             for a in c:
-                orphan_artifact_id_set.remove(a)
+                if a in orphan_artifact_id_set:  # could be in multiple clusters, and handled before this.
+                    orphan_artifact_id_set.remove(a)
 
     @staticmethod
     def collect_seen_artifacts(clusters: List[Cluster]) -> Set[str]:

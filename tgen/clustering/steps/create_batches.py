@@ -28,7 +28,7 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             state.seeded_cluster_map = seed2artifacts  # used to link seeds to source artifacts later on.
             artifact_batches = [artifacts for seed, artifacts in seed2artifacts.items() if len(artifacts) > 0]
         else:
-            artifact_batches = [artifact_ids]
+            artifact_batches = args.subset_ids if args.subset_ids else [artifact_ids]
         state.artifact_batches = artifact_batches
 
     @staticmethod

@@ -59,8 +59,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             section_chunks = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             clustering_pipeline_kwargs["cluster_seeds"] = section_chunks
             clustering_pipeline_kwargs["cluster_artifact_type"] = section_id
-            clustering_pipeline_kwargs["cluster_reduction_factor"] = .10
+            clustering_pipeline_kwargs["cluster_reduction_factor"] = .15
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
         cluster_args = ClusteringArgs(dataset=source_dataset, create_dataset=True, export_dir=clustering_export_path,
-                                      **clustering_pipeline_kwargs)
+                                      cluster_max_size=20, **clustering_pipeline_kwargs)
         return cluster_args

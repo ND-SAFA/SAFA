@@ -16,13 +16,13 @@ DEFAULT_MIN_CLUSTER_SIZE = 2
 NO_CLUSTER_LABEL = -1
 MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING = 0.5
 MIN_PAIRWISE_AVG_PERCENTILE = 75
-ADD_ORPHAN_TO_CLUSTER_THRESHOLD  = 0.75
+ADD_ORPHAN_TO_CLUSTER_THRESHOLD = 0.75
 
 RANDOM_STATE_PARAM = "random_state"
 N_CLUSTERS_PARAM = "n_clusters"
 CLUSTER_METHOD_INIT_PARAMS = {
     SupportedClusteringMethods.BIRCH: {
-        "branching_factor": MAX_CLUSTER_SIZE
+        "branching_factor": DEFAULT_MAX_CLUSTER_SIZE
     },
     SupportedClusteringMethods.OPTICS: {
         "metric": "cosine",

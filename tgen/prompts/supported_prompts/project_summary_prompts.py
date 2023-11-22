@@ -6,7 +6,7 @@ from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
-PROJECT_SUMMARY_CONTEXT_PROMPT = Prompt((
+PROJECT_SUMMARY_CONTEXT_PROMPT_ARTIFACTS = Prompt((
     "# Goal\n"
     "You are creating an complete document detailing the software system below."
     "The document is being created one section at a time by answering the questions at the bottom. "
@@ -14,14 +14,24 @@ PROJECT_SUMMARY_CONTEXT_PROMPT = Prompt((
     f"to accurately and exhaustively answer the questions."
 ))
 
-OVERVIEW_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("Write a set of bullet points indicating what is important in the system.",
-                   response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
-    QuestionPrompt("Using your notes, write a polished description of the high-level functionality of the software system. "
-                   "Write in the activate voice and use 2-3 paragraphs to group your description. "
-                   "Assume your reader is someone unfamiliar with the system.",
-                   response_manager=PromptResponseManager(response_tag=PS_OVERVIEW_TAG))
-])
+PROJECT_SUMMARY_CONTEXT_PROMPT_VERSIONS = Prompt((
+    "# Goal\n"
+    "You are creating an complete document detailing the software system below."
+    "The document is being created one section at a time by answering the questions at the bottom. "
+    "Currently, there are several versions of this section, creating by examining different subsets of the system."
+    f"The goal is to read through all the versions that have been created, condense repeated or overlapping portions, and "
+    f"organize them into a cohesive final section that accurately and exhaustively answer the questions."
+))
+
+OVERVIEW_SECTION_PROMPT = QuestionnairePrompt(
+    question_prompts=[
+        QuestionPrompt("Write a set of bullet points indicating what is important in the system.",
+                       response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+        QuestionPrompt("Using your notes, write a polished description of the high-level functionality of the software system. "
+                       "Write in the activate voice and use 2-3 paragraphs to group your description. "
+                       "Assume your reader is someone unfamiliar with the system.",
+                       response_manager=PromptResponseManager(response_tag=PS_OVERVIEW_TAG))
+    ])
 
 FEATURE_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("Make a list of all the different features present in the system.",
@@ -39,7 +49,7 @@ ENTITIES_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("Using your notes, create a comprehensive list of all domain entities and key vocabularly used in the system. "
                    "Format each entity as '{name}: {description}'",
                    response_manager=PromptResponseManager(response_tag=PS_ENTITIES_TAG,
-                                                          response_instructions_format="and enclose each entity "
+                                                          response_instructions_format="and enclose each individual entity "
                                                                                        "inside of a set of {}"))
 ])
 

@@ -16,8 +16,15 @@ MOCK_PS_RES_MAP = {
     PS_DATA_FLOW_TITLE: "project_data_flow"
 }
 
+
+SECTION_TAG_TO_TILE = {
+    v: k for k, v in PROJECT_SUMMARY_TAGS.items()
+}
+
+
 TEST_PROJECT_SUMMARY = Summary({title: EnumDict({"chunks": ["summary of project"], "title": title})
                                 for title in MOCK_PS_RES_MAP.keys()})
+
 
 def create(title: str, body_prefix: str = None, tag: str = None):
     if body_prefix is None:
@@ -40,6 +47,7 @@ class MockResponses:
                                  project_title_to_response[PS_SUBSYSTEM_TITLE],
                                  project_title_to_response[PS_DATA_FLOW_TITLE],
                                  project_title_to_response[PS_OVERVIEW_TITLE]]
+
     def __getattr__(self, item: str):
         """
         Returns a copy of the requested attribute.

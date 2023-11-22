@@ -6,7 +6,7 @@ from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
@@ -34,10 +34,11 @@ class GenerateExplanationsForLinksStep(AbstractPipelineStep[HGenArgs, HGenState]
 
         missing_explanations = self._find_missing_explanations(state)
         have_explanations = [trace for trace in state.selected_predictions if trace.get(TraceKeys.EXPLANATION)]
-        pipeline_state = RankingState(candidate_entries=missing_explanations)
-        CreateExplanationsStep().run(pipeline_args, pipeline_state)
-        selected_traces = pipeline_state.get_current_entries()
-        state.selected_predictions = have_explanations + selected_traces
+        if missing_explanations:
+            pipeline_state = RankingState(candidate_entries=missing_explanations)
+            CreateExplanationsStep().run(pipeline_args, pipeline_state)
+            selected_traces = pipeline_state.get_current_entries()
+            state.selected_predictions = have_explanations + selected_traces
         assert not self._find_missing_explanations(state), "Traces are still missing explanations. Ensure LLM responses have been " \
                                                            "deleted."
 

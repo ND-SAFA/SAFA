@@ -1,70 +1,23 @@
 import os
 from abc import ABC, abstractmethod
-from copy import deepcopy
-from typing import Generic, List, Optional, Type, TypeVar, Tuple, Set
+from typing import Generic, List, Optional, Type, Tuple, Set
 
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.deliminator_constants import F_SLASH, NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
+from tgen.pipeline.abstract_pipeline_step import ArgType, StateType, title_format_for_logs
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.pipeline.state import State
 from tgen.scripts.toolset.confirm import confirm
 from tgen.scripts.toolset.selector import inquirer_selection, inquirer_value
-from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
-
-StateType = TypeVar("StateType", bound=State)
-ArgType = TypeVar("ArgType", bound=PipelineArgs)
-
-title_format_for_logs = "---{}---"
-
-
-class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
-
-    def run(self, args: ArgType, state: State, re_run: bool = False, verbose: bool = True) -> bool:
-        """
-        Runs the step operations, modifying state in some way.
-        :param args: The pipeline arguments and configuration.
-        :param state: The current state of the pipeline results.
-        :param re_run: If True, will run even if the step is already completed
-        :param verbose: If True, prints logs
-        :return: None
-        """
-        step_ran = False
-        if re_run or not state.step_is_complete(self.get_step_name()):
-            if verbose:
-                logger.log_with_title(f"Starting step: {self.get_step_name()}", formatting=title_format_for_logs)
-            self._run(args, state)
-            step_ran = True
-        if step_ran:
-            state.on_step_complete(step_name=self.get_step_name())
-            if verbose:
-                logger.log_with_title(f"Finished step: {self.get_step_name()}", formatting=title_format_for_logs)
-        return step_ran
-
-    @abstractmethod
-    def _run(self, args: ArgType, state: State) -> None:
-        """
-        Runs the step operations, modifying state in some way.
-        :param args: The pipeline arguments and configuration.
-        :param state: The current state of the pipeline results.
-        :return: None
-        """
-        if state.step_is_complete(self.get_step_name()):
-            return
-
-    @classmethod
-    def get_step_name(cls) -> str:
-        """
-        Returns the name of the step class
-        :return: The name of the step class
-        """
-        return cls.__name__
 
 
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
@@ -84,10 +37,10 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         self.args = args
         self.steps = [s() for s in steps]
-        self.summarizer_args = SummarizerArgs(do_resummarize_project=False,
-                                              summarize_code_only=True,
-                                              do_resummarize_artifacts=False,
-                                              **summarizer_args_kwargs) if not summarizer_args else summarizer_args
+        self.summarizer_args = SummarizerArgs(
+            summarize_code_only=True,
+            do_resummarize_artifacts=False,
+            **summarizer_args_kwargs) if not summarizer_args else summarizer_args
         self.resume_interactive_mode_step = None
         if skip_summarization:
             self.summarizer_args = None
@@ -115,6 +68,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :param run_setup: If True, runs the necessary setup before running the pipeline
         :return: None
         """
+        logger.log_with_title(f"{self.get_pipeline_name().upper()}", formatting=NEW_LINE + title_format_for_logs)
         if run_setup:
             self.run_setup_for_pipeline()
         for step in self.steps:
@@ -141,6 +95,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Runs the summarizer to create pipeline project summary and summarize artifacts
         :return: The project summary
         """
+        from tgen.summarizer.summarizer import Summarizer
         self.summarizer_args.update_export_dir(self.state.export_dir)
         dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
         if not self.args.dataset.project_summary:
@@ -228,6 +183,33 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             return not self.state.step_is_complete(curr_step.get_step_name())  # check if an earlier state was loaded
         return False
 
+    def get_next_step(self, curr_step: AbstractPipelineStep) -> AbstractPipelineStep:
+        """
+        Marks the next step as complete
+        :param curr_step: The current step
+        :return: The next step if the current step is not the last
+        """
+        next_index = self.steps.index(curr_step) + 1
+        if next_index < len(self.steps):
+            return self.steps[next_index]
+
+    def get_current_step(self) -> AbstractPipelineStep:
+        """
+        Gets the current step the pipeline is on
+        :return: The  current step the pipeline is on
+        """
+        completed_steps = [step for step in self.steps if self.state.step_is_complete(step.get_step_name())]
+        curr_step = None if len(completed_steps) == 0 else completed_steps[-1]
+        return curr_step
+
+    def get_pipeline_name(self) -> str:
+        """
+        Gets the name of the pipeline
+        :return: The name of the pipeline
+        """
+        name = ReflectionUtil.get_class_name(self)
+        return name
+
     def _get_current_and_next_step(self, exclude_options: Set[str]) -> Tuple[AbstractPipelineStep, AbstractPipelineStep]:
         """
         Determines what is the current step the pipeline is on and what is the next step
@@ -257,25 +239,6 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         for i, step in enumerate(self.steps):
             if i > curr_step_i:
                 self.state.mark_step_as_incomplete(step.get_step_name())
-
-    def get_next_step(self, curr_step: AbstractPipelineStep) -> AbstractPipelineStep:
-        """
-        Marks the next step as complete
-        :param curr_step: The current step
-        :return: The next step if the current step is not the last
-        """
-        next_index = self.steps.index(curr_step) + 1
-        if next_index < len(self.steps):
-            return self.steps[next_index]
-
-    def get_current_step(self) -> AbstractPipelineStep:
-        """
-        Gets the current step the pipeline is on
-        :return: The  current step the pipeline is on
-        """
-        completed_steps = [step for step in self.steps if self.state.step_is_complete(step.get_step_name())]
-        curr_step = None if len(completed_steps) == 0 else completed_steps[-1]
-        return curr_step
 
     def _option_new_state(self, curr_step: AbstractPipelineStep) -> bool:
         """

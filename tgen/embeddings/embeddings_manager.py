@@ -1,3 +1,5 @@
+import logging
+import math
 import os
 import uuid
 from typing import Any, Dict, List, Optional, Union
@@ -7,6 +9,7 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 from tgen.common.constants.environment_constants import IS_TEST
+from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -358,9 +361,11 @@ class EmbeddingsManager:
         artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
         if include_ids:
             artifact_contents = [f"{a_id}: {content}" for a_id, content in zip(subset_ids, artifact_contents)]
-        if not self.show_progress_bar:
-            logger.info("Calculating embeddings for artifacts...")
-        embeddings = self.get_model().encode(artifact_contents, show_progress_bar=self.show_progress_bar)
+        show_progress_bar = self.show_progress_bar and math.ceil(len(artifact_contents) / DEFAULT_ENCODING_BATCH_SIZE) > 1
+        if not show_progress_bar:
+            logger.log_without_spam(msg="Calculating embeddings for artifacts...", level=logging.INFO)
+        embeddings = self.get_model().encode(artifact_contents, batch_size=DEFAULT_ENCODING_BATCH_SIZE,
+                                             show_progress_bar=show_progress_bar)
         return embeddings if return_as_list else embeddings[0]
 
     def __set_embedding_order(self, ordered_ids: List[Any] = None) -> None:

@@ -27,7 +27,7 @@ class EmbeddingSorter(iSorter):
         children_embeddings = embedding_manager.create_artifact_embeddings(artifact_ids=child_ids)
 
         parent2rankings = {}
-        iterable = tqdm(parent_ids, desc="Performing Ranking Via Embeddings") if len(parent_ids) >= 5 else parent_ids
+        iterable = ListUtil.selective_tqdm(parent_ids, desc="Performing Ranking Via Embeddings")
         for parent_id in iterable:
             parent_embedding = embedding_manager.get_embedding(parent_id)
             scores = EmbeddingUtil.calculate_similarities([parent_embedding], children_embeddings)[0]

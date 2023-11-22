@@ -1,8 +1,9 @@
-from typing import List, Tuple
+from typing import List, Tuple, Sized, Iterable
 
 import numpy as np
 import pandas as pd
 from scipy.stats import percentileofscore
+from tqdm import tqdm
 
 
 class ListUtil:
@@ -111,3 +112,14 @@ class ListUtil:
         :return:
         """
         return [i.item() for i in numpy_array]
+
+    @staticmethod
+    def selective_tqdm(iterable: Iterable, length_threshold: int = 3, **tqdm_args) -> Iterable:
+        """
+        Uses tqdm only if the iterable is greater than a given threshold.
+        :param iterable: The object being iterated through.
+        :param length_threshold: If the length of the iterable exceeds the threshold, tqdm is used.
+        :param tqdm_args: Additional args to tqdm.
+        :return: An iterable, either using tqdm if its long or just the original iterable if short.
+        """
+        return tqdm(iterable, **tqdm_args) if len(iterable) >= length_threshold else iterable

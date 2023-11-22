@@ -63,7 +63,7 @@ class HGenUtil:
         load_path = FileUtil.add_ext(load_path, FileUtil.YAML_EXT) if load_path else load_path
         if dataset is None:
             predictions = LLMTrainer.predict_from_prompts(llm_manager=llm_manager, prompt_builder=prompt_builder,
-                                                          save_and_load_path=load_path).predictions
+                                                                    save_and_load_path=load_path).predictions
         else:
             dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
             trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,

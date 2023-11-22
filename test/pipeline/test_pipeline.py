@@ -11,7 +11,8 @@ from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep, AbstractPipeline
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.pipeline.state import State
 from tgen.testres.base_tests.base_test import BaseTest

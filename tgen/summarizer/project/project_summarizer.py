@@ -6,49 +6,57 @@ from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_STATE_FILENA
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
     USE_PROJECT_SUMMARY_SECTIONS
-from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS
+from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, BODY_VERSION_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.project.supported_project_summary_sections import PROJECT_SUMMARY_MAP
 from tgen.summarizer.summarizer_args import SummarizerArgs
+from tgen.summarizer.summarizer_util import SummarizerUtil
 from tgen.summarizer.summary import Summary
 
 
 class ProjectSummarizer(BaseObject):
 
-    def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset,
+    def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset = None,
+                 project_summary_versions: List[Summary] = None,
                  reload_existing: bool = True, n_tokens: int = DEFAULT_SUMMARY_TOKENS):
         """
         Generates a system specification document for containing all artifacts.
         :param summarizer_args: The args necessary for the summary
         :param dataset: The dataset to create the summary for
+        :param project_summary_versions: A list of different versions of the project summary from unique subsets.
         :param reload_existing: If True, reloads an existing project summary if it exists
         :param n_tokens: The token limit for the LLM
         """
         super().__init__()
-        self.artifact_df = dataset.artifact_df
+        self.args = summarizer_args
+        self.project_summary_versions = project_summary_versions
+        self.dataset = dataset
+        assert self.project_summary_versions or self.dataset, \
+            "Must supply existing project summaries or artifacts to create one"
+
         self.llm_manager: AbstractLLMManager = summarizer_args.llm_manager_for_project_summary
         self.n_tokens = n_tokens
         self.export_dir = summarizer_args.export_dir
         self.save_progress = bool(self.export_dir)
-        self.args = summarizer_args
-        self.dataset = dataset
         self.reload_existing = reload_existing
-        self.project_summary = Summary() if not dataset.project_summary else deepcopy(dataset.project_summary)
+        self.project_summary = Summary() if not dataset or not dataset.project_summary else deepcopy(dataset.project_summary)
         self.all_project_sections = self._get_all_project_sections(self.args)
         self.section_display_order = self._get_section_display_order(self.args.section_display_order,
                                                                      self.all_project_sections)
@@ -58,19 +66,25 @@ class ProjectSummarizer(BaseObject):
         Creates the project summary from the project artifacts.
         :return: The summary of the project.
         """
-        if self.args.project_summary_sections:
-            logger.log_title(f"Creating project specification: {self.args.project_summary_sections}")
-        self.artifact_df.summarize_content(ArtifactsSummarizer(self.args, project_summary=self.project_summary))
+
         if FileUtil.safely_check_path_exists(self.get_save_path()) and self.reload_existing:
             logger.info(f"Loading previous project summary from {self.get_save_path()}")
             self.project_summary = Summary.load_from_file(self.get_save_path())
+
+        if not self.args.project_summary_sections or not SummarizerUtil.needs_project_summary(self.project_summary, self.args):
+            return self.project_summary
+
+        logger.log_title(f"Creating project specification: "
+                         f"{SummarizerUtil.missing_project_summary_sections(self.project_summary, self.args)}")
 
         for section_id, section_prompt in self.get_generation_iterator():
             logger.log_step(f"Creating section: `{section_id}`")
             prompt_builder = self._create_prompt_builder(section_id, section_prompt)
             task_tag = section_prompt.get_response_tags_for_question(-1)
             task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
-            section_body, section_title = self._generate_section(prompt_builder, task_tag,
+            dataset = self.dataset if self.dataset \
+                else self._create_dataset_from_project_summaries(self.project_summary_versions, section_id)
+            section_body, section_title = self._generate_section(prompt_builder, task_tag, dataset=dataset,
                                                                  multi_line_items=section_id in MULTI_LINE_ITEMS)
             if not section_title:
                 section_title = section_id
@@ -90,32 +104,41 @@ class ProjectSummarizer(BaseObject):
         """
         assert isinstance(section_prompt, QuestionnairePrompt), f"Expected section {section_id} prompt " \
                                                                 f"to be a {QuestionnairePrompt.__class__.__name__}"
-        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=BODY_ARTIFACT_TITLE,
+        content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.dataset \
+            else SupportedPrompts.PROJECT_SUMMARY_CONTEXT_VERSIONS.value
+        prompt_prefix = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
+        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=prompt_prefix,
                                                build_method=MultiArtifactPrompt.BuildMethod.XML,
-                                               include_ids=True)
-        prompt_builder = PromptBuilder(prompts=[SupportedPrompts.PROJECT_SUMMARY_CONTEXT.value,
+                                               xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
+                                               if self.dataset else {"versions": ["id", "body"]},
+                                               include_ids=self.dataset is not None)
+        section_prompt.set_instructions(f"PS_QUESTIONS_HEADER{NEW_LINE}"
+                                        f"*Importantly, ONLY answer the {len(section_prompt.question_prompts)} questions below "
+                                        f"and ensure the ALL tags {section_prompt.get_all_response_tags()} "
+                                        f"are included in your answer*")
+        prompt_builder = PromptBuilder(prompts=[content_prompt,
                                                 artifacts_prompt,
                                                 section_prompt])
         if self.project_summary and section_id in USE_PROJECT_SUMMARY_SECTIONS:
             current_summary = self.project_summary.to_string()
             prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
-        section_prompt.set_instructions(PS_QUESTIONS_HEADER)
         return prompt_builder
 
-    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, multi_line_items: bool = False) -> Tuple[
-        str, str]:
+    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, dataset: PromptDataset,
+                          multi_line_items: bool = False) -> Tuple[str, str]:
         """
         Has the LLM generate the section corresponding using the prompt builder
         :param prompt_builder: Contains prompts necessary for generating section
         :param task_tag: The tag used to retrieve the generations from the parsed response
+        :param dataset: The dataset that will be provided to the model when generating
         :param multi_line_items: If True, expects each item in the body to span multiple lines
         :return: The section body and section title (if one was generated)
         """
         self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
         self.llm_manager.llm_args.temperature = 0
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
-            PromptDataset(
-                artifact_df=self.artifact_df)})
+
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset
+                                                                              })
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
                                              prompt_builder=prompt_builder,
                                              trainer_dataset_manager=trainer_dataset_manager))
@@ -193,3 +216,17 @@ class ProjectSummarizer(BaseObject):
         current_sections = set(args.project_summary_sections)
         sections_to_add = set(args.new_sections.keys()).difference(current_sections)
         return args.project_summary_sections + list(sections_to_add)
+
+    @staticmethod
+    def _create_dataset_from_project_summaries(project_summaries: List[Summary], curr_section: str) -> PromptDataset:
+        """
+        Creates a dataset using the project summaries' sections as artifacts
+        :param project_summaries: The versions of the project summary
+        :param curr_section: The section currently being built
+        :return: A dataset using the project summaries' sections as artifacts
+        """
+        versions = [summary.to_string([curr_section]) for summary in project_summaries]
+        artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [i for i in range(len(versions))],
+                                         ArtifactKeys.CONTENT: versions,
+                                         ArtifactKeys.LAYER_ID: ["summary_version" for _ in versions]})
+        return PromptDataset(artifact_df=artifact_df)

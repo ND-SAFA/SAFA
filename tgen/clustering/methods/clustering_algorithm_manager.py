@@ -7,6 +7,7 @@ from tgen.common.constants.clustering_constants import CLUSTER_METHOD_INIT_PARAM
     DEFAULT_RANDOM_STATE, NO_CLUSTER_LABEL, N_CLUSTERS_PARAM, RANDOM_STATE_PARAM
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
@@ -20,13 +21,16 @@ class ClusteringAlgorithmManager:
         """
         self.method = method
 
-    def cluster(self, embedding_manager: EmbeddingsManager, reduction_factor: float, subset_ids: List[str] = None,
+    def cluster(self, embedding_manager: EmbeddingsManager, reduction_factor: float, min_cluster_size: int,
+                max_cluster_size: int, subset_ids: List[str] = None,
                 **kwargs) -> ClusterMapType:
         """
         Clusters embeddings in map and creates sets of links.
         :param embedding_manager: Proxy for managing project embeddings, including retrieving them.
         :param reduction_factor: The factor by which the embeddings are reduced into clusters
         (e.g. 0.25 => # clusters = (embeddings / 4))
+        :param min_cluster_size: The minimum number of artifacts in a cluster.
+        :param max_cluster_size: The maximum number of artifacts in a cluster.
         :param kwargs: Clustering method arguments.
         :param subset_ids: Subset of artifacts to considering in clustering method.
         :return: Map of cluster ID to artifact ids in cluster.
@@ -37,7 +41,7 @@ class ClusteringAlgorithmManager:
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         n_clusters = max(round(len(embeddings) * reduction_factor), 1)
-        self.add_internal_kwargs(kwargs, n_clusters)
+        kwargs = self.add_internal_kwargs(kwargs, n_clusters, min_cluster_size, max_cluster_size)
 
         try:
             clustering_algo = self.method.value(**kwargs)
@@ -49,11 +53,14 @@ class ClusteringAlgorithmManager:
             clusters = {}
         return clusters
 
-    def add_internal_kwargs(self, kwargs: Dict, n_clusters: int) -> None:
+    def add_internal_kwargs(self, kwargs: Dict, n_clusters: int, min_cluster_size: int,
+                            max_cluster_size: int) -> Dict:
         """
         Creates kwargs internally defined for the algorithm.
         :param kwargs: Starting kwargs.
         :param n_clusters: The expected number of clusters to produce.
+           :param min_cluster_size: The minimum number of artifacts in a cluster.
+        :param max_cluster_size: The maximum number of artifacts in a cluster.
         :return: None, kwargs modified in place.
         """
         internal_init_params = CLUSTER_METHOD_INIT_PARAMS.get(self.method, {})
@@ -65,6 +72,10 @@ class ClusteringAlgorithmManager:
             DictUtil.update_kwarg_values(kwargs, n_clusters=n_clusters)
         if RANDOM_STATE_PARAM in param_specs.param_names:
             DictUtil.update_kwarg_values(kwargs, random_state=DEFAULT_RANDOM_STATE)
+
+        kwargs = FileUtil.expand_paths(paths=kwargs, use_abs_paths=False,
+                                       replacements={"[MIN_CLUSTER_SIZE]": min_cluster_size, "[MAX_CLUSTER_SIZE]": max_cluster_size})
+        return kwargs
 
     @staticmethod
     def create_clusters_from_labels(artifact_ids: List[str], cluster_labels: List[int],

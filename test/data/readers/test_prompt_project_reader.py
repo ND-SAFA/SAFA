@@ -41,8 +41,8 @@ class TestPromptProjectReader(BaseTest):
         ai_manager.mock_summarization()
         project_reader = self.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
-        project_reader.set_summarizer(ArtifactsSummarizer(SummarizerArgs(llm_manager_for_artifact_summaries=llm_manager,
-                                                                         summarize_code_only=False)))
+        project_reader.set_summarizer(ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager,
+                                                                         summarize_code_only=False))
         prompts_df = project_reader.read_project()
         expected_prompts = []
         with open(self.PROJECT_PATH) as file:

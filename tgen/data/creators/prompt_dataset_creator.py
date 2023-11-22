@@ -13,8 +13,6 @@ from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
-from tgen.summarizer.summarizer import Summarizer
-from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
 
 
@@ -72,21 +70,9 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         :return: The summarized dataset
         """
         if dataset.artifact_df is not None and not dataset.artifact_df.is_summarized(code_only=True):
-            export_path = dataset.data_export_path if dataset.data_export_path else self.get_project_path()
-            export_path = FileUtil.get_directory_path(export_path)
-            summarizer_args = SummarizerArgs(export_dir=export_path,
-                                             summarize_code_only=True,
-                                             do_resummarize_project=False,
-                                             do_resummarize_artifacts=True)
-            summary_path = os.path.join(self.get_project_path(), summarizer_args.summary_dirname)
-            if os.path.exists(summary_path):
-                self._use_existing_summaries(dataset, summary_path)
-                summarizer = ArtifactsSummarizer(summarizer_args,
-                                                 project_summary=dataset.project_summary, )
-                dataset.artifact_df.summarize_content(summarizer)  # summarize any artifacts that were not in existing summaries
-            else:
-                summarizer = Summarizer(summarizer_args, dataset=dataset)
-                dataset = summarizer.summarize()
+            summarizer = ArtifactsSummarizer(summarize_code_only=True,
+                                             project_summary=dataset.project_summary)
+            dataset.artifact_df.summarize_content(summarizer)  # summarize any artifacts that were not in existing summaries
         return dataset
 
     def _use_existing_summaries(self, dataset: PromptDataset, summary_path: str) -> None:

@@ -4,9 +4,9 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.add_clusters_to_dataset import AddClustersToDataset
 from tgen.clustering.steps.condense_clusters import CondenseClusters
+from tgen.clustering.steps.create_batches import CreateBatches
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
-from tgen.clustering.steps.create_seeded_clusters import CreateSeededClusters
 from tgen.clustering.steps.link_orphans import LinkOrphans
 from tgen.common.util.base_object import BaseObject
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
@@ -18,7 +18,7 @@ class ClusteringPipeline(AbstractPipeline[ClusteringArgs, ClusteringState], Base
     """
     steps = [
         CreateEmbeddings,
-        CreateSeededClusters,
+        CreateBatches,
         CreateClustersFromEmbeddings,
         CondenseClusters,
         LinkOrphans,

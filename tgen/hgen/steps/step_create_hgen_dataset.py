@@ -42,35 +42,31 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         layer_data_frames = [curr_layer_df]
 
         if args.add_clusters_as_artifacts:
-            cluster_trace_dataset = state.cluster_dataset.trace_dataset
-            cluster_artifact_type = cluster_trace_dataset.artifact_df.get_artifact_types()[0]
-            artifact2cluster = {a: cluster_id for cluster_id, artifacts in state.seeded_cluster_map.items() for a in artifacts}
+            # TODO: Check that don't need to filter out the seeds.
+            artifact2seed = {a: cluster_id for cluster_id, artifacts in state.seed2artifacts.items() for a in artifacts}
 
-            cluster2generated = {}
-            for source_artifact in state.original_dataset.artifact_df.to_artifacts():
+            seed2cluster = {}
+            source_artifacts = state.original_dataset.artifact_df.to_artifacts()
+            print("Starting...")
+            for source_artifact in source_artifacts:  # TODO : Add iterator
                 source_id = source_artifact[ArtifactKeys.ID]
-                artifact_parents = curr_trace_df.get_parents(source_id)
-                source_cluster = artifact2cluster[source_id]
-                for artifact_parent in artifact_parents:
-                    cluster2generated[source_cluster].add(artifact_parent)
+                seed = artifact2seed.get(source_id, None)
+                if seed is None:
+                    continue
+                cluster_artifacts = curr_trace_df.get_parents(source_id)
+                if seed not in seed2cluster:
+                    seed2cluster[seed] = set()
+                for a in cluster_artifacts:
+                    seed2cluster[seed].add(a)
 
-            cluster_artifacts = cluster_trace_dataset.artifact_df.to_artifacts()  # TODO: Fix bug where dictionary keys are included as artifacts here
-            new_cluster_artifacts = []
-            for a in cluster_artifacts:
-                new_cluster_artifact = self.create_cluster_artifact(a)
-                prev_id = a[ArtifactKeys.ID]
-                new_id = new_cluster_artifact[ArtifactKeys.ID]
-                if prev_id in cluster2generated:
-                    cluster2generated[new_id] = cluster2generated.pop(prev_id)  # rename key
-                else:
-                    print("oopsies")
+            new_seed_map = {seed: self.create_cluster_artifact(seed, args.get_seed_id()) for seed in seed2cluster.keys()}
+            new_cluster_artifacts = list(new_seed_map.values())
 
-                new_cluster_artifacts.append(new_cluster_artifact)
             artifact_df = ArtifactDataFrame(new_cluster_artifacts)
-            trace_links = [Trace(source=g_id, target=c_id, label=1, score=1)
-                           for c_id, g_ids in cluster2generated.items() for g_id in g_ids]
+            trace_links = [Trace(source=c_id, target=new_seed_map[seed][ArtifactKeys.ID], label=1, score=1)
+                           for seed, cluster_ids in seed2cluster.items() for c_id in cluster_ids]
             trace_df = TraceDataFrame(trace_links)
-            layer_df = LayerDataFrame.from_single(source_type=args.target_type, target_type=cluster_artifact_type)
+            layer_df = LayerDataFrame.from_single(source_type=args.target_type, target_type=args.seed_project_summary_section)
 
             artifact_data_frames.append(artifact_df)
             trace_data_frames.append(trace_df)
@@ -86,12 +82,12 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.final_dataset = dataset
 
     @staticmethod
-    def create_cluster_artifact(cluster_artifact: Artifact):
-        curr_id = cluster_artifact[ArtifactKeys.ID].splitlines()
+    def create_cluster_artifact(seed_text: str, seed_layer_id: str):  # TODO: Handle case where new newline exists.
+        curr_id = seed_text.splitlines()
         artifact_id = curr_id[0]
         artifact_content = NEW_LINE.join(curr_id[1:])
-        layer_id = cluster_artifact[ArtifactKeys.LAYER_ID]
-        new_artifact = Artifact(id=artifact_id, content=artifact_content, layer_id=layer_id, summary=EMPTY_STRING, )
+        layer_id = seed_layer_id
+        new_artifact = Artifact(id=artifact_id, content=artifact_content, layer_id=layer_id, summary=EMPTY_STRING)
         return new_artifact
 
     @staticmethod

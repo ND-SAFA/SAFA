@@ -112,7 +112,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Adds clusters as artifacts
     """
-    add_clusters_as_artifacts: bool = False
+    add_clusters_as_artifacts: bool = True
 
     def __post_init__(self) -> None:
         """
@@ -134,3 +134,6 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
+
+    def get_seed_id(self) -> str:
+        return self.seed_project_summary_section

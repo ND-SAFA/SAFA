@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Set, Union
 
-from tgen.clustering.base.cluster import Cluster
+from tgen.clustering.base.cluster_type import ClusterIdType
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -27,9 +27,9 @@ class HGenState(State):
     """
     Optional Step 3 - Break project into parts and generate for each part
     """
-    id_to_cluster_artifacts: Dict[Any, List[EnumDict]] = None  # maps cluster id to the list of artifacts in that cluster
-    seeded_cluster_map: Dict[Any, List[Cluster]] = None
-    cluster_dataset: Optional[PromptDataset] = None  # contains prompt dataset with just the artifact df of the clusters.
+    id_to_cluster_artifacts: dict = None  # maps cluster id to the list of artifacts in that cluster
+    seed2artifacts: ClusterIdType = None  # If given seeds, maps seeds to cluster artifacts.
+    cluster_dataset: PromptDataset = None  # contains prompt dataset with just the artifact df of the clusters.
     embedding_manager: EmbeddingsManager = None  # allows embeddings to be reused
 
     """

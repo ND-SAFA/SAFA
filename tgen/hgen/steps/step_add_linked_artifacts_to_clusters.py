@@ -2,6 +2,7 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.link_orphans import LinkOrphans
+from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -19,7 +20,9 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
         """
         if args.perform_clustering and args.add_linked_artifacts_to_cluster and state.original_dataset.trace_dataset:
             original_trace_dataset = state.original_dataset.trace_dataset
-            for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
+            cluster2artifacts = ClusteringUtil.replace_ids_with_artifacts(state.id_to_cluster_artifacts,
+                                                                          state.source_dataset.artifact_df)
+            for cluster_id, cluster_artifacts in cluster2artifacts.items():
                 additional_artifacts = []
                 for artifact in cluster_artifacts:
                     child_traces = original_trace_dataset.trace_df.filter_by_row(
@@ -39,13 +42,12 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
             clustering_state = ClusteringState(
                 final_cluster_map={cluster_id: Cluster.from_artifacts([a[ArtifactKeys.ID] for a in cluster_artifacts],
                                                                       embeddings_manager=state.embedding_manager)
-                                   for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items()},
+                                   for cluster_id, cluster_artifacts in cluster2artifacts.items()},
                 embedding_manager=state.embedding_manager)
             LinkOrphans().run(clustering_args, clustering_state)
 
             new_clusters = {c_id for c_id, c_artifacts in clustering_state.final_cluster_map.items()
-                            if c_id not in state.id_to_cluster_artifacts}
-            state.id_to_cluster_artifacts = {c_id: [state.original_dataset.artifact_df.get_artifact(a_id)
-                                                    for a_id in artifact_ids]
+                            if c_id not in cluster2artifacts}
+            state.id_to_cluster_artifacts = {c_id: [a_id for a_id in artifact_ids]
                                              for c_id, artifact_ids in clustering_state.final_cluster_map.items()
                                              if c_id not in new_clusters}

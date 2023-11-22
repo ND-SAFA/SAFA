@@ -2,7 +2,6 @@ from typing import Dict, List
 
 import numpy as np
 
-from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.common.logging.logger_manager import logger
@@ -11,7 +10,7 @@ from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
-class CreateSeededClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
+class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
     def _run(self, args: ClusteringArgs, state: ClusteringState) -> None:
         """
         Links artifacts to their nearest seeded cluster.
@@ -21,30 +20,30 @@ class CreateSeededClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]
         """
         seeds = args.cluster_seeds
         artifact_ids = list(args.dataset.artifact_df.index)
-
-        if seeds is None or len(seeds) == 0:
-            return
-
+        embedding_manager: EmbeddingsManager = state.embedding_manager
         if len(artifact_ids) == 0:
             raise Exception("Cannot perform seed clustering with no artifacts.")
+        if seeds:
+            seed2artifacts = self.cluster_around_centroids(embedding_manager, artifact_ids, seeds)
+            state.seeded_cluster_map = seed2artifacts  # used to link seeds to source artifacts later on.
+            artifact_batches = [artifacts for seed, artifacts in seed2artifacts.items() if len(artifacts) > 0]
+        else:
+            artifact_batches = [artifact_ids]
+        state.artifact_batches = artifact_batches
 
-        embedding_manager: EmbeddingsManager = state.embedding_manager
-        cluster_map = self.cluster_with_centroids(embedding_manager, artifact_ids, seeds)
-        state.seeded_cluster_map = cluster_map
-        state.artifact_batches = [Cluster.from_artifacts(cluster_map[seed], embedding_manager) for seed in seeds]
-
-    def cluster_with_centroids(self, embedding_manager: EmbeddingsManager, artifact_ids: List[str], centroids: List[str]):
+    @staticmethod
+    def cluster_around_centroids(embedding_manager: EmbeddingsManager, artifact_ids: List[str], centroids: List[str]):
         """
         Clusters artifacts around seeds.
         :param embedding_manager: Used to get artifact and seed embeddings.
         :param artifact_ids: The artifacts to cluster.
         :param centroids: The seeds to cluster around.
-        :return:
+        :return: Map of centroids to their clustered artifacts.
         """
         artifact_embeddings = embedding_manager.get_embeddings(artifact_ids)
-        centroid_embeddings = self.create_embeddings(embedding_manager, centroids)
+        centroid_embeddings = CreateBatches.create_embeddings(embedding_manager, centroids)
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, centroid_embeddings)
-        cluster_map = self.assign_clusters_to_artifacts(centroids, artifact_ids, similarity_matrix)
+        cluster_map = CreateBatches.assign_clusters_to_artifacts(centroids, artifact_ids, similarity_matrix)
         return cluster_map
 
     @staticmethod

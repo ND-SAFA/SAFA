@@ -7,7 +7,7 @@ from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.math_util import MathUtil
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -81,7 +81,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map()
         state.embedding_manager.update_or_add_contents(new_artifact_map)
-        subset_ids = list({a[ArtifactKeys.ID] for artifacts in state.id_to_cluster_artifacts.values() for a in artifacts})
+        subset_ids = list({a_id for a_ids in state.id_to_cluster_artifacts.values() for a_id in a_ids})
         subset_ids += list(state.new_artifact_dataset.artifact_df.index)
         state.embedding_manager.create_artifact_embeddings(artifact_ids=subset_ids)
         pipeline_kwargs = dict(dataset=state.all_artifacts_dataset, selection_method=None,
@@ -89,16 +89,15 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                embeddings_manager=state.embedding_manager)
 
         orphans = state.original_dataset.trace_dataset.trace_df.get_orphans() if state.original_dataset.trace_dataset else set()
-        for cluster_id in state.cluster_dataset.trace_dataset.artifact_df.index:
+        for cluster_id in state.cluster_dataset.artifact_df.index:
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations if
                           generation in generation2id]  # ignores if dup deleted already
             if len(parent_ids) == 0:
                 continue
-            children_ids = [a[ArtifactKeys.ID] for a in state.id_to_cluster_artifacts[cluster_id]
-                            if a[ArtifactKeys.ID] in state.source_dataset.artifact_df
-                            or a[ArtifactKeys.ID] in orphans
-                            ]
+            children_ids = [a_id for a_id in state.id_to_cluster_artifacts[cluster_id]
+                            if a_id in state.source_dataset.artifact_df
+                            or a_id in orphans]
             cluster_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), str(cluster_id))
             run_name = f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
                                                                           args.target_type, parent_ids)

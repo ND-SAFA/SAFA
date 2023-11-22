@@ -45,5 +45,5 @@ class ContextPrompt(MultiArtifactPrompt):
             id_to_context_artifacts = {a_id: [EnumDict({ArtifactKeys.ID: id_,
                                                         ArtifactKeys.CONTENT: embedding_manager.get_content(id_)})
                                               for id_, score in zip(sorted_ids, scores) if score >= context_threshold]}
-        artifacts = id_to_context_artifacts.get(a_id)
+        artifacts = id_to_context_artifacts.get(a_id, [])
         return super()._build(artifacts=artifacts, **kwargs)

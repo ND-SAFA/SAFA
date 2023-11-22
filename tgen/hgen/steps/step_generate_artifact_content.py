@@ -3,7 +3,9 @@ from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
+from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -41,18 +43,23 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         dataset = state.cluster_dataset if state.cluster_dataset is not None else state.source_dataset
 
+        id_to_context_artifact = ClusteringUtil.replace_ids_with_artifacts(state.id_to_cluster_artifacts,
+                                                                           state.source_dataset.artifact_df)
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True,
-                                                                    id_to_context_artifacts=state.id_to_cluster_artifacts,
+                                                                    id_to_context_artifacts=id_to_context_artifact,
                                                                     use_summary=False)
         if state.id_to_cluster_artifacts:
             n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
             prompt_builder.format_variables = {"n_targets": n_targets}
-        if state.project_summary:
-            overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
-                                               f"{NEW_LINE}{state.project_summary.to_string()}", allow_formatting=False)
-            prompt_builder.add_prompt(overview_of_system_prompt, 1)
 
+        project_summary = state.original_dataset.project_summary
+        if project_summary:
+            project_overview = project_summary.to_string([PS_OVERVIEW_TITLE])
+            overview_of_system_prompt = Prompt(f"\n{PromptUtil.as_markdown_header('Overview of System:')}"
+                                               f"{NEW_LINE}{project_overview}", allow_formatting=False)
+            prompt_builder.add_prompt(overview_of_system_prompt, 1)
+        # TODO: Check is project summary
         generation_predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
                                                           dataset=dataset, response_prompt_ids={task_prompt.id},
                                                           tags_for_response={generated_artifacts_tag}, return_first=False,
@@ -71,8 +78,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current HGEN state
         :return: A list of the expected number of target artifacts for each cluster
         """
-        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(state.id_to_cluster_artifacts[i]))
-                     for i in artifact_ids]
+        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(artifact_ids))
+                     for c_id, artifact_ids in state.id_to_cluster_artifacts.items()]
         return n_targets
 
     @staticmethod
@@ -115,7 +122,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         generated_artifact_to_predicted_sources = {}
         cluster2generations = {cluster_id: [] for cluster_id in
-                               state.cluster_dataset.trace_dataset.artifact_df.index} if state.cluster_dataset else {}
+                               state.cluster_dataset.artifact_df.index} if state.cluster_dataset else {}
         cluster_ids = list(cluster2generations.keys()) if state.cluster_dataset is not None else []
         for i, pred in enumerate(generation_predictions):
             for p in pred:

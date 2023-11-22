@@ -12,7 +12,6 @@ from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_FACTOR
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.embedding_util import EmbeddingUtil
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
@@ -85,7 +84,8 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
             new_name = expected_names[cluster_id]
             self.assertIn(new_name, state.all_artifacts_dataset.artifact_df)
             self.assertNotIn(cluster_id, state.all_artifacts_dataset.artifact_df)
-            for i, artifact in enumerate(cluster_artifacts):
+            for i, a_id in enumerate(cluster_artifacts):
+                artifact = args.dataset.artifact_df.get_artifact(a_id)
                 found_pred = self.find_link(artifact, new_name, state.trace_predictions)
                 found_selected = self.find_link(artifact, new_name, state.selected_predictions)
                 self.assertEqual(len(found_pred), 1)
@@ -176,15 +176,15 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         n = 11
         n_artifacts_last_cluster = n
         n_clusters = math.floor(len(artifacts) / n)
-        state.id_to_cluster_artifacts = {i: [EnumDict(a) for a in artifacts[i * n:i * n + n]]
+        state.id_to_cluster_artifacts = {i: [a[ArtifactKeys.ID] for a in artifacts[i * n:i * n + n]]
                                          for i in range(n_clusters)}
         if n_clusters * n < len(artifacts):
             rem = n_clusters * n
-            added_clusters = [EnumDict(a) for a in artifacts[rem:] + artifacts[:2]]
+            added_clusters = [a[ArtifactKeys.ID] for a in artifacts[rem:] + artifacts[:2]]
             state.id_to_cluster_artifacts[n_clusters - 1].extend(added_clusters)
             n_artifacts_last_cluster += len(added_clusters)
 
-        manual_clusters = {i: [a[ArtifactKeys.ID] for a in artifacts] for i, artifacts in state.id_to_cluster_artifacts.items()}
+        manual_clusters = {i: [a_id for a_id in artifact_ids] for i, artifact_ids in state.id_to_cluster_artifacts.items()}
         cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters).create()
         state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
         return artifacts, n, n_artifacts_last_cluster,

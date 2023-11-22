@@ -65,21 +65,22 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("Avoid ambiguous language, and only include information contained in the {source_type}. "),
     QuestionPrompt("Ensure that all features and functionality are included in the {target_type}s.")],
     enumeration_chars=["-"])
-GENERATION_NOTES_PROMPT = Prompt(
-    "First, write all the important information about the {source_type}s that should be captured in the {target_type}(s).",
-    response_manager=PromptResponseManager(response_tag="notes")
-)
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
-    GENERATION_NOTES_PROMPT,
+    Prompt(
+        "First, write a highly detailed paragraph describing the functionality of the {source_type}(s) that should be captured by the {target_type}(s).",
+        response_manager=PromptResponseManager(response_tag="notes")
+    ),
     QuestionPrompt(
-        "For your next task, the primary objective is to desecribe the functionality represented across the {source_type} "
-        "into a minimal set ({n_targets}) of overarching {target_type}s. "
-        "The {target_type}s should generalize common functionality from multiple {source_type}s. "),
-    QuestionPrompt("The {target_type}s should focus on the what the functionality achieves in `{source_type}`. "
-                   "You can use the `Overview of System` to understand the project."),
-    QuestionPrompt("Make sure each {target_type} is detailed and stays focused on a single, clear purpose. "
-                   "Their should be enough details to guide the implementation of the {target_type}."),
+        "For your next task, the primary objective is to create a minimal set ({n_targets}) of detailed {target_type}s "
+        "specifying the functionality achieved by the {source_type}s."
+    ),
+    QuestionPrompt(
+        "The {target_type}s should generalize the important functionality into {n_targets} {target_type}(s). "
+        "Each {target_type} should be detailed and focused on a single, clear purpose. "
+        "Their should be enough details to guide the implementation of the {target_type}. "
+        "Use the `Overview of System` to understand the greater context of the system containing the {source_type}s."
+    ),
     QuestionPrompt("{description} "),
     QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}.")
 ], enumeration_chars=["-"])

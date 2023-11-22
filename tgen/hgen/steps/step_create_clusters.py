@@ -1,8 +1,8 @@
-from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
+from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.file_util import FileUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
@@ -20,44 +20,47 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: Current state of the hgen pipeline.
         :return: None
         """
+        if not args.perform_clustering:
+            state.embedding_manager = EmbeddingsManager(content_map={}, model_name=DEFAULT_EMBEDDING_MODEL)
+            return
+
+        cluster_args = self.create_clustering_args(args, state.source_dataset)
+        clustering_pipeline = ClusteringPipeline(cluster_args)
+        clustering_pipeline.run()
+
+        self.update_hgen_state(state, clustering_pipeline.state)
+
+    @staticmethod
+    def update_hgen_state(state: HGenState, cluster_state: ClusteringState) -> None:
+        """
+        Updates the state of hgen with the result of the clustering pipeline.
+        :param args: The configuration of the HGen pipeline.
+        :param state: The state of the hgen pipeline.
+        :param cluster_state: The final state of the clustering pipeline.
+        :return: None
+        """
+        state.update_total_costs_from_state(cluster_state)
+        state.embedding_manager = cluster_state.embedding_manager
+        state.id_to_cluster_artifacts = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
+        state.seed2artifacts = cluster_state.seeded_cluster_map
+        state.cluster_dataset = cluster_state.cluster_artifact_dataset
+
+    @staticmethod
+    def create_clustering_args(args: HGenArgs, source_dataset: PromptDataset) -> ClusteringArgs:
+        """
+        Creates the configuration of the clustering pipeline basedon the args of the hgen pipeline.
+        :param args: The configuration of the hgen pipeline.
+        :param source_dataset: Dataset containing source artifacts.
+        :return: The arguments to clustering pipeline.
+        """
         clustering_pipeline_kwargs = {}
         if args.seed_project_summary_section:
             section_id = args.seed_project_summary_section
             section_chunks = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             clustering_pipeline_kwargs["cluster_seeds"] = section_chunks
             clustering_pipeline_kwargs["cluster_artifact_type"] = section_id
-
+            clustering_pipeline_kwargs["cluster_reduction_factor"] = .10
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
-        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
+        cluster_args = ClusteringArgs(dataset=source_dataset, create_dataset=True, export_dir=clustering_export_path,
                                       **clustering_pipeline_kwargs)
-        if not args.perform_clustering:
-            state.embedding_manager = EmbeddingsManager(content_map={}, model_name=cluster_args.embedding_model)
-            return
-
-        clustering_pipeline = ClusteringPipeline(cluster_args)
-        clustering_pipeline.run()
-        state.update_total_costs_from_state(clustering_pipeline.state)
-
-        cluster_map = clustering_pipeline.state.final_cluster_map
-
-        if args.seed_project_summary_section:
-            cluster_subset = clustering_pipeline.state.cluster_dataset.trace_dataset.artifact_df.get_type(section_id)
-            clustering_pipeline.state.cluster_dataset.trace_dataset.artifact_df = cluster_subset
-
-        state.cluster_dataset = PromptDataset(trace_dataset=clustering_pipeline.state.cluster_dataset.trace_dataset)
-        state.embedding_manager = clustering_pipeline.state.embedding_manager
-
-        source_artifact_df = state.source_dataset.artifact_df
-        state.id_to_cluster_artifacts = self._replace_ids_with_artifacts(cluster_map, source_artifact_df)
-        state.seeded_cluster_map = clustering_pipeline.state.seeded_cluster_map  # Check that has minimal information
-
-    @staticmethod
-    def _replace_ids_with_artifacts(cluster_map: ClusterMapType, artifact_df: ArtifactDataFrame):
-        """
-        Replaces the artifact ids in the cluster map with the artifacts themselves.
-        :param cluster_map: Map from cluster ids to artifacts ids.
-        :param artifact_df: Artifact data frame containing artifacts referenced by clusters.
-        :return: Cluster map with artifacts instead of artifact ids.
-        """
-        return {cluster_id: [artifact_df.get_artifact(a_id) for a_id in artifact_ids]
-                for cluster_id, artifact_ids in cluster_map.items()}
+        return cluster_args

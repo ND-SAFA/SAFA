@@ -1,9 +1,8 @@
 from typing import Dict, List, Set, Tuple
 
-from tgen.common.logging.logger_manager import logger
-
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -90,7 +89,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                embeddings_manager=state.embedding_manager)
 
         orphans = state.original_dataset.trace_dataset.trace_df.get_orphans() if state.original_dataset.trace_dataset else set()
-        for cluster_id in state.cluster_dataset.artifact_df.index:
+        for cluster_id in state.cluster_dataset.trace_dataset.artifact_df.index:
             generations = state.cluster2generation.get(cluster_id)
             parent_ids = [generation2id[generation] for generation in generations if
                           generation in generation2id]  # ignores if dup deleted already

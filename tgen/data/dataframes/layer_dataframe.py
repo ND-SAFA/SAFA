@@ -1,7 +1,7 @@
 from typing import List, Tuple, Type
 
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import LayerKeys
 
@@ -27,6 +27,18 @@ class LayerDataFrame(AbstractProjectDataFrame):
         """
         return LayerKeys
 
+    @staticmethod
+    def from_single(source_type: str, target_type: str):
+        """
+        Creates layer data frame with single entry.
+        :param source_type: The source type of the single entry.
+        :param target_type: The target type of the single entry.
+        :return: The new layer data frame.
+        """
+        layer_df = LayerDataFrame()
+        layer_df.add_layer(source_type=source_type, target_type=target_type)
+        return layer_df
+
     def add_layer(self, source_type: str, target_type: str) -> EnumDict:
         """
         Adds linked layers to dataframe
@@ -50,15 +62,13 @@ class LayerDataFrame(AbstractProjectDataFrame):
         return tracing_layers
 
     @classmethod
-    def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",
-               ignore_index: bool = True) -> "AbstractProjectDataFrame":
+    def concat(cls, *dataframes: "AbstractProjectDataFrame", ignore_index: bool = True) -> "LayerDataFrame":
         """
         Combines two dataframes
-        :param dataframe1: The first dataframe
-        :param dataframe2: The second dataframe
+        :param dataframes: The data frames to concatenate.
         :param ignore_index: If True, do not use the index values along the concatenation axis.
         :return: The new combined dataframe
         """
         if not ignore_index:
             logger.warning("Index should be ignored for concatenating layer dataframe since they are not unique")
-        return super().concat(dataframe1, dataframe2, ignore_index=True)
+        return super().concat(*dataframes, ignore_index=True)

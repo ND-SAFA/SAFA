@@ -1,6 +1,9 @@
 import uuid
-from typing import Tuple, Union, Set
+from typing import Set, Tuple, Union
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -25,19 +28,71 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
 
-        original_artifact_df, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
+        _, original_layer_df, original_trace_df = self._get_original_dataframes(state.original_dataset)
 
-        final_artifact_df = state.selected_artifacts_dataset.artifact_df
-        new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, state, final_artifact_df)
-        new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(state, final_artifact_df, new_layer_df)
+        curr_artifact_df = state.selected_artifacts_dataset.artifact_df
+        curr_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, state, curr_artifact_df)
+        curr_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(state, curr_artifact_df, curr_layer_df)
 
-        final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
-        final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
+        curr_trace_df = TraceDataFrame.concat(original_trace_df, curr_trace_df) if original_trace_df is not None else curr_trace_df
+        curr_layer_df = LayerDataFrame.concat(original_layer_df, curr_layer_df) if original_layer_df is not None else curr_layer_df
+
+        artifact_data_frames = [curr_artifact_df]
+        trace_data_frames = [curr_trace_df]
+        layer_data_frames = [curr_layer_df]
+
+        if args.add_clusters_as_artifacts:
+            cluster_trace_dataset = state.cluster_dataset.trace_dataset
+            cluster_artifact_type = cluster_trace_dataset.artifact_df.get_artifact_types()[0]
+            artifact2cluster = {a: cluster_id for cluster_id, artifacts in state.seeded_cluster_map.items() for a in artifacts}
+
+            cluster2generated = {}
+            for source_artifact in state.original_dataset.artifact_df.to_artifacts():
+                source_id = source_artifact[ArtifactKeys.ID]
+                artifact_parents = curr_trace_df.get_parents(source_id)
+                source_cluster = artifact2cluster[source_id]
+                for artifact_parent in artifact_parents:
+                    cluster2generated[source_cluster].add(artifact_parent)
+
+            cluster_artifacts = cluster_trace_dataset.artifact_df.to_artifacts()  # TODO: Fix bug where dictionary keys are included as artifacts here
+            new_cluster_artifacts = []
+            for a in cluster_artifacts:
+                new_cluster_artifact = self.create_cluster_artifact(a)
+                prev_id = a[ArtifactKeys.ID]
+                new_id = new_cluster_artifact[ArtifactKeys.ID]
+                if prev_id in cluster2generated:
+                    cluster2generated[new_id] = cluster2generated.pop(prev_id)  # rename key
+                else:
+                    print("oopsies")
+
+                new_cluster_artifacts.append(new_cluster_artifact)
+            artifact_df = ArtifactDataFrame(new_cluster_artifacts)
+            trace_links = [Trace(source=g_id, target=c_id, label=1, score=1)
+                           for c_id, g_ids in cluster2generated.items() for g_id in g_ids]
+            trace_df = TraceDataFrame(trace_links)
+            layer_df = LayerDataFrame.from_single(source_type=args.target_type, target_type=cluster_artifact_type)
+
+            artifact_data_frames.append(artifact_df)
+            trace_data_frames.append(trace_df)
+            layer_data_frames.append(layer_df)
+
+        final_artifact_df = ArtifactDataFrame.concat(*artifact_data_frames)
+        final_layer_df = LayerDataFrame.concat(*layer_data_frames)
+        final_trace_df = TraceDataFrame.concat(*trace_data_frames)
 
         dataset = PromptDataset(trace_dataset=TraceDataset(final_artifact_df, final_trace_df, final_layer_df),
                                 project_summary=args.dataset.project_summary)
 
         state.final_dataset = dataset
+
+    @staticmethod
+    def create_cluster_artifact(cluster_artifact: Artifact):
+        curr_id = cluster_artifact[ArtifactKeys.ID].splitlines()
+        artifact_id = curr_id[0]
+        artifact_content = NEW_LINE.join(curr_id[1:])
+        layer_id = cluster_artifact[ArtifactKeys.LAYER_ID]
+        new_artifact = Artifact(id=artifact_id, content=artifact_content, layer_id=layer_id, summary=EMPTY_STRING, )
+        return new_artifact
 
     @staticmethod
     def _get_layers_traced(final_artifact_df: ArtifactDataFrame, hgen_state: HGenState) -> Set[str]:

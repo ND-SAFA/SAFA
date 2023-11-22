@@ -7,9 +7,9 @@ import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
 
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict, EnumUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 
 
@@ -145,26 +145,25 @@ class AbstractProjectDataFrame(pd.DataFrame):
             i += 1
 
     @classmethod
-    def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",
-               ignore_index: bool = False) -> "AbstractProjectDataFrame":
+    def concat(cls, *data_frames: "AbstractProjectDataFrame", ignore_index: bool = False) -> "AbstractProjectDataFrame":
         """
         Combines two dataframes
-        :param dataframe1: The first dataframe
-        :param dataframe2: The second dataframe
+        :param data_frames: The data frames to concatenate.
         :param ignore_index: If True, do not use the index values along the concatenation axis.
         :return: The new combined dataframe
         """
         orient = 'records' if ignore_index else 'index'
-        data1 = dataframe1.remove_duplicate_indices().to_dict(orient=orient)
-        data2 = dataframe2.remove_duplicate_indices().to_dict(orient=orient)
+        data = [df.remove_duplicate_indices().to_dict(orient=orient) for df in data_frames]
         if ignore_index:
-            data1.extend(data2)
-            result = cls(data1)
+            data = [d for inner in data for d in inner]
+            result = cls(data)
         else:
-            data1.update(data2)
-            for index, cols in data1.items():
+            data_dict = {}
+            for d in data:
+                data_dict.update(d)
+            for index, cols in data_dict.items():
                 cols[cls.index_name()] = index
-            result = cls.from_dict(data1.values())
+            result = cls.from_dict(data_dict.values())
         return result
 
     @overrides(pd.DataFrame)

@@ -76,7 +76,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, automatically generates trace links explanations
     """
-    generate_explanations: bool = True
+    generate_explanations: bool = False
     """
     If True, creates clusters of related artifacts to create higher levels of docs for 
     """
@@ -109,6 +109,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     The section of the project summary to use as seeds for clustering.
     """
     seed_project_summary_section: str = None
+    """
+    Adds clusters as artifacts
+    """
+    add_clusters_as_artifacts: bool = False
 
     def __post_init__(self) -> None:
         """

@@ -1,5 +1,6 @@
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 
+CLUSTER_ARTIFACT_TYPE = "Cluster"
 DEFAULT_REDUCTION_FACTOR = 0.50  # # clusters =  # of artifacts * reduction_factor
 DEFAULT_CLUSTER_SIMILARITY_THRESHOLD = 0.5  # Similarity equal or greater will be considered as same clusters
 DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION = .75

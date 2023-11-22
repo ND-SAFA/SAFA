@@ -73,9 +73,9 @@ GENERATION_NOTES_PROMPT = Prompt(
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     GENERATION_NOTES_PROMPT,
     QuestionPrompt(
-        "For your next task, the primary objective is to generalize and abstract the functionality represented across the {source_type} "
+        "For your next task, the primary objective is to desecribe the functionality represented across the {source_type} "
         "into a minimal set ({n_targets}) of overarching {target_type}s. "
-        "The {target_type}s should group and consolidate common functionality from multiple {source_type}s. "),
+        "The {target_type}s should generalize common functionality from multiple {source_type}s. "),
     QuestionPrompt("The {target_type}s should focus on the what the functionality achieves in `{source_type}`. "
                    "You can use the `Overview of System` to understand the project."),
     QuestionPrompt("Make sure each {target_type} is detailed and stays focused on a single, clear purpose. "

@@ -115,7 +115,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         generated_artifact_to_predicted_sources = {}
         cluster2generations = {cluster_id: [] for cluster_id in
-                               state.cluster_dataset.artifact_df.index} if state.cluster_dataset else {}
+                               state.cluster_dataset.trace_dataset.artifact_df.index} if state.cluster_dataset else {}
         cluster_ids = list(cluster2generations.keys()) if state.cluster_dataset is not None else []
         for i, pred in enumerate(generation_predictions):
             for p in pred:

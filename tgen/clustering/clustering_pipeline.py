@@ -16,7 +16,14 @@ class ClusteringPipeline(AbstractPipeline[ClusteringArgs, ClusteringState], Base
     """
     Pipeline transforming dataset into clusters via embeddings.
     """
-    steps = [CreateEmbeddings, CreateSeededClusters, CreateClustersFromEmbeddings, CondenseClusters, LinkOrphans, AddClustersToDataset]
+    steps = [
+        CreateEmbeddings,
+        CreateSeededClusters,
+        CreateClustersFromEmbeddings,
+        CondenseClusters,
+        LinkOrphans,
+        AddClustersToDataset
+    ]
 
     def __init__(self, args: ClusteringArgs, **kwargs):
         """

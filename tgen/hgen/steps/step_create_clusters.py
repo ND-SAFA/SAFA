@@ -3,6 +3,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -24,6 +25,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             section_id = args.seed_project_summary_section
             section_chunks = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             clustering_pipeline_kwargs["cluster_seeds"] = section_chunks
+            clustering_pipeline_kwargs["cluster_artifact_type"] = section_id
+
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
         cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
                                       **clustering_pipeline_kwargs)
@@ -37,11 +40,16 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         cluster_map = clustering_pipeline.state.final_cluster_map
 
-        state.cluster_dataset = clustering_pipeline.state.cluster_artifact_dataset
+        if args.seed_project_summary_section:
+            cluster_subset = clustering_pipeline.state.cluster_dataset.trace_dataset.artifact_df.get_type(section_id)
+            clustering_pipeline.state.cluster_dataset.trace_dataset.artifact_df = cluster_subset
+
+        state.cluster_dataset = PromptDataset(trace_dataset=clustering_pipeline.state.cluster_dataset.trace_dataset)
         state.embedding_manager = clustering_pipeline.state.embedding_manager
 
         source_artifact_df = state.source_dataset.artifact_df
         state.id_to_cluster_artifacts = self._replace_ids_with_artifacts(cluster_map, source_artifact_df)
+        state.seeded_cluster_map = clustering_pipeline.state.seeded_cluster_map  # Check that has minimal information
 
     @staticmethod
     def _replace_ids_with_artifacts(cluster_map: ClusterMapType, artifact_df: ArtifactDataFrame):

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 from tgen.clustering.base.cluster_type import ClusterMapType, MethodClusterMapType
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -15,7 +16,9 @@ class ClusteringState(State):
     :TODO: param docs.
     """
     embedding_manager: EmbeddingsManager = None
-    multi_method_cluster_map: MethodClusterMapType = None
+    multi_method_cluster_map: List[MethodClusterMapType] = None
     final_cluster_map: ClusterMapType = None
     cluster_artifact_dataset: PromptDataset = None
     cluster_dataset: PromptDataset = None
+    seeded_cluster_map: ClusterMapType = None
+    artifact_batches: List[List[str]] = None

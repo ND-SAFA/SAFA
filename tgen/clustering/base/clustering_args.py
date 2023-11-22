@@ -3,7 +3,8 @@ from typing import Dict, List
 
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.constants import environment_constants
-from tgen.common.constants.clustering_constants import DEFAULT_ADD_CLUSTERS_TO_DATASET, DEFAULT_CLUSTERING_METHODS, \
+from tgen.common.constants.clustering_constants import CLUSTER_ARTIFACT_TYPE, DEFAULT_ADD_CLUSTERS_TO_DATASET, \
+    DEFAULT_CLUSTERING_METHODS, \
     DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
     DEFAULT_MIN_ORPHAN_SIMILARITY, DEFAULT_REDUCTION_FACTOR
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_EMBEDDING_MODEL
@@ -21,6 +22,7 @@ class ClusteringArgs(PipelineArgs):
     :param dataset_creator: The creator used to get the dataset.
     :param dataset: The dataset to cluster.
     :param cluster_seeds: The centroids for clusters in a project.
+    :param cluster_artifact_type: The artifact type to assign to cluster artifacts.
     """
     cluster_methods: List[SupportedClusteringMethods] = field(default_factory=lambda: DEFAULT_CLUSTERING_METHODS)
     clustering_method_args: Dict = field(default_factory=dict)
@@ -32,6 +34,7 @@ class ClusteringArgs(PipelineArgs):
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY
     cluster_seeds: List[str] = None
+    cluster_artifact_type: str = CLUSTER_ARTIFACT_TYPE
 
     def __post_init__(self) -> None:
         """

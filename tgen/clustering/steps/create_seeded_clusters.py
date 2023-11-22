@@ -5,6 +5,7 @@ import numpy as np
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -29,8 +30,8 @@ class CreateSeededClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]
 
         embedding_manager: EmbeddingsManager = state.embedding_manager
         cluster_map = self.cluster_with_centroids(embedding_manager, artifact_ids, seeds)
-        state.final_cluster_map = {t: Cluster.from_artifacts(artifacts, embedding_manager)
-                                   for t, artifacts in cluster_map.items() if len(artifacts) > 0}
+        state.seeded_cluster_map = cluster_map
+        state.artifact_batches = [Cluster.from_artifacts(cluster_map[seed], embedding_manager) for seed in seeds]
 
     def cluster_with_centroids(self, embedding_manager: EmbeddingsManager, artifact_ids: List[str], centroids: List[str]):
         """
@@ -59,6 +60,7 @@ class CreateSeededClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]
         upper_threshold = np.quantile(similarity_matrix, 0.95)
 
         cluster_map = {t: [] for t in centroids}
+        n_high_artifacts = 0
         for i, a_id in enumerate(artifact_ids):
             cluster_similarities = similarity_matrix[i, :]
 
@@ -68,11 +70,14 @@ class CreateSeededClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]
                 closest_cluster_similarity = cluster_similarities[closest_cluster_index]
                 if closest_cluster_similarity >= min_score:
                     assigned_clusters_indices.append(closest_cluster_index)
+            else:
+                n_high_artifacts += 1
 
             assigned_centroids = [centroids[i] for i in assigned_clusters_indices]
-            print("hi")
+
             for assigned_centroid_id in assigned_centroids:
                 cluster_map[assigned_centroid_id].append(a_id)
+        logger.info(f"# of highly linked artifacts: {n_high_artifacts}")
         return cluster_map
 
     @staticmethod

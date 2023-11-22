@@ -14,7 +14,6 @@ from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class AddClustersToDataset(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
-    CLUSTER_ARTIFACT_TYPE = "Cluster"
 
     def _run(self, args: ClusteringArgs, state: ClusteringState) -> None:
         """
@@ -28,7 +27,7 @@ class AddClustersToDataset(AbstractPipelineStep[ClusteringArgs, ClusteringState]
         cluster_map = state.final_cluster_map
         cluster_dataset_creator = ClusterDatasetCreator(prompt_dataset=args.dataset,
                                                         manual_clusters=cluster_map,
-                                                        layer_id=self.CLUSTER_ARTIFACT_TYPE)
+                                                        layer_id=args.cluster_artifact_type)
         new_prompt_dataset = cluster_dataset_creator.create()
         state.cluster_artifact_dataset = PromptDataset(artifact_df=new_prompt_dataset.artifact_df)
         state.cluster_dataset = PromptDataset(trace_dataset=new_prompt_dataset.trace_dataset)

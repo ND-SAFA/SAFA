@@ -1,27 +1,36 @@
+import re
+from string import ascii_lowercase
+
+from bs4 import BeautifulSoup
+
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.summarizer.summarizer import Summarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs
+from tgen.summarizer.summarizer_state import SummarizerState
 from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MockResponses, TEST_PROJECT_SUMMARY
+from tgen.testres.mocking.mock_responses import MockResponses, TEST_PROJECT_SUMMARY, create, SECTION_TAG_TO_TILE
 from tgen.testres.mocking.test_response_manager import TestAIManager
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
 
 
 class TestSummarizer(BaseTest):
-
     N_ARTIFACTS = len(SafaTestProject.get_source_artifacts() + SafaTestProject.get_target_artifacts())
     N_PROJECT_SECTIONS = len(MockResponses.project_summary_responses)
 
     """
     NO RE-SUMMARIZATIONS SO EVERYTHING IS SUMMARIZED AT MAX ONCE
     """
+
     @mock_anthropic
     def test_with_no_resummarize_and_no_summaries(self, ai_manager: TestAIManager):
         args = SummarizerArgs(do_resummarize_artifacts=False)
@@ -53,17 +62,17 @@ class TestSummarizer(BaseTest):
         summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
         self._assert_summarization(summarizer, 0, ai_manager)
 
-
     """
     RE_SUMMARIZE ARTIFACTS SO ARTIFACTS ARE ALWAYS SUMMARIZED AT LEAST ONCE, PROJECT SUMMARIZED NO MORE THAN ONCE
     """
+
     @mock_anthropic
     def test_with_resummarize_artifacts_and_no_summaries(self, ai_manager: TestAIManager):
         args = SummarizerArgs(do_resummarize_artifacts=True)
 
         ai_manager.set_responses(MockResponses.project_summary_responses)
         summarizer = self.get_summarizer(args)
-        n_expected_summarizations = 2*self.N_ARTIFACTS + self.N_PROJECT_SECTIONS
+        n_expected_summarizations = 2 * self.N_ARTIFACTS + self.N_PROJECT_SECTIONS
         self._assert_summarization(summarizer, n_expected_summarizations, ai_manager)
 
     @mock_anthropic
@@ -79,7 +88,7 @@ class TestSummarizer(BaseTest):
 
         ai_manager.set_responses(MockResponses.project_summary_responses)
         summarizer = self.get_summarizer(args, with_artifact_summaries=True)
-        self._assert_summarization(summarizer, self.N_PROJECT_SECTIONS+self.N_ARTIFACTS, ai_manager)
+        self._assert_summarization(summarizer, self.N_PROJECT_SECTIONS + self.N_ARTIFACTS, ai_manager)
 
     @mock_anthropic
     def test_with_resummarize_artifacts_with_all_summarized(self, ai_manager):
@@ -87,6 +96,49 @@ class TestSummarizer(BaseTest):
 
         summarizer = self.get_summarizer(args, with_artifact_summaries=True, with_project_summary=True)
         self._assert_summarization(summarizer, self.N_ARTIFACTS, ai_manager)
+
+    @mock_anthropic
+    def test_with_large_project(self, ai_manager: TestAIManager):
+        def assert_summary(summary, n_expected_ids):
+            n_ids = len(find_ids(summary.to_string())) / (n_project_summary_sections - 1)
+            self.assertEqual(n_ids, n_expected_ids)
+
+        def find_ids(body):
+            pattern = r'\[[a-zA-Z]\]'
+            matches = re.findall(pattern, body)
+            matches = [StrUtil.remove_chars(match, ["[", "]"]) for match in matches]
+            return matches
+
+        def project_summary_response(prompt, **kwargs):
+            artifact_ids = [tag.text for tag in BeautifulSoup(prompt).findAll("id")]
+            if not artifact_ids:
+                artifact_ids = set(find_ids(prompt))
+            artifact_ids = EMPTY_STRING.join([f"[{id_}]" for id_ in artifact_ids])
+            pattern = re.compile(r'<[^>]+>')
+            tag = pattern.findall(prompt)[-1]
+            tag = StrUtil.remove_chars(tag, ["</", ">"])
+            section_title = SECTION_TAG_TO_TILE.get(tag, PS_SUBSYSTEM_TITLE)
+            body_prefix = artifact_ids if section_title != PS_SUBSYSTEM_TITLE else None
+            return create(title=section_title, body_prefix=body_prefix)
+
+        ai_manager.mock_summarization()
+        summarizer = self.get_summarizer(SummarizerArgs())
+        ids = list(ascii_lowercase)
+        contents = [c * 10000 for c in ascii_lowercase]
+        layer = ["Large Layer" for _ in ids]
+        summarizer.dataset.update_artifact_df(ArtifactDataFrame({ArtifactKeys.ID: ids, ArtifactKeys.CONTENT: contents,
+                                                                 ArtifactKeys.LAYER_ID: layer}))
+        n_project_summary_sections = len(summarizer.args.project_summary_sections)
+        project_summary_responses = [project_summary_response for _ in range(3*n_project_summary_sections)]
+        ai_manager.set_responses(project_summary_responses)
+        summarizer.summarize()
+        state: SummarizerState = summarizer.state
+        clustered_artifacts = {a_id for c in state.cluster_map.values() for a_id in c.artifact_ids}
+        self.assertSize(len(ids), clustered_artifacts)
+        self.assertGreater(len(state.cluster_map), 1)
+        for project_summary, cluster in zip(state.project_summaries, state.cluster_map.values()):
+            assert_summary(project_summary, len(cluster))
+        assert_summary(state.final_project_summary, len(ids))
 
     def _assert_summarization(self, summarizer: Summarizer, expected_summarization_calls: int, ai_manager: TestAIManager):
         ai_manager.mock_summarization()
@@ -106,5 +158,3 @@ class TestSummarizer(BaseTest):
             dataset.project_summary = TEST_PROJECT_SUMMARY
         summarizer_args.summarize_code_only = False
         return Summarizer(summarizer_args, dataset)
-
-

@@ -35,6 +35,7 @@ class ClusteringArgs(PipelineArgs):
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY
     filter_by_cohesiveness: bool = True
     add_orphans_to_best_home: bool = False
+    subset_ids: List[str] = None
 
     def __post_init__(self) -> None:
         """

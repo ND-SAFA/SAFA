@@ -55,4 +55,5 @@ class StepClusterArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerState]
                                       add_orphans_to_best_home=True)
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
-        return clustering_pipeline.state.final_cluster_map
+        cluster_map = clustering_pipeline.state.final_cluster_map
+        return {cluster_id: cluster for cluster_id, cluster in cluster_map.items() if len(cluster) > 1}

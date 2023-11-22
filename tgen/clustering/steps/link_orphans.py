@@ -43,6 +43,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         """
         Attempts to create clusters from the orphan artifacts.
         :param args: The arguments to the clustering pipeline
+        :param state: The current state of the clustering pipeline
         :param cluster_map: The cluster map to add new clusters to.
         :param orphan_artifact_id_set:Set of orphan artifact ids.
         :param min_cluster_similarity: The minimum similarity score for a cluster to be accepted.
@@ -94,7 +95,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             best_cluster, sim_score = LinkOrphans.get_best_home_for_orphan(artifact_id, clusters)
             DictUtil.set_or_append_item(best_clusters, best_cluster, (artifact_id, sim_score))
         for cluster, orphans in best_clusters.items():
-            sorted_orphans = sorted(orphans, key=lambda x: x[1])
+            sorted_orphans = sorted(orphans, key=lambda x: x[1], reverse=True)  # ensure that top matches make it into cluster
             for (orphan_id, sim_score) in sorted_orphans:
                 if sim_score >= avg_similarity_threshold and len(cluster) < args.cluster_max_size:
                     cluster.add_artifact(orphan_id)

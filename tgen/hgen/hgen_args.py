@@ -32,7 +32,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The layer of the source artifacts for which higher-level artifacts will be generated
     """
-    source_layer_id: Union[str, List[str]] = required_field(field_name="source_layer_id")
+    source_layer_ids: Union[str, List[str]] = required_field(field_name="source_layer_id")
     """
     The type of higher-level artifact that will be generated
     """
@@ -129,8 +129,8 @@ class HGenArgs(PipelineArgs, BaseObject):
         """
         super().__post_init__()
         if not self.source_type:
-            is_code = all([layer_id in self.dataset.artifact_df.get_code_layers() for layer_id in self.source_layer_id])
-            self.source_type = "code" if is_code else self.source_layer_id[0]
+            is_code = all([layer_id in self.dataset.artifact_df.get_code_layers() for layer_id in self.source_layer_ids])
+            self.source_type = "code" if is_code else self.source_layer_ids[0]
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \

@@ -36,7 +36,6 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         cluster_args = self.create_clustering_args(args, state)
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
-
         self.update_hgen_state(state, clustering_pipeline.state)
 
     @staticmethod

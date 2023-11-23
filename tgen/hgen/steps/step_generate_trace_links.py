@@ -35,7 +35,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             state.selected_predictions = state.trace_predictions
             return
 
-        logger.info(f"Predicting links between {args.target_type} and {args.source_layer_id}\n")
+        logger.info(f"Predicting links between {args.target_type} and {args.source_layer_ids}\n")
 
         if args.perform_clustering:
             trace_predictions, selected_predictions = self._trace_artifacts_in_cluster_to_generated_parents(args, state)
@@ -54,7 +54,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state of HGen
         :return: The trace predictions for all candidates (that were not filtered)
         """
-        children_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.source_layer_id).index)
+        children_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.source_layer_ids).index)
         parent_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.target_type).index)
         run_name = RankingJob.get_run_name(args.source_type, children_ids, args.target_type, parent_ids)
         pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids,

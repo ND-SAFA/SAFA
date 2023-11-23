@@ -6,8 +6,7 @@ import mock
 import numpy as np
 import pandas as pd
 
-from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args, \
-    MISSING_PROJECT_SUMMARY_RESPONSES
+from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -191,7 +190,7 @@ class TestHierarchyGenerator(BaseTest):
         self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
         self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
         self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_linked_artifact, content[0],
-                                                                       self.HGEN_ARGS.source_layer_id[0])
+                                                                       self.HGEN_ARGS.source_layer_ids[0])
         original_link = EnumDict({TraceKeys.child_label(): dup_linked_artifact,
                                   TraceKeys.parent_label(): dup_artifact_id,
                                   TraceKeys.SCORE: 0.6,
@@ -224,14 +223,14 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(new_artifact[ArtifactKeys.LAYER_ID], self.HGEN_ARGS.target_type)
             for orig_id, orig_artifact in self.HGEN_STATE.original_dataset.artifact_df.itertuples():
                 self.assertIn(orig_id, self.HGEN_STATE.final_dataset.artifact_df.index)
-                if orig_artifact[ArtifactKeys.LAYER_ID] == self.HGEN_ARGS.source_layer_id:
+                if orig_artifact[ArtifactKeys.LAYER_ID] == self.HGEN_ARGS.source_layer_ids:
                     q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.trace_df, {"source": orig_id, "target": name})
                     self.assertEqual(len(q), 1)
         for i, layer in self.HGEN_STATE.original_dataset.trace_dataset.layer_df.itertuples():
             q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df, layer)
             self.assertEqual(len(q), 1)
         q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df,
-                                   {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id[0],
+                                   {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_ids[0],
                                     LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)
 

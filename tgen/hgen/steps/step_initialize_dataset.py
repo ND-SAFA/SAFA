@@ -21,7 +21,8 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         original_dataset_complete = args.dataset
         PipelineUtil.save_dataset_checkpoint(original_dataset_complete, state.export_dir, filename="initial_dataset_with_sources")
 
-        source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df, args.source_layer_id)
+        source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
+                                                                           args.source_layer_ids)
 
         state.source_dataset = source_layer_only_dataset
         state.original_dataset = original_dataset_complete

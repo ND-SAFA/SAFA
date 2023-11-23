@@ -111,10 +111,10 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         n_added_sources = len({trace[TraceKeys.SOURCE] for trace in state.trace_predictions
                                if trace[TraceKeys.SCORE] >= args.min_orphan_score_threshold}) - len(selected_sources)
         n_added_sources = max(n_added_sources, 0)
-        n_orphans = n_artifacts - len(selected_sources) - n_added_sources -1
+        n_orphans = n_artifacts - len(selected_sources) - n_added_sources - 1
         anthropic_manager.add_responses(
-                                        [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
-                                         for _ in range(n_orphans)])
+            [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
+             for _ in range(n_orphans)])
         FindHomesForOrphansStep().run(args, state)
 
     def assert_generate_explanations_step(self, args, state):
@@ -150,7 +150,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         state.project_summary = HGEN_PROJECT_SUMMARY
         state.original_dataset = args.dataset
         state.source_dataset = InitializeDatasetStep._create_dataset_with_single_layer(state.original_dataset.artifact_df,
-                                                                                       args.source_layer_id)
+                                                                                       args.source_layer_ids)
 
         user_story_responses = [PromptUtil.create_xml("user-story", us) for i, us in enumerate(HGenTestConstants.user_stories)]
 

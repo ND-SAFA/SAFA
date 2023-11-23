@@ -20,7 +20,7 @@ class NameArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         new_artifact_dataset = PromptDataset(artifact_df=new_artifact_df)
 
-        source_artifact_df = state.original_dataset.artifact_df.get_type(args.source_layer_id)
+        source_artifact_df = state.original_dataset.artifact_df.get_type(args.source_layer_ids)
         all_artifact_df = ArtifactDataFrame.concat(source_artifact_df, new_artifact_df)
         all_artifacts_dataset = PromptDataset(artifact_df=all_artifact_df, project_summary=args.dataset.project_summary)
 

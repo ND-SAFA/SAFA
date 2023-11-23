@@ -71,7 +71,7 @@ class HGenDatasetExporter:
         Adds the source artifacts to linked artifact data frames.
         :return:None.
         """
-        source_types = self.args.source_layer_id
+        source_types = self.args.source_layer_ids
         source_artifact_df = self.state.original_dataset.artifact_df.get_type(source_types)
         self.artifact_data_frames.append(source_artifact_df)
 
@@ -83,7 +83,7 @@ class HGenDatasetExporter:
         generated_artifact_df = self.state.selected_artifacts_dataset.artifact_df.get_type(self.args.target_type)
         self.artifact_data_frames.append(generated_artifact_df)
 
-        source_types = self.args.source_layer_id
+        source_types = self.args.source_layer_ids
         layer_df = LayerDataFrame.from_types(source_types, self.args.target_type)
         self.layer_data_frames.append(layer_df)
 

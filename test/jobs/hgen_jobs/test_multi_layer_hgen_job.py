@@ -59,7 +59,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         source_arts = args.dataset.artifact_df.filter_by_row(lambda row:
                                                              row[ArtifactKeys.LAYER_ID.value]
                                                              ==
-                                                             args.source_layer_id)
+                                                             args.source_layer_ids)
         final_cluster_step.side_effect = self.set_clustering_state
 
         expected_user_story_names, anthropic_responses = get_all_responses(target_type=args.target_type)
@@ -102,8 +102,8 @@ class TestMultiLayerHGenJob(BaseJobTest):
         if isinstance(dataset, str):
             self.fail(dataset)
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
-        layers = [args.source_layer_id] + [args.target_type, self.higher_levels[0],
-                                           self.higher_levels[1]]
+        layers = [args.source_layer_ids] + [args.target_type, self.higher_levels[0],
+                                            self.higher_levels[1]]
         n_expected_links = 0
         for i, layer in enumerate(layers):
             target_artifacts = dataset.artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer)
@@ -128,7 +128,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         anthropic_ai_manager.mock_summarization()
         project_summary_sections = {sec for sec in HierarchyGenerator.PROJECT_SUMMARY_SECTIONS}
         project_summary_sections.update(set(DEFAULT_PROJECT_SUMMARY_SECTIONS))
-        args = HGenArgs(source_layer_id="C++ Code",
+        args = HGenArgs(source_layer_ids="C++ Code",
                         target_type="Test User Story",
                         dataset_creator=PromptDatasetCreator(
                             project_summary=Summary({title: EnumDict({"title": title, "chunks": ["summary of project"]})

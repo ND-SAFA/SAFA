@@ -80,7 +80,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         anthropic_ai_manager.add_responses(mock_explanations)
         anthropic_ai_manager.mock_summarization()
         GenerateTraceLinksStep().run(args, state)
-        for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
+        for cluster_id, cluster_artifacts in state.cluster2artifacts.items():
             new_name = expected_names[cluster_id]
             self.assertIn(new_name, state.all_artifacts_dataset.artifact_df)
             self.assertNotIn(cluster_id, state.all_artifacts_dataset.artifact_df)
@@ -164,9 +164,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
     def _reset_cluster_artifacts_for_tracing_test(self, n_artifacts_last_cluster, n_artifacts_per_cluster, state):
         # makes it easier to test tracing
         added_artifacts_to_last_cluster = n_artifacts_last_cluster - n_artifacts_per_cluster
-        last_cluster_artifacts = state.id_to_cluster_artifacts[len(state.generation_predictions) - 1]
-        state.id_to_cluster_artifacts[len(state.generation_predictions) - 1] = last_cluster_artifacts[
-                                                                               :-added_artifacts_to_last_cluster]
+        last_cluster_artifacts = state.cluster2artifacts[len(state.generation_predictions) - 1]
+        state.cluster2artifacts[len(state.generation_predictions) - 1] = last_cluster_artifacts[
+                                                                         :-added_artifacts_to_last_cluster]
 
     def _setup_state_post_clustering_step(self, state):
         # makes it easier to test tracing + generation
@@ -174,15 +174,15 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         n = 11
         n_artifacts_last_cluster = n
         n_clusters = math.floor(len(artifacts) / n)
-        state.id_to_cluster_artifacts = {i: [a[ArtifactKeys.ID] for a in artifacts[i * n:i * n + n]]
-                                         for i in range(n_clusters)}
+        state.cluster2artifacts = {i: [a[ArtifactKeys.ID] for a in artifacts[i * n:i * n + n]]
+                                   for i in range(n_clusters)}
         if n_clusters * n < len(artifacts):
             rem = n_clusters * n
             added_clusters = [a[ArtifactKeys.ID] for a in artifacts[rem:] + artifacts[:2]]
-            state.id_to_cluster_artifacts[n_clusters - 1].extend(added_clusters)
+            state.cluster2artifacts[n_clusters - 1].extend(added_clusters)
             n_artifacts_last_cluster += len(added_clusters)
 
-        manual_clusters = {i: [a_id for a_id in artifact_ids] for i, artifact_ids in state.id_to_cluster_artifacts.items()}
+        manual_clusters = {i: [a_id for a_id in artifact_ids] for i, artifact_ids in state.cluster2artifacts.items()}
         cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters).create()
         state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
         return artifacts, n, n_artifacts_last_cluster,

@@ -20,7 +20,7 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
         """
         if args.perform_clustering and args.add_linked_artifacts_to_cluster and state.original_dataset.trace_dataset:
             original_trace_dataset = state.original_dataset.trace_dataset
-            cluster2artifacts = ClusteringUtil.replace_ids_with_artifacts(state.id_to_cluster_artifacts,
+            cluster2artifacts = ClusteringUtil.replace_ids_with_artifacts(state.cluster2artifacts,
                                                                           state.source_dataset.artifact_df)
             for cluster_id, cluster_artifacts in cluster2artifacts.items():
                 additional_artifacts = []
@@ -48,6 +48,6 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
 
             new_clusters = {c_id for c_id, c_artifacts in clustering_state.final_cluster_map.items()
                             if c_id not in cluster2artifacts}
-            state.id_to_cluster_artifacts = {c_id: [a_id for a_id in artifact_ids]
-                                             for c_id, artifact_ids in clustering_state.final_cluster_map.items()
-                                             if c_id not in new_clusters}
+            state.cluster2artifacts = {c_id: [a_id for a_id in artifact_ids]
+                                       for c_id, artifact_ids in clustering_state.final_cluster_map.items()
+                                       if c_id not in new_clusters}

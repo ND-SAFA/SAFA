@@ -81,7 +81,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map()
         state.embedding_manager.update_or_add_contents(new_artifact_map)
-        subset_ids = list({a_id for a_ids in state.id_to_cluster_artifacts.values() for a_id in a_ids})
+        subset_ids = list({a_id for a_ids in state.cluster2artifacts.values() for a_id in a_ids})
         subset_ids += list(state.new_artifact_dataset.artifact_df.index)
         state.embedding_manager.create_artifact_embeddings(artifact_ids=subset_ids)
         pipeline_kwargs = dict(dataset=state.all_artifacts_dataset, selection_method=None,
@@ -95,7 +95,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                           generation in generation2id]  # ignores if dup deleted already
             if len(parent_ids) == 0:
                 continue
-            children_ids = [a_id for a_id in state.id_to_cluster_artifacts[cluster_id]
+            children_ids = [a_id for a_id in state.cluster2artifacts[cluster_id]
                             if a_id in state.source_dataset.artifact_df
                             or a_id in orphans]
             cluster_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), str(cluster_id))

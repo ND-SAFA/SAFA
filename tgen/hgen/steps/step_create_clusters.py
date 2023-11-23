@@ -68,7 +68,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.embedding_manager = cluster_state.embedding_manager
         state.seed2artifacts = cluster_state.cluster2artifacts
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
-        state.id_to_cluster_artifacts = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
+        state.cluster2artifacts = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
         cluster_state.cluster_artifact_dataset.artifact_df.index = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)
 
     @staticmethod

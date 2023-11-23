@@ -4,7 +4,7 @@ import numpy as np
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_condenser import ClusterCondenser
-from tgen.clustering.base.cluster_type import MethodClusterMapType
+from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.common.constants.clustering_constants import MIN_PAIRWISE_AVG_PERCENTILE, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
@@ -20,15 +20,15 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param state: Current state of the clustering pipeline.
         :return: None
         """
-        global_batch_cluster_map: List[MethodClusterMapType] = state.multi_method_cluster_map
+        global_batch_cluster_map: List[ClusterMapType] = state.multi_method_cluster_map
 
         global_clusters = {}
         for i, batch_cluster_map in enumerate(global_batch_cluster_map):
             unique_cluster_map = ClusterCondenser(state.embedding_manager, threshold=args.cluster_intersection_threshold)
-            for method_name, method_cluster_map in batch_cluster_map.items():
-                clusters = method_cluster_map.values()
-                clusters = self.first_filter(args, clusters, unique_cluster_map)
-                self.second_filtering(args, clusters, unique_cluster_map)
+            clusters = list(batch_cluster_map.values())
+            clusters = self.first_filter(args, clusters, unique_cluster_map)
+            clusters = self.second_filtering(args, clusters, unique_cluster_map)
+            unique_cluster_map.add_all(clusters)
             batch_cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
             batch_cluster_map = {f"{i}:{k}": v for k, v in batch_cluster_map.items()}
             global_clusters.update(batch_cluster_map)
@@ -54,7 +54,7 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         if min_pairwise_avg is not None:
             clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filter_clusters))
             clusters = list(sorted(clusters, key=lambda v: v.avg_pairwise_sim, reverse=True))
-        unique_cluster_map.add_all(clusters)
+        return clusters
 
     @staticmethod
     def _calculate_min_pairwise_avg_threshold(clusters: List[Cluster]) -> Optional[float]:

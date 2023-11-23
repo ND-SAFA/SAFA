@@ -13,6 +13,7 @@
               "generate_trace_links": true,
               "interactive_mode": "[IS_INTERACTIVE_BOOL]",
               "seed_project_summary_section": "[PS_SECTION_OPTIONAL]",
+              "seed_layer_id": "[SEED_LAYER_ID]",
               "dataset_creator": {
                 "object_type": "PROMPT",
                 "trace_dataset_creator": {

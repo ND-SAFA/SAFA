@@ -110,9 +110,17 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     seed_project_summary_section: str = None
     """
+    The layer_id of the artifacts to use as seeds
+    """
+    seed_layer_id: str = None
+    """
     Adds clusters as artifacts
     """
     add_clusters_as_artifacts: bool = True
+    """
+    Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
+    """
+    export_hgen_content_only: bool = False
 
     def __post_init__(self) -> None:
         """
@@ -136,4 +144,11 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
 
     def get_seed_id(self) -> str:
-        return self.seed_project_summary_section
+        """
+        :return: The current seed layer id.
+        """
+        if self.seed_project_summary_section:
+            return self.seed_project_summary_section
+        if self.seed_layer_id:
+            return self.seed_layer_id
+        raise Exception("No seed id available. Seedd project Summary and layer_id are none.")

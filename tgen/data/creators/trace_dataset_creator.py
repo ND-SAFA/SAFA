@@ -1,4 +1,5 @@
 from collections import Counter
+from trace import Trace
 from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
@@ -176,6 +177,27 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             true_links = TraceDataFrame(self.trace_df[self.trace_df[StructuredKeys.Trace.LABEL] == 1])
             self.linked_artifact_ids = set(true_links[StructuredKeys.Trace.SOURCE]).union(true_links[StructuredKeys.Trace.TARGET])
         return self.linked_artifact_ids
+
+    @staticmethod
+    def create_trace_df_from_predictions(predictions: List[Trace],
+                                         artifact_df: ArtifactDataFrame,
+                                         layer_df: LayerDataFrame) -> TraceDataFrame:
+        """
+        Creates a dataframe of traces including the new trace links between the original lower-level artifacts
+        and the newly generated upper-level artifacts
+        :param predictions: The predictions to include in the trace data frame.
+        :param artifact_df: The dataframe containing artifacts referenced.
+        :param layer_df: The dataframe containing the layer mapping between artifacts
+        :return: The dataframe containing new and old trace links
+        """
+        traces = {}
+        if predictions:
+            for link in predictions:
+                DataFrameUtil.append(traces, link)
+        new_trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=layer_df,
+                                                                   artifact_df=artifact_df,
+                                                                   trace_df=TraceDataFrame(traces))
+        return new_trace_df
 
     @staticmethod
     def generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,

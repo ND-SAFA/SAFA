@@ -3,7 +3,7 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.file_util import FileUtil
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -12,6 +12,7 @@ from tgen.summarizer.summary import SummarySectionKeys
 
 
 class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
+    rf = {"small": 0.5, "medium": 0.3, "big": 0.15}
 
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
@@ -24,7 +25,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             state.embedding_manager = EmbeddingsManager(content_map={}, model_name=DEFAULT_EMBEDDING_MODEL)
             return
 
-        cluster_args = self.create_clustering_args(args, state.source_dataset)
+        cluster_args = self.create_clustering_args(args, state)
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
 
@@ -44,9 +45,10 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.id_to_cluster_artifacts = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
         state.seed2artifacts = cluster_state.seeded_cluster_map
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
+        cluster_state.cluster_artifact_dataset.artifact_df.index = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)
 
     @staticmethod
-    def create_clustering_args(args: HGenArgs, source_dataset: PromptDataset) -> ClusteringArgs:
+    def create_clustering_args(args: HGenArgs, state: HGenState) -> ClusteringArgs:
         """
         Creates the configuration of the clustering pipeline basedon the args of the hgen pipeline.
         :param args: The configuration of the hgen pipeline.
@@ -56,11 +58,32 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         clustering_pipeline_kwargs = {}
         if args.seed_project_summary_section:
             section_id = args.seed_project_summary_section
+
             section_chunks = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             clustering_pipeline_kwargs["cluster_seeds"] = section_chunks
             clustering_pipeline_kwargs["cluster_artifact_type"] = section_id
-            clustering_pipeline_kwargs["cluster_reduction_factor"] = .15
+            clustering_pipeline_kwargs["cluster_reduction_factor"] = CreateClustersStep.rf[CreateClustersStep]
+        if args.seed_layer_id:
+            seed_artifacts = state.original_dataset.artifact_df.get_type(args.seed_layer_id).to_artifacts()
+            seed_contents = [a[ArtifactKeys.CONTENT] for a in seed_artifacts]
+            clustering_pipeline_kwargs["cluster_seeds"] = seed_contents
+            clustering_pipeline_kwargs["cluster_artifact_type"] = args.seed_layer_id
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
-        cluster_args = ClusteringArgs(dataset=source_dataset, create_dataset=True, export_dir=clustering_export_path,
+        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
                                       cluster_max_size=20, **clustering_pipeline_kwargs)
         return cluster_args
+
+    @staticmethod
+    def get_reduction_factor(args: HGenArgs, state: HGenState):
+        n_sources = len(state.original_dataset.artifact_df.get_type(args.source_type))
+        project_size = CreateClustersStep.get_project_size(n_sources)
+        return CreateClustersStep.rf[project_size]
+
+    @staticmethod
+    def get_project_size(n_sources: int):
+        if n_sources <= 50:
+            return "small"
+        elif n_sources <= 300:
+            return "medium"
+        else:
+            return "large"

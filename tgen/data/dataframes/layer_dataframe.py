@@ -1,4 +1,4 @@
-from typing import List, Tuple, Type
+from typing import List, Tuple, Type, Union
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
@@ -28,15 +28,21 @@ class LayerDataFrame(AbstractProjectDataFrame):
         return LayerKeys
 
     @staticmethod
-    def from_single(source_type: str, target_type: str):
+    def from_types(source_types: Union[List[str], str], target_types: Union[List[str], str]):
         """
         Creates layer data frame with single entry.
-        :param source_type: The source type of the single entry.
-        :param target_type: The target type of the single entry.
+        :param source_types: The source type of the single entry.
+        :param target_types: The target type of the single entry.
         :return: The new layer data frame.
         """
+        if isinstance(source_types, str):
+            source_types = [source_types]
+        if isinstance(target_types, str):
+            target_types = [target_types] * len(source_types)
+
         layer_df = LayerDataFrame()
-        layer_df.add_layer(source_type=source_type, target_type=target_type)
+        for source_type, target_type in zip(source_types, target_types):
+            layer_df.add_layer(source_type=source_type, target_type=target_type)
         return layer_df
 
     def add_layer(self, source_type: str, target_type: str) -> EnumDict:

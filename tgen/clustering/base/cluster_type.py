@@ -5,4 +5,3 @@ from tgen.clustering.base.cluster import Cluster
 ClusterType = Cluster
 ClusterIdType = Dict[Any, List[Any]]
 ClusterMapType = Dict[Any, Cluster]
-MethodClusterMapType = Dict[str, ClusterMapType]

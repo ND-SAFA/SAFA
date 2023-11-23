@@ -2,7 +2,7 @@ from typing import List
 
 from tqdm import tqdm
 
-from tgen.clustering.base.cluster_type import MethodClusterMapType
+from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
@@ -19,16 +19,17 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :param state: Used to store final clusters.
         :return: None
         """
-        global_batch_clusters: List[MethodClusterMapType] = []
+        global_batch_clusters: List[ClusterMapType] = []
         batches = state.artifact_batches
-        for subset_ids in batches:
-            global_clusters = {} if len(subset_ids) == 0 else self.get_batch_clusters(args, state.embedding_manager,
-                                                                                      batch_artifact_ids=subset_ids)
+        for batch_ids in batches:
+            global_clusters = {} if len(batch_ids) == 0 else self.get_batch_clusters(args, state.embedding_manager,
+                                                                                     batch_artifact_ids=batch_ids)
             global_batch_clusters.append(global_clusters)
         state.multi_method_cluster_map = global_batch_clusters
 
     @staticmethod
-    def get_batch_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager, batch_artifact_ids: List[str]):
+    def get_batch_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager,
+                           batch_artifact_ids: List[str]) -> ClusterMapType:
         """
         Creates the clusters for a subset of artifacts.
         :param args: The clustering arguments / configuration.
@@ -36,7 +37,7 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :param batch_artifact_ids: The artifacts ids to cluster.
         :return: Map of clustering method name to clusters produced by that method.
         """
-        global_clusters = {}
+        global_clusters: ClusterMapType = {}
         # TODO: Add description including batch index
         for clustering_method in tqdm(args.cluster_methods, desc="Running Clustering Algorithms...", ncols=TQDM_NCOLS):
             cluster_manager = ClusteringAlgorithmManager(clustering_method)
@@ -46,5 +47,5 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
                                                **args.clustering_method_args)
             clustering_method_name = cluster_manager.get_method_name()
             clusters = {f"{clustering_method_name}{k}": v for k, v in clusters.items()}
-            global_clusters[clustering_method.name] = clusters
+            global_clusters.update(clusters)
         return global_clusters

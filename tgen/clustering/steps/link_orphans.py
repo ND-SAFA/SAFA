@@ -7,8 +7,8 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.condense_clusters import CondenseClusters
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.common.constants.clustering_constants import ADD_ORPHAN_TO_CLUSTER_THRESHOLD
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.dict_util import DictUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
@@ -29,10 +29,12 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         all_artifacts = set(args.dataset.artifact_df.index)
         orphan_artifact_id_set = all_artifacts.difference(seen_artifacts)
 
+        logger.info(f"{len(orphan_artifact_id_set)} artifacts were not clustered.")
+
         adopted_orphans = self.place_orphans_in_homes(args, clusters, orphan_artifact_id_set)
-        orphan_artifact_id_set = orphan_artifact_id_set.difference(adopted_orphans)
-        self.cluster_orphans(args, state, cluster_map, orphan_artifact_id_set, args.min_orphan_similarity)
-        for a in orphan_artifact_id_set:
+        remaining_orphans = orphan_artifact_id_set.difference(adopted_orphans)
+        self.cluster_orphans(args, state, cluster_map, remaining_orphans, args.min_orphan_similarity)
+        for a in remaining_orphans:
             self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
 
     @classmethod
@@ -54,6 +56,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
                                                                      dataset_creator=None,
                                                                      subset_ids=list(orphan_artifact_id_set)))
         orphan_state = ClusteringState(**DataclassUtil.convert_to_dict(state))
+        orphan_state.artifact_batches = [orphan_artifact_id_set]
         CreateClustersFromEmbeddings().run(orphan_args, orphan_state, re_run=True)
         CondenseClusters().run(orphan_args, orphan_state, re_run=True)
         orphan_cluster_map = orphan_state.final_cluster_map
@@ -88,30 +91,22 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         """
         avg_similarity_threshold = 0 if args.add_orphans_to_best_home else ADD_ORPHAN_TO_CLUSTER_THRESHOLD
         adopted_orphans = set()
-        best_clusters = {}
+        best_clusters = []
         for artifact_id in orphan_artifacts:
-            best_cluster, sim_score = LinkOrphans.get_best_home_for_orphan(artifact_id, clusters)
-            DictUtil.set_or_append_item(best_clusters, best_cluster, (artifact_id, sim_score))
-        for cluster, orphans in best_clusters.items():
-            sorted_orphans = sorted(orphans, key=lambda x: x[1])
-            for (orphan_id, sim_score) in sorted_orphans:
-                if sim_score >= avg_similarity_threshold and len(cluster) < args.cluster_max_size:
-                    cluster.add_artifact(orphan_id)
-                    adopted_orphans.add(orphan_id)
+            similarities_to_clusters = [c.similarity_to_neighbors(artifact_id) for c in clusters]
+            artifact_iterable = [(artifact_id, t[0], t[1]) for t in zip(clusters, similarities_to_clusters)]
+            best_clusters.extend(artifact_iterable)
+
+        best_clusters = list(filter(lambda t: t[-1] >= 0.6, best_clusters))
+        best_clusters = sorted(best_clusters, key=lambda t: t[-1], reverse=True)
+
+        for i, (artifact, cluster, cluster_similarity) in enumerate(best_clusters):
+            delta = cluster.min_sim - cluster_similarity if len(cluster) > 1 else 0
+            if delta < .02 and len(cluster) < args.cluster_max_size and artifact not in adopted_orphans:
+                cluster.add_artifact(artifact)
+                adopted_orphans.add(artifact)
+
         return adopted_orphans
-
-    @classmethod
-    def get_best_home_for_orphan(cls, artifact_id: str, clusters: List[Cluster]) -> List[Cluster]:
-        """
-        Places orphan in cluster in which its similarity to the cluster is about the same as the average cluster distance.
-        :param artifact_id: The artifact ID of the orphan.
-        :param clusters: The clusters to check if want artifact.
-        :return: The clusters accepting that artifacts.
-        """
-        similarities_to_clusters = [c.similarity_to_neighbors(artifact_id) for c in clusters]
-        similarity_score, best_cluster = sorted(zip(similarities_to_clusters, clusters), key=lambda t: t[0], reverse=True)[0]
-
-        return best_cluster, similarity_score
 
     @classmethod
     def add_singleton_cluster(cls, a_id: str, cluster_map: ClusterMapType, embeddings_manager: EmbeddingsManager) -> None:

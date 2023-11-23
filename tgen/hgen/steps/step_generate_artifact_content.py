@@ -121,9 +121,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
         """
         generated_artifact_to_predicted_sources = {}
-        cluster2generations = {cluster_id: [] for cluster_id in
-                               state.cluster_dataset.artifact_df.index} if state.cluster_dataset else {}
-        cluster_ids = list(cluster2generations.keys()) if state.cluster_dataset is not None else []
+        cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
+        cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
         for i, pred in enumerate(generation_predictions):
             for p in pred:
                 generation = p[target_tag_id][0]

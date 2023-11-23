@@ -49,7 +49,6 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         clustering_kwargs = {}
         if args.seed_project_summary_section or args.seed_layer_id:
             seeding_kwargs = CreateClustersStep.get_seeding_kwargs(args, state)
-            state.seeds = seeding_kwargs[SEEDS_PARAM]
             clustering_kwargs.update(seeding_kwargs)
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
         cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
@@ -64,12 +63,15 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param cluster_state: The final state of the clustering pipeline.
         :return: None
         """
+        clusters = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)  # converting all keys to str bc pd is stupid
+        cluster_state.cluster_artifact_dataset.artifact_df.index = clusters
+        cluster_map = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
+
         state.update_total_costs_from_state(cluster_state)
         state.embedding_manager = cluster_state.embedding_manager
         state.seed2artifacts = cluster_state.cluster2artifacts
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
-        state.cluster2artifacts = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
-        cluster_state.cluster_artifact_dataset.artifact_df.index = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)
+        state.cluster2artifacts = cluster_map
 
     @staticmethod
     def get_seeding_kwargs(args: HGenArgs, state: HGenState) -> Dict:

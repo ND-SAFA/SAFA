@@ -30,7 +30,6 @@ class HGenState(State):
     """
     cluster2artifacts: dict = None  # maps cluster id to the list of artifacts in that cluster
     seed2artifacts: ClusterIdType = None  # If given seeds, maps seeds to cluster artifacts.
-    seeds: List[str] = None
     cluster_dataset: PromptDataset = None  # contains prompt dataset with just the artifact df of the clusters.
     embedding_manager: EmbeddingsManager = None  # allows embeddings to be reused
 
@@ -69,3 +68,9 @@ class HGenState(State):
     Step Final - Dataset Construction
     """
     final_dataset: PromptDataset = None  # The final dataset with generated artifacts.
+
+    def get_cluster_ids(self) -> List[str]:
+        """
+        :return: Returns the ordered list of clustered ids.
+        """
+        return list(self.cluster_dataset.artifact_df.index)

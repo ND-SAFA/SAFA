@@ -36,9 +36,16 @@ class MultiLayerHGenJob(AbstractJob):
         Runs all the hgen jobs, slowly progressing up the hierarchy
         :return: The final dataset created by the top level hgen job
         """
+        add_seeds_as_artifacts = self.starting_hgen_job.hgen_args.add_clusters_as_artifacts
+        self.starting_hgen_job.hgen_args.add_clusters_as_artifacts = False  # only adds seeds if is last job.
+
         current_hgen_job = self.starting_hgen_job
         current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
+
+        last_index = len(self.target_types) - 1
         for i, next_target_type in enumerate(self.target_types):
+            if i == last_index:
+                current_hgen_job.hgen_args.add_clusters_as_artifacts = add_seeds_as_artifacts
             res = current_hgen_job.run()
             if res.status != Status.SUCCESS:
                 raise Exception(res.body)

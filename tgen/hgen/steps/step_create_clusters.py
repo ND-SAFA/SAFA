@@ -3,6 +3,7 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
@@ -12,8 +13,9 @@ from tgen.summarizer.summary import SummarySectionKeys
 
 
 class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
-    rf = {"small": 0.5, "medium": 0.3, "big": 0.15}
+    REDUCTION_FACTORS = {"small": 0.5, "medium": 0.3, "big": 0.15}
 
+    @nested_pipeline(HGenState)
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates clusters from source artifacts to generate new artifacts for each clusters.
@@ -62,7 +64,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             section_chunks = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             clustering_pipeline_kwargs["cluster_seeds"] = section_chunks
             clustering_pipeline_kwargs["cluster_artifact_type"] = section_id
-            clustering_pipeline_kwargs["cluster_reduction_factor"] = CreateClustersStep.rf[CreateClustersStep]
+            clustering_pipeline_kwargs["cluster_reduction_factor"] = CreateClustersStep.REDUCTION_FACTORS[CreateClustersStep]
         if args.seed_layer_id:
             seed_artifacts = state.original_dataset.artifact_df.get_type(args.seed_layer_id).to_artifacts()
             seed_contents = [a[ArtifactKeys.CONTENT] for a in seed_artifacts]
@@ -77,7 +79,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
     def get_reduction_factor(args: HGenArgs, state: HGenState):
         n_sources = len(state.original_dataset.artifact_df.get_type(args.source_type))
         project_size = CreateClustersStep.get_project_size(n_sources)
-        return CreateClustersStep.rf[project_size]
+        return CreateClustersStep.REDUCTION_FACTORS[project_size]
 
     @staticmethod
     def get_project_size(n_sources: int):

@@ -154,7 +154,7 @@ class TestOpenAiTrainer(BaseTest):
         trainer_dataset_manager = TrainerDatasetManager.create_from_map({role: dataset_creator for role in roles})
         llm_manager = OpenAIManager(OpenAIArgs())
         return LLMTrainer(LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager,
-                                          prompt_builder=prompt_builder, llm_manager=llm_manager, **params))
+                                          prompt_builders=prompt_builder, llm_manager=llm_manager, **params))
 
     def fake_fine_tune_create(self, not_classification: bool = True, **params):
         self.assertGreater(len(params), 0)

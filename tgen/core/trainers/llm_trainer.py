@@ -1,13 +1,13 @@
 import json
 import os.path
-from typing import Any, List, Union
+from typing import Any, List, Union, Dict
 
 from openai.api_resources.fine_tune import FineTune
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -29,7 +29,6 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
     REVERSE_CATEGORIES
-from tgen.pipeline.state_manager import StateManager
 
 
 class LLMTrainer(AbstractTrainer):
@@ -43,8 +42,7 @@ class LLMTrainer(AbstractTrainer):
         :param initial_state: The current state of the trainer to use
         """
         super().__init__(initial_state.trainer_dataset_manager, trainer_args=initial_state.llm_manager.llm_args)
-        self.initial_state = initial_state
-        self.state_manager = StateManager(self.initial_state)
+        self.state = initial_state
 
     def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
         """
@@ -54,17 +52,17 @@ class LLMTrainer(AbstractTrainer):
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(self.llm_manager,
-                                                             prompt_builder=self.prompt_builder)
+                                                             prompt_builder=self.prompt_builders)
         custom_params = {}
         instructions = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
         if include_classification_metrics:
             instructions["include_classification_metrics"] = True
-            instructions["prompt_builder"] = self.prompt_builder
+            instructions["prompt_builder"] = self.prompt_builders
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
             custom_params[OpenAIParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 self.llm_manager,
-                prompt_builder=self.prompt_builder)
+                prompt_builder=self.prompt_builders)
 
         res = self.llm_manager.make_fine_tune_request(completion_type=completion_type, training_file=training_file_id,
                                                       instructions=instructions, **custom_params)
@@ -99,10 +97,14 @@ class LLMTrainer(AbstractTrainer):
                 YamlUtil.write(res, save_and_load_path)
         batch_responses = res.batch_responses if isinstance(res, GenerationResponse) else [r.text for r in res.batch_responses]
         debugging = [p + NEW_LINE + r for p, r in zip(prompts, batch_responses)]
+        prompt_builder_map = {prompt_builder.id: prompt_builder
+                              for prompt_builder in (self.prompt_builders
+                                                     if isinstance(self.prompt_builders, list) else [self.prompt_builders])}
+        prompt_builder_ids = dataset.get_prompt_dataframe()[PromptKeys.PROMPT_BUILDER_ID]
         if isinstance(res, ClassificationResponse):
-            output = self._create_classification_output(res, dataset, self.prompt_builder)
+            output = self._create_classification_output(res, dataset, prompt_builder_map)
         elif isinstance(res, GenerationResponse):
-            output = self._create_generation_output(res.batch_responses, self.prompt_builder)
+            output = self._create_generation_output(res.batch_responses, prompt_builder_map, prompt_builder_ids)
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
@@ -111,9 +113,10 @@ class LLMTrainer(AbstractTrainer):
         """
         Gets the prompts used for the prediction
         :param dataset: The dataset to use when creating the prompts
-        :return: The prompts
+        :return: The prompts and the prompt dataframe
         """
-        prompt_df = dataset.get_prompt_dataframe(prompt_builder=self.prompt_builder,
+
+        prompt_df = dataset.get_prompt_dataframe(prompt_builders=self.prompt_builders,
                                                  prompt_args=self.llm_manager.prompt_args)
         prompts = list(prompt_df[PromptKeys.PROMPT])
         first_prompt = prompts[0]
@@ -136,10 +139,12 @@ class LLMTrainer(AbstractTrainer):
         """
         if not prompts:
             prompts = [prompt_builder.build(llm_manager.prompt_args, **prompt_kwargs)[PromptKeys.PROMPT]]
-        prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts, PromptKeys.COMPLETION: [EMPTY_STRING for _ in prompts]})
+        prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts,
+                                     PromptKeys.COMPLETION: [EMPTY_STRING for _ in prompts],
+                                     PromptKeys.PROMPT_BUILDER_ID: [prompt_builder.id for _ in prompts]})
         dataset = PromptDataset(prompt_df=prompt_df)
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
-        initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builder=prompt_builder,
+        initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builders=prompt_builder,
                                         trainer_dataset_manager=trainer_dataset_manager)
         trainer = LLMTrainer(initial_state)
         return trainer.perform_prediction(save_and_load_path=save_and_load_path, prompts=list(prompt_df[PromptKeys.PROMPT]))
@@ -163,22 +168,26 @@ class LLMTrainer(AbstractTrainer):
         return dataset
 
     @staticmethod
-    def _create_generation_output(responses: List[str], prompt_builder: PromptBuilder) -> TracePredictionOutput:
+    def _create_generation_output(responses: List[str], prompt_builder_map: Dict[str, PromptBuilder],
+                                  prompt_builder_ids: List[str]) -> TracePredictionOutput:
         """
         Creates the output for a generation
         :param responses: The response from the completion.
-        :param prompt_builder: The builder responsible for building the prompts
+        :param prompt_builder_map: Map of id to the builder for each prompt builder responsible for building the prompts
+        :param prompt_builder_ids: List of ids for prompt builders corresponding to the order of responses
         :return: The generation output.
         """
-        return TracePredictionOutput(predictions=[prompt_builder.parse_responses(r) for r in responses],
+        return TracePredictionOutput(predictions=[prompt_builder_map[p_id].parse_responses(r)
+                                                  for r, p_id in zip(responses, prompt_builder_ids)],
                                      original_response=responses)  #
 
-    def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset, prompt_builder: PromptBuilder):
+    def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset,
+                                      prompt_builder_map: Dict[str, PromptBuilder]):
         """
         Creates the output for a classification
         :param res: The response from the completion
         :param dataset: The dataset being predicted on
-        :param prompt_builder: The builder responsible for building the prompts
+        :param prompt_builder_map: Map of id to the builder for each prompt builder responsible for building the prompts
         :return: The classification output
         """
         trace_dataset = dataset.trace_dataset
@@ -267,7 +276,7 @@ class LLMTrainer(AbstractTrainer):
         """
         if not item.startswith("__"):
             try:
-                return self.state_manager.get(item)
-            except AttributeError:
+                return getattr(self.state, item)
+            except Exception as e:
                 pass
-        return super().__getattr__(self, item)
+        raise AttributeError(f"{self.__class__.__name__} object has no attribute {item}")

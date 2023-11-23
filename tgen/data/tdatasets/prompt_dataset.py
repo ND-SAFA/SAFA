@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import pandas as pd
 from tqdm import tqdm
@@ -100,7 +100,7 @@ class PromptDataset(iDataset):
         :return: The project file id used by open_ai
         """
         if not self.project_file_id:
-            prompt_df = self.get_prompt_dataframe(prompt_builder=prompt_builder, prompt_args=llm_manager.prompt_args)
+            prompt_df = self.get_prompt_dataframe(prompt_builders=prompt_builder, prompt_args=llm_manager.prompt_args)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
             res = llm_manager.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
@@ -108,16 +108,21 @@ class PromptDataset(iDataset):
                 os.remove(export_path)
         return self.project_file_id
 
-    def get_prompt_dataframe(self, prompt_builder: PromptBuilder = None, prompt_args: PromptArgs = None) -> PromptDataFrame:
+    def get_prompt_dataframe(self, prompt_builders: Union[List[PromptBuilder], PromptBuilder] = None,
+                             prompt_args: PromptArgs = None) -> PromptDataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
         :param prompt_args: The arguments for properly formatting the prompt
-        :param prompt_builder: The generator of prompts for the dataset
+        :param prompt_builders: The generator of prompts for the dataset
         :return: The prompt dataframe containing prompts and completions
         """
-        if self.prompt_df is None or (prompt_builder and prompt_args):
-            generation_method = self._get_generation_method(prompt_args, prompt_builder)
-            prompt_entries = generation_method(prompt_builder=prompt_builder, prompt_args=prompt_args)
+        if self.prompt_df is None or (prompt_builders and prompt_args):
+            if not isinstance(prompt_builders, list):
+                prompt_builders = [prompt_builders]
+            prompt_entries = []
+            for prompt_builder in prompt_builders:
+                generation_method = self._get_generation_method(prompt_args, prompt_builder)
+                prompt_entries.extend(generation_method(prompt_builder=prompt_builder, prompt_args=prompt_args))
             self.prompt_df = PromptDataFrame(prompt_entries)
         return self.prompt_df
 

@@ -140,7 +140,7 @@ class ProjectSummarizer(BaseObject):
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset
                                                                               })
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
-                                             prompt_builder=prompt_builder,
+                                             prompt_builders=prompt_builder,
                                              trainer_dataset_manager=trainer_dataset_manager))
         predictions = trainer.perform_prediction().predictions[0]
         parsed_responses = predictions[prompt_builder.get_prompt(-1).id]

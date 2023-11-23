@@ -67,9 +67,9 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         state.update_total_costs_from_state(cluster_state)
         state.embedding_manager = cluster_state.embedding_manager
-        state.id_to_cluster_artifacts = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
-        state.seed2artifacts = cluster_state.seeded_cluster_map
+        state.seed2artifacts = cluster_state.cluster2artifacts
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
+        state.id_to_cluster_artifacts = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
         cluster_state.cluster_artifact_dataset.artifact_df.index = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)
 
     @staticmethod
@@ -95,7 +95,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         kwargs[SEEDS_PARAM] = seed_contents
         kwargs[SEEDS_LAYER_PARAM] = seed_artifact_type
         return kwargs
-    
+
     @staticmethod
     def get_reduction_factor(args: HGenArgs):
         """

@@ -30,6 +30,7 @@ class HGenState(State):
     """
     id_to_cluster_artifacts: dict = None  # maps cluster id to the list of artifacts in that cluster
     seed2artifacts: ClusterIdType = None  # If given seeds, maps seeds to cluster artifacts.
+    seeds: List[str] = None
     cluster_dataset: PromptDataset = None  # contains prompt dataset with just the artifact df of the clusters.
     embedding_manager: EmbeddingsManager = None  # allows embeddings to be reused
 

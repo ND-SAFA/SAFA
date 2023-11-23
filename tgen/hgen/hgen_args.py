@@ -120,7 +120,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """
-    export_hgen_content_only: bool = False
+    export_hgen_content_only: bool = True
 
     def __post_init__(self) -> None:
         """

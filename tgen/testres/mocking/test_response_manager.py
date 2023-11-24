@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.llm_response_util import LLMResponseUtil
 
 
@@ -22,7 +22,7 @@ class TestAIManager:
         handled_responses, manual_prompts = self.run_prompt_handlers(prompts_global)
 
         n_manual_prompts = len(manual_prompts)
-        manual_responses = self.get_next_response(n_requested=n_manual_prompts)
+        manual_responses = self.get_next_response(n_requested=n_manual_prompts, prompts=manual_prompts)
         manual_responses = [r(manual_prompts[i]) if callable(r) else r for i, r in enumerate(manual_responses)]
         responses = handled_responses + manual_responses
         responses = self.response_formatter(responses)
@@ -105,11 +105,12 @@ class TestAIManager:
         summary = f"<summary>Summary of {artifact_body}</summary>"
         return summary
 
-    def get_next_response(self, n_requested: int = 1) -> List[str]:
+    def get_next_response(self, n_requested: int = 1, prompts: List[str] = None) -> List[str]:
         total_requested = self.n_used + n_requested
         n_responses = len(self._responses)
         if total_requested > n_responses:
-            raise ValueError(f"Requested {total_requested} out of {n_responses} responses.")
+            prompts_error = f"{NEW_LINE}{NEW_LINE.join(prompts)}".strip()
+            raise ValueError(f"Requested {total_requested} out of {n_responses} responses.{prompts_error}")
 
         responses = self._responses[self.start_index: total_requested]
         self.start_index = total_requested

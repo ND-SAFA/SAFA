@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -18,7 +17,7 @@ from tgen.summarizer.summarizer_state import SummarizerState
 from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MockResponses, TEST_PROJECT_SUMMARY, create, SECTION_TAG_TO_TILE
+from tgen.testres.mocking.mock_responses import MockResponses, SECTION_TAG_TO_TILE, TEST_PROJECT_SUMMARY, create
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
 
@@ -121,15 +120,20 @@ class TestSummarizer(BaseTest):
             body_prefix = artifact_ids if section_title != PS_SUBSYSTEM_TITLE else None
             return create(title=section_title, body_prefix=body_prefix)
 
+        n_clusters = 4
         ai_manager.mock_summarization()
         summarizer = self.get_summarizer(SummarizerArgs())
         ids = list(ascii_lowercase)
-        contents = [c * 10000 for c in ascii_lowercase]
-        layer = ["Large Layer" for _ in ids]
-        summarizer.dataset.update_artifact_df(ArtifactDataFrame({ArtifactKeys.ID: ids, ArtifactKeys.CONTENT: contents,
-                                                                 ArtifactKeys.LAYER_ID: layer}))
+        artifact_df = ArtifactDataFrame({
+            ArtifactKeys.ID: ids,
+            ArtifactKeys.CONTENT: [c * 10000 for c in ids],
+            ArtifactKeys.LAYER_ID: ["Large Layer"] * len(ids)
+        })
+        summarizer.dataset.update_artifact_df(artifact_df)
         n_project_summary_sections = len(summarizer.args.project_summary_sections)
-        project_summary_responses = [project_summary_response for _ in range(3*n_project_summary_sections)]
+
+        n_cluster_prompts = n_project_summary_sections * (n_clusters + 1)  # prompts for clusters + combination
+        project_summary_responses = [project_summary_response for _ in range(n_cluster_prompts)]  # 1 for combining
         ai_manager.set_responses(project_summary_responses)
         summarizer.summarize()
         state: SummarizerState = summarizer.state

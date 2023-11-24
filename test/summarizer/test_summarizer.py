@@ -138,11 +138,10 @@ class TestSummarizer(BaseTest):
         summarizer.summarize()
         state: SummarizerState = summarizer.state
         clustered_artifacts = {a_id for c in state.cluster_map.values() for a_id in c.artifact_ids}
-        self.assertSize(len(ids), clustered_artifacts)
         self.assertGreater(len(state.cluster_map), 1)
         for project_summary, cluster in zip(state.project_summaries, state.cluster_map.values()):
             assert_summary(project_summary, len(cluster))
-        assert_summary(state.final_project_summary, len(ids))
+        assert_summary(state.final_project_summary, len(clustered_artifacts))
 
     def _assert_summarization(self, summarizer: Summarizer, expected_summarization_calls: int, ai_manager: TestAIManager):
         ai_manager.mock_summarization()

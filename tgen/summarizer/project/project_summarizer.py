@@ -112,13 +112,16 @@ class ProjectSummarizer(BaseObject):
                                                xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
                                                if self.dataset else {"versions": ["id", "body"]},
                                                include_ids=self.dataset is not None)
+        section_prompt.set_instructions(f"PS_QUESTIONS_HEADER{NEW_LINE}"
+                                        f"*Importantly, ONLY answer the {len(section_prompt.question_prompts)} questions below "
+                                        f"and ensure the ALL tags {section_prompt.get_all_response_tags()} "
+                                        f"are included in your answer*")
         prompt_builder = PromptBuilder(prompts=[content_prompt,
                                                 artifacts_prompt,
                                                 section_prompt])
         if self.project_summary and section_id in USE_PROJECT_SUMMARY_SECTIONS:
             current_summary = self.project_summary.to_string()
             prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
-        section_prompt.set_instructions(PS_QUESTIONS_HEADER)
         return prompt_builder
 
     def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, dataset: PromptDataset,

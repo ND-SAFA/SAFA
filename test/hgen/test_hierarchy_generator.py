@@ -8,6 +8,7 @@ import pandas as pd
 
 from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
@@ -185,12 +186,14 @@ class TestHierarchyGenerator(BaseTest):
         content = list(self.HGEN_STATE.generation_predictions.keys())
         dup_artifact_id = "dup1"
         dup_linked_artifact = "dup_link"
-        dup_content = content[0] + content[1]
+        dup_content = NEW_LINE.join([content[0], content[1]])
         expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[0]
         self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
         self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_linked_artifact, content[0],
-                                                                       self.HGEN_ARGS.source_layer_ids[0])
+
+        self.HGEN_ARGS.dataset.artifact_df.add_artifact(dup_linked_artifact, content[0], self.HGEN_ARGS.source_layer_ids[0])
+        self.HGEN_STATE.embedding_manager.update_or_add_content(dup_linked_artifact, content[0])
+
         original_link = EnumDict({TraceKeys.child_label(): dup_linked_artifact,
                                   TraceKeys.parent_label(): dup_artifact_id,
                                   TraceKeys.SCORE: 0.6,

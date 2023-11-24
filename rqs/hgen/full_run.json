@@ -7,7 +7,7 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/testing/[CURRENT_PROJECT]",
-              "source_layer_id": "[SOURCE_LAYER_ID_LIST]",
+              "source_layer_ids": "[SOURCE_LAYER_ID_LIST]",
               "target_type": "[TARGET_TYPE]",
               "create_project_summary": "[CREATE_PROJECT_SUMMARY_BOOL]",
               "generate_trace_links": true,

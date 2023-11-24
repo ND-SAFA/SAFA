@@ -26,9 +26,10 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         for i, batch_cluster_map in enumerate(global_batch_cluster_map):
             unique_cluster_map = ClusterCondenser(state.embedding_manager, threshold=args.cluster_intersection_threshold)
             clusters = list(batch_cluster_map.values())
-            clusters = self.first_filter(args, clusters, unique_cluster_map)
-            clusters = self.second_filtering(args, clusters, unique_cluster_map)
+
+            clusters = self.cohesiveness_filter(args, clusters)
             unique_cluster_map.add_all(clusters)
+
             batch_cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
             batch_cluster_map = {f"{i}:{k}": v for k, v in batch_cluster_map.items()}
             global_clusters.update(batch_cluster_map)
@@ -36,24 +37,32 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         final_clusters = global_clusters
         state.final_cluster_map = final_clusters
 
-    def first_filter(self, args, clusters, unique_cluster_map):
-        filter_clusters = [c for c in clusters if args.cluster_min_size <= len(c) <= args.cluster_max_size]
-        clusters = filter_clusters if filter_clusters else clusters
-        min_pairwise_avg = self._calculate_min_pairwise_avg_threshold(filter_clusters)
+    def cohesiveness_filter(self, args: ClusteringArgs, clusters: List[Cluster]):
+        """
+        Filters clusters by their cohesiveness relative to the average cohesiveness of all clusters.
+        :param args: Clustering args determining if this step should be run.
+        :param clusters: The clusters to filter.
+        :return: List of filtered clusters.
+        """
+        filtered_clusters = self._filter_by_size(clusters, args.cluster_min_size, args.cluster_max_size)
+        min_pairwise_avg = self._calculate_min_pairwise_avg_threshold(filtered_clusters)
         if min_pairwise_avg is not None:
             if args.filter_by_cohesiveness:
-                clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filter_clusters))
-            clusters = list(sorted(clusters, key=lambda v: v.avg_pairwise_sim, reverse=True))
-        unique_cluster_map.add_all(clusters)
+                clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
+            clusters = list(sorted(clusters, key=lambda v: v.avg_pairwise_sim if v.avg_pairwise_sim else 0, reverse=True))
         return clusters
 
-    def second_filtering(self, args, clusters, unique_cluster_map):
-        filter_clusters = [c for c in clusters if args.cluster_min_size <= len(c) <= args.cluster_max_size]
+    @staticmethod
+    def _filter_by_size(clusters: List[Cluster], min_size: int, max_size: int):
+        """
+        Filters list of clusters by min and max size. If there are no resulting clusters then original list if returned.
+        :param clusters: The clusters to filter.
+        :param min_size: The minimum size of a cluster.
+        :param max_size: The maximum size of a cluster.
+        :return: The filtered clusters within the size bounds.
+        """
+        filter_clusters = [c for c in clusters if min_size <= len(c) <= max_size]
         clusters = filter_clusters if filter_clusters else clusters
-        min_pairwise_avg = self._calculate_min_pairwise_avg_threshold(filter_clusters)
-        if min_pairwise_avg is not None:
-            clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filter_clusters))
-            clusters = list(sorted(clusters, key=lambda v: v.avg_pairwise_sim, reverse=True))
         return clusters
 
     @staticmethod

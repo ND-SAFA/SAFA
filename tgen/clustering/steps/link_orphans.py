@@ -43,6 +43,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         """
         Attempts to create clusters from the orphan artifacts.
         :param args: The arguments to the clustering pipeline
+        :param state: State of clustering pipeline.
         :param cluster_map: The cluster map to add new clusters to.
         :param orphan_artifact_id_set:Set of orphan artifact ids.
         :param min_cluster_similarity: The minimum similarity score for a cluster to be accepted.

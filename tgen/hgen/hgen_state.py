@@ -76,5 +76,9 @@ class HGenState(State):
         return list(self.cluster_dataset.artifact_df.index)
 
     def get_cluster2artifacts(self):
+        """
+        Optionally returns the map from cluster ids to list of artifacts in cluster if clustering is enabled.
+        :return: Map if clusters are available, otherwise none.
+        """
         return ClusteringUtil.replace_ids_with_artifacts(self.cluster2artifacts,
                                                          self.source_dataset.artifact_df) if self.cluster2artifacts else None

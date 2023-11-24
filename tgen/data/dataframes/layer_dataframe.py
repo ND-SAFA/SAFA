@@ -78,3 +78,13 @@ class LayerDataFrame(AbstractProjectDataFrame):
         if not ignore_index:
             logger.warning("Index should be ignored for concatenating layer dataframe since they are not unique")
         return super().concat(*dataframes, ignore_index=True)
+
+    def get_layer(self, source_type: str, target_type: str):
+        """
+        Returns the layer(s) matching the given source and target types.
+        :param source_type: The source artifact type.
+        :param target_type: The target artifact type.
+        :return: Data frame containing query.
+        """
+        return self.filter_by_row(
+            lambda row: row[LayerKeys.SOURCE_TYPE.value] == source_type and row[LayerKeys.TARGET_TYPE.value] == target_type)

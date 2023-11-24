@@ -20,7 +20,7 @@ class CondenseClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param state: Current state of the clustering pipeline.
         :return: None
         """
-        global_batch_cluster_map: List[ClusterMapType] = state.multi_method_cluster_map
+        global_batch_cluster_map: List[ClusterMapType] = state.batched_cluster_maps
 
         global_clusters = {}
         for i, batch_cluster_map in enumerate(global_batch_cluster_map):

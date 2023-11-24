@@ -20,12 +20,11 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :return: None
         """
         global_batch_clusters: List[ClusterMapType] = []
-        batches = state.artifact_batches
+        batches = state.artifact_batches if state.artifact_batches else [None]
         for batch_ids in batches:
-            global_clusters = {} if len(batch_ids) == 0 else self.get_batch_clusters(args, state.embedding_manager,
-                                                                                     batch_artifact_ids=batch_ids)
+            global_clusters = self.get_batch_clusters(args, state.embedding_manager, batch_artifact_ids=batch_ids)
             global_batch_clusters.append(global_clusters)
-        state.multi_method_cluster_map = global_batch_clusters
+        state.batched_cluster_maps = global_batch_clusters
 
     @staticmethod
     def get_batch_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager,
@@ -37,6 +36,8 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :param batch_artifact_ids: The artifacts ids to cluster.
         :return: Map of clustering method name to clusters produced by that method.
         """
+        if isinstance(batch_artifact_ids, list) and len(batch_artifact_ids) == 0:
+            return {}
         global_clusters: ClusterMapType = {}
         # TODO: Add description including batch index
         for clustering_method in tqdm(args.cluster_methods, desc="Running Clustering Algorithms...", ncols=TQDM_NCOLS):

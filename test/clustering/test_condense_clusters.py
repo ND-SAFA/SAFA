@@ -22,7 +22,7 @@ class TestCondenseClusters(TestCase):
         c1: Cluster = Cluster.from_artifacts(["A", "B", "C", "D"], embeddings_manager)
         c2: Cluster = Cluster.from_artifacts(["A", "B"], embeddings_manager)
         c3: Cluster = Cluster.from_artifacts(["A"], embeddings_manager)
-        state.multi_method_cluster_map = {
+        state.batched_cluster_maps = {
             SupportedClusteringMethods.KMEANS.name: {
                 0: c1, 1: c2, 2: c3
             },

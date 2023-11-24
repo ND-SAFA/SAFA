@@ -2,7 +2,6 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.link_orphans import LinkOrphans
-from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -20,8 +19,7 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
         """
         if args.perform_clustering and args.add_linked_artifacts_to_cluster and state.original_dataset.trace_dataset:
             original_trace_dataset = state.original_dataset.trace_dataset
-            cluster2artifacts = ClusteringUtil.replace_ids_with_artifacts(state.cluster2artifacts,
-                                                                          state.source_dataset.artifact_df)
+            cluster2artifacts = state.get_cluster2artifacts()
             for cluster_id, cluster_artifacts in cluster2artifacts.items():
                 additional_artifacts = []
                 for artifact in cluster_artifacts:

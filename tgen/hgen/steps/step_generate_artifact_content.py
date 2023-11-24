@@ -5,7 +5,6 @@ from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
 from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -43,11 +42,10 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         dataset = state.cluster_dataset if state.cluster_dataset is not None else state.source_dataset
 
-        id_to_context_artifact = ClusteringUtil.replace_ids_with_artifacts(state.cluster2artifacts,
-                                                                           state.source_dataset.artifact_df)
+        cluster2artifacts = state.get_cluster2artifacts()
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True,
-                                                                    id_to_context_artifacts=id_to_context_artifact,
+                                                                    id_to_context_artifacts=cluster2artifacts,
                                                                     use_summary=False)
         if state.cluster2artifacts:
             n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)

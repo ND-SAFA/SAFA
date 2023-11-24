@@ -24,9 +24,9 @@ class HGenDatasetExporter:
         """
         self.args = args
         self.state = state
-        self.artifact_data_frames: List[ArtifactDataFrame] = []
-        self.trace_data_frames = []
-        self.layer_data_frames = []
+        self._artifact_data_frames: List[ArtifactDataFrame] = []
+        self._trace_data_frames = []
+        self._layer_data_frames = []
 
     @staticmethod
     def export(args: HGenArgs, state: HGenState):
@@ -62,9 +62,9 @@ class HGenDatasetExporter:
             self.add_source_artifacts()
         else:
             original_dataset = self.args.dataset
-            self.artifact_data_frames.append(original_dataset.artifact_df)
-            self.trace_data_frames.append(original_dataset.trace_df)
-            self.trace_data_frames.append(original_dataset.layer_df)
+            self._artifact_data_frames.append(original_dataset.artifact_df)
+            self._trace_data_frames.append(original_dataset.trace_df)
+            self._layer_data_frames.append(original_dataset.layer_df)
 
     def add_source_artifacts(self) -> None:
         """
@@ -73,7 +73,7 @@ class HGenDatasetExporter:
         """
         source_types = self.args.source_layer_ids
         source_artifact_df = self.state.original_dataset.artifact_df.get_type(source_types)
-        self.artifact_data_frames.append(source_artifact_df)
+        self._artifact_data_frames.append(source_artifact_df)
 
     def add_generated_content(self) -> None:
         """
@@ -81,15 +81,15 @@ class HGenDatasetExporter:
         :return: None.
         """
         generated_artifact_df = self.state.selected_artifacts_dataset.artifact_df.get_type(self.args.target_type)
-        self.artifact_data_frames.append(generated_artifact_df)
+        self._artifact_data_frames.append(generated_artifact_df)
 
         source_types = self.args.source_layer_ids
         layer_df = LayerDataFrame.from_types(source_types, self.args.target_type)
-        self.layer_data_frames.append(layer_df)
+        self._layer_data_frames.append(layer_df)
 
         generated_traces = self.state.selected_predictions
         trace_df = TraceDataFrame(generated_traces)
-        self.trace_data_frames.append(trace_df)
+        self._trace_data_frames.append(trace_df)
 
     def add_clusters_data_frames(self, generated_trace_df: TraceDataFrame) -> None:
         """
@@ -102,13 +102,13 @@ class HGenDatasetExporter:
                                                                  list(seed2generated.keys()))  # seed to seed artifact
 
         cluster_artifact_df = ArtifactDataFrame(list(seed2artifact.values()))
-        self.artifact_data_frames.append(cluster_artifact_df)
+        self._artifact_data_frames.append(cluster_artifact_df)
 
         cluster_trace_df = self.create_cluster_trace_df(seed2generated, seed2artifact)
-        self.trace_data_frames.append(cluster_trace_df)
+        self._trace_data_frames.append(cluster_trace_df)
 
         layer_df = LayerDataFrame.from_types(source_types=self.args.target_type, target_types=self.args.get_seed_id())
-        self.layer_data_frames.append(layer_df)
+        self._layer_data_frames.append(layer_df)
 
     @staticmethod
     def create_seed2generated(state: HGenState, generated_trace_df: TraceDataFrame) -> Dict[str, Set[Artifact]]:
@@ -184,19 +184,19 @@ class HGenDatasetExporter:
         """
         :return: Returns the current trace data frame composed of all those added.
         """
-        return TraceDataFrame.concat(*self.trace_data_frames)
+        return TraceDataFrame.concat(*self._trace_data_frames)
 
     def get_artifact_df(self) -> ArtifactDataFrame:
         """
         :return: Returns the current artifact data frame composed of all those added.
         """
-        return ArtifactDataFrame.concat(*self.artifact_data_frames)
+        return ArtifactDataFrame.concat(*self._artifact_data_frames)
 
     def get_layer_df(self):
         """
         :return: Returns the current layer data frame composed of all those added.
         """
-        return LayerDataFrame.concat(*self.layer_data_frames)
+        return LayerDataFrame.concat(*self._layer_data_frames)
 
     def get_trace_dataset(self) -> TraceDataset:
         """

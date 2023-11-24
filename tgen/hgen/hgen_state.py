@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Set, Union
 
 from tgen.clustering.base.cluster_type import ClusterIdType
 from tgen.common.objects.trace import Trace
+from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -73,3 +74,7 @@ class HGenState(State):
         :return: Returns the ordered list of clustered ids.
         """
         return list(self.cluster_dataset.artifact_df.index)
+
+    def get_cluster2artifacts(self):
+        return ClusteringUtil.replace_ids_with_artifacts(self.cluster2artifacts,
+                                                         self.source_dataset.artifact_df) if self.cluster2artifacts else None

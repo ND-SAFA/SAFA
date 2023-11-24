@@ -27,9 +27,12 @@ class TestClusterEmbeddings(TestCase):
         CreateEmbeddings().run(args, state)
         CreateClustersFromEmbeddings().run(args, state)
 
-        method_cluster_map = state.batched_cluster_maps
+        batched_cluster_map = state.batched_cluster_maps
+        self.assertEqual(1, len(batched_cluster_map))
+
+        cluster_map = batched_cluster_map[0]
         for clustering_method_name in DEFAULT_TESTING_CLUSTERING_METHODS:
             supported_clustering_method = SupportedClusteringMethods[clustering_method_name]
             method_name = supported_clustering_method.name
             c_id = f"{method_name}0"
-            self.assertIn(c_id, method_cluster_map)
+            self.assertIn(c_id, cluster_map)

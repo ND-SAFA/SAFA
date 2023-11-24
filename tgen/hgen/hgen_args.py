@@ -76,7 +76,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, automatically generates trace links explanations
     """
-    generate_explanations: bool = False
+    generate_explanations: bool = True
     """
     If True, creates clusters of related artifacts to create higher levels of docs for 
     """
@@ -84,7 +84,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, adds already linked artifacts to the cluster that their parent is in
     """
-    add_linked_artifacts_to_cluster: bool = False  # TODO change to default to false
+    add_linked_artifacts_to_cluster: bool = False
     """
     The llm manager to use for each prediction step
     """
@@ -120,7 +120,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """
-    export_hgen_content_only: bool = True
+    export_hgen_content_only: bool = False
 
     def __post_init__(self) -> None:
         """

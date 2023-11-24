@@ -136,8 +136,7 @@ class ClusteringTestUtil:
         """
         if isinstance(expected_children, list):
             expected_children = {i: c for i, c in enumerate(expected_children)}
-        for cluster_id, children in expected_children.items():
-            cluster = clusters[cluster_id]
-            test.assertEqual(len(children), len(cluster))
-            for c in children:
-                test.assertIn(c, cluster)
+        for resulting_cluster, expected_cluster in zip(clusters.values(), expected_children.values()):
+            test.assertEqual(len(expected_cluster), len(resulting_cluster))
+            for c in expected_cluster:
+                test.assertIn(c, resulting_cluster)

@@ -31,7 +31,7 @@ class ContextPrompt(MultiArtifactPrompt):
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        a_id = str(artifact[ArtifactKeys.ID])  # TMP FIX: Make as keys strings. 
+        a_id = artifact[ArtifactKeys.ID]
         id_to_context_artifacts = self.id_to_context_artifacts
         if not self.id_to_context_artifacts:
             assert embedding_manager is not None, "Must supply either a mapping of id to context or an embeddings manager to make one"

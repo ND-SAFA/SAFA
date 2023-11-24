@@ -1,13 +1,20 @@
 import threading
 import time
 from queue import Queue
-from typing import Any, Callable, List, Union
+from typing import Any, Callable, List, Union, Dict, TypedDict, Optional, Set
 
 from tqdm import tqdm
 
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.constants.threading_constants import THREAD_SLEEP
 from tgen.common.logging.logger_manager import logger
+
+
+class GlobalState(TypedDict):
+    successful: bool
+    exception: Optional[Exception]
+    failed_responses: Set[int]
+    results: Optional[List[Any]]
 
 
 class ThreadUtil:
@@ -17,7 +24,8 @@ class ThreadUtil:
 
     @staticmethod
     def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1,
-                             collect_results: bool = False, thread_sleep: float = THREAD_SLEEP) -> Union[None, List[Any]]:
+                             collect_results: bool = False, thread_sleep: float = THREAD_SLEEP,
+                             retries: Set = None, raise_exception: bool = True) -> Dict[str, Any]:
         """
         Performs distributed work over threads.
         :param title: The title of the work being done, used for logging.
@@ -27,19 +35,26 @@ class ThreadUtil:
         :param max_attempts: The maximum number of attempts before stopping thread entirely.
         :param collect_results: Whether to collect the output of each thread
         :param thread_sleep: The amount of time to sleep after an error occurs.
+        :param retries: List of indices to retry if they failed initially.
+        :param raise_exception: Throws an exception if one of the threads fails.
         :return: None
         """
-        if collect_results:
-            iterable = list(enumerate(iterable))
+        iterable = list(enumerate(iterable))
 
         result_list = [None] * len(iterable)
 
         item_queue = Queue()
-        for i in iterable:
-            item_queue.put(i)
+        for i, item in iterable:
+            if not retries or i in retries:
+                item_queue.put((i, item))
 
-        progress_bar = tqdm(total=len(iterable), desc=title, ncols=TQDM_NCOLS)
-        global_state = {"successful": True, "exception": None}
+        progress_bar = tqdm(total=item_queue.unfinished_tasks, desc=title, ncols=TQDM_NCOLS)
+        global_state: GlobalState = {
+            "successful": True,
+            "exception": None,
+            "failed_responses": set(),
+            "results": None
+        }
 
         def thread_body() -> None:
             """
@@ -47,9 +62,7 @@ class ThreadUtil:
             has been reached.
             """
             while not item_queue.empty() and global_state["successful"]:
-                item = item_queue.get()
-                if collect_results:
-                    index, item = item
+                index, item = item_queue.get()
 
                 attempts = 0
                 successful_local = False
@@ -66,7 +79,9 @@ class ThreadUtil:
                         if attempts >= max_attempts and not successful_local:
                             global_state["successful"] = False
                             global_state["exception"] = e
-                            return
+                            global_state["failed_responses"].add(index)
+                            if collect_results:
+                                result_list[index] = e
                         else:
                             logger.exception(e)
                             logger.info(f"Request failed, retrying in {thread_sleep} seconds.")
@@ -83,6 +98,8 @@ class ThreadUtil:
             t.join()
 
         if not global_state["successful"]:
-            raise global_state["exception"]
+            if raise_exception:
+                raise global_state["exception"]
         if collect_results:
-            return result_list
+            global_state["results"] = result_list
+        return global_state

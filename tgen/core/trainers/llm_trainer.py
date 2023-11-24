@@ -1,6 +1,6 @@
 import json
 import os.path
-from typing import Any, List, Union, Dict
+from typing import Any, List, Union, Dict, Tuple
 
 from openai.api_resources.fine_tune import FineTune
 
@@ -8,6 +8,7 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.thread_util import GlobalState
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -23,7 +24,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
+from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
@@ -71,32 +72,50 @@ class LLMTrainer(AbstractTrainer):
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
                            dataset: iDataset = None, prompts: List[str] = None,
-                           save_and_load_path: str = EMPTY_STRING) -> TracePredictionOutput:
+                           save_and_load_path: str = EMPTY_STRING, raise_exception: bool = True) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :param dataset: The dataset to use instead of from the dataset manager
         :param prompts: The list of prompts to use instead of making from the dataset
         :param save_and_load_path: The path to load or save response
+        :param raise_exception: If True, raises an exception if a response fails
         :return: THe prediction response
         """
         assert not save_and_load_path or save_and_load_path.endswith(FileUtil.YAML_EXT), "Response must be saved to yaml file."
 
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
+        assert dataset is not None, "Must provide a dataset for predicting on."
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
         prompts = self._get_prompts_for_prediction(dataset) if not prompts else prompts
-        if os.path.exists(save_and_load_path):
+
+        original_responses = None
+        reloaded = False
+        if FileUtil.safely_check_path_exists(save_and_load_path):
             logger.info(f"IMPORTANT!!! Loading previous LLM responses from {save_and_load_path}")
             res = YamlUtil.read(save_and_load_path)
-        else:
-            res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
-                                                           prompt=prompts)
+            reloaded = True
+            failed_responses = self._get_failed_responses(res)
+            if len(failed_responses) > 0:
+                original_responses = self._get_batch_responses(res)
+
+        if not reloaded or original_responses is not None:
+            res = self.llm_manager.make_completion_request(
+                completion_type=self.completion_type,
+                prompt=prompts,
+                original_responses=original_responses,
+                raise_exception=raise_exception and not save_and_load_path)
             if save_and_load_path:
                 logger.info(f"Saved LLM responses to {save_and_load_path}")
                 FileUtil.create_dir_safely(save_and_load_path)
                 YamlUtil.write(res, save_and_load_path)
-        batch_responses = res.batch_responses if isinstance(res, GenerationResponse) else [r.text for r in res.batch_responses]
-        debugging = [p + NEW_LINE + r for p, r in zip(prompts, batch_responses)]
+
+        batch_responses = self._get_batch_responses(res)
+        failed_responses = self._get_failed_responses(res)
+        if raise_exception and len(failed_responses) > 0:
+            raise Exception(failed_responses[0])
+
+        debugging = [p + NEW_LINE + str(r) for p, r in zip(prompts, batch_responses)]
         prompt_builder_map = {prompt_builder.id: prompt_builder
                               for prompt_builder in (self.prompt_builders
                                                      if isinstance(self.prompt_builders, list) else [self.prompt_builders])}
@@ -108,6 +127,27 @@ class LLMTrainer(AbstractTrainer):
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
+
+    @staticmethod
+    def _get_failed_responses(res: SupportedLLMResponses) -> List[Exception]:
+        """
+        Gets failed responses from the response.
+        :param res: The LLM Response.
+        :return: A list of failed responses.
+        """
+        batch_responses = LLMTrainer._get_batch_responses(res)
+        failed_responses = [r for r in batch_responses if isinstance(r, Exception)]
+        return failed_responses
+
+    @staticmethod
+    def _get_batch_responses(res: SupportedLLMResponses) -> List[str]:
+        """
+        Gets batch responses from the response.
+        :param res: The LLM Response.
+        :return: Batch responses.
+        """
+        batch_responses = res.batch_responses if isinstance(res, GenerationResponse) else [r.text for r in res.batch_responses]
+        return batch_responses
 
     def _get_prompts_for_prediction(self, dataset: PromptDataset) -> List[str]:
         """
@@ -177,8 +217,9 @@ class LLMTrainer(AbstractTrainer):
         :param prompt_builder_ids: List of ids for prompt builders corresponding to the order of responses
         :return: The generation output.
         """
-        return TracePredictionOutput(predictions=[prompt_builder_map[p_id].parse_responses(r)
-                                                  for r, p_id in zip(responses, prompt_builder_ids)],
+        return TracePredictionOutput(predictions=[(prompt_builder_map[p_id].parse_responses(r)
+                                                   if not isinstance(r, Exception) else r)
+                                                  for i, (r, p_id) in enumerate(zip(responses, prompt_builder_ids))],
                                      original_response=responses)  #
 
     def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset,
@@ -199,6 +240,8 @@ class LLMTrainer(AbstractTrainer):
         class2correct = {}
         for i, classification_item in enumerate(res.batch_responses):
             r = classification_item.text
+            if isinstance(r, Exception):
+                continue
             entry = LLMResponseUtil.extract_labels(r, {label: label for label in CURRENT_LABELS})
             entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
 

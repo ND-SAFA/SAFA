@@ -1,19 +1,26 @@
+import math
 from collections import namedtuple
 from copy import deepcopy
 from typing import Dict, List
 from unittest import mock
 
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -70,6 +77,59 @@ class TestOpenAiTrainer(BaseTest):
         for dataset_creator in self.get_all_dataset_creators().values():
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
             res = trainer.perform_training()
+
+    @mock.patch.object(FileUtil, "safely_check_path_exists", return_value=True)
+    @mock.patch.object(YamlUtil, "read")
+    @mock_openai
+    def test_perform_prediction_reloaded(self, test_ai_manager: TestAIManager, read_mock: mock.MagicMock,
+                                         file_exists_mock: mock.MagicMock):
+
+        prompt = ArtifactPrompt("Tell me about this artifact: ")
+        prompt_builder = PromptBuilder([prompt])
+        dataset_creator = TestOpenAiTrainer.get_dataset_creator_with_artifact_df()
+        trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_builder=prompt_builder)
+
+        n_prompts = len(dataset_creator.create().artifact_df)
+        n_good_res = 5
+        n_bad_res = n_prompts - n_good_res
+        test_ai_manager.set_responses(["res" for i in range(n_bad_res)])
+
+        good_res = ['res' for _ in range(n_good_res)]
+        bad_res = [Exception('fake exception') for _ in range(n_bad_res)]
+        read_mock.return_value = GenerationResponse(batch_responses=good_res + bad_res)
+
+        res = trainer.perform_prediction(raise_exception=False)
+        self.assertEqual(len(res.original_response), n_prompts)
+        self.assertListEqual(good_res[:1] * n_prompts, res.original_response)
+
+    @mock_openai
+    def test_perform_prediction_multiple_prompt_builders(self, test_ai_manager: TestAIManager):
+
+        artifact_prompt = ArtifactPrompt("Tell me about this artifact: ")
+        response_prompt1 = Prompt("First response:",
+                                  response_manager=PromptResponseManager(response_tag="response1"))
+        response_prompt2 = Prompt("Second response:",
+                                  response_manager=PromptResponseManager(response_tag="response2"))
+        prompt_ids = [response_prompt1.id, response_prompt2.id]
+        prompt_builder1 = PromptBuilder([artifact_prompt, response_prompt1])
+        prompt_builder2 = PromptBuilder([artifact_prompt, response_prompt2])
+        dataset_creator = TestOpenAiTrainer.get_dataset_creator_with_artifact_df()
+        trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_builder=[prompt_builder1, prompt_builder2])
+        prompts = trainer._get_prompts_for_prediction(dataset_creator.create())
+
+        n_prompts = len(dataset_creator.create().artifact_df)
+        responses1 = [PromptUtil.create_xml("response1", "Here is my first response.") for _ in range(n_prompts)]
+        responses2 = [PromptUtil.create_xml("response2", "Here is my second response.") for _ in range(n_prompts)]
+        test_ai_manager.set_responses(responses1+responses2)
+
+        res = trainer.perform_prediction()
+        predictions = res.predictions
+        for i in range(len(predictions)):
+            response_num = math.floor(i / n_prompts)
+            tag = f"response{response_num+1}"
+            prompt_response = predictions[i][prompt_ids[response_num]]
+            self.assertIn(tag, prompts[i])
+            self.assertIn(tag, prompt_response)
 
     @mock_openai
     @mock.patch.object(LLMResponseUtil, "extract_labels")

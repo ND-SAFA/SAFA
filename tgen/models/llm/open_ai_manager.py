@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import Set, List
 
 import openai
 from openai.openai_object import OpenAIObject
@@ -7,7 +8,8 @@ from tgen.common.constants import open_ai_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.thread_util import ThreadUtil
+from tgen.common.util.attr_dict import AttrDict
+from tgen.common.util.thread_util import ThreadUtil, GlobalState
 from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
@@ -56,9 +58,13 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         """
         return openai.FineTune.retrieve(**params)
 
-    def make_completion_request_impl(self, **params) -> AIObject:
+    def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,
+                                     retries: Set[int] = None, **params) -> AIObject:
         """
         Makes a request to completion a model
+        :param raise_exception: If True, raises an exception if the request has failed.
+        :param original_responses: List of the original responses from the model if retrying.
+        :param retries: Set of indices of responses that need retried because they failed the first time.
         :param params: Params necessary for request
         :return: The response from open  ai
         """
@@ -77,14 +83,22 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
             res = openai.ChatCompletion.create(**params)
             return res.choices[0]
 
-        choices = ThreadUtil.multi_thread_process("Making completion requests",
-                                                  prompts,
-                                                  complete_prompt,
-                                                  n_threads=open_ai_constants.OPENAI_MAX_THREADS,
-                                                  max_attempts=open_ai_constants.OPENAI_MAX_ATTEMPTS,
-                                                  collect_results=True)
+        global_state: GlobalState = ThreadUtil.multi_thread_process("Making completion requests",
+                                                                    prompts,
+                                                                    complete_prompt,
+                                                                    raise_exception=raise_exception,
+                                                                    n_threads=open_ai_constants.OPENAI_MAX_THREADS,
+                                                                    max_attempts=open_ai_constants.OPENAI_MAX_ATTEMPTS,
+                                                                    retries=retries,
+                                                                    collect_results=True)
 
-        return Res(choices=choices)
+        self._handle_exceptions(global_state)
+
+        global_responses = global_state["results"]
+        if retries:
+            global_responses = self._combine_original_responses_and_retries(global_responses, original_responses, retries)
+        global_state["results"] = Res(choices=global_responses)
+        return global_state
 
     @staticmethod
     def extract_all_text_from_response(res: OpenAIObject) -> str:
@@ -93,7 +107,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param res: The response
         :return: All text across all batches from the response
         """
-        return EMPTY_STRING.join([res.message["content"] for res in res.choices])
+        return EMPTY_STRING.join([res.message["content"] for res in res.choices if res.message])
 
     @staticmethod
     def translate_to_response(task: LLMCompletionType, res: OpenAIObject, **params) -> SupportedLLMResponses:
@@ -104,11 +118,12 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param params: The parameters to the API.
         :return: A response for the supported types.
         """
-        text_responses = [choice.message["content"].strip() for choice in res.choices]
+        text_responses = [choice.message["content"].strip() if choice.message else choice.exception
+                          for choice in res.choices]
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse(text_responses)
         elif task == LLMCompletionType.CLASSIFICATION:
-            probs = [r.logprobs.top_logprobs[0] for r in res.choices]
+            probs = [r.logprobs.top_logprobs[0] if r.logprobs else None for r in res.choices]
             classification_items = [ClassificationItemResponse(t, probs=p) for t, p in zip(text_responses, probs)]
             return ClassificationResponse(classification_items)
         else:
@@ -121,3 +136,18 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :return: The response from open  ai
         """
         return openai.File.create(**params)
+
+    @classmethod
+    def format_response(cls, response_text: str = None, exception: Exception = None) -> AttrDict:
+        """
+        Formats the text, exception and any other information in the same way as all other responses from OpenAI.
+        :param response_text: The models generated text.
+        :param exception: Any exception raised during the generation.
+        :return: The formatted response
+        """
+        response = AttrDict({"message": None, "log_probs": None})
+        if response_text:
+            response.message = {"content": response_text}
+        if exception:
+            response["exception"] = exception
+        return response

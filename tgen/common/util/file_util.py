@@ -633,3 +633,14 @@ class FileUtil:
         if not path:
             return False
         return os.path.exists(path)
+
+    @staticmethod
+    def insert_before_ext(path: str, additional_filename_part: str) -> str:
+        """
+        Inserts some text before the filepath ext
+        :param path: The full path
+        :param additional_filename_part: The additional part of the filename to insert before the ext
+        :return: The path with the additional filename part
+        """
+        path, ext = os.path.splitext(path)
+        return FileUtil.add_ext(path + additional_filename_part, ext)

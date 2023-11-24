@@ -116,7 +116,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Adds clusters as artifacts
     """
-    add_clusters_as_artifacts: bool = True
+    add_clusters_as_artifacts: bool = False
     """
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """

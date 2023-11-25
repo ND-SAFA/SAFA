@@ -23,11 +23,14 @@ class TestAIManager:
 
         n_manual_prompts = len(manual_prompts)
         manual_responses = self.get_next_response(n_requested=n_manual_prompts)
+
+        self.n_used += n_manual_prompts
+        self.mock_calls += n_manual_prompts
+
         manual_responses = [r(manual_prompts[i]) if callable(r) else r for i, r in enumerate(manual_responses)]
         responses = handled_responses + manual_responses
         responses = self.response_formatter(responses)
-        self.n_used += n_manual_prompts
-        self.mock_calls += n_manual_prompts
+
         return responses
 
     def run_prompt_handlers(self, prompts):

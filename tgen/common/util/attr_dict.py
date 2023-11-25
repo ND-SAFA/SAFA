@@ -15,3 +15,5 @@ class AttrDict(dict):
         if key in self:
             return self[key]
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{key}'")
+
+

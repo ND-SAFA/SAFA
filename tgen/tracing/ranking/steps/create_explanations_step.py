@@ -60,7 +60,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
                                                                                   PromptDataset(trace_dataset=filter_dataset)})
         save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
             state.get_path_to_state_checkpoint(args.export_dir), "explanation_response") if args.export_dir else args.export_dir
-        trainer = LLMTrainer(LLMTrainerState(llm_manager=args.explanation_llm_model, prompt_builder=prompt_builder,
+        trainer = LLMTrainer(LLMTrainerState(llm_manager=args.explanation_llm_model, prompt_builders=prompt_builder,
                                              trainer_dataset_manager=trainer_dataset_manager))
         predictions = trainer.perform_prediction(save_and_load_path=save_and_load_path).predictions
         task_prompt: QuestionnairePrompt = prompt_builder.prompts[-1]

@@ -1,3 +1,4 @@
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -18,6 +19,7 @@ class StepCreateProjectSummaries(AbstractPipelineStep[SummarizerArgs, Summarizer
         """
         project_summaries = []
         for cluster_id, cluster in state.cluster_map.items():
+            logger.log_title(f"Creating project summary for {len(cluster)} artifacts.")
             export_dir = FileUtil.safely_join_paths(args.export_dir, cluster_id)
             params = DataclassUtil.convert_to_dict(args)
             args_for_cluster = SummarizerArgs(**params)

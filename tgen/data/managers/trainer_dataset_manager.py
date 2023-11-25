@@ -96,7 +96,7 @@ class TrainerDatasetManager(BaseObject):
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
 
     @staticmethod
-    def create_from_datasets(dataset_map: Dict[DatasetRole, iDataset]) -> "TrainerDatasetManager":
+    def create_from_datasets(dataset_map: Dict[DatasetRole, Union[iDataset, List[iDataset]]]) -> "TrainerDatasetManager":
         """
         Creates instance containing dataset for each mapped role.
         :param dataset_map: The map of roles to data to set in instance.
@@ -108,7 +108,9 @@ class TrainerDatasetManager(BaseObject):
                 trainer_dataset_manager._datasets[role] = None
             else:
                 dataset = dataset_map[role]
-                assert isinstance(dataset, iDataset), f"Unexpected type of dataset {type(dataset)}"
+                datasets = dataset if isinstance(dataset, list) else [dataset]
+                for d in datasets:
+                    assert isinstance(d, iDataset), f"Unexpected type of dataset {type(d)}"
                 trainer_dataset_manager._datasets[role] = dataset
         return trainer_dataset_manager
 

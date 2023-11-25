@@ -66,7 +66,7 @@ class TestPromptDataset(BaseTest):
         llm_manager = OpenAIManager(OpenAIArgs())
         prompt = QuestionPrompt("Tell me about this artifact:")
         prompt_builder = PromptBuilder([prompt, ArtifactPrompt()])
-        prompts_df = artifact_prompt_dataset.get_prompt_dataframe(prompt_builder=prompt_builder,
+        prompts_df = artifact_prompt_dataset.get_prompt_dataframe(prompt_builders=prompt_builder,
                                                                   prompt_args=llm_manager.prompt_args)
 
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))

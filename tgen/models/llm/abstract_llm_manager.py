@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Generic, Type, TypeVar
+from typing import Dict, Generic, Type, TypeVar, Tuple, List, Set, Any, Callable
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.util.attr_dict import AttrDict
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.thread_util import GlobalState
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.models.llm.llm_responses import SupportedLLMResponses
@@ -32,10 +34,14 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         self.state = state if state else State()
 
     def make_completion_request(self, completion_type: LLMCompletionType,
+                                original_responses: List = None,
+                                raise_exception: bool = True,
                                 **params) -> SupportedLLMResponses:
         """
         Makes a request to fine-tune a model.
         :param completion_type: The task to translate response to.
+        :param original_responses: List of the original responses from the model if retrying.
+        :param raise_exception: If True, raises an exception if the request has failed.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
@@ -47,7 +53,13 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
                                                                                      model_name=self.llm_args.model,
                                                                                      input_or_output=INPUT_TOKENS,
                                                                                      raise_exception=False)
-        llm_response = self.make_completion_request_impl(**completion_params)
+        retries = self._get_indices_to_retry(original_responses)
+        global_state: GlobalState = self.make_completion_request_impl(raise_exception=raise_exception,
+                                                                      original_responses=original_responses,
+                                                                      retries=retries,
+                                                                      **completion_params)
+        llm_response = global_state["results"]
+
         output_content = self.extract_all_text_from_response(llm_response)
         self.state.total_output_cost += ModelTokenCost.calculate_cost_for_content(content=output_content,
                                                                                   model_name=self.llm_args.model,
@@ -57,9 +69,12 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         return translated_response
 
     @abstractmethod
-    def make_completion_request_impl(self, **params) -> AIObject:
+    def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,
+                                     **params) -> AIObject:
         """
         Makes a completion request to model.
+        :param raise_exception: If True, raises an exception if the request has failed.
+        :param original_responses: List of the original responses from the model if retrying.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
@@ -95,6 +110,31 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         params = self.llm_args.to_params(TrainerTask.TRAIN, completion_type, instructions=instructions, **kwargs)
         return self._make_fine_tune_request_impl(**params)
 
+    @classmethod
+    @abstractmethod
+    def format_response(cls, response_text: str = None, exception: Exception = None) -> SupportedLLMResponses:
+        """
+        Formats the text, exception and any other information in the same way as all other responses.
+        :param response_text: The models generated text.
+        :param exception: Any exception raised during the generation.
+        :return: The formatted response
+        """
+
+    @classmethod
+    def _handle_exceptions(cls, global_state: GlobalState) -> None:
+        """
+        Ensures that any exceptions are appropriately formatted.
+        :param global_state: The global state from running the thread calls to the LLM.
+        :param formatter: Handles formatting the exception in the format of the LLM (e.g. OpenAI vs. Anthropic)
+        :return: None.
+        """
+        global_responses = global_state["results"]
+        for i, res in enumerate(global_responses):
+            if isinstance(res, Exception) or not res:
+                e = global_state["exception"] if global_state["exception"] else Exception("Unknown Exception Occurred")
+                global_responses[i] = cls.format_response(exception=e)
+                global_state["failed_responses"].add(i)
+
     @abstractmethod
     def _make_fine_tune_request_impl(self, **kwargs) -> AIObject:
         """
@@ -129,3 +169,26 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         """
         from tgen.models.llm.supported_llm_manager import SupportedLLMManager
         return SupportedLLMManager
+
+    @staticmethod
+    def _get_indices_to_retry(original_responses: List[Any]) -> Set[int]:
+        """
+        Gets what indices need retried because of an exception from the original LLM responses.
+        :param original_responses: The list of original responses.
+        :return: The set of indices that need retried because of an exception.
+        """
+        retries = {i for i, r in enumerate(original_responses) if isinstance(r, Exception)} if original_responses is not None else None
+        return retries
+
+    def _combine_original_responses_and_retries(self, new_response: List[Any], original_responses: List[Any],
+                                                retries: Set[int]) -> List[SupportedLLMResponses]:
+        """
+        Combines the original responses with any that have been redone because they failed initially.
+        :param new_response: The new response from the LLM.
+        :param original_responses: The original responses.
+        :param retries: List of indices of all responses that have been retried.
+        :return: A list of all responses (both original and retried).
+        """
+        new_response = [(r if i in retries else self.format_response(response_text=original_responses[i]))
+                        for i, r in enumerate(new_response)]
+        return new_response

@@ -68,7 +68,7 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     Prompt(
-        "First, describe the role of the {source_type}(s) within the system and their unique functionality.",
+        "First, describe the unique functionality of the {source_type}(s) within the system.",
         response_manager=PromptResponseManager(response_tag="notes")
     ),
     QuestionPrompt(

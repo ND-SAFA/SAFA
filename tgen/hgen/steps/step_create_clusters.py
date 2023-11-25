@@ -3,6 +3,8 @@ from typing import Dict
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
+from tgen.common.constants.hgen_constants import LARGE_PROJECT, MEDIUM_PROJECT, REDUCTION_FACTORS, SEEDS_LAYER_PARAM, SEEDS_PARAM, \
+    SEED_RF_PARAM, SMALL_PROJECT
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
@@ -13,13 +15,8 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.summarizer.summary import SummarySectionKeys
 
-SEEDS_PARAM = "cluster_seeds"
-SEEDS_LAYER_PARAM = "cluster_artifact_type"
-SEED_RF_PARAM = "cluster_reduction_factor"
-
 
 class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
-    REDUCTION_FACTORS = {"small": 0.5, "medium": 0.3, "big": 0.15}
 
     @nested_pipeline(HGenState)
     def _run(self, args: HGenArgs, state: HGenState) -> None:
@@ -86,7 +83,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             section_id = args.seed_project_summary_section
             seed_contents = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             seed_artifact_type = section_id
-            kwargs[SEED_RF_PARAM] = CreateClustersStep.REDUCTION_FACTORS[CreateClustersStep]
+            kwargs[SEED_RF_PARAM] = REDUCTION_FACTORS[CreateClustersStep]
         elif args.seed_layer_id:
             seed_artifacts = state.original_dataset.artifact_df.get_type(args.seed_layer_id).to_artifacts()
             seed_contents = [a[ArtifactKeys.CONTENT] for a in seed_artifacts]
@@ -106,7 +103,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         n_sources = len(args.dataset.artifact_df.get_type(args.source_type))
         project_size = CreateClustersStep.get_project_size(n_sources)
-        return CreateClustersStep.REDUCTION_FACTORS[project_size]
+        return REDUCTION_FACTORS[project_size]
 
     @staticmethod
     def get_project_size(n_artifacts: int):
@@ -116,8 +113,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The size of the run.
         """
         if n_artifacts <= 50:
-            return "small"
+            return SMALL_PROJECT
         elif n_artifacts <= 300:
-            return "medium"
+            return MEDIUM_PROJECT
         else:
-            return "large"
+            return LARGE_PROJECT

@@ -6,7 +6,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.condense_clusters import CondenseClusters
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
-from tgen.common.constants.clustering_constants import ADD_ORPHAN_TO_CLUSTER_THRESHOLD
+from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_SIMILARITY_DELTA, MIN_ORPHAN_HOME_SIMILARITY
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -84,13 +84,12 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
     @staticmethod
     def place_orphans_in_homes(args: ClusteringArgs, clusters: List[Cluster], orphan_artifacts: Set[str]) -> Set[str]:
         """
-        Attempts to add orphans to clusters
+        Attempts to house orphans from best to worst houses for them.
         :param args: The arguments to the clustering pipeline.
         :param clusters: The list of clusters to place orphans into.
         :param orphan_artifacts: List of artifact ids that need clusters.
         :return: set of orphans that found homes.
         """
-        avg_similarity_threshold = 0 if args.add_orphans_to_best_home else ADD_ORPHAN_TO_CLUSTER_THRESHOLD
         adopted_orphans = set()
         best_clusters = []
         for artifact_id in orphan_artifacts:
@@ -98,12 +97,12 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             artifact_iterable = [(artifact_id, t[0], t[1]) for t in zip(clusters, similarities_to_clusters)]
             best_clusters.extend(artifact_iterable)
 
-        best_clusters = list(filter(lambda t: t[-1] >= 0.6, best_clusters))
+        best_clusters = list(filter(lambda t: t[-1] >= MIN_ORPHAN_HOME_SIMILARITY, best_clusters))
         best_clusters = sorted(best_clusters, key=lambda t: t[-1], reverse=True)
 
         for i, (artifact, cluster, cluster_similarity) in enumerate(best_clusters):
             delta = cluster.min_sim - cluster_similarity if len(cluster) > 1 else 0
-            if delta < .02 and len(cluster) < args.cluster_max_size and artifact not in adopted_orphans:
+            if delta < ALLOWED_ORPHAN_SIMILARITY_DELTA and len(cluster) < args.cluster_max_size and artifact not in adopted_orphans:
                 cluster.add_artifact(artifact)
                 adopted_orphans.add(artifact)
 

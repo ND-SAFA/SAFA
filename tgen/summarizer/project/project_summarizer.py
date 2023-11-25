@@ -136,6 +136,8 @@ class ProjectSummarizer(BaseObject):
         """
         sections_being_created = [s for s in SummarizerUtil.missing_project_summary_sections(self.project_summary, self.args)
                                   if not async_sections_only or self.can_be_generated_async(s)]
+        if len(sections_being_created) == 0:
+            return
         logger.log_title(f"Creating project specification: {sections_being_created}")
         prompt_builders = {section_id: self._create_prompt_builder(section_id, section_prompt)
                            for section_id, section_prompt in self.get_generation_iterator(async_sections_only=async_sections_only)}

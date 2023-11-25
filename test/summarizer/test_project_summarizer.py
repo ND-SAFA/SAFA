@@ -85,9 +85,10 @@ class TestProjectSummarizer(BaseTest):
     def _project_responses(self):
         new_section_response = create(self.NEW_SECTION_TITLE, tag="new") + PromptUtil.create_xml(CUSTOM_TITLE_TAG, self.NEW_TITLE)
         res = [MockResponses.project_title_to_response[PS_DATA_FLOW_TITLE],
-               MockResponses.project_title_to_response[PS_OVERVIEW_TITLE],
                new_section_response,
-               MockResponses.project_title_to_response[PS_DATA_FLOW_TITLE]]
+               MockResponses.project_title_to_response[PS_OVERVIEW_TITLE],
+               MockResponses.project_title_to_response[PS_DATA_FLOW_TITLE],
+               ]
         return res
 
     def _assert_summary(self, summary):

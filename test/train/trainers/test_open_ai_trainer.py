@@ -13,6 +13,7 @@ from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.prompts.artifact_prompt import ArtifactPrompt
@@ -115,7 +116,7 @@ class TestOpenAiTrainer(BaseTest):
         prompt_builder2 = PromptBuilder([artifact_prompt, response_prompt2])
         dataset_creator = TestOpenAiTrainer.get_dataset_creator_with_artifact_df()
         trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_builder=[prompt_builder1, prompt_builder2])
-        prompts = trainer._get_prompts_for_prediction(dataset_creator.create())
+        prompts = trainer._get_prompts_for_prediction(dataset_creator.create(), [prompt_builder1, prompt_builder2])[PromptKeys.PROMPT]
 
         n_prompts = len(dataset_creator.create().artifact_df)
         responses1 = [PromptUtil.create_xml("response1", "Here is my first response.") for _ in range(n_prompts)]

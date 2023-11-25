@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from copy import deepcopy
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Union
 
 from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_STATE_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
@@ -77,15 +77,18 @@ class ProjectSummarizer(BaseObject):
         logger.log_title(f"Creating project specification: "
                          f"{SummarizerUtil.missing_project_summary_sections(self.project_summary, self.args)}")
 
-        for section_id, section_prompt in self.get_generation_iterator():
-            logger.log_step(f"Creating section: `{section_id}`")
-            prompt_builder = self._create_prompt_builder(section_id, section_prompt)
+        prompt_builders = {section_id: self._create_prompt_builder(section_id, section_prompt)
+                           for section_id, section_prompt in self.get_generation_iterator()}
+        dataset = [self._create_dataset_from_project_summaries(self.project_summary_versions, section_id)
+                       for section_id, section_prompt in self.get_generation_iterator()] if not self.dataset else [self.dataset]
+
+        generated_section_responses = self._generate_sections(prompt_builders, dataset)
+        for i, (section_id, section_prompt) in enumerate(self.get_generation_iterator()):
             task_tag = section_prompt.get_response_tags_for_question(-1)
             task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
-            dataset = self.dataset if self.dataset \
-                else self._create_dataset_from_project_summaries(self.project_summary_versions, section_id)
-            section_body, section_title = self._generate_section(prompt_builder, task_tag, dataset=dataset,
-                                                                 multi_line_items=section_id in MULTI_LINE_ITEMS)
+
+            section_body, section_title = self._parse_section(response=generated_section_responses[i],
+                                                              task_tag=task_tag, multi_line_items=section_id in MULTI_LINE_ITEMS)
             if not section_title:
                 section_title = section_id
 
@@ -124,31 +127,41 @@ class ProjectSummarizer(BaseObject):
             prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
         return prompt_builder
 
-    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, dataset: PromptDataset,
-                          multi_line_items: bool = False) -> Tuple[str, str]:
+    def _generate_sections(self, prompt_builders: Dict[str, PromptBuilder],
+                           dataset: Union[PromptDataset, List[PromptDataset]]) -> List[Dict]:
         """
         Has the LLM generate the section corresponding using the prompt builder
-        :param prompt_builder: Contains prompts necessary for generating section
-        :param task_tag: The tag used to retrieve the generations from the parsed response
+        :param prompt_builders: Contains prompts necessary for generating sections
         :param dataset: The dataset that will be provided to the model when generating
-        :param multi_line_items: If True, expects each item in the body to span multiple lines
-        :return: The section body and section title (if one was generated)
+        :return: Responses for all sections
         """
         self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
         self.llm_manager.llm_args.temperature = 0
 
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset
-                                                                              })
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
-                                             prompt_builders=prompt_builder,
+                                             prompt_builders=list(prompt_builders.values()),
                                              trainer_dataset_manager=trainer_dataset_manager))
-        predictions = trainer.perform_prediction().predictions[0]
-        parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
-        body_res = parsed_responses[task_tag]
+        res = trainer.perform_prediction(raise_exception=False)
+        failures = {i for i, r in enumerate(res.original_response) if isinstance(r, Exception)}
+        parsed_responses = [(res.predictions[i][prompt_builder.get_prompt(-1).id] if i not in failures else res.original_response[i])
+                            for i, prompt_builder in enumerate(prompt_builders.values())]
+        return parsed_responses
+
+    @staticmethod
+    def _parse_section(response: Dict, task_tag: str, multi_line_items: bool = False) -> Tuple[str, str]:
+        """
+        Extracts the necessary information for creating the section from its response.
+        :param response: The section response.
+        :param task_tag: The tag used to retrieve the generations from the parsed response.
+        :param multi_line_items: If True, expects each item in the body to span multiple lines.
+        :return: The section body and section title (if one was generated).
+        """
+        body_res = response[task_tag]
         body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(
             body_res) > 1 and not multi_line_items)
                     for r in body_res]
-        task_title = parsed_responses[CUSTOM_TITLE_TAG][0] if parsed_responses.get(CUSTOM_TITLE_TAG) else None
+        task_title = response[CUSTOM_TITLE_TAG][0] if response.get(CUSTOM_TITLE_TAG) else None
         deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"
         task_body = body_res[0] if len(body_res) == 1 else deliminator.join(body_res)
         return deliminator + task_body, task_title

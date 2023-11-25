@@ -66,7 +66,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         state.update_total_costs_from_state(cluster_state)
         state.embedding_manager = cluster_state.embedding_manager
-        state.seed2artifacts = cluster_state.cluster2artifacts
+        state.seed2artifacts = cluster_state.seed2artifacts
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
         state.cluster2artifacts = cluster_map
 

@@ -25,7 +25,7 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             raise Exception("Cannot perform seed clustering with no artifacts.")
         if seeds:
             seed2artifacts = self.cluster_around_centroids(embedding_manager, artifact_ids, seeds)
-            state.cluster2artifacts = seed2artifacts  # used to link seeds to source artifacts later on.
+            state.seed2artifacts = seed2artifacts  # used to link seeds to source artifacts later on.
             artifact_batches = [artifacts for seed, artifacts in seed2artifacts.items() if len(artifacts) > 0]
         else:
             artifact_batches = args.subset_ids if args.subset_ids else [artifact_ids]

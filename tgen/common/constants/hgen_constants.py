@@ -18,3 +18,5 @@ REDUCTION_FACTORS = {SMALL_PROJECT: 0.5, MEDIUM_PROJECT: 0.3, LARGE_PROJECT: 0.1
 SEEDS_PARAM = "cluster_seeds"
 SEEDS_LAYER_PARAM = "cluster_artifact_type"
 SEED_RF_PARAM = "cluster_reduction_factor"
+MIN_SEED_SIMILARITY_QUANTILE = 0.10  # lower percentage of scores to exclude from linking to seeds
+UPPER_SEED_SIMILARITY_QUANTILE = 0.95  # percentage of scores to allow to link to multiple parents.

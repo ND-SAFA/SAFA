@@ -4,7 +4,7 @@ import numpy as np
 
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.common.logging.logger_manager import logger
+from tgen.common.constants.hgen_constants import MIN_SEED_SIMILARITY_QUANTILE, UPPER_SEED_SIMILARITY_QUANTILE
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -55,28 +55,24 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param similarity_matrix: Similarity between each artifact to each centroid.
         :return: Map of centroid to artifacts it contains.
         """
-        min_score = np.quantile(similarity_matrix, 0.10)
-        upper_threshold = np.quantile(similarity_matrix, 0.95)
+        min_seed_similarity = np.quantile(similarity_matrix, MIN_SEED_SIMILARITY_QUANTILE)
+        upper_seed_similarity_threshold = np.quantile(similarity_matrix, UPPER_SEED_SIMILARITY_QUANTILE)
 
         cluster_map = {t: [] for t in centroids}
-        n_high_artifacts = 0
         for i, a_id in enumerate(artifact_ids):
             cluster_similarities = similarity_matrix[i, :]
-
-            assigned_clusters_indices = [i for i, score in enumerate(list(cluster_similarities)) if score >= upper_threshold]
+            assigned_clusters_indices = [i for i, score in enumerate(list(cluster_similarities)) if
+                                         score >= upper_seed_similarity_threshold]
             if len(assigned_clusters_indices) == 0:
                 closest_cluster_index: int = np.argmax(cluster_similarities)
                 closest_cluster_similarity = cluster_similarities[closest_cluster_index]
-                if closest_cluster_similarity >= min_score:
+                if closest_cluster_similarity >= min_seed_similarity:
                     assigned_clusters_indices.append(closest_cluster_index)
-            else:
-                n_high_artifacts += 1
 
             assigned_centroids = [centroids[i] for i in assigned_clusters_indices]
 
             for assigned_centroid_id in assigned_centroids:
                 cluster_map[assigned_centroid_id].append(a_id)
-        logger.info(f"# of highly linked artifacts: {n_high_artifacts}")
         return cluster_map
 
     @staticmethod

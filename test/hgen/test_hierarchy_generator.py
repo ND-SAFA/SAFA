@@ -226,7 +226,7 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(new_artifact[ArtifactKeys.LAYER_ID], self.HGEN_ARGS.target_type)
             for orig_id, orig_artifact in self.HGEN_STATE.original_dataset.artifact_df.itertuples():
                 self.assertIn(orig_id, self.HGEN_STATE.final_dataset.artifact_df.index)
-                if orig_artifact[ArtifactKeys.LAYER_ID] == self.HGEN_ARGS.source_layer_ids:
+                if orig_artifact[ArtifactKeys.LAYER_ID] in self.HGEN_ARGS.source_layer_ids:
                     q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.trace_df, {"source": orig_id, "target": name})
                     self.assertEqual(len(q), 1)
         for i, layer in self.HGEN_STATE.original_dataset.trace_dataset.layer_df.itertuples():

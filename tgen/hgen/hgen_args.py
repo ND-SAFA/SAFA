@@ -116,7 +116,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Adds clusters as artifacts
     """
-    add_clusters_as_artifacts: bool = False
+    add_seeds_as_artifacts: bool = False
     """
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """
@@ -142,6 +142,9 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
+
+        if isinstance(self.source_layer_ids, str):
+            self.source_layer_ids = [self.source_layer_ids]
 
     def get_seed_id(self) -> str:
         """

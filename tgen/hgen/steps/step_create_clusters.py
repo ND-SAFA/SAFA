@@ -4,11 +4,14 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY, DEFAULT_SEED_MAX_CLUSTER_SIZE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.hgen_constants import CLUSTER_ARTIFACT_TYPE_PARAM, CLUSTER_MAX_SIZE_PARAM, CLUSTER_SEEDS_PARAM, \
     LARGE_PROJECT, MEDIUM_PROJECT, REDUCTION_FACTORS, SEED_RF_PARAM, SMALL_PROJECT
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
+from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
@@ -34,10 +37,10 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         cluster_args = self.create_clustering_args(args, state)
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
-        self.update_hgen_state(state, clustering_pipeline.state)
+        self.update_hgen_state(args, state, clustering_pipeline.state)
 
     @staticmethod
-    def update_hgen_state(state: HGenState, cluster_state: ClusteringState) -> None:
+    def update_hgen_state(args: HGenArgs, state: HGenState, cluster_state: ClusteringState) -> None:
         """
         Updates the state of hgen with the result of the clustering pipeline.
         :param state: The state of the hgen pipeline.
@@ -48,11 +51,22 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         cluster_state.cluster_artifact_dataset.artifact_df.index = clusters
         cluster_map = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
 
+        # Req: Clusters should be added to cluster data frame.
         state.update_total_costs_from_state(cluster_state)
         state.embedding_manager = cluster_state.embedding_manager
-        state.seed2artifacts = cluster_state.seed2artifacts
+
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
         state.cluster2artifacts = cluster_map
+
+        if cluster_state.seed2artifacts:
+            seed_ids = list(cluster_state.seed2artifacts.keys())
+            seed2artifact = {seed: CreateClustersStep.create_cluster_artifact(seed, args.get_seed_id()) for seed in seed_ids}
+            new_cluster_artifacts = list(seed2artifact.values())
+            seed_rename_map = {seed: a[ArtifactKeys.ID] for seed, a in seed2artifact.items()}
+
+            seed_artifact_df = ArtifactDataFrame(new_cluster_artifacts)
+            state.cluster_dataset.artifact_df = ArtifactDataFrame.concat(state.cluster_dataset.artifact_df, seed_artifact_df)
+            state.seed2artifacts = {seed_rename_map[s]: artifacts for s, artifacts in cluster_state.seed2artifacts.items()}
 
     @staticmethod
     def create_clustering_args(args: HGenArgs, state: HGenState) -> ClusteringArgs:
@@ -118,3 +132,17 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             return MEDIUM_PROJECT
         else:
             return LARGE_PROJECT
+
+    @staticmethod
+    def create_cluster_artifact(seed_text: str, seed_layer_id: str) -> Artifact:
+        """
+        Creates artifact for cluster with given content and layer id.
+        :param seed_text: The content of the seed.
+        :param seed_layer_id: The layer to given the seed artifact.
+        :return: Artifact.
+        """
+        curr_id = seed_text.splitlines()
+        artifact_id = curr_id[0]
+        artifact_content = NEW_LINE.join(curr_id[1:])
+        new_artifact = Artifact(id=artifact_id, content=artifact_content, layer_id=seed_layer_id, summary=EMPTY_STRING)
+        return new_artifact

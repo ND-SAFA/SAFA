@@ -6,11 +6,11 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
-from api.endpoints.base.docs.doc_generator import autodoc
+from api.docs.doc_generator import autodoc
 from api.utils.view_util import ViewUtil
+from tgen.common.logging.log_capture import LogCapture
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
-from tgen.common.util.logging.log_capture import LogCapture
-from tgen.common.util.logging.logger_manager import logger
 
 
 def endpoint(serializer, skip_serialization: bool = False):
@@ -48,7 +48,7 @@ def endpoint(serializer, skip_serialization: bool = False):
                     payload = json.loads(request.body)
                 else:
                     payload = ViewUtil.read_request(request, serializer)
-                    
+
                 if isinstance(func, Task):
                     payload_str = json.dumps(payload, cls=NpEncoder)
                     payload_dict = json.loads(payload_str)

@@ -2,7 +2,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 
-from api.endpoints.base.docs.type_map import TYPE_MAP
+from api.docs.type_map import TYPE_MAP
 
 
 def autodoc(serializer, *args, **kwargs):
@@ -60,7 +60,8 @@ def get_schema_for_field(field: serializers.Field):
         return get_serializer_swagger_info(field.__class__)['request_body']
 
     if field.help_text is None:
-        raise Exception(f"{field.__class__.__name__} is missing help text.")
+        parent_text = field.parent.help_text
+        raise Exception(f"Child of `{parent_text}` is missing help text.")
 
     parent_fields = [serializers.ListField, serializers.ListSerializer, serializers.DictField]
     if any([isinstance(field, p) for p in parent_fields]):

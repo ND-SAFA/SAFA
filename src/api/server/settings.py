@@ -15,8 +15,8 @@ import sys
 
 from kombu.serialization import register
 
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
-from tgen.common.util.logging.logger_manager import logger
 from .paths import load_paths
 
 load_paths()
@@ -142,7 +142,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    'https://localhost:3000',
+    "https://bend.safa.ai",
+    "https://dev.bend.safa.ai"
+]
 
 ENV_NAME = os.environ.get("ENV_MODE", "development")
 logger.info(f"Environment: {ENV_NAME}")
@@ -154,8 +158,11 @@ CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
 CELERYD_HIJACK_ROOT_LOGGER = False
-if ENV_NAME == "local":
-    CELERY_TASK_ALWAYS_EAGER = True
+
+run_as_eager = ENV_NAME.lower() == "local"
+CELERY_TASK_ALWAYS_EAGER = run_as_eager
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = run_as_eager
+logger.info("Running in EAGER mode." if run_as_eager else "Running with online worker.")
 
 
 # Encoder function

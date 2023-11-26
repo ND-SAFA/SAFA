@@ -5,6 +5,7 @@ from api.tests.test_data import TestData
 class TestPredictionView(APIBaseTest):
     """
     Tests trace link prediction endpoint.
+    TODO: Remove or actually finish writing
     """
 
     def test_pos_generate(self):

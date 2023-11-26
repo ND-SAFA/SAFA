@@ -3,9 +3,9 @@ from typing import List
 
 from rest_framework import serializers
 
-from api.constants.api_constants import LONG_TEXT, MEDIUM_TEXT
+from api.constants.api_constants import TEXT_LONG, TEXT_MEDIUM
 from api.endpoints.serializers.artifact_serializer import ArtifactSerializer
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataframe_util import DataFrameUtil
 
@@ -25,8 +25,8 @@ class HGenSerializer(serializers.Serializer):
     artifacts = ArtifactSerializer(many=True, help_text="List of source artifacts.")
     targetTypes = serializers.ListSerializer(
         help_text="List of target types to generate.",
-        child=serializers.CharField(max_length=MEDIUM_TEXT, help_text="The types of artifacts to generate."))
-    summary = serializers.CharField(max_length=LONG_TEXT, help_text="Pre-generated project summary.", required=False,
+        child=serializers.CharField(max_length=TEXT_MEDIUM, help_text="The types of artifacts to generate."))
+    summary = serializers.CharField(max_length=TEXT_LONG, help_text="Pre-generated project summary.", required=False,
                                     allow_null=True,
                                     allow_blank=False)
 

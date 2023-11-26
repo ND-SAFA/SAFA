@@ -1,4 +1,4 @@
-from api.endpoints.serializers.completion_serializer import CompletionSerializer
+from api.endpoints.completion.completion_serializer import CompletionSerializer
 from api.tests.api_base_test import APIBaseTest
 
 

@@ -1,10 +1,14 @@
 import json
+import os
+import uuid
 from typing import Dict
 from unittest import TestCase
 
 from django.core.wsgi import get_wsgi_application
 from django.test import Client
 from dotenv import load_dotenv
+
+from tgen.common.constants import environment_constants
 
 
 class APIBaseTest(TestCase):
@@ -18,6 +22,8 @@ class APIBaseTest(TestCase):
         """
         load_dotenv()
         get_wsgi_application()
+        environment_constants.IS_TEST = True
+        os.environ["ANTHROPIC_API_KEY"] = str(uuid.uuid4())
 
     @staticmethod
     def request(url: str, data: Dict = None, method: str = "POST", content_type="application/json"):

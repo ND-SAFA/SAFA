@@ -1,8 +1,9 @@
-from api.endpoints.base.async_endpoint import async_endpoint
-from api.endpoints.base.endpoint import endpoint
+from api.endpoints.async_endpoint import async_endpoint
+from api.endpoints.common.dataset_converter import create_api_dataset
+from api.endpoints.endpoint import endpoint
 from api.endpoints.serializers.summarize_serializer import SummarizeRequest, SummarizeSerializer
 from api.utils.view_util import ViewUtil
-from tgen.jobs.summary_jobs.summarize_artifacts_job import SummarizeArtifactsJob
+from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 
 
 @endpoint(SummarizeSerializer)
@@ -24,10 +25,11 @@ def perform_summarize_request(data: SummarizeRequest):
     :param data: Serialized data.
     :return: The same artifacts with content as summary.
     """
-    summarize_job = SummarizeArtifactsJob(data.artifacts,
-                                          project_summary=data.project_summary,
-                                          do_resummarize_project=False,
-                                          is_subset=True)
+    dataset_creator = create_api_dataset(data.artifacts)
+    summarize_job = SummarizeJob(dataset_creator=dataset_creator,
+                                 project_summary=data.project_summary,
+                                 do_resummarize_project=False,
+                                 is_subset=True)
 
     summarized_artifacts = ViewUtil.run_job(summarize_job)
     return summarized_artifacts

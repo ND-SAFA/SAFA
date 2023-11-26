@@ -6,9 +6,9 @@ from celery import Task, shared_task
 from rest_framework import serializers
 
 from api.constants.config import get_api_header
-from api.endpoints.base.endpoint import PostProcessType, PreProcessType, endpoint, endpoint_postprocess, endpoint_preprocess
+from api.endpoints.endpoint import PostProcessType, PreProcessType, endpoint, endpoint_postprocess, endpoint_preprocess
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
-from tgen.common.util.logging.logger_manager import logger
 
 
 def async_endpoint(serializer: Type[serializers.Serializer], pre_process: PreProcessType = None, post_process: PostProcessType = None):
@@ -32,7 +32,7 @@ def async_endpoint(serializer: Type[serializers.Serializer], pre_process: PrePro
 
         @endpoint(serializer, skip_serialization=True)
         @shared_task(*args, **kwargs, name=func.__name__, bind=True)
-        def task_endpoint(self: Task, *task_args, **task_kwargs):
+        def task_endpoint(task: Task, *task_args, **task_kwargs):
             """
             Constructs an task endpoint who will queue a job performing function being wrapped.
             :param task_args: Positional arguments.
@@ -56,7 +56,7 @@ def async_endpoint(serializer: Type[serializers.Serializer], pre_process: PrePro
                 if not is_successful:
                     raise local_state["exception"]
                 logs = log_capture.get_logs()
-                self.update_state(state="PROGRESS", meta={'logs': logs})
+                task.update_state(state="PROGRESS", meta={'logs': logs})
 
             def run_job():
                 try:

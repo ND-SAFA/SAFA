@@ -22,12 +22,12 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from api.constants.config import get_current_version, get_home_page
-from api.endpoints.views.completion_view import perform_completion
+from api.endpoints.completion.completion_view import perform_completion
 from api.endpoints.views.hgen_view import perform_hgen
-from api.endpoints.views.predict_view import perform_prediction, perform_search
-from api.endpoints.views.project_summary_view import perform_project_summary
+from api.endpoints.summary.project_summary_view import perform_project_summary
 from api.endpoints.views.result_view import cancel_job, get_result, get_status
 from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
+from api.endpoints.views.trace_view import perform_prediction, perform_search
 
 
 def wrap_html(body: str):

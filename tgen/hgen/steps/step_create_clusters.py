@@ -3,8 +3,9 @@ from typing import Dict
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
-from tgen.common.constants.hgen_constants import LARGE_PROJECT, MEDIUM_PROJECT, REDUCTION_FACTORS, SEEDS_LAYER_PARAM, SEEDS_PARAM, \
-    SEED_RF_PARAM, SMALL_PROJECT
+from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY, DEFAULT_SEED_MAX_CLUSTER_SIZE
+from tgen.common.constants.hgen_constants import CLUSTER_ARTIFACT_TYPE_PARAM, CLUSTER_MAX_SIZE_PARAM, CLUSTER_SEEDS_PARAM, \
+    LARGE_PROJECT, MEDIUM_PROJECT, REDUCTION_FACTORS, SEED_RF_PARAM, SMALL_PROJECT
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
@@ -36,23 +37,6 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         self.update_hgen_state(state, clustering_pipeline.state)
 
     @staticmethod
-    def create_clustering_args(args: HGenArgs, state: HGenState) -> ClusteringArgs:
-        """
-        Creates the configuration of the clustering pipeline basedon the args of the hgen pipeline.
-        :param args: The configuration of the hgen pipeline.
-        :param state: State of HGEN pipeline.
-        :return: The arguments to clustering pipeline.
-        """
-        clustering_kwargs = {}
-        if args.seed_project_summary_section or args.seed_layer_id:
-            seeding_kwargs = CreateClustersStep.get_seeding_kwargs(args, state)
-            clustering_kwargs.update(seeding_kwargs)
-        clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
-        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
-                                      cluster_artifact_type=args.seed_layer_id, cluster_max_size=20, **clustering_kwargs)
-        return cluster_args
-
-    @staticmethod
     def update_hgen_state(state: HGenState, cluster_state: ClusteringState) -> None:
         """
         Updates the state of hgen with the result of the clustering pipeline.
@@ -71,7 +55,22 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.cluster2artifacts = cluster_map
 
     @staticmethod
-    def get_seeding_kwargs(args: HGenArgs, state: HGenState) -> Dict:
+    def create_clustering_args(args: HGenArgs, state: HGenState) -> ClusteringArgs:
+        """
+        Creates the configuration of the clustering pipeline basedon the args of the hgen pipeline.
+        :param args: The configuration of the hgen pipeline.
+        :param state: State of HGEN pipeline.
+        :return: The arguments to clustering pipeline.
+        """
+        uses_seeds = args.seed_project_summary_section or args.seed_layer_id
+        seed_kwargs = CreateClustersStep.create_clustering_kwargs(args, state) if uses_seeds else {}
+        clustering_export_path = FileUtil.safely_join_paths(args.export_dir, CLUSTERING_SUBDIRECTORY)
+        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
+                                      **seed_kwargs)
+        return cluster_args
+
+    @staticmethod
+    def create_clustering_kwargs(args: HGenArgs, state: HGenState) -> Dict:
         """
         Creates clustering arguments related to seeding.
         :param args: The arguments to HGEN pipeline.
@@ -90,8 +89,9 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
             seed_artifact_type = args.seed_layer_id
         else:
             raise Exception("Unable to determine which seeding algorithm to use, received both project section and layer_id.")
-        kwargs[SEEDS_PARAM] = seed_contents
-        kwargs[SEEDS_LAYER_PARAM] = seed_artifact_type
+        kwargs[CLUSTER_SEEDS_PARAM] = seed_contents
+        kwargs[CLUSTER_ARTIFACT_TYPE_PARAM] = seed_artifact_type
+        kwargs[CLUSTER_MAX_SIZE_PARAM] = DEFAULT_SEED_MAX_CLUSTER_SIZE
         return kwargs
 
     @staticmethod

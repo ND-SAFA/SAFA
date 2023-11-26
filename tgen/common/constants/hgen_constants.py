@@ -16,8 +16,9 @@ MEDIUM_PROJECT = "medium"
 LARGE_PROJECT = "big"
 REDUCTION_FACTORS = {SMALL_PROJECT: 0.5, MEDIUM_PROJECT: 0.3, LARGE_PROJECT: 0.15}
 # Seeds
-SEEDS_PARAM = "cluster_seeds"
-SEEDS_LAYER_PARAM = "cluster_artifact_type"
+CLUSTER_SEEDS_PARAM = "cluster_seeds"
+CLUSTER_ARTIFACT_TYPE_PARAM = "cluster_artifact_type"
 SEED_RF_PARAM = "cluster_reduction_factor"
+CLUSTER_MAX_SIZE_PARAM = "cluster_max_size"
 MIN_SEED_SIMILARITY_QUANTILE = 0.10  # lower percentage of scores to exclude from linking to seeds
 UPPER_SEED_SIMILARITY_QUANTILE = 0.95  # percentage of scores to allow to link to multiple parents.

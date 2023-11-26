@@ -1,3 +1,4 @@
+import uuid
 from typing import Any, Dict, List
 
 from tgen.common.util.enum_util import EnumDict
@@ -23,6 +24,7 @@ class PromptBuilder:
         self.format_variables = format_variables if format_variables else {}
         self._n_built = 0
         self._create_config()
+        self.id = str(uuid.uuid4())
 
     def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs) -> EnumDict[str, str]:
         """
@@ -40,7 +42,8 @@ class PromptBuilder:
         self._n_built += 1
         return EnumDict({
             PromptKeys.PROMPT: prompt,
-            PromptKeys.COMPLETION: completion
+            PromptKeys.COMPLETION: completion,
+            PromptKeys.PROMPT_BUILDER_ID: self.id
         })
 
     def add_prompt(self, prompt: Prompt, i: int = None) -> None:

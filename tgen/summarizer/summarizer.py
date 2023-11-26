@@ -43,7 +43,7 @@ class Summarizer(AbstractPipeline):
                 self.steps = [StepSummarizeArtifacts()]
             else:
                 self.steps = []
-        super().run(run_setup=False)
+        super().run()
         if not self.state.summarized_dataset:
             self.state.summarized_dataset = self.state.dataset
         return self.state.summarized_dataset

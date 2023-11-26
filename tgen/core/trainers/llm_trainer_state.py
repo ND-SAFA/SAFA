@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from typing import List, Union
+
 from tgen.common.util.dataclass_util import required_field
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.prompts.prompt_builder import PromptBuilder
@@ -17,7 +19,7 @@ class LLMTrainerState(State):
     """
     :param prompt_builder: Creates the prompts for trace link prediction.
     """
-    prompt_builder: PromptBuilder = required_field(field_name="prompt_builder")
+    prompt_builders: Union[PromptBuilder, List[PromptBuilder]] = required_field(field_name="prompt_builder")
     """
     :param trainer_dataset_manager: The dataset manager for training and prediction
     """

@@ -11,6 +11,9 @@ class PromptDataFrame(AbstractProjectDataFrame):
     Contains the layers that are linked found in a project
     """
 
+    OPTIONAL_COLUMNS = [PromptKeys.COMPLETION.value,
+                        PromptKeys.PROMPT_BUILDER_ID.value]
+
     @classmethod
     def index_name(cls) -> str:
         """
@@ -27,12 +30,14 @@ class PromptDataFrame(AbstractProjectDataFrame):
         """
         return PromptKeys
 
-    def add_prompt(self, prompt: str, completion: str = EMPTY_STRING) -> EnumDict:
+    def add_prompt(self, prompt: str, completion: str = EMPTY_STRING, prompt_builder_id: str = None) -> EnumDict:
         """
         Adds prompt and completion pair to dataframe
         :param prompt: The prompt
         :param completion: The completion/response
+        :param prompt_builder_id: The id of the prompt builder the prompt was constructed from
         :return: The prompt and completion pair
         """
         return self.add_or_update_row({PromptKeys.PROMPT: prompt,
-                                       PromptKeys.COMPLETION: completion})
+                                       PromptKeys.COMPLETION: completion,
+                                       PromptKeys.PROMPT_BUILDER_ID: prompt_builder_id})

@@ -39,7 +39,6 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         if isinstance(batch_artifact_ids, list) and len(batch_artifact_ids) == 0:
             return {}
         global_clusters: ClusterMapType = {}
-        # TODO: Add description including batch index
         for clustering_method in tqdm(args.cluster_methods, desc="Running Clustering Algorithms...", ncols=TQDM_NCOLS):
             cluster_manager = ClusteringAlgorithmManager(clustering_method)
             clusters = cluster_manager.cluster(embeddings_manager, reduction_factor=args.cluster_reduction_factor,

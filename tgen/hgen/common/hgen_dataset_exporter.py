@@ -6,6 +6,7 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
+from tgen.common.util.dict_util import DictUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -58,7 +59,7 @@ class HGenDatasetExporter:
         Adds the content from the original dataset. If ignored, only source artifacts are added.
         :return: None.
         """
-        if self.args.export_hgen_content_only:
+        if self.args.export_original_dataset:
             self.add_source_artifacts()
         else:
             original_dataset = self.args.dataset
@@ -72,7 +73,7 @@ class HGenDatasetExporter:
         :return:None.
         """
         source_types = self.args.source_layer_ids
-        source_artifact_df = self.state.original_dataset.artifact_df.get_type(source_types)
+        source_artifact_df = self.state.source_dataset.artifact_df.get_type(source_types)
         self._artifact_data_frames.append(source_artifact_df)
 
     def add_generated_content(self) -> None:
@@ -119,7 +120,7 @@ class HGenDatasetExporter:
         :return: Map of seed id to set of generated artifacts.
         """
         seed2generated = {}
-        source_artifacts = state.original_dataset.artifact_df.to_artifacts()
+        source_artifacts = state.source_dataset.to_artifacts()
         artifact2seed = {a: cluster_id for cluster_id, artifacts in state.seed2artifacts.items() for a in artifacts}
 
         for source_artifact in tqdm(source_artifacts, ncols=TQDM_NCOLS):
@@ -128,10 +129,7 @@ class HGenDatasetExporter:
             if seed is None:
                 continue
             generated_artifacts = generated_trace_df.get_parents(source_id)
-            if seed not in seed2generated:
-                seed2generated[seed] = set()
-            for gen_artifacts in generated_artifacts:
-                seed2generated[seed].add(gen_artifacts)
+            DictUtil.set_or_append_item(seed2generated, seed, generated_artifacts, iterable_type=set)
         return seed2generated
 
     @staticmethod

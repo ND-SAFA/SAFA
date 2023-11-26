@@ -26,7 +26,6 @@ from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
-from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -149,8 +148,8 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
 
         state.project_summary = HGEN_PROJECT_SUMMARY
         state.original_dataset = args.dataset
-        state.source_dataset = InitializeDatasetStep._create_dataset_with_single_layer(state.original_dataset.artifact_df,
-                                                                                       args.source_layer_ids)
+        source_artifact_df = state.original_dataset.artifact_df.get_type(args.source_layer_ids)
+        state.source_dataset = PromptDataset(artifact_df=source_artifact_df)
 
         user_story_responses = [PromptUtil.create_xml("user-story", us) for i, us in enumerate(HGenTestConstants.user_stories)]
 

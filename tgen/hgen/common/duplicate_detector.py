@@ -1,5 +1,6 @@
-from typing import List, Set, Tuple, Dict
+from typing import Dict, List, Set, Tuple
 
+from tgen.common.constants.hgen_constants import DUPLICATE_THRESHOLD_PERCENTILE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
@@ -12,7 +13,7 @@ class DuplicateDetector:
         """
         Initializes detector with access to embeddings from manager.
         :param embeddings_manager: Contains the embeddings for the artifacts to be compared.
-        :param duplicate_similarity_threshold: The similarity threshold for when two artifacts are too similar.
+        :param duplicate_similarity_threshold: The similarity quantile for when two artifacts are too similar.
         """
         self.embeddings_manager = embeddings_manager
         self.duplicate_similarity_threshold = duplicate_similarity_threshold
@@ -25,7 +26,9 @@ class DuplicateDetector:
         """
         artifact_embeddings = self.embeddings_manager.get_embeddings(artifact_ids)
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
-        similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, self.duplicate_similarity_threshold)
+        duplicate_similarity_threshold = NpUtil.get_similarity_matrix_percentile(similarity_matrix, DUPLICATE_THRESHOLD_PERCENTILE)
+        duplicate_similarity_threshold = max(duplicate_similarity_threshold, self.duplicate_similarity_threshold)
+        similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, duplicate_similarity_threshold)
         dup_counter, dup_pairs = DuplicateDetector.count_duplicates(artifact_ids, similar_indices)
         dup_map = self.create_duplicate_map(dup_pairs)
         duplicate_artifact_ids = self.find_most_duplicated_artifacts(dup_counter, dup_map)

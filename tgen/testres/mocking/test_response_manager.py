@@ -1,7 +1,11 @@
 from typing import Callable, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_SUBSYSTEM_TAG
+from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATION_TAG, ENTITIES_TAG, JUSTIFICATION_TAG, \
+    RANKING_SCORE_TAG, SUB_SYSTEMS_TAG
 from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.prompt_util import PromptUtil
 
 
 class TestAIManager:
@@ -58,6 +62,31 @@ class TestAIManager:
         """
         self.set_responses(self._responses + new_responses, start_index=self.start_index)
 
+    def mock_explanations(self, n_response: int, scores: List[float] = None, default_score: float = 0.5) -> None:
+        if scores is None:
+            scores = [default_score] * n_response
+        tag2response = {
+            SUB_SYSTEMS_TAG: "SUB_SYSTEM",
+            ENTITIES_TAG: "ENTITIES",
+            DERIVATION_TAG: "DERIVATION",
+            CHANGE_IMPACT_TAG: "IMPACT",
+            JUSTIFICATION_TAG: "JUSTIFICATION"
+        }
+        responses = []
+        for i, score in enumerate(scores):
+            explanation_dict = {RANKING_SCORE_TAG: score}
+            explanation_dict.update(tag2response)
+            response = NEW_LINE.join(PromptUtil.create_xml(t, r) for t, r in explanation_dict.items())
+            responses.append(response)
+        self.add_responses(responses)
+
+    def mock_hgen(self, tag: str, bodies: List[str]):
+        response = EMPTY_STRING
+        for body in bodies:
+            response += f"<{tag}>{body}</{tag}>"
+
+        self.add_responses([response])
+
     def mock_summarization(self) -> None:
         """
         Adds handler that will generically process the artifact summarization whenever it is detected.
@@ -73,6 +102,19 @@ class TestAIManager:
 
         if summarization_handler not in self.handlers:
             self.handlers.append(summarization_handler)
+
+    def mock_project_summary(self, sections: Dict[str, str]):
+        responses = [self.create_project_summary_response(PROJECT_SUMMARY_TAGS[s], body) for s, body in sections.items()]
+        self.add_responses(responses)
+        return responses
+
+    @staticmethod
+    def create_project_summary_response(tag: str, tag_body: str):
+        if tag == PS_SUBSYSTEM_TAG:
+            name, desc = tag_body.split(NEW_LINE) if NEW_LINE in tag_body else [tag_body, tag_body]
+            tag_body = f"<name>{name}</name><descr>{desc}</descr>"
+        body = f"<{tag}>{tag_body}</{tag}>"
+        return f"<notes></notes>{body}"
 
     def mock_responses(self):
         def response_handler(p: str):

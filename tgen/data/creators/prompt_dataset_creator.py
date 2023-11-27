@@ -1,7 +1,7 @@
 import os
 from typing import Optional, Union
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME, PROJECT_SUMMARY_STATE_FILENAME
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -96,7 +96,8 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         :return: The project summary
         """
         project_dir = FileUtil.get_directory_path(project_path)
-        for filename in [PROJECT_SUMMARY_STATE_FILENAME, PROJECT_SUMMARY_FILENAME]:
+        for filename_ext in [FileUtil.JSON_EXT, FileUtil.TEXT_EXT]:
+            filename = FileUtil.add_ext(PROJECT_SUMMARY_FILENAME, filename_ext)
             project_summary_path = os.path.join(project_dir, filename)
             if os.path.exists(project_summary_path):
                 return Summary.load_from_file(project_summary_path)

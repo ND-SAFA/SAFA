@@ -74,10 +74,10 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
     user_value = input(message)
     if allow_back and user_value.lower() == BACK_COMMAND:
         return None
-    if class_type is list:  # TODO: Support list of ints, bools, and floats.
-        return user_value.split(",")
     if user_value.strip() == EMPTY_STRING:
         if default_value is None:
             raise Exception(REQUIRED_FIELD_ERROR)
         user_value = default_value
+    if class_type is list and isinstance(user_value, str):  # TODO: Support list of ints, bools, and floats.
+        return user_value.split(",")
     return class_type(user_value)

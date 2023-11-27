@@ -3,7 +3,7 @@ from enum import Enum, auto
 from typing import Dict, List, Union
 
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
-    DEFAULT_ORPHAN_THRESHOLD
+    DEFAULT_ORPHAN_THRESHOLD, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.util.base_object import BaseObject
@@ -84,7 +84,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, adds already linked artifacts to the cluster that their parent is in
     """
-    add_linked_artifacts_to_cluster: bool = False  # TODO change to default to false
+    add_linked_artifacts_to_cluster: bool = False
     """
     The llm manager to use for each prediction step
     """
@@ -101,6 +101,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     Threshold for which generated artifacts are deemed duplicates.
     """
     duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
+    """
+    Percent of the number of children artifacts that will be the number generated.
+    """
+    reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
     """
     If True, creates a project summary, else False
     """

@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, MISSING_PROJECT_SUMMARY_RESPONSES, get_name_responses, \
     get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR
+from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.enum_util import EnumDict
@@ -102,7 +102,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
 
     def assert_generation_prompts(self, prompt: str, return_value: str):
         n_artifacts = len(BeautifulSoup(prompt, features="lxml").findAll(self.HGEN_ARGS.source_type))
-        expected_value = GenerateArtifactContentStep._calculate_proportion_of_artifacts(n_artifacts, DEFAULT_BRANCHING_FACTOR)
+        expected_value = GenerateArtifactContentStep._calculate_proportion_of_artifacts(n_artifacts, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS)
         self.assertIn(f"a minimal set ({expected_value})", prompt)
         return return_value
 

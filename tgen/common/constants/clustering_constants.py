@@ -1,6 +1,6 @@
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 
-DEFAULT_REDUCTION_FACTOR = 0.20  # Expected reduction in # of artifacts to # clusters
+DEFAULT_REDUCTION_PERCENTAGE_CLUSTERING = 0.20  # Expected reduction in # of artifacts to # clusters
 DEFAULT_CLUSTER_SIMILARITY_THRESHOLD = 0.5  # Similarity equal or greater will be considered as same clusters
 DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION = 0.75
 DEFAULT_MIN_ORPHAN_SIMILARITY = 0.75  # Minimum similarity score for an oprhan to be placed in a cluster.
@@ -15,7 +15,7 @@ DEFAULT_MIN_CLUSTER_SIZE = 2
 NO_CLUSTER_LABEL = -1
 MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING = 0.5
 MIN_PAIRWISE_AVG_PERCENTILE = 75
-ADD_ORPHAN_TO_CLUSTER_THRESHOLD  = 0.75
+ADD_ORPHAN_TO_CLUSTER_THRESHOLD = 0.75
 
 RANDOM_STATE_PARAM = "random_state"
 N_CLUSTERS_PARAM = "n_clusters"

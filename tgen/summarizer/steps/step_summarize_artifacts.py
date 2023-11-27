@@ -19,3 +19,4 @@ class StepSummarizeArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerStat
         project_summary = state.dataset.project_summary if re_summarize else None
         summarizer = ArtifactsSummarizer(**params, project_summary=project_summary)
         state.dataset.artifact_df.summarize_content(summarizer, re_summarize=re_summarize)
+        state.dataset.update_artifact_df(state.dataset.artifact_df)

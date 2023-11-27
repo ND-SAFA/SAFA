@@ -41,7 +41,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         self._re_trace_duplicates(args, state, duplicate_artifact_ids, duplicate_map)
 
     @staticmethod
-    def _re_trace_duplicates(args: HGenArgs, state: HGenState, duplicate_artifact_ids: List[str],
+    def _re_trace_duplicates(args: HGenArgs, state: HGenState, duplicate_artifact_ids: Set[str],
                              duplicate_map: Dict[str, Set[str]]) -> None:
         """
         Re traces the children of a duplicate being removed to its potential dups

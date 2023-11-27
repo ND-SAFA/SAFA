@@ -64,7 +64,8 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         for c in clusters:
             cls.add_cluster(cluster_map, c)
             for a in c:
-                orphan_artifact_id_set.remove(a)
+                if a in orphan_artifact_id_set:
+                    orphan_artifact_id_set.remove(a)
 
     @staticmethod
     def collect_seen_artifacts(clusters: List[Cluster]) -> Set[str]:

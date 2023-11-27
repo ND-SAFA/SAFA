@@ -43,6 +43,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
     def update_hgen_state(args: HGenArgs, state: HGenState, cluster_state: ClusteringState) -> None:
         """
         Updates the state of hgen with the result of the clustering pipeline.
+        :param args: Arguments to hgen pipeline.
         :param state: The state of the hgen pipeline.
         :param cluster_state: The final state of the clustering pipeline.
         :return: None

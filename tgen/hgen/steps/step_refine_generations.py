@@ -3,9 +3,9 @@ from typing import Dict, List, Set
 
 from tqdm import tqdm
 
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -13,10 +13,10 @@ from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.summarizer.summary import Summary
 
 
@@ -30,17 +30,17 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         if not args.optimize_with_reruns or args.perform_clustering:
-            state.all_generated_content = state.generation_predictions
-            state.refined_content = state.generation_predictions
+            state.all_generated_content = state.generations2sources
+            state.refined_content = state.generations2sources
             return
-        all_generation_predictions = deepcopy(state.generation_predictions)
-        refined_content = deepcopy(state.generation_predictions)
+        all_generation_predictions = deepcopy(state.generations2sources)
+        refined_content = deepcopy(state.generations2sources)
         generate_artifact_content_step = GenerateArtifactContentStep()
         for i in tqdm(range(max(state.n_generations, 1), args.n_reruns + 1),
                       desc=f"Re-running generations of {args.target_type}s"):
             generate_artifact_content_step.run(args, state, re_run=True)
-            all_generation_predictions.update(state.generation_predictions)
-            refined_content = self.perform_refinement(args, state.generation_predictions,
+            all_generation_predictions.update(state.generations2sources)
+            refined_content = self.perform_refinement(args, state.generations2sources,
                                                       refined_content,
                                                       state.project_summary, state.export_dir)
         state.refined_content = refined_content
@@ -88,7 +88,8 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                               response_prompt_ids=questionnaire.id,
                                                               tags_for_response={generated_artifacts_tag}, return_first=True,
                                                               export_path=FileUtil.safely_join_paths(export_path,
-                                                                                                     "gen_refinement_response.yaml"))[0]
+                                                                                                     "gen_refinement_response.yaml"))[
+                0]
             selected_artifact_nums = set(selected_artifact_nums)
             selected_artifacts = RefineGenerationsStep._get_selected_artifacts(refined_artifact_content, selected_artifact_nums)
             selected_artifacts.update(RefineGenerationsStep._get_selected_artifacts(new_generated_artifact_content,

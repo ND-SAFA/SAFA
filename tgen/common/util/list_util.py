@@ -1,9 +1,11 @@
-from typing import List, Tuple, Sized, Iterable
+from typing import Iterable, List, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy.stats import percentileofscore
 from tqdm import tqdm
+
+from tgen.common.constants.logging_constants import TQDM_NCOLS
 
 
 class ListUtil:
@@ -122,4 +124,4 @@ class ListUtil:
         :param tqdm_args: Additional args to tqdm.
         :return: An iterable, either using tqdm if its long or just the original iterable if short.
         """
-        return tqdm(iterable, **tqdm_args) if len(iterable) >= length_threshold else iterable
+        return tqdm(iterable, ncols=TQDM_NCOLS, **tqdm_args) if len(iterable) >= length_threshold else iterable

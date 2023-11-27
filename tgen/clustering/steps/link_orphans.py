@@ -4,7 +4,6 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.steps.condense_clusters import CondenseClusters
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_SIMILARITY_DELTA, MIN_ORPHAN_HOME_SIMILARITY
 from tgen.common.logging.logger_manager import logger
@@ -59,7 +58,6 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         orphan_state = ClusteringState(**DataclassUtil.convert_to_dict(state))
         orphan_state.artifact_batches = [orphan_artifact_id_set]
         CreateClustersFromEmbeddings().run(orphan_args, orphan_state, re_run=True)
-        CondenseClusters().run(orphan_args, orphan_state, re_run=True)
         orphan_cluster_map = orphan_state.final_cluster_map
         clusters = [c for c in orphan_cluster_map.values() if c.avg_similarity >= min_cluster_similarity]
         for c in clusters:

@@ -20,7 +20,6 @@ class ClusteringState(State):
     :param final_cluster_map: Map of cluster_id to Cluster containing artifacts.
     """
     embedding_manager: EmbeddingsManager = None
-    batched_cluster_maps: List[ClusterMapType] = None
     cluster_artifact_dataset: PromptDataset = None
     cluster_dataset: PromptDataset = None
     artifact_batches: List[List[str]] = None

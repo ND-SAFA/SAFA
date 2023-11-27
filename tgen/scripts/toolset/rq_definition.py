@@ -26,7 +26,7 @@ class RQVariable:
         """
         self.definition = variable_definition
         is_optional = OPTIONAL_KEY in variable_definition
-        self.is_required = is_optional
+        self.is_required = not is_optional
         if is_optional:
             variable_definition = variable_definition.replace(OPTIONAL_KEY, EMPTY_STRING)
         self.name, self.type_constructor, self.type_class = RQVariable.get_variable_type(variable_definition)

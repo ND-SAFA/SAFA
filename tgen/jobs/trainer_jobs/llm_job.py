@@ -55,7 +55,7 @@ class LLMJob(AbstractTrainerJob):
         if self._trainer is None:
             self._trainer = LLMTrainer(LLMTrainerState(
                 trainer_dataset_manager=self.trainer_dataset_manager,
-                prompt_builder=self.prompt_builder,
+                prompt_builders=self.prompt_builder,
                 llm_manager=self.llm_manager,
                 completion_type=self.completion_type,
                 **kwargs))

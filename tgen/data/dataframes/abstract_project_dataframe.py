@@ -124,7 +124,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         if self.columns.empty and columns is None:
             return
         columns = self.columns if columns is None else columns
-        columns = [col.value if isinstance(col, Enum) else col.lower() for col in columns]
+        columns = [col.value if isinstance(col, Enum) else col.lower() for col in columns if col is not None]
         expected_columns = deepcopy(self.required_column_names())
         expected_columns = [c for c in expected_columns if c not in self.OPTIONAL_COLUMNS]
         if self.index_name() and self.index_name() not in columns:

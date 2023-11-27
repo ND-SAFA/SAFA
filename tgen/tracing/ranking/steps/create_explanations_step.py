@@ -1,7 +1,6 @@
-from typing import List, Dict
+from typing import Dict, List
 
-from tgen.common.constants.ranking_constants import RANKING_SCORE_TAG, RANKING_MIN_SCORE, \
-    RANKING_MAX_SCORE, FIRST_PASS_THRESHOLD_DELTA
+from tgen.common.constants.ranking_constants import FIRST_PASS_THRESHOLD_DELTA, RANKING_MAX_SCORE, RANKING_MIN_SCORE, RANKING_SCORE_TAG
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -10,16 +9,16 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.tracing.ranking.common.artifact_reasoning import ArtifactReasoning
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
@@ -60,7 +59,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
                                                                                   PromptDataset(trace_dataset=filter_dataset)})
         save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
             state.get_path_to_state_checkpoint(args.export_dir), "explanation_response") if args.export_dir else args.export_dir
-        trainer = LLMTrainer(LLMTrainerState(llm_manager=args.explanation_llm_model, prompt_builder=prompt_builder,
+        trainer = LLMTrainer(LLMTrainerState(llm_manager=args.explanation_llm_model, prompt_builders=prompt_builder,
                                              trainer_dataset_manager=trainer_dataset_manager))
         predictions = trainer.perform_prediction(save_and_load_path=save_and_load_path).predictions
         task_prompt: QuestionnairePrompt = prompt_builder.prompts[-1]
@@ -103,7 +102,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
             layers.add((source[ArtifactKeys.LAYER_ID], target[ArtifactKeys.LAYER_ID]))
         layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [source for source, _ in layers],
                                    LayerKeys.TARGET_TYPE: [target for _, target in layers]})
-        trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=layer_df, artifact_df=artifact_df)
+        trace_df = TraceDatasetCreator.generate_negative_links(layer_df=layer_df, artifact_df=artifact_df)
         trace_df = trace_df.filter_by_index(selected_ids)
         expected_order = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
                           for entry in state.get_current_entries()]

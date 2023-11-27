@@ -78,7 +78,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: list(source_layers),
                                    LayerKeys.TARGET_TYPE: [self.layer_id for _ in source_layers]})
         trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=artifact_df, trace_df=TraceDataFrame(traces),
-                                                               layer_mapping_df=layer_df)
+                                                               layer_df=layer_df)
         trace_df = TraceDataFrame.concat(trace_df, self.trace_dataset.trace_df)
         layer_df = LayerDataFrame.concat(layer_df, self.trace_dataset.layer_df)
         return PromptDataset(artifact_df=new_artifact_df, trace_dataset=TraceDataset(artifact_df, trace_df, layer_df))

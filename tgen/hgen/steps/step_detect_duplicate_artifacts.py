@@ -1,4 +1,4 @@
-from typing import Dict, List, Set
+from typing import Dict, Set
 
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD
 from tgen.common.logging.logger_manager import logger
@@ -38,14 +38,12 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.selected_artifacts_dataset = PromptDataset(artifact_df=selected_artifacts_df,
                                                          project_summary=state.all_artifacts_dataset.project_summary)
 
-        self._re_trace_duplicates(args, state, duplicate_artifact_ids, duplicate_map)
+        self._re_trace_duplicates(state, duplicate_artifact_ids, duplicate_map)
 
     @staticmethod
-    def _re_trace_duplicates(args: HGenArgs, state: HGenState, duplicate_artifact_ids: List[str],
-                             duplicate_map: Dict[str, Set[str]]) -> None:
+    def _re_trace_duplicates(state: HGenState, duplicate_artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]]) -> None:
         """
         Re traces the children of a duplicate being removed to its potential dups
-        :param args: The arguments to HGEN
         :param state: The current state of HGEN
         :param duplicate_artifact_ids: A list of duplicate artifact ids to remove
         :param duplicate_map: A list of pairs of duplicate artifacts
@@ -73,7 +71,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             if pair not in existing_traces:
                 trace_predictions.append(trace)
                 existing_traces.add(pair)
-                if (parent, child) in selected_artifact_pairs:
+                if (parent, child) not in selected_artifact_pairs:
                     selected_predictions.append(trace)
         state.trace_predictions = trace_predictions
         state.selected_predictions = selected_predictions

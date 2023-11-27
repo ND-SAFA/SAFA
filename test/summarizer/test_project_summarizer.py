@@ -5,7 +5,6 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -86,9 +85,10 @@ class TestProjectSummarizer(BaseTest):
     def _project_responses(self):
         new_section_response = create(self.NEW_SECTION_TITLE, tag="new") + PromptUtil.create_xml(CUSTOM_TITLE_TAG, self.NEW_TITLE)
         res = [MockResponses.project_title_to_response[PS_DATA_FLOW_TITLE],
-               MockResponses.project_title_to_response[PS_OVERVIEW_TITLE],
                new_section_response,
-               MockResponses.project_title_to_response[PS_DATA_FLOW_TITLE]]
+               MockResponses.project_title_to_response[PS_OVERVIEW_TITLE],
+               MockResponses.project_title_to_response[PS_DATA_FLOW_TITLE],
+               ]
         return res
 
     def _assert_summary(self, summary):

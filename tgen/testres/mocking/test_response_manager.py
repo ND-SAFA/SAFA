@@ -9,9 +9,7 @@ from tgen.common.util.prompt_util import PromptUtil
 
 
 class TestAIManager:
-    def __init__(self,
-                 library: str,
-                 response_formatter: Callable):
+    def __init__(self, library: str, response_formatter: Callable, require_used_all_responses: bool = True):
         self.library = library
         self._responses = []
         self.response_formatter = response_formatter
@@ -20,6 +18,7 @@ class TestAIManager:
         self.end_index = 0
         self.handlers = []
         self.mock_calls = 0
+        self.require_used_all_responses = require_used_all_responses
 
     def __call__(self, *args, **kwargs) -> List[str]:
         prompts_global = self.get_prompts(kwargs)
@@ -27,11 +26,14 @@ class TestAIManager:
 
         n_manual_prompts = len(manual_prompts)
         manual_responses = self.get_next_response(n_requested=n_manual_prompts, prompts=manual_prompts)
+
+        self.n_used += n_manual_prompts
+        self.mock_calls += n_manual_prompts
+
         manual_responses = [r(manual_prompts[i]) if callable(r) else r for i, r in enumerate(manual_responses)]
         responses = handled_responses + manual_responses
         responses = self.response_formatter(responses)
-        self.n_used += n_manual_prompts
-        self.mock_calls += n_manual_prompts
+
         return responses
 
     def run_prompt_handlers(self, prompts):
@@ -163,3 +165,10 @@ class TestAIManager:
             return [m["content"] for m in kwargs["messages"]]
         elif self.library == "anthropic":
             return [kwargs["prompt"]]
+
+    def on_test_end(self) -> None:
+        n_used = self.start_index
+        n_expected = len(self._responses)
+        if self.require_used_all_responses:
+            response_txt = NEW_LINE.join([str(r) for r in self._responses])
+            assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses.{response_txt}"

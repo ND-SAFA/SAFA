@@ -6,6 +6,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.common.constants.hgen_constants import MIN_SEED_SIMILARITY_QUANTILE, UPPER_SEED_SIMILARITY_QUANTILE
 from tgen.common.util.embedding_util import EmbeddingUtil
+from tgen.common.util.np_util import NpUtil
 from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 
@@ -47,7 +48,8 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         return cluster_map
 
     @staticmethod
-    def assign_clusters_to_artifacts(centroids: List[str], artifact_ids: List[str], similarity_matrix) -> Dict[str, List[str]]:
+    def assign_clusters_to_artifacts(centroids: List[str], artifact_ids: List[str], similarity_matrix: np.array) -> Dict[
+        str, List[str]]:
         """
         Assigns each artifact to its closest centroid.
         :param centroids: The center of the clusters to assign to artifacts.
@@ -55,8 +57,8 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param similarity_matrix: Similarity between each artifact to each centroid.
         :return: Map of centroid to artifacts it contains.
         """
-        min_seed_similarity = np.quantile(similarity_matrix, MIN_SEED_SIMILARITY_QUANTILE)
-        upper_seed_similarity_threshold = np.quantile(similarity_matrix, UPPER_SEED_SIMILARITY_QUANTILE)
+        min_seed_similarity = NpUtil.get_similarity_matrix_percentile(similarity_matrix, MIN_SEED_SIMILARITY_QUANTILE)
+        upper_seed_similarity_threshold = NpUtil.get_similarity_matrix_percentile(similarity_matrix, UPPER_SEED_SIMILARITY_QUANTILE)
 
         cluster_map = {t: [] for t in centroids}
         for i, a_id in enumerate(artifact_ids):

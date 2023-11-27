@@ -68,7 +68,7 @@ class HGenUtil:
             dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
             trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
                                                  trainer_dataset_manager=dataset_manager,
-                                                 prompt_builder=prompt_builder,
+                                                 prompt_builders=prompt_builder,
                                                  completion_type=LLMCompletionType.GENERATION))
             predictions = trainer.perform_prediction(save_and_load_path=load_path).predictions
 

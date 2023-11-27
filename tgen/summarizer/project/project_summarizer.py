@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from copy import deepcopy
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Union
 
 from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_STATE_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
@@ -74,94 +74,30 @@ class ProjectSummarizer(BaseObject):
         if not self.args.project_summary_sections or not SummarizerUtil.needs_project_summary(self.project_summary, self.args):
             return self.project_summary
 
-        logger.log_title(f"Creating project specification: "
-                         f"{SummarizerUtil.missing_project_summary_sections(self.project_summary, self.args)}")
-
-        for section_id, section_prompt in self.get_generation_iterator():
-            logger.log_step(f"Creating section: `{section_id}`")
-            prompt_builder = self._create_prompt_builder(section_id, section_prompt)
-            task_tag = section_prompt.get_response_tags_for_question(-1)
-            task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
-            dataset = self.dataset if self.dataset \
-                else self._create_dataset_from_project_summaries(self.project_summary_versions, section_id)
-            section_body, section_title = self._generate_section(prompt_builder, task_tag, dataset=dataset,
-                                                                 multi_line_items=section_id in MULTI_LINE_ITEMS)
-            if not section_title:
-                section_title = section_id
-
-            self.project_summary.add_section(section_id=section_id, section_title=section_title, body=section_body)
-            if self.save_progress:
-                self.project_summary.save(self.get_save_path())
+        self._create_sections(async_sections_only=True)  # create sections that can be created asynchronously
+        self._create_sections(async_sections_only=False)  # create sections that require other sections to be included in the prompt
         self.project_summary.re_order_sections(self.section_display_order, remove_unordered_sections=True)
         return self.project_summary
 
-    def _create_prompt_builder(self, section_id: str, section_prompt: QuestionnairePrompt) -> PromptBuilder:
-        """
-        Creates a prompt builder for a given section prompt
-        :param section_id: The id of the section
-        :param section_prompt: The prompt used to create the section
-        :return: The prompt builder for creating the section
-        """
-        assert isinstance(section_prompt, QuestionnairePrompt), f"Expected section {section_id} prompt " \
-                                                                f"to be a {QuestionnairePrompt.__class__.__name__}"
-        content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.dataset \
-            else SupportedPrompts.PROJECT_SUMMARY_CONTEXT_VERSIONS.value
-        prompt_prefix = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
-        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=prompt_prefix,
-                                               build_method=MultiArtifactPrompt.BuildMethod.XML,
-                                               xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
-                                               if self.dataset else {"versions": ["id", "body"]},
-                                               include_ids=self.dataset is not None)
-        section_prompt.set_instructions(f"PS_QUESTIONS_HEADER{NEW_LINE}"
-                                        f"*Importantly, ONLY answer the {len(section_prompt.question_prompts)} questions below "
-                                        f"and ensure the ALL tags {section_prompt.get_all_response_tags()} "
-                                        f"are included in your answer*")
-        prompt_builder = PromptBuilder(prompts=[content_prompt,
-                                                artifacts_prompt,
-                                                section_prompt])
-        if self.project_summary and section_id in USE_PROJECT_SUMMARY_SECTIONS:
-            current_summary = self.project_summary.to_string()
-            prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
-        return prompt_builder
-
-    def _generate_section(self, prompt_builder: PromptBuilder, task_tag: str, dataset: PromptDataset,
-                          multi_line_items: bool = False) -> Tuple[str, str]:
-        """
-        Has the LLM generate the section corresponding using the prompt builder
-        :param prompt_builder: Contains prompts necessary for generating section
-        :param task_tag: The tag used to retrieve the generations from the parsed response
-        :param dataset: The dataset that will be provided to the model when generating
-        :param multi_line_items: If True, expects each item in the body to span multiple lines
-        :return: The section body and section title (if one was generated)
-        """
-        self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
-        self.llm_manager.llm_args.temperature = 0
-
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset
-                                                                              })
-        trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
-                                             prompt_builder=prompt_builder,
-                                             trainer_dataset_manager=trainer_dataset_manager))
-        predictions = trainer.perform_prediction().predictions[0]
-        parsed_responses = predictions[prompt_builder.get_prompt(-1).id]
-        body_res = parsed_responses[task_tag]
-        body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(
-            body_res) > 1 and not multi_line_items)
-                    for r in body_res]
-        task_title = parsed_responses[CUSTOM_TITLE_TAG][0] if parsed_responses.get(CUSTOM_TITLE_TAG) else None
-        deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"
-        task_body = body_res[0] if len(body_res) == 1 else deliminator.join(body_res)
-        return deliminator + task_body, task_title
-
-    def get_generation_iterator(self) -> Generator:
+    def get_generation_iterator(self, async_sections_only: bool = False) -> Generator:
         """
         Creates iterator for section titles and questions.
+        :param async_sections_only: If true, iterators only through sections that can be generated asynchronously.
         :return: Iterator for each title and prompt.
         """
         for section_id in self.all_project_sections:
-            if section_id not in self.project_summary:
+            if section_id not in self.project_summary and (not async_sections_only or self.can_be_generated_async(section_id)):
                 section_prompt = self.get_section_prompt_by_id(section_id)
                 yield section_id, section_prompt
+
+    @staticmethod
+    def can_be_generated_async(section_id: str) -> bool:
+        """
+        Returns whether the section can be generated async or requires earlier sections to be generated first.
+        :param section_id: The section id to check if it can be generated async.
+        :return: Whether the section can be generated async or requires earlier sections to be generated first.
+        """
+        return section_id not in USE_PROJECT_SUMMARY_SECTIONS
 
     def get_section_prompt_by_id(self, section_id: str) -> QuestionnairePrompt:
         """
@@ -191,6 +127,117 @@ class ProjectSummarizer(BaseObject):
         :return: The save path
         """
         return FileUtil.safely_join_paths(self.export_dir, PROJECT_SUMMARY_STATE_FILENAME)
+
+    def _create_sections(self, async_sections_only: bool = False) -> None:
+        """
+        Handles creating each section of the project summary.
+        :param async_sections_only: If true, iterators only through sections that can be generated asynchronously.
+        :return: None
+        """
+        sections_being_created = [s for s in SummarizerUtil.missing_project_summary_sections(self.project_summary, self.args)
+                                  if not async_sections_only or self.can_be_generated_async(s)]
+        if len(sections_being_created) == 0:
+            return
+        logger.log_title(f"Creating project specification: {sections_being_created}")
+        prompt_builders = {section_id: self._create_prompt_builder(section_id, section_prompt)
+                           for section_id, section_prompt in self.get_generation_iterator(async_sections_only=async_sections_only)}
+        dataset = [self._create_dataset_from_project_summaries(self.project_summary_versions, section_id)
+                   for section_id, section_prompt in self.get_generation_iterator(async_sections_only=async_sections_only)] \
+            if not self.dataset else [self.dataset]
+        generated_section_responses = self._generate_sections(prompt_builders, dataset)
+        for i, (section_id, section_prompt) in enumerate(self.get_generation_iterator(async_sections_only=async_sections_only)):
+            self._create_section(generated_section_responses[i], section_id, section_prompt)
+
+    def _create_section(self, section_response: Dict, section_id: str, section_prompt: QuestionnairePrompt) -> bool:
+        """
+        Creates the project section from the LLM response.
+        :param section_response: The response for the section from the LLM.
+        :param section_id: The id of the section being created.
+        :param section_prompt: The prompt used to create the section.
+        :return: Whether the creation was successful.
+        """
+        try:
+            task_tag = section_prompt.get_response_tags_for_question(-1)
+            task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
+            section_body, section_title = self._parse_section(response=section_response,
+                                                              task_tag=task_tag, multi_line_items=section_id in MULTI_LINE_ITEMS)
+            if not section_title:
+                section_title = section_id
+            self.project_summary.add_section(section_id=section_id, section_title=section_title, body=section_body)
+            if self.save_progress:
+                self.project_summary.save(self.get_save_path())
+            return True
+        except Exception:
+            logger.exception(f"Unable to create project section {section_id}")
+            return False
+
+    def _generate_sections(self, prompt_builders: Dict[str, PromptBuilder],
+                           dataset: Union[PromptDataset, List[PromptDataset]]) -> List[Dict]:
+        """
+        Has the LLM generate the section corresponding using the prompt builder
+        :param prompt_builders: Contains prompts necessary for generating sections
+        :param dataset: The dataset that will be provided to the model when generating
+        :return: Responses for all sections
+        """
+        self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
+        self.llm_manager.llm_args.temperature = 0
+
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+        trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
+                                             prompt_builders=list(prompt_builders.values()),
+                                             trainer_dataset_manager=trainer_dataset_manager))
+        res = trainer.perform_prediction(raise_exception=False)
+        failures = {i for i, r in enumerate(res.original_response) if isinstance(r, Exception)}
+        parsed_responses = [(res.predictions[i][prompt_builder.get_prompt(-1).id] if i not in failures else res.original_response[i])
+                            for i, prompt_builder in enumerate(prompt_builders.values())]
+        return parsed_responses
+
+    def _create_prompt_builder(self, section_id: str, section_prompt: QuestionnairePrompt) -> PromptBuilder:
+        """
+        Creates a prompt builder for a given section prompt
+        :param section_id: The id of the section
+        :param section_prompt: The prompt used to create the section
+        :return: The prompt builder for creating the section
+        """
+        assert isinstance(section_prompt, QuestionnairePrompt), f"Expected section {section_id} prompt " \
+                                                                f"to be a {QuestionnairePrompt.__class__.__name__}"
+        content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.dataset \
+            else SupportedPrompts.PROJECT_SUMMARY_CONTEXT_VERSIONS.value
+        prompt_prefix = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
+        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=prompt_prefix,
+                                               build_method=MultiArtifactPrompt.BuildMethod.XML,
+                                               xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
+                                               if self.dataset else {"versions": ["id", "body"]},
+                                               include_ids=self.dataset is not None)
+        section_prompt.set_instructions(f"{PS_QUESTIONS_HEADER}{NEW_LINE}"
+                                        f"*Importantly, ONLY answer the {len(section_prompt.question_prompts)} questions below "
+                                        f"and ensure the ALL tags {section_prompt.get_all_response_tags()} "
+                                        f"are included in your answer*")
+        prompt_builder = PromptBuilder(prompts=[content_prompt,
+                                                artifacts_prompt,
+                                                section_prompt])
+        if self.project_summary and section_id in USE_PROJECT_SUMMARY_SECTIONS:
+            current_summary = self.project_summary.to_string()
+            prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
+        return prompt_builder
+
+    @staticmethod
+    def _parse_section(response: Dict, task_tag: str, multi_line_items: bool = False) -> Tuple[str, str]:
+        """
+        Extracts the necessary information for creating the section from its response.
+        :param response: The section response.
+        :param task_tag: The tag used to retrieve the generations from the parsed response.
+        :param multi_line_items: If True, expects each item in the body to span multiple lines.
+        :return: The section body and section title (if one was generated).
+        """
+        body_res = response[task_tag]
+        body_res = [PromptUtil.strip_new_lines_and_extra_space(r, remove_all_new_lines=len(
+            body_res) > 1 and not multi_line_items)
+                    for r in body_res]
+        task_title = response[CUSTOM_TITLE_TAG][0] if response.get(CUSTOM_TITLE_TAG) else None
+        deliminator = NEW_LINE if not multi_line_items else f"{NEW_LINE}{PromptUtil.as_markdown_header(EMPTY_STRING, level=2)}"
+        task_body = body_res[0] if len(body_res) == 1 else deliminator.join(body_res)
+        return deliminator + task_body, task_title
 
     @staticmethod
     def _get_section_display_order(section_order: List[str], all_project_sections: List[str]) -> List[str]:

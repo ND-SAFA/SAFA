@@ -102,7 +102,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         if isinstance(dataset, str):
             self.fail(dataset)
         orig_layers = set(orig_dataset.artifact_df[ArtifactKeys.LAYER_ID])
-        layers = [args.source_layer_ids] + [args.target_type, self.higher_levels[0], self.higher_levels[1]]
+        layers = args.source_layer_ids + [args.target_type, self.higher_levels[0], self.higher_levels[1]]
         n_expected_links = 0
         for i, layer in enumerate(layers):
             target_artifacts = dataset.artifact_df.get_type(layer)

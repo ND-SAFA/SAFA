@@ -15,7 +15,7 @@ export_dir: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-
 final_dataset: null
 format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
   or benefit].
-generation_predictions: null
+generations2sources: null
 n_generations: 0
 original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner

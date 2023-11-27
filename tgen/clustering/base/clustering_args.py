@@ -52,3 +52,10 @@ class ClusteringArgs(PipelineArgs):
             self.artifact_types = self.dataset.artifact_df.get_artifact_types()
 
         self.cluster_methods = [SupportedClusteringMethods[c] if isinstance(c, str) else c for c in self.cluster_methods]
+
+    def get_artifact_ids(self) -> List[str]:
+        """
+        :return: Returns the artifact ids in scope for this pipeline.
+        """
+        artifact_ids = list(self.dataset.artifact_df.index)
+        return self.subset_ids if self.subset_ids else artifact_ids

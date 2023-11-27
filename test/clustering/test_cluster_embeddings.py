@@ -1,11 +1,10 @@
 from unittest import TestCase
 
 from test.clustering.clustering_test_util import ClusteringTestUtil
+from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
-from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
 
 
 class TestClusterEmbeddings(TestCase):
@@ -28,8 +27,33 @@ class TestClusterEmbeddings(TestCase):
         CreateClustersFromEmbeddings().run(args, state)
 
         cluster_map = state.final_cluster_map
-        for clustering_method_name in DEFAULT_TESTING_CLUSTERING_METHODS:
-            supported_clustering_method = SupportedClusteringMethods[clustering_method_name]
-            method_name = supported_clustering_method.name
-            c_id = f"{method_name}0"
-            self.assertIn(c_id, cluster_map)
+
+        ClusteringTestUtil.verify_clusters(self, cluster_map, {
+            "0:0": ["A3", "A4"],
+            "0:1": ["A1", "A2"]
+        })
+
+    def test_condense_clusters(self):
+        """
+        Tests that cluster are condensed based on their similarity.
+        """
+        args = ClusteringTestUtil.create_clustering_args(["hi"])  # artifacts are required, but ignored.
+        state = ClusteringState()
+
+        args.cluster_min_votes = 1
+        args.cluster_intersection_threshold = 0.8
+
+        step = CreateClustersFromEmbeddings()
+        embeddings_manager = ClusteringTestUtil.create_embeddings_manager()
+        c1: Cluster = Cluster.from_artifacts(["A", "B", "C", "D"], embeddings_manager)
+        c2: Cluster = Cluster.from_artifacts(["A", "B"], embeddings_manager)
+        c3: Cluster = Cluster.from_artifacts(["A"], embeddings_manager)
+        batch_cluster_Map = {
+            "kmeans0": c1,
+            "kmeans2": c2,
+            "kmeans3": c3,
+            "agglomerative0": Cluster.from_artifacts(["A", "B", "C"], embeddings_manager)
+        }
+
+        cluster_map = step.condense_clusters(args, state, batch_cluster_Map, 0)
+        ClusteringTestUtil.assert_contains_clusters(cluster_map, [c1, c2, c3])

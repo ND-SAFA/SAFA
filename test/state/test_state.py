@@ -96,7 +96,7 @@ class TestState(BaseTest):
         self.assertEqual(orig_state.description_of_artifact, reloaded_attrs["description_of_artifact"])
         self.assertEqual(orig_state.project_summary, reloaded_attrs["project_summary"])
         self.assertListEqual(orig_state.questions, reloaded_attrs["questions"])
-        self.assertDictEqual(orig_state.generations2sources, reloaded_attrs["generation_predictions"])
+        self.assertDictEqual(orig_state.generations2sources, reloaded_attrs["generations2sources"])
         self.assertEqual(orig_state.format_of_artifacts, reloaded_attrs["format_of_artifacts"])
         reloaded_dataset_original = assert_check_type("original_dataset", reloaded_attrs["original_dataset"], )
         self.assertSetEqual(set(orig_state.original_dataset.artifact_df.index), set(reloaded_dataset_original.artifact_df.index))

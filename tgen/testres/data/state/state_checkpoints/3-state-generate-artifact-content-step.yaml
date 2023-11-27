@@ -10,7 +10,7 @@ export_dir: "[ROOT_PATH]/tgen/testres/output"
 final_dataset: null
 format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
   or benefit].
-generation_predictions:
+generations2sources:
   ? As a game developer, I want a Player class to store player state, apply movement,
     handle collisions, perform raycasting for block selection, and render the player,
     so that I can implement a controllable character that interacts with the 3D world.

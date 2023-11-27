@@ -111,11 +111,11 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return n_artifacts_tokens
 
     @staticmethod
-    def _map_generations_to_predicted_sources(generation_predictions: List, source_tag_id: str, target_tag_id: str,
+    def _map_generations_to_predicted_sources(generations: List, source_tag_id: str, target_tag_id: str,
                                               state: HGenState) -> Tuple[Dict[str, Set[str]], Dict[Any, str]]:
         """
         Creates a mapping of the generated artifact to a list of the predicted links to it and the source artifacts
-        :param generation_predictions: The predictions from the LLM
+        :param generations: The predictions from the LLM
         :param source_tag_id: The id of the predicted sources tag
         :param target_tag_id: The id of the generated target artifact tag
         :param state: The current state of the hierarchy generator
@@ -124,10 +124,10 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generations2sources = {}
         cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
         cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
-        for i, pred in enumerate(generation_predictions):
-            for p in pred:
-                generation = p[target_tag_id][0]
-                sources = set(p[source_tag_id][0]) if len(p[source_tag_id]) > 0 else set()
+        for i, sources in enumerate(generations):
+            for source in sources:
+                generation = source[target_tag_id][0]
+                sources = set(source[source_tag_id][0]) if len(source[source_tag_id]) > 0 else set()
                 generations2sources[generation] = sources
                 if cluster_ids:
                     cluster2generations[cluster_ids[i]].append(generation)

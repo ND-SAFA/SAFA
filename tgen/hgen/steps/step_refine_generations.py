@@ -33,18 +33,18 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             state.all_generated_content = state.generations2sources
             state.refined_content = state.generations2sources
             return
-        all_generation_predictions = deepcopy(state.generations2sources)
+        all_generations2sources = deepcopy(state.generations2sources)
         refined_content = deepcopy(state.generations2sources)
         generate_artifact_content_step = GenerateArtifactContentStep()
         for i in tqdm(range(max(state.n_generations, 1), args.n_reruns + 1),
                       desc=f"Re-running generations of {args.target_type}s"):
             generate_artifact_content_step.run(args, state, re_run=True)
-            all_generation_predictions.update(state.generations2sources)
+            all_generations2sources.update(state.generations2sources)
             refined_content = self.perform_refinement(args, state.generations2sources,
                                                       refined_content,
                                                       state.project_summary, state.export_dir)
         state.refined_content = refined_content
-        state.all_generated_content = all_generation_predictions
+        state.all_generated_content = all_generations2sources
 
     @staticmethod
     def perform_refinement(hgen_args: HGenArgs,
@@ -78,7 +78,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in new_generated_artifact_content.keys()])
             prompt_builder.add_prompt(Prompt(refined_artifacts), -1)
             artifacts, _ = HGenUtil.create_artifact_df_from_generated_artifacts(hgen_args,
-                                                                                generation_predictions=refined_artifact_content,
+                                                                                generations2sources=refined_artifact_content,
                                                                                 target_layer_id=hgen_args.target_type,
                                                                                 generate_names=False)
             generated_artifacts_tag: str = questionnaire.get_response_tags_for_question(-1)

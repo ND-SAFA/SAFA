@@ -56,7 +56,7 @@ final_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptD
     trace_df: null
 format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
   or benefit].
-generation_predictions: *id001
+generations2sources: *id001
 n_generations: 1
 original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner

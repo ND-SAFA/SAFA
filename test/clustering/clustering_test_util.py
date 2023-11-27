@@ -19,6 +19,7 @@ class ClusteringTestUtil:
     """
     Provides utility testing methods for clustering tests.
     """
+    DEFAULT_CLUSTER_MAX_SIZE = 2
     DEFAULT_ARTIFACT_TYPE = "A"
     DEFAULT_ARTIFACTS = {
         "A": "I have a very fluffy dog.",
@@ -49,7 +50,8 @@ class ClusteringTestUtil:
         :return:  Clustering args.
         """
         artifact_bodies = list(ClusteringTestUtil.DEFAULT_ARTIFACTS.values())
-        return ClusteringTestUtil.create_clustering_args(artifact_bodies, **kwargs)
+        return ClusteringTestUtil.create_clustering_args(artifact_bodies, cluster_max_size=ClusteringTestUtil.DEFAULT_CLUSTER_MAX_SIZE,
+                                                         **kwargs)
 
     @staticmethod
     def create_clustering_args(artifact_bodies: List[str], artifact_type: str = DEFAULT_ARTIFACT_TYPE,

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from tqdm import tqdm
@@ -23,32 +23,44 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :param state: Used to store final clusters.
         :return: None
         """
-        batches = state.artifact_batches if state.artifact_batches else [None]
+        batches = state.artifact_batches if state.artifact_batches else [args.get_artifact_ids()]
         global_clusters = {}
         for i, batch_ids in enumerate(batches):
-            batch_cluster_map = self.get_batch_clusters(args, state.embedding_manager, batch_artifact_ids=batch_ids)
-            batch_cluster_map = self.condense_clusters(args, batch_cluster_map, i, state)
+            batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
+                                                                                state.embedding_manager,
+                                                                                batch_artifact_ids=batch_ids)
+            batch_cluster_map = CreateClustersFromEmbeddings.condense_clusters(args, state, batch_cluster_map, i)
             global_clusters.update(batch_cluster_map)
         state.final_cluster_map = global_clusters
 
-    def condense_clusters(self, args: ClusteringArgs, batch_cluster_map, i, state: ClusteringState):
+    @staticmethod
+    def condense_clusters(args: ClusteringArgs, state: ClusteringState, cluster_map: Dict, i: Any) -> ClusterMapType:
+        """
+        Condenses the clusters in the given map.
+        :param args: Arguments of clustering pipeline.
+        :param state: State of clustering pipeline.
+        :param cluster_map: Map of method name to cluster to condense.
+        :param i: The unique ID for this cluster.
+        :return: The new cluster map.
+        """
         unique_cluster_map = ClusterCondenser(state.embedding_manager, threshold=args.cluster_intersection_threshold)
-        clusters = list(batch_cluster_map.values())
-        clusters = self.cohesiveness_filter(args, clusters)
+        clusters = list(cluster_map.values())
+        clusters = CreateClustersFromEmbeddings.cohesiveness_filter(args, clusters)
         unique_cluster_map.add_all(clusters)
-        batch_cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
-        batch_cluster_map = {f"{i}:{k}": v for k, v in batch_cluster_map.items()}
-        return batch_cluster_map
+        cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
+        cluster_map = {f"{i}:{k}": v for k, v in cluster_map.items()}
+        return cluster_map
 
-    def cohesiveness_filter(self, args: ClusteringArgs, clusters: List[Cluster]):
+    @staticmethod
+    def cohesiveness_filter(args: ClusteringArgs, clusters: List[Cluster]):
         """
         Filters clusters by their cohesiveness relative to the average cohesiveness of all clusters.
         :param args: Clustering args determining if this step should be run.
         :param clusters: The clusters to filter.
         :return: List of filtered clusters.
         """
-        filtered_clusters = self._filter_by_size(clusters, args.cluster_min_size, args.cluster_max_size)
-        min_pairwise_avg = self._calculate_min_pairwise_avg_threshold(filtered_clusters)
+        filtered_clusters = CreateClustersFromEmbeddings._filter_by_size(clusters, args.cluster_min_size, args.cluster_max_size)
+        min_pairwise_avg = CreateClustersFromEmbeddings._calculate_min_pairwise_avg_threshold(filtered_clusters)
         if min_pairwise_avg is not None:
             if args.filter_by_cohesiveness:
                 clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
@@ -75,12 +87,13 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :param clusters: List of the clusters to base the threshold on
         :return: The threshold for the minimum acceptable pairwise similarity
         """
-        pairwise_avgs = [cluster.avg_pairwise_sim for cluster in clusters if cluster.avg_pairwise_sim is not None]
-        if not pairwise_avgs:
+        unique_clusters = set(clusters)
+        cluster_scores = [cluster.avg_pairwise_sim for cluster in unique_clusters if cluster.avg_pairwise_sim is not None]
+        if not cluster_scores:
             return None
-        if max(pairwise_avgs) >= MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING:
-            return MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
-        return np.percentile(pairwise_avgs, MIN_PAIRWISE_AVG_PERCENTILE)
+        percentile_score = np.quantile(cluster_scores, MIN_PAIRWISE_AVG_PERCENTILE)
+        final_score = min(percentile_score, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING)
+        return final_score
 
     @staticmethod
     def get_batch_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager,

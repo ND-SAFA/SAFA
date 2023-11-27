@@ -107,8 +107,6 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         """
         if isinstance(batch_artifact_ids, list) and len(batch_artifact_ids) == 0:
             return {}
-        if len(batch_artifact_ids) < args.cluster_max_size:
-            return {"singleton": Cluster.from_artifacts(batch_artifact_ids, embeddings_manager)}
 
         global_clusters: ClusterMapType = {}
         for clustering_method in tqdm(args.cluster_methods, desc="Running Clustering Algorithms...", ncols=TQDM_NCOLS):

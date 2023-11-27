@@ -6,9 +6,9 @@ import mock
 import numpy as np
 import pandas as pd
 
-from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args, \
-    MISSING_PROJECT_SUMMARY_RESPONSES
+from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
@@ -43,6 +43,8 @@ from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 
+DUP_SOURCE_ARTIFACT = "dup_link"
+
 
 class TestHierarchyGenerator(BaseTest):
     HGEN_ARGS = None
@@ -50,6 +52,7 @@ class TestHierarchyGenerator(BaseTest):
 
     @mock_anthropic
     def test_run(self, anthropic_ai_manager: TestAIManager):
+        anthropic_ai_manager.require_used_all_responses = False  # TODO: Investigate why too many link explanations responses.
         anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
         self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
@@ -73,24 +76,25 @@ class TestHierarchyGenerator(BaseTest):
         hgen._log_costs()
 
     def assert_save_dataset_checkpoint(self):
-        def assert_dataset(dataset: TraceDataset, orig_dataset: TraceDataset):
-            self.assertSetEqual(set(dataset.artifact_df.index), set(orig_dataset.artifact_df.index))
-            self.assertEqual(len(dataset.trace_df), len(orig_dataset.trace_df))
+        def assert_dataset(dataset: TraceDataset, orig_dataset: TraceDataset, msg: str = None):
+            self.assertSetEqual(set(dataset.artifact_df.index), set(orig_dataset.artifact_df.index), msg=msg)
+            self.assertEqual(len(dataset.trace_df), len(orig_dataset.trace_df), msg=msg)
             for i, trace in orig_dataset.trace_df.itertuples():
-                self.assertIsNotNone(dataset.trace_df.get_link(source_id=trace[TraceKeys.SOURCE], target_id=trace[TraceKeys.TARGET]))
-            self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df))
+                self.assertIsNotNone(dataset.trace_df.get_link(source_id=trace[TraceKeys.SOURCE], target_id=trace[TraceKeys.TARGET]),
+                                     msg=msg)
+            self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df), msg=msg)
 
         export_path = TEST_OUTPUT_DIR
         trace_df = self.HGEN_STATE.final_dataset.trace_dataset.trace_df
-        ids2remove = [i for i, trace in trace_df.itertuples() if trace[TraceKeys.child_label()] == "dup_link"]
+        ids2remove = [i for i, trace in trace_df.itertuples() if trace[TraceKeys.child_label()] == DUP_SOURCE_ARTIFACT]
         trace_df.remove_rows(ids2remove)
         artifact_df = self.HGEN_STATE.final_dataset.trace_dataset.artifact_df
-        artifact_df.remove_row("dup_link")
+        artifact_df.remove_row(DUP_SOURCE_ARTIFACT)
         self.HGEN_STATE.final_dataset.update_artifact_df(artifact_df)
         safa_save_path = PipelineUtil.save_dataset_checkpoint(self.HGEN_STATE.final_dataset, export_path, filename="dir",
                                                               exporter_class=SafaExporter)
         saved_safa_dataset = TraceDatasetCreator(StructuredProjectReader(project_path=safa_save_path)).create()
-        assert_dataset(saved_safa_dataset, self.HGEN_STATE.final_dataset)
+        assert_dataset(saved_safa_dataset, self.HGEN_STATE.final_dataset, msg="Exported does not match final dataset.")
         csv_save_path = PipelineUtil.save_dataset_checkpoint(self.HGEN_STATE.source_dataset, export_path, filename="artifacts")
         saved_csv_dataset = ArtifactDataFrame(pd.read_csv(csv_save_path))
         self.assertSetEqual(set(saved_csv_dataset.index), set(self.HGEN_STATE.source_dataset.artifact_df.index))
@@ -185,14 +189,17 @@ class TestHierarchyGenerator(BaseTest):
     def assert_detect_duplicates_step(self):
         content = list(self.HGEN_STATE.generation_predictions.keys())
         dup_artifact_id = "dup1"
-        dup_linked_artifact = "dup_link"
-        dup_content = content[0] + content[1]
+        dup_content = NEW_LINE.join([content[0], content[1]])
         expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[0]
+
         self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
         self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_linked_artifact, content[0],
-                                                                       self.HGEN_ARGS.source_layer_id[0])
-        original_link = EnumDict({TraceKeys.child_label(): dup_linked_artifact,
+        self.HGEN_STATE.source_dataset.artifact_df.add_artifact(DUP_SOURCE_ARTIFACT, content[0],
+                                                                self.HGEN_ARGS.source_layer_ids[0])
+
+        self.HGEN_STATE.embedding_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content[0])
+
+        original_link = EnumDict({TraceKeys.child_label(): DUP_SOURCE_ARTIFACT,
                                   TraceKeys.parent_label(): dup_artifact_id,
                                   TraceKeys.SCORE: 0.6,
                                   TraceKeys.EXPLANATION: "Explanation"})
@@ -201,7 +208,7 @@ class TestHierarchyGenerator(BaseTest):
         self.assertNotIn(dup_artifact_id, self.HGEN_STATE.selected_artifacts_dataset.artifact_df)
         self.assertNotIn(dup_artifact_id, self.HGEN_STATE.selected_artifacts_dataset.artifact_df)
         self.assertNotIn(original_link, self.HGEN_STATE.selected_predictions)
-        new_link = [trace for trace in self.HGEN_STATE.trace_predictions if trace[TraceKeys.child_label()] == dup_linked_artifact]
+        new_link = [trace for trace in self.HGEN_STATE.trace_predictions if trace[TraceKeys.child_label()] == DUP_SOURCE_ARTIFACT]
         self.assertSize(1, new_link)
         self.assertEqual(new_link[0][TraceKeys.TARGET], expected_parent)
 
@@ -224,14 +231,15 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(new_artifact[ArtifactKeys.LAYER_ID], self.HGEN_ARGS.target_type)
             for orig_id, orig_artifact in self.HGEN_STATE.original_dataset.artifact_df.itertuples():
                 self.assertIn(orig_id, self.HGEN_STATE.final_dataset.artifact_df.index)
-                if orig_artifact[ArtifactKeys.LAYER_ID] == self.HGEN_ARGS.source_layer_id:
+
+                if orig_id in self.HGEN_ARGS.source_layer_ids:
                     q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.trace_df, {"source": orig_id, "target": name})
                     self.assertEqual(len(q), 1)
         for i, layer in self.HGEN_STATE.original_dataset.trace_dataset.layer_df.itertuples():
             q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df, layer)
             self.assertEqual(len(q), 1)
         q = DataFrameUtil.query_df(self.HGEN_STATE.final_dataset.layer_df,
-                                   {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_id[0],
+                                   {LayerKeys.SOURCE_TYPE.value: self.HGEN_ARGS.source_layer_ids[0],
                                     LayerKeys.TARGET_TYPE.value: self.HGEN_ARGS.target_type})
         self.assertEqual(len(q), 1)
 

@@ -3,7 +3,6 @@ from unittest import TestCase
 from test.clustering.clustering_test_util import ClusteringTestUtil
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.clustering.steps.condense_clusters import CondenseClusters
 
 
@@ -22,14 +21,14 @@ class TestCondenseClusters(TestCase):
         c1: Cluster = Cluster.from_artifacts(["A", "B", "C", "D"], embeddings_manager)
         c2: Cluster = Cluster.from_artifacts(["A", "B"], embeddings_manager)
         c3: Cluster = Cluster.from_artifacts(["A"], embeddings_manager)
-        state.multi_method_cluster_map = {
-            SupportedClusteringMethods.KMEANS.name: {
-                0: c1, 1: c2, 2: c3
-            },
-            SupportedClusteringMethods.AGGLOMERATIVE.name: {
-                0: Cluster.from_artifacts(["A", "B", "C"], embeddings_manager)
+        state.batched_cluster_maps = [
+            {
+                "kmeans0": c1,
+                "kmeans2": c2,
+                "kmeans3": c3,
+                "agglomerative0": Cluster.from_artifacts(["A", "B", "C"], embeddings_manager)
             }
-        }
+        ]
 
         CondenseClusters().run(args, state)
         cluster_map = state.final_cluster_map

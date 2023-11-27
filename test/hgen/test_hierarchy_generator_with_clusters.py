@@ -1,19 +1,17 @@
 import math
 import random
-from copy import deepcopy
 from unittest.mock import MagicMock
 
 import mock
 import numpy as np
 from bs4 import BeautifulSoup
 
-from test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, MISSING_PROJECT_SUMMARY_RESPONSES, get_name_responses, \
+from test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, get_name_responses, \
     get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.embedding_util import EmbeddingUtil
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
@@ -28,7 +26,6 @@ from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
-from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -82,11 +79,12 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         anthropic_ai_manager.add_responses(mock_explanations)
         anthropic_ai_manager.mock_summarization()
         GenerateTraceLinksStep().run(args, state)
-        for cluster_id, cluster_artifacts in state.id_to_cluster_artifacts.items():
+        for cluster_id, cluster_artifacts in state.cluster2artifacts.items():
             new_name = expected_names[cluster_id]
             self.assertIn(new_name, state.all_artifacts_dataset.artifact_df)
             self.assertNotIn(cluster_id, state.all_artifacts_dataset.artifact_df)
-            for i, artifact in enumerate(cluster_artifacts):
+            for i, a_id in enumerate(cluster_artifacts):
+                artifact = args.dataset.artifact_df.get_artifact(a_id)
                 found_pred = self.find_link(artifact, new_name, state.trace_predictions)
                 found_selected = self.find_link(artifact, new_name, state.selected_predictions)
                 self.assertEqual(len(found_pred), 1)
@@ -102,7 +100,8 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
 
     def assert_generation_prompts(self, prompt: str, return_value: str):
         n_artifacts = len(BeautifulSoup(prompt, features="lxml").findAll(self.HGEN_ARGS.source_type))
-        expected_value = GenerateArtifactContentStep._calculate_proportion_of_artifacts(n_artifacts, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS)
+        expected_value = GenerateArtifactContentStep._calculate_proportion_of_artifacts(n_artifacts,
+                                                                                        DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS)
         self.assertIn(f"a minimal set ({expected_value})", prompt)
         return return_value
 
@@ -112,10 +111,10 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         n_added_sources = len({trace[TraceKeys.SOURCE] for trace in state.trace_predictions
                                if trace[TraceKeys.SCORE] >= args.min_orphan_score_threshold}) - len(selected_sources)
         n_added_sources = max(n_added_sources, 0)
-        n_orphans = n_artifacts - len(selected_sources) - n_added_sources -1
+        n_orphans = n_artifacts - len(selected_sources) - n_added_sources - 1
         anthropic_manager.add_responses(
-                                        [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
-                                         for _ in range(n_orphans)])
+            [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
+             for _ in range(n_orphans)])
         FindHomesForOrphansStep().run(args, state)
 
     def assert_generate_explanations_step(self, args, state):
@@ -150,8 +149,8 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
 
         state.project_summary = HGEN_PROJECT_SUMMARY
         state.original_dataset = args.dataset
-        state.source_dataset = InitializeDatasetStep._create_dataset_with_single_layer(state.original_dataset.artifact_df,
-                                                                                       args.source_layer_id)
+        source_artifact_df = state.original_dataset.artifact_df.get_type(args.source_layer_ids)
+        state.source_dataset = PromptDataset(artifact_df=source_artifact_df)
 
         user_story_responses = [PromptUtil.create_xml("user-story", us) for i, us in enumerate(HGenTestConstants.user_stories)]
 
@@ -165,9 +164,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
     def _reset_cluster_artifacts_for_tracing_test(self, n_artifacts_last_cluster, n_artifacts_per_cluster, state):
         # makes it easier to test tracing
         added_artifacts_to_last_cluster = n_artifacts_last_cluster - n_artifacts_per_cluster
-        last_cluster_artifacts = state.id_to_cluster_artifacts[len(state.generation_predictions) - 1]
-        state.id_to_cluster_artifacts[len(state.generation_predictions) - 1] = last_cluster_artifacts[
-                                                                               :-added_artifacts_to_last_cluster]
+        last_cluster_artifacts = state.cluster2artifacts[len(state.generation_predictions) - 1]
+        state.cluster2artifacts[len(state.generation_predictions) - 1] = last_cluster_artifacts[
+                                                                         :-added_artifacts_to_last_cluster]
 
     def _setup_state_post_clustering_step(self, state):
         # makes it easier to test tracing + generation
@@ -175,15 +174,15 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         n = 11
         n_artifacts_last_cluster = n
         n_clusters = math.floor(len(artifacts) / n)
-        state.id_to_cluster_artifacts = {i: [EnumDict(a) for a in artifacts[i * n:i * n + n]]
-                                         for i in range(n_clusters)}
+        state.cluster2artifacts = {i: [a[ArtifactKeys.ID] for a in artifacts[i * n:i * n + n]]
+                                   for i in range(n_clusters)}
         if n_clusters * n < len(artifacts):
             rem = n_clusters * n
-            added_clusters = [EnumDict(a) for a in artifacts[rem:] + artifacts[:2]]
-            state.id_to_cluster_artifacts[n_clusters - 1].extend(added_clusters)
+            added_clusters = [a[ArtifactKeys.ID] for a in artifacts[rem:] + artifacts[:2]]
+            state.cluster2artifacts[n_clusters - 1].extend(added_clusters)
             n_artifacts_last_cluster += len(added_clusters)
 
-        manual_clusters = {i: [a[ArtifactKeys.ID] for a in artifacts] for i, artifacts in state.id_to_cluster_artifacts.items()}
+        manual_clusters = {i: [a_id for a_id in artifact_ids] for i, artifact_ids in state.cluster2artifacts.items()}
         cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters).create()
         state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
         return artifacts, n, n_artifacts_last_cluster,

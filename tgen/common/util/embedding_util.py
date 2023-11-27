@@ -30,7 +30,7 @@ class EmbeddingUtil:
         return cls.calculate_similarities([source_embedding], [target_embedding])[0][0]
 
     @staticmethod
-    def calculate_similarities(source_embeddings: List[EmbeddingType], target_embeddings: List[EmbeddingType]) -> List[List[float]]:
+    def calculate_similarities(source_embeddings: List[EmbeddingType], target_embeddings: List[EmbeddingType]) -> np.array:
         """
         Calculates the similarities between source and target embeddings.
         :param source_embeddings: Rows of similarity matrix.

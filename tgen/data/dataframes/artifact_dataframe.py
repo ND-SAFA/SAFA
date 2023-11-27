@@ -155,9 +155,9 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: The list of artifacts.
         """
         artifacts = [Artifact(id=artifact_id,
+                              content=artifact_row[ArtifactKeys.CONTENT],
                               layer_id=artifact_row[ArtifactKeys.LAYER_ID],
-                              summary=artifact_row[ArtifactKeys.SUMMARY],
-                              content=artifact_row[ArtifactKeys.CONTENT])
+                              summary=artifact_row[ArtifactKeys.SUMMARY])
                      for artifact_id, artifact_row in self.itertuples()]
         return artifacts
 

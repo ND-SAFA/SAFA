@@ -32,7 +32,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The layer of the source artifacts for which higher-level artifacts will be generated
     """
-    source_layer_id: Union[str, List[str]] = required_field(field_name="source_layer_id")
+    source_layer_ids: Union[str, List[str]] = required_field(field_name="source_layer_id")
     """
     The type of higher-level artifact that will be generated
     """
@@ -106,9 +106,21 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
     """
-    If True, creates a project summary, else False
+    The section of the project summary to use as seeds for clustering.
     """
-    create_project_summary: bool = True
+    seed_project_summary_section: str = None
+    """
+    The layer_id of the artifacts to use as seeds
+    """
+    seed_layer_id: str = None
+    """
+    Adds clusters as artifacts
+    """
+    add_seeds_as_artifacts: bool = False
+    """
+    Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
+    """
+    export_original_dataset: bool = False
 
     def __post_init__(self) -> None:
         """
@@ -117,8 +129,8 @@ class HGenArgs(PipelineArgs, BaseObject):
         """
         super().__post_init__()
         if not self.source_type:
-            is_code = all([layer_id in self.dataset.artifact_df.get_code_layers() for layer_id in self.source_layer_id])
-            self.source_type = "code" if is_code else self.source_layer_id[0]
+            is_code = all([layer_id in self.dataset.artifact_df.get_code_layers() for layer_id in self.source_layer_ids])
+            self.source_type = "code" if is_code else self.source_layer_ids[0]
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \
@@ -130,3 +142,16 @@ class HGenArgs(PipelineArgs, BaseObject):
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
+
+        if isinstance(self.source_layer_ids, str):
+            self.source_layer_ids = [self.source_layer_ids]
+
+    def get_seed_id(self) -> str:
+        """
+        :return: The current seed layer id.
+        """
+        if self.seed_project_summary_section:
+            return self.seed_project_summary_section
+        if self.seed_layer_id:
+            return self.seed_layer_id
+        raise Exception("No seed id available. Seedd project Summary and layer_id are none.")

@@ -1,9 +1,12 @@
 import os
 from typing import Any, Type, Tuple
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.scripts.constants import SUPPORTED_TYPES_RQ
 from tgen.scripts.toolset.selector import inquirer_value
+
+OPTIONAL_KEY = "_OPTIONAL"
 
 
 class RQVariable:
@@ -14,6 +17,10 @@ class RQVariable:
         :param variable_definition: The variable definition containing name and optionally the type to cast into.
         """
         self.definition = variable_definition
+        is_optional = OPTIONAL_KEY in variable_definition
+        self.is_required = is_optional
+        if is_optional:
+            variable_definition = variable_definition.replace(OPTIONAL_KEY, EMPTY_STRING)
         self.name, self.type_constructor, self.type_class = RQVariable.get_variable_type(variable_definition)
         self.__value = None
         self.__default_value = None
@@ -65,7 +72,7 @@ class RQVariable:
         :param default_value: Default value to set.
         :return: None
         """
-        typed_default_value = self.type_constructor(default_value)
+        typed_default_value = self.type_constructor(default_value) if default_value is not None else default_value
         self.__default_value = typed_default_value
 
     def set_value(self, value: Any) -> None:

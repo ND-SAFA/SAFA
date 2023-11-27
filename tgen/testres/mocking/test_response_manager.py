@@ -1,13 +1,11 @@
 from typing import Callable, Dict, List, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.llm_response_util import LLMResponseUtil
 
 
 class TestAIManager:
-    def __init__(self,
-                 library: str,
-                 response_formatter: Callable):
+    def __init__(self, library: str, response_formatter: Callable, require_used_all_responses: bool = True):
         self.library = library
         self._responses = []
         self.response_formatter = response_formatter
@@ -16,13 +14,14 @@ class TestAIManager:
         self.end_index = 0
         self.handlers = []
         self.mock_calls = 0
+        self.require_used_all_responses = require_used_all_responses
 
     def __call__(self, *args, **kwargs) -> List[str]:
         prompts_global = self.get_prompts(kwargs)
         handled_responses, manual_prompts = self.run_prompt_handlers(prompts_global)
 
         n_manual_prompts = len(manual_prompts)
-        manual_responses = self.get_next_response(n_requested=n_manual_prompts)
+        manual_responses = self.get_next_response(n_requested=n_manual_prompts, prompts=manual_prompts)
 
         self.n_used += n_manual_prompts
         self.mock_calls += n_manual_prompts
@@ -108,11 +107,12 @@ class TestAIManager:
         summary = f"<summary>Summary of {artifact_body}</summary>"
         return summary
 
-    def get_next_response(self, n_requested: int = 1) -> List[str]:
+    def get_next_response(self, n_requested: int = 1, prompts: List[str] = None) -> List[str]:
         total_requested = self.n_used + n_requested
         n_responses = len(self._responses)
         if total_requested > n_responses:
-            raise ValueError(f"Requested {total_requested} out of {n_responses} responses.")
+            prompts_error = f"{NEW_LINE}{NEW_LINE.join(prompts)}".strip()
+            raise ValueError(f"Requested {total_requested} out of {n_responses} responses.{prompts_error}")
 
         responses = self._responses[self.start_index: total_requested]
         self.start_index = total_requested
@@ -123,3 +123,10 @@ class TestAIManager:
             return [m["content"] for m in kwargs["messages"]]
         elif self.library == "anthropic":
             return [kwargs["prompt"]]
+
+    def on_test_end(self) -> None:
+        n_used = self.start_index
+        n_expected = len(self._responses)
+        if self.require_used_all_responses:
+            response_txt = NEW_LINE.join([str(r) for r in self._responses])
+            assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses.{response_txt}"

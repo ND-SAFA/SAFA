@@ -23,12 +23,12 @@ class TestAddToDataset(TestCase):
         step = AddClustersToDataset()
         step.run(args, state)
 
-        artifact_df = state.cluster_dataset.artifact_df
+        artifact_df = state.cluster_dataset.trace_dataset.artifact_df
         artifact_types = artifact_df.get_artifact_types()
-        self.assertIn(AddClustersToDataset.CLUSTER_ARTIFACT_TYPE, artifact_types)
+        self.assertIn(args.cluster_artifact_type, artifact_types)
 
         # Verifies artifacts were added
-        cluster_artifacts = artifact_df.get_type(AddClustersToDataset.CLUSTER_ARTIFACT_TYPE)
+        cluster_artifacts = artifact_df.get_type(args.cluster_artifact_type)
         self.assertEqual(2, len(cluster_artifacts))
         self.assertIsNotNone(artifact_df.get_artifact(0))
         self.assertIsNotNone(artifact_df.get_artifact(1))
@@ -46,4 +46,4 @@ class TestAddToDataset(TestCase):
         self.assertEqual(1, len(layers))
         traced_layer = layers[0]
         self.assertEqual(ClusteringTestUtil.DEFAULT_ARTIFACT_TYPE, traced_layer[0])
-        self.assertEqual(AddClustersToDataset.CLUSTER_ARTIFACT_TYPE, traced_layer[1])
+        self.assertEqual(args.cluster_artifact_type, traced_layer[1])

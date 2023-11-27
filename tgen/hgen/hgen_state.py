@@ -1,7 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Set, Union
 
-from tgen.common.util.enum_util import EnumDict
+from tgen.clustering.base.cluster_type import ClusterIdType
+from tgen.common.objects.trace import Trace
+from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -26,8 +28,9 @@ class HGenState(State):
     """
     Optional Step 3 - Break project into parts and generate for each part
     """
-    id_to_cluster_artifacts: Dict[Any, List[EnumDict]] = None  # maps cluster id to the list of artifacts in that cluster
-    cluster_dataset: Optional[PromptDataset] = None  # contains prompt dataset with just the artifact df of the clusters.
+    cluster2artifacts: dict = None  # maps cluster id to the list of artifacts in that cluster
+    seed2artifacts: ClusterIdType = None  # If given seeds, maps seeds to cluster artifacts.
+    cluster_dataset: PromptDataset = None  # contains prompt dataset with just the artifact df of the clusters.
     embedding_manager: EmbeddingsManager = None  # allows embeddings to be reused
 
     """
@@ -53,8 +56,8 @@ class HGenState(State):
     """
     Optional Step 7 - generate trace links between source and target artifacts
     """
-    trace_predictions: List[EnumDict] = None  # list of traces between source and target artifacts
-    selected_predictions: List[EnumDict] = None  # met the criteria required to count as a trace
+    trace_predictions: List[Trace] = None  # list of traces between source and target artifacts
+    selected_predictions: List[Trace] = None  # met the criteria required to count as a trace
 
     """
     Step 8 - remove duplicate artifacts
@@ -65,3 +68,17 @@ class HGenState(State):
     Step Final - Dataset Construction
     """
     final_dataset: PromptDataset = None  # The final dataset with generated artifacts.
+
+    def get_cluster_ids(self) -> List[str]:
+        """
+        :return: Returns the ordered list of clustered ids.
+        """
+        return list(self.cluster_dataset.artifact_df.index)
+
+    def get_cluster2artifacts(self):
+        """
+        Optionally returns the map from cluster ids to list of artifacts in cluster if clustering is enabled.
+        :return: Map if clusters are available, otherwise none.
+        """
+        return ClusteringUtil.replace_ids_with_artifacts(self.cluster2artifacts,
+                                                         self.source_dataset.artifact_df) if self.cluster2artifacts else None

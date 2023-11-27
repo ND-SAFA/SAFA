@@ -1,7 +1,7 @@
 import os
 from copy import deepcopy
 from os.path import dirname
-from typing import Any, Iterable, List, Tuple, Dict
+from typing import Any, Dict, Iterable, List, Tuple
 
 import numpy as np
 
@@ -176,7 +176,7 @@ class Cluster:
         :return: Min and Max similarity scores.
         """
         unique_indices = NpUtil.get_unique_indices(len(self.artifact_id_set))
-        similarities = self.get_values(self.similarity_matrix, unique_indices)
+        similarities = NpUtil.get_values(self.similarity_matrix, unique_indices)
         min_sim = np.min(similarities)
         max_sim = np.max(similarities)
         return min_sim, max_sim
@@ -188,19 +188,8 @@ class Cluster:
         """
         n_artifacts = len(self.artifact_id_set)
         indices = NpUtil.get_unique_indices(n_artifacts)
-        unique_scores = self.get_values(self.similarity_matrix, indices)
+        unique_scores = NpUtil.get_values(self.similarity_matrix, indices)
         return sum(unique_scores) / len(unique_scores)
-
-    @staticmethod
-    def get_values(matrix: np.array, indices: List[Tuple[int, int]]):
-        """
-        Gets the values in the matrix. TODO: Replace with actual numpy notation.
-        :param matrix: The matrix to index.
-        :param indices: The index in the matrix to retrieve. Expected to be 2D.
-        :return: List of values in the matrix.
-        """
-        values = [matrix[i][j] for i, j in indices]
-        return values
 
     def to_yaml(self, export_path: str = None, **kwargs) -> "Cluster":
         """
@@ -210,7 +199,6 @@ class Cluster:
         """
         if export_path:
             yaml_safe_cluster = deepcopy(self)
-            yaml_safe_cluster.__init_stats()
             export_path = os.path.join(dirname(export_path), ReflectionUtil.extract_name_of_variable(f"{self.embedding_manager=}",
                                                                                                      is_self_property=True))
             yaml_safe_cluster.embedding_manager = yaml_safe_cluster.embedding_manager.to_yaml(export_path)

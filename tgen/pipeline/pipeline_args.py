@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.pipeline_constants import DEFAULT_INTERACTIVE_STATE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -31,7 +32,7 @@ class PipelineArgs(BaseObject):
     """
     :param interactive_mode: If True, enters interactive mode
     """
-    interactive_mode: bool = False
+    interactive_mode: bool = DEFAULT_INTERACTIVE_STATE
 
     def __post_init__(self):
         """

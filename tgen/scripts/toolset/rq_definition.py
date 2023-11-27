@@ -2,7 +2,7 @@ import os
 import re
 from typing import Any, Dict, List, Optional
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE, NONE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
@@ -52,7 +52,8 @@ class RQDefinition:
             default_values = {}
         if use_os_values:
             for env_key, env_value in os.environ.items():
-                default_values[env_key] = os.path.expanduser(env_value)
+                env_value = None if env_value.lower() == NONE else os.path.expanduser(env_value)
+                default_values[env_key] = env_value
 
         for variable in self.variables:
             if variable.name not in default_values:

@@ -1,8 +1,8 @@
 import os
 from unittest import mock
 
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.common.util.file_util import FileUtil
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -186,7 +186,7 @@ class TestPipeline(BaseTest):
         self.assertEqual(curr_step.get_step_name(), CreateHGenDatasetStep.get_step_name())
 
     def get_pipeline(self):
-        args = HGenArgs(source_layer_id="source", target_type="target",
+        args = HGenArgs(source_layer_ids="source", target_type="target",
                         dataset_creator=PromptDatasetCreator(
                             trace_dataset_creator=TraceDatasetCreator(SafaTestProject.get_project_reader())))
         return HierarchyGenerator(args)

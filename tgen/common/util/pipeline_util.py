@@ -3,20 +3,19 @@ from datetime import datetime
 from functools import wraps
 from typing import Any, Type
 
+import pandas as pd
+
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-import pandas as pd
-
 from tgen.pipeline.abstract_pipeline_step import title_format_for_logs
 from tgen.pipeline.state import State
 
@@ -60,18 +59,20 @@ class PipelineUtil:
         return full_export_path
 
 
-def nested_pipeline(parent_pipeline_state: State) -> Any:
+def nested_pipeline(parent_pipeline_state: Type[State]) -> Any:
     """
     Decorator for using a different pipeline inside of a pipeline
     :param parent_pipeline_state: The state of the pipeline calling the nested pipeline
     :return: The result of the function
     """
+
     def decorator(func):
         """
         Logic for creating the decorator
         :param func: Function containing the nested pipeline call
         :return: Result of the function
         """
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             """

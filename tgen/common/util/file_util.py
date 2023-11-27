@@ -3,7 +3,7 @@ import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union, Iterable
 
 import numpy as np
 import yaml
@@ -153,12 +153,13 @@ class FileUtil:
 
     @staticmethod
     def expand_paths(paths: Union[List, Dict, str], replacements: Dict[str, Any] = None,
-                     use_abs_paths: bool = True):
+                     use_abs_paths: bool = True, remove_none_vals: bool = False):
         """
         For every string found in value, if its a path its expanded completed path
         :param paths: List, Dict, or String containing one or more paths.
         :param replacements: Dictionary from source to target string replacements in paths.
         :param use_abs_paths: If True, returns the absolute path
+        :param remove_none_vals: If True, removes path that are None
         :return: Same type as value, but with its content processed.
         """
 
@@ -166,7 +167,7 @@ class FileUtil:
             """
             Performs replacements on path.
             :param path: The path possibly containing keys.
-            :param replacements: They keys and values to be replaced with.
+            :param replacements: The keys and values to be replaced with.
             :return: The processed path.
             """
             if replacements:
@@ -180,7 +181,7 @@ class FileUtil:
                 path = FileUtil.get_path_relative_to_proj_path(path)
             return path
 
-        return FileUtil.perform_function_on_paths(paths, expand, replacements=replacements)
+        return FileUtil.perform_function_on_paths(paths, expand, replacements=replacements, remove_none_vals=remove_none_vals)
 
     @staticmethod
     def collapse_paths(paths: Union[List, Dict, str], replacements: Dict[str, str] = None):
@@ -210,22 +211,39 @@ class FileUtil:
         return FileUtil.perform_function_on_paths(paths, collapse, replacements=replacements)
 
     @staticmethod
-    def perform_function_on_paths(paths: Union[List, Dict, str], func: Callable, replacements: Dict[str, str] = None, **kwargs):
+    def perform_function_on_paths(paths: Union[List, Dict, str], func: Callable, replacements: Dict[str, str] = None,
+                                  remove_none_vals: bool = False, **kwargs):
         """
         For every string found in value, if its a path its collapsed into a shorter form
         :param paths: List, Dict, or String containing one or more paths.
         :param func: Function to perform
         :param replacements: Dictionary from source to target string replacements in paths.
+        :param remove_none_vals: If True, removes path that are None
         :return: Same type as value, but with its content processed.
         """
+
+        def should_keep(val: Any):
+            """
+            Returns True if the path should be kept, otherwise False if it should be removed.
+            :param val: The value to check.
+            :return: True if the path should be kept, otherwise False if it should be removed.
+            """
+            is_none = val is None or (isinstance(val, tuple) and None in val)
+            return not remove_none_vals or not is_none
+
         if replacements is None:
             replacements = FileUtil.get_env_replacements()
-        if isinstance(paths, list):
-            return [FileUtil.perform_function_on_paths(v, func, replacements=replacements, **kwargs) for v in paths]
-        if isinstance(paths, dict):
-            return {k: FileUtil.perform_function_on_paths(v, func, replacements=replacements, **kwargs) for k, v in paths.items()}
         if isinstance(paths, str):
             paths = func(paths, replacements=replacements, **kwargs)
+        elif isinstance(paths, list) or isinstance(paths, dict):
+            processed_paths = map(lambda v: FileUtil.perform_function_on_paths(v, func, replacements=replacements,
+                                                                               remove_none_vals=remove_none_vals, **kwargs),
+                                  paths.values() if isinstance(paths, dict) else paths)
+            iterable = processed_paths
+            if isinstance(paths, dict):
+                paths = dict(zip(paths.keys(), processed_paths))
+                iterable = paths.items()
+            paths = type(paths)(filter(should_keep, iterable))
         return paths
 
     @staticmethod
@@ -292,7 +310,7 @@ class FileUtil:
         :param path: the path to file
         :return: the file object
         """
-        FileUtil.create_dir_safely(os.path.dirname(path))
+        FileUtil.create_dir_safely(FileUtil.get_directory_path(path))
         return open(path, 'w')
 
     @staticmethod

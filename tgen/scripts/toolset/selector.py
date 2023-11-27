@@ -55,13 +55,15 @@ def inquirer_selection(selections: List[str], message: str = None, allow_back: b
     return selected_choice
 
 
-def inquirer_value(message: str, class_type: Type, default_value: Any = None, allow_back: bool = DEFAULT_ALLOW_BACK):
+def inquirer_value(message: str, class_type: Type, default_value: Any = None, allow_back: bool = DEFAULT_ALLOW_BACK,
+                   is_required: bool = True):
     """
     Prompts user with message for a value.
     :param message: The message to prompt user with.
     :param class_type: The type of value to expect back.
     :param default_value: The default value to use if optional.
     :param allow_back: Allow the user to type back command.
+    :param is_required: If True, then the user is required to supply a value (unless a default is provided) else may be blank
     :return: The value after parsing user response.
     """
     annotation_name = class_type.__name__ if hasattr(class_type, "__name__") else repr(class_type)
@@ -75,9 +77,7 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
     if allow_back and user_value.lower() == BACK_COMMAND:
         return None
     if user_value.strip() == EMPTY_STRING:
-        if default_value is None:
+        if default_value is None and is_required:
             raise Exception(REQUIRED_FIELD_ERROR)
         user_value = default_value
-    if class_type is list and isinstance(user_value, str):  # TODO: Support list of ints, bools, and floats.
-        return user_value.split(",")
-    return class_type(user_value)
+    return class_type(user_value) if user_value is not None else user_value

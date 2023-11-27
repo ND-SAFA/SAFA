@@ -79,7 +79,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
-        self.summarizer_args = None
         super().run(**kwargs)
 
         dataset = self.state.final_dataset

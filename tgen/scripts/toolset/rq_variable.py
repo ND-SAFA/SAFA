@@ -18,7 +18,7 @@ class RQVariable:
         """
         self.definition = variable_definition
         is_optional = OPTIONAL_KEY in variable_definition
-        self.is_required = is_optional
+        self.is_required = not is_optional
         if is_optional:
             variable_definition = variable_definition.replace(OPTIONAL_KEY, EMPTY_STRING)
         self.name, self.type_constructor, self.type_class = RQVariable.get_variable_type(variable_definition)
@@ -48,12 +48,13 @@ class RQVariable:
         """
         message = f"{self.name}"
         try:
-            value = inquirer_value(message, self.type_class, default_value=self.__default_value, allow_back=True)
+            value = inquirer_value(message, self.type_class, default_value=self.__default_value, allow_back=True,
+                                   is_required=self.is_required)
             self.__value = value
         except Exception as e:
             logger.warning(e)
             return False
-        assert value is not None
+        assert value is not None or not self.is_required
         return True
 
     def parse_value(self, variable_value: Any) -> Any:
@@ -91,10 +92,11 @@ class RQVariable:
         value = self.get_value()
         result = True
         if value is None:
-            if throw_error:
-                raise Exception(f"{self.name} has value of None.")
-            result = False
-        if not isinstance(value, self.type_class):
+            if self.is_required:
+                if throw_error:
+                    raise Exception(f"{self.name} has value of None.")
+                result = False
+        elif not isinstance(value, self.type_class):
             if throw_error:
                 raise Exception(f"{self.name} contains value of type {type(value)} but expected {self.type_class}.")
             result = False

@@ -124,8 +124,14 @@ class TestFileUtil(BaseTest):
             expanded_path_iter = FileUtil.expand_paths(iterable_paths, replacements)
             self.assertTrue(expanded_path_iter[0].startswith(os.path.join(PROJ_PATH, "hi")))
             self.assertTrue(expanded_path_iter[1].startswith(os.path.join(PROJ_PATH, "hola")))
-
         self.assertEqual(expected_path, FileUtil.expand_paths(expected_path))
+
+        replacements = {"[replacement1]": "hi", "[replacement2]": None}
+        paths_dict = {1: "[replacement1]/one.txt", 2: "[replacement2]"}
+        expanded_path_without_none = FileUtil.expand_paths(paths_dict, replacements, remove_none_vals=True)
+        self.assertEqual(len(expanded_path_without_none), 1)
+        self.assertIn(1, expanded_path_without_none)
+
 
     def test_expand_paths_int(self):
         """

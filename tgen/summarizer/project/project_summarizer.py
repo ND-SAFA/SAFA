@@ -129,6 +129,8 @@ class ProjectSummarizer(BaseObject):
         :param as_json: If True, saves it as a json, else as a txt
         :return: The save path
         """
+        if not export_dir:
+            return export_dir
         path = FileUtil.safely_join_paths(export_dir, PROJECT_SUMMARY_FILENAME)
         ext = FileUtil.JSON_EXT if as_json else FileUtil.TEXT_EXT
         return FileUtil.add_ext(path, ext)

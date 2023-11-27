@@ -135,9 +135,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
             return lambda prompt: self.assert_generation_prompts(prompt, return_value=r)
 
         anthropic_ai_manager.mock_summarization()
-        anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
         args: HGenArgs = get_test_hgen_args()()
         self.HGEN_ARGS = args
+        args.dataset.project_summary = HGEN_PROJECT_SUMMARY
         args.target_type = "User Story"
         args.perform_clustering = True
         args.generate_trace_links = generate_trace_links
@@ -147,7 +147,6 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         state.description = HGenTestConstants.description
         state.format_of_artifacts = HGenTestConstants.format_
 
-        state.project_summary = HGEN_PROJECT_SUMMARY
         state.original_dataset = args.dataset
         source_artifact_df = state.original_dataset.artifact_df.get_type(args.source_layer_ids)
         state.source_dataset = PromptDataset(artifact_df=source_artifact_df)

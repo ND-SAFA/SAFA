@@ -25,7 +25,7 @@ class StepClusterArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerState]
         all_content = EMPTY_STRING.join(state.dataset.artifact_df.get_summaries_or_contents())
         n_tokens = TokenCalculator.estimate_num_tokens(all_content)
         if n_tokens < MAX_TOKENS_FOR_PROJECT_SUMMARY or not SummarizerUtil.needs_project_summary(state.dataset.project_summary, args):
-            state.cluster_map = {0: list(state.dataset.artifact_df.index)}
+            state.cluster_id_to_artifacts = {0: list(state.dataset.artifact_df.index)}
             return
 
         final_cluster_map = self._run_clustering_pipeline(args, state, n_tokens)

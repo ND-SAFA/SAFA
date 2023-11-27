@@ -35,7 +35,7 @@ class RQDefinition:
         :return: RQ Json.
         """
         variable_replacements = self.__get_variable_replacements()
-        built_rq_json = FileUtil.expand_paths(self.rq_json, variable_replacements)
+        built_rq_json = FileUtil.expand_paths(self.rq_json, variable_replacements, remove_none_vals=True)
         self.save_rq_variables()
         return built_rq_json
 
@@ -67,6 +67,7 @@ class RQDefinition:
         :return: None
         """
         load_rq_path = self.get_rq_save_path()
+        reloaded = False
         if FileUtil.safely_check_path_exists(load_rq_path):
             should_reload = confirm(f"Do you want to reload variables from the last run of {self.script_name}?")
             if should_reload:
@@ -75,20 +76,23 @@ class RQDefinition:
                     for v in self.variables:
                         if v.name in variables_map:
                             v.set_value(variables_map[v.name].get_value())
+                    reloaded = True
                 except Exception:
                     logger.exception(f"Unable to reload previous rq config from {load_rq_path}")
-        self.inquirer_variables()
+        self.inquirer_variables(reloaded=reloaded)
 
-    def inquirer_variables(self) -> None:
+    def inquirer_variables(self, reloaded: bool = False) -> None:
         """
         Prompts user to fill in any missing variables in RQ definition.
+        :param reloaded: True if the variables have been reloaded else False
         :return: None
         """
         for variable in self.variables:
-            if not variable.has_value():
-                success = variable.inquirer_value()
-                if not success:
-                    self.inquirer_variables()
+            if variable.has_value() or (reloaded and not variable.is_required):
+                continue
+            success = variable.inquirer_value()
+            if not success:
+                self.inquirer_variables()
         if not self.has_all_variable():
             self.inquirer_variables()
         if not self.confirm():

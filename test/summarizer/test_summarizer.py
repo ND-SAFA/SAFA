@@ -137,9 +137,9 @@ class TestSummarizer(BaseTest):
         ai_manager.set_responses(project_summary_responses)
         summarizer.summarize()
         state: SummarizerState = summarizer.state
-        clustered_artifacts = {a_id for c in state.cluster_map.values() for a_id in c.artifact_ids}
-        self.assertGreater(len(state.cluster_map), 1)
-        for project_summary, cluster in zip(state.project_summaries, state.cluster_map.values()):
+        clustered_artifacts = {a_id for c in state.cluster_id_to_artifacts.values() for a_id in c}
+        self.assertGreater(len(state.cluster_id_to_artifacts), 1)
+        for project_summary, cluster in zip(state.project_summaries, state.cluster_id_to_artifacts.values()):
             assert_summary(project_summary, len(cluster))
         assert_summary(state.final_project_summary, len(clustered_artifacts))
 

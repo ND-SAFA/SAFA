@@ -75,7 +75,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current HGEN state
         :return: A list of the expected number of target artifacts for each cluster
         """
-        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(state.id_to_cluster_artifacts[i]),
+        cluster2artifacts = state.get_cluster2artifacts()
+        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(cluster2artifacts[i]),
                                                                                     reduction_percentage=args.reduction_percentage)
                      for i in artifact_ids]
         return n_targets

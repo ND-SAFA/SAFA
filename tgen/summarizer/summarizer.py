@@ -48,7 +48,7 @@ class Summarizer(AbstractPipeline):
         super().run(log_start=len(self.steps) > 0)
         if not self.state.summarized_dataset:
             self.state.summarized_dataset = self.state.dataset
-        if self.state.final_project_summary:
+        if self.state.final_project_summary and self.state.export_dir:
             save_path = ProjectSummarizer.get_save_path(self.state.export_dir, as_json=False)
             self.state.final_project_summary.save(save_path)
         return self.state.summarized_dataset

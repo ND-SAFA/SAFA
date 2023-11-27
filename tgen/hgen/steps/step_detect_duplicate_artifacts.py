@@ -1,8 +1,7 @@
-from typing import Any, Dict, List, Set
+from typing import Dict, List, Set
 
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD
 from tgen.common.logging.logger_manager import logger
-from tgen.common.objects.trace import Trace
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -65,8 +64,10 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 potential_parents = duplicate_map[parent].difference(duplicate_artifact_ids)
                 if not potential_parents:
                     continue
-
-                new_parent = DetectDuplicateArtifactsStep.get_top_parent(child, potential_parents, state.embedding_manager)
+                new_parent = DetectDuplicateArtifactsStep.get_top_parent(child,
+                                                                         potential_parents,
+                                                                         state.embedding_manager,
+                                                                         FIRST_PASS_LINK_THRESHOLD)
                 if new_parent is None:
                     continue  # discard trace entirely
                 trace[parent_key] = new_parent
@@ -82,23 +83,19 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.selected_predictions = selected_predictions
 
     @staticmethod
-    def get_affected_links(links: List[Trace], artifact_ids: Set[Any], key_name: str):
-        affected = []
-        not_affected = []
-        for link in links:
-            if link[key_name] in artifact_ids:
-                affected.append(link)
-            else:
-                not_affected.append(link)
-        return affected, not_affected
-
-    @staticmethod
-    def get_top_parent(artifact_id: str, potential_parents: List[str], embeddings_manager: EmbeddingsManager):
-
+    def get_top_parent(artifact_id: str, potential_parents: List[str], embeddings_manager: EmbeddingsManager, min_score: float):
+        """
+        Returns the most similar parent to the given artifact.
+        :param artifact_id: ID of artifact to calculate similarity between.
+        :param potential_parents: IDs of potential parents.
+        :param embeddings_manager: Contains the artifact embeddings.
+        :param min_score: The minimum similarity score to allow.
+        :return: The most similar parent, if its score reaches a minimum threshold.
+        """
         sorted_parents, sorted_scores = EmbeddingSorter.sort([artifact_id], potential_parents,
                                                              embedding_manager=embeddings_manager,
                                                              return_scores=True)[artifact_id]
         top_parent, top_parent_score = sorted_parents[0], sorted_scores[0]
-        if top_parent_score < FIRST_PASS_LINK_THRESHOLD:
+        if top_parent_score < min_score:
             return None
         return top_parent

@@ -38,6 +38,12 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.original_dataset = original_dataset_complete
 
     def get_seed_artifacts(self, args: HGenArgs, state: HGenState) -> List[Artifact]:
+        """
+        Creates artifacts from seeds defined by HGEN configuration.
+        :param args: Args defining where to find the seeds.
+        :param state: State containing seed contents.
+        :return: The seeds as artifacts.
+        """
         if args.seed_project_summary_section:
             section_id = args.seed_project_summary_section
             assert section_id in args.dataset.project_summary, f"{section_id} not in {list(args.dataset.project_summary.keys())}"

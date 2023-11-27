@@ -5,9 +5,7 @@ from tgen.common.util.llm_response_util import LLMResponseUtil
 
 
 class TestAIManager:
-    def __init__(self,
-                 library: str,
-                 response_formatter: Callable):
+    def __init__(self, library: str, response_formatter: Callable, require_used_all_responses: bool = True):
         self.library = library
         self._responses = []
         self.response_formatter = response_formatter
@@ -16,6 +14,7 @@ class TestAIManager:
         self.end_index = 0
         self.handlers = []
         self.mock_calls = 0
+        self.require_used_all_responses = require_used_all_responses
 
     def __call__(self, *args, **kwargs) -> List[str]:
         prompts_global = self.get_prompts(kwargs)
@@ -124,3 +123,10 @@ class TestAIManager:
             return [m["content"] for m in kwargs["messages"]]
         elif self.library == "anthropic":
             return [kwargs["prompt"]]
+
+    def on_test_end(self) -> None:
+        n_used = self.start_index
+        n_expected = len(self._responses)
+        if self.require_used_all_responses:
+            response_txt = NEW_LINE.join(self._responses)
+            assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses.{response_txt}"

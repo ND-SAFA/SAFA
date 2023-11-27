@@ -6,6 +6,7 @@ from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.dict_util import DictUtil
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -39,6 +40,9 @@ class HGenDatasetExporter:
         exporter = HGenDatasetExporter(args, state)
         exporter.add_content()
         trace_dataset = exporter.get_trace_dataset()
+        trace_dataset.trace_df = TraceDatasetCreator.generate_negative_links(layer_df=trace_dataset.layer_df,
+                                                                             trace_df=trace_dataset.trace_df,
+                                                                             artifact_df=trace_dataset.artifact_df)
         return trace_dataset
 
     def add_content(self) -> None:
@@ -62,9 +66,21 @@ class HGenDatasetExporter:
             self.add_source_artifacts()
         else:
             original_dataset = self.args.dataset
-            self._artifact_data_frames.append(original_dataset.artifact_df)
+            self._artifact_data_frames.append(self.get_original_artifacts())
             self._trace_data_frames.append(original_dataset.trace_df)
             self._layer_data_frames.append(original_dataset.layer_df)
+
+    def get_original_artifacts(self):
+        """
+        Gathers the unique artifacts from all data frames possibly containing source artifacts.
+        :return: Artifact data frame containing only unique artifacts.
+        """
+        datasets = [self.args.dataset.artifact_df, self.state.source_dataset.artifact_df]
+        artifact_map = {}
+        for dataset_artifact_df in datasets:
+            dataset_artifact_map = {a[ArtifactKeys.ID]: a for a in dataset_artifact_df.to_artifacts()}
+            artifact_map.update(dataset_artifact_map)
+        return ArtifactDataFrame(artifact_map.values())
 
     def add_source_artifacts(self) -> None:
         """

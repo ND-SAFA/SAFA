@@ -50,8 +50,7 @@ class ClusteringTestUtil:
         :return:  Clustering args.
         """
         artifact_bodies = list(ClusteringTestUtil.DEFAULT_ARTIFACTS.values())
-        return ClusteringTestUtil.create_clustering_args(artifact_bodies, cluster_max_size=ClusteringTestUtil.DEFAULT_CLUSTER_MAX_SIZE,
-                                                         **kwargs)
+        return ClusteringTestUtil.create_clustering_args(artifact_bodies, **kwargs)
 
     @staticmethod
     def create_clustering_args(artifact_bodies: List[str], artifact_type: str = DEFAULT_ARTIFACT_TYPE,
@@ -70,6 +69,7 @@ class ClusteringTestUtil:
         prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=trace_dataset_creator)
 
         args = ClusteringArgs(dataset_creator=prompt_dataset_creator, embedding_model=embedding_model,
+                              cluster_max_size=ClusteringTestUtil.DEFAULT_CLUSTER_MAX_SIZE,
                               cluster_methods=DEFAULT_TESTING_CLUSTERING_METHODS, **kwargs)
         return args
 

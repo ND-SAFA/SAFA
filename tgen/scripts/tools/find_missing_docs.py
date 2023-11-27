@@ -5,6 +5,7 @@ from _ast import AST, ClassDef, FunctionDef, arg
 from typing import List
 
 from dotenv import load_dotenv
+from mccabe import get_module_complexity
 
 load_dotenv()
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -17,6 +18,7 @@ NodeType = AST
 EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
 DIRECTORY_PATHS = [os.path.join(ROOT_PATH, "tgen")]
 IGNORED_PARAM_NAMES = ["self", "cls", "_"]
+DEFAULT_COMPLEXITY_THRESHOLD = 7
 
 
 class DocNode:
@@ -224,5 +226,16 @@ def get_link(file_path: str, line_number):
     return display_path
 
 
+def print_complex_functions(threshold: int = DEFAULT_COMPLEXITY_THRESHOLD):
+    """
+    Prints the complexity of functions exceed complexity threshold.
+    :param threshold: The threshold of the complexity to filter by.
+    :return: None.
+    """
+    files = [f for directory_path in DIRECTORY_PATHS for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
+    for file in files:
+        get_module_complexity(file, threshold=threshold)
+
+
 if __name__ == "__main__":
-    print_missing_headers(throw_error=True)
+    print_complex_functions()

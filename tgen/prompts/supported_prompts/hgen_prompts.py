@@ -48,6 +48,7 @@ GENERATION_PROMPT = Prompt("You are an engineer working on a software system and
 SUMMARY_INSTRUCTIONS = "Using the {source_type}, write a comprehensive summary of this system focusing on the technical details " \
                        "and design aspects needed to understand the functionality. " \
                        "In your summary, consider the following questions as guidelines to help extract useful information: "
+
 GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("Identify the main features and functionality provided by the {source_type} and system summary. "),
     QuestionPrompt("Then, reverse engineer a set of {target_type} "
@@ -66,15 +67,22 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     enumeration_chars=["-"])
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("The primary objective is to generalize and abstract the functionality represented across the {source_type} "
-                   "into a minimal set ({n_targets}) of overarching {target_type}s. "
-                   "The {target_type}s should group and consolidate common functionality from multiple {source_type}s. "),
-    QuestionPrompt("The {target_type}s should focus on the what the functionality achieves in `{source_type}`. "
-                   "You can use the `Overview of System` to understand the project."),
-    QuestionPrompt("Make sure each {target_type} is detailed and stays focused on a single, clear purpose. "
-                   "Their should be enough details to guide the implementation of the {target_type}."),
+    Prompt(
+        "First, describe the unique functionality of the {source_type}(s) within the system.",
+        response_manager=PromptResponseManager(response_tag="notes")
+    ),
+    QuestionPrompt(
+        "For your next task, the primary objective is to create a minimal set ({n_targets}) of detailed {target_type}s "
+        "specifying the functionality achieved by the {source_type}s."
+    ),
+    QuestionPrompt(
+        "The {target_type}s should generalize the important functionality into {n_targets} {target_type}(s). "
+        "Each {target_type} should be detailed and focused on a single, clear purpose. "
+        "Their should be enough details to guide the implementation of the {target_type}. "
+        "Use the `Overview of System` to understand the greater context of the system containing the {source_type}s."
+    ),
     QuestionPrompt("{description} "),
-    QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}."),
+    QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}.")
 ], enumeration_chars=["-"])
 
 REFINE_PROMPT = Prompt("You are an engineer that is an expert on a software system and your goal is to refine "

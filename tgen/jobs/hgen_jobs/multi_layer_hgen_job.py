@@ -36,9 +36,16 @@ class MultiLayerHGenJob(AbstractJob):
         Runs all the hgen jobs, slowly progressing up the hierarchy
         :return: The final dataset created by the top level hgen job
         """
+        add_seeds_as_artifacts = self.starting_hgen_job.hgen_args.add_seeds_as_artifacts
+        self.starting_hgen_job.hgen_args.add_seeds_as_artifacts = False  # only adds seeds if is last job.
+
         current_hgen_job = self.starting_hgen_job
         current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
+
+        last_index = len(self.target_types) - 1
         for i, next_target_type in enumerate(self.target_types):
+            if i == last_index:
+                current_hgen_job.hgen_args.add_seeds_as_artifacts = add_seeds_as_artifacts
             res = current_hgen_job.run()
             if res.status != Status.SUCCESS:
                 raise Exception(res.body)
@@ -57,9 +64,11 @@ class MultiLayerHGenJob(AbstractJob):
         current_state: HGenState = current_hgen_job.hgen.state
         generated_dataset = current_state.final_dataset
         project_summary = generated_dataset.project_summary
-        project_summary.combine_summaries(current_state.all_artifacts_dataset.project_summary)
+        if project_summary:
+            project_summary.combine_summaries(current_state.all_artifacts_dataset.project_summary)
         export_dir = os.path.dirname(current_state.export_dir)
-        new_params = DataclassUtil.convert_to_dict(current_args, source_layer_id=current_args.target_type,
+        new_params = DataclassUtil.convert_to_dict(current_args,
+                                                   source_layer_ids=current_args.target_type,
                                                    export_dir=export_dir,
                                                    source_type=current_args.target_type,
                                                    target_type=next_target_type,

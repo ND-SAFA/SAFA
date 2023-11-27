@@ -2,20 +2,21 @@ import uuid
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
-from tgen.common.constants.hgen_constants import DEFAULT_BRANCHING_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
-from tgen.common.util.file_util import FileUtil
+from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
+from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.models.tokens.token_calculator import TokenCalculator
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -41,18 +42,22 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         dataset = state.cluster_dataset if state.cluster_dataset is not None else state.source_dataset
 
+        cluster2artifacts = state.get_cluster2artifacts()
         prompt_builder = HGenUtil.get_prompt_builder_for_generation(args, task_prompt,
                                                                     combine_summary_and_task_prompts=True,
-                                                                    id_to_context_artifacts=state.id_to_cluster_artifacts,
+                                                                    id_to_context_artifacts=cluster2artifacts,
                                                                     use_summary=False)
-        if state.id_to_cluster_artifacts:
+        if state.cluster2artifacts:
             n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
             prompt_builder.format_variables = {"n_targets": n_targets}
-        if state.project_summary:
-            overview_of_system_prompt = Prompt(f"{PromptUtil.as_markdown_header('Overview of System:')}"
-                                               f"{NEW_LINE}{state.project_summary.to_string()}", allow_formatting=False)
-            prompt_builder.add_prompt(overview_of_system_prompt, 1)
 
+        project_summary = state.original_dataset.project_summary
+        if project_summary:
+            project_overview = project_summary.to_string([PS_OVERVIEW_TITLE])
+            overview_of_system_prompt = Prompt(f"\n{PromptUtil.as_markdown_header('Overview of System:')}"
+                                               f"{NEW_LINE}{project_overview}", allow_formatting=False)
+            prompt_builder.add_prompt(overview_of_system_prompt, 1)
+        # TODO: Check is project summary
         generation_predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
                                                           dataset=dataset, response_prompt_ids={task_prompt.id},
                                                           tags_for_response={generated_artifacts_tag}, return_first=False,
@@ -71,19 +76,19 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current HGEN state
         :return: A list of the expected number of target artifacts for each cluster
         """
-        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(state.id_to_cluster_artifacts[i]))
-                     for i in artifact_ids]
+        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(artifact_ids))
+                     for c_id, artifact_ids in state.cluster2artifacts.items()]
         return n_targets
 
     @staticmethod
-    def _calculate_proportion_of_artifacts(n_artifacts: int, branching_factor: int = DEFAULT_BRANCHING_FACTOR) -> int:
+    def _calculate_proportion_of_artifacts(n_artifacts: int, reduction_factor: float = DEFAULT_REDUCTION_FACTOR) -> int:
         """
         Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
         :param n_artifacts: Total number of artifacts
-        :param branching_factor: Determines the proportion (e.g. branching_factor = 2 would be 50% of artifacts)
+        :param reduction_factor: Determines the proportion of generated artifacts = n_artifacts * reduction_factor
         :return: The number of artifacts equal to a proportion of the total
         """
-        return max(round(n_artifacts * (1 / branching_factor)), 1)
+        return max(round(n_artifacts * reduction_factor), 1)
 
     @staticmethod
     def _calculate_proportion_of_tokens(artifacts: List, args: HGenArgs,
@@ -114,9 +119,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
         """
         generated_artifact_to_predicted_sources = {}
-        cluster2generations = {cluster_id: [] for cluster_id in
-                               state.cluster_dataset.artifact_df.index} if state.cluster_dataset else {}
-        cluster_ids = list(cluster2generations.keys()) if state.cluster_dataset is not None else []
+        cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
+        cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
         for i, pred in enumerate(generation_predictions):
             for p in pred:
                 generation = p[target_tag_id][0]
@@ -133,7 +137,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state of the hierarchy generator
         :return: The prompt used for the primary creation task
         """
-        task_prompt = SupportedPrompts.HGEN_GENERATION_QUESTIONNAIRE.value if not state.id_to_cluster_artifacts \
+        task_prompt = SupportedPrompts.HGEN_GENERATION_QUESTIONNAIRE.value if not state.cluster2artifacts \
             else SupportedPrompts.HGEN_CLUSTERING_QUESTIONNAIRE.value
         task_prompt.id = self.TASK_PROMPT_ID
         target_type_tag, target_tag_id = HGenUtil.convert_spaces_to_dashes(args.target_type), "target"

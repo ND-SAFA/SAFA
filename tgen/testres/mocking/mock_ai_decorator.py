@@ -1,7 +1,7 @@
 from typing import Callable, List, Union
 from unittest.mock import patch
 
-from tgen.testres.mocking.mocking_config import library_mock_map, library_formatter_map
+from tgen.testres.mocking.mocking_config import library_formatter_map, library_mock_map
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
@@ -25,9 +25,7 @@ def mock_ai(libraries: Union[str, List[str]], func=None):
             self, *local_args = wrapper_args
             res = test_func(self, *local_managers, *test_func_args, *local_args, **test_func_kwargs, **wrapper_kwargs)
             for ai_manager in library_ai_managers:
-                n_used = ai_manager.start_index
-                n_expected = len(ai_manager._responses)
-                assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses."
+                ai_manager.on_test_end()
             return res
 
         function_name = test_func.__name__ if hasattr(test_func, "__name__") else func.__name__

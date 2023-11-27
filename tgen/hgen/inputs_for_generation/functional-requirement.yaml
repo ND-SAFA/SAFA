@@ -9,8 +9,8 @@ example:
   shall allow users to add items to their shopping cart, view the contents of the
   cart, and modify the quantity of items in the cart before proceeding to checkout."'
 format:
-- '"The system shall [action verb] [object] to [purpose or outcome], [additional details
-  or conditions]."'
+- '"The system shall [action verb] [object] to [purpose or outcome].
+ [additional details or conditions]"'
 questions:
 - - What are the main functions or methods in the code?
   - What are the inputs and outputs of these main functions?

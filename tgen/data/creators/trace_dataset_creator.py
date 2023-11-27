@@ -1,4 +1,5 @@
 from collections import Counter
+from trace import Trace
 from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
@@ -178,11 +179,32 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         return self.linked_artifact_ids
 
     @staticmethod
-    def generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
+    def create_trace_df_from_predictions(predictions: List[Trace],
+                                         artifact_df: ArtifactDataFrame,
+                                         layer_df: LayerDataFrame) -> TraceDataFrame:
+        """
+        Creates a dataframe of traces including the new trace links between the original lower-level artifacts
+        and the newly generated upper-level artifacts
+        :param predictions: The predictions to include in the trace data frame.
+        :param artifact_df: The dataframe containing artifacts referenced.
+        :param layer_df: The dataframe containing the layer mapping between artifacts
+        :return: The dataframe containing new and old trace links
+        """
+        traces = {}
+        if predictions:
+            for link in predictions:
+                DataFrameUtil.append(traces, link)
+        new_trace_df = TraceDatasetCreator.generate_negative_links(layer_df=layer_df,
+                                                                   artifact_df=artifact_df,
+                                                                   trace_df=TraceDataFrame(traces))
+        return new_trace_df
+
+    @staticmethod
+    def generate_negative_links(layer_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
                                 trace_df: TraceDataFrame = None, n_threads: int = 10) -> TraceDataFrame:
         """
         Compares source and target artifacts for each entry in layer mapping and generates negative links between them.
-        :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.
+        :param layer_df: DataFrame containing the comparisons between artifact types present in project.
         :param artifact_df: DataFrame containing information about the artifacts in the project.
         :param trace_df: DataFrame containing true links present in project.
         :param n_threads: The maximum number of threads to use for pre-processing.
@@ -192,7 +214,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             trace_df = TraceDataFrame()
         negative_links: Dict[int, Dict[TraceKeys, Any]] = {}
 
-        for _, row in layer_mapping_df.itertuples():
+        for _, row in layer_df.itertuples():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
 

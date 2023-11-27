@@ -1,5 +1,8 @@
-from typing import List, Set, Tuple, Dict
+from typing import Dict, List, Set, Tuple
 
+import numpy as np
+
+from tgen.common.constants.hgen_constants import DUPLICATE_THRESHOLD_PERCENTILE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
@@ -12,7 +15,7 @@ class DuplicateDetector:
         """
         Initializes detector with access to embeddings from manager.
         :param embeddings_manager: Contains the embeddings for the artifacts to be compared.
-        :param duplicate_similarity_threshold: The similarity threshold for when two artifacts are too similar.
+        :param duplicate_similarity_threshold: The similarity quantile for when two artifacts are too similar.
         """
         self.embeddings_manager = embeddings_manager
         self.duplicate_similarity_threshold = duplicate_similarity_threshold
@@ -23,13 +26,30 @@ class DuplicateDetector:
         :param artifact_ids: The artifacts ids to compare.
         :return: List of duplicate artifact ids and all identified duplicate pairs.
         """
+        if len(artifact_ids) <= 1:
+            return set(), {}
         artifact_embeddings = self.embeddings_manager.get_embeddings(artifact_ids)
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
-        similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, self.duplicate_similarity_threshold)
+        duplicate_similarity_threshold = self.calculate_duplicate_similarity_threshold(similarity_matrix)
+        similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, duplicate_similarity_threshold)
         dup_counter, dup_pairs = DuplicateDetector.count_duplicates(artifact_ids, similar_indices)
         dup_map = self.create_duplicate_map(dup_pairs)
         duplicate_artifact_ids = self.find_most_duplicated_artifacts(dup_counter, dup_map)
         return duplicate_artifact_ids, dup_map
+
+    def calculate_duplicate_similarity_threshold(self, similarity_matrix: np.array) -> float:
+        """
+        Calculates the duplicate similarity threshold based on the number of artifacts present.
+        :param similarity_matrix: The similarity matrix between artifacts being processed.
+        :return: The threshold of whether to consider two artifacts as duplicates.
+        """
+        has_single_score = similarity_matrix.shape[0] <= 2 and similarity_matrix.shape[1] <= 2
+        duplicate_similarity_threshold = self.duplicate_similarity_threshold
+        if not has_single_score:  # do not use percentile is only single unique
+            percentile_similarity_threshold = NpUtil.get_similarity_matrix_percentile(similarity_matrix,
+                                                                                      DUPLICATE_THRESHOLD_PERCENTILE)
+            duplicate_similarity_threshold = max(percentile_similarity_threshold, duplicate_similarity_threshold)
+        return duplicate_similarity_threshold
 
     @staticmethod
     def find_most_duplicated_artifacts(dup_counter: CountMap, dup_map: Dict[str, Set[str]]) -> Set[str]:

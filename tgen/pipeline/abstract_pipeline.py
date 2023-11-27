@@ -1,10 +1,10 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Generic, List, Optional, Type, Tuple, Set
+from typing import Generic, List, Optional, Set, Tuple, Type, TypeVar
 
 from tgen.common.constants import environment_constants
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.constants.pipeline_constants import DEFAULT_INTERACTIVE_STATE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.file_util import FileUtil
@@ -114,8 +114,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         step_ran = step.run(self.args, self.state, re_run=re_run)
         if step.get_step_name() == self.resume_interactive_mode_step:
-            self.args.interactive_mode = True
-            environment_constants.IS_INTERACTIVE = True
+            self.args.interactive_mode = DEFAULT_INTERACTIVE_STATE
+            environment_constants.IS_INTERACTIVE = DEFAULT_INTERACTIVE_STATE
         if step_ran and self.args.interactive_mode:
             return self._run_interactive_mode()
         return False

@@ -1,4 +1,5 @@
-from typing import Dict, List
+from typing import Dict, List, Union
+from unittest import TestCase
 
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -123,3 +124,19 @@ class ClusteringTestUtil:
 
         c_intersection = c1_set.intersection(c2_set)
         return len(c_intersection) == len(c1) == len(c2)
+
+    @staticmethod
+    def verify_clusters(test: TestCase, clusters: ClusterMapType, expected_children: Union[List[List[str]], dict]):
+        """
+        Verifies that the clusters match those given.
+        :param test: The test used to make the verifications.
+        :param clusters: The clusters to verify.
+        :param expected_children: The ground truth clusters.
+        :return: None
+        """
+        if isinstance(expected_children, list):
+            expected_children = {i: c for i, c in enumerate(expected_children)}
+        for resulting_cluster, expected_cluster in zip(clusters.values(), expected_children.values()):
+            test.assertEqual(len(expected_cluster), len(resulting_cluster))
+            for c in expected_cluster:
+                test.assertIn(c, resulting_cluster)

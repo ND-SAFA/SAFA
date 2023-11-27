@@ -1,8 +1,8 @@
 import os
 import re
-from typing import Any, Dict, List, Tuple, Type, Optional
+from typing import Any, Dict, List, Optional, Tuple, Type
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, NONE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
@@ -14,6 +14,8 @@ from tgen.scripts.constants import MISSING_DEFINITION_ERROR, RQ_INQUIRER_CONFIRM
 from tgen.scripts.toolset.confirm import confirm
 from tgen.scripts.toolset.selector import inquirer_value
 
+OPTIONAL_KEY = "_OPTIONAL"
+
 
 class RQVariable:
 
@@ -23,6 +25,10 @@ class RQVariable:
         :param variable_definition: The variable definition containing name and optionally the type to cast into.
         """
         self.definition = variable_definition
+        is_optional = OPTIONAL_KEY in variable_definition
+        self.is_required = is_optional
+        if is_optional:
+            variable_definition = variable_definition.replace(OPTIONAL_KEY, EMPTY_STRING)
         self.name, self.type_constructor, self.type_class = RQVariable.get_variable_type(variable_definition)
         self.__value = None
         self.__default_value = None
@@ -74,7 +80,7 @@ class RQVariable:
         :param default_value: Default value to set.
         :return: None
         """
-        typed_default_value = self.type_constructor(default_value)
+        typed_default_value = self.type_constructor(default_value) if default_value is not None else default_value
         self.__default_value = typed_default_value
 
     def set_value(self, value: Any) -> None:
@@ -164,7 +170,8 @@ class RQDefinition:
             default_values = {}
         if use_os_values:
             for env_key, env_value in os.environ.items():
-                default_values[env_key] = os.path.expanduser(env_value)
+                env_value = None if env_value.lower() == NONE else os.path.expanduser(env_value)
+                default_values[env_key] = env_value
 
         for variable in self.variables:
             if variable.name not in default_values:

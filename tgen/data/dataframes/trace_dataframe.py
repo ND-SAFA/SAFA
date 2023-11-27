@@ -176,3 +176,13 @@ class TraceDataFrame(AbstractProjectDataFrame):
         orphans = {trace[artifact_role] for i, trace in self.itertuples()
                    if trace[artifact_role] not in linked_artifacts}
         return orphans
+
+    def get_parents(self, artifact_id: str) -> List[str]:
+        """
+        Returns the parent artifact ids of given artifact.
+        :param artifact_id: Id of artifact to find parents for.
+        :return: Parent ids of artifact.
+        """
+        query_df = self[(self[TraceKeys.child_label()] == artifact_id) & (~self[TraceKeys.SCORE.value].isna())]
+        parent_ids = list(query_df[TraceKeys.TARGET.value])
+        return parent_ids

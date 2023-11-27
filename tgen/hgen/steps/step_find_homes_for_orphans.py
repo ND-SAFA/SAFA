@@ -38,7 +38,7 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param trace_selections:  List of selected trace links.
         :return: None. Selections are added to list.
         """
-        all_children_ids = list(state.selected_artifacts_dataset.artifact_df.get_type(args.source_layer_id).index)
+        all_children_ids = list(state.selected_artifacts_dataset.artifact_df.get_type(args.source_layer_ids).index)
         all_parent_ids = list(state.selected_artifacts_dataset.artifact_df.get_type(args.target_type).index)
 
         child2predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label())

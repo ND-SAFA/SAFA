@@ -128,5 +128,5 @@ class TestAIManager:
         n_used = self.start_index
         n_expected = len(self._responses)
         if self.require_used_all_responses:
-            response_txt = NEW_LINE.join(self._responses)
+            response_txt = NEW_LINE.join([str(r) for r in self._responses])
             assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses.{response_txt}"

@@ -3,7 +3,6 @@ from typing import List
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.pipeline_util import PipelineUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -50,9 +49,8 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             seed_contents = args.dataset.project_summary[section_id][SummarySectionKeys.CHUNKS]
             seed_artifact_type = section_id
         elif args.seed_layer_id:
-            seed_artifacts = state.original_dataset.artifact_df.get_type(args.seed_layer_id).to_artifacts()
-            seed_contents = [a[ArtifactKeys.CONTENT] for a in seed_artifacts]
-            seed_artifact_type = args.seed_layer_id
+            # Artifacts already present in data frame.
+            return []
         else:
             return []
 

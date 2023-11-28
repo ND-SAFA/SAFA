@@ -34,7 +34,13 @@ Tags
 RANKING_PARENT_TAG = "parent-artifact"
 RANKING_ARTIFACT_TAG = "artifact-answers"
 RANKING_PARENT_SUMMARY_TAG = "parent-summary"
+SUB_SYSTEMS_TAG = "sub-systems"
+ENTITIES_TAG = "entities"
+DERIVATION_TAG = "derivation"
 JUSTIFICATION_TAG = "justification"
+CHANGE_IMPACT_TAG = "change-impact"
+FUNCTIONALITY_TAG = "functionality"
+
 RANKING_ID_TAG = "id"
 RANKING_EXPLANATION_TAG = "explanation"
 RANKING_SCORE_TAG = "score"

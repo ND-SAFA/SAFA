@@ -1,9 +1,11 @@
-from typing import List, Tuple, Sized, Iterable
+from typing import Iterable, List, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy.stats import percentileofscore
 from tqdm import tqdm
+
+from tgen.common.constants.logging_constants import TQDM_NCOLS
 
 
 class ListUtil:

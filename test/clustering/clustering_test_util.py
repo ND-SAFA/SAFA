@@ -19,6 +19,7 @@ class ClusteringTestUtil:
     """
     Provides utility testing methods for clustering tests.
     """
+    DEFAULT_CLUSTER_MAX_SIZE = 2
     DEFAULT_ARTIFACT_TYPE = "A"
     DEFAULT_ARTIFACTS = {
         "A": "I have a very fluffy dog.",
@@ -68,6 +69,7 @@ class ClusteringTestUtil:
         prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=trace_dataset_creator)
 
         args = ClusteringArgs(dataset_creator=prompt_dataset_creator, embedding_model=embedding_model,
+                              cluster_max_size=ClusteringTestUtil.DEFAULT_CLUSTER_MAX_SIZE,
                               cluster_methods=DEFAULT_TESTING_CLUSTERING_METHODS, **kwargs)
         return args
 

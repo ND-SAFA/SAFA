@@ -20,7 +20,7 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :return: None
         """
         seeds = args.cluster_seeds
-        artifact_ids = list(args.dataset.artifact_df.index)
+        artifact_ids = args.get_artifact_ids()
         embedding_manager: EmbeddingsManager = state.embedding_manager
         if len(artifact_ids) == 0:
             raise Exception("Cannot perform seed clustering with no artifacts.")
@@ -29,7 +29,7 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             state.seed2artifacts = seed2artifacts  # used to link seeds to source artifacts later on.
             artifact_batches = [artifacts for seed, artifacts in seed2artifacts.items() if len(artifacts) > 0]
         else:
-            artifact_batches = args.subset_ids if args.subset_ids else [artifact_ids]
+            artifact_batches = [artifact_ids]
         state.artifact_batches = artifact_batches
 
     @staticmethod

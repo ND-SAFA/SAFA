@@ -31,7 +31,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
 
         if not args.generate_trace_links:
-            state.trace_predictions = self._create_traces_from_generation_predictions(state.id_to_related_children)
+            state.trace_predictions = self._create_traces_from_references(state.id_to_related_children)
             state.selected_predictions = state.trace_predictions
             return
 
@@ -128,7 +128,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return selected_predictions
 
     @staticmethod
-    def _create_traces_from_generation_predictions(id_to_related_children) -> List[EnumDict]:
+    def _create_traces_from_references(id_to_related_children) -> List[EnumDict]:
         """
         Creates traces using the related sources from the previous step
         :param id_to_related_children: Dictionary mapping new artifact id to a list of related children

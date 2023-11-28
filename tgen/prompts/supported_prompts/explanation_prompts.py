@@ -1,7 +1,11 @@
-from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_MAX_SCORE, RANKING_MIN_SCORE, JUSTIFICATION_TAG
+from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATION_TAG, ENTITIES_TAG, FUNCTIONALITY_TAG, \
+    JUSTIFICATION_TAG, \
+    PROJECT_SUMMARY_HEADER, \
+    RANKING_MAX_SCORE, \
+    RANKING_MIN_SCORE, \
+    SUB_SYSTEMS_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
-
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -29,7 +33,7 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                                   "was originally scored to be {orig_score} on a scale from "
                                                                   f"{RANKING_MIN_SCORE}-{RANKING_MAX_SCORE} "
                                                                   "where a higher score represents a stronger relationship. "
-                                                                  "Use this to guide your answers. " 
+                                                                  "Use this to guide your answers. "
                                                                   "Importantly, provide all answers as complete sentences "
                                                                   "that would be able to "
                                                                   "be understood without seeing the question. "
@@ -39,28 +43,28 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                          QuestionPrompt("What sub-systems and components do the artifacts belong to, "
                                                                         "impact or reference? Are any of the sub-systems/components "
                                                                         "shared between the two artifacts?",
-                                                                        PromptResponseManager(response_tag="sub-systems")),
+                                                                        PromptResponseManager(response_tag=SUB_SYSTEMS_TAG)),
                                                          QuestionPrompt("What inputs, outputs, entities or technical details "
                                                                         "are specified in each artifact? Do the artifacts "
                                                                         "reference any of the same ones?",
-                                                                        PromptResponseManager(response_tag="entities")),
+                                                                        PromptResponseManager(response_tag=ENTITIES_TAG)),
                                                          QuestionPrompt("What are the primary functions or purposes "
                                                                         "of each artifact? Could the functionality of one "
                                                                         "artifact impact the other? Does one artifact reference "
                                                                         "functionality that is fulfilled in the other?",
-                                                                        PromptResponseManager(response_tag="functionality")),
+                                                                        PromptResponseManager(response_tag=FUNCTIONALITY_TAG)),
                                                          QuestionPrompt("Could one artifact be derived from, "
                                                                         "decomposed from, or be an implementation of the other? "
                                                                         "This means that it was created by extracting, "
                                                                         "breaking down, or implementing a portion of the "
                                                                         "other artifact, generally resulting in "
                                                                         "a smaller, more detailed component at a lower-level. ",
-                                                                        PromptResponseManager(response_tag="derivation")),
+                                                                        PromptResponseManager(response_tag=DERIVATION_TAG)),
                                                          QuestionPrompt("If one artifact changed, "
                                                                         "would it impact or necessitate changes in the other? "
                                                                         "Could a change in one create a misalignment with the "
                                                                         "capabilities/functionality described in the other?",
-                                                                        PromptResponseManager(response_tag="change-impact")),
+                                                                        PromptResponseManager(response_tag=CHANGE_IMPACT_TAG)),
                                                          SCORE_INSTRUCTIONS,
                                                          QuestionPrompt("Using your previous responses and both scores given, "
                                                                         "write a brief explanation that accesses the strength of the "

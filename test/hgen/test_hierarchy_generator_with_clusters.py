@@ -63,8 +63,8 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                                               anthropic_ai_manager: TestAIManager):
         anthropic_ai_manager.mock_summarization()
         GenerateArtifactContentStep().run(args, state)
-        self.assertEqual(len(state.generation_predictions), len(HGenTestConstants.user_stories))
-        for i, us in enumerate(state.generation_predictions.keys()):
+        self.assertEqual(len(state.generations2sources), len(HGenTestConstants.user_stories))
+        for i, us in enumerate(state.generations2sources.keys()):
             self.assertEqual(us, HGenTestConstants.user_stories[i])
 
     @mock.patch.object(EmbeddingUtil, "calculate_similarities")
@@ -154,7 +154,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         user_story_responses = [PromptUtil.create_xml("user-story", us) for i, us in enumerate(HGenTestConstants.user_stories)]
 
         responses = [prompt_res_creator(user_story_responses[i]) for i in range(len(user_story_responses))]
-        names, expected_names, name_responses = get_name_responses(state.generation_predictions)
+        names, expected_names, name_responses = get_name_responses(state.generations2sources)
         responses.extend(name_responses)
         anthropic_ai_manager.add_responses(responses)
         anthropic_ai_manager.mock_summarization()
@@ -163,9 +163,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
     def _reset_cluster_artifacts_for_tracing_test(self, n_artifacts_last_cluster, n_artifacts_per_cluster, state):
         # makes it easier to test tracing
         added_artifacts_to_last_cluster = n_artifacts_last_cluster - n_artifacts_per_cluster
-        last_cluster_artifacts = state.cluster2artifacts[len(state.generation_predictions) - 1]
-        state.cluster2artifacts[len(state.generation_predictions) - 1] = last_cluster_artifacts[
-                                                                         :-added_artifacts_to_last_cluster]
+        last_cluster_artifacts = state.cluster2artifacts[len(state.generations2sources) - 1]
+        state.cluster2artifacts[len(state.generations2sources) - 1] = last_cluster_artifacts[
+                                                                      :-added_artifacts_to_last_cluster]
 
     def _setup_state_post_clustering_step(self, state):
         # makes it easier to test tracing + generation

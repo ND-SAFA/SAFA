@@ -29,14 +29,14 @@ class HGenState(State):
     Optional Step 3 - Break project into parts and generate for each part
     """
     cluster2artifacts: dict = None  # maps cluster id to the list of artifacts in that cluster
-    seed2artifacts: ClusterIdType = None  # If given seeds, maps seeds to cluster artifacts.
+    seed2artifact_ids: ClusterIdType = None  # If given seeds, maps seeds to cluster artifacts.
     cluster_dataset: PromptDataset = None  # contains prompt dataset with just the artifact df of the clusters.
     embedding_manager: EmbeddingsManager = None  # allows embeddings to be reused
 
     """
     Step 4 - Artifact generation
     """
-    generation_predictions: Dict[str, Set[str]] = None  # dictionary mapping generated content to a list of related source ids
+    generations2sources: Dict[str, Set[str]] = None  # dictionary mapping generated content to a list of related source ids
     cluster2generation: Dict[Any, List[str]] = None  # Maps cluster id to the generation that was produced for that cluster
     n_generations: int = 0  # number of runs of artifact generation
 

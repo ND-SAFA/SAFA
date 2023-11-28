@@ -9,7 +9,7 @@ root_path = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(root_path)
 
 from tgen.common.constants import environment_constants
-from tgen.scripts.tools.find_missing_docs import print_missing_headers
+from tgen.scripts.tools.find_missing_docs import print_complex_functions, print_missing_headers
 from tgen.scripts.tools.rq_tools import RQ_TOOLS
 from tgen.scripts.toolset.tool import Tool
 from tgen.scripts.toolset.selector import inquirer_selection
@@ -55,7 +55,7 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
 TOOLS = {
     "Run RQ": RQ_TOOLS,
     "Data": S3_TOOLS,
-    "Dev-Ops": [print_missing_headers]
+    "Dev-Ops": [print_missing_headers, print_complex_functions]
 }
 
 if __name__ == "__main__":

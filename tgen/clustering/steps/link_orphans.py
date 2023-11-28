@@ -103,8 +103,9 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             within_cluster_size = len(cluster) < args.cluster_max_size
             above_minimum_score = cluster_similarity >= MIN_ORPHAN_HOME_SIMILARITY
             not_seen = artifact not in adopted_orphans
-            if args.add_orphans_to_best_home or (
-                    within_similarity_threshold and within_cluster_size and not_seen and above_minimum_score):
+            if args.add_orphans_to_best_home or (within_similarity_threshold and not_seen and above_minimum_score):
+                if not within_cluster_size:
+                    continue
                 cluster.add_artifact(artifact)
                 adopted_orphans.add(artifact)
         return adopted_orphans

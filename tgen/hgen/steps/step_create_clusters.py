@@ -46,7 +46,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         clusters = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)  # converting all keys to str bc pd is stupid
         cluster_state.cluster_artifact_dataset.artifact_df.index = clusters
-        cluster_map = {str(k): v for k, v in cluster_state.final_cluster_map.items()}
+        cluster_map = {str(k): v.artifact_ids for k, v in cluster_state.final_cluster_map.items()}
 
         # Req: Clusters should be added to cluster data frame.
         state.update_total_costs_from_state(cluster_state)

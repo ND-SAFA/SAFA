@@ -3,6 +3,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions
+from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.add_clusters_to_dataset import AddClustersToDataset
@@ -146,7 +147,9 @@ class TestMultiLayerHGenJob(BaseJobTest):
         artifacts = args.dataset.artifact_df.to_artifacts()
         divisor = 3 - self.clustering_calls
         n = math.floor(len(artifacts) / divisor)
-        state.final_cluster_map = {i: [a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]] for i in range(divisor)}
+        state.final_cluster_map = {
+            i: Cluster.from_artifacts([a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]], state.embedding_manager) for i in
+            range(divisor)}
         cluster_dataset = ClusterDatasetCreator(args.dataset, state.final_cluster_map).create()
         state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)
         state.cluster_artifact_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)

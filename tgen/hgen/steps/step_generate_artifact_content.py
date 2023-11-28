@@ -58,13 +58,16 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                f"{NEW_LINE}{project_overview}", allow_formatting=False)
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
         # TODO: Check is project summary
-        generation_predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
-                                                          dataset=dataset, response_prompt_ids={task_prompt.id},
-                                                          tags_for_response={generated_artifacts_tag}, return_first=False,
-                                                          export_path=export_path)
-        state.generation_predictions, state.cluster2generation = self._map_generations_to_predicted_sources(generation_predictions,
-                                                                                                            source_tag_id,
-                                                                                                            target_tag_id, state)
+        generations = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
+                                               dataset=dataset, response_prompt_ids={task_prompt.id},
+                                               tags_for_response={generated_artifacts_tag}, return_first=False,
+                                               export_path=export_path)
+
+        generations2sources, cluster2generation = self._map_generations_to_predicted_sources(generations,
+                                                                                             source_tag_id,
+                                                                                             target_tag_id, state)
+        state.generations2sources = generations2sources
+        state.cluster2generation = cluster2generation
         state.n_generations += 1
 
     @staticmethod
@@ -108,27 +111,27 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return n_artifacts_tokens
 
     @staticmethod
-    def _map_generations_to_predicted_sources(generation_predictions: List, source_tag_id: str, target_tag_id: str,
+    def _map_generations_to_predicted_sources(generations: List, source_tag_id: str, target_tag_id: str,
                                               state: HGenState) -> Tuple[Dict[str, Set[str]], Dict[Any, str]]:
         """
         Creates a mapping of the generated artifact to a list of the predicted links to it and the source artifacts
-        :param generation_predictions: The predictions from the LLM
+        :param generations: The predictions from the LLM
         :param source_tag_id: The id of the predicted sources tag
         :param target_tag_id: The id of the generated target artifact tag
         :param state: The current state of the hierarchy generator
         :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
         """
-        generated_artifact_to_predicted_sources = {}
+        generations2sources = {}
         cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
         cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
-        for i, pred in enumerate(generation_predictions):
-            for p in pred:
-                generation = p[target_tag_id][0]
-                sources = set(p[source_tag_id][0]) if len(p[source_tag_id]) > 0 else set()
-                generated_artifact_to_predicted_sources[generation] = sources
+        for i, sources in enumerate(generations):
+            for source in sources:
+                generation = source[target_tag_id][0]
+                sources = set(source[source_tag_id][0]) if len(source[source_tag_id]) > 0 else set()
+                generations2sources[generation] = sources
                 if cluster_ids:
                     cluster2generations[cluster_ids[i]].append(generation)
-        return generated_artifact_to_predicted_sources, cluster2generations
+        return generations2sources, cluster2generations
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:
         """

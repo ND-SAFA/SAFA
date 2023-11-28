@@ -4,11 +4,11 @@ from typing import Dict, List, Set, Tuple, Union
 
 import pandas as pd
 
-from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE, SPACE
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
@@ -63,7 +63,7 @@ class HGenUtil:
         load_path = FileUtil.add_ext(load_path, FileUtil.YAML_EXT) if load_path else load_path
         if dataset is None:
             predictions = LLMTrainer.predict_from_prompts(llm_manager=llm_manager, prompt_builder=prompt_builder,
-                                                                    save_and_load_path=load_path).predictions
+                                                          save_and_load_path=load_path).predictions
         else:
             dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
             trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
@@ -141,20 +141,20 @@ class HGenUtil:
 
     @staticmethod
     def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs,
-                                                    generation_predictions: Dict[str, Set],
+                                                    generations2sources: Dict[str, Set],
                                                     target_layer_id: str,
                                                     generate_names: bool = True) -> Tuple[ArtifactDataFrame, Dict[str, Set]]:
         """
         Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
         :param hgen_args: The arguments for the hierarchy generation
-        :param generation_predictions: A dictionary mapping generated artifact content to the predicted links
+        :param generations2sources: A dictionary mapping generated artifact content to the predicted links
         :param target_layer_id: The id for the layer with the new generated artifacts
         :param generate_names: If True, generates names for the new artifacts
         :return: The dataframe of generated artifacts and a dictionary mapping the new name to the list of predicted related artifacts
         """
-        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(generation_predictions))],
-                                             ArtifactKeys.CONTENT: list(generation_predictions.keys()),
-                                             ArtifactKeys.LAYER_ID: [target_layer_id for _ in generation_predictions]})
+        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(generations2sources))],
+                                             ArtifactKeys.CONTENT: list(generations2sources.keys()),
+                                             ArtifactKeys.LAYER_ID: [target_layer_id for _ in generations2sources]})
         if generate_names:
             try:
                 use_content_as_names = {i: content
@@ -186,7 +186,7 @@ class HGenUtil:
             except Exception:
                 logger.exception("Unable to generate names for the artifacts")
         name_2_related_children = {name: links for name, links in
-                                   zip(new_artifact_df.index, list(generation_predictions.values()))}
+                                   zip(new_artifact_df.index, list(generations2sources.values()))}
         return new_artifact_df, name_2_related_children
 
     @staticmethod
@@ -199,7 +199,7 @@ class HGenUtil:
         :return: The formatted name with the initials of the target type
         """
         initials = HGenUtil.get_initials(target_type)
-        id_format = f"[{initials}{index+1}]"
+        id_format = f"[{initials}{index + 1}]"
         return f"{id_format} {PromptUtil.strip_new_lines_and_extra_space(name)}"
 
     @staticmethod

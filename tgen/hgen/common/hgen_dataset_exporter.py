@@ -111,7 +111,7 @@ class HGenDatasetExporter:
         :return: None
         """
         seed_id = self.args.get_seed_id()
-        seed_artifact_df = self.state.cluster_dataset.artifact_df.get_type(seed_id)
+        seed_artifact_df = self.state.original_dataset.artifact_df.get_type(seed_id)
         seed2generated = self.create_seed2generated(self.state, generated_trace_df)
 
         # Removing the above...
@@ -133,8 +133,8 @@ class HGenDatasetExporter:
         :return: Map of seed id to set of generated artifacts.
         """
         seed2generated = {}
-        source_artifacts = state.source_dataset.to_artifacts()
-        artifact2seed = {a: seed_id for seed_id, artifacts in state.seed2artifacts.items() for a in artifacts}
+        source_artifacts = state.source_dataset.artifact_df.to_artifacts()
+        artifact2seed = {a_id: seed_id for seed_id, artifact_ids in state.seed2artifact_ids.items() for a_id in artifact_ids}
 
         for source_artifact in tqdm(source_artifacts, ncols=TQDM_NCOLS):
             source_id = source_artifact[ArtifactKeys.ID]
@@ -142,7 +142,8 @@ class HGenDatasetExporter:
             if seed is None:
                 continue
             generated_artifacts = generated_trace_df.get_parents(source_id)
-            DictUtil.set_or_append_item(seed2generated, seed, generated_artifacts, iterable_type=set)
+            for gen_artifact in generated_artifacts:
+                DictUtil.set_or_append_item(seed2generated, seed, gen_artifact, iterable_type=set)
         return seed2generated
 
     @staticmethod

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import List
 
 from tqdm import tqdm
 
@@ -23,24 +23,62 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         batches = state.artifact_batches if state.artifact_batches else [args.get_artifact_ids()]
         global_clusters = {}
         for i, batch_ids in enumerate(batches):
-            batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
-                                                                                state.embedding_manager,
-                                                                                batch_artifact_ids=batch_ids)
-            batch_cluster_map = CreateClustersFromEmbeddings.condense_clusters(args, state, batch_cluster_map, i)
+            batch_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids, prefix=str(i))
             global_clusters.update(batch_cluster_map)
         state.final_cluster_map = global_clusters
 
     @staticmethod
-    def condense_clusters(args: ClusteringArgs, state: ClusteringState, cluster_map: Dict, i: Any) -> ClusterMapType:
+    def create_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager, batch_ids: List[str], prefix: str = None):
+        """
+        Creates list of candidate batches and condenses them.
+        :param args: Configuration of the clustering pipeline used to construct clusters.
+        :param embeddings_manager: Contains the embeddings used to create clusters.
+        :param batch_ids: IDs of subset of artifacts to cluster. If none, all artifacts in embeddings manager are used.
+        :param prefix: The prefix to append to the final cluster map.
+        :return: Map of cluster ID to clusters.
+        """
+        batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
+                                                                            embeddings_manager,
+                                                                            batch_artifact_ids=batch_ids)
+        batch_cluster_map = CreateClustersFromEmbeddings.condense_clusters(args, embeddings_manager, batch_cluster_map)
+        if prefix:
+            batch_cluster_map = {f"{prefix}: {k}": v for k, v in batch_cluster_map.items()}
+        batch_cluster_map = CreateClustersFromEmbeddings.reduce_large_clusters(args,
+                                                                               embeddings_manager,
+                                                                               batch_cluster_map)
+        return batch_cluster_map
+
+    @staticmethod
+    def reduce_large_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager,
+                              cluster_map: ClusterMapType) -> ClusterMapType:
+        """
+        Recursively clusters exceeding the maximum size defined by the clustering args.
+        :param args: Define clustering pipeline configuration to use for clustering large clusters.
+        :param embeddings_manager: Contains embeddings used to create child clusters.
+        :param cluster_map: The cluster map containing clusters to filter.
+        :return: Cluster map containing valid clusters and the children of those that got broken down.
+        """
+        final_cluster_map = {}
+        for c_key, c in cluster_map.items():
+            if len(c) > args.cluster_max_size:
+                cluster_map = CreateClustersFromEmbeddings.create_clusters(args, embeddings_manager, c)
+                for child_key, child_cluster in cluster_map.items():
+                    final_cluster_map[f"{c_key}:{child_key}"] = child_cluster
+            else:
+                final_cluster_map[c_key] = c
+        return final_cluster_map
+
+    @staticmethod
+    def condense_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager, cluster_map: ClusterMapType) -> ClusterMapType:
         """
         Condenses the clusters in the given map.
         :param args: Arguments of clustering pipeline.
-        :param state: State of clustering pipeline.
+        :param embeddings_manager: Contains the embeddings used to cluster.
         :param cluster_map: Map of method name to cluster to condense.
         :param i: The unique ID for this cluster.
         :return: The new cluster map.
         """
-        unique_cluster_map = ClusterCondenser(state.embedding_manager,
+        unique_cluster_map = ClusterCondenser(embeddings_manager,
                                               threshold=args.cluster_intersection_threshold,
                                               min_cluster_size=args.cluster_min_size,
                                               max_cluster_size=args.cluster_max_size,
@@ -48,7 +86,6 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         clusters = list(cluster_map.values())
         unique_cluster_map.add_all(clusters)
         cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
-        cluster_map = {f"{i}:{k}": v for k, v in cluster_map.items()}
         return cluster_map
 
     @staticmethod

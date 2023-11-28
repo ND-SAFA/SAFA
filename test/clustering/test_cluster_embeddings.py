@@ -55,5 +55,5 @@ class TestClusterEmbeddings(TestCase):
             "agglomerative0": Cluster.from_artifacts(["A", "B", "C"], embeddings_manager)
         }
 
-        cluster_map = step.condense_clusters(args, state, batch_cluster_Map, 0)
+        cluster_map = step.condense_clusters(args, state.embedding_manager, batch_cluster_Map)
         ClusteringTestUtil.assert_contains_clusters(cluster_map, [c1, c2, c3])

@@ -5,8 +5,8 @@ from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.constants.clustering_constants import CLUSTER_METHOD_INIT_PARAMS, \
     DEFAULT_RANDOM_STATE, NO_CLUSTER_LABEL, N_CLUSTERS_PARAM, RANDOM_STATE_PARAM
-from tgen.common.util.dict_util import DictUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -41,6 +41,7 @@ class ClusteringAlgorithmManager:
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         n_clusters = max(round(len(embeddings) * reduction_factor), 1)
+        n_clusters = max(n_clusters, min_cluster_size)
         kwargs = self.add_internal_kwargs(kwargs, n_clusters, min_cluster_size, max_cluster_size)
 
         try:

@@ -1,9 +1,13 @@
 from typing import List, Optional, Set
 
+import numpy as np
+
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, DEFAULT_CLUSTER_MIN_VOTES, \
-    DEFAULT_CLUSTER_SIMILARITY_THRESHOLD
+    DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, DEFAULT_MIN_CLUSTER_SIZE, \
+    MIN_PAIRWISE_AVG_PERCENTILE, \
+    MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
@@ -13,16 +17,25 @@ class ClusterCondenser:
     Condenses clusters into single unique set.
     """
 
-    def __init__(self, embeddings_manager: EmbeddingsManager, threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD):
+    def __init__(self, embeddings_manager: EmbeddingsManager,
+                 threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD,
+                 min_cluster_size: int = DEFAULT_MIN_CLUSTER_SIZE,
+                 max_cluster_size: int = DEFAULT_MAX_CLUSTER_SIZE,
+                 filter_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS):
         """
         Creates map with similarity threshold.
         :param embeddings_manager: Manages embeddings used to calculate distances between artifacts and clusters.
         :param threshold: The percentage of overlap to which consider sets are the same.
+        :param min_cluster_size: The minimum size of a cluster.
+        :param max_cluster_size: The maximum size of a cluster.
         """
         self.embeddings_manager = embeddings_manager
         self.cluster_map = {}
         self.seen_artifacts = set()
         self.threshold = threshold
+        self.min_cluster_size = min_cluster_size
+        self.max_cluster_size = max_cluster_size
+        self.filter_cohesiveness = filter_cohesiveness
 
     def get_clusters(self, min_votes: int = DEFAULT_CLUSTER_MIN_VOTES) -> ClusterMapType:
         """
@@ -41,6 +54,7 @@ class ClusterCondenser:
         :param clusters: List of clusters to add.
         :return: None
         """
+        clusters = self.cohesiveness_filter(clusters)
         for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
             self.add(c)
 
@@ -153,6 +167,20 @@ class ClusterCondenser:
             self.seen_artifacts.add(a)
         new_cluster.votes += old_cluster.votes
 
+    def cohesiveness_filter(self, clusters: List[Cluster]):
+        """
+        Filters clusters by their cohesiveness relative to the average cohesiveness of all clusters.
+        :param clusters: The clusters to filter.
+        :return: List of filtered clusters.
+        """
+        filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
+        min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
+        if min_pairwise_avg is not None:
+            if self.filter_cohesiveness:
+                clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
+            clusters = list(sorted(clusters, key=lambda v: v.avg_pairwise_sim if v.avg_pairwise_sim else 0, reverse=True))
+        return clusters
+
     def __get_next_cluster_id(self) -> int:
         """
         Gets the id of the next new cluster.
@@ -173,3 +201,31 @@ class ClusterCondenser:
         c2_intersection_amount = len(c_intersection) / len(target)
         avg_intersection_amount = (c1_intersection_amount + c2_intersection_amount) / 2
         return avg_intersection_amount
+
+    @staticmethod
+    def _filter_by_size(clusters: List[Cluster], min_size: int, max_size: int):
+        """
+        Filters list of clusters by min and max size. If there are no resulting clusters then original list if returned.
+        :param clusters: The clusters to filter.
+        :param min_size: The minimum size of a cluster.
+        :param max_size: The maximum size of a cluster.
+        :return: The filtered clusters within the size bounds.
+        """
+        filter_clusters = [c for c in clusters if min_size <= len(c) <= max_size]
+        clusters = filter_clusters if filter_clusters else clusters
+        return clusters
+
+    @staticmethod
+    def _calculate_min_pairwise_avg_threshold(clusters: List[Cluster]) -> Optional[float]:
+        """
+        Calculates the minimum acceptable pairwise similarity for a cluster based on the minimum avg of the artifacts in all clusters
+        :param clusters: List of the clusters to base the threshold on
+        :return: The threshold for the minimum acceptable pairwise similarity
+        """
+        unique_clusters = set(clusters)
+        cluster_scores = [cluster.avg_pairwise_sim for cluster in unique_clusters if cluster.avg_pairwise_sim is not None]
+        if not cluster_scores:
+            return None
+        percentile_score = np.quantile(cluster_scores, MIN_PAIRWISE_AVG_PERCENTILE)
+        final_score = min(percentile_score, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING)
+        return final_score

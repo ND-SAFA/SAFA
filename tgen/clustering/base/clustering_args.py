@@ -4,7 +4,8 @@ from typing import Dict, List
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.constants import environment_constants
 from tgen.common.constants.clustering_constants import CLUSTER_ARTIFACT_TYPE, DEFAULT_ADD_CLUSTERS_TO_DATASET, \
-    DEFAULT_CLUSTERING_METHODS, DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_MAX_CLUSTER_SIZE, \
+    DEFAULT_CLUSTERING_METHODS, DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, \
+    DEFAULT_MAX_CLUSTER_SIZE, \
     DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_MIN_ORPHAN_SIMILARITY, DEFAULT_REDUCTION_FACTOR
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.pipeline.pipeline_args import PipelineArgs
@@ -36,7 +37,7 @@ class ClusteringArgs(PipelineArgs):
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY
     cluster_seeds: List[str] = None
     cluster_artifact_type: str = CLUSTER_ARTIFACT_TYPE
-    filter_by_cohesiveness: bool = True
+    filter_by_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS
     add_orphans_to_best_home: bool = False
     subset_ids: List[str] = None
 

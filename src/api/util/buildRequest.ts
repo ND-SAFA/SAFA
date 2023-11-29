@@ -94,8 +94,8 @@ class RequestBuilder<
 
     const content = await res.text();
 
-    if (res.status === LOGOUT_STATUS_CODE) {
-      // Log out of the app if credentials expire.
+    if (res.status === LOGOUT_STATUS_CODE && !url.includes("credentials")) {
+      // Log out of the app if credentials expire, and not if integration credentials expire.
       throw Error(LOGOUT_ERROR);
     } else if (this.responseType !== "json") {
       return content as unknown as ReturnType;

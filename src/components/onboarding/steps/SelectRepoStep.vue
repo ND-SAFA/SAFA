@@ -18,7 +18,7 @@
       value="
         Our integration will only use read access from the repository you select,
         and does not train on any data you import.
-        We are currently working on our SOC II compliance.
+        As we work toward SOC II compliance, you can track our current security practices below.
       "
     />
     <template #action>

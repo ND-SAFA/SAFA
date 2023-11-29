@@ -3,6 +3,8 @@ package edu.nd.crc.safa.features.organizations.entities.app;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.billing.entities.MonthlyUsage;
+import edu.nd.crc.safa.features.billing.entities.app.BillingInfoAppEntity;
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 
@@ -34,7 +36,8 @@ public class OrganizationAppEntity {
     }
 
     public OrganizationAppEntity(Organization organization, List<MembershipAppEntity> members,
-                                 List<TeamAppEntity> teams, List<String> permissions, BillingInfo billingInfo) {
+                                 List<TeamAppEntity> teams, List<String> permissions, BillingInfo billingInfo,
+                                 MonthlyUsage monthlyUsage) {
         this.id = organization.getId();
         this.name = organization.getName();
         this.description = organization.getDescription();
@@ -42,6 +45,6 @@ public class OrganizationAppEntity {
         this.members = members;
         this.teams = teams;
         this.permissions = permissions;
-        this.billing = new BillingInfoAppEntity(organization, billingInfo);
+        this.billing = new BillingInfoAppEntity(organization, billingInfo, monthlyUsage);
     }
 }

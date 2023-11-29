@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.billing.entities.MonthlyUsage;
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
@@ -158,9 +159,10 @@ public class OrganizationService {
         List<TeamAppEntity> teamAppEntities = teamService.getAppEntities(teams, currentUser);
 
         BillingInfo billingInfo = billingService.getBillingInfoForOrg(organization);
+        MonthlyUsage monthlyUsage = billingService.getMonthlyUsageForOrg(organization);
 
         return new OrganizationAppEntity(organization, membershipAppEntities, teamAppEntities,
-            permissions, billingInfo);
+            permissions, billingInfo, monthlyUsage);
     }
 
     /**

@@ -42,21 +42,22 @@
           />
         </flex-box>
         <flex-box y="1" align="center">
-          <multiselect-input
-            v-model="includePatterns"
-            label="Include Patterns"
-            :options="[]"
-            add-values
-            hint="Press enter to save a regex file path pattern."
-          />
-          <multiselect-input
-            v-model="excludePatterns"
-            label="Exclude Patterns"
-            :options="[]"
-            add-values
-            hint="Press enter to save a regex file path pattern."
-            class="q-mx-sm"
-          />
+          <div class="q-mr-sm">
+            <multiselect-input
+              v-model="includePatterns"
+              label="Include Patterns"
+              :options="[]"
+              add-values
+              hint="Press enter to save a regex file path pattern."
+            />
+            <multiselect-input
+              v-model="excludePatterns"
+              label="Exclude Patterns"
+              :options="[]"
+              add-values
+              hint="Press enter to save a regex file path pattern."
+            />
+          </div>
           <icon-button
             tooltip="Learn about file patterns"
             icon="info"

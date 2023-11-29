@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.billing.entities.db;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
@@ -57,7 +57,7 @@ public class Transaction {
     private String description;
 
     @Column
-    private Date timestamp;
+    private LocalDateTime timestamp;
 
     @JoinColumn(name = "organization_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -68,7 +68,7 @@ public class Transaction {
         this.amount = amount;
         this.description = description;
         this.status = Status.PENDING;
-        this.timestamp = new Date();
+        this.timestamp = LocalDateTime.now();
         this.organization = organization;
     }
 

@@ -1,6 +1,12 @@
 package edu.nd.crc.safa.features.billing.services;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
+
 import edu.nd.crc.safa.features.billing.entities.InsufficientFundsException;
+import edu.nd.crc.safa.features.billing.entities.MonthlyUsage;
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.billing.repositories.BillingInfoRepository;
@@ -236,5 +242,38 @@ public class BillingService {
                 BillingInfo billingInfo = new BillingInfo(organization);
                 return billingInfoRepository.save(billingInfo);
             });
+    }
+
+    /**
+     * Get monthly usage statistics for an organization
+     *
+     * @param organization The org to get stats for
+     * @return The org's stats
+     */
+    public MonthlyUsage getMonthlyUsageForOrg(Organization organization) {
+        LocalDateTime monthStart = LocalDateTime.now()
+            .with(TemporalAdjusters.firstDayOfMonth())
+            .with(ChronoField.NANO_OF_DAY, 0);
+        List<Transaction> thisMonthTransactions =
+            transactionRepository.findByOrganizationAndTimestampIsAfter(organization, monthStart);
+
+        int usedCredits = 0;
+        int successfulCredits = 0;
+
+        for (Transaction transaction : thisMonthTransactions) {
+            int usedCreditAmount = toUsedCreditAmount(transaction.getAmount());
+
+            switch (transaction.getStatus()) {
+                case FAILED -> usedCredits += usedCreditAmount;
+                case SUCCESSFUL -> {
+                    usedCredits += usedCreditAmount;
+                    successfulCredits += usedCreditAmount;
+                }
+                default -> {
+                }
+            }
+        }
+
+        return new MonthlyUsage(usedCredits, successfulCredits);
     }
 }

@@ -1,14 +1,18 @@
 package edu.nd.crc.safa.test.features.billing;
 
+import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import edu.nd.crc.safa.features.billing.entities.InsufficientFundsException;
+import edu.nd.crc.safa.features.billing.entities.MonthlyUsage;
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.billing.repositories.BillingInfoRepository;
+import edu.nd.crc.safa.features.billing.repositories.TransactionRepository;
 import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
@@ -25,6 +29,9 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Autowired
     private BillingInfoRepository billingInfoRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private OrganizationService organizationService;
@@ -111,7 +118,7 @@ public class TestBillingService extends ApplicationBaseTest {
         assertThat(transaction.getStatus()).isSameAs(Transaction.Status.PENDING);
         assertThat(transaction.getDescription()).isEqualTo("test credit");
         assertThat(transaction.getAmount()).isEqualTo(100);
-        assertThat(transaction.getTimestamp()).isCloseTo(new Date(), 1000);
+        assertThat(transaction.getTimestamp()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
         assertThat(transaction.getId()).isNotNull();
         assertThat(transaction.getOrganization()).isEqualTo(myOrg);
     }
@@ -306,5 +313,37 @@ public class TestBillingService extends ApplicationBaseTest {
 
     private Transaction markRefunded(Transaction transaction) {
         return billingService.markTransactionRefunded(transaction);
+    }
+
+    @Test
+    public void testMonthlyUsageStats() {
+        LocalDateTime beforeThisMonth = LocalDateTime.now().minusYears(1);
+
+        markSuccessful(billingService.credit(myOrg, 10_000, "test credit"));
+
+        billingService.charge(myOrg, 1_000, "test charge");
+        markSuccessful(billingService.charge(myOrg, 100, "test charge"));
+        markFailed(billingService.charge(myOrg, 10, "test charge"));
+        markRefunded(billingService.charge(myOrg, 1, "test charge"));
+
+        Transaction pending = billingService.charge(myOrg, 1_000, "test charge");
+        Transaction successful = markSuccessful(billingService.charge(myOrg, 100, "test charge"));
+        Transaction failed = markFailed(billingService.charge(myOrg, 10, "test charge"));
+        Transaction refunded = markRefunded(billingService.charge(myOrg, 1, "test charge"));
+
+        pending.setTimestamp(beforeThisMonth);
+        successful.setTimestamp(beforeThisMonth);
+        failed.setTimestamp(beforeThisMonth);
+        refunded.setTimestamp(beforeThisMonth);
+
+        transactionRepository.save(pending);
+        transactionRepository.save(successful);
+        transactionRepository.save(failed);
+        transactionRepository.save(refunded);
+
+        MonthlyUsage monthlyUsage = billingService.getMonthlyUsageForOrg(myOrg);
+        assertThat(monthlyUsage).isNotNull();
+        assertThat(monthlyUsage.getUsedCredits()).isEqualTo(110);
+        assertThat(monthlyUsage.getSuccessfulCredits()).isEqualTo(100);
     }
 }

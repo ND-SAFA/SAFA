@@ -15,6 +15,7 @@
     <typography variant="caption" value="Body" />
     <typography
       default-expanded
+      :collapse-length="0"
       :variant="variant"
       :value="body"
       data-cy="text-selected-body"

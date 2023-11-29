@@ -8,6 +8,14 @@ export const DEFAULT_LAYOUT_ID = "default";
  */
 export const DEFAULT_VIEW_NAME = "All Artifacts";
 
+/**
+ * The status code for a session timeout.
+ */
+export const LOGOUT_STATUS_CODE = 401;
+
+/**
+ * The error message for a logout error.
+ */
 export const LOGOUT_ERROR = "Session has timed out. Please log back in.";
 
 /**

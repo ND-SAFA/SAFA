@@ -1,5 +1,5 @@
 import { APIMethods } from "@/types";
-import { LOGOUT_ERROR } from "@/util";
+import { LOGOUT_ERROR, LOGOUT_STATUS_CODE } from "@/util";
 import { BASE_URL, Endpoint } from "@/api";
 
 /**
@@ -94,7 +94,7 @@ class RequestBuilder<
 
     const content = await res.text();
 
-    if (res.status === 401) {
+    if (res.status === LOGOUT_STATUS_CODE) {
       // Log out of the app if credentials expire.
       throw Error(LOGOUT_ERROR);
     } else if (this.responseType !== "json") {

@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS transaction
 (
     id               BINARY(16)     NOT NULL PRIMARY KEY,
     status           VARCHAR(255)   NOT NULL,
-    amount           INT UNSIGNED   NOT NULL,
+    amount           INT            NOT NULL,
     description      VARCHAR(1024)  NOT NULL,
     timestamp        DATETIME       NOT NULL,
-    organization_id  BINARY(16)  NOT NULL,
+    organization_id  BINARY(16)     NOT NULL,
     CONSTRAINT transaction_org_id_fk FOREIGN KEY (organization_id) REFERENCES organization (id) ON DELETE CASCADE
 );

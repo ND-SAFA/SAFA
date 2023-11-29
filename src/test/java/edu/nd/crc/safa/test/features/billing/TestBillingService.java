@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,16 +29,19 @@ public class TestBillingService extends ApplicationBaseTest {
     @Autowired
     private OrganizationService organizationService;
 
+    private Organization myOrg;
+
+    @BeforeEach
+    public void setup() {
+        myOrg = organizationService.getPersonalOrganization(getCurrentUser());
+    }
+
     @Test
     public void testBillingInfoRetrieval() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
-        // Test that something is retrieved without having to do any insertions
         BillingInfo billingInfo = billingService.getBillingInfoForOrg(myOrg);
         assertThat(billingInfo).isNotNull();
         assertThat(billingInfo.getOrganization()).isEqualTo(myOrg);
 
-        // Make a modification and test that it is reflected in later retrievals
         int newBalance = 42;
         billingInfo.setBalance(newBalance);
         billingInfoRepository.save(billingInfo);
@@ -49,8 +53,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testSimpleTransactionUpdatesBalance() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         billingService.credit(myOrg, 100, "test credit");
         assertBalance(myOrg, 100);
 
@@ -60,8 +62,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testBalanceCannotGoNegative() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         int balance = 10;
         int charge = 100;
 
@@ -75,8 +75,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testTransactionAmountMustBePositive() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         assertThatThrownBy(() -> billingService.charge(myOrg, -1, "test charge"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Amount cannot be negative");
@@ -108,8 +106,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testTransactionReturnValue() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction transaction = billingService.credit(myOrg, 100, "test credit");
         assertThat(transaction).isNotNull();
         assertThat(transaction.getStatus()).isSameAs(Transaction.Status.PENDING);
@@ -122,8 +118,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkPendingTransactionSuccessful() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = billingService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markSuccessful(credit);
 
@@ -139,8 +133,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkPendingTransactionFailed() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = billingService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markFailed(credit);
 
@@ -158,8 +150,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkPendingTransactionRefunded() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = billingService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markRefunded(credit);
 
@@ -177,8 +167,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkSuccessfulTransactionFailed() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = markSuccessful(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markFailed(credit))
@@ -194,8 +182,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkSuccessfulTransactionRefunded() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = markSuccessful(billingService.credit(myOrg, 100, "test credit"));
         Transaction updatedCredit = markRefunded(credit);
 
@@ -213,8 +199,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkFailedTransactionRefunded() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = markFailed(billingService.credit(myOrg, 100, "test credit"));
         Transaction updatedCredit = markRefunded(credit);
 
@@ -232,8 +216,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkFailedTransactionSuccessful() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = markFailed(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markSuccessful(credit))
@@ -251,8 +233,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkRefundedTransactionSuccessful() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = markRefunded(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markSuccessful(credit))
@@ -270,8 +250,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testMarkRefundedTransactionFailed() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         Transaction credit = markRefunded(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markFailed(credit))
@@ -289,8 +267,6 @@ public class TestBillingService extends ApplicationBaseTest {
 
     @Test
     public void testTotalsWithMultipleTransactions() {
-        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
-
         billingService.credit(myOrg, 10_000_000, "test credit");
         markSuccessful(billingService.credit(myOrg, 1_000_000, "test credit"));
         markFailed(billingService.credit(myOrg, 100_000, "test credit"));

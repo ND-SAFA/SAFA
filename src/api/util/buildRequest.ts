@@ -94,9 +94,8 @@ class RequestBuilder<
 
     const content = await res.text();
 
-    if (res.status === 403 && !this.relativeUrl.includes("credentials")) {
+    if (res.status === 401) {
       // Log out of the app if credentials expire.
-      // Ensure that we don't log out if the expired credential status is for an integration.
       throw Error(LOGOUT_ERROR);
     } else if (this.responseType !== "json") {
       return content as unknown as ReturnType;

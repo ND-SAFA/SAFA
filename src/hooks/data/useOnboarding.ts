@@ -37,7 +37,7 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     steps: Object.values(ONBOARDING_STEPS).map((step) => ({
       ...step,
-      done: true,
+      done: false,
     })),
     /**
      * The types of artifacts that will be generated.

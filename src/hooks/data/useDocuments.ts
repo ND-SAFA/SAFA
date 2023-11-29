@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-
 import {
   LayoutPositionsSchema,
   DocumentSchema,
@@ -115,11 +114,9 @@ export const useDocuments = defineStore("documents", {
         documents.find(({ documentId }) => documentId === currentDocumentId) ||
         defaultDocument;
       const currentArtifactIds = loadedDocument.artifactIds;
-
       this.allDocuments = documents;
       this.baseDocument = defaultDocument;
       this.currentDocument = loadedDocument;
-
       artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
       traceStore.initializeTraces({ traces, currentArtifactIds });
       layoutStore.updatePositions(loadedDocument.layout);
@@ -151,7 +148,6 @@ export const useDocuments = defineStore("documents", {
      */
     updateBaseLayout(layout: LayoutPositionsSchema): void {
       projectStore.updateProject({ layout });
-
       this.baseDocument.layout = layout;
 
       if (!this.isBaseDocument) return;
@@ -186,7 +182,6 @@ export const useDocuments = defineStore("documents", {
       const currentArtifactIds = document.artifactIds;
 
       this.currentDocument = document;
-
       this.history.push(document);
       this.historyIndex = this.history.length - 1;
       selectionStore.clearSelections({ onlySubtree: !document.documentId });
@@ -225,7 +220,6 @@ export const useDocuments = defineStore("documents", {
       this.allDocuments = removeMatches(this.allDocuments, "documentId", [
         document.documentId,
       ]).concat(document);
-
       await this.switchDocuments(document);
     },
     /**
@@ -247,7 +241,6 @@ export const useDocuments = defineStore("documents", {
           )
           .map(({ id }) => id),
       });
-
       await this.addDocument(document);
       layoutStore.mode = "tree";
     },
@@ -283,7 +276,6 @@ export const useDocuments = defineStore("documents", {
     async removeDocument(document: string | DocumentSchema): Promise<void> {
       const deleteDocumentId =
         typeof document === "string" ? document : document.documentId;
-
       this.allDocuments = this.allDocuments.filter(
         ({ documentId }) => documentId !== deleteDocumentId
       );

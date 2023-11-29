@@ -38,189 +38,19 @@
           color="gradient"
         >
           <template #1>
-            <typography
-              el="p"
-              value="
-                To import code, you will need to connect to our GitHub integration,
-                and be a contributor on the repository.
-                Your organization will also need to approve our integration.
-              "
-            />
-
-            <git-hub-authentication inactive />
-
-            <q-banner rounded class="bg-background q-mt-md">
-              <template #avatar>
-                <icon
-                  variant="security"
-                  color="secondary"
-                  size="md"
-                  class="q-mr-sm"
-                />
-              </template>
-              <typography
-                value="
-                  We take security seriously.
-                  Our integration will only use read access from the repository you select,
-                  and does not train on any data you import.
-                  We are currently working on our SOC II compliance.
-                "
-              />
-              <template #action>
-                <text-button
-                  text
-                  color="secondary"
-                  icon="changelog"
-                  @click="handleViewSecurityPractices"
-                >
-                  Security Practices
-                </text-button>
-              </template>
-            </q-banner>
+            <select-repo-step />
           </template>
           <template #2>
             <git-hub-project-input />
           </template>
           <template #3>
-            <flex-box column align="center" t="2">
-              <typography el="div" value="Importing from GitHub:" />
-              <attribute-chip
-                :value="integrationsStore.gitHubProject?.name || ''"
-                icon="project-add"
-                color="primary"
-              />
-              <template v-if="ENABLED_FEATURES.GENERATE_ONBOARDING">
-                <typography el="div" value="Generating Documents:" />
-                <attribute-chip
-                  v-for="type in onboardingStore.generationTypes"
-                  :key="type"
-                  :value="type"
-                  icon="create-artifact"
-                  color="primary"
-                />
-              </template>
-              <!-- TODO: confirm data generation cost estimate, pay with stripe -->
-              <flex-box t="4">
-                <text-button
-                  text
-                  color="gradient"
-                  class="bd-gradient"
-                  icon="generate-artifacts"
-                  :disabled="onboardingStore.error"
-                  @click="onboardingStore.handleGenerate"
-                >
-                  {{ onboardingStore.steps[2].title }}
-                </text-button>
-              </flex-box>
-              <q-banner
-                v-if="onboardingStore.error"
-                rounded
-                class="bg-background q-mt-md"
-              >
-                <template #avatar>
-                  <icon
-                    variant="error"
-                    color="secondary"
-                    size="md"
-                    class="q-mr-sm"
-                  />
-                </template>
-                <typography
-                  value="
-                  On no! It looks like there was an issue with importing from GitHub.
-                  You can schedule a call with us below to ensure your data gets uploaded properly.
-                "
-                />
-                <template #action>
-                  <text-button
-                    text
-                    color="secondary"
-                    icon="calendar"
-                    @click="onboardingStore.handleScheduleCall"
-                  >
-                    Schedule a Call
-                  </text-button>
-                </template>
-              </q-banner>
-            </flex-box>
+            <generate-step />
           </template>
-          <template v-if="!!uploadedJob" #4>
-            <typography
-              el="p"
-              value="
-                You will receive an email when the import completes.
-                This process takes a less than 10 minutes for a few dozen code files, to around 30 minutes for a few hundred code files.
-              "
-            />
-            <!-- TODO: handle errors with followup call -->
-            <list-item
-              dense
-              :title="uploadedJob.name"
-              :subtitle="onboardingStore.uploadProgress"
-            >
-              <template #icon>
-                <q-circular-progress
-                  v-if="uploadedJob.status === 'IN_PROGRESS'"
-                  color="gradient"
-                  indeterminate
-                  size="md"
-                />
-                <icon
-                  v-else-if="uploadedJob.status === 'COMPLETED'"
-                  variant="job-complete"
-                  color="primary"
-                  size="md"
-                />
-                <icon
-                  v-else-if="uploadedJob.status === 'FAILED'"
-                  variant="job-fail"
-                  color="error"
-                  size="md"
-                />
-              </template>
-            </list-item>
-          </template>
-          <template v-else #4>
-            <flex-box justify="center">
-              <q-circular-progress color="primary" indeterminate size="md" />
-            </flex-box>
+          <template #4>
+            <await-generate-step />
           </template>
           <template #5>
-            <flex-box
-              v-if="ENABLED_FEATURES.GENERATE_ONBOARDING"
-              column
-              align="center"
-              t="2"
-            >
-              <text-button
-                text
-                color="gradient"
-                class="bd-gradient"
-                icon="download"
-                :loading="projectApiStore.saveProjectLoading"
-                @click="onboardingStore.handleExportProject"
-              >
-                Export as CSV
-              </text-button>
-              <flex-box align="center" justify="center" full-width>
-                <separator style="width: 40px" />
-                <typography secondary el="div" class="q-ma-sm" value="OR" />
-                <separator style="width: 40px" />
-              </flex-box>
-              <text-button
-                text
-                color="gradient"
-                class="bd-gradient"
-                icon="view-tree"
-                @click="onboardingStore.handleViewProject"
-              >
-                View in SAFA
-              </text-button>
-            </flex-box>
-            <typography
-              v-else
-              value="Now that your data has been imported, our team will follow up soon with the generated documentation!"
-            />
+            <view-step />
           </template>
         </stepper>
       </div>
@@ -239,38 +69,24 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { ENABLED_FEATURES, SECURITY_LINK } from "@/util";
+import { ENABLED_FEATURES } from "@/util";
 import {
   gitHubApiStore,
   integrationsStore,
   onboardingStore,
-  projectApiStore,
   sessionStore,
 } from "@/hooks";
+import { TextButton, Stepper, Typography } from "@/components/common";
+import { GitHubProjectInput } from "@/components/integrations";
 import {
-  TextButton,
-  Stepper,
-  Typography,
-  FlexBox,
-  AttributeChip,
-  ListItem,
-  Icon,
-  Separator,
-} from "@/components/common";
-import {
-  GitHubAuthentication,
-  GitHubProjectInput,
-} from "@/components/integrations";
+  SelectRepoStep,
+  ViewStep,
+  GenerateStep,
+  AwaitGenerateStep,
+} from "@/components/onboarding/steps";
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 const uploadedJob = computed(() => onboardingStore.uploadedJob);
-
-/**
- * Opens the security practices link in a new tab.
- */
-function handleViewSecurityPractices() {
-  window.open(SECURITY_LINK);
-}
 
 // Preload GitHub projects if credentials are already set.
 onMounted(async () => {

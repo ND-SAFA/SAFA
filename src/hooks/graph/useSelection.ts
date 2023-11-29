@@ -7,7 +7,7 @@ import {
   TraceLinkSchema,
   TraceMatrixSchema,
 } from "@/types";
-import { LARGE_NODE_COUNT, sanitizeNodeId } from "@/util";
+import { sanitizeNodeId } from "@/util";
 import {
   timStore,
   subtreeStore,

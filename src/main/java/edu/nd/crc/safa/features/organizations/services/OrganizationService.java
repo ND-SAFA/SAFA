@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
+import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
@@ -38,6 +39,7 @@ public class OrganizationService {
     private final TeamService teamService;
     private final OrganizationMembershipService organizationMembershipService;
     private final PermissionService permissionService;
+    private final BillingService billingService;
 
     /**
      * Create a new organization. This will also create a new team for the organization.
@@ -133,13 +135,13 @@ public class OrganizationService {
             memberships
                 .stream()
                 .map(MembershipAppEntity::new)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         List<String> permissions = getUserPermissions(organization, currentUser)
             .stream()
             .filter(permission -> permission instanceof OrganizationPermission)
             .map(Permission::getName)
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
 
         List<Team> teams = teamService.getAllTeamsByOrganization(organization)
             .stream()
@@ -150,12 +152,15 @@ public class OrganizationService {
                     currentUser
                 )
             )
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
 
 
         List<TeamAppEntity> teamAppEntities = teamService.getAppEntities(teams, currentUser);
 
-        return new OrganizationAppEntity(organization, membershipAppEntities, teamAppEntities, permissions);
+        BillingInfo billingInfo = billingService.getBillingInfoForOrg(organization);
+
+        return new OrganizationAppEntity(organization, membershipAppEntities, teamAppEntities,
+            permissions, billingInfo);
     }
 
     /**
@@ -168,7 +173,7 @@ public class OrganizationService {
     public List<OrganizationAppEntity> getAppEntities(Collection<Organization> organizations, SafaUser currentUser) {
         return organizations.stream()
             .map(org -> getAppEntity(org, currentUser))
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     }
 
     /**
@@ -182,7 +187,7 @@ public class OrganizationService {
         return organizationMembershipService.getRolesForUser(currentUser, organization)
             .stream()
             .flatMap(role -> role.getGrants().stream())
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     }
 
     /**

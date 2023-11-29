@@ -202,7 +202,7 @@ export const useCy = defineStore("cy", {
     /**
      * Set the visibility of nodes and edges related to given list of artifact names.
      * if no artifact ids are given, all nodes and edges are set.
-     * @param artifactIds - The artifacts to display or hide.
+     * @param artifactIds - The artifacts to display or hide, or all if empty.
      * @param visible - Whether to display or hide these artifacts.
      * @param type - The type of graph to use.
      */
@@ -213,19 +213,25 @@ export const useCy = defineStore("cy", {
     ): void {
       const display = visible ? "element" : "none";
 
+      const doUpdateDisplay = (elDisplay: string | undefined, ids: string[]) =>
+        // Update the display if changing to or from visible.
+        elDisplay !== display &&
+        (elDisplay === "none" || display === "none") &&
+        // Update the display if the element is in the list of artifacts to update, or all are being updated.
+        (artifactIds.length === 0 ||
+          ids.every((id) => artifactIds.includes(id)));
+
       this.getCy(type).then((cy) => {
         cy.nodes()
-          .filter(
-            (n) => artifactIds.length === 0 || artifactIds.includes(n.data().id)
-          )
+          .filter((n) => doUpdateDisplay(n.style().display, [n.data().id]))
           .style({ display });
 
         cy.edges()
-          .filter(
-            (e) =>
-              artifactIds.length === 0 ||
-              (artifactIds.includes(e.target().data().id) &&
-                artifactIds.includes(e.source().data().id))
+          .filter((e) =>
+            doUpdateDisplay(e.style().display, [
+              e.target().data().id,
+              e.source().data().id,
+            ])
           )
           .style({ display });
       });

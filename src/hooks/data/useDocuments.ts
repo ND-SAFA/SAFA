@@ -179,18 +179,25 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Sets the current document and initializes its artifacts and traces.
+     * - The view is set to the TIM if the graph is too large.
      * @param document - The document to switch to.
      */
     async switchDocuments(document: DocumentSchema): Promise<void> {
       const currentArtifactIds = document.artifactIds;
 
       this.currentDocument = document;
+
       this.history.push(document);
       this.historyIndex = this.history.length - 1;
       selectionStore.clearSelections({ onlySubtree: !document.documentId });
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
-      layoutStore.updatePositions(document.layout);
+
+      if (this.isBaseDocument && artifactStore.largeNodeCount) {
+        layoutStore.mode = "tim";
+      }
+
+      await layoutStore.updatePositions(document.layout);
     },
     /**
      * Switches to the next or previous document in the history.

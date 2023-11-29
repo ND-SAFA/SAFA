@@ -166,7 +166,7 @@ export const useSelection = defineStore("selection", {
       this.selectedTraceLinkIds = ["", ""];
       this.selectedArtifactId = artifactId;
 
-      if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
+      if (artifactStore.largeNodeCount) {
         this.centerOnArtifacts([artifactId]);
       } else {
         this.filterGraph({
@@ -212,7 +212,7 @@ export const useSelection = defineStore("selection", {
       this.selectedArtifactId = "";
       this.selectedTraceLinkIds = nodeIds;
 
-      if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
+      if (artifactStore.largeNodeCount) {
         this.centerOnArtifacts(nodeIds);
       } else {
         this.filterGraph({ type: "subtree", nodeIds });

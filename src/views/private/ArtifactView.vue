@@ -3,8 +3,12 @@
     <project-tree />
     <graph-fab />
 
-    <div class="q-pa-lg bg-background" style="min-height: inherit">
-      <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs">
+    <div
+      v-if="isTableMode"
+      class="q-pa-lg bg-background"
+      style="min-height: inherit"
+    >
+      <tab-list v-model="tab" :tabs="tabs">
         <template #artifact>
           <artifact-table />
         </template>

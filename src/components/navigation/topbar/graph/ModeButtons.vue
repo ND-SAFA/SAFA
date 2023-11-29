@@ -13,6 +13,7 @@
     <text-button
       v-bind="buttonProps(options.tree)"
       :hide-label="smallWindow"
+      :disabled="artifactStore.largeNodeCount"
       label="Tree"
       data-cy="button-nav-tree"
       icon="view-tree"
@@ -50,7 +51,13 @@ export default {
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { GraphMode } from "@/types";
-import { appStore, deltaStore, layoutStore, useScreen } from "@/hooks";
+import {
+  appStore,
+  artifactStore,
+  deltaStore,
+  layoutStore,
+  useScreen,
+} from "@/hooks";
 import { TextButton } from "@/components/common";
 import DeltaModeButton from "./DeltaModeButton.vue";
 

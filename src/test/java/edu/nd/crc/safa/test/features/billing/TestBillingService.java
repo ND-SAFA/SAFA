@@ -1,7 +1,9 @@
 package edu.nd.crc.safa.test.features.billing;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import edu.nd.crc.safa.features.billing.entities.InsufficientFundsException;
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.repositories.BillingInfoRepository;
 import edu.nd.crc.safa.features.billing.services.BillingService;
@@ -40,5 +42,49 @@ public class TestBillingService extends ApplicationBaseTest {
         BillingInfo updatedBillingInfo = billingService.getBillingInfoForOrg(myOrg);
         assertThat(updatedBillingInfo).isNotNull();
         assertThat(updatedBillingInfo.getBalance()).isEqualTo(newBalance);
+    }
+
+    @Test
+    public void testSimpleTransactionUpdatesBalance() {
+        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
+
+        billingService.transact(myOrg, BillingService.TransactionType.CREDIT, 100);
+        assertBalance(myOrg, 100);
+
+        billingService.transact(myOrg, BillingService.TransactionType.CHARGE, 25);
+        assertBalance(myOrg, 75);
+    }
+
+    @Test
+    public void testBalanceCannotGoNegative() {
+        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
+
+        int balance = 10;
+        int charge = 100;
+
+        billingService.transact(myOrg, BillingService.TransactionType.CREDIT, balance);
+
+        InsufficientFundsException expected = new InsufficientFundsException(balance, charge);
+        assertThatThrownBy(() -> billingService.transact(myOrg, BillingService.TransactionType.CHARGE, charge))
+            .isInstanceOf(InsufficientFundsException.class)
+            .isEqualTo(expected);
+    }
+
+    @Test
+    public void testTransactionAmountMustBePositive() {
+        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
+
+        assertThatThrownBy(() -> billingService.transact(myOrg, BillingService.TransactionType.CHARGE, -1))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Amount cannot be negative");
+
+        assertThatThrownBy(() -> billingService.transact(myOrg, BillingService.TransactionType.CHARGE, 0))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Amount cannot be zero");
+    }
+
+    private void assertBalance(Organization organization, int balance) {
+        BillingInfo billingInfo = billingService.getBillingInfoForOrg(organization);
+        assertThat(billingInfo.getBalance()).isEqualTo(balance);
     }
 }

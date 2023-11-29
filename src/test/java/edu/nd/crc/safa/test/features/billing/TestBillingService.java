@@ -99,6 +99,13 @@ public class TestBillingService extends ApplicationBaseTest {
         assertThat(billingInfo.getBalance()).isEqualTo(balance);
     }
 
+    private void assertBalances(Organization organization, int balance, int totalUsed, int totalSuccessful) {
+        BillingInfo billingInfo = billingService.getBillingInfoForOrg(organization);
+        assertThat(billingInfo.getBalance()).isEqualTo(balance);
+        assertThat(billingInfo.getTotalUsed()).isEqualTo(totalUsed);
+        assertThat(billingInfo.getTotalSuccessful()).isEqualTo(totalSuccessful);
+    }
+
     @Test
     public void testTransactionReturnValue() {
         Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
@@ -120,13 +127,13 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction credit = billingService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markSuccessful(credit);
 
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.SUCCESSFUL);
 
         Transaction charge = billingService.charge(myOrg, 100, "test charge");
         Transaction updatedCharge = markSuccessful(charge);
 
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 100, 100);
         assertThat(updatedCharge.getStatus()).isSameAs(Transaction.Status.SUCCESSFUL);
     }
 
@@ -137,7 +144,7 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction credit = billingService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markFailed(credit);
 
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.FAILED);
 
         markSuccessful(billingService.credit(myOrg, 100, "test credit"));
@@ -145,7 +152,7 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction charge = billingService.charge(myOrg, 100, "test charge");
         Transaction updatedCharge = markFailed(charge);
 
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 100, 0);
         assertThat(updatedCharge.getStatus()).isSameAs(Transaction.Status.FAILED);
     }
 
@@ -156,7 +163,7 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction credit = billingService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markRefunded(credit);
 
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.REFUNDED);
 
         markSuccessful(billingService.credit(myOrg, 100, "test credit"));
@@ -164,25 +171,25 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction charge = billingService.charge(myOrg, 100, "test charge");
         Transaction updatedCharge = markRefunded(charge);
 
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 0, 0);
         assertThat(updatedCharge.getStatus()).isSameAs(Transaction.Status.REFUNDED);
     }
 
     @Test
-    public void testMarkingSuccessfulTransactionFailedFails() {
+    public void testMarkSuccessfulTransactionFailed() {
         Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
 
         Transaction credit = markSuccessful(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markFailed(credit))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 0, 0);
 
         Transaction charge = markSuccessful(billingService.charge(myOrg, 100, "test charge"));
 
         assertThatThrownBy(() -> markFailed(charge))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 100, 100);
     }
 
     @Test
@@ -192,7 +199,7 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction credit = markSuccessful(billingService.credit(myOrg, 100, "test credit"));
         Transaction updatedCredit = markRefunded(credit);
 
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.REFUNDED);
 
         markSuccessful(billingService.credit(myOrg, 100, "test credit"));
@@ -200,7 +207,7 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction charge = markSuccessful(billingService.charge(myOrg, 100, "test charge"));
         Transaction updatedCharge = markRefunded(charge);
 
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 0, 0);
         assertThat(updatedCharge.getStatus()).isSameAs(Transaction.Status.REFUNDED);
     }
 
@@ -211,7 +218,7 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction credit = markFailed(billingService.credit(myOrg, 100, "test credit"));
         Transaction updatedCredit = markRefunded(credit);
 
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.REFUNDED);
 
         markSuccessful(billingService.credit(myOrg, 100, "test credit"));
@@ -219,19 +226,19 @@ public class TestBillingService extends ApplicationBaseTest {
         Transaction charge = markFailed(billingService.charge(myOrg, 100, "test charge"));
         Transaction updatedCharge = markRefunded(charge);
 
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 0, 0);
         assertThat(updatedCharge.getStatus()).isSameAs(Transaction.Status.REFUNDED);
     }
 
     @Test
-    public void testMarkingFailedTransactionSuccessfulFails() {
+    public void testMarkFailedTransactionSuccessful() {
         Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
 
         Transaction credit = markFailed(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markSuccessful(credit))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 0, 0);
 
         markSuccessful(billingService.credit(myOrg, 100, "test credit"));
 
@@ -239,18 +246,18 @@ public class TestBillingService extends ApplicationBaseTest {
 
         assertThatThrownBy(() -> markSuccessful(charge))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 100, 0);
     }
 
     @Test
-    public void testMarkingRefundedTransactionSuccessfulFails() {
+    public void testMarkRefundedTransactionSuccessful() {
         Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
 
         Transaction credit = markRefunded(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markSuccessful(credit))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 0, 0);
 
         markSuccessful(billingService.credit(myOrg, 100, "test credit"));
 
@@ -258,18 +265,18 @@ public class TestBillingService extends ApplicationBaseTest {
 
         assertThatThrownBy(() -> markSuccessful(charge))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 0, 0);
     }
 
     @Test
-    public void testMarkingRefundedTransactionFailedFails() {
+    public void testMarkRefundedTransactionFailed() {
         Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
 
         Transaction credit = markRefunded(billingService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markFailed(credit))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 0);
+        assertBalances(myOrg, 0, 0, 0);
 
         markSuccessful(billingService.credit(myOrg, 100, "test credit"));
 
@@ -277,7 +284,40 @@ public class TestBillingService extends ApplicationBaseTest {
 
         assertThatThrownBy(() -> markFailed(charge))
             .isInstanceOf(IllegalArgumentException.class);
-        assertBalance(myOrg, 100);
+        assertBalances(myOrg, 100, 0, 0);
+    }
+
+    @Test
+    public void testTotalsWithMultipleTransactions() {
+        Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
+
+        billingService.credit(myOrg, 10_000_000, "test credit");
+        markSuccessful(billingService.credit(myOrg, 1_000_000, "test credit"));
+        markFailed(billingService.credit(myOrg, 100_000, "test credit"));
+        markRefunded(billingService.credit(myOrg, 10_000, "test credit"));
+
+        assertBalances(myOrg, 11_000_000, 0, 0);
+
+        billingService.charge(myOrg, 1_000, "test credit");
+        markSuccessful(billingService.charge(myOrg, 100, "test credit"));
+        markFailed(billingService.charge(myOrg, 10, "test credit"));
+        markRefunded(billingService.charge(myOrg, 1, "test credit"));
+
+        assertBalances(myOrg, 10_998_900, 110, 100);
+
+        billingService.credit(myOrg, 10_000_000, "test credit");
+        markSuccessful(billingService.credit(myOrg, 1_000_000, "test credit"));
+        markFailed(billingService.credit(myOrg, 100_000, "test credit"));
+        markRefunded(billingService.credit(myOrg, 10_000, "test credit"));
+
+        assertBalances(myOrg, 21_998_900, 110, 100);
+
+        billingService.charge(myOrg, 1_000, "test credit");
+        markSuccessful(billingService.charge(myOrg, 100, "test credit"));
+        markFailed(billingService.charge(myOrg, 10, "test credit"));
+        markRefunded(billingService.charge(myOrg, 1, "test credit"));
+
+        assertBalances(myOrg, 21_997_800, 220, 200);
     }
 
     private Transaction markFailed(Transaction transaction) {

@@ -19,30 +19,15 @@ public class BillingService {
 
     private final BillingInfoRepository billingInfoRepository;
 
-    public enum TransactionType {
-        CREDIT,
-        CHARGE
-    }
-
     /**
      * Apply a transaction to an account
      *
      * @param organization The account to apply the transaction to
-     * @param transactionType The type of transaction
-     * @param amount The amount of the transaction (always positive)
+     * @param amount The amount of the transaction
      */
-    @Transactional
-    public void transact(Organization organization, TransactionType transactionType, int amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative: " + amount);
-        }
-
+    private void transact(Organization organization, int amount) {
         if (amount == 0) {
             throw new IllegalArgumentException("Amount cannot be zero");
-        }
-
-        if (transactionType == TransactionType.CHARGE) {
-            amount = -amount;
         }
 
         boolean success = false;
@@ -61,6 +46,34 @@ public class BillingService {
             throw new SafaError("Unable to adjust account balance, please try again later.");
         }
 
+    }
+
+    /**
+     * Charge an account a certain amount
+     *
+     * @param organization The account to charge
+     * @param amount The amount to charge
+     */
+    @Transactional
+    public void charge(Organization organization, int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount cannot be negative: " + amount);
+        }
+        transact(organization, -amount);
+    }
+
+    /**
+     * Credit an account a certain amount
+     *
+     * @param organization The account to credit
+     * @param amount The amount to credit
+     */
+    @Transactional
+    public void credit(Organization organization, int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount cannot be negative: " + amount);
+        }
+        transact(organization, amount);
     }
 
     /**

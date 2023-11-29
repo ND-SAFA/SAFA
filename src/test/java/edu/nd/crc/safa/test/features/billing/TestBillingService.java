@@ -48,10 +48,10 @@ public class TestBillingService extends ApplicationBaseTest {
     public void testSimpleTransactionUpdatesBalance() {
         Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
 
-        billingService.transact(myOrg, BillingService.TransactionType.CREDIT, 100);
+        billingService.credit(myOrg, 100);
         assertBalance(myOrg, 100);
 
-        billingService.transact(myOrg, BillingService.TransactionType.CHARGE, 25);
+        billingService.charge(myOrg, 25);
         assertBalance(myOrg, 75);
     }
 
@@ -62,10 +62,10 @@ public class TestBillingService extends ApplicationBaseTest {
         int balance = 10;
         int charge = 100;
 
-        billingService.transact(myOrg, BillingService.TransactionType.CREDIT, balance);
+        billingService.credit(myOrg, balance);
 
         InsufficientFundsException expected = new InsufficientFundsException(balance, charge);
-        assertThatThrownBy(() -> billingService.transact(myOrg, BillingService.TransactionType.CHARGE, charge))
+        assertThatThrownBy(() -> billingService.charge(myOrg, charge))
             .isInstanceOf(InsufficientFundsException.class)
             .isEqualTo(expected);
     }
@@ -74,11 +74,19 @@ public class TestBillingService extends ApplicationBaseTest {
     public void testTransactionAmountMustBePositive() {
         Organization myOrg = organizationService.getPersonalOrganization(getCurrentUser());
 
-        assertThatThrownBy(() -> billingService.transact(myOrg, BillingService.TransactionType.CHARGE, -1))
+        assertThatThrownBy(() -> billingService.charge(myOrg, -1))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Amount cannot be negative");
 
-        assertThatThrownBy(() -> billingService.transact(myOrg, BillingService.TransactionType.CHARGE, 0))
+        assertThatThrownBy(() -> billingService.credit(myOrg, -1))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Amount cannot be negative");
+
+        assertThatThrownBy(() -> billingService.charge(myOrg, 0))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Amount cannot be zero");
+
+        assertThatThrownBy(() -> billingService.credit(myOrg, 0))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Amount cannot be zero");
     }

@@ -24,7 +24,7 @@ class ChildThread(threading.Thread):
         while self.state.has_work():
             index, item = self.state.get_item()
             work_result = self._perform_work(item, index)
-            self.state.on_item_finished(work_result, index=index)
+            self.state.on_item_finished(work_result, index)
 
     def _perform_work(self, item: Any, index: int) -> Any:
         """

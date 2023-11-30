@@ -64,7 +64,7 @@ class MultiThreadState:
         """
         return self.item_queue.get()
 
-    def on_item_finished(self, result: Any, index: int = None) -> None:
+    def on_item_finished(self, result: Any, index: int) -> None:
         """
         Process the result performed by a job.
         :param result: The result of a job.

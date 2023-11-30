@@ -8,6 +8,7 @@ import {
   JiraProjectSchema,
 } from "@/types";
 import { pinia } from "@/plugins";
+import { GITHUB_DEFAULT_EXCLUDE } from "@/util/integrations-config";
 
 /**
  * This module defines the state of 3rd party integrations.
@@ -41,7 +42,9 @@ export const useIntegrations = defineStore("integrations", {
     /**
      * The configuration for the GitHub import.
      */
-    gitHubConfig: {} as GitHubImportSchema,
+    gitHubConfig: {
+      exclude: GITHUB_DEFAULT_EXCLUDE,
+    } as GitHubImportSchema,
   }),
   getters: {},
   actions: {

@@ -7,6 +7,7 @@
     <app-confirm-modal :message="confirmationMessage" />
     <save-project-modal />
     <delete-project-modal />
+    <onboarding-popup />
     <flex-box
       v-if="displayLoading"
       full-width
@@ -14,7 +15,7 @@
       align="center"
       style="height: 100vh"
     >
-      <q-spinner-ball color="primary" size="4em" />
+      <q-spinner-ball class="nav-gradient" size="4em" />
     </flex-box>
   </div>
 </template>
@@ -36,9 +37,9 @@ import {
   sessionApiStore,
   sessionStore,
 } from "@/hooks";
-import { AppConfirmModal } from "@/components/common";
+import { AppConfirmModal, FlexBox } from "@/components/common";
 import { SaveProjectModal, DeleteProjectModal } from "@/components/project";
-import FlexBox from "@/components/common/display/content/FlexBox.vue";
+import { OnboardingPopup } from "@/components/onboarding";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";

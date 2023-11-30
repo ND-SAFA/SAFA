@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-
 import {
   LayoutPositionsSchema,
   DocumentSchema,
@@ -115,11 +114,9 @@ export const useDocuments = defineStore("documents", {
         documents.find(({ documentId }) => documentId === currentDocumentId) ||
         defaultDocument;
       const currentArtifactIds = loadedDocument.artifactIds;
-
       this.allDocuments = documents;
       this.baseDocument = defaultDocument;
       this.currentDocument = loadedDocument;
-
       artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
       traceStore.initializeTraces({ traces, currentArtifactIds });
       layoutStore.updatePositions(loadedDocument.layout);
@@ -151,7 +148,6 @@ export const useDocuments = defineStore("documents", {
      */
     updateBaseLayout(layout: LayoutPositionsSchema): void {
       projectStore.updateProject({ layout });
-
       this.baseDocument.layout = layout;
 
       if (!this.isBaseDocument) return;
@@ -179,6 +175,7 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Sets the current document and initializes its artifacts and traces.
+     * - The view is set to the TIM if the graph is too large.
      * @param document - The document to switch to.
      */
     async switchDocuments(document: DocumentSchema): Promise<void> {
@@ -190,7 +187,12 @@ export const useDocuments = defineStore("documents", {
       selectionStore.clearSelections({ onlySubtree: !document.documentId });
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
-      layoutStore.updatePositions(document.layout);
+
+      if (this.isBaseDocument && artifactStore.largeNodeCount) {
+        layoutStore.mode = "tim";
+      }
+
+      await layoutStore.updatePositions(document.layout);
     },
     /**
      * Switches to the next or previous document in the history.
@@ -218,7 +220,6 @@ export const useDocuments = defineStore("documents", {
       this.allDocuments = removeMatches(this.allDocuments, "documentId", [
         document.documentId,
       ]).concat(document);
-
       await this.switchDocuments(document);
     },
     /**
@@ -240,7 +241,6 @@ export const useDocuments = defineStore("documents", {
           )
           .map(({ id }) => id),
       });
-
       await this.addDocument(document);
       layoutStore.mode = "tree";
     },
@@ -276,7 +276,6 @@ export const useDocuments = defineStore("documents", {
     async removeDocument(document: string | DocumentSchema): Promise<void> {
       const deleteDocumentId =
         typeof document === "string" ? document : document.documentId;
-
       this.allDocuments = this.allDocuments.filter(
         ({ documentId }) => documentId !== deleteDocumentId
       );

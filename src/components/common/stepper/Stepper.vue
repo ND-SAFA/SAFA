@@ -8,6 +8,11 @@
       :done="step.done"
       :caption="step.caption"
       :header-nav="step.done && !props.hideStepBack"
+      :color="
+        step.done && props.color === 'gradient'
+          ? `nodeGradient${idx + 1}`
+          : undefined
+      "
     >
       <slot :name="idx + 1" />
     </q-step>

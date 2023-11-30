@@ -22,44 +22,50 @@
       option-label="name"
       data-cy="input-github-project"
     />
-    <flex-box v-if="!!projectName" column t="1">
-      <flex-box y="1">
-        <select-input
-          v-model="importBranch"
-          label="Import Branch"
-          :options="branches"
-          hint="The branch to import files from."
-        />
-        <text-input
-          v-model="artifactType"
-          label="Artifact Type"
-          hint="A name for imported artifacts."
-          class="q-mx-sm"
-        />
+    <expansion-item
+      v-if="!!integrationsStore.gitHubProject"
+      label="Import Settings"
+    >
+      <flex-box v-if="!!projectName" column t="1">
+        <flex-box y="1">
+          <select-input
+            v-model="importBranch"
+            label="Import Branch"
+            :options="branches"
+            hint="The branch to import files from."
+          />
+          <text-input
+            v-model="artifactType"
+            label="Artifact Type"
+            hint="A name for imported artifacts."
+            class="q-mx-sm"
+          />
+        </flex-box>
+        <flex-box y="1" align="center">
+          <div class="q-mr-sm">
+            <multiselect-input
+              v-model="includePatterns"
+              label="Include Patterns"
+              :options="[]"
+              add-values
+              hint="Press enter to save a regex file path pattern."
+            />
+            <multiselect-input
+              v-model="excludePatterns"
+              label="Exclude Patterns"
+              :options="[]"
+              add-values
+              hint="Press enter to save a regex file path pattern."
+            />
+          </div>
+          <icon-button
+            tooltip="Learn about file patterns"
+            icon="info"
+            @click="handleFilePatternInfo"
+          />
+        </flex-box>
       </flex-box>
-      <flex-box y="1" align="center">
-        <multiselect-input
-          v-model="includePatterns"
-          label="Include Patterns"
-          :options="[]"
-          add-values
-          hint="Press enter to save a regex file path pattern."
-        />
-        <multiselect-input
-          v-model="excludePatterns"
-          label="Exclude Patterns"
-          :options="[]"
-          add-values
-          hint="Press enter to save a regex file path pattern."
-          class="q-mx-sm"
-        />
-        <icon-button
-          tooltip="Learn about file patterns"
-          icon="info"
-          @click="handleFilePatternInfo"
-        />
-      </flex-box>
-    </flex-box>
+    </expansion-item>
   </div>
 </template>
 
@@ -82,6 +88,7 @@ import {
   MultiselectInput,
   TextInput,
   IconButton,
+  ExpansionItem,
 } from "@/components/common";
 import { GitHubAuthentication } from "@/components/integrations/authentication";
 

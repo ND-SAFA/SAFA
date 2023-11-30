@@ -155,8 +155,11 @@ export const useLayout = defineStore("layout", {
     },
     /**
      * Adds auto-move handlers to all nodes, so that their children are dragged along with then.
+     * - This action is skipped if the graph is too large.
      */
     applyAutomove(): void {
+      if (artifactStore.largeNodeCount) return;
+
       cyStore.getCy("project").then((cy) => {
         cy.automove("destroy");
 
@@ -184,8 +187,11 @@ export const useLayout = defineStore("layout", {
     },
     /**
      * Applies style changes to graph links.
+     * - This action is skipped if the graph is too large.
      */
     styleGeneratedLinks(): void {
+      if (artifactStore.largeNodeCount) return;
+
       cyStore.getCy("project").then((cy) => {
         cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach((edge) => {
           edge.style({

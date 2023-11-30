@@ -95,7 +95,10 @@ export type IconVariant =
   | "pw-show"
   | "pw-hide"
   | "connected"
-  | "disconnected";
+  | "disconnected"
+  | "onboarding"
+  | "changelog"
+  | "security";
 
 /**
  * Defines props for an icon.

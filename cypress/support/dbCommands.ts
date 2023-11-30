@@ -3,6 +3,7 @@ const apiUrl = "https://dev-api.safa.ai";
 Cypress.on("window:before:load", (window) => {
   // Disable the cookie banner.
   window.document.cookie = `wpcc=dismiss`;
+  window.localStorage.setItem("onboarding", "true");
 });
 
 Cypress.Commands.add(

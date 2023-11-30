@@ -189,9 +189,11 @@ export const useSubtree = defineStore("subtrees", {
      * Resets all hidden nodes.
      */
     resetHiddenNodes(): void {
-      this.collapsedParentNodes = [];
-      this.hiddenSubtreeNodes = [];
-      cyStore.setDisplay([], true);
+      if (this.hiddenSubtreeNodes.length > 0) {
+        this.collapsedParentNodes = [];
+        this.hiddenSubtreeNodes = [];
+        cyStore.setDisplay([], true);
+      }
     },
     /**
      * Hides the given artifact's subtree and add replaces child links with

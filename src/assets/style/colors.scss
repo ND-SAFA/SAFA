@@ -55,10 +55,35 @@ $color-linear-gradient: linear-gradient(
     border-color: $color-background !important;
   }
 
-  i, .q-fab__label {
+  i, .q-fab__label, .q-btn__content {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-image: $color-linear-gradient;
+  }
+}
+
+.bd-gradient {
+  background-image: $color-linear-gradient;
+
+  &:before {
+    border: 1px solid transparent !important;
+    background: $color-neutral !important;
+    background-clip: content-box, border-box !important;
+    background-origin: border-box !important;
+  }
+}
+
+.nav-gradient {
+  circle {
+    stroke: url(#color-gradient-full);
+  }
+  .q-linear-progress__model {
+    &:before, &:after {
+      border: 1px solid transparent !important;
+      background-image: $color-linear-gradient;
+      background-clip: content-box, border-box !important;
+      background-origin: border-box !important;
+    }
   }
 }
 

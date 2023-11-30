@@ -4,6 +4,7 @@ import { ArtifactSchema, DocumentArtifacts, FlatArtifact } from "@/types";
 import {
   collectByField,
   flattenArtifact,
+  LARGE_NODE_COUNT,
   preserveMatches,
   removeMatches,
   standardizeValueArray,
@@ -49,6 +50,13 @@ export const useArtifacts = defineStore("artifacts", {
      */
     flatArtifacts(): FlatArtifact[] {
       return this.currentArtifacts.map(flattenArtifact);
+    },
+    /**
+     * @return Whether the current document has a large number of artifacts,
+     * in which case certain graph features are optimized and disabled.
+     */
+    largeNodeCount(): boolean {
+      return this.currentArtifacts.length > LARGE_NODE_COUNT;
     },
   },
   actions: {

@@ -104,7 +104,7 @@ export const useGetVersionApi = defineStore(
     }
 
     async function handleLoadCurrent(
-      identifier: IdentifierSchema
+      identifier: Pick<IdentifierSchema, "projectId">
     ): Promise<void> {
       const versions = await getProjectVersions(identifier.projectId);
 

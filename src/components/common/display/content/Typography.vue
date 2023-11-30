@@ -126,11 +126,15 @@ const className = useMargins(props, () => [
   ["class", props.class],
 ]);
 
-const expanded = ref(
-  props.defaultExpanded &&
+const baseExpanded = computed(
+  () =>
+    props.defaultExpanded &&
+    props.variant !== "code" &&
     (props.collapseLength === 0 ||
       String(props.value).length < props.collapseLength)
 );
+
+const expanded = ref(baseExpanded.value);
 
 const expandable = computed(() => props.variant === "expandable");
 
@@ -157,17 +161,10 @@ const codeExt = computed(() => {
 });
 
 /**
- * Collapse the text if it changes and is too long.
+ * When the variant or value changes, reset the expanded state.
  */
 watch(
   () => [props.value, props.variant],
-  () => {
-    if (
-      props.collapseLength === 0 ||
-      String(props.value).length < props.collapseLength
-    )
-      return;
-    expanded.value = false;
-  }
+  () => (expanded.value = baseExpanded.value)
 );
 </script>

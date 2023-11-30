@@ -44,6 +44,10 @@ export interface StepperProps extends MinimalProps {
    * If true, the ability to click a previous step to go back will be hidden.
    */
   hideStepBack?: boolean;
+  /**
+   * The color to display the completed steps using.
+   */
+  color?: "gradient" | "primary";
 }
 
 /**

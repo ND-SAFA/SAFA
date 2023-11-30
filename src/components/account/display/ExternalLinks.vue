@@ -1,9 +1,33 @@
 <template>
   <panel-card title="SAFA Documentation">
-    <flex-box full-width align="center" column>
-      <text-button text label="Send Feedback" @click="handleFeedback" />
-      <text-button text label="About SAFA" @click="handleWalkthrough" />
-      <text-button text label="Recent Changes" @click="handleChangelog" />
+    <flex-box full-width justify="center">
+      <flex-box column>
+        <text-button
+          text
+          color="primary"
+          label="Getting Started"
+          icon="onboarding"
+          @click="handleOnboarding"
+        />
+        <text-button
+          text
+          label="About SAFA"
+          icon="nav-artifact"
+          @click="handleWalkthrough"
+        />
+        <text-button
+          text
+          label="Send Feedback"
+          icon="feedback"
+          @click="handleFeedback"
+        />
+        <text-button
+          text
+          label="Recent Changes"
+          icon="changelog"
+          @click="handleChangelog"
+        />
+      </flex-box>
     </flex-box>
   </panel-card>
 </template>
@@ -19,7 +43,15 @@ export default {
 
 <script setup lang="ts">
 import { ABOUT_SAFA_LINK, CHANGELOG_LINK, FEEDBACK_LINK } from "@/util";
+import { onboardingStore } from "@/hooks";
 import { PanelCard, FlexBox, TextButton } from "@/components/common";
+
+/**
+ * Opens the onboarding workflow.
+ */
+function handleOnboarding(): void {
+  onboardingStore.handleReload(true);
+}
 
 /**
  * Routes the user to the feedback page.

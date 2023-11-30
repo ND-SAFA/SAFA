@@ -41,14 +41,15 @@
       <git-hub-project-input v-if="props.panel.variant === 'github'" />
       <jira-project-input v-if="props.panel.variant === 'jira'" />
 
+      <switch-input
+        v-if="hasBulkFiles"
+        v-model="props.panel.emptyFiles"
+        label="Create an empty project"
+        data-cy="toggle-create-empty-project"
+      />
+
       <expansion-item v-if="!props.hideUploadType" label="Advanced Settings">
         <flex-box column>
-          <switch-input
-            v-if="hasBulkFiles"
-            v-model="props.panel.emptyFiles"
-            label="Create an empty project"
-            data-cy="toggle-create-empty-project"
-          />
           <switch-input
             v-if="hasBulkFiles"
             v-model="props.panel.summarize"

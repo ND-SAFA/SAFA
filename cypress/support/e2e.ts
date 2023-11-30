@@ -39,8 +39,6 @@ before(() => {
   cy.log("Generating users...");
   cy.dbGenerateUsers();
   cy.expandViewport("l");
-
-  window.localStorage.setItem("onboarding", "true");
 });
 
 /**

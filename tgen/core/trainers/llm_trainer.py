@@ -1,7 +1,6 @@
 import json
-import os.path
 from collections import OrderedDict
-from typing import Any, List, Union, Dict, Tuple
+from typing import Any, Dict, List, Union
 
 from openai.api_resources.fine_tune import FineTune
 
@@ -9,7 +8,6 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.thread_util import GlobalState
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput

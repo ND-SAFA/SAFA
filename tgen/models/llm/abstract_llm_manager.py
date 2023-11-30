@@ -1,18 +1,17 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Generic, Type, TypeVar, Tuple, List, Set, Any, Callable
+from typing import Any, Dict, Generic, List, Set, Type, TypeVar
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.attr_dict import AttrDict
+from tgen.common.threading.threading_state import MultiThreadState
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.thread_util import GlobalState
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.tokens.token_costs import INPUT_TOKENS, ModelTokenCost, OUTPUT_TOKENS
-from tgen.prompts.prompt_args import PromptArgs
 from tgen.pipeline.state import State
+from tgen.prompts.prompt_args import PromptArgs
 
 AIObject = TypeVar("AIObject")
 
@@ -54,11 +53,11 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
                                                                                      input_or_output=INPUT_TOKENS,
                                                                                      raise_exception=False)
         retries = self._get_indices_to_retry(original_responses)
-        global_state: GlobalState = self.make_completion_request_impl(raise_exception=raise_exception,
-                                                                      original_responses=original_responses,
-                                                                      retries=retries,
-                                                                      **completion_params)
-        llm_response = global_state["results"]
+        global_state: MultiThreadState = self.make_completion_request_impl(raise_exception=raise_exception,
+                                                                           original_responses=original_responses,
+                                                                           retries=retries,
+                                                                           **completion_params)
+        llm_response = global_state.results
 
         output_content = self.extract_all_text_from_response(llm_response)
         self.state.total_output_cost += ModelTokenCost.calculate_cost_for_content(content=output_content,
@@ -121,19 +120,19 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         """
 
     @classmethod
-    def _handle_exceptions(cls, global_state: GlobalState) -> None:
+    def _handle_exceptions(cls, global_state: MultiThreadState) -> None:
         """
         Ensures that any exceptions are appropriately formatted.
         :param global_state: The global state from running the thread calls to the LLM.
         :param formatter: Handles formatting the exception in the format of the LLM (e.g. OpenAI vs. Anthropic)
         :return: None.
         """
-        global_responses = global_state["results"]
+        global_responses = global_state.results
         for i, res in enumerate(global_responses):
             if isinstance(res, Exception) or not res:
-                e = global_state["exception"] if global_state["exception"] else Exception("Unknown Exception Occurred")
+                e = global_state.exception if global_state.exception else Exception("Unknown Exception Occurred")
                 global_responses[i] = cls.format_response(exception=e)
-                global_state["failed_responses"].add(i)
+                global_state.failed_responses.add(i)
 
     @abstractmethod
     def _make_fine_tune_request_impl(self, **kwargs) -> AIObject:

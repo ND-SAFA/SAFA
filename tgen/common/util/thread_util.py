@@ -1,20 +1,8 @@
-import threading
-import time
-from queue import Queue
-from typing import Any, Callable, List, Union, Dict, TypedDict, Optional, Set
+from typing import Callable, List, Set
 
-from tqdm import tqdm
-
-from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.constants.threading_constants import THREAD_SLEEP
-from tgen.common.logging.logger_manager import logger
-
-
-class GlobalState(TypedDict):
-    successful: bool
-    exception: Optional[Exception]
-    failed_responses: Set[int]
-    results: Optional[List[Any]]
+from tgen.common.threading.child_thread import ChildThread
+from tgen.common.threading.threading_state import MultiThreadState
 
 
 class ThreadUtil:
@@ -25,7 +13,7 @@ class ThreadUtil:
     @staticmethod
     def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1,
                              collect_results: bool = False, thread_sleep: float = THREAD_SLEEP,
-                             retries: Set = None, raise_exception: bool = True) -> Dict[str, Any]:
+                             retries: Set = None, raise_exception: bool = True) -> MultiThreadState:
         """
         Performs distributed work over threads.
         :param title: The title of the work being done, used for logging.
@@ -39,67 +27,22 @@ class ThreadUtil:
         :param raise_exception: Throws an exception if one of the threads fails.
         :return: None
         """
-        iterable = list(enumerate(iterable))
 
-        result_list = [None] * len(iterable)
-
-        item_queue = Queue()
-        for i, item in iterable:
-            if not retries or i in retries:
-                item_queue.put((i, item))
-
-        progress_bar = tqdm(total=item_queue.unfinished_tasks, desc=title, ncols=TQDM_NCOLS)
-        global_state: GlobalState = {
-            "successful": True,
-            "exception": None,
-            "failed_responses": set(),
-            "results": None
-        }
-
-        def thread_body() -> None:
-            """
-            Performs the next work payload from the item queue. If fails, then thread will sleed and retry until the max attempts
-            has been reached.
-            """
-            while not item_queue.empty() and global_state["successful"]:
-                index, item = item_queue.get()
-
-                attempts = 0
-                successful_local = False
-                while not successful_local and attempts < max_attempts and global_state["successful"]:
-                    if attempts > 0:
-                        logger.info(f"Re-trying request...")
-                    try:
-                        attempts += 1
-                        thread_result = thread_work(item)
-                        successful_local = True
-                        if collect_results:
-                            result_list[index] = thread_result
-                    except Exception as e:
-                        if attempts >= max_attempts and not successful_local:
-                            global_state["successful"] = False
-                            global_state["exception"] = e
-                            global_state["failed_responses"].add(index)
-                            if collect_results:
-                                result_list[index] = e
-                        else:
-                            logger.exception(e)
-                            logger.info(f"Request failed, retrying in {thread_sleep} seconds.")
-                            time.sleep(thread_sleep)
-
-                progress_bar.update()
+        global_state: MultiThreadState = MultiThreadState(iterable, title=title, retries=retries,
+                                                          max_attempts=max_attempts, collect_results=collect_results,
+                                                          sleep_time=thread_sleep)
 
         threads = []
         for i in range(n_threads):
-            t1 = threading.Thread(target=thread_body, args=[])
+            t1 = ChildThread(global_state, thread_work)
             threads.append(t1)
             t1.start()
         for t in threads:
             t.join()
 
-        if not global_state["successful"]:
+        if not global_state.successful:
             if raise_exception:
-                raise global_state["exception"]
+                raise global_state.exception
         if collect_results:
-            global_state["results"] = result_list
+            global_state.results = global_state.result_list
         return global_state

@@ -15,7 +15,7 @@ class TestThreadUtil(BaseTest):
         results = ThreadUtil.multi_thread_process("Testing multi-threaded jobs", payloads, lambda p: p,
                                                   n_threads=2,
                                                   collect_results=True,
-                                                  max_attempts=1)["results"]
+                                                  max_attempts=1).results
         self.assertEqual(payloads, results)
 
     def test_re_tries(self):
@@ -40,7 +40,7 @@ class TestThreadUtil(BaseTest):
                                                   n_threads=n_threads,
                                                   collect_results=True,
                                                   max_attempts=max_attempts,
-                                                  thread_sleep=thread_sleep)["results"]
+                                                  thread_sleep=thread_sleep).results
         self.assertEqual(payloads, results)
 
     def test_assert_max_retries(self):

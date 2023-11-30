@@ -1,5 +1,4 @@
 import time
-from dataclasses import field
 from queue import Queue
 from typing import Any, Iterable, List, Optional, Set
 
@@ -29,7 +28,7 @@ class MultiThreadState:
         self.progress_bar = None
         self.successful: bool = True
         self.exception: Optional[Exception] = None
-        self.failed_responses: Set[int] = field(default_factory=set)
+        self.failed_responses: Set[int] = set()
         self.results: Optional[List[Any]] = None
         self.collect_results = collect_results
         self.sleep_time = sleep_time

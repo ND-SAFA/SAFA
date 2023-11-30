@@ -1,5 +1,5 @@
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.hgen.common.hgen_dataset_exporter import HGenDatasetExporter
+from tgen.hgen.common.hgen_dataset_exporter import HGenDatasetBuilder
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -14,6 +14,6 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param args: The arguments and current state of HGEN.
         :return: None
         """
-        trace_dataset = HGenDatasetExporter.export(args, state)
+        trace_dataset = HGenDatasetBuilder.build(args, state)
         dataset = PromptDataset(trace_dataset=trace_dataset, project_summary=args.dataset.project_summary)
         state.final_dataset = dataset

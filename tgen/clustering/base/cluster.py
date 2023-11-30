@@ -1,7 +1,7 @@
 import os
 from copy import deepcopy
 from os.path import dirname
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple, Union, Callable
 
 import numpy as np
 
@@ -73,26 +73,36 @@ class Cluster:
         """
         self.votes += 1
 
-    def add_artifacts(self, artifact_ids: List[str], update_stats: bool = True) -> None:
+    def remove_artifacts(self, artifact_ids: List[str], update_stats: bool = True) -> None:
+        """
+        Removes multiple artifacts from cluster and updates its stats.
+        :param artifact_ids: The artifact ids to remove.
+        :param update_stats: If True, updates the cluster stats.
+        :return: None.
+        """
+        self._commit_action(self._remove_artifact, artifact_ids, update_stats)
+
+    def add_artifacts(self, artifact_ids: Union[List[str], str], update_stats: bool = True) -> None:
         """
         Adds multiple artifacts to cluster and updates its stats.
         :param artifact_ids: The artifact ids to add to the cluster.
         :param update_stats: If True, updates the cluster stats.
         :return: None.
         """
-        for artifact_id in artifact_ids:
-            self._add_artifact(artifact_id)
-        if update_stats:
-            self.__update_stats()
+        self._commit_action(self._add_artifact, artifact_ids, update_stats)
 
-    def add_artifact(self, artifact_id: str, update_stats: bool = True) -> None:
+    def _commit_action(self, action: Callable, artifact_ids: Union[List[str], str], update_stats: bool) -> None:
         """
-        Adds an artifact to the cluster.
-        :param artifact_id: ID of artifact to add to cluster.
-        :param update_stats: If True, updates the cluster stats.
+        Performs an action on all given artifacts.
+        :param action: The method used to perform the action.
+        :param artifact_ids: The ids of the artifacts to perform action for.
+        :param update_stats: If True, updates the clusters stats.
         :return: None.
         """
-        self._add_artifact(artifact_id)
+        if isinstance(artifact_ids, str):
+            artifact_ids = [artifact_ids]
+        for artifact_id in artifact_ids:
+            action(artifact_id)
         if update_stats:
             self.__update_stats()
 
@@ -128,6 +138,16 @@ class Cluster:
             self.artifact_id_set.add(artifact_id)
             self.artifact_ids.append(artifact_id)
 
+    def _remove_artifact(self, artifact_id: str) -> None:
+        """
+        Adds an artifact to the cluster.
+        :param artifact_id: ID of artifact to add to cluster.
+        :return: None
+        """
+        if artifact_id in self.artifact_id_set:
+            self.artifact_id_set.remove(artifact_id)
+            self.artifact_ids.remove(artifact_id)
+
     def __update_stats(self) -> None:
         """
         Calculates all statistics for the cluster.
@@ -137,8 +157,9 @@ class Cluster:
         self.avg_similarity = self.__calculate_average_similarity()
         if len(self.artifact_id_set) > 1:
             self.similarity_matrix = self.__calculate_similarity_matrix()
-            self.min_sim, self.max_sim = self.__calculate_min_max_similarity()
+            self.min_sim, self.max_sim, self.med_sim = self.__calculate_min_max_median_similarity()
             self.avg_pairwise_sim = self.__calculate_avg_pairwise_distance()
+            self.size_weighted_sim = self.__weight_average_pairwise_sim_with_size(self.avg_pairwise_sim)
 
     def __init_stats(self) -> None:
         """
@@ -151,45 +172,7 @@ class Cluster:
         self.min_sim = None
         self.max_sim = None
         self.avg_pairwise_sim = None
-
-    def __calculate_average_similarity(self) -> float:
-        """
-        Calculates the average similarity from the artifacts to the centroid.
-        :return: Average similarity to centroid.
-        """
-        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
-        similarities = EmbeddingUtil.calculate_similarities([self.centroid], artifact_embeddings)[0]
-        return np.sum(similarities) / len(similarities)
-
-    def __calculate_similarity_matrix(self) -> np.array:
-        """
-        Calculates the similarity scores between all artifacts in the cluster.
-        :return: The similarity matrix.
-        """
-        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
-        similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
-        return similarity_matrix
-
-    def __calculate_min_max_similarity(self) -> Tuple[float, float]:
-        """
-        Calculates the minimum and maximum similarity scores in the similarity matrix.
-        :return: Min and Max similarity scores.
-        """
-        unique_indices = NpUtil.get_unique_indices(len(self.artifact_id_set))
-        similarities = NpUtil.get_values(self.similarity_matrix, unique_indices)
-        min_sim = np.min(similarities)
-        max_sim = np.max(similarities)
-        return min_sim, max_sim
-
-    def __calculate_avg_pairwise_distance(self) -> float:
-        """
-        Calculates the average pairwise distance between all points of a matrix.
-        :return: Calculates the pairwise distances and returns its average.
-        """
-        n_artifacts = len(self.artifact_id_set)
-        indices = NpUtil.get_unique_indices(n_artifacts)
-        unique_scores = NpUtil.get_values(self.similarity_matrix, indices)
-        return sum(unique_scores) / len(unique_scores)
+        self.size_weighted_sim = None
 
     def to_yaml(self, export_path: str = None, **kwargs) -> "Cluster":
         """
@@ -212,6 +195,76 @@ class Cluster:
         """
         self.__update_stats()
         return self
+
+    def calculate_avg_pairwise_sim_for_artifacts(self, artifact_ids: Union[List[str], str]) -> Union[float, List[float]]:
+        """
+        Calculates the avg pairwise similarity of an artifact to its neighbors.
+        :param artifact_ids: The id(s) of the artifact(s) to calculate the avg pairwise sim of.
+        :return: The avg pairwise similarity of each artifact to its neighbors.
+        """
+        if isinstance(artifact_ids, list):
+            return [self._calculate_avg_pairwise_sim_for_artifact(a_id) for a_id in artifact_ids]
+        else:
+            return self._calculate_avg_pairwise_sim_for_artifact(artifact_ids)
+
+    def _calculate_avg_pairwise_sim_for_artifact(self, artifact_id: str) -> float:
+        """
+        Calculates the avg pairwise similarity of an artifact to its neighbors.
+        :param artifact_id: The id of the artifact to calculate the avg pairwise sim of.
+        :return: The avg pairwise similarity of an artifact to its neighbors.
+        """
+        artifact_index = self.artifact_ids.index(artifact_id)
+        neighbor_indices = [i for i in range(self.similarity_matrix.shape[1]) if i != artifact_index]
+        neighbor_similarities = self.similarity_matrix[artifact_index, neighbor_indices]
+        return sum(neighbor_similarities) / len(neighbor_similarities)
+
+    def __calculate_avg_pairwise_distance(self) -> float:
+        """
+        Calculates the average pairwise distance between all points of a matrix.
+        :return: Calculates the pairwise distances and returns its average.
+        """
+        n_artifacts = len(self.artifact_id_set)
+        indices = NpUtil.get_unique_indices(n_artifacts)
+        unique_scores = NpUtil.get_values(self.similarity_matrix, indices)
+        return sum(unique_scores) / len(unique_scores)
+
+    def __weight_average_pairwise_sim_with_size(self, avg_pairwise_sim: float, size_weight: float = 0.15) -> float:
+        """
+        Calculates the average pairwise distance between all points of a matrix, weighted with the size of the cluster.
+        :param avg_pairwise_sim: The average pairwise distance.
+        :return: Calculates the pairwise distances and returns its average, weighted with the size of the cluster.
+        """
+        return (size_weight * np.log(len(self))) + avg_pairwise_sim
+
+    def __calculate_average_similarity(self) -> float:
+        """
+        Calculates the average similarity from the artifacts to the centroid.
+        :return: Average similarity to centroid.
+        """
+        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
+        similarities = EmbeddingUtil.calculate_similarities([self.centroid], artifact_embeddings)[0]
+        return np.sum(similarities) / len(similarities)
+
+    def __calculate_similarity_matrix(self) -> np.array:
+        """
+        Calculates the similarity scores between all artifacts in the cluster.
+        :return: The similarity matrix.
+        """
+        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
+        similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
+        return similarity_matrix
+
+    def __calculate_min_max_median_similarity(self) -> Tuple[float, float, float]:
+        """
+        Calculates the minimum and maximum similarity scores in the similarity matrix.
+        :return: Min and Max similarity scores.
+        """
+        unique_indices = NpUtil.get_unique_indices(len(self.artifact_id_set))
+        similarities = NpUtil.get_values(self.similarity_matrix, unique_indices)
+        min_sim = np.min(similarities)
+        max_sim = np.max(similarities)
+        med_sim = np.median(similarities)
+        return min_sim, max_sim, med_sim
 
     def __len__(self) -> int:
         """
@@ -255,7 +308,8 @@ class Cluster:
         """
         :return: Cluster is represented by the list of artifact ids it contains.
         """
-        metrics = {"AVG": self.avg_similarity, "MIN": self.min_sim, "MAX": self.max_sim, "P": self.avg_pairwise_sim}
+        metrics = {"AVG": self.avg_similarity, "MIN": self.min_sim, "MAX": self.max_sim,
+                   "P": self.avg_pairwise_sim, "IMPORTANCE": self.size_weighted_sim}
         metrics = {k: round(v, 2) for k, v in metrics.items() if v is not None}
         cluster_repr = f"{self.artifact_ids.__str__()}{str(metrics)}"
         return cluster_repr

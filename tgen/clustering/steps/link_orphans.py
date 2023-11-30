@@ -8,6 +8,7 @@ from tgen.clustering.steps.create_clusters_from_embeddings import CreateClusters
 from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_SIMILARITY_DELTA, MIN_ORPHAN_HOME_SIMILARITY
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
@@ -90,7 +91,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         """
         adopted_orphans = set()
         best_clusters = []
-        for artifact_id in orphan_artifacts:
+        for artifact_id in ListUtil.selective_tqdm(orphan_artifacts, desc="Placing orphans in homes."):
             similarities_to_clusters = [c.similarity_to_neighbors(artifact_id) for c in clusters]
             artifact_iterable = [(artifact_id, t[0], t[1]) for t in zip(clusters, similarities_to_clusters)]
             best_clusters.extend(artifact_iterable)
@@ -106,7 +107,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
             if args.add_orphans_to_best_home or (within_similarity_threshold and not_seen and above_minimum_score):
                 if not within_cluster_size:
                     continue
-                cluster.add_artifact(artifact)
+                cluster.add_artifacts(artifact)
                 adopted_orphans.add(artifact)
         return adopted_orphans
 

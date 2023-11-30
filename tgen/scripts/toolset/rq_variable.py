@@ -48,7 +48,8 @@ class RQVariable:
         """
         message = f"{self.name}"
         try:
-            value = inquirer_value(message, self.type_class, default_value=self.__default_value, allow_back=True,
+            value = inquirer_value(message=message, class_type=self.type_class, type_constructor=self.type_constructor,
+                                   default_value=self.__default_value, allow_back=True,
                                    is_required=self.is_required)
             self.__value = value
         except Exception as e:

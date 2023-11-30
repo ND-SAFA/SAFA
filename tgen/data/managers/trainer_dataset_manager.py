@@ -78,7 +78,7 @@ class TrainerDatasetManager(BaseObject):
                 exporter: AbstractDatasetExporter = format_type.value
                 export_path = os.path.join(output_dir, self.get_dataset_filename(dataset_role)) \
                     if exporter.include_filename() else os.path.join(output_dir, dataset_role.value)
-                output_path = exporter(export_path=export_path, dataset=dataset).export()
+                output_path = exporter(export_path=export_path, dataset=dataset).build()
                 output_paths.append(output_path)
         return output_paths
 

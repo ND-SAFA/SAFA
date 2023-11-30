@@ -53,7 +53,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             prompt_builder.format_variables = {"n_targets": n_targets}
 
         if state.project_summary:
-            project_overview = state.project_summary.to_string([PS_OVERVIEW_TITLE])
+            project_overview = state.project_summary.to_string(args.content_generation_project_summary_sections)
             overview_of_system_prompt = Prompt(f"\n{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{project_overview}", allow_formatting=False)
             prompt_builder.add_prompt(overview_of_system_prompt, 1)

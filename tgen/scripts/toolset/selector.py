@@ -1,5 +1,5 @@
 import sys
-from typing import Any, List, Type
+from typing import Any, List, Type, Callable
 
 from tgen.common.logging.logger_manager import logger
 
@@ -55,12 +55,14 @@ def inquirer_selection(selections: List[str], message: str = None, allow_back: b
     return selected_choice
 
 
-def inquirer_value(message: str, class_type: Type, default_value: Any = None, allow_back: bool = DEFAULT_ALLOW_BACK,
+def inquirer_value(message: str, class_type: Type, type_constructor: Callable = None,
+                   default_value: Any = None, allow_back: bool = DEFAULT_ALLOW_BACK,
                    is_required: bool = True):
     """
     Prompts user with message for a value.
     :param message: The message to prompt user with.
     :param class_type: The type of value to expect back.
+    :param type_constructor: Responsible for converting the input to the correct type.
     :param default_value: The default value to use if optional.
     :param allow_back: Allow the user to type back command.
     :param is_required: If True, then the user is required to supply a value (unless a default is provided) else may be blank
@@ -70,7 +72,10 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
     message += f" - {annotation_name}"
     if default_value is not None:
         message += f" ({default_value})"
-
+    elif is_required:
+        message += "*"
+    else:
+        message += " (Optional)"
     message = message + ": "
 
     user_value = input(message)
@@ -80,4 +85,6 @@ def inquirer_value(message: str, class_type: Type, default_value: Any = None, al
         if default_value is None and is_required:
             raise Exception(REQUIRED_FIELD_ERROR)
         user_value = default_value
-    return class_type(user_value) if user_value is not None else user_value
+    if user_value is not None and not isinstance(user_value, class_type):
+        user_value = class_type(user_value) if not type_constructor else type_constructor(user_value)
+    return user_value

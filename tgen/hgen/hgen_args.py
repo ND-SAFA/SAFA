@@ -6,6 +6,7 @@ from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_TH
     DEFAULT_ORPHAN_THRESHOLD, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
+from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
@@ -121,6 +122,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """
     export_original_dataset: bool = False
+    """
+    The sections of the project summary to include in content generation.
+    """
+    content_generation_project_summary_sections: List[str] = field(default_factory=lambda: [PS_ENTITIES_TITLE])
 
     def __post_init__(self) -> None:
         """
@@ -146,7 +151,7 @@ class HGenArgs(PipelineArgs, BaseObject):
         if isinstance(self.source_layer_ids, str):
             self.source_layer_ids = [self.source_layer_ids]
 
-    def get_seed_id(self) -> str:
+    def get_seed_id(self, raise_exception: bool=True) -> str:
         """
         :return: The current seed layer id.
         """
@@ -154,4 +159,5 @@ class HGenArgs(PipelineArgs, BaseObject):
             return self.seed_project_summary_section
         if self.seed_layer_id:
             return self.seed_layer_id
-        raise Exception("No seed id available. Seedd project Summary and layer_id are none.")
+        if raise_exception:
+            raise Exception("No seed id available. Seed project Summary and layer_id are none.")

@@ -32,7 +32,6 @@ class ClusteringArgs(PipelineArgs):
     cluster_max_size: int = DEFAULT_MAX_CLUSTER_SIZE
     cluster_min_size: int = DEFAULT_MIN_CLUSTER_SIZE
     cluster_intersection_threshold: float = DEFAULT_CLUSTER_SIMILARITY_THRESHOLD  # 80% or more of intersection equals same cluster
-    cluster_reduction_factor: float = DEFAULT_REDUCTION_PERCENTAGE_CLUSTERING
     create_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY

@@ -45,10 +45,8 @@ class StepClusterArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerState]
         avg_file_size = n_tokens / n_artifacts
         max_cluster_size = round(MAX_TOKENS_FOR_PROJECT_SUMMARY / avg_file_size)
         min_cluster_size = round(min(.25 * n_artifacts, (MAX_TOKENS_FOR_PROJECT_SUMMARY / avg_file_size) * .75))
-        cluster_reduction_factor = 1 / max_cluster_size
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, "clustering")
         cluster_args = ClusteringArgs(dataset=state.dataset, create_dataset=True, export_dir=clustering_export_path,
-                                      cluster_reduction_factor=cluster_reduction_factor,
                                       cluster_min_size=min_cluster_size,
                                       cluster_max_size=max_cluster_size,
                                       filter_by_cohesiveness=False,

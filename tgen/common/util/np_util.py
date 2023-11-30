@@ -2,6 +2,10 @@ from typing import List, Tuple
 
 import numpy as np
 
+import pandas as pd
+
+from tgen.common.util.list_util import ListUtil
+
 
 class NpUtil:
     """
@@ -16,14 +20,51 @@ class NpUtil:
         :param quantile: The quantile at which to retrieve the threshold for.
         :return: Threshold to achieve percentile within the similarity matrix.
         """
+        unique_scores = [s[-1] for s in NpUtil.get_unique_values(similarity_matrix)]
+        quantile_score = np.quantile(unique_scores, quantile)
+        return quantile_score
+
+    @staticmethod
+    def get_similarity_matrix_outliers(similarity_matrix: np.array) -> Tuple[float, float]:
+        """
+        Returns the indices in the matrix whose values are outliers in the matrix.
+        :param similarity_matrix: The matrix whose similarities are analyzed.
+        :return: The lower and upper threshold scores for filtering out outliers.
+        """
+        unique_values = NpUtil.get_unique_values(similarity_matrix)
+        unique_scores = ListUtil.unzip(unique_values, -1)
+        lower_threshold, upper_threshold = NpUtil.detect_outlier_scores(unique_scores)
+        return lower_threshold, upper_threshold
+
+    @staticmethod
+    def get_unique_values(similarity_matrix: np.array) -> List[Tuple[int, int, float]]:
+        """
+        Returns the values of the unique comparisons in similarity matrix.
+        :param similarity_matrix: Matrix of similarity scores containing the same artifacts as rows and cols.
+        :return:
+        """
         n_rows = similarity_matrix.shape[0]
         n_cols = similarity_matrix.shape[1]
         use_all_indices = n_rows != n_cols
         unique_indices = NpUtil.get_all_indices(n_rows=n_rows, n_cols=n_cols) if use_all_indices else NpUtil.get_unique_indices(
             n_rows=n_rows, n_cols=n_cols)
         unique_scores = NpUtil.get_values(similarity_matrix, unique_indices)
-        quantile_score = np.quantile(unique_scores, quantile)
-        return quantile_score
+        result = [(i[0], i[1], s) for i, s in zip(unique_indices, unique_scores)]
+        return result
+
+    @staticmethod
+    def detect_outlier_scores(scores: List[float], sigma: int = 2.5) -> Tuple[float, float]:
+        """
+        Detects the list of outlier scores within sigma.
+        :param scores: List of scores to detect outliers from.
+        :param sigma: Number of Std Deviations to include in valid boundary.
+        :return: The lower and upper threshold scores for filtering out outliers.
+        """
+        scores = pd.Series(scores)
+        lower_limit = scores.mean() - sigma * scores.std()
+        upper_limit = scores.mean() + sigma * scores.std()
+
+        return lower_limit, upper_limit
 
     @staticmethod
     def get_unique_indices(n_rows: int, n_cols: int = None) -> List[Tuple[int, int]]:

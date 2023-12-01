@@ -213,6 +213,7 @@ export const useDocuments = defineStore("documents", {
 
       this.currentDocument = document;
       this.historyIndex = documentIndex;
+      selectionStore.clearSelections();
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
@@ -229,18 +230,23 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Creates and adds a new document based on the neighborhood of an artifact.
+     * If the neighborhood is too large, the document will instead include the parents and children, and
+     * hide the child subtrees.
      * @param artifact - The artifact to display the neighborhood of.
      */
     async addDocumentOfNeighborhood(
       artifact: Pick<ArtifactSchema, "name" | "id">
     ): Promise<void> {
-      const neighbors =
-        subtreeStore.getNeighbors(artifact.id).length < LARGE_NODE_LAYOUT_COUNT
-          ? new Set(subtreeStore.getNeighbors(artifact.id))
-          : new Set([
-              ...subtreeStore.getChildren(artifact.id),
-              ...subtreeStore.getParents(artifact.id),
-            ]);
+      const hideSubtrees =
+        subtreeStore.getNeighbors(artifact.id).length > LARGE_NODE_LAYOUT_COUNT;
+
+      const neighbors = hideSubtrees
+        ? new Set([
+            ...subtreeStore.getChildren(artifact.id),
+            ...subtreeStore.getParents(artifact.id),
+          ])
+        : new Set(subtreeStore.getNeighbors(artifact.id));
+
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,
@@ -252,8 +258,45 @@ export const useDocuments = defineStore("documents", {
           )
           .map(({ id }) => id),
       });
+
       await this.addDocument(document);
       layoutStore.mode = "tree";
+      subtreeStore.resetHiddenNodes();
+
+      if (hideSubtrees) {
+        subtreeStore
+          .getChildren(artifact.id)
+          .forEach((id) => subtreeStore.hideSubtree(id));
+      }
+    },
+    /**
+     * Shows the subtree of an artifact in the current document.
+     * If the subtree is at all missing from the current document, it will be added.
+     * @param artifact - The artifact to show the subtree of.
+     */
+    async extendDocumentSubtree(artifact: ArtifactSchema): Promise<void> {
+      const documentArtifactsWithSubtree = new Set([
+        ...subtreeStore.getChildren(artifact.id),
+        ...this.currentDocument.artifactIds,
+      ]);
+
+      if (
+        this.currentDocument.artifactIds.length <
+        documentArtifactsWithSubtree.size
+      ) {
+        await this.addDocument(
+          buildDocument({
+            project: projectStore.projectIdentifier,
+            name: this.currentDocument.name,
+            artifactIds: Array.from(documentArtifactsWithSubtree),
+          })
+        );
+      }
+
+      await subtreeStore.showSubtree(artifact.id);
+      subtreeStore
+        .getChildren(artifact.id)
+        .forEach((id) => subtreeStore.hideSubtree(id));
     },
     /**
      * Creates and adds a new document for multiple types of artifacts.

@@ -4,7 +4,7 @@
     :color="props.color"
     variant="footer"
     :selected="props.selected"
-    @click="subtreeStore.showSubtree(id)"
+    @click="documentStore.extendDocumentSubtree(props.artifact)"
     @mousedown.stop
     @mouseup.stop
   >
@@ -37,7 +37,7 @@ export default {
 import { computed } from "vue";
 import { ArtifactNodeDisplayProps } from "@/types";
 import { getEnumColor } from "@/util";
-import { deltaStore, subtreeStore } from "@/hooks";
+import { deltaStore, documentStore, subtreeStore } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, Icon, Typography, Separator } from "@/components/common";
 

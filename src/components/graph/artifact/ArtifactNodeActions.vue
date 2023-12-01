@@ -18,7 +18,7 @@
         tooltip="Show subtree"
         icon="group-open-all"
         data-cy="button-toggle-subtree"
-        @click="subtreeStore.showSubtree(id)"
+        @click="documentStore.extendDocumentSubtree(props.artifact)"
       />
       <icon-button
         v-else-if="hasSubtree"

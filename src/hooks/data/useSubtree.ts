@@ -218,6 +218,8 @@ export const useSubtree = defineStore("subtrees", {
         (id) => !this.hiddenSubtreeNodes.includes(id)
       );
 
+      if (childrenInSubtree.length === 0) return;
+
       this.$patch({
         hiddenSubtreeNodes: [...this.hiddenSubtreeNodes, ...visibleChildren],
         collapsedParentNodes: [...this.collapsedParentNodes, rootId],

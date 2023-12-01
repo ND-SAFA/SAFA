@@ -119,7 +119,7 @@ const graphClassName = computed(() => {
  * Clears all project data.
  */
 function handleClear() {
-  identifierSaveStore.resetIdentifier();
+  identifierSaveStore.resetIdentifier(true);
   projectSaveStore.resetProject();
 }
 

@@ -36,8 +36,13 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
   actions: {
     /**
      * Resets the identifier value to the given base value.
+     * @param clear - Whether to clear the base identifier.
      */
-    resetIdentifier(): void {
+    resetIdentifier(clear?: boolean): void {
+      if (clear) {
+        this.baseIdentifier = undefined;
+      }
+
       this.editedIdentifier = buildProjectIdentifier(this.baseIdentifier);
     },
     /**

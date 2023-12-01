@@ -58,6 +58,7 @@ class NpUtil:
         Detects the list of outlier scores within sigma.
         :param scores: List of scores to detect outliers from.
         :param sigma: Number of Std Deviations to include in valid boundary.
+        :param epsilon: The small number to use instead of negative or zero values.
         :return: The lower and upper threshold scores for filtering out outliers.
         """
         scores = pd.Series(scores)

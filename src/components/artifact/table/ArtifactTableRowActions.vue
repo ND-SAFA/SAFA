@@ -54,11 +54,11 @@ import { ArtifactProps } from "@/types";
 import {
   artifactApiStore,
   artifactSaveStore,
-  documentStore,
   layoutStore,
   permissionStore,
   selectionStore,
   traceSaveStore,
+  viewsStore,
 } from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
@@ -89,7 +89,7 @@ function handleDelete() {
  * Opens tree view with the current artifact selected.
  */
 function handleOpenTree(): void {
-  documentStore.addDocumentOfNeighborhood(props.artifact);
+  viewsStore.addDocumentOfNeighborhood(props.artifact);
   layoutStore.mode = "tree";
 }
 

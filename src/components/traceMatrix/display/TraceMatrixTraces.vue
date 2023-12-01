@@ -39,9 +39,9 @@ export default {
 import { computed } from "vue";
 import {
   artifactStore,
-  documentStore,
   selectionStore,
   subtreeStore,
+  viewsStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -97,7 +97,7 @@ const traceCoverage = computed(() => {
 function handleViewLevel(): void {
   if (!traceMatrix.value) return;
 
-  documentStore.addDocumentOfTypes([
+  viewsStore.addDocumentOfTypes([
     traceMatrix.value.sourceType,
     traceMatrix.value.targetType,
   ]);

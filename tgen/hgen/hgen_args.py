@@ -153,6 +153,8 @@ class HGenArgs(PipelineArgs, BaseObject):
 
     def get_seed_id(self, raise_exception: bool=True) -> str:
         """
+        Gets the id of the seed layer.
+        :param raise_exception: If True, raises an exception if no seed args are set.
         :return: The current seed layer id.
         """
         if self.seed_project_summary_section:

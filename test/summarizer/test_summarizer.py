@@ -120,7 +120,7 @@ class TestSummarizer(BaseTest):
             body_prefix = artifact_ids if section_title != PS_SUBSYSTEM_TITLE else None
             return create(title=section_title, body_prefix=body_prefix)
 
-        n_clusters = 4
+        n_clusters = 2
         ai_manager.mock_summarization()
         summarizer = self.get_summarizer(SummarizerArgs())
         ids = list(ascii_lowercase)

@@ -53,7 +53,7 @@ class NpUtil:
         return result
 
     @staticmethod
-    def detect_outlier_scores(scores: List[float], sigma: int = 1.5, epsilon=0.01) -> Tuple[float, float]:
+    def detect_outlier_scores(scores: List[float], epsilon=0.01) -> Tuple[float, float]:
         """
         Detects the list of outlier scores within sigma.
         :param scores: List of scores to detect outliers from.
@@ -61,6 +61,7 @@ class NpUtil:
         :param epsilon: The small number to use instead of negative or zero values.
         :return: The lower and upper threshold scores for filtering out outliers.
         """
+        sigma = 2.5 if len(scores) > 20 else 1.5
         scores = pd.Series(scores)
         scores[scores < 0] = epsilon
         harmonic_mean = hmean(scores)

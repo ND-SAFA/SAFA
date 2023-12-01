@@ -1,8 +1,8 @@
 from typing import List, Tuple
 
 import numpy as np
-
 import pandas as pd
+from scipy.stats import hmean
 
 from tgen.common.util.list_util import ListUtil
 
@@ -53,7 +53,7 @@ class NpUtil:
         return result
 
     @staticmethod
-    def detect_outlier_scores(scores: List[float], sigma: int = 2.5) -> Tuple[float, float]:
+    def detect_outlier_scores(scores: List[float], sigma: int = 1.5, epsilon=0.01) -> Tuple[float, float]:
         """
         Detects the list of outlier scores within sigma.
         :param scores: List of scores to detect outliers from.
@@ -61,8 +61,10 @@ class NpUtil:
         :return: The lower and upper threshold scores for filtering out outliers.
         """
         scores = pd.Series(scores)
-        lower_limit = scores.mean() - sigma * scores.std()
-        upper_limit = scores.mean() + sigma * scores.std()
+        scores[scores < 0] = epsilon
+        harmonic_mean = hmean(scores)
+        lower_limit = harmonic_mean - sigma * scores.std()
+        upper_limit = harmonic_mean + sigma * scores.std()
 
         return lower_limit, upper_limit
 

@@ -192,10 +192,10 @@ class TestHierarchyGenerator(BaseTest):
         dup_content = NEW_LINE.join([content[0], content[1]])
         expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[0]
 
-        self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifacts(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifacts(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.source_dataset.artifact_df.add_artifacts(DUP_SOURCE_ARTIFACT, content[0],
-                                                                 self.HGEN_ARGS.source_layer_ids[0])
+        self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
+        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
+        self.HGEN_STATE.source_dataset.artifact_df.add_artifact(DUP_SOURCE_ARTIFACT, content[0],
+                                                                self.HGEN_ARGS.source_layer_ids[0])
 
         self.HGEN_STATE.embedding_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content[0])
 

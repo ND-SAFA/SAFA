@@ -28,6 +28,7 @@ class ClusterCondenser:
         :param threshold: The percentage of overlap to which consider sets are the same.
         :param min_cluster_size: The minimum size of a cluster.
         :param max_cluster_size: The maximum size of a cluster.
+        :param filter_cohesiveness: If True, first filters the clusters by their cohesiveness.
         """
         self.embeddings_manager = embeddings_manager
         self.cluster_map = {}

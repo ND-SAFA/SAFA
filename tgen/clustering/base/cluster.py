@@ -232,6 +232,7 @@ class Cluster:
         """
         Calculates the average pairwise distance between all points of a matrix, weighted with the size of the cluster.
         :param avg_pairwise_sim: The average pairwise distance.
+        :param size_weight: The amount by which the log of the size should be weighted with the avg. pairwise sim
         :return: Calculates the pairwise distances and returns its average, weighted with the size of the cluster.
         """
         return (size_weight * np.log(len(self))) + avg_pairwise_sim

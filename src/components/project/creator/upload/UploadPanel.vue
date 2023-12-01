@@ -42,7 +42,7 @@
       <jira-project-input v-if="props.panel.variant === 'jira'" />
 
       <switch-input
-        v-if="hasBulkFiles"
+        v-if="props.panel.variant === 'bulk'"
         v-model="props.panel.emptyFiles"
         label="Create an empty project"
         data-cy="toggle-create-empty-project"

@@ -201,6 +201,7 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Switches to the next or previous document in the history.
+     * - Clears current selections and hidden nodes, as these are not saved between versions.
      * @param method - Whether to go forward or backward between documents.
      */
     switchDocumentHistory(method: "next" | "previous"): void {
@@ -214,6 +215,7 @@ export const useDocuments = defineStore("documents", {
       this.currentDocument = document;
       this.historyIndex = documentIndex;
       selectionStore.clearSelections();
+      subtreeStore.resetHiddenNodes();
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
@@ -230,8 +232,8 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Creates and adds a new document based on the neighborhood of an artifact.
-     * If the neighborhood is too large, the document will instead include the parents and children, and
-     * hide the child subtrees.
+     * - If the neighborhood is too large, the document will instead include the parents and children, and
+     *   hide the child subtrees.
      * @param artifact - The artifact to display the neighborhood of.
      */
     async addDocumentOfNeighborhood(
@@ -239,24 +241,22 @@ export const useDocuments = defineStore("documents", {
     ): Promise<void> {
       const hideSubtrees =
         subtreeStore.getNeighbors(artifact.id).length > LARGE_NODE_LAYOUT_COUNT;
-
       const neighbors = hideSubtrees
-        ? new Set([
-            ...subtreeStore.getChildren(artifact.id),
-            ...subtreeStore.getParents(artifact.id),
-          ])
-        : new Set(subtreeStore.getNeighbors(artifact.id));
+        ? subtreeStore.getParentsAndChildren(artifact.id)
+        : subtreeStore.getNeighbors(artifact.id);
 
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,
-        artifactIds: artifactStore.allArtifacts
-          .filter(
-            ({ id, type }) =>
-              (artifact.id === id || neighbors.has(id)) &&
-              !selectionStore.ignoreTypes.includes(type)
-          )
-          .map(({ id }) => id),
+        artifactIds: [
+          artifact.id,
+          ...neighbors.filter(
+            (id) =>
+              !selectionStore.ignoreTypes.includes(
+                artifactStore.getArtifactById(id)?.type || ""
+              )
+          ),
+        ],
       });
 
       await this.addDocument(document);
@@ -264,14 +264,13 @@ export const useDocuments = defineStore("documents", {
       subtreeStore.resetHiddenNodes();
 
       if (hideSubtrees) {
-        subtreeStore
-          .getChildren(artifact.id)
-          .forEach((id) => subtreeStore.hideSubtree(id));
+        await subtreeStore.hideChildSubtrees(artifact.id);
       }
     },
     /**
      * Shows the subtree of an artifact in the current document.
-     * If the subtree is at all missing from the current document, it will be added.
+     * - If the subtree is at all missing from the current document, it will be added.
+     * - All child nodes added will also have their subtrees hidden.
      * @param artifact - The artifact to show the subtree of.
      */
     async extendDocumentSubtree(artifact: ArtifactSchema): Promise<void> {
@@ -294,9 +293,7 @@ export const useDocuments = defineStore("documents", {
       }
 
       await subtreeStore.showSubtree(artifact.id);
-      subtreeStore
-        .getChildren(artifact.id)
-        .forEach((id) => subtreeStore.hideSubtree(id));
+      await subtreeStore.hideChildSubtrees(artifact.id);
     },
     /**
      * Creates and adds a new document for multiple types of artifacts.
@@ -325,6 +322,7 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Removes an existing document.
+     * - If the document is the current document, the first document will be switched to.
      * @param document - The document, or document id, to delete.
      */
     async removeDocument(document: string | DocumentSchema): Promise<void> {

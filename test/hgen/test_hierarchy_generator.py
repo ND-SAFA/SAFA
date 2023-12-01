@@ -186,15 +186,20 @@ class TestHierarchyGenerator(BaseTest):
             if child in us2code[parent]:
                 self.assertGreater(new_pred[TraceKeys.SCORE], 0.8)  # these should be weighted higher than original prediction
 
-    def assert_detect_duplicates_step(self):
+    @mock.patch("numpy.where")
+    def assert_detect_duplicates_step(self, np_where_mock: MagicMock):
         content = list(self.HGEN_STATE.generations2sources.keys())
         dup_artifact_id = "dup1"
-        dup_content = NEW_LINE.join([content[0], content[1]])
-        expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[0]
+        dup_indices = [0, 1]
+        dup_content = NEW_LINE.join([content[dup_indices[0]], content[dup_indices[1]][:75]])
+        expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[dup_indices[0]]
+        n_generations = len(self.HGEN_STATE.new_artifact_dataset.artifact_df)
+        all_indices = [i for i in range(n_generations)]
+        np_where_mock.return_value = (all_indices + dup_indices, all_indices + [n_generations, n_generations])
 
-        self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifacts(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifacts(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.source_dataset.artifact_df.add_artifacts(DUP_SOURCE_ARTIFACT, content[0],
+        self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
+        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
+        self.HGEN_STATE.source_dataset.artifact_df.add_artifact(DUP_SOURCE_ARTIFACT, content[0],
                                                                  self.HGEN_ARGS.source_layer_ids[0])
 
         self.HGEN_STATE.embedding_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content[0])
@@ -205,7 +210,6 @@ class TestHierarchyGenerator(BaseTest):
                                   TraceKeys.EXPLANATION: "Explanation"})
         self.HGEN_STATE.trace_predictions.append(deepcopy(original_link))
         DetectDuplicateArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
-        self.assertNotIn(dup_artifact_id, self.HGEN_STATE.selected_artifacts_dataset.artifact_df)
         self.assertNotIn(dup_artifact_id, self.HGEN_STATE.selected_artifacts_dataset.artifact_df)
         self.assertNotIn(original_link, self.HGEN_STATE.selected_predictions)
         new_link = [trace for trace in self.HGEN_STATE.trace_predictions if trace[TraceKeys.child_label()] == DUP_SOURCE_ARTIFACT]

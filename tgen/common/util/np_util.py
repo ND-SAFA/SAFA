@@ -53,7 +53,7 @@ class NpUtil:
         return result
 
     @staticmethod
-    def detect_outlier_scores(scores: List[float], sigma: int = 2.5) -> Tuple[float, float]:
+    def detect_outlier_scores(scores: List[float], sigma: int = 1.5) -> Tuple[float, float]:
         """
         Detects the list of outlier scores within sigma.
         :param scores: List of scores to detect outliers from.

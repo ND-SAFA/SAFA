@@ -83,6 +83,15 @@ export const useSubtree = defineStore("subtrees", {
       return this.getSubtreeItem(artifactId).children;
     },
     /**
+     * Returns the neighbors of an artifact.
+     *
+     * @param artifactId - The artifact to get.
+     * @return The artifact's children.
+     */
+    getNeighbors(artifactId: string): string[] {
+      return this.getSubtreeItem(artifactId).neighbors;
+    },
+    /**
      * Returns the relationship between artifacts.
      *
      * @param sourceId - The source artifact's id.

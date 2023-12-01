@@ -6,7 +6,12 @@ import {
   ProjectSchema,
   ArtifactSchema,
 } from "@/types";
-import { buildDocument, DEFAULT_VIEW_NAME, removeMatches } from "@/util";
+import {
+  buildDocument,
+  DEFAULT_VIEW_NAME,
+  LARGE_NODE_LAYOUT_COUNT,
+  removeMatches,
+} from "@/util";
 import {
   subtreeStore,
   layoutStore,
@@ -229,7 +234,13 @@ export const useDocuments = defineStore("documents", {
     async addDocumentOfNeighborhood(
       artifact: Pick<ArtifactSchema, "name" | "id">
     ): Promise<void> {
-      const neighbors = new Set(subtreeStore.subtreeMap[artifact.id].neighbors);
+      const neighbors =
+        subtreeStore.getNeighbors(artifact.id).length < LARGE_NODE_LAYOUT_COUNT
+          ? new Set(subtreeStore.getNeighbors(artifact.id))
+          : new Set([
+              ...subtreeStore.getChildren(artifact.id),
+              ...subtreeStore.getParents(artifact.id),
+            ]);
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,

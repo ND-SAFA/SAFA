@@ -29,6 +29,15 @@ export const routerBeforeChecks: RouteChecks = {
 
     sessionApiStore.handleReset();
   },
+  async verifyEmail(to) {
+    if (to.path !== Routes.VERIFY_ACCOUNT) return;
+
+    const token = to.query[QueryParams.ACCOUNT_TOKEN];
+
+    await sessionApiStore.handleVerifyAccount(String(token));
+
+    return { path: Routes.HOME };
+  },
   async redirectToLoginIfNoSessionFound(to) {
     const isPublic = to.matched.some(({ meta }) => meta.isPublic);
     let authenticated = false;

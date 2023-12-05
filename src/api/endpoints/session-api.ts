@@ -25,6 +25,20 @@ export async function createUser(
 }
 
 /**
+ * Verifies a new account.
+ *
+ * @param token - The account token to verify.
+ */
+export async function saveUserVerification(token: string): Promise<void> {
+  return buildRequest<void, string, { token: string }>(
+    "verifyAccount"
+  ).sessionRequest({
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+}
+
+/**
  * Logs the given user in.
  *
  * @param user - The user to log in.

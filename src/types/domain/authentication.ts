@@ -22,6 +22,10 @@ export interface UserSchema {
    * Whether this user is a superuser.
    */
   superuser: boolean;
+  /**
+   * If the user is a superuser, whether they are in superuser mode.
+   */
+  admin?: { active: boolean };
 }
 
 /**

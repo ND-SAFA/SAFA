@@ -30,6 +30,12 @@ export enum Endpoint {
   getAccount = "accounts/self",
   editAccountOrg = "accounts/organization",
 
+  // Admin
+
+  setSuperuser = "accounts/superuser/:userId",
+  activateSuperuser = "accounts/superuser/activate",
+  deactivateSuperuser = "accounts/superuser/deactivate",
+
   // Jobs
   createProjectJob = "jobs/projects",
   createProjectThroughFlatFiles = "jobs/projects/upload",

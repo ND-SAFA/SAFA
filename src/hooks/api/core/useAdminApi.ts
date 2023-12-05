@@ -1,14 +1,15 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
+import { AdminApiHook, MembershipSchema } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
-import { sessionStore } from "@/hooks";
+import { logStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import {
   activateSuperuser,
+  createSuperuser,
   deactivateSuperuser,
 } from "@/api/endpoints/admin-api";
-import { AdminApiHook } from "@/types/hooks/api/core/adminApi";
 import useApi from "./useApi";
 
 /**
@@ -39,7 +40,21 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
     },
   });
 
-  return { displaySuperuser, activeSuperuser };
+  async function enableSuperuser(member: MembershipSchema): Promise<void> {
+    logStore.confirm(
+      "Enable Superuser",
+      `Are you sure you want to enable superuser for "${member.email}"?`,
+      async (confirmed) => {
+        if (!confirmed) return;
+
+        await adminApi.handleRequest(async () => {
+          await createSuperuser(member.id);
+        });
+      }
+    );
+  }
+
+  return { displaySuperuser, activeSuperuser, enableSuperuser };
 });
 
 export default useAdminApi(pinia);

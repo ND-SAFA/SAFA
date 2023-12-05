@@ -12,5 +12,5 @@ export const ENABLED_FEATURES = {
   GENERATE_ONBOARDING: false,
   BILLING_ONBOARDING: false,
 
-  SUPERUSER_TEST: true,
+  SUPERUSER_TEST: false,
 };

@@ -44,6 +44,13 @@
 
       <template #cell-actions="{ row }: { row: MembershipSchema }">
         <icon-button
+          v-if="adminApiStore.displaySuperuser"
+          icon="security"
+          tooltip="Create superuser"
+          data-cy="button-member-superuser"
+          @click="handleSuperuser(row)"
+        />
+        <icon-button
           v-if="row.email === userEmail"
           icon="leave"
           tooltip="Leave project"
@@ -81,6 +88,7 @@ import {
 } from "@/types";
 import { capitalizeSentence, membersColumns } from "@/util";
 import {
+  adminApiStore,
   memberApiStore,
   membersStore,
   permissionStore,
@@ -170,5 +178,13 @@ function handleAdd(email: string | null): void {
  */
 function handleDelete(member: MembershipSchema): void {
   memberApiStore.handleDelete(member);
+}
+
+/**
+ * Enables superuser access for the member.
+ * @param member - The member to turn into a superuser.
+ */
+function handleSuperuser(member: MembershipSchema): void {
+  adminApiStore.enableSuperuser(member);
 }
 </script>

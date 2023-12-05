@@ -55,8 +55,12 @@ export interface SessionApiHook {
    * Attempts to create a new account.
    *
    * @param user - The user to create.
+   * @param verified - Whether the account is pre-verified.
    */
-  handleCreateAccount(user: UserPasswordSchema): Promise<void>;
+  handleCreateAccount(
+    user: UserPasswordSchema,
+    verified?: boolean
+  ): Promise<void>;
   /**
    * Attempts to send a password reset email.
    *

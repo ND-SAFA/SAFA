@@ -11,4 +11,6 @@ export const ENABLED_FEATURES = {
   ONBOARDING: true,
   GENERATE_ONBOARDING: false,
   BILLING_ONBOARDING: false,
+
+  TRACE_MATRIX_TABLE: false,
 };

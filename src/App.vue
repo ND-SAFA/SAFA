@@ -26,13 +26,16 @@ import { LocalStorageKeys } from "@/types";
 import { useTheme } from "@/hooks";
 import { AppNav } from "@/components";
 
-const { toggleDarkMode } = useTheme();
+const theme = useTheme();
 
 onMounted(() => {
-  const storedDarkMode =
-    localStorage.getItem(LocalStorageKeys.darkMode) === "true";
+  const now = new Date();
+  const hour = now.getHours();
+  const isNight = hour < 6 || hour > 18; // Assuming night is from 6PM to 6AM
 
-  toggleDarkMode(storedDarkMode);
+  const storedDarkMode = localStorage.getItem(LocalStorageKeys.darkMode);
+
+  theme.darkMode.value = storedDarkMode ? storedDarkMode === "true" : isNight;
 });
 </script>
 

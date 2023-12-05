@@ -56,3 +56,15 @@ jobs:
         env:
           DEBUG: '@cypress/github-action'
           NODE_TLS_REJECT_UNAUTHORIZED: 0
+  muuktest-e2e-tests:
+    runs-on: ubuntu-latest
+    name: Execute MuukTest E2E.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Retrieve and execute MuukTest E2E
+        uses: muuklabs/action@v1.0.2
+        with:
+          muuk-key: ${{ secrets.MUUKTEST_TOKEN }}
+          tag-property: 'hashtag'
+          tag-value: '#cicd'

@@ -4,7 +4,6 @@ import {
   DocumentSchema,
   DocumentType,
   ProjectSchema,
-  ArtifactSchema,
 } from "@/types";
 import { buildDocument, DEFAULT_VIEW_NAME, removeMatches } from "@/util";
 import {
@@ -184,6 +183,7 @@ export const useDocuments = defineStore("documents", {
       this.currentDocument = document;
       this.history.push(document);
       this.historyIndex = this.history.length - 1;
+      subtreeStore.resetHiddenNodes();
       selectionStore.clearSelections({ onlySubtree: !document.documentId });
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
@@ -196,6 +196,7 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Switches to the next or previous document in the history.
+     * - Clears current selections and hidden nodes, as these are not saved between versions.
      * @param method - Whether to go forward or backward between documents.
      */
     switchDocumentHistory(method: "next" | "previous"): void {
@@ -208,6 +209,8 @@ export const useDocuments = defineStore("documents", {
 
       this.currentDocument = document;
       this.historyIndex = documentIndex;
+      selectionStore.clearSelections();
+      subtreeStore.resetHiddenNodes();
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
@@ -223,44 +226,6 @@ export const useDocuments = defineStore("documents", {
       await this.switchDocuments(document);
     },
     /**
-     * Creates and adds a new document based on the neighborhood of an artifact.
-     * @param artifact - The artifact to display the neighborhood of.
-     */
-    async addDocumentOfNeighborhood(
-      artifact: Pick<ArtifactSchema, "name" | "id">
-    ): Promise<void> {
-      const neighbors = new Set(subtreeStore.subtreeMap[artifact.id].neighbors);
-      const document = buildDocument({
-        project: projectStore.projectIdentifier,
-        name: artifact.name,
-        artifactIds: artifactStore.allArtifacts
-          .filter(
-            ({ id, type }) =>
-              (artifact.id === id || neighbors.has(id)) &&
-              !selectionStore.ignoreTypes.includes(type)
-          )
-          .map(({ id }) => id),
-      });
-      await this.addDocument(document);
-      layoutStore.mode = "tree";
-    },
-    /**
-     * Creates and adds a new document for multiple types of artifacts.
-     * @param types - The artifact types to include in the document.
-     */
-    async addDocumentOfTypes(types: string[]): Promise<void> {
-      const document = buildDocument({
-        project: projectStore.projectIdentifier,
-        name: types.join(", "),
-        artifactIds: types.flatMap((type) =>
-          artifactStore.getArtifactsByType(type).map(({ id }) => id)
-        ),
-      });
-
-      await this.addDocument(document);
-      layoutStore.mode = types.length > 1 ? "tree" : "table";
-    },
-    /**
      * Adds artifacts to the current document.
      * @param newIds - The new artifacts to add.
      */
@@ -271,6 +236,7 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Removes an existing document.
+     * - If the document is the current document, the first document will be switched to.
      * @param document - The document, or document id, to delete.
      */
     async removeDocument(document: string | DocumentSchema): Promise<void> {

@@ -5,14 +5,14 @@
         text
         label="View Artifacts"
         icon="view-tree"
-        @click="documentStore.addDocumentOfTypes([name])"
+        @click="viewsStore.addDocumentOfTypes([name])"
       />
     </template>
     <artifact-list-display
       :artifacts="artifacts"
       data-cy="list-selected-artifacts"
       item-data-cy="list-selected-artifact-item"
-      @click="documentStore.addDocumentOfNeighborhood($event)"
+      @click="viewsStore.addDocumentOfNeighborhood($event)"
     />
   </panel-card>
 </template>
@@ -28,7 +28,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { documentStore, selectionStore, artifactStore } from "@/hooks";
+import { selectionStore, artifactStore, viewsStore } from "@/hooks";
 import { PanelCard, TextButton } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact/display";
 

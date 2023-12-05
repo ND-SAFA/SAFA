@@ -6,7 +6,7 @@
           text
           label="View Parents"
           icon="view-tree"
-          @click="documentStore.addDocumentOfTypes([targetType])"
+          @click="viewsStore.addDocumentOfTypes([targetType])"
         />
       </template>
       <artifact-list-display
@@ -14,7 +14,7 @@
         :artifacts="targetArtifacts"
         data-cy="list-selected-parent-artifacts"
         item-data-cy="list-selected-parent-artifact-item"
-        @click="documentStore.addDocumentOfNeighborhood($event)"
+        @click="viewsStore.addDocumentOfNeighborhood($event)"
       />
       <typography
         v-else
@@ -30,7 +30,7 @@
           text
           label="View Children"
           icon="view-tree"
-          @click="documentStore.addDocumentOfTypes([sourceType])"
+          @click="viewsStore.addDocumentOfTypes([sourceType])"
         />
       </template>
       <artifact-list-display
@@ -38,7 +38,7 @@
         :artifacts="sourceArtifacts"
         data-cy="list-selected-child-artifacts"
         item-data-cy="list-selected-child-artifact-item"
-        @click="documentStore.addDocumentOfNeighborhood($event)"
+        @click="viewsStore.addDocumentOfNeighborhood($event)"
       />
       <typography
         v-else
@@ -61,7 +61,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { artifactStore, documentStore, selectionStore } from "@/hooks";
+import { artifactStore, selectionStore, viewsStore } from "@/hooks";
 import { PanelCard, Typography, TextButton } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact/display";
 

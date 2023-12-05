@@ -27,7 +27,7 @@
         <icon-button
           tooltip="View artifacts"
           icon="view-tree"
-          @click="documentStore.addDocumentOfTypes([props.artifactType])"
+          @click="viewsStore.addDocumentOfTypes([props.artifactType])"
         />
         <separator v-if="displayActions" class="full-width q-my-xs" />
         <icon-button
@@ -71,10 +71,10 @@ import { sanitizeNodeId } from "@/util";
 import {
   timStore,
   appStore,
-  documentStore,
   selectionStore,
   useTheme,
   permissionStore,
+  viewsStore,
 } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
@@ -125,7 +125,7 @@ function handleSelect(): void {
   if (!selected.value) {
     selectionStore.selectArtifactLevel(props.artifactType);
   } else {
-    documentStore.addDocumentOfTypes([props.artifactType]);
+    viewsStore.addDocumentOfTypes([props.artifactType]);
   }
 }
 </script>

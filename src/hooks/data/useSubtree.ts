@@ -83,6 +83,27 @@ export const useSubtree = defineStore("subtrees", {
       return this.getSubtreeItem(artifactId).children;
     },
     /**
+     * Returns the combined parents and children of an artifact.
+     *
+     * @param artifactId - The artifact to get.
+     * @return The artifact's children.
+     */
+    getParentsAndChildren(artifactId: string): string[] {
+      return [
+        ...this.getSubtreeItem(artifactId).parents,
+        ...this.getSubtreeItem(artifactId).children,
+      ];
+    },
+    /**
+     * Returns the neighbors of an artifact.
+     *
+     * @param artifactId - The artifact to get.
+     * @return The artifact's children.
+     */
+    getNeighbors(artifactId: string): string[] {
+      return this.getSubtreeItem(artifactId).neighbors;
+    },
+    /**
      * Returns the relationship between artifacts.
      *
      * @param sourceId - The source artifact's id.
@@ -209,12 +230,21 @@ export const useSubtree = defineStore("subtrees", {
         (id) => !this.hiddenSubtreeNodes.includes(id)
       );
 
+      if (childrenInSubtree.length === 0) return;
+
       this.$patch({
         hiddenSubtreeNodes: [...this.hiddenSubtreeNodes, ...visibleChildren],
         collapsedParentNodes: [...this.collapsedParentNodes, rootId],
       });
 
       cyStore.setDisplay(visibleChildren, false);
+    },
+    /**
+     * Hides the subtrees of all children of the given artifact.
+     * @param rootId - The Id of the root artifact whose subtree is being hidden.
+     */
+    async hideChildSubtrees(rootId: string): Promise<void> {
+      this.getChildren(rootId).forEach((id) => this.hideSubtree(id));
     },
     /**
      * Un-hides the given artifact's subtree if hidden.

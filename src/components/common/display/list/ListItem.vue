@@ -37,7 +37,11 @@
         <slot />
         <separator v-if="props.divider" t="1" />
       </q-item-label>
-      <q-item-label v-if="!!props.subtitle || !!slots.subtitle" caption>
+      <q-item-label
+        v-if="!!props.subtitle || !!slots.subtitle"
+        caption
+        class="text-ellipsis"
+      >
         <typography
           v-if="!!props.subtitle"
           secondary

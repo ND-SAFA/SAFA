@@ -20,7 +20,7 @@ import {
   TimLinkProps,
 } from "@/types";
 import { getTraceId, sanitizeNodeId } from "@/util";
-import { documentStore, selectionStore, useTheme } from "@/hooks";
+import { selectionStore, useTheme, viewsStore } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 
 const props = defineProps<TimLinkProps>();
@@ -64,7 +64,7 @@ function handleSelect(): void {
   ) {
     selectionStore.selectTraceMatrix(props.sourceType, props.targetType);
   } else {
-    documentStore.addDocumentOfTypes([props.sourceType, props.targetType]);
+    viewsStore.addDocumentOfTypes([props.sourceType, props.targetType]);
   }
 }
 </script>

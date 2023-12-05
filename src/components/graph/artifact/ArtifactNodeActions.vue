@@ -11,14 +11,14 @@
       <icon-button
         tooltip="View related artifacts"
         icon="view-tree"
-        @click="documentStore.addDocumentOfNeighborhood(props.artifact)"
+        @click="viewsStore.addDocumentOfNeighborhood(props.artifact)"
       />
       <icon-button
         v-if="showHiddenChildren && hasSubtree"
         tooltip="Show subtree"
         icon="group-open-all"
         data-cy="button-toggle-subtree"
-        @click="subtreeStore.showSubtree(id)"
+        @click="viewsStore.extendDocumentSubtree(props.artifact)"
       />
       <icon-button
         v-else-if="hasSubtree"
@@ -74,9 +74,9 @@ import { computed } from "vue";
 import { ArtifactNodeDisplayProps } from "@/types";
 import {
   subtreeStore,
-  documentStore,
   permissionStore,
   traceSaveStore,
+  viewsStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, Separator, IconButton } from "@/components/common";

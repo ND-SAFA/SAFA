@@ -35,7 +35,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactNodeDisplayProps } from "@/types";
-import { deltaStore, selectionStore, documentStore } from "@/hooks";
+import { deltaStore, selectionStore, viewsStore } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { Separator } from "@/components/common";
 import { ArtifactNameDisplay } from "@/components/artifact";
@@ -53,7 +53,7 @@ function handleSelect(selected = props.selected): void {
   if (!selected) {
     selectionStore.selectArtifact(id.value);
   } else {
-    documentStore.addDocumentOfNeighborhood({
+    viewsStore.addDocumentOfNeighborhood({
       id: id.value,
       name: props.artifact.name,
     });

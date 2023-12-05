@@ -138,7 +138,7 @@ Cypress.Commands.add("dbGenerateUsers", () => {
     cy.request<{ token: string }>({
       failOnStatusCode: false,
       method: "POST",
-      url: `${apiUrl}/accounts/create`,
+      url: `${apiUrl}/accounts/create-verified`,
       body: { email: user.email, password: user.password },
     });
   }

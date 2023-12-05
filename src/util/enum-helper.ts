@@ -202,10 +202,10 @@ export function settingsTabOptions(): SelectOption<SettingsTab>[] {
 export function tableViewTabOptions(): SelectOption<ProjectTableTab>[] {
   return [
     createOption("artifact", "Artifacts"),
+    createOption("trace", "Trace Links"),
     ...(ENABLED_FEATURES.TRACE_MATRIX_TABLE
-      ? [createOption("trace", "Trace Links")]
+      ? [createOption("matrix", "Trace Matrix")]
       : []),
-    createOption("approve", "Trace Approval"),
   ];
 }
 

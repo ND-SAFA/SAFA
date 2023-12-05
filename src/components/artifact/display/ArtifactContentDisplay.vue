@@ -19,6 +19,7 @@
           :value="props.artifact.body"
           :default-expanded="!isCode"
           :code-ext="props.artifact.name.split('.').pop()"
+          :collapse-length="isCode ? undefined : 0"
         />
       </div>
     </template>
@@ -30,6 +31,7 @@
       :value="props.artifact.body"
       :default-expanded="!isCode"
       :code-ext="props.artifact.name.split('.').pop()"
+      :collapse-length="isCode ? undefined : 0"
     />
   </div>
 </template>

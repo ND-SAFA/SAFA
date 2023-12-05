@@ -13,10 +13,10 @@
           <artifact-table />
         </template>
         <template #trace>
-          <trace-table />
-        </template>
-        <template #approve>
           <approval-table />
+        </template>
+        <template #matrix>
+          <trace-table />
         </template>
       </tab-list>
     </div>

@@ -16,12 +16,9 @@ import {
   artifactStore,
   jobApiStore,
   projectStore,
+  traceStore,
 } from "@/hooks";
-import {
-  createGeneratedLinks,
-  createModelTraining,
-  getGeneratedLinks,
-} from "@/api";
+import { createGeneratedLinks, createModelTraining } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -44,9 +41,7 @@ export const useTraceGenerationApi = defineStore(
           const traceLinks: FlatTraceLink[] = [];
           const approvedIds: string[] = [];
           const declinedIds: string[] = [];
-          const generatedLinks = await getGeneratedLinks(
-            projectStore.versionId
-          );
+          const generatedLinks = traceStore.allTraces;
 
           generatedLinks.forEach((link) => {
             const source = artifactStore.getArtifactById(link.sourceId);

@@ -10,6 +10,22 @@
         @click="sessionApiStore.handleLogout(true)"
       />
     </flex-box>
+    <flex-box
+      v-if="adminApiStore.displaySuperuser"
+      justify="between"
+      align="center"
+      t="2"
+    >
+      <div>
+        <typography value="Superuser mode" el="div" />
+        <typography secondary value="Enables all permissions" />
+      </div>
+      <q-toggle
+        v-model="adminApiStore.activeSuperuser"
+        label="Enabled"
+        class="q-mr-md"
+      />
+    </flex-box>
   </panel-card>
 </template>
 
@@ -24,7 +40,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { sessionApiStore, sessionStore } from "@/hooks";
+import { adminApiStore, sessionApiStore, sessionStore } from "@/hooks";
 import {
   PanelCard,
   FlexBox,

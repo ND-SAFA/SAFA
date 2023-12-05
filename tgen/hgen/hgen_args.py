@@ -3,9 +3,10 @@ from enum import Enum, auto
 from typing import Dict, List, Union
 
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
-    DEFAULT_ORPHAN_THRESHOLD
+    DEFAULT_ORPHAN_THRESHOLD, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
+from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
@@ -102,9 +103,9 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
     """
-    If True, creates a project summary, else False
+    Percent of the number of children artifacts that will be the number generated.
     """
-    create_project_summary: bool = True
+    reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
     """
     The section of the project summary to use as seeds for clustering.
     """
@@ -121,6 +122,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """
     export_original_dataset: bool = False
+    """
+    The sections of the project summary to include in content generation.
+    """
+    content_generation_project_summary_sections: List[str] = field(default_factory=lambda: [PS_ENTITIES_TITLE])
 
     def __post_init__(self) -> None:
         """
@@ -146,12 +151,15 @@ class HGenArgs(PipelineArgs, BaseObject):
         if isinstance(self.source_layer_ids, str):
             self.source_layer_ids = [self.source_layer_ids]
 
-    def get_seed_id(self) -> str:
+    def get_seed_id(self, raise_exception: bool=True) -> str:
         """
+        Gets the id of the seed layer.
+        :param raise_exception: If True, raises an exception if no seed args are set.
         :return: The current seed layer id.
         """
         if self.seed_project_summary_section:
             return self.seed_project_summary_section
         if self.seed_layer_id:
             return self.seed_layer_id
-        raise Exception("No seed id available. Seedd project Summary and layer_id are none.")
+        if raise_exception:
+            raise Exception("No seed id available. Seed project Summary and layer_id are none.")

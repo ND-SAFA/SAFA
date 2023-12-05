@@ -50,6 +50,7 @@ class PromptDataset(iDataset):
         self.project_file_id = project_file_id
         self.data_export_path = data_export_path
         self.project_summary = project_summary
+        self.__state_has_changed = False
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """
@@ -135,7 +136,7 @@ class PromptDataset(iDataset):
         """
         from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
         from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-        if not os.path.exists(project_path):
+        if not os.path.exists(project_path) or self.__state_has_changed:
             PromptDatasetExporter(export_path=project_path, trace_dataset_exporter_type=SafaExporter, dataset=self).export()
         collapsed_path = FileUtil.collapse_paths(project_path)
         if self.trace_dataset is not None:
@@ -156,6 +157,7 @@ class PromptDataset(iDataset):
         self.artifact_df = artifact_df
         if self.trace_dataset is not None:
             self.trace_dataset.artifact_df = artifact_df
+        self.__state_has_changed = True
 
     def _get_generation_method(self, prompt_args: PromptArgs, prompt_builder: PromptBuilder) -> Callable:
         """

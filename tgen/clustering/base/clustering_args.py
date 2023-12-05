@@ -7,6 +7,7 @@ from tgen.common.constants.clustering_constants import CLUSTER_ARTIFACT_TYPE, DE
     DEFAULT_CLUSTERING_METHODS, DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, \
     DEFAULT_MAX_CLUSTER_SIZE, \
     DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_MIN_ORPHAN_SIMILARITY, DEFAULT_REDUCTION_FACTOR
+from tgen.common.constants.clustering_constants import DEFAULT_REDUCTION_PERCENTAGE_CLUSTERING
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.pipeline.pipeline_args import PipelineArgs
 
@@ -31,7 +32,6 @@ class ClusteringArgs(PipelineArgs):
     cluster_max_size: int = DEFAULT_MAX_CLUSTER_SIZE
     cluster_min_size: int = DEFAULT_MIN_CLUSTER_SIZE
     cluster_intersection_threshold: float = DEFAULT_CLUSTER_SIMILARITY_THRESHOLD  # 80% or more of intersection equals same cluster
-    cluster_reduction_factor: float = DEFAULT_REDUCTION_FACTOR
     create_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY

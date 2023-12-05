@@ -2,7 +2,7 @@ from collections.abc import Generator
 from copy import deepcopy
 from typing import List, Tuple, Dict, Union
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_STATE_FILENAME
+from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
     USE_PROJECT_SUMMARY_SECTIONS
@@ -66,10 +66,10 @@ class ProjectSummarizer(BaseObject):
         Creates the project summary from the project artifacts.
         :return: The summary of the project.
         """
-
-        if FileUtil.safely_check_path_exists(self.get_save_path()) and self.reload_existing:
-            logger.info(f"Loading previous project summary from {self.get_save_path()}")
-            self.project_summary = Summary.load_from_file(self.get_save_path())
+        save_path = self.get_save_path(export_dir=self.export_dir)
+        if FileUtil.safely_check_path_exists(save_path) and self.reload_existing:
+            logger.info(f"Loading previous project summary from {save_path}")
+            self.project_summary = Summary.load_from_file(save_path)
 
         if not self.args.project_summary_sections or not SummarizerUtil.needs_project_summary(self.project_summary, self.args):
             return self.project_summary
@@ -121,12 +121,19 @@ class ProjectSummarizer(BaseObject):
         """
         return self.project_summary.to_string(self.section_display_order, raise_exception_on_not_found)
 
-    def get_save_path(self) -> str:
+    @staticmethod
+    def get_save_path(export_dir: str, as_json: bool = True) -> str:
         """
         Gets the path to save the summary at
+        :param export_dir: The directory to save the summary to
+        :param as_json: If True, saves it as a json, else as a txt
         :return: The save path
         """
-        return FileUtil.safely_join_paths(self.export_dir, PROJECT_SUMMARY_STATE_FILENAME)
+        if not export_dir:
+            return export_dir
+        path = FileUtil.safely_join_paths(export_dir, PROJECT_SUMMARY_FILENAME)
+        ext = FileUtil.JSON_EXT if as_json else FileUtil.TEXT_EXT
+        return FileUtil.add_ext(path, ext)
 
     def _create_sections(self, async_sections_only: bool = False) -> None:
         """
@@ -165,7 +172,7 @@ class ProjectSummarizer(BaseObject):
                 section_title = section_id
             self.project_summary.add_section(section_id=section_id, section_title=section_title, body=section_body)
             if self.save_progress:
-                self.project_summary.save(self.get_save_path())
+                self.project_summary.save(self.get_save_path(export_dir=self.export_dir))
             return True
         except Exception:
             logger.exception(f"Unable to create project section {section_id}")

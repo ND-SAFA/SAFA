@@ -12,5 +12,4 @@ CACHE_DIR_NAME = "HuggingFace"
 TRACE_THRESHOLD = 0.5
 EXCLUDED_FILES = ["__init__.py", ".DS_Store", ""]
 ARTIFACT_FILE_NAME = "artifact_df.csv"
-PROJECT_SUMMARY_FILENAME = "project_summary.txt"
-PROJECT_SUMMARY_STATE_FILENAME = "project_summary.json"
+PROJECT_SUMMARY_FILENAME = "project_summary"

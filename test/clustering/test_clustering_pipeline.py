@@ -12,7 +12,7 @@ class TestClusteringPipeline(TestCase):
         """
         Tests that simple clustering of sentences results in reasonable clusters.
         """
-        args = ClusteringTestUtil.create_default_args(cluster_reduction_factor=0.5, cluster_min_votes=1)
+        args = ClusteringTestUtil.create_default_args(cluster_min_votes=1)
         pipeline: ClusteringPipeline = ClusteringPipeline(args, skip_summarization=True)
         pipeline.run()
 

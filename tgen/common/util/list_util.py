@@ -124,4 +124,29 @@ class ListUtil:
         :param tqdm_args: Additional args to tqdm.
         :return: An iterable, either using tqdm if its long or just the original iterable if short.
         """
-        return tqdm(iterable, ncols=TQDM_NCOLS, **tqdm_args) if len(iterable) >= length_threshold else iterable
+        return tqdm(iterable, **tqdm_args) if len(iterable) >= length_threshold else iterable
+
+    @staticmethod
+    def zip_sort(list1: List, list2: List, list_to_sort_on: int = 1, return_both: bool = True, **kwargs) -> List:
+        """
+        Sorts the items in two lists by the value in list_to_sort_on.
+        :param list1: The first list.
+        :param list2: The second list.
+        :param list_to_sort_on: 0 if sort on the first list, 1 if sort on second.
+        :param return_both: If True, returns both lists as a list of tuples, else only returns the list that was not used to sort.
+        :param kwargs: Additional arguments to sorted.
+        :return: Returns both lists as a list of tuples if return_both, else only returns the list that was not used to sort.
+        """
+        sorted_list = sorted(zip(list1, list2), key=lambda item: item[list_to_sort_on], **kwargs)
+        list_to_return = 1-list_to_sort_on
+        return [item if return_both else item[list_to_return] for item in sorted_list]
+
+    @staticmethod
+    def unzip(zipped_list: List, item_index: int) -> List:
+        """
+        Returns list containing items at index in zipped list.
+        :param zipped_list: List of zipped items.
+        :param item_index: The index of the items to extract.
+        :return: List of items at index.
+        """
+        return [i[item_index] for i in zipped_list]

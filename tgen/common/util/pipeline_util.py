@@ -87,7 +87,7 @@ def nested_pipeline(parent_pipeline_state: Type[State]) -> Any:
                 return result
             finally:
                 parent_pipeline_name = ReflectionUtil.get_class_name(parent_pipeline_state)
-                parent_pipeline_name.replace(ReflectionUtil.get_class_name(State), EMPTY_STRING)
+                parent_pipeline_name = parent_pipeline_name.replace(ReflectionUtil.get_class_name(State), EMPTY_STRING)
                 logger.log_with_title(f"Returning to {parent_pipeline_name}",
                                       formatting=NEW_LINE + title_format_for_logs)
             return result

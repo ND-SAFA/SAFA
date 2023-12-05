@@ -4,8 +4,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY
-from tgen.common.constants.hgen_constants import CLUSTER_ARTIFACT_TYPE_PARAM, CLUSTER_SEEDS_PARAM, \
-    LARGE_PROJECT, MEDIUM_PROJECT, REDUCTION_FACTORS, SEED_RF_PARAM, SMALL_PROJECT
+from tgen.common.constants.hgen_constants import CLUSTER_ARTIFACT_TYPE_PARAM, CLUSTER_SEEDS_PARAM
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
@@ -85,32 +84,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         seed_artifact_type = args.get_seed_id()
         seed_contents = [a[ArtifactKeys.CONTENT] for a in
                          state.original_dataset.artifact_df.get_type(seed_artifact_type).to_artifacts()]
-        kwargs[SEED_RF_PARAM] = CreateClustersStep.get_reduction_factor(args)
         kwargs[CLUSTER_SEEDS_PARAM] = seed_contents
         kwargs[CLUSTER_ARTIFACT_TYPE_PARAM] = seed_artifact_type
         return kwargs
 
-    @staticmethod
-    def get_reduction_factor(args: HGenArgs):
-        """
-        Calculates the reduction factor based on the number of source artifacts.
-        :param args: HGEN args containing source artifacts.
-        :return: The reduction factor based on the size of the source artifacts.
-        """
-        n_sources = len(args.dataset.artifact_df.get_type(args.source_type))
-        project_size = CreateClustersStep.get_project_size(n_sources)
-        return REDUCTION_FACTORS[project_size]
 
-    @staticmethod
-    def get_project_size(n_artifacts: int):
-        """
-        Returns the size of the project based on the size of the artifacts.
-        :param n_artifacts: The number of artifacts in an HGEN run.
-        :return: The size of the run.
-        """
-        if n_artifacts <= 50:
-            return SMALL_PROJECT
-        elif n_artifacts <= 300:
-            return MEDIUM_PROJECT
-        else:
-            return LARGE_PROJECT

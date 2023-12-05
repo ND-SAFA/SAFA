@@ -62,13 +62,15 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             return self.state_class().load_latest(self.args.load_dir, self.get_step_names())
         return self.state_class()()
 
-    def run(self, run_setup: bool = True) -> None:
+    def run(self, run_setup: bool = True, log_start: bool = True) -> None:
         """
         Runs steps with store.
         :param run_setup: If True, runs the necessary setup before running the pipeline
+        :param log_start: If True, logs that the pipeline is starting
         :return: None
         """
-        logger.log_with_title(f"{self.get_pipeline_name().upper()}", formatting=NEW_LINE + title_format_for_logs)
+        if log_start:
+            logger.log_with_title(f"{self.get_pipeline_name().upper()}", formatting=NEW_LINE + title_format_for_logs)
         if run_setup:
             self.run_setup_for_pipeline()
         for step in self.steps:

@@ -1,5 +1,6 @@
 from typing import Type
 
+from tgen.common.util.file_util import FileUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.pipeline.abstract_pipeline_step import StateType

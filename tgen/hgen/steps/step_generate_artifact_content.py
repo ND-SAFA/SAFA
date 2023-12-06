@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Set, Tuple
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.hgen_constants import DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
-from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -125,13 +124,16 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generations2sources = {}
         cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
         cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
-        for i, sources in enumerate(generations):
-            for source in sources:
-                generation = source[target_tag_id][0]
-                sources = set(source[source_tag_id][0]) if len(source[source_tag_id]) > 0 else set()
-                generations2sources[generation] = sources
-                if cluster_ids:
-                    cluster2generations[cluster_ids[i]].append(generation)
+        for i, generations4cluster in enumerate(generations):
+            for generation in generations4cluster:
+                try:
+                    target = generation[target_tag_id][0]
+                    sources = set(generation[source_tag_id][0]) if len(generation[source_tag_id]) > 0 else set()
+                    generations2sources[target] = sources
+                    if cluster_ids:
+                        cluster2generations[cluster_ids[i]].append(target)
+                except Exception:
+                    logger.exception("A generation failed")
         return generations2sources, cluster2generations
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:

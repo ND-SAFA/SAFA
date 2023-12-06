@@ -2,6 +2,7 @@ from typing import List
 
 from tqdm import tqdm
 
+from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_condenser import ClusterCondenser
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
@@ -38,9 +39,12 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :param prefix: The prefix to append to the final cluster map.
         :return: Map of cluster ID to clusters.
         """
-        batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
-                                                                            embeddings_manager,
-                                                                            batch_artifact_ids=batch_ids)
+        if len(batch_ids) <= args.cluster_max_size:
+            batch_cluster_map = {0: Cluster.from_artifacts(batch_ids, embeddings_manager)}
+        else:
+            batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
+                                                                                embeddings_manager,
+                                                                                batch_artifact_ids=batch_ids)
         batch_cluster_map = CreateClustersFromEmbeddings.condense_clusters(args, embeddings_manager, batch_cluster_map)
         if prefix:
             batch_cluster_map = {f"{prefix}: {k}": v for k, v in batch_cluster_map.items()}

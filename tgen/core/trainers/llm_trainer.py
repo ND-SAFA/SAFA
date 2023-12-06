@@ -186,13 +186,16 @@ class LLMTrainer(AbstractTrainer):
     def predict_from_prompts(llm_manager: AbstractLLMManager,
                              prompt_builder: PromptBuilder,
                              prompts: List[Prompt] = None,
-                             save_and_load_path: str = EMPTY_STRING, **prompt_kwargs) -> TracePredictionOutput:
+                             save_and_load_path: str = EMPTY_STRING,
+                             raise_exception: bool = True,
+                             **prompt_kwargs) -> TracePredictionOutput:
         """
         Makes generation predictions from a list of prompts
         :param llm_manager: The llm manager to use for predictions
         :param prompt_builder: The prompt builder to parse the response (or additionally create prompts)
         :param prompts: The list of prompts to use unless built from prompt_builder
         :param save_and_load_path: Path used to load or save predictions
+         :param raise_exception: If True, raises an exception if a response fails
         :param prompt_kwargs: Additional arguments used when building prompts (optionally)
         :return: The output from the predictions
         """
@@ -206,7 +209,9 @@ class LLMTrainer(AbstractTrainer):
         initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builders=prompt_builder,
                                         trainer_dataset_manager=trainer_dataset_manager)
         trainer = LLMTrainer(initial_state)
-        return trainer.perform_prediction(save_and_load_path=save_and_load_path, prompts=list(prompt_df[PromptKeys.PROMPT]))
+        return trainer.perform_prediction(save_and_load_path=save_and_load_path,
+                                          raise_exception=raise_exception,
+                                          prompts=list(prompt_df[PromptKeys.PROMPT]))
 
     def cleanup(self) -> None:
         """

@@ -32,7 +32,7 @@ export enum Endpoint {
 
   // Admin
 
-  setSuperuser = "accounts/superuser/:userId",
+  setSuperuser = "accounts/superuser",
   activateSuperuser = "accounts/superuser/activate",
   deactivateSuperuser = "accounts/superuser/deactivate",
 

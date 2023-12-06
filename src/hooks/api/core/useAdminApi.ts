@@ -20,7 +20,7 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
   const adminApi = useApi("adminApi");
 
   const displaySuperuser = computed(
-    () => sessionStore.user?.superuser || ENABLED_FEATURES.SUPERUSER_TEST
+    () => !!sessionStore.user?.admin || ENABLED_FEATURES.SUPERUSER_TEST
   );
 
   const activeSuperuser = computed({
@@ -48,7 +48,7 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
         if (!confirmed) return;
 
         await adminApi.handleRequest(async () => {
-          await createSuperuser(member.id);
+          await createSuperuser(member.email);
         });
       }
     );

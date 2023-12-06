@@ -58,11 +58,11 @@ class SummarizerArgs(PipelineArgs):
     """
     List of file types to include when summarizing
     """
-    include_subset_by_type: List[str] = None
+    include_subset_by_type: List[str] = field(default_factory=list)
     """
     List of directories to include when summarizing
     """
-    include_subset_by_dir: List[str] = None
+    include_subset_by_dir: List[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """

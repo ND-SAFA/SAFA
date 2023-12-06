@@ -11,7 +11,7 @@
       />
     </flex-box>
     <flex-box
-      v-if="adminApiStore.displaySuperuser"
+      v-if="sessionStore.superuser"
       justify="between"
       align="center"
       t="2"

@@ -1,4 +1,4 @@
-import { ComputedRef, WritableComputedRef } from "vue";
+import { WritableComputedRef } from "vue";
 import { MembershipSchema } from "@/types";
 
 /**
@@ -6,12 +6,8 @@ import { MembershipSchema } from "@/types";
  */
 export interface AdminApiHook {
   /**
-   * Whether this user is a superuser.
-   */
-  displaySuperuser: ComputedRef<boolean>;
-  /**
    * Whether this superuser's powers are active.
-   * - Setting this value will update the user's superuser status.
+   * - Setting this value will update the user's saved superuser status.
    */
   activeSuperuser: WritableComputedRef<boolean>;
   /**

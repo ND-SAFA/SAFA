@@ -8,7 +8,7 @@ import {
   TeamSchema,
   UserSchema,
 } from "@/types";
-import { buildSession, buildUser } from "@/util";
+import { buildSession, buildUser, ENABLED_FEATURES } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -29,6 +29,12 @@ export const useSession = defineStore("session", {
   },
   getters: {
     /**
+     * @return The current user's authentication token.
+     */
+    authToken(): string {
+      return this.session.token;
+    },
+    /**
      * @return Whether there is a current session.
      */
     doesSessionExist(): boolean {
@@ -41,11 +47,17 @@ export const useSession = defineStore("session", {
     userEmail(): string {
       return this.user.email || "";
     },
+    /**
+     * @return The current user's id.
+     */
     userId(): string {
       return this.user.userId || "";
     },
-    authToken(): string {
-      return this.session.token;
+    /**
+     * @return Whether the current user is a superuser.
+     */
+    superuser(): boolean {
+      return !!this.user.admin || ENABLED_FEATURES.SUPERUSER_TEST;
     },
   },
   actions: {

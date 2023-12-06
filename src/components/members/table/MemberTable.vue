@@ -44,7 +44,7 @@
 
       <template #cell-actions="{ row }: { row: MembershipSchema }">
         <icon-button
-          v-if="adminApiStore.displaySuperuser"
+          v-if="sessionStore.superuser"
           icon="security"
           tooltip="Create superuser"
           data-cy="button-member-superuser"

@@ -4,12 +4,8 @@ import { computed } from "vue";
 import { AdminApiHook, MembershipSchema } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import { logStore, sessionStore } from "@/hooks";
+import { activateSuperuser, createSuperuser, deactivateSuperuser } from "@/api";
 import { pinia } from "@/plugins";
-import {
-  activateSuperuser,
-  createSuperuser,
-  deactivateSuperuser,
-} from "@/api/endpoints/admin-api";
 import useApi from "./useApi";
 
 /**

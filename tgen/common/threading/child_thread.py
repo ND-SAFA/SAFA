@@ -1,0 +1,59 @@
+import threading
+from typing import Any, Callable
+
+from tgen.common.logging.logger_manager import logger
+from tgen.common.threading.threading_state import MultiThreadState
+
+
+class ChildThread(threading.Thread):
+    def __init__(self, state: MultiThreadState, thread_work: Callable):
+        """
+        Constructs a child thread for the multi-thread state.
+        :param state: State containing synchronization information for child threads.
+        :param thread_work: The work to be performed by the child thread.
+        """
+        super().__init__()
+        self.state = state
+        self.thread_work = thread_work
+
+    def run(self) -> None:
+        """
+        Performs work on the next available items until no more work is available.
+        :return: None
+        """
+        while self.state.has_work():
+            index, item = self.state.get_item()
+            work_result = self._perform_work(item, index)
+            self.state.on_item_finished(work_result, index)
+
+    def _perform_work(self, item: Any, index: int) -> Any:
+        """
+        Performs work on item.
+        :param item: The item to perform work on.
+        :param index: The index of the item.
+        :return: The result of the work.
+        """
+        attempts = 0
+        has_performed_work = False
+        while not has_performed_work and self.state.should_attempt_work(attempts):
+            if attempts > 0:
+                logger.info(f"Re-trying request...")
+            try:
+                attempts += 1
+                thread_result = self.thread_work(item)
+                return thread_result
+            except Exception as e:
+                self._handle_exception(attempts, e, index)
+
+    def _handle_exception(self, attempts: int, e: Exception, index: int) -> None:
+        """
+        Handles exception caused while performing work.
+        :param attempts: The number of attempts on this current work.
+        :param e: The exception thrown.
+        :param index: The item's index
+        :return: None
+        """
+        if not self.state.below_attempt_threshold(attempts):
+            self.state.on_item_fail(e, index=index)
+        else:
+            self.state.on_valid_exception(e)

@@ -178,8 +178,8 @@ class ClusterCondenser:
         min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
         if min_pairwise_avg is not None:
             if self.filter_cohesiveness:
-                clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
-            clusters = list(sorted(clusters, key=lambda v: v.size_weighted_sim if v.size_weighted_sim else 0, reverse=True))
+                filtered_clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
+            clusters = list(sorted(filtered_clusters, key=lambda v: v.size_weighted_sim if v.size_weighted_sim else 0, reverse=True))
         return clusters
 
     def __get_next_cluster_id(self) -> int:

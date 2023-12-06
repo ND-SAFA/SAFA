@@ -51,6 +51,6 @@ class StepClusterArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerState]
                                       filter_by_cohesiveness=False,
                                       add_orphans_to_best_home=True)
         clustering_pipeline = ClusteringPipeline(cluster_args)
-        clustering_pipeline.run(run_setup=False)  # avoids running summarizer again
+        clustering_pipeline.run()
         cluster_map = clustering_pipeline.state.final_cluster_map
         return {cluster_id: cluster for cluster_id, cluster in cluster_map.items() if len(cluster) > 1}

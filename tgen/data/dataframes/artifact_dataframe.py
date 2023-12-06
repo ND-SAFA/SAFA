@@ -185,7 +185,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :param re_summarize: True if old summaries should be replaced
         :return: The summaries
         """
-        if re_summarize or not self.is_summarized():
+        if re_summarize or not self.is_summarized(code_only=summarizer.code_or_above_limit_only):
             missing_all = self[ArtifactKeys.SUMMARY].isna().all() or re_summarize
             if missing_all:
                 summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)

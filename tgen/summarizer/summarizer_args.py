@@ -1,16 +1,15 @@
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import Dict, List
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, \
     DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
-from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.pipeline.state import State
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 
 
@@ -59,11 +58,11 @@ class SummarizerArgs(PipelineArgs):
     """
     List of file types to include when summarizing
     """
-    include_subset_by_type: List[str] = field(default_factory=list)
+    include_subset_by_type: List[str] = None
     """
     List of directories to include when summarizing
     """
-    include_subset_by_dir: List[str] = field(default_factory=list)
+    include_subset_by_dir: List[str] = None
 
     def __post_init__(self) -> None:
         """

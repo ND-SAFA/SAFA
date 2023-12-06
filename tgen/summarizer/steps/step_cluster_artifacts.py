@@ -1,13 +1,12 @@
-from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.project_summary_constants import MAX_TOKENS_FOR_PROJECT_SUMMARY
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
-from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summarizer_state import SummarizerState
 from tgen.summarizer.summarizer_util import SummarizerUtil
@@ -52,6 +51,6 @@ class StepClusterArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerState]
                                       filter_by_cohesiveness=False,
                                       add_orphans_to_best_home=True)
         clustering_pipeline = ClusteringPipeline(cluster_args)
-        clustering_pipeline.run()
+        clustering_pipeline.run(run_setup=False)  # avoids running summarizer again
         cluster_map = clustering_pipeline.state.final_cluster_map
         return {cluster_id: cluster for cluster_id, cluster in cluster_map.items() if len(cluster) > 1}

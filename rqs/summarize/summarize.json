@@ -5,8 +5,7 @@
         {
           "object_type": "SUMMARY",
           "summarize_code_only": true,
-          "do_resummarize_artifacts": false,
-          "include_subset_by_dir": "app",
+          "do_resummarize_artifacts": true,
           "dataset_creator": {
             "object_type": "PROMPT",
             "trace_dataset_creator": {

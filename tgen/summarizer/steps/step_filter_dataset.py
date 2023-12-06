@@ -17,9 +17,11 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         if not args.include_subset_by_type and not args.include_subset_by_dir:
             return
         artifact_df = state.dataset.artifact_df
-        indices2keep = [a_id for a_id in artifact_df.index if self.in_dirs(a_id, args.include_subset_by_dir)
-                        or self.is_file_type(a_id, args.include_subset_by_type)]
-        state.dataset.update_artifact_df(artifact_df.filter_by_index(index_to_filter=indices2keep))
+        should_filter = args.include_subset_by_type or args.include_subset_by_dir
+        if should_filter:
+            indices2keep = [a_id for a_id in artifact_df.index if self.in_dirs(a_id, args.include_subset_by_dir)
+                            or self.is_file_type(a_id, args.include_subset_by_type)]
+            state.dataset.update_artifact_df(artifact_df.filter_by_index(index_to_filter=indices2keep))
 
     @staticmethod
     def check_condition(a_id: str, conditions2check: Union[List[str], str], method2use: str) -> bool:
@@ -37,7 +39,7 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         return False
 
     @staticmethod
-    def in_dirs(a_id: str, directories:  Union[List[str], str]) -> bool:
+    def in_dirs(a_id: str, directories: Union[List[str], str]) -> bool:
         """
         Checks whether a file is inside of the dir based on its name.
         :param a_id: The artifact id.
@@ -47,7 +49,7 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         return StepFilterDataset.check_condition(a_id, directories, "startswith")
 
     @staticmethod
-    def is_file_type(a_id: str, file_types:  Union[List[str], str]) -> bool:
+    def is_file_type(a_id: str, file_types: Union[List[str], str]) -> bool:
         """
         Checks whether a file is one of the given types.
         :param a_id: The artifact id.

@@ -1,11 +1,10 @@
 import threading
 import time
 from queue import Queue
-from typing import Any, Callable, List, Union, Dict, TypedDict, Optional, Set
+from typing import Any, Callable, Dict, List, Optional, Set, TypedDict
 
 from tqdm import tqdm
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.constants.threading_constants import THREAD_SLEEP
 from tgen.common.logging.logger_manager import logger

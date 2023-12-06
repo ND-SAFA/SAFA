@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, get_name_responses, \
     get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_FACTOR
+from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -100,7 +100,8 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
 
     def assert_generation_prompts(self, prompt: str, return_value: str):
         n_artifacts = len(BeautifulSoup(prompt, features="lxml").findAll(self.HGEN_ARGS.source_type))
-        expected_value = GenerateArtifactContentStep._calculate_proportion_of_artifacts(n_artifacts, DEFAULT_REDUCTION_FACTOR)
+        expected_value = GenerateArtifactContentStep._calculate_proportion_of_artifacts(n_artifacts,
+                                                                                        DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS)
         self.assertIn(f"a minimal set ({expected_value})", prompt)
         return return_value
 
@@ -134,9 +135,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
             return lambda prompt: self.assert_generation_prompts(prompt, return_value=r)
 
         anthropic_ai_manager.mock_summarization()
-        anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
         args: HGenArgs = get_test_hgen_args()()
         self.HGEN_ARGS = args
+        args.dataset.project_summary = HGEN_PROJECT_SUMMARY
         args.target_type = "User Story"
         args.perform_clustering = True
         args.generate_trace_links = generate_trace_links
@@ -146,7 +147,6 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         state.description = HGenTestConstants.description
         state.format_of_artifacts = HGenTestConstants.format_
 
-        state.project_summary = HGEN_PROJECT_SUMMARY
         state.original_dataset = args.dataset
         source_artifact_df = state.original_dataset.artifact_df.get_type(args.source_layer_ids)
         state.source_dataset = PromptDataset(artifact_df=source_artifact_df)

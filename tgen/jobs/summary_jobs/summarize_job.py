@@ -1,7 +1,9 @@
+import os
 from typing import Any, Dict
 
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.abstract_job import AbstractJob
@@ -45,10 +47,13 @@ class SummarizeJob(AbstractJob):
         self.args.no_project_summary = self.is_subset and not dataset.project_summary
 
         dataset = Summarizer(self.args, dataset=dataset).summarize()
+
         summary = dataset.project_summary.to_string() if dataset.project_summary else None
 
-        if self.export_dir:
-            exporter = SafaExporter(self.export_dir, dataset=dataset)
+        if self.args.export_dir:
+            exporter = PromptDatasetExporter(os.path.join(self.args.export_dir, "final_dataset"),
+                                             trace_dataset_exporter_type=SafaExporter,
+                                             dataset=dataset)
             exporter.export()
 
         artifacts = dataset.artifact_df.to_artifacts()

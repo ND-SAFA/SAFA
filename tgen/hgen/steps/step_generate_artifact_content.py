@@ -2,7 +2,8 @@ import uuid
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
-from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_FACTOR, DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
+from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
+from tgen.common.constants.hgen_constants import DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
 from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
@@ -51,13 +52,11 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
             prompt_builder.format_variables = {"n_targets": n_targets}
 
-        project_summary = state.original_dataset.project_summary
-        if project_summary:
-            project_overview = project_summary.to_string([PS_OVERVIEW_TITLE])
+        if state.project_summary:
+            project_overview = state.project_summary.to_string(args.content_generation_project_summary_sections)
             overview_of_system_prompt = Prompt(f"\n{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{project_overview}", allow_formatting=False)
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
-        # TODO: Check is project summary
         generations = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
                                                dataset=dataset, response_prompt_ids={task_prompt.id},
                                                tags_for_response={generated_artifacts_tag}, return_first=False,
@@ -79,19 +78,21 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current HGEN state
         :return: A list of the expected number of target artifacts for each cluster
         """
-        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(artifact_ids))
-                     for c_id, artifact_ids in state.cluster2artifacts.items()]
+        cluster2artifacts = state.get_cluster2artifacts()
+        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(cluster2artifacts[i]),
+                                                                                    reduction_percentage=args.reduction_percentage)
+                     for i in artifact_ids]
         return n_targets
 
     @staticmethod
-    def _calculate_proportion_of_artifacts(n_artifacts: int, reduction_factor: float = DEFAULT_REDUCTION_FACTOR) -> int:
+    def _calculate_proportion_of_artifacts(n_artifacts: int, reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS) -> int:
         """
         Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
         :param n_artifacts: Total number of artifacts
-        :param reduction_factor: Determines the proportion of generated artifacts = n_artifacts * reduction_factor
+        :param reduction_percentage: Determines the proportion of source artifacts to use for # of generations
         :return: The number of artifacts equal to a proportion of the total
         """
-        return max(round(n_artifacts * reduction_factor), 1)
+        return max(round(n_artifacts * reduction_percentage), 1)
 
     @staticmethod
     def _calculate_proportion_of_tokens(artifacts: List, args: HGenArgs,

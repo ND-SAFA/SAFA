@@ -48,7 +48,6 @@ def set_repr(custom_repr):
     return set_repr_decorator
 
 
-@set_repr(lambda f: "bool")
 def bool_constructor(s: str):
     """
     The default boolean constructor that uses bool reprbut is able to parse wide range of true responses.
@@ -58,7 +57,6 @@ def bool_constructor(s: str):
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
 
-@set_repr(lambda f: "list")
 def list_constructor(s: str, delimiter: str = COMMA) -> List[str]:
     """
     Constructs a list from a string by splitting the string on delimiter.

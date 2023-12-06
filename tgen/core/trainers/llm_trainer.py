@@ -95,8 +95,8 @@ class LLMTrainer(AbstractTrainer):
             assert len(datasets) == 1, "If prompts are provided, only one dataset may be used"
             prompt_df = datasets[0].get_prompt_dataframe()
 
-        original_responses = None
         reloaded = False
+        original_responses = None
         if FileUtil.safely_check_path_exists(save_and_load_path):
             logger.info(f"IMPORTANT!!! Loading previous LLM responses from {save_and_load_path}")
             res = YamlUtil.read(save_and_load_path)

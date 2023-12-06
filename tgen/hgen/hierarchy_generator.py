@@ -51,7 +51,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         summarizer_args = SummarizerArgs(
                                          summarize_code_only=True,
                                          do_resummarize_artifacts=False,
-                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS if args.create_project_summary else [],
+                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
                                          )
         super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
@@ -79,7 +79,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
-        self.summarizer_args = None
         super().run(**kwargs)
 
         dataset = self.state.final_dataset

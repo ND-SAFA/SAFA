@@ -6,16 +6,16 @@
           "object_type": "MULTI_LAYER_HGEN",
           "starting_hgen_job": {
             "hgen_args": {
-              "export_dir": "[OUTPUT_PATH]/hgen/testing/[CURRENT_PROJECT]",
+              "export_dir": "[OUTPUT_PATH]/hgen/[CURRENT_PROJECT]",
               "source_layer_ids": "[SOURCE_LAYER_IDS_LIST]",
               "target_type": "[TARGET_TYPE]",
-              "create_project_summary": "[CREATE_PROJECT_SUMMARY_BOOL]",
               "generate_trace_links": true,
               "interactive_mode": "[IS_INTERACTIVE_BOOL]",
               "generate_explanations": "[GENERATE_EXPLANATIONS_BOOL_OPTIONAL]",
               "seed_project_summary_section": "[PS_SECTION_OPTIONAL]",
-              "seed_layer_id": "[SEED_LAYER_ID]",
+              "seed_layer_id": "[SEED_LAYER_ID_OPTIONAL]",
               "add_seeds_as_artifacts": "[ADD_SEEDS_AS_ARTIFACTS_BOOL_OPTIONAL]",
+              "reduction_percentage": "[REDUCTION_PERCENTAGE_OPTIONAL_FLOAT]",
               "dataset_creator": {
                 "object_type": "PROMPT",
                 "trace_dataset_creator": {

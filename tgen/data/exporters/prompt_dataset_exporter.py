@@ -2,7 +2,7 @@ import os
 
 from typing import Type, Union
 
-from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME, PROJECT_SUMMARY_FILENAME, PROJECT_SUMMARY_STATE_FILENAME
+from tgen.common.constants.dataset_constants import ARTIFACT_FILE_NAME, PROJECT_SUMMARY_FILENAME
 from tgen.common.util.file_util import FileUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
@@ -44,9 +44,8 @@ class PromptDatasetExporter(AbstractDatasetExporter):
         dataset: PromptDataset = self.get_dataset()
         if dataset.project_summary:
             project_summary_path = os.path.join(FileUtil.get_directory_path(self.export_path), PROJECT_SUMMARY_FILENAME)
-            project_state_path = os.path.join(FileUtil.get_directory_path(self.export_path), PROJECT_SUMMARY_STATE_FILENAME)
-            dataset.project_summary.save(project_summary_path)
-            dataset.project_summary.save(project_state_path)
+            dataset.project_summary.save(FileUtil.add_ext(project_summary_path, FileUtil.TEXT_EXT))
+            dataset.project_summary.save(FileUtil.add_ext(project_summary_path, FileUtil.JSON_EXT))
         if dataset.trace_dataset is not None:
             exporter: AbstractDatasetExporter = self.trace_dataset_exporter_type(export_path=self.export_path,
                                                                                  dataset=dataset.trace_dataset)

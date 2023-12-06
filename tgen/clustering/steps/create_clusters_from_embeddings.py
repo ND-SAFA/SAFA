@@ -8,6 +8,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.common.constants.logging_constants import TQDM_NCOLS
+from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
@@ -44,26 +45,24 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         if prefix:
             batch_cluster_map = {f"{prefix}: {k}": v for k, v in batch_cluster_map.items()}
         batch_cluster_map = CreateClustersFromEmbeddings.reduce_large_clusters(args,
-                                                                               embeddings_manager,
                                                                                batch_cluster_map)
         return batch_cluster_map
 
     @staticmethod
-    def reduce_large_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager,
-                              cluster_map: ClusterMapType) -> ClusterMapType:
+    def reduce_large_clusters(args: ClusteringArgs, cluster_map: ClusterMapType) -> ClusterMapType:
         """
         Recursively clusters exceeding the maximum size defined by the clustering args.
         :param args: Define clustering pipeline configuration to use for clustering large clusters.
-        :param embeddings_manager: Contains embeddings used to create child clusters.
         :param cluster_map: The cluster map containing clusters to filter.
         :return: Cluster map containing valid clusters and the children of those that got broken down.
         """
         final_cluster_map = {}
         for c_key, c in cluster_map.items():
             if len(c) > args.cluster_max_size:
-                cluster_map = CreateClustersFromEmbeddings.create_clusters(args, embeddings_manager, c)
-                for child_key, child_cluster in cluster_map.items():
-                    final_cluster_map[f"{c_key}:{child_key}"] = child_cluster
+                pairwise_sims = c.calculate_avg_pairwise_sim_for_artifacts(c.artifact_ids)
+                ranked_artifacts = ListUtil.zip_sort(c.artifact_ids, pairwise_sims, list_to_sort_on=1, return_both=False)
+                n_artifacts_to_remove = len(c) - args.cluster_max_size
+                c.remove_artifacts(ranked_artifacts[:n_artifacts_to_remove])
             else:
                 final_cluster_map[c_key] = c
         return final_cluster_map
@@ -100,11 +99,10 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         """
         if isinstance(batch_artifact_ids, list) and len(batch_artifact_ids) == 0:
             return {}
-
         global_clusters: ClusterMapType = {}
         for clustering_method in tqdm(args.cluster_methods, desc="Running Clustering Algorithms...", ncols=TQDM_NCOLS):
             cluster_manager = ClusteringAlgorithmManager(clustering_method)
-            clusters = cluster_manager.cluster(embeddings_manager, reduction_factor=args.cluster_reduction_factor,
+            clusters = cluster_manager.cluster(embeddings_manager,
                                                min_cluster_size=args.cluster_min_size, max_cluster_size=args.cluster_max_size,
                                                subset_ids=batch_artifact_ids,
                                                **args.clustering_method_args)

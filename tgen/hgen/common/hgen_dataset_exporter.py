@@ -16,7 +16,7 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 
 
-class HGenDatasetExporter:
+class HGenDatasetBuilder:
     def __init__(self, args: HGenArgs, state: HGenState):
         """
         Creates exporter for pipeline with args and state.
@@ -30,14 +30,14 @@ class HGenDatasetExporter:
         self._layer_data_frames = []
 
     @staticmethod
-    def export(args: HGenArgs, state: HGenState):
+    def build(args: HGenArgs, state: HGenState):
         """
         Exports HGEN as a trace dataset from the arguments and state.
         :param args: Configuration of HGEN pipeline to export.
         :param state: State of HGEN pipeline to export.
         :return: Trace dataset containing artifacts, traces, and traced layers.
         """
-        exporter = HGenDatasetExporter(args, state)
+        exporter = HGenDatasetBuilder(args, state)
         exporter.add_content()
         trace_dataset = exporter.get_trace_dataset()
         trace_dataset.trace_df = TraceDatasetCreator.generate_negative_links(layer_df=trace_dataset.layer_df,
@@ -54,7 +54,7 @@ class HGenDatasetExporter:
         self.add_generated_content()
         generated_trace_df = self.get_trace_df()
 
-        if self.args.add_seeds_as_artifacts:
+        if self.args.add_seeds_as_artifacts and self.args.get_seed_id(raise_exception=False):
             self.add_seed_data_frames(generated_trace_df)
 
     def add_original_dataset(self) -> None:

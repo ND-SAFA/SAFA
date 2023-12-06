@@ -3,6 +3,7 @@ from typing import List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.status import Status
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -76,8 +77,9 @@ class MultiLayerHGenJob(AbstractJob):
                                                    dataset_creator=None,
                                                    optimize_with_reruns=False,
                                                    load_dir=EMPTY_STRING)
+        DictUtil.get_kwarg_values(new_params, reduction_percentage=None, pop=True)
         init_params = ParamSpecs.create_from_method(HGenArgs.__init__).param_names
-        new_params = {name: new_params[name] for name in init_params}
+        new_params = {name: new_params[name] for name in init_params if name in new_params}
         next_job = BaseHGenJob(HGenArgs(**new_params), current_hgen_job.job_args)
         next_job.result.experimental_vars = {"target_type": next_target_type}
         return next_job

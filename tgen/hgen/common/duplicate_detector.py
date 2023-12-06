@@ -46,9 +46,8 @@ class DuplicateDetector:
         has_single_score = similarity_matrix.shape[0] <= 2 and similarity_matrix.shape[1] <= 2
         duplicate_similarity_threshold = self.duplicate_similarity_threshold
         if not has_single_score:  # do not use percentile is only single unique
-            percentile_similarity_threshold = NpUtil.get_similarity_matrix_percentile(similarity_matrix,
-                                                                                      DUPLICATE_THRESHOLD_PERCENTILE)
-            duplicate_similarity_threshold = max(percentile_similarity_threshold, duplicate_similarity_threshold)
+            _, outlier_threshold = NpUtil.get_similarity_matrix_outliers(similarity_matrix)
+            duplicate_similarity_threshold = max(duplicate_similarity_threshold, outlier_threshold)
         return duplicate_similarity_threshold
 
     @staticmethod

@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple, TypedDict, Set
+from typing import Dict, List, Optional, Set, Tuple, TypedDict
 
 import anthropic
 
@@ -6,8 +6,9 @@ from tgen.common.constants import anthropic_constants, environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.environment_constants import ANTHROPIC_KEY
 from tgen.common.logging.logger_manager import logger
+from tgen.common.threading.threading_state import MultiThreadState
 from tgen.common.util.attr_dict import AttrDict
-from tgen.common.util.thread_util import ThreadUtil, GlobalState
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
@@ -79,7 +80,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         raise NotImplementedError(NotImplementedError)
 
     def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,
-                                     retries: Set[int] = None, **params) -> GlobalState:
+                                     retries: Set[int] = None, **params) -> MultiThreadState:
         """
         Makes a completion request to anthropic api.
         :param raise_exception: If True, raises an exception if the request has failed.
@@ -106,24 +107,24 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             local_response = get_client().completion(**prompt_params)
             return local_response
 
-        global_state: GlobalState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
-                                                                    thread_work,
-                                                                    retries=retries,
-                                                                    collect_results=True,
-                                                                    n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
-                                                                    max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
-                                                                    raise_exception=raise_exception)
+        global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
+                                                                         thread_work,
+                                                                         retries=retries,
+                                                                         collect_results=True,
+                                                                         n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
+                                                                         max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
+                                                                         raise_exception=raise_exception)
 
         self._handle_exceptions(global_state)
-        global_responses = global_state["results"]
+        global_responses = global_state.results
         for i, res in enumerate(global_responses):
             if res.get("exception", EMPTY_STRING):
                 if raise_exception:
                     raise Exception(res["exception"])
-                global_state["failed_responses"].add(i)
+                global_state.failed_responses.add(i)
         if retries:
             global_responses = self._combine_original_responses_and_retries(global_responses, original_responses, retries)
-        global_state["results"] = [res for res in global_responses]
+        global_state.results = [res for res in global_responses]
         return global_state
 
     @staticmethod

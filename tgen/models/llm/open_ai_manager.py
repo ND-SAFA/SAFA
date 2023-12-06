@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Set, List
+from typing import List, Set
 
 import openai
 from openai.openai_object import OpenAIObject
@@ -8,8 +8,9 @@ from tgen.common.constants import open_ai_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.common.logging.logger_manager import logger
+from tgen.common.threading.threading_state import MultiThreadState
 from tgen.common.util.attr_dict import AttrDict
-from tgen.common.util.thread_util import ThreadUtil, GlobalState
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
@@ -83,21 +84,21 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
             res = openai.ChatCompletion.create(**params)
             return res.choices[0]
 
-        global_state: GlobalState = ThreadUtil.multi_thread_process("Making completion requests",
-                                                                    prompts,
-                                                                    complete_prompt,
-                                                                    raise_exception=raise_exception,
-                                                                    n_threads=open_ai_constants.OPENAI_MAX_THREADS,
-                                                                    max_attempts=open_ai_constants.OPENAI_MAX_ATTEMPTS,
-                                                                    retries=retries,
-                                                                    collect_results=True)
+        global_state: MultiThreadState = ThreadUtil.multi_thread_process("Making completion requests",
+                                                                         prompts,
+                                                                         complete_prompt,
+                                                                         raise_exception=raise_exception,
+                                                                         n_threads=open_ai_constants.OPENAI_MAX_THREADS,
+                                                                         max_attempts=open_ai_constants.OPENAI_MAX_ATTEMPTS,
+                                                                         retries=retries,
+                                                                         collect_results=True)
 
         self._handle_exceptions(global_state)
 
-        global_responses = global_state["results"]
+        global_responses = global_state.results
         if retries:
             global_responses = self._combine_original_responses_and_retries(global_responses, original_responses, retries)
-        global_state["results"] = Res(choices=global_responses)
+        global_state.results = Res(choices=global_responses)
         return global_state
 
     @staticmethod

@@ -1,7 +1,11 @@
+from typing import List
+
 from tests.base_test import BaseTest
 from tests.common.request_proxy import RequestProxy
 from tests.common.test_data import TestData
 from tests.common.test_data_creator import TestDataCreator
+from tgen.common.objects.artifact import Artifact
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
@@ -10,8 +14,29 @@ class TestUseCase(BaseTest):
     @mock_anthropic
     def test_use_case(self, ai_manager: TestAIManager):
         source_artifacts = TestDataCreator.get_source_artifacts()
+        source_summaries = [a[ArtifactKeys.SUMMARY] for a in source_artifacts]
+        fake_summaries = ["mock_summary" for i in range(len(source_summaries))]
+        self.remove_summaries(source_artifacts)
 
         project_summary_json = TestData.read_summary(True)
+        ai_manager.mock_summarization(responses=fake_summaries)
         ai_manager.mock_project_summary(project_summary_json)
+        ai_manager.mock_summarization(responses=source_summaries)
+
         summary_response = RequestProxy.summarize(source_artifacts)
-        print(summary_response)
+        project_summary = summary_response["summary"]
+        summarized_artifacts = summary_response["artifacts"]
+        self.assertEqual(project_summary, TestData.read_summary())
+
+        for e_summary, r_artifact in zip(source_summaries, summarized_artifacts):
+            self.assertEqual(e_summary, r_artifact[ArtifactKeys.SUMMARY])
+
+    @staticmethod
+    def remove_summaries(artifact: List[Artifact]) -> None:
+        """
+        Sets summary field of artifacts to none.
+        :param artifact: The artifacts to remove summaries from
+        :return:
+        """
+        for a in artifact:
+            a[ArtifactKeys.SUMMARY] = None

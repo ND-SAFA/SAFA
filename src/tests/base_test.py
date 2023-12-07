@@ -20,6 +20,7 @@ class BaseTest(TestCase):
         load_dotenv()
         get_wsgi_application()
         environment_constants.IS_TEST = True
+        anthropic_constants.ANTHROPIC_MAX_THREADS = 1
         open_ai_constants.OPENAI_MAX_ATTEMPTS = 1
         anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS = 1
         os.environ["ANTHROPIC_API_KEY"] = str(uuid.uuid4())

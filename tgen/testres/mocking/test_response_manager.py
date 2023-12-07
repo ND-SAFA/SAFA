@@ -2,7 +2,8 @@ from copy import deepcopy
 from typing import Any, Callable, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_TAGS, PS_SUBSYSTEM_TAG
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_TAGS, PS_DATA_FLOW_TAG, \
+    PS_SUBSYSTEM_TAG
 from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATION_TAG, ENTITIES_TAG, JUSTIFICATION_TAG, \
     RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_SCORE_TAG, SUB_SYSTEMS_TAG
 from tgen.common.util.llm_response_util import LLMResponseUtil
@@ -161,11 +162,16 @@ class TestAIManager:
 
         self.add_responses([response])
 
-    def mock_summarization(self) -> None:
+    def mock_summarization(self, responses: List[str] = None) -> None:
         """
         Adds handler that will generically process the artifact summarization whenever it is detected.
         :return: None
         """
+
+        if responses:
+            new_responses = [PromptUtil.create_xml("summary", r) for r in responses]
+            self.add_responses(new_responses)
+            return
 
         def summarization_handler(p: str):
             summary_tag = "<summary>"
@@ -189,6 +195,8 @@ class TestAIManager:
             chunks = tag_body["chunks"]
             if tag == PS_SUBSYSTEM_TAG:
                 body = [TestAIManager.create_subsystem_response(c) for c in chunks]
+            elif tag == PS_DATA_FLOW_TAG:
+                body = PromptUtil.create_xml(tag, NEW_LINE.join(chunks))
             else:
                 body = [PromptUtil.create_xml(tag, c) for c in chunks]
         else:
@@ -209,7 +217,7 @@ class TestAIManager:
         desc = NEW_LINE.join(desc)
         name = name.replace("#", EMPTY_STRING)
         content = f"<name>{name}</name><descr>{desc}</descr>"
-
+        content = PromptUtil.create_xml(PS_SUBSYSTEM_TAG, content)
         return content
 
     @staticmethod

@@ -40,6 +40,7 @@ class ClusteringArgs(PipelineArgs):
     filter_by_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS
     add_orphans_to_best_home: bool = False
     subset_ids: List[str] = None
+    assign_centroids_top_artifacts: bool = True
 
     def __post_init__(self) -> None:
         """

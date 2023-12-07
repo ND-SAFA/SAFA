@@ -23,10 +23,15 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :return: None
         """
         batches = state.artifact_batches if state.artifact_batches else [args.get_artifact_ids()]
+        seeds = list(state.seed2artifacts.keys()) if state.seed2artifacts else []
+        cluster_id_to_seed = {}
         global_clusters = {}
         for i, batch_ids in enumerate(batches):
             batch_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids, prefix=str(i))
+            if i < len(seeds):
+                cluster_id_to_seed.update({c_id: seeds[i] for c_id in batch_cluster_map.keys()})
             global_clusters.update(batch_cluster_map)
+        state.cluster_id_2seeds = cluster_id_to_seed
         state.final_cluster_map = global_clusters
 
     @staticmethod

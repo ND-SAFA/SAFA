@@ -26,7 +26,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
                                 InteractiveModeOptions.TURN_OFF_INTERACTIVE]
 
     def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]], summarizer_args: SummarizerArgs = None,
-                 skip_summarization: bool = False, **summarizer_args_kwargs):
+                 skip_summarization: bool = False, log_state_exception: bool = True, **summarizer_args_kwargs):
         """
         Constructs pipeline of steps.
         :param args: The arguments to the pipeline.
@@ -34,6 +34,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :param summarizer_args: The args used to create project summary
         :param summarizer_args_kwargs: Keyword arguments to summarizer to customize default settings.
         :param skip_summarization: Whether to skip summarization of artifacts.
+        :param log_state_exception: If True, logs any exceptions thrown while init state, else fails silently
         """
         self.args = args
         self.steps = [s() for s in steps]
@@ -44,6 +45,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         self.resume_interactive_mode_step = None
         if skip_summarization:
             self.summarizer_args = None
+        self.log_state_exception = log_state_exception
         self.state: StateType = self.init_state()
         self.artifact_summaries_costs = 0
         self.project_summary_costs = 0
@@ -59,7 +61,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if not self.args.load_dir:
             self.args.load_dir = self.args.export_dir
         if self.args.load_dir:
-            return self.state_class().load_latest(self.args.load_dir, self.get_step_names())
+            return self.state_class().load_latest(self.args.load_dir, self.get_step_names(), self.log_state_exception)
         return self.state_class()()
 
     def run(self, run_setup: bool = True, log_start: bool = True) -> None:

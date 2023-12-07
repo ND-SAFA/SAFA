@@ -37,6 +37,8 @@ class CustomLoader(SafeLoader):
                 if isinstance(node.value, str):
                     return cls[node.value]
                 return self._create_enum_from_meta(cls, node)
+            if ReflectionUtil.is_instance_or_subclass(cls, Exception):
+                return cls(node.value[0].value)
             deep = hasattr(cls, '__setstate__')
             state = self.construct_mapping(node, deep=True)
             use_init = False

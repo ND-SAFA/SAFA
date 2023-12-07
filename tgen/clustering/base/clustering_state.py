@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 
 from tgen.clustering.base.cluster_type import ClusterIdType, ClusterMapType
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -24,4 +24,5 @@ class ClusteringState(State):
     cluster_dataset: PromptDataset = None
     artifact_batches: List[List[str]] = None
     seed2artifacts: ClusterIdType = None
+    cluster_id_2seeds: Dict = None
     final_cluster_map: ClusterMapType = None

@@ -56,6 +56,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         if cluster_state.seed2artifacts:
             state.seed2artifact_ids = cluster_state.seed2artifacts
+            state.cluster_id2seeds = cluster_state.cluster_id_2seeds
 
     @staticmethod
     def create_clustering_args(args: HGenArgs, state: HGenState) -> ClusteringArgs:

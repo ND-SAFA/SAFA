@@ -32,7 +32,7 @@ class Summarizer(AbstractPipeline):
         self.dataset = dataset
         if self.args.no_project_summary:
             self.args.project_summary_sections = []
-        super().__init__(args, steps=self.steps, skip_summarization=True)
+        super().__init__(args, steps=self.steps, skip_summarization=True, log_state_exception=False)
 
     def summarize(self) -> PromptDataset:
         """

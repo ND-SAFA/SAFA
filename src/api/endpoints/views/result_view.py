@@ -7,10 +7,10 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_MEDIUM
 from api.constants.celery_status import CeleryStatus
-from api.endpoints.endpoint import endpoint
+from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
-from tgen.common.util.json_util import NpEncoder
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.json_util import NpEncoder
 
 
 class ResultPayload(TypedDict):

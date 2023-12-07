@@ -1,5 +1,5 @@
-from api.endpoints.async_endpoint import async_endpoint
 from api.endpoints.common.dataset_converter import create_api_dataset
+from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.summary.project_summary_serializer import ProjectSummaryRequest, \
     ProjectSummarySerializer
 from tgen.common.util.status import Status
@@ -9,7 +9,7 @@ from tgen.jobs.summary_jobs.summary_response import SummaryResponse
 LAYER_ID = "LAYER_ID"
 
 
-@async_endpoint(ProjectSummarySerializer)
+@endpoint(ProjectSummarySerializer, is_async=True)
 def perform_project_summary(request_data: ProjectSummaryRequest) -> SummaryResponse:
     """
     Creates a project specification summarizing artifacts in system.

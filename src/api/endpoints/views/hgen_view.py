@@ -1,5 +1,5 @@
-from api.endpoints.async_endpoint import async_endpoint
 from api.endpoints.common.dataset_converter import create_api_dataset
+from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
 from api.utils.view_util import ViewUtil
 from tgen.common.logging.logger_manager import logger
@@ -11,7 +11,7 @@ from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 ARTIFACT_LAYER = "source_layer_id"
 
 
-@async_endpoint(HGenSerializer)
+@endpoint(HGenSerializer, is_async=True)
 def perform_hgen(request: HGenRequest):
     """
     Performs generation of single artifacts from cluster.

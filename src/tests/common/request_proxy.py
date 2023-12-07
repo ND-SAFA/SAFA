@@ -1,0 +1,90 @@
+import json
+from typing import Callable, Dict, List, Union
+
+from django.test import Client
+
+from tests.common.app_endpoints import AppEndpoints
+from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
+from tgen.common.util.json_util import NpEncoder
+from tgen.data.readers.definitions.api_definition import ApiDefinition
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.jobs.summary_jobs.summary_response import SummaryResponse
+
+
+class RequestProxy:
+    CLIENT = None
+
+    @staticmethod
+    def trace(dataset: ApiDefinition, sync=False) -> List[Trace]:
+        """
+        Traces the layers defined in given api definition.
+        :param dataset: The dataset containing artifacts and layers to trace.
+        :param sync: Whether to trace syncronously.
+        :return: The list of trace predictions.
+        """
+        data = {"dataset": dataset}
+        response = RequestProxy._request(AppEndpoints.TGEN.as_endpoint(sync=sync), data)
+        return [Trace(**t) for t in response["predictions"]]
+
+    @staticmethod
+    def hgen(artifacts: List[Artifact], target_types: List[str], summary: str = None) -> TraceDataset:
+        """
+        Generates given target types from artifacts.
+        :param artifacts: The source artifacts to generate target types from.
+        :param target_types: The types of artifacts to generate.
+        :param summary: The project summary.
+        :return: Dataset containing source and target artifacts.
+        """
+        if isinstance(target_types, str):
+            target_types = [target_types]
+        data = {"artifacts": artifacts, "targetTypes": target_types, "summary": summary}
+        response = RequestProxy._request(AppEndpoints.HGEN, data)
+        return response
+
+    @staticmethod
+    def summarize(artifacts: List[Artifact]) -> SummaryResponse:
+        """
+        Summarizes artifacts and returns summary response.
+        :param artifacts: The artifacts to summarize.
+        :return: Artifact summaries and optionally project summary.
+        """
+        data = {"artifacts": artifacts}
+        response = RequestProxy._request(AppEndpoints.PROJECT_SUMMARY, data)
+        return response
+
+    @staticmethod
+    def _request(url: Union[str, AppEndpoints], data: Dict = None, method: str = "POST", content_type="application/json"):
+        """
+        Requests the application at given url
+        :param url: The url to make request for.
+        :param data: The data to include in request.
+        :param method: The type of request to make.
+        :param content_type: The type of content expected to be received.
+        :return: The endpoint response.
+        """
+        if isinstance(url, AppEndpoints):
+            url = url.as_endpoint()
+        client_method = RequestProxy.get_client_method(method)
+        data = json.loads(json.dumps(data, cls=NpEncoder))
+        response = client_method(url, data=data, content_type=content_type)
+        if response.status_code >= 300:
+            raise Exception(response.content)
+        return json.loads(response.content)
+
+    @classmethod
+    def get_client_method(cls, method: str) -> Callable:
+        """
+        Creates django server client singleton and returns method associated with that singleton.
+        :param method: The HTTP request type for method to retrieve.
+        :return: The callable of client representing method type.
+        """
+        if cls.CLIENT is None:
+            cls.CLIENT = Client()
+        c = cls.CLIENT
+        methods = {
+            "POST": c.post,
+            "GET": c.get
+        }
+        assert method in methods, f"Expected method to be one of: {methods.keys()}"
+        return methods[method]

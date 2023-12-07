@@ -1,10 +1,10 @@
 from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
-from api.tests.api_base_test import APIBaseTest
+from tests.base_test import BaseTest
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.testres.test_assertions import TestAssertions
 
 
-class TestHGenSerializer(APIBaseTest):
+class TestHGenSerializer(BaseTest):
     data = {
         "artifacts": [{
             "id": "A1",

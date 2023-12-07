@@ -2,7 +2,9 @@ from typing import Dict, List
 from unittest import TestCase
 
 from tgen.common.objects.artifact import Artifact
-from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.common.objects.trace import Trace
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 
 class TestVerifier:
@@ -47,3 +49,19 @@ class TestVerifier:
                 if a_key in ignore_keys:
                     continue
                 test_case.assertEqual(expected_artifact[a_key], resulting_artifact[a_key.value])
+
+    @staticmethod
+    def verify_order(tc: TestCase, predictions: List[Trace], parent2sorted_children: Dict) -> None:
+        """
+        Verifies the order of the trace links for each parent.
+        :param tc: The test case to use to make assertions with.
+        :param predictions: The predictions to verify the ranked order of children.
+        :param parent2sorted_children: Map of parent to its ranked list of children.
+        :return: None.
+        """
+        parent2children = RankingUtil.group_trace_predictions(predictions, TraceKeys.parent_label())
+        for parent_id, artifact_ids in parent2sorted_children.items():
+            parent_predictions = parent2children[parent_id]
+            sorted_parent_predictions = sorted(parent_predictions, key=lambda t: t["score"], reverse=True)
+            for t_prediction, a_id in zip(sorted_parent_predictions, artifact_ids):
+                tc.assertEqual(a_id, t_prediction[TraceKeys.child_label()])

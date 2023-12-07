@@ -1,8 +1,8 @@
 from api.endpoints.completion.completion_serializer import CompletionSerializer
-from api.tests.api_base_test import APIBaseTest
+from tests.base_test import BaseTest
 
 
-class TestGenerationSerializer(APIBaseTest):
+class TestGenerationSerializer(BaseTest):
     def test_pos_serialization(self):
         prompt = "hello, my name is "
         payload = {

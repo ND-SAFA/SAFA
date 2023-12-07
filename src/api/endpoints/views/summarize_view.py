@@ -1,6 +1,5 @@
-from api.endpoints.async_endpoint import async_endpoint
 from api.endpoints.common.dataset_converter import create_api_dataset
-from api.endpoints.endpoint import endpoint
+from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.serializers.summarize_serializer import SummarizeRequest, SummarizeSerializer
 from api.utils.view_util import ViewUtil
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
@@ -11,7 +10,7 @@ def perform_summarization_sync(request_data: SummarizeRequest):
     return perform_summarize_request(request_data)
 
 
-@async_endpoint(SummarizeSerializer)
+@endpoint(SummarizeSerializer, is_async=True)
 def perform_summarization_job(request_data: SummarizeRequest):
     return perform_summarize_request(request_data)
 

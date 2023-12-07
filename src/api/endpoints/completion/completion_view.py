@@ -1,7 +1,7 @@
 import os.path
 
+from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.completion.completion_serializer import CompletionPayload, CompletionSerializer
-from api.endpoints.endpoint import endpoint
 from api.utils.model_util import ModelUtil
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager

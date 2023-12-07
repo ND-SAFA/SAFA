@@ -1,8 +1,7 @@
 import os.path
 from typing import Type, Union
 
-from api.endpoints.async_endpoint import async_endpoint
-from api.endpoints.endpoint import endpoint
+from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.views.predict_serializer import PredictionSerializer, TraceRequest
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.dataset_constants import NO_CHECK
@@ -29,7 +28,7 @@ def perform_tracing_job(dataset: ApiDefinition, job: Union[Type[RankingJob], Typ
     return {"predictions": prediction_result.prediction_entries}
 
 
-@async_endpoint(PredictionSerializer)
+@endpoint(PredictionSerializer, is_async=True)
 def perform_prediction(prediction_payload: TraceRequest):
     dataset: ApiDefinition = prediction_payload["dataset"]
     return perform_tracing_job(dataset,

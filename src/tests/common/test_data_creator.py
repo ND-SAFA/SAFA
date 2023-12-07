@@ -1,5 +1,8 @@
 from typing import List
 
+import pandas as pd
+
+from tests.common.test_constants import SOURCE_CODE_PATH
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.objects.artifact import Artifact
 
@@ -24,4 +27,27 @@ class TestDataCreator:
             bodies = [content] * n_artifacts
 
         artifacts = [Artifact(id=f"{i}{extension}", content=body, layer_id=layer_id) for i, body in enumerate(bodies)]
+        return artifacts
+
+    @staticmethod
+    def get_source_artifacts() -> List[Artifact]:
+        """
+        :return: List of source artifacts.
+        """
+        source_artifacts = TestDataCreator.read_artifacts(SOURCE_CODE_PATH)
+        return source_artifacts
+
+    @staticmethod
+    def read_artifacts(file_path: str) -> List[Artifact]:
+        """
+        Reads artifact file and creates artifact entities.
+        :param file_path: Path to artifact file.
+        :param layer_id: The layer id to assign to each artifact.
+        :return: List of artifacts in file.
+        """
+        source_df = pd.read_csv(file_path)
+        artifacts = []
+        for i, row in source_df.iterrows():
+            artifact = Artifact(**row)
+            artifacts.append(artifact)
         return artifacts

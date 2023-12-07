@@ -1,0 +1,401 @@
+id,content,layer_id,summary
+/Artifact.java,"package edu.nd.crc.safa.features.artifacts.entities.db;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.features.common.IBaseEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.type.SqlTypes;
+
+/**
+ * Responsible for storing the unique identifiers for artifacts
+ * in a project.
+ */
+@Entity
+@Table(name = ""artifact"",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {
+                ""project_id"",
+                ""name""
+            }, name = AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT)
+    })
+@Data
+public class Artifact implements Serializable, IBaseEntity, IArtifact {
+
+    @Id
+    @GeneratedValue
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = ""artifact_id"")
+    private UUID artifactId;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = ""project_id"",
+        nullable = false
+    )
+    private Project project;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = ""type_id"",
+        nullable = false)
+    private ArtifactType type;
+
+    @Column(name = ""name"")
+    private String name;
+
+    public Artifact() {
+    }
+
+    public Artifact(Project project, ArtifactType type, String name) {
+        this();
+        this.project = project;
+        this.type = type;
+        this.name = name;
+    }
+
+    @Override
+    public UUID getBaseEntityId() {
+        return this.artifactId;
+    }
+}
+",Java,"This Java code defines the Artifact entity class that represents unique artifacts stored within software projects in the system. The Artifact class maps to a database table with a composite unique constraint on the project ID and artifact name to ensure uniqueness per project. It contains attributes for the artifact ID, name, and many-to-one relationships to the associated Project and ArtifactType entities. Annotations are used to specify the database column mappings and cascade delete behaviors for the relationships. Constructors are provided to instantiate Artifact instances from its constituent project, type, and name values. By defining this entity class, artifacts can now be persisted to and retrieved from the underlying repository to track project artifacts and their relationships within the software analysis application."
+/ArtifactService.java,"package edu.nd.crc.safa.features.artifacts.services;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
+import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.VersionCalculator;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@AllArgsConstructor
+@Service
+public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
+    private IVersionRepository<ArtifactVersion, ArtifactAppEntity> artifactVersionRepository;
+
+    /**
+     * Returns all artifacts present in the given version.
+     *
+     * @param projectVersion The project version to retrieve artifacts from.
+     * @return The artifacts at current version.
+     */
+    public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion) {
+        return getAppEntities(projectVersion, null);
+    }
+
+    /**
+     * Returns all artifacts present in the given version.
+     *
+     * @param projectVersion The project version to retrieve artifacts from.
+     * @param user           The user used to retrieve the entities (optional).
+     * @return The artifacts at current version.
+     */
+    @Override
+    public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
+        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
+            .retrieveVersionEntitiesByProjectVersion(projectVersion);
+        return versionToAppEntity(artifactVersions);
+    }
+
+    /**
+     * Returns all versions of all artifacts in the project.
+     *
+     * @param project The project whose artifacts are retrieved.
+     * @return All artifacts across all versions of their lifetime.
+     */
+    public List<ArtifactAppEntity> getAppEntities(Project project) {
+        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
+            .retrieveVersionEntitiesByProject(project);
+        return versionToAppEntity(artifactVersions);
+    }
+
+    @Override
+    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion,
+                                                       SafaUser user, List<UUID> appEntityIds) {
+        return getAppEntitiesByIds(projectVersion, appEntityIds);
+    }
+
+    /**
+     * Retrieves the artifacts at the version specified.
+     *
+     * @param projectVersion The project version of the artifacts to retrieve.
+     * @param artifactIds    The IDs of the artifacts to retrieve.
+     * @return The constructed artifacts at given version.
+     */
+    public List<ArtifactAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, List<UUID> artifactIds) {
+        List<ArtifactVersion> allArtifactVersions =
+            this.artifactVersionRepository.retrieveVersionEntitiesByBaseIds(artifactIds);
+        List<ArtifactVersion> artifactAtVersion = VersionCalculator.getEntitiesAtVersion(projectVersion,
+            allArtifactVersions);
+        return versionToAppEntity(artifactAtVersion);
+    }
+
+    private List<ArtifactAppEntity> versionToAppEntity(List<ArtifactVersion> artifactVersions) {
+        List<ArtifactAppEntity> artifacts = new ArrayList<>();
+        for (ArtifactVersion artifactVersion : artifactVersions) {
+            ArtifactAppEntity artifactAppEntity = this.artifactVersionRepository
+                .retrieveAppEntityFromVersionEntity(artifactVersion);
+            artifacts.add(artifactAppEntity);
+        }
+        return artifacts;
+    }
+}
+",Java,"This ArtifactService code handles retrieving artifact data from a versioned data store and mapping it to application objects. It provides methods to get all artifacts for a given ProjectVersion, all artifacts across all versions for a Project, and artifacts by ID at a specific version. These methods query the underlying IVersionRepository to retrieve ArtifactVersion database entities matching the criteria. They then use the VersionCalculator utility to filter entities to the requested version if needed. Finally, the ArtifactVersion objects are mapped to ArtifactAppEntity application objects using the repository's mapping function before being collected and returned in a list to the caller. This allows higher level application code to work with consistent object representations of the artifacts while abstracting away the database persistence details."
+/TraceLink.java,"package edu.nd.crc.safa.features.traces.entities.db;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.common.IBaseEntity;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.type.SqlTypes;
+
+/**
+ * Identifies a series of versioned trace links between a source
+ * and target artifacts.
+ */
+@Entity
+@Table(name = ""trace_link"",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+            ""source_artifact_id"", ""target_artifact_id""
+        }, name = AppConstraints.SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET)
+    }
+)
+@Data
+@NoArgsConstructor
+public class TraceLink implements Serializable, IBaseEntity {
+
+    @Id
+    @GeneratedValue
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = ""trace_link_id"")
+    private UUID traceLinkId;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = ""source_artifact_id"",
+        referencedColumnName = ""artifact_id"",
+        nullable = false
+    )
+    private Artifact sourceArtifact;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(
+        name = ""target_artifact_id"",
+        referencedColumnName = ""artifact_id"",
+        nullable = false
+    )
+    private Artifact targetArtifact;
+
+    public TraceLink(Artifact sourceArtifact,
+                     Artifact targetArtifact) {
+        this.sourceArtifact = sourceArtifact;
+        this.targetArtifact = targetArtifact;
+    }
+
+    public String getSourceName() {
+        return this.sourceArtifact.getName();
+    }
+
+    public String getTargetName() {
+        return this.targetArtifact.getName();
+    }
+
+    public ArtifactType getSourceType() {
+        return this.sourceArtifact.getType();
+    }
+
+    public ArtifactType getTargetType() {
+        return this.targetArtifact.getType();
+    }
+
+    public boolean isSourceName(String sourceName) {
+        return this.sourceArtifact.getName().equals(sourceName);
+    }
+
+    public boolean isTargetName(String targetName) {
+        return this.targetArtifact.getName().equals(targetName);
+    }
+
+    @Override
+    public UUID getBaseEntityId() {
+        return this.getTraceLinkId();
+    }
+}
+",Java,"This code defines the TraceLink entity to represent traceability links between artifacts in the software system's database. The TraceLink class is mapped to the ""trace_link"" table with a unique constraint ensuring only one link can exist between a given source and target. Relationships are established to the Artifact entities for the source and target, cascading deletes. Properties expose metadata about the linked artifacts like name, type. Methods check the artifact names and return the base entity ID. Overall, this entity class models trace links in the object-relational mapping to enable querying and persisting traceability relationships between artifacts in the database."
+/TraceLinkService.java,"package edu.nd.crc.safa.features.traces.services;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.VersionCalculator;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
+
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@AllArgsConstructor
+@Service
+public class TraceService implements IAppEntityService<TraceAppEntity> {
+    private ArtifactService artifactService;
+    private TraceLinkVersionRepository traceLinkVersionRepository;
+
+    /**
+     * Retrieves traces visible in project version.
+     *
+     * @param projectVersion The version of the entities to construct.
+     * @param user           The user making the request
+     * @return Trace links in version.
+     */
+    @Override
+    public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
+        return getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
+    }
+
+    /**
+     * Retrieves list of filtered trace links at given version.
+     *
+     * @param projectVersion The version of the trace links to retrieve.
+     * @param user           The user making the request
+     * @param tracePredicate The filtering predicate, returns link if true on predicate.
+     * @return List of filtered trace links.
+     */
+    public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user,
+                                               Predicate<TraceAppEntity> tracePredicate) {
+        List<ArtifactAppEntity> projectVersionArtifacts = artifactService
+            .getAppEntities(projectVersion, user);
+        List<UUID> projectVersionArtifactIds = projectVersionArtifacts
+            .stream()
+            .map(ArtifactAppEntity::getId)
+            .collect(Collectors.toList());
+        return getTracesRelatedToArtifacts(projectVersion, projectVersionArtifactIds)
+            .stream().filter(tracePredicate).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves the trace links present in version with app entity ids.
+     *
+     * @param projectVersion The project version of the entities to calculate.
+     * @param user           Nullable, not used.
+     * @param appEntityIds   The trace link base entity ids.
+     * @return List of trace links at version.
+     */
+    @Override
+    public List<TraceAppEntity> getAppEntitiesByIds(ProjectVersion projectVersion, SafaUser user,
+                                                    List<UUID> appEntityIds) {
+        List<TraceLinkVersion> allVersions = this.traceLinkVersionRepository.findByTraceLinkTraceLinkIdIn(appEntityIds)
+            .stream()
+            .filter(TraceLinkVersion::isVisible)
+            .collect(Collectors.toList());
+        return VersionCalculator.getEntitiesAtVersion(projectVersion, allVersions)
+            .stream()
+            .map(this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns trace links associated with given artifacts at the specified version.
+     *
+     * @param projectVersion      The version of the artifacts and associated traces to retrieve.
+     * @param existingArtifactIds Artifact IDs of trace links to retrieve.
+     * @return List of {@link TraceAppEntity} Traces associated with existing artifact IDs.
+     */
+    public List<TraceAppEntity> retrieveActiveTraces(ProjectVersion projectVersion,
+                                                     List<UUID> existingArtifactIds) {
+        return this.getTracesRelatedToArtifacts(projectVersion, existingArtifactIds)
+            .stream()
+            .filter(TraceAppEntity::isVisible)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns list of traces current active in project version containing
+     * source or target as given artifact.
+     *
+     * @param projectVersion The project version used to retrieve active links.
+     * @param artifactIds    The artifact ids referenced by trace links.
+     * @return List of traces active in version and associated with artifact
+     */
+    public List<TraceAppEntity> getTracesRelatedToArtifacts(
+        ProjectVersion projectVersion,
+        List<UUID> artifactIds
+    ) {
+        List<TraceLinkVersion> traceVersions = this.traceLinkVersionRepository.getTraceVersionsRelatedToArtifacts(
+            artifactIds);
+        Map<UUID, List<TraceLinkVersion>> baseEntityTable = ProjectDataStructures.groupEntitiesByProperty(
+            traceVersions,
+            TraceLinkVersion::getBaseEntityId
+        );
+        List<TraceLinkVersion> traceLinksAtVersion =
+            VersionCalculator.calculateVersionEntitiesAtProjectVersion(projectVersion,
+                baseEntityTable);
+        return traceLinksAtVersion
+            .stream()
+            .filter(t -> t.getModificationType() != ModificationType.REMOVED)
+            .map(this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity)
+            .collect(Collectors.toList());
+    }
+}
+",Java,"This TraceService class implements the retrieval and filtering of trace links from the database for a given project version and user. It utilizes the ArtifactService to first get artifacts in the project version. It then queries the database to retrieve TraceLinkVersion entities related to those artifacts' IDs. These trace versions are mapped to TraceAppEntity objects and filtered based on visibility and the given predicate. Additional methods provide querying capabilities to retrieve traces by IDs or only those active in the project version and associated with given artifacts. The service abstracts working with the database repositories and entities, assembling trace data into application objects for use in the code."

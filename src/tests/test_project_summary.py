@@ -1,17 +1,18 @@
-from api.tests.api_base_test import APIBaseTest
-from api.tests.common.mock_async import mock_async
-from api.tests.common.test_data_creator import TestDataCreator
-from api.tests.common.test_verifier import TestVerifier
+from tests.base_test import BaseTest
+from tests.common.request_proxy import RequestProxy
+from tests.common.test_data_creator import TestDataCreator
+from tests.common.test_verifier import TestVerifier
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
-class TestProjectSummary(APIBaseTest):
+class TestProjectSummary(BaseTest):
 
-    @mock_async
-    def test_sync_summarize(self, test_manager: TestAIManager):
+    @mock_anthropic
+    def test_use_case(self, test_manager: TestAIManager):
         """
         Verifies that project summary endpoint is able to summarize artifacts and create project summary.
         """
@@ -21,15 +22,14 @@ class TestProjectSummary(APIBaseTest):
         artifacts = TestDataCreator.create_artifacts(layer_id, n_artifacts=n_artifacts, extension=extension)
 
         section_body_map = {s: f"{s} body." for s in DEFAULT_PROJECT_SUMMARY_SECTIONS}
-        section_bodies = list(section_body_map.values())
 
         test_manager.mock_summarization()
         test_manager.mock_project_summary(section_body_map)
 
-        data = {"artifacts": artifacts}
-        response: SummaryResponse = self.request("/project-summary/", data)
+        response: SummaryResponse = RequestProxy.summarize(artifacts)
         response_artifacts = response["artifacts"]
         summary = response["summary"]
 
-        TestVerifier.assert_all_in(summary, section_bodies)
-        TestVerifier.verify_artifacts(artifacts, response_artifacts, ignore_keys=[ArtifactKeys.SUMMARY])
+        section_bodies = list(section_body_map.values())
+        TestVerifier.assert_all_in(self, summary, section_bodies)
+        TestVerifier.verify_artifacts(self, artifacts, response_artifacts, ignore_keys=[ArtifactKeys.SUMMARY])

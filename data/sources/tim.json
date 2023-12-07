@@ -1,0 +1,13 @@
+{
+  "artifacts": [
+    {
+      "type": "Java",
+      "fileName": "ja.csv"
+    },
+    {
+      "type": "Functional Requirement",
+      "fileName": "functional_requirement.csv"
+    }
+  ],
+  "traces": []
+}

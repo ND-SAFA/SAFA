@@ -1,9 +1,9 @@
 from api.endpoints.serializers.summarize_serializer import SummarizeRequest, SummarizeSerializer
-from api.tests.api_base_test import APIBaseTest
+from tests.base_test import BaseTest
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 
 
-class TestSummarySerializer(APIBaseTest):
+class TestSummarySerializer(BaseTest):
     """
     Tests that summary is able to be serializes
     """

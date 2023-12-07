@@ -1,14 +1,14 @@
 from dotenv import load_dotenv
 
 from api.endpoints.serializers.dataset_serializer import DatasetSerializer
-from api.tests.api_base_test import APIBaseTest
-from api.tests.test_data import TestData
+from tests.base_test import BaseTest
+from tests.common.test_data import TestData, TestSubset
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 
 load_dotenv()
 
 
-class TestDatasetSerializer(APIBaseTest):
+class TestDatasetSerializer(BaseTest):
     """
     Tests that datasets are able to be serialized.
     """
@@ -17,11 +17,13 @@ class TestDatasetSerializer(APIBaseTest):
         """
         Tests that a valid example is serialized correctly.
         """
-        serializer = DatasetSerializer(data=TestData.dataset)
-        self.assertTrue(serializer.is_valid())
+        for subset in TestSubset:
+            dataset = TestData.get_dataset(subset, encode=True)
+            serializer = DatasetSerializer(data=dataset)
+            self.assertTrue(serializer.is_valid())
 
-        dataset: ApiDefinition = serializer.save()
-        TestData.assert_valid_dataset(self, dataset)
+            dataset: ApiDefinition = serializer.save()
+            TestData.verify_dataset(self, dataset, subset)
 
     def test_neg_serialization(self):
         """

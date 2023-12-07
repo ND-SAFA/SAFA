@@ -241,7 +241,7 @@ export function buildOrg(
     name: org.name || "",
     description: org.description || "",
     personalOrg: org.personalOrg || false,
-    paymentTier: org.paymentTier || "",
+    paymentTier: org.paymentTier || "AS_NEEDED",
     members: org.members || [],
     teams: org.teams || [],
     permissions: org?.permissions || [],

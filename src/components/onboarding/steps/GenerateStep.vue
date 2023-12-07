@@ -1,21 +1,29 @@
 <template>
+  <typography
+    el="div"
+    value="
+      Now that your code has been imported and summarized,
+      we can generate additional documentation to group related functionality.
+      You will receive an email when the import completes.
+    "
+  />
+  <typography
+    el="div"
+    secondary
+    value="This process may take an additional 30 minutes depending on the size of your project."
+  />
+
   <flex-box column align="center" t="2">
-    <typography el="div" value="Importing from GitHub:" />
+    <typography el="div" value="Project Size:" />
+    <attribute-chip :value="codeFiles" icon="code" color="primary" />
+    <typography el="div" value="Generating Documents:" />
     <attribute-chip
-      :value="integrationsStore.gitHubProject?.name || ''"
-      icon="project-add"
+      v-for="type in onboardingStore.generationTypes"
+      :key="type"
+      :value="type"
+      icon="create-artifact"
       color="primary"
     />
-    <template v-if="ENABLED_FEATURES.GENERATE_ONBOARDING">
-      <typography el="div" value="Generating Documents:" />
-      <attribute-chip
-        v-for="type in onboardingStore.generationTypes"
-        :key="type"
-        :value="type"
-        icon="create-artifact"
-        color="primary"
-      />
-    </template>
     <!-- TODO: confirm data generation cost estimate, pay with stripe -->
     <flex-box t="4">
       <text-button
@@ -26,35 +34,61 @@
         :disabled="onboardingStore.error"
         @click="onboardingStore.handleGenerate"
       >
-        {{ onboardingStore.steps[2].title }}
+        Generate Documentation
       </text-button>
     </flex-box>
-    <q-banner
-      v-if="onboardingStore.error"
-      rounded
-      class="bg-background q-mt-md"
-    >
-      <template #avatar>
-        <icon variant="error" color="secondary" size="md" class="q-mr-sm" />
-      </template>
-      <typography
-        value="
-          On no! It looks like there was an issue with importing from GitHub.
-          You can schedule a call with us below to ensure your data gets uploaded properly.
-        "
-      />
-      <template #action>
-        <text-button
-          text
-          color="secondary"
-          icon="calendar"
-          @click="onboardingStore.handleScheduleCall"
-        >
-          Schedule a Call
-        </text-button>
-      </template>
-    </q-banner>
   </flex-box>
+
+  <job-loading-sub-step v-if="status === 'loading'" />
+
+  <flex-box v-if="status === 'success'" column align="center" t="2">
+    <text-button
+      text
+      color="gradient"
+      class="bd-gradient"
+      icon="download"
+      :loading="projectApiStore.saveProjectLoading"
+      @click="onboardingStore.handleExportProject"
+    >
+      Export as CSV
+    </text-button>
+    <flex-box align="center" justify="center" full-width>
+      <separator style="width: 40px" />
+      <typography secondary el="div" class="q-ma-sm" value="OR" />
+      <separator style="width: 40px" />
+    </flex-box>
+    <text-button
+      text
+      color="gradient"
+      class="bd-gradient"
+      icon="view-tree"
+      @click="onboardingStore.handleViewProject"
+    >
+      View in SAFA
+    </text-button>
+  </flex-box>
+
+  <q-banner v-if="status === 'error'" rounded class="bg-background q-mt-md">
+    <template #avatar>
+      <icon variant="error" color="secondary" size="md" class="q-mr-sm" />
+    </template>
+    <typography
+      value="
+          On no! It looks like there was an issue with generating documentation.
+          You can schedule a call with us below to ensure your data gets generated properly.
+        "
+    />
+    <template #action>
+      <text-button
+        text
+        color="secondary"
+        icon="calendar"
+        @click="onboardingStore.handleScheduleCall"
+      >
+        Schedule a Call
+      </text-button>
+    </template>
+  </q-banner>
 </template>
 
 <script lang="ts">
@@ -67,13 +101,21 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ENABLED_FEATURES } from "@/util";
-import { integrationsStore, onboardingStore } from "@/hooks";
+import { computed, ref } from "vue";
+import { onboardingStore, projectApiStore } from "@/hooks";
 import {
   AttributeChip,
   FlexBox,
   Icon,
+  Separator,
   TextButton,
   Typography,
-} from "@/components";
+} from "@/components/common";
+import JobLoadingSubStep from "./JobLoadingSubStep.vue";
+
+const codeFiles = ref("[X] Files");
+
+const status = computed<"initial" | "loading" | "success" | "error">(() =>
+  onboardingStore.error ? "error" : "initial"
+);
 </script>

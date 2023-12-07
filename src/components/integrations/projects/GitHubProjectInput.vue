@@ -8,7 +8,7 @@
       :options="gitHubApiStore.organizationList"
       :loading="gitHubApiStore.loading"
       hint="Required"
-      class="full-width"
+      class="full-width q-mb-sm"
       option-label="name"
       data-cy="input-github-organization"
     />
@@ -18,29 +18,41 @@
       label="GitHub Repository"
       :options="projects"
       hint="Required"
-      class="full-width"
+      class="full-width q-mb-sm"
       option-label="name"
       data-cy="input-github-project"
     />
+
+    <flex-box v-if="!!projectName" column t="1">
+      <select-input
+        v-model="importBranch"
+        label="Import Branch"
+        :options="branches"
+        class="full-width q-mb-sm"
+        hint="The branch to import files from, using the default branch if not specified."
+      />
+      <multiselect-input
+        v-model="filePaths"
+        label="Import Path"
+        :options="[]"
+        add-values
+        class="full-width q-mb-sm"
+        hint="The file path(s) of the core code, such as 'src/'. Press enter to save."
+      />
+    </flex-box>
+
     <expansion-item
-      v-if="!!integrationsStore.gitHubProject"
-      label="Import Settings"
+      v-if="!!integrationsStore.gitHubProject && !props.minimal"
+      label="Advanced Configuration"
     >
       <flex-box v-if="!!projectName" column t="1">
-        <flex-box y="1">
-          <select-input
-            v-model="importBranch"
-            label="Import Branch"
-            :options="branches"
-            hint="The branch to import files from."
-          />
-          <text-input
-            v-model="artifactType"
-            label="Artifact Type"
-            hint="A name for imported artifacts."
-            class="q-mx-sm"
-          />
-        </flex-box>
+        <text-input
+          v-model="artifactType"
+          label="Artifact Type"
+          class="full-width q-mb-sm"
+          hint="A name for imported artifacts."
+        />
+
         <flex-box y="1" align="center">
           <div class="q-mr-sm">
             <multiselect-input
@@ -80,7 +92,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from "vue";
-import { GitHubProjectSchema } from "@/types";
+import { GitHubProjectSchema, MinimalProps } from "@/types";
 import { gitHubApiStore, integrationsStore } from "@/hooks";
 import {
   FlexBox,
@@ -92,7 +104,10 @@ import {
 } from "@/components/common";
 import { GitHubAuthentication } from "@/components/integrations/authentication";
 
+const props = defineProps<MinimalProps>();
+
 const projects = ref<GitHubProjectSchema[]>([]);
+const filePaths = ref<string[]>([]);
 
 const organizationName = computed(
   () => integrationsStore.gitHubOrganization?.name

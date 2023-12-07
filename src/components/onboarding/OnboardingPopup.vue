@@ -38,19 +38,16 @@
           color="gradient"
         >
           <template #1>
-            <select-repo-step />
+            <connect-git-hub-step />
           </template>
           <template #2>
-            <git-hub-project-input />
+            <select-repo-step />
           </template>
           <template #3>
-            <generate-step />
+            <summarize-step />
           </template>
           <template #4>
-            <await-generate-step />
-          </template>
-          <template #5>
-            <view-step />
+            <generate-step />
           </template>
         </stepper>
       </div>
@@ -69,7 +66,6 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { ENABLED_FEATURES } from "@/util";
 import {
   gitHubApiStore,
   integrationsStore,
@@ -77,16 +73,14 @@ import {
   sessionStore,
 } from "@/hooks";
 import { TextButton, Stepper, Typography } from "@/components/common";
-import { GitHubProjectInput } from "@/components/integrations";
 import {
+  ConnectGitHubStep,
   SelectRepoStep,
-  ViewStep,
+  SummarizeStep,
   GenerateStep,
-  AwaitGenerateStep,
 } from "@/components/onboarding/steps";
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
-const uploadedJob = computed(() => onboardingStore.uploadedJob);
 
 // Preload GitHub projects if credentials are already set.
 onMounted(async () => {
@@ -97,11 +91,7 @@ onMounted(async () => {
 watch(
   () => userLoggedIn.value,
   (userLoggedIn) => {
-    if (
-      userLoggedIn &&
-      !onboardingStore.isComplete &&
-      ENABLED_FEATURES.ONBOARDING
-    ) {
+    if (userLoggedIn && !onboardingStore.isComplete) {
       onboardingStore.open = true;
     }
   }
@@ -115,26 +105,6 @@ watch(
 
     onboardingStore.handleNextStep("connect");
     gitHubApiStore.handleLoadProjects();
-  }
-);
-
-// Move from Generate Data step if repo is selected.
-watch(
-  () => !!integrationsStore.gitHubProject,
-  (valid) => {
-    if (!valid) return;
-
-    onboardingStore.handleNextStep("code");
-  }
-);
-
-// Move from Await Generation step if the job completes.
-watch(
-  () => uploadedJob.value?.status,
-  (status) => {
-    if (status !== "COMPLETED") return;
-
-    onboardingStore.handleNextStep("job");
   }
 );
 </script>

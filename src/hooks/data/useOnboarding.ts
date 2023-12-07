@@ -37,14 +37,14 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     steps: Object.values(ONBOARDING_STEPS).map((step) => ({
       ...step,
-      done: false,
+      done: true,
     })),
     /**
      * The types of artifacts that will be generated.
      */
     generationTypes: [
-      ARTIFACT_GENERATION_TYPES.USER_STORY,
-      ARTIFACT_GENERATION_TYPES.SUB_SYSTEM,
+      ARTIFACT_GENERATION_TYPES.FUNCTIONAL_REQ,
+      ARTIFACT_GENERATION_TYPES.FEATURE,
     ],
   }),
   getters: {

@@ -1,11 +1,15 @@
-from typing import Callable, Dict, List, Union
+from copy import deepcopy
+from typing import Any, Callable, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS, PS_SUBSYSTEM_TAG
+from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_TAGS, PS_SUBSYSTEM_TAG
 from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATION_TAG, ENTITIES_TAG, JUSTIFICATION_TAG, \
-    RANKING_SCORE_TAG, SUB_SYSTEMS_TAG
+    RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_SCORE_TAG, SUB_SYSTEMS_TAG
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
+
+DEFAULT_SCORE = 0.5
+DEFAULT_EXPLANATION = "EXPLANATION"
 
 
 class TestAIManager:
@@ -64,9 +68,41 @@ class TestAIManager:
         """
         self.set_responses(self._responses + new_responses, start_index=self.start_index)
 
-    def mock_explanations(self, n_response: int, scores: List[float] = None, default_score: float = 0.5) -> None:
+    def mock_ranking(self, artifact_ids: List[Any], scores: List[float] = None,
+                     explanations: List[str] = None, default_score: float = DEFAULT_SCORE,
+                     default_explanation: str = DEFAULT_EXPLANATION):
+        """
+
+        :param artifact_ids: Artifacts being ranked.
+        :param scores: The score to assign to each artifact.
+        :param explanations: The explanations to assign to each artifact item.
+        :param default_score: The default score to use.
+        :param default_explanation: The default explanation to use.
+        :return: None, responses added in place.
+        """
+        n_artifacts = len(artifact_ids)
         if scores is None:
-            scores = [default_score] * n_response
+            scores = [default_score] * n_artifacts
+
+        if all(isinstance(f, float) for f in scores):
+            scores = [round(s * 5) for s in scores]
+        if explanations is None:
+            explanations = [default_explanation] * n_artifacts
+
+        response = EMPTY_STRING
+        for artifact_id, score, explanation in zip(artifact_ids, scores, explanations):
+            tag2response = {
+                RANKING_ID_TAG: artifact_id,
+                RANKING_EXPLANATION_TAG: explanation,
+                RANKING_SCORE_TAG: score
+            }
+            response += self.create_response_content(tag2response)
+            response = PromptUtil.create_xml(RANKING_ARTIFACT_TAG, tag_content=response)
+        self.add_responses([response])
+
+    def mock_explanations(self, artifacts: List[Any], scores: List[float] = None, default_score: float = 0.5) -> None:
+        if scores is None:
+            scores = [default_score] * len(artifacts)
         tag2response = {
             SUB_SYSTEMS_TAG: "SUB_SYSTEM",
             ENTITIES_TAG: "ENTITIES",
@@ -75,14 +111,50 @@ class TestAIManager:
             JUSTIFICATION_TAG: "JUSTIFICATION"
         }
         responses = []
-        for i, score in enumerate(scores):
-            explanation_dict = {RANKING_SCORE_TAG: score}
-            explanation_dict.update(tag2response)
-            response = NEW_LINE.join(PromptUtil.create_xml(t, r) for t, r in explanation_dict.items())
+        self.validate_inputs(artifacts, scores)
+
+        for artifact_id in artifacts:
+            response = EMPTY_STRING
+            tag2response[RANKING_ID_TAG] = artifact_id
+            tag2response[RANKING_SCORE_TAG] = scores
+            response += self.create_response_content(tag2response, multi_tags=[RANKING_SCORE_TAG])
             responses.append(response)
         self.add_responses(responses)
 
-    def mock_hgen(self, tag: str, bodies: List[str]):
+    @staticmethod
+    def create_response_content(tag2response: Dict, multi_tags: List[str] = None) -> str:
+        """
+        Creates a response containing the keys as tags and values as their contents.
+        :param tag2response: Tags and their
+        :param multi_tags:
+        :return:
+        """
+        if multi_tags is None:
+            multi_tags = []
+        response = EMPTY_STRING
+        tags = []
+        if multi_tags:
+            for mt in multi_tags:
+                for st in tag2response[mt]:
+                    copy_tag = deepcopy(tag2response)
+                    copy_tag[mt] = st  # override multi-tag with single tag
+                    tags.append(copy_tag)
+        for t in tags:
+            response += NEW_LINE.join(PromptUtil.create_xml(t, r) for t, r in t.items())
+        return response
+
+    @staticmethod
+    def validate_inputs(*items) -> float:
+        """
+        Verifies that lists all have same length.
+        :param The lists to verify.
+        :return: None, verifications in place.
+        """
+        n_items = len(items[0])
+        for item in items[1:]:
+            assert len(item) == n_items, f"Expected {item} to have {n_items} elements."
+
+    def add_xml_response(self, tag: str, bodies: List[str]):
         response = EMPTY_STRING
         for body in bodies:
             response += f"<{tag}>{body}</{tag}>"
@@ -106,18 +178,41 @@ class TestAIManager:
             self.handlers.append(summarization_handler)
 
     def mock_project_summary(self, sections: Dict[str, str]):
-        responses = [self.create_project_summary_response(PROJECT_SUMMARY_TAGS[s], body) for s, body in sections.items()]
+        responses = [self.create_project_summary_response(PROJECT_SUMMARY_TAGS[s], sections[s])
+                     for s in DEFAULT_PROJECT_SUMMARY_SECTIONS]
         self.add_responses(responses)
         return responses
 
     @staticmethod
-    def create_project_summary_response(tag: str, tag_body: str):
-        if tag == PS_SUBSYSTEM_TAG:
-            name, desc = tag_body.split(NEW_LINE) if NEW_LINE in tag_body else [tag_body, tag_body]
-            tag_body = f"<name>{name}</name><descr>{desc}</descr>"
-        body = f"<{tag}>{tag_body}</{tag}>"
-        return f"<notes></notes>{body}"
+    def create_project_summary_response(tag: str, tag_body: Union[str, Dict]):
+        if isinstance(tag_body, dict):
+            chunks = tag_body["chunks"]
+            if tag == PS_SUBSYSTEM_TAG:
+                body = [TestAIManager.create_subsystem_response(c) for c in chunks]
+            else:
+                body = [PromptUtil.create_xml(tag, c) for c in chunks]
+        else:
+            if tag == PS_SUBSYSTEM_TAG:
+                tag_body = TestAIManager.create_subsystem_response(tag_body)
+            body = f"<{tag}>{tag_body}</{tag}>"
+        return f"<notes></notes>{body}" if isinstance(body, str) else NEW_LINE.join([f"<notes></notes>{b}" for b in body])
 
+    @staticmethod
+    def create_subsystem_response(content: str) -> str:
+        """
+        Creates subsystem project summary response that contains given content.
+        First line is used to name the subsystem. If no newline if found then content is used as name.
+        :param content: The content of the sub-system.
+        :return:The response with XML tags.
+        """
+        name, *desc = content.split(NEW_LINE) if NEW_LINE in content else [content, content]
+        desc = NEW_LINE.join(desc)
+        name = name.replace("#", EMPTY_STRING)
+        content = f"<name>{name}</name><descr>{desc}</descr>"
+
+        return content
+
+    @staticmethod
     def mock_responses(self):
         def response_handler(p: str):
             return "mock text"

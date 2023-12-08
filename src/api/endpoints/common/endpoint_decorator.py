@@ -1,10 +1,10 @@
-from celery import shared_task
 from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from dotenv import load_dotenv
 from rest_framework.views import APIView
 
 from api.docs.doc_generator import autodoc
+from api.endpoints.common.async_endpoint_handler import AsyncEndpointHandler
 from api.endpoints.common.endpoint_handler import EndpointHandlerProxy
 from tgen.common.constants import environment_constants
 
@@ -28,11 +28,8 @@ def endpoint(serializer, is_async: bool = False):
 
 
 def create_task_decorator(serializer, func):
-    @shared_task(name=func.__name__)
-    def task_decorator():
-        return class_decorator(serializer, func)
-
-    return task_decorator()
+    request_receiver = AsyncEndpointHandler.create_receiver(func, serializer)
+    return class_decorator(serializer, request_receiver)
 
 
 def class_decorator(serializer, func):

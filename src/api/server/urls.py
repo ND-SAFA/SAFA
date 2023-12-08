@@ -28,7 +28,7 @@ from api.endpoints.views.hgen_view import perform_hgen
 from api.endpoints.views.result_view import cancel_job, get_result, get_status
 from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
 from api.endpoints.views.trace_view import perform_prediction, perform_search
-from tests.common.app_endpoints import AppEndpoints
+from api.server.app_endpoints import AppEndpoints
 
 
 def wrap_html(body: str):

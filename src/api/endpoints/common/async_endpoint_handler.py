@@ -27,7 +27,12 @@ class AsyncEndpointHandler(IHandler):
         self.exception = None
         self.task = None
         self.result = {}
-        self.data = None
+        self.task = self.create_task()
+
+    @staticmethod
+    def create_receiver(func, serializer):
+        handler = AsyncEndpointHandler(func, serializer)
+        return lambda r: handler.handle_request(r)
 
     def _request_handler(self, data: Dict) -> JsonResponse:
         """
@@ -35,42 +40,42 @@ class AsyncEndpointHandler(IHandler):
         :param data: The request data.
         :return: None
         """
-        data = self.encode_object(data)
-        task = self.create_task()
-        result = task.delay(data)
+        result = self.task.delay(data)
         return JsonResponse({"task_id": result.id}, encoder=NpEncoder)
 
     def create_task(self):
-        @shared_task
-        def task(*args, **kwargs):
+        @shared_task(name=self.func.__name__)
+        def task(data):
+            self.is_running = True
             self.pre_process()
-            self.poll_job()
+            self.poll_job(data)
             self.post_process()
+            return self.result["output"]
 
         return task
 
-    def poll_job(self) -> None:
+    def poll_job(self, data) -> None:
         """
         Runs the job within a thread using the main thread to update the task logs.
         :return: None
         """
-        thread = threading.Thread(target=self.run_job)
+        thread = threading.Thread(target=self.run_job, args=[data])
         thread.start()
         while self.is_running:
             self.write_logs()
             threading.Event().wait(5)
         thread.join()
 
-    def run_job(self):
+    def run_job(self, data):
         """
         Runs the
         :return:
         """
         try:
-            data = self.serialize_data(self.data)
+            data = self.serialize_data(data)
             response = self.func(data)
             response_dict = self.encode_object(response)
-            self.result.update(response_dict)
+            self.result["output"] = response_dict
             self.is_success = True
         except Exception as e:
             logger.exception(e)

@@ -3,7 +3,7 @@ from typing import Callable, Dict, List, Union
 
 from django.test import Client
 
-from tests.common.app_endpoints import AppEndpoints
+from api.server.app_endpoints import AppEndpoints
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.json_util import NpEncoder

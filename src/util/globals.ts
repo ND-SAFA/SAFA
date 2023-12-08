@@ -36,3 +36,5 @@ export const DEMO_ACCOUNT = {
   email: "view@safa.ai",
   password: "safa!",
 };
+
+export const DEMO_PROJECT_ID = "5d2c0bb9-16db-452f-a6ba-cd072b4786a0"; // fEMR

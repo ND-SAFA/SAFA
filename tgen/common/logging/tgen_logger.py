@@ -44,7 +44,7 @@ class TGenLogger(Logger):
         step_formatted = TGenLogger.__create_step(step)
         self.info(step_formatted)
 
-    @lru_cache(maxsize=2)
+    @lru_cache(maxsize=5)
     def log_without_spam(self, level: int, msg: object, *args: object, **kwargs) -> None:
         """
         Logs a given message only once

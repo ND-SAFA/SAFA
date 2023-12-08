@@ -7,8 +7,6 @@ from copy import deepcopy
 from inspect import getfullargspec
 from typing import Any, Dict, Type
 
-import torch
-
 from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
@@ -70,7 +68,6 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         if self.model_manager:
             self.model_manager.clear_model()
-        torch.cuda.empty_cache()
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """

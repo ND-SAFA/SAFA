@@ -1,6 +1,7 @@
 from collections import Counter
-from typing import List, Union
+from typing import List, Union, Set
 
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.summarizer.summarizer_args import SummarizerArgs
@@ -18,13 +19,7 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         """
         artifact_df = state.dataset.artifact_df
         should_filter = args.include_subset_by_type or args.include_subset_by_dir
-        duplicate_content = {content for content, n in Counter([a[ArtifactKeys.CONTENT]
-                                                                for a in artifact_df.to_artifacts()]).items() if n > 1}
-        indices2remove = set()
-        for artifact in artifact_df.to_artifacts():
-            if artifact[ArtifactKeys.CONTENT] in duplicate_content:
-                indices2remove.add(artifact[ArtifactKeys.ID])
-                duplicate_content.remove(artifact[ArtifactKeys.CONTENT])
+        indices2remove = self.identify_indices_with_duplicate_content(artifact_df)
         if should_filter:
             indices2remove.update({a_id for a_id in artifact_df.index if not (self.in_dirs(a_id, args.include_subset_by_dir)
                                                                               or self.is_file_type(a_id,
@@ -33,6 +28,22 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         filtered_artifacts = artifact_df.filter_by_index(index_to_filter=indices2keep)
         assert len(filtered_artifacts) > 0, "No artifacts remain after filtering. Please check the filter conditions."
         state.dataset.update_artifact_df(filtered_artifacts)
+
+    @staticmethod
+    def identify_indices_with_duplicate_content(artifact_df: ArtifactDataFrame) -> Set:
+        """
+        Identifies indices in the dataframe that have duplicated content so they can be removed.
+        :param artifact_df: The artifact df to identify duplicates in.
+        :return: The set of indices in the dataframe that have duplicated content so they can be removed.
+        """
+        duplicate_content = {content for content, n in Counter([a[ArtifactKeys.CONTENT]
+                                                                for a in artifact_df.to_artifacts()]).items() if n > 1}
+        indices2remove = set()
+        for artifact in artifact_df.to_artifacts():
+            if artifact[ArtifactKeys.CONTENT] in duplicate_content:
+                indices2remove.add(artifact[ArtifactKeys.ID])
+                duplicate_content.remove(artifact[ArtifactKeys.CONTENT])
+        return indices2remove
 
     @staticmethod
     def check_condition(a_id: str, conditions2check: Union[List[str], str], method2use: str) -> bool:

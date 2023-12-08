@@ -10,7 +10,7 @@ from tgen.common.logging.logger_manager import logger
 
 
 class MultiThreadState:
-    def __init__(self, iterable: Iterable, title: str, retries: Set, collect_results: bool = False, max_attempts: int = 5,
+    def __init__(self, iterable: Iterable, title: str, retries: Set, collect_results: bool = False, max_attempts: int = 3,
                  sleep_time: float = THREAD_SLEEP):
         """
         Creates the state to syncronize a multi-threaded job.

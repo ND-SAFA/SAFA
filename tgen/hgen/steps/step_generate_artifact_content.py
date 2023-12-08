@@ -9,6 +9,7 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
@@ -16,6 +17,7 @@ from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -54,11 +56,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             prompt_builder.format_variables = {"n_targets": n_targets}
 
         if args.seed_layer_id:
-            seed_contents = [f"{NEW_LINE}{TAB}".join(state.cluster_id2seeds.get(c_id, EMPTY_STRING).split(NEW_LINE))
-                             for c_id in dataset.artifact_df.index]
-            seed_prompt_index = prompt_builder.find_prompt_by_id(task_prompt.id)
-            prompt_builder.add_prompt(SupportedPrompts.HGEN_SEED_PROMPT.value, seed_prompt_index)
-            prompt_builder.format_variables.update({"seed_content": seed_contents})
+            self._add_seeds_to_prompt(dataset, task_prompt, prompt_builder, state)
 
         if state.project_summary:
             project_overview = state.project_summary.to_string(args.content_generation_project_summary_sections)
@@ -78,6 +76,23 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.generations2sources = generations2sources
         state.cluster2generation = cluster2generation
         state.n_generations += 1
+
+    @staticmethod
+    def _add_seeds_to_prompt(dataset: PromptDataset, task_prompt: QuestionnairePrompt,
+                             prompt_builder: PromptBuilder, state: HGenState) -> None:
+        """
+        Adds the seeds to the prompt if they came from a real artifact layer so that they can ground the model's generations.
+        :param dataset: The dataset made from the clusters/
+        :param task_prompt: The prompt used to get the model to create the generations.
+        :param prompt_builder: The builder of the prompt for the generations.
+        :param state: The current state of HGen.
+        :return: None
+        """
+        seed_contents = [state.cluster_id2seeds.get(c_id, EMPTY_STRING).replace(NEW_LINE, f"{NEW_LINE}{TAB}")
+                         for c_id in dataset.artifact_df.index]
+        seed_prompt_index = prompt_builder.find_prompt_by_id(task_prompt.id)
+        prompt_builder.add_prompt(SupportedPrompts.HGEN_SEED_PROMPT.value, seed_prompt_index)
+        prompt_builder.format_variables.update({"seed_content": seed_contents})
 
     @staticmethod
     def _calculate_number_of_targets_per_cluster(artifact_ids: List, args: HGenArgs, state: HGenState) -> List[int]:

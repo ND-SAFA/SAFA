@@ -5,6 +5,7 @@ import numpy as np
 
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
+from tgen.clustering.methods.supported_seed_clustering_methods import SupportedSeedClusteringMethods
 from tgen.common.constants.hgen_constants import MIN_SEED_SIMILARITY_QUANTILE, UPPER_SEED_SIMILARITY_QUANTILE
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
@@ -48,10 +49,11 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         artifact_embeddings = embedding_manager.get_embeddings(artifact_ids)
         centroid_embeddings = CreateBatches.create_embeddings(embedding_manager, centroids)
         similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, centroid_embeddings)
-        cluster_map = CreateBatches.assign_centroids_top_artifacts(centroids, artifact_ids, similarity_matrix,
-                                                                   max_size=args.cluster_max_size) \
-            if args.assign_centroids_top_artifacts else CreateBatches.assign_clusters_to_artifacts(centroids, artifact_ids,
-                                                                                                   similarity_matrix)
+        if args.seed_clustering_method == SupportedSeedClusteringMethods.CENTROID_CHOOSES_ARTIFACTS:
+            cluster_map = CreateBatches.assign_centroids_top_artifacts(centroids, artifact_ids, similarity_matrix,
+                                                                       max_size=args.cluster_max_size)
+        else:
+            cluster_map = CreateBatches.assign_clusters_to_artifacts(centroids, artifact_ids, similarity_matrix)
         return cluster_map
 
     @staticmethod

@@ -22,7 +22,6 @@ class SearchPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         summarizer_args = SummarizerArgs(
             project_summary_sections=[],
-            do_resummarize_project=False,
             do_resummarize_artifacts=False
         )
         super().__init__(args, SearchPipeline.steps, summarizer_args=summarizer_args)

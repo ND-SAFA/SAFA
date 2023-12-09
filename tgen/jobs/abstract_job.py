@@ -1,3 +1,4 @@
+import gc
 import os
 import threading
 import traceback
@@ -68,6 +69,7 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         if self.model_manager:
             self.model_manager.clear_model()
+        gc.collect()
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """

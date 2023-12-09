@@ -7,10 +7,9 @@ from tgen.common.constants.model_constants import get_best_default_llm_manager, 
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EMBEDDING_MODEL, \
     DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
-
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
@@ -62,7 +61,7 @@ class RankingArgs(PipelineArgs):
     """
     - embedding_model: The model whose embeddings are used to rank children.
     """
-    embedding_model_name: str = None
+    embedding_model_name: str = DEFAULT_EMBEDDING_MODEL
     """
     - parent_thresholds: The threshold used to establish parents from (primary, secondary and min)
     """
@@ -136,4 +135,4 @@ class RankingArgs(PipelineArgs):
         :return: None
         """
         super().__post_init__()
-        self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else DEFAULT_EMBEDDING_MODEL
+        self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else self.embedding_model_name

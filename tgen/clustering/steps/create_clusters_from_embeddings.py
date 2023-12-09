@@ -8,6 +8,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.common.constants.logging_constants import TQDM_NCOLS
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -26,6 +27,7 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         for i, batch_ids in enumerate(batches):
             batch_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids, prefix=str(i))
             global_clusters.update(batch_cluster_map)
+        logger.info(f"Found {len(global_clusters)} clusters in the source artifacts.")
         state.final_cluster_map = global_clusters
 
     @staticmethod
@@ -102,8 +104,9 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         global_clusters: ClusterMapType = {}
         for clustering_method in tqdm(args.cluster_methods, desc="Running Clustering Algorithms...", ncols=TQDM_NCOLS):
             cluster_manager = ClusteringAlgorithmManager(clustering_method)
+            max_cluster_size = min(len(batch_artifact_ids), args.cluster_max_size)
             clusters = cluster_manager.cluster(embeddings_manager,
-                                               min_cluster_size=args.cluster_min_size, max_cluster_size=args.cluster_max_size,
+                                               min_cluster_size=args.cluster_min_size, max_cluster_size=max_cluster_size,
                                                subset_ids=batch_artifact_ids,
                                                **args.clustering_method_args)
             clustering_method_name = cluster_manager.get_method_name()

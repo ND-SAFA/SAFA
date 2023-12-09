@@ -1,7 +1,6 @@
 import uuid
-from collections import Set
 from copy import deepcopy
-from typing import Dict, Tuple
+from typing import Dict, Set, Tuple
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.common.constants.deliminator_constants import SPACE

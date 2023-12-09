@@ -153,6 +153,7 @@ class HGenDatasetBuilder:
         """
         Creates trace data frame containing links from generated artifacts to seeds.
         :param cluster2artifacts: Map of seeds to associated generated artifacts.
+        :param seed_df: The dataframe containing the seed artifacts.
         :return: Dataframe containing links from generated artifacts to seeds.
         """
         content2artifact_id = {a[ArtifactKeys.CONTENT]: a[ArtifactKeys.ID] for a in seed_df.to_artifacts()}

@@ -21,6 +21,7 @@ class Prompt:
         :param value: The value of the prompt
         :param response_manager: Handles creating response instructions and parsing response
         :param prompt_id: Specify specific id for the prompt
+        :param title: The markdown style title to put at the start of the prompt text.
         :param allow_formatting: Whether to allow formatting the prompts.
         """
         self.value = value

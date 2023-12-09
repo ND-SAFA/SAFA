@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderArgs;
+import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class GenerateLinksStep implements IFlatFileBuilderStep {
     @Override
-    public void perform(FlatFileBuilderArgs state, ServiceProvider serviceProvider) throws Exception {
+    public void perform(FlatFileBuilderStore state, ServiceProvider serviceProvider) throws Exception {
         ProjectCommitDefinition projectCommitDefinition = state.getProjectCommitDefinition();
         ProjectVersion projectVersion = state.getProjectVersion();
         TGenRequestAppEntity TGenRequestAppEntity = state.getFlatFileParser().getTGenRequestAppEntity();

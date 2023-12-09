@@ -10,7 +10,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderArgs;
+import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
 import edu.nd.crc.safa.features.flatfiles.builder.FlatFileProjectBuilder;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -65,11 +65,9 @@ public class FlatFileController extends BaseController {
         if (files.isEmpty()) {
             throw new SafaError("Could not create project because no files were received.");
         }
-        if (asCompleteSet == null) {
-            asCompleteSet = false;
-        }
-
-        FlatFileBuilderArgs args = new FlatFileBuilderArgs(user, files, projectVersion, asCompleteSet, true);
+        boolean summarizeArtifacts = false;
+        FlatFileBuilderStore args = new FlatFileBuilderStore(
+            user, files, projectVersion, asCompleteSet, summarizeArtifacts, true);
         FlatFileProjectBuilder.build(args, getServiceProvider());
         return getServiceProvider().getProjectRetrievalService().getProjectAppEntity(projectVersion);
     }

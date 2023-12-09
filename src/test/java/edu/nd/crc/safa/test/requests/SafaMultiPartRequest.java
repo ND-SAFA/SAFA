@@ -39,9 +39,7 @@ public abstract class SafaMultiPartRequest extends SafaRequest {
 
         // Step - Adding external parameters to request
         for (String key : kwargs.keySet()) {
-            byte[] content = kwargs.get(key).toString().getBytes();
-            MockMultipartFile jsonFile = new MockMultipartFile(key, "", "application/json", content);
-            request.file(jsonFile);
+            request.param(key, kwargs.get(key).toString());
         }
 
         // Step - Send request

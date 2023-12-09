@@ -7,8 +7,10 @@ import edu.nd.crc.safa.features.flatfiles.builder.steps.CommitStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.GenerateTraceLinksStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.IFlatFileBuilderStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.ParseArtifactStep;
+import edu.nd.crc.safa.features.flatfiles.builder.steps.ParseProjectSummaryStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.ParseTraces;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.ParsingSetupStep;
+import edu.nd.crc.safa.features.flatfiles.builder.steps.SummarizeArtifactsStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.UploadFilesStep;
 
 import lombok.AccessLevel;
@@ -24,8 +26,10 @@ public class FlatFileProjectBuilder {
     private static final List<IFlatFileBuilderStep> STEPS = List.of(
         new UploadFilesStep(),
         new ParsingSetupStep(),
+        new ParseProjectSummaryStep(),
         new ParseArtifactStep(),
         new ParseTraces(),
+        new SummarizeArtifactsStep(),
         new GenerateTraceLinksStep(),
         new CommitStep()
     );
@@ -33,13 +37,13 @@ public class FlatFileProjectBuilder {
     /**
      * Parses flat files and commits project to project version.
      *
-     * @param args            State containing all configuration information about the upload.
+     * @param store           State containing all configuration information about the upload.
      * @param serviceProvider Provides access to the services to fetch and commit data.
      */
-    public static void build(FlatFileBuilderArgs args, ServiceProvider serviceProvider) {
+    public static void build(FlatFileBuilderStore store, ServiceProvider serviceProvider) {
         for (IFlatFileBuilderStep step : STEPS) {
             try {
-                step.perform(args, serviceProvider);
+                step.perform(store, serviceProvider);
             } catch (Exception e) {
                 e.printStackTrace();
                 String error = String.format("Unable to complete step (%s) due to error:\n\n%s",

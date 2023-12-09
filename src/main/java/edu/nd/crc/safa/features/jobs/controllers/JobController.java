@@ -131,8 +131,9 @@ public class JobController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(
         @PathVariable UUID versionId,
-        @RequestParam Optional<MultipartFile[]> files,
-        @RequestParam(required = false, defaultValue = "false") boolean summarize)
+        @RequestParam Optional<List<MultipartFile>> files,
+        @RequestParam(required = false, defaultValue = "false") boolean summarize,
+        @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet)
         throws Exception {
         SafaUser user = safaUserService.getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
@@ -145,7 +146,8 @@ public class JobController extends BaseController {
                 getServiceProvider(),
                 projectVersion,
                 files.orElseGet(this::defaultFileListSupplier),
-                summarize);
+                summarize,
+                asCompleteSet);
 
         return jobBuilder.perform();
     }
@@ -165,7 +167,7 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.Projects.PROJECT_BULK_UPLOAD)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectCreationJob(
-        @RequestParam Optional<MultipartFile[]> files,
+        @RequestParam Optional<List<MultipartFile>> files,
         @RequestParam String name,
         @RequestParam String description,
         @RequestParam(required = false, defaultValue = "false") boolean summarize,
@@ -236,10 +238,8 @@ public class JobController extends BaseController {
      *
      * @return The default files. Currently, just the most basic tim.json
      */
-    private MultipartFile[] defaultFileListSupplier() {
-        return new MultipartFile[]{
-            new MockMultipartFile(TIM_FILE_NAME, TIM_FILE_NAME,
-                null, EMPTY_TIM_CONTENT.getBytes(StandardCharsets.UTF_8))
-        };
+    private List<MultipartFile> defaultFileListSupplier() {
+        return List.of(new MockMultipartFile(TIM_FILE_NAME, TIM_FILE_NAME,
+            null, EMPTY_TIM_CONTENT.getBytes(StandardCharsets.UTF_8)));
     }
 }

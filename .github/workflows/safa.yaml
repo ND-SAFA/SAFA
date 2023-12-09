@@ -31,6 +31,6 @@ jobs:
 
       - name: Run unit tests
         run: |
-          python src/api/manage.py test src/api
+          python src/api/manage.py test src/tests
         env:
           DEPLOYMENT: test

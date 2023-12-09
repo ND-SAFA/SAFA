@@ -5,8 +5,7 @@ from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.views.predict_serializer import PredictionSerializer, TraceRequest
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.dataset_constants import NO_CHECK
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SEARCH_FILTER, SEARCH_CHILD_TYPE, \
-    SEARCH_PARENT_TYPE
+from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SEARCH_FILTER
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
@@ -45,5 +44,4 @@ def perform_search(prediction_payload: TraceRequest):
                                max_children_per_query=DEFAULT_SEARCH_FILTER,
                                embedding_model_name=DEFAULT_SEARCH_EMBEDDING_MODEL,
                                select_top_predictions=False,
-                               sorter="embedding",
-                               layer_ids=[SEARCH_PARENT_TYPE, SEARCH_CHILD_TYPE])
+                               sorter="embedding")

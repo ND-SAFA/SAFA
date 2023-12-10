@@ -1,6 +1,7 @@
 import gc
 from typing import Dict, List, Optional, Type
 
+import torch
 from torch.nn.parameter import Parameter
 from transformers import AutoConfig, PreTrainedModel, PretrainedConfig
 from transformers.models.auto.tokenization_auto import AutoTokenizer
@@ -8,8 +9,8 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 
 from tgen.common.constants.deliminator_constants import PERIOD
 from tgen.common.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
-from tgen.common.util.base_object import BaseObject
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
 from tgen.models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
@@ -92,6 +93,7 @@ class ModelManager(BaseObject):
         self._model = None
         self._tokenizer = None
         gc.collect()
+        torch.cuda.empty_cache()
 
     def update_model(self, model_path: str) -> PreTrainedModel:
         """

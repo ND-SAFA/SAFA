@@ -73,8 +73,8 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         cluster_map = {t: [] for t in centroids}
         for i, a_id in enumerate(artifact_ids):
             cluster_similarities = similarity_matrix[i, :]
-            assigned_clusters_indices = {i for i, score in enumerate(list(cluster_similarities)) if
-                                         score >= upper_seed_similarity_threshold} if use_top_centroid_only else {}
+            assigned_clusters_indices = set({i for i, score in enumerate(list(cluster_similarities)) if
+                                             score >= upper_seed_similarity_threshold}) if use_top_centroid_only else set()
             if len(assigned_clusters_indices) == 0:
                 closest_cluster_index: int = np.argmax(cluster_similarities)
                 closest_cluster_similarity = cluster_similarities[closest_cluster_index]

@@ -1,5 +1,7 @@
 from typing import Any, Dict, List
 
+import math
+
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
@@ -39,7 +41,7 @@ class ClusteringAlgorithmManager:
         artifact_ids = list(embedding_map.keys())
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         expected_avg_cluster_size = (max_cluster_size + min_cluster_size) / 2
-        n_clusters = max(round(len(embeddings) / expected_avg_cluster_size), 1)
+        n_clusters = max(math.ceil(len(embeddings) / expected_avg_cluster_size), 1)
         kwargs = self.add_internal_kwargs(kwargs, n_clusters, min_cluster_size, max_cluster_size)
 
         try:

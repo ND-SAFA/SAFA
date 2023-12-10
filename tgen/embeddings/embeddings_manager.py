@@ -1,9 +1,9 @@
 import logging
-import math
 import os
 import uuid
 from typing import Any, Dict, List, Optional, Union
 
+import math
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
@@ -29,6 +29,7 @@ IdType = Union[int, str]
 
 
 class EmbeddingsManager:
+    MODEL_MAP = {}
 
     def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None,
                  show_progress_bar: bool = True):
@@ -184,8 +185,13 @@ class EmbeddingsManager:
         :return: The model.
         """
         if self.__model is None:
-            cache_dir = EmbeddingsManager.get_cache_dir()
-            self.__model = SentenceTransformer(self.model_name, cache_folder=cache_dir)
+            if self.model_name in self.MODEL_MAP:
+                self.__model = self.MODEL_MAP[self.model_name]
+            else:
+                cache_dir = EmbeddingsManager.get_cache_dir()
+                logger.info(f"Loading model {self.model_name} from {cache_dir}")
+                self.__model = SentenceTransformer(self.model_name, cache_folder=cache_dir)
+                self.MODEL_MAP[self.model_name] = self.__model
         return self.__model
 
     @staticmethod

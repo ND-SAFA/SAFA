@@ -29,7 +29,8 @@ public class GithubProjectImportJob extends GithubProjectCreationJob {
                                   GithubIdentifier githubIdentifier,
                                   GithubImportDTO githubImportDTO) {
         super(projectOwner, jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO);
-        setProjectCommitDefinition(new ProjectCommitDefinition(githubIdentifier.getProjectVersion(), false));
+        setProjectCommitDefinition(new ProjectCommitDefinition(projectOwner, githubIdentifier.getProjectVersion(),
+            false));
         getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }
 

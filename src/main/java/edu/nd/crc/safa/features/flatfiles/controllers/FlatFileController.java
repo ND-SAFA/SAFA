@@ -3,11 +3,11 @@ package edu.nd.crc.safa.features.flatfiles.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.JobUtil;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,8 +55,8 @@ public class FlatFileController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
-        @RequestParam("files") List<MultipartFile> files,
-        @RequestPart(value = ProjectVariables.AS_COMPLETE_SET, required = false) Boolean asCompleteSet)
+        @RequestParam("files") Optional<List<MultipartFile>> files,
+        @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet)
         throws SafaError, IOException {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
@@ -65,9 +65,15 @@ public class FlatFileController extends BaseController {
         if (files.isEmpty()) {
             throw new SafaError("Could not create project because no files were received.");
         }
+
         boolean summarizeArtifacts = false;
         FlatFileBuilderStore args = new FlatFileBuilderStore(
-            user, files, projectVersion, asCompleteSet, summarizeArtifacts, true);
+            user,
+            files.orElseGet(JobUtil::defaultFileListSupplier),
+            projectVersion,
+            asCompleteSet,
+            summarizeArtifacts,
+            true);
         FlatFileProjectBuilder.build(args, getServiceProvider());
         return getServiceProvider().getProjectRetrievalService().getProjectAppEntity(projectVersion);
     }

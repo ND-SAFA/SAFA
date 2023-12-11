@@ -42,15 +42,12 @@ public class FlatFileProjectCreationJob extends CommitJob {
         super(user, jobDbEntity, serviceProvider, store.getProjectCommitDefinition(), isNewProject);
         this.store = store;
         this.isNewProject = isNewProject;
+        setAsCompleteSet(store.isAsCompleteSet());
     }
 
-    @IJobStep(value = "Uploading Flat Files", position = 1)
-    public void initJobData(JobLogger jobLogger) throws IOException {
-        this.store.setJobLogger(jobLogger);
-    }
-
-    @IJobStep(value = "Parsing Files", position = 2)
+    @IJobStep(value = "Parsing Files", position = 1)
     public void parsingFiles(JobLogger logger) throws Exception {
+        this.store.setJobLogger(logger);
         ParsingSetupStep parsingStep = new ParsingSetupStep();
         parsingStep.perform(this.store, getServiceProvider());
 
@@ -64,13 +61,13 @@ public class FlatFileProjectCreationJob extends CommitJob {
         parseTraces.perform(this.store, getServiceProvider());
     }
 
-    @IJobStep(value = "Summarizing Code Artifacts", position = 3)
+    @IJobStep(value = "Summarizing Code Artifacts", position = 2)
     public void summarizeCodeArtifacts() throws Exception {
         SummarizeArtifactsStep summarizeArtifactsStep = new SummarizeArtifactsStep();
         summarizeArtifactsStep.perform(this.store, getServiceProvider());
     }
 
-    @IJobStep(value = "Generating Trace Links", position = 4)
+    @IJobStep(value = "Generating Trace Links", position = 3)
     public void generatingTraces(JobLogger logger) throws Exception {
         GenerateTraceLinksStep generateTraceLinksStep = new GenerateTraceLinksStep();
         generateTraceLinksStep.perform(this.store, getServiceProvider());

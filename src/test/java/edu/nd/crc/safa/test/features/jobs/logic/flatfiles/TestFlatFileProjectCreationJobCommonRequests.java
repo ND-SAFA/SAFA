@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 class TestFlatFileProjectCreationJobCommonRequests extends AbstractUpdateProjectViaFlatFileTestCommonRequests {
 
-    int N_STEPS = 6;
+    int N_STEPS = 5;
 
     /*
      * Tests that uploading default project as job completes.

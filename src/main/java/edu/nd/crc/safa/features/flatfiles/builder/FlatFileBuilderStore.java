@@ -39,6 +39,6 @@ public class FlatFileBuilderStore {
         this.projectVersion = projectVersion;
         this.asCompleteSet = asCompleteSet;
         this.summarizeArtifacts = summarizeArtifacts;
-        this.projectCommitDefinition = new ProjectCommitDefinition(projectVersion, failOnError);
+        this.projectCommitDefinition = new ProjectCommitDefinition(user, projectVersion, failOnError);
     }
 }

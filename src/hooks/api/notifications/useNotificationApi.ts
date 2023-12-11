@@ -128,14 +128,6 @@ export const useNotificationApi = defineStore(
         case "LAYOUT":
           // Never called, case here for completion.
           break;
-        case "MODELS":
-          // (entityIds = modelIds)
-          projectStore.updateProject({
-            models: projectStore.models.filter(
-              ({ id }) => !change.entityIds.includes(id)
-            ),
-          });
-          break;
         case "ATTRIBUTES":
           // (entityIds = attribute keys)
           attributesStore.deleteAttributes(change.entityIds);
@@ -195,8 +187,6 @@ export const useNotificationApi = defineStore(
           return documentStore.updateBaseLayout(project.layout);
         case "SUBTREES":
           return subtreeStore.initializeProject(project);
-        case "MODELS":
-          return projectStore.updateProject({ models: project.models });
         case "ATTRIBUTES":
           return attributesStore.updateAttributes(project.attributes || []);
         case "ATTRIBUTE_LAYOUTS":

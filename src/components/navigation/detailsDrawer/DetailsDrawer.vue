@@ -20,6 +20,7 @@
       <separator />
       <delta-panel />
       <document-panel />
+      <project-overview-panel />
       <artifact-panel />
       <artifact-body-panel />
       <save-artifact-panel />
@@ -74,6 +75,7 @@ import {
   SaveArtifactLevelPanel,
 } from "@/components/artifactType";
 import { TraceMatrixPanel } from "@/components/traceMatrix";
+import { ProjectOverviewPanel } from "@/components/project/panel";
 
 const { smallWindow } = useScreen();
 
@@ -114,6 +116,8 @@ const title = computed(() => {
       return "Save Artifact Type";
     case "displayTraceMatrix":
       return "Trace Matrix";
+    case "displayProject":
+      return "Project Overview";
     default:
       return "";
   }
@@ -132,7 +136,8 @@ const width = computed(() => {
     return 600;
   } else if (
     openState.value === "displayArtifactBody" ||
-    openState.value === "generateTrace"
+    openState.value === "generateTrace" ||
+    openState.value === "displayProject"
   ) {
     return 800;
   } else {

@@ -1,10 +1,5 @@
 import { defineStore } from "pinia";
-import {
-  GenerationModelSchema,
-  IdentifierSchema,
-  ProjectSchema,
-  VersionSchema,
-} from "@/types";
+import { IdentifierSchema, ProjectSchema, VersionSchema } from "@/types";
 import { buildProject, buildProjectIdentifier, removeMatches } from "@/util";
 import {
   attributesStore,
@@ -86,10 +81,10 @@ export const useProject = defineStore("project", {
       return this.versionId;
     },
     /**
-     * @return The current project's models.
+     * @return An overview of the current project.
      */
-    models(): GenerationModelSchema[] {
-      return this.project.models;
+    overview(): string {
+      return this.project.specification || this.project.description;
     },
   },
   actions: {

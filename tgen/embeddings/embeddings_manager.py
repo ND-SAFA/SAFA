@@ -1,14 +1,13 @@
 import logging
+import math
 import os
 import uuid
 from typing import Any, Dict, List, Optional, Union
 
-import math
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
-from tgen.common.constants.environment_constants import IS_TEST
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
@@ -16,6 +15,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.embeddings.model_cache import ModelCache
 
 
 class EmbeddingsManagerObjects(SupportedEnum):
@@ -185,24 +185,8 @@ class EmbeddingsManager:
         :return: The model.
         """
         if self.__model is None:
-            if self.model_name in self.MODEL_MAP:
-                self.__model = self.MODEL_MAP[self.model_name]
-            else:
-                cache_dir = EmbeddingsManager.get_cache_dir()
-                logger.info(f"Loading model {self.model_name} from {cache_dir}")
-                self.__model = SentenceTransformer(self.model_name, cache_folder=cache_dir)
-                self.MODEL_MAP[self.model_name] = self.__model
+            self.__model = ModelCache.get_model(self.model_name)
         return self.__model
-
-    @staticmethod
-    def get_cache_dir() -> str:
-        """
-        :return: Returns path to cache directory for the models.
-        """
-        cache_dir = os.environ.get("HF_DATASETS_CACHE", None)
-        if cache_dir is None or IS_TEST or not os.path.exists(cache_dir):
-            cache_dir = None
-        return cache_dir
 
     def to_yaml(self, export_path: str) -> "EmbeddingsManager":
         """

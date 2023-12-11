@@ -5,6 +5,7 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.artifact_prompt import ArtifactPrompt
 
 INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must reverse engineer "
                                      "{target_type} from the {source_type}. "
@@ -84,6 +85,10 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("{description} "),
     QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}.")
 ], enumeration_chars=["-"])
+SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "
+                     "When creating the {target_type}(s) from {source_type}, "
+                     "focus on the functionality in the {source_type} that was likely implemented/derived from it.\n\t"
+                     "{seed_content}", title="Higher-level Reference Artifact")
 
 REFINE_PROMPT = Prompt("You are an engineer that is an expert on a software system and your goal is to refine "
                        "{target_type}s. There are many duplicate {target_type} between the new and original {target_type}s "

@@ -2,6 +2,7 @@ from typing import List
 
 from tqdm import tqdm
 
+from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_condenser import ClusterCondenser
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
@@ -23,10 +24,15 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :return: None
         """
         batches = state.artifact_batches if state.artifact_batches else [args.get_artifact_ids()]
+        seeds = list(state.seed2artifacts.keys()) if state.seed2artifacts else []
+        cluster_id_to_seed = {}
         global_clusters = {}
         for i, batch_ids in enumerate(batches):
             batch_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids, prefix=str(i))
+            if i < len(seeds):
+                cluster_id_to_seed.update({c_id: seeds[i] for c_id in batch_cluster_map.keys()})
             global_clusters.update(batch_cluster_map)
+        state.cluster_id_2seeds = cluster_id_to_seed
         logger.info(f"Found {len(global_clusters)} clusters in the source artifacts.")
         state.final_cluster_map = global_clusters
 
@@ -40,9 +46,12 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         :param prefix: The prefix to append to the final cluster map.
         :return: Map of cluster ID to clusters.
         """
-        batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
-                                                                            embeddings_manager,
-                                                                            batch_artifact_ids=batch_ids)
+        if len(batch_ids) <= args.cluster_max_size:
+            batch_cluster_map = {0: Cluster.from_artifacts(batch_ids, embeddings_manager)}
+        else:
+            batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
+                                                                                embeddings_manager,
+                                                                                batch_artifact_ids=batch_ids)
         batch_cluster_map = CreateClustersFromEmbeddings.condense_clusters(args, embeddings_manager, batch_cluster_map)
         if prefix:
             batch_cluster_map = {f"{prefix}: {k}": v for k, v in batch_cluster_map.items()}

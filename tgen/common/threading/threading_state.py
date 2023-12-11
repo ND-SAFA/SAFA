@@ -28,6 +28,7 @@ class MultiThreadState:
         self.progress_bar = None
         self.successful: bool = True
         self.exception: Optional[Exception] = None
+        self.pause_work: bool = False
         self.failed_responses: Set[int] = set()
         self.results: Optional[List[Any]] = None
         self.collect_results = collect_results
@@ -95,9 +96,9 @@ class MultiThreadState:
         :param e: The exception thrown.
         :return: None
         """
+        self.pause_work = True
         logger.exception(e)
         logger.info(f"Request failed, retrying in {self.sleep_time} seconds.")
-        time.sleep(self.sleep_time)
 
     def _init_progress_bar(self) -> None:
         """

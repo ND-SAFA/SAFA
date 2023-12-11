@@ -1,5 +1,6 @@
 from typing import Type
 
+from tgen.common.util.file_util import FileUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.pipeline.abstract_pipeline_step import StateType
@@ -31,7 +32,7 @@ class Summarizer(AbstractPipeline):
         self.dataset = dataset
         if self.args.no_project_summary:
             self.args.project_summary_sections = []
-        super().__init__(args, steps=self.steps, skip_summarization=True)
+        super().__init__(args, steps=self.steps, skip_summarization=True, log_state_exception=False)
 
     def summarize(self) -> PromptDataset:
         """

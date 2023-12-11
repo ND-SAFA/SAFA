@@ -1,4 +1,4 @@
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -142,11 +142,14 @@ class ListUtil:
         return [item if return_both else item[list_to_return] for item in sorted_list]
 
     @staticmethod
-    def unzip(zipped_list: List, item_index: int) -> List:
+    def unzip(zipped_list: List, item_index: int = None) -> Union[List, Tuple[List, List]]:
         """
         Returns list containing items at index in zipped list.
         :param zipped_list: List of zipped items.
-        :param item_index: The index of the items to extract.
-        :return: List of items at index.
+        :param item_index: The index of the items to extract. If not provided, both lists are returned
+        :return: List of items at index, or both lists unziped.
         """
-        return [i[item_index] for i in zipped_list]
+        if item_index is not None:
+            return [i[item_index] for i in zipped_list]
+        else:
+            return ListUtil.unzip(zipped_list, 0), ListUtil.unzip(zipped_list, 1)

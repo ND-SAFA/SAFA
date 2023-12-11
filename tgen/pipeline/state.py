@@ -135,11 +135,12 @@ class State(BaseObject):
         return output
 
     @classmethod
-    def load_latest(cls, load_dir: str, step_names: List[str]) -> "State":
+    def load_latest(cls, load_dir: str, step_names: List[str], log_exception: bool = True) -> "State":
         """
         Loads the latest state found in the load dir
         :param load_dir: The directory to load the state from
         :param step_names: The names of the steps
+        :param log_exception: If True, logs any exceptions that occur, else fails silently
         :return: The loaded state
         """
         steps = deepcopy(step_names)
@@ -152,9 +153,11 @@ class State(BaseObject):
                     return state
             raise FileNotFoundError(f"Unable to find a previous state to load from {load_dir}")
         except FileNotFoundError as f:
-            logger.info(str(f))
+            if log_exception:
+                logger.info(str(f))
         except Exception:
-            logger.exception(f"Could not reload state of step: {step}. Creating new instance.")
+            if log_exception:
+                logger.exception(f"Could not reload state of step: {step}. Creating new instance.")
         return cls()
 
     @classmethod

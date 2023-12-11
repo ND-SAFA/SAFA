@@ -1,20 +1,23 @@
 import uuid
 from typing import Any, Dict, List, Set, Tuple
 
-from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
+from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE, COLON, EMPTY_STRING, TAB
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.constants.hgen_constants import DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
-from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
+from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -52,11 +55,16 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
             prompt_builder.format_variables = {"n_targets": n_targets}
 
+        if args.seed_layer_id:
+            self._add_seeds_to_prompt(dataset, task_prompt, prompt_builder, state)
+
         if state.project_summary:
             project_overview = state.project_summary.to_string(args.content_generation_project_summary_sections)
             overview_of_system_prompt = Prompt(f"\n{PromptUtil.as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{project_overview}", allow_formatting=False)
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
+
+        prompt_builder.format_prompts_with_var(source_type=args.source_type, target_type=args.target_type)
         generations = HGenUtil.get_predictions(prompt_builder, hgen_args=args, prediction_step=PredictionStep.GENERATION,
                                                dataset=dataset, response_prompt_ids={task_prompt.id},
                                                tags_for_response={generated_artifacts_tag}, return_first=False,
@@ -68,6 +76,23 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.generations2sources = generations2sources
         state.cluster2generation = cluster2generation
         state.n_generations += 1
+
+    @staticmethod
+    def _add_seeds_to_prompt(dataset: PromptDataset, task_prompt: QuestionnairePrompt,
+                             prompt_builder: PromptBuilder, state: HGenState) -> None:
+        """
+        Adds the seeds to the prompt if they came from a real artifact layer so that they can ground the model's generations.
+        :param dataset: The dataset made from the clusters/
+        :param task_prompt: The prompt used to get the model to create the generations.
+        :param prompt_builder: The builder of the prompt for the generations.
+        :param state: The current state of HGen.
+        :return: None
+        """
+        seed_contents = [state.cluster_id2seeds.get(c_id, EMPTY_STRING).replace(NEW_LINE, f"{NEW_LINE}{TAB}")
+                         for c_id in dataset.artifact_df.index]
+        seed_prompt_index = prompt_builder.find_prompt_by_id(task_prompt.id)
+        prompt_builder.add_prompt(SupportedPrompts.HGEN_SEED_PROMPT.value, seed_prompt_index)
+        prompt_builder.format_variables.update({"seed_content": seed_contents})
 
     @staticmethod
     def _calculate_number_of_targets_per_cluster(artifact_ids: List, args: HGenArgs, state: HGenState) -> List[int]:
@@ -85,7 +110,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         return n_targets
 
     @staticmethod
-    def _calculate_proportion_of_artifacts(n_artifacts: int, reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS) -> int:
+    def _calculate_proportion_of_artifacts(n_artifacts: int,
+                                           reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS) -> int:
         """
         Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
         :param n_artifacts: Total number of artifacts
@@ -125,13 +151,16 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generations2sources = {}
         cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
         cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
-        for i, sources in enumerate(generations):
-            for source in sources:
-                generation = source[target_tag_id][0]
-                sources = set(source[source_tag_id][0]) if len(source[source_tag_id]) > 0 else set()
-                generations2sources[generation] = sources
-                if cluster_ids:
-                    cluster2generations[cluster_ids[i]].append(generation)
+        for i, generations4cluster in enumerate(generations):
+            for generation in generations4cluster:
+                try:
+                    target = generation[target_tag_id][0]
+                    sources = set(generation[source_tag_id][0]) if len(generation[source_tag_id]) > 0 else set()
+                    generations2sources[target] = sources
+                    if cluster_ids:
+                        cluster2generations[cluster_ids[i]].append(target)
+                except Exception:
+                    logger.exception("A generation failed")
         return generations2sources, cluster2generations
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:
@@ -143,6 +172,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         task_prompt = SupportedPrompts.HGEN_GENERATION_QUESTIONNAIRE.value if not state.cluster2artifacts \
             else SupportedPrompts.HGEN_CLUSTERING_QUESTIONNAIRE.value
+
         task_prompt.id = self.TASK_PROMPT_ID
         target_type_tag, target_tag_id = HGenUtil.convert_spaces_to_dashes(args.target_type), "target"
         source_type_tag, source_tag_id = HGenUtil.convert_spaces_to_dashes(args.source_type), "source"

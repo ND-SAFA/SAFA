@@ -34,21 +34,13 @@ class TestLogging(BaseTest):
 
     @mock.patch.object(TGenLogger, "_log")
     def test_log_once(self, log_mock: MagicMock = None):
-        msg_1 = "Unable to parse"
-        msg_2 = "This is a new problem"
-        msg_3 = "Another one"
-        logger.log_without_spam(level=logging.WARNING, msg=msg_1)
-        logger.log_without_spam(level=logging.WARNING, msg=msg_1)
-        logger.log_without_spam(level=logging.WARNING, msg=msg_1)
-        logger.log(level=logging.WARNING, msg=msg_2)
-        logger.log(level=logging.WARNING, msg=msg_2)
-        logger.log_without_spam(level=logging.WARNING, msg=msg_3)
-        logger.log_without_spam(level=logging.WARNING, msg=msg_1)
-        logger.log_without_spam(level=logging.WARNING, msg=msg_2)
-        logger.log_without_spam(level=logging.WARNING, msg=msg_3)
-        msgs = [call[0][1] for call in log_mock.call_args_list]
-        self.assertSize(6, msgs)
-        self.assertListEqual([msg_1, msg_2, msg_2, msg_3, msg_2, msg_3], msgs)
+        log_memory = 5
+        for i in range(2*log_memory):
+            logger.log_without_spam(logging.WARNING, f"msg{i%log_memory}")
+        self.assertEqual(log_mock.call_count, log_memory)
+        logger.log_without_spam(logging.WARNING, "another one")
+        logger.log_without_spam(logging.WARNING, "msg0")
+        self.assertEqual(log_mock.call_count, log_memory+2)
 
     def get_log_baseFilename(self):
         file_handler = None

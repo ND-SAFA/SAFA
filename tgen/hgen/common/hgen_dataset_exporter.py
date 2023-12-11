@@ -118,7 +118,7 @@ class HGenDatasetBuilder:
         self.state.cluster_dataset.artifact_df.get_type(seed_id)
         self._artifact_data_frames.append(seed_artifact_df)
 
-        cluster_trace_df = self.create_cluster_trace_df(seed2generated)
+        cluster_trace_df = self.create_cluster_trace_df(seed2generated, seed_artifact_df)
         self._trace_data_frames.append(cluster_trace_df)
 
         layer_df = LayerDataFrame.from_types(source_types=self.args.target_type, target_types=self.args.get_seed_id())
@@ -144,17 +144,21 @@ class HGenDatasetBuilder:
             generated_artifacts = generated_trace_df.get_parents(source_id)
             for gen_artifact in generated_artifacts:
                 DictUtil.set_or_append_item(seed2generated, seed, gen_artifact, iterable_type=set)
+
+        state
         return seed2generated
 
     @staticmethod
-    def create_cluster_trace_df(cluster2artifacts: Dict[str, Set[Artifact]]) -> TraceDataFrame:
+    def create_cluster_trace_df(cluster2artifacts: Dict[str, Set[Artifact]], seed_df: ArtifactDataFrame) -> TraceDataFrame:
         """
         Creates trace data frame containing links from generated artifacts to seeds.
         :param cluster2artifacts: Map of seeds to associated generated artifacts.
+        :param seed_df: The dataframe containing the seed artifacts.
         :return: Dataframe containing links from generated artifacts to seeds.
         """
-        trace_links = [Trace(source=c_id, target=cluster_id, label=1, score=1)
-                       for cluster_id, cluster_ids in cluster2artifacts.items() for c_id in cluster_ids]
+        content2artifact_id = {a[ArtifactKeys.CONTENT]: a[ArtifactKeys.ID] for a in seed_df.to_artifacts()}
+        trace_links = [Trace(source=c_id, target=content2artifact_id[seed_content], label=1, score=1)
+                       for seed_content, cluster_ids in cluster2artifacts.items() for c_id in cluster_ids]
         trace_df = TraceDataFrame(trace_links)
         return trace_df
 

@@ -1,4 +1,5 @@
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
+from tgen.clustering.methods.supported_seed_clustering_methods import SupportedSeedClusteringMethods
 
 DEFAULT_REDUCTION_PERCENTAGE_CLUSTERING = 0.20  # Expected reduction in # of artifacts to # clusters
 CLUSTER_ARTIFACT_TYPE = "Cluster"
@@ -20,6 +21,7 @@ MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING = 0.30
 MIN_PAIRWISE_AVG_PERCENTILE = 0.10
 ADD_ORPHAN_TO_CLUSTER_THRESHOLD = 0.75
 CLUSTERING_SUBDIRECTORY = "clustering"
+DEFAULT_SEED_CLUSTERING_METHOD = SupportedSeedClusteringMethods.ARTIFACTS_CHOOSE_CENTROIDS
 
 RANDOM_STATE_PARAM = "random_state"
 N_CLUSTERS_PARAM = "n_clusters"

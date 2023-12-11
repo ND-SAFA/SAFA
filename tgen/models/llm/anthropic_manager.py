@@ -113,7 +113,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          collect_results=True,
                                                                          n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
                                                                          max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
-                                                                         raise_exception=raise_exception)
+                                                                         raise_exception=raise_exception,
+                                                                         start_delay=1)
 
         self._handle_exceptions(global_state)
         global_responses = global_state.results

@@ -18,7 +18,7 @@ class ThreadUtil:
 
     @staticmethod
     def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1,
-                             collect_results: bool = False, thread_sleep: float = THREAD_SLEEP,
+                             collect_results: bool = False, thread_sleep: float = THREAD_SLEEP, start_delay: float = None,
                              retries: Set = None, raise_exception: bool = True) -> MultiThreadState:
         """
         Performs distributed work over threads.
@@ -29,6 +29,7 @@ class ThreadUtil:
         :param max_attempts: The maximum number of attempts before stopping thread entirely.
         :param collect_results: Whether to collect the output of each thread
         :param thread_sleep: The amount of time to sleep after an error occurs.
+          :param start_delay: How much to delay the start of the thread
         :param retries: List of indices to retry if they failed initially.
         :param raise_exception: Throws an exception if one of the threads fails.
         :return: None
@@ -40,7 +41,7 @@ class ThreadUtil:
 
         threads = []
         for i in range(n_threads):
-            t1 = ChildThread(global_state, thread_work)
+            t1 = ChildThread(global_state, thread_work, start_delay=start_delay)
             threads.append(t1)
             t1.start()
         for t in threads:

@@ -235,7 +235,7 @@ public class TestTim extends ApplicationBaseTest {
     }
 
     private void createArtifacts(ProjectVersion version) {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(version, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(getCurrentUser(), version, true);
         projectCommitDefinition.addArtifact(ModificationType.ADDED, createArtifact(type1Name, artifact1Name));
         projectCommitDefinition.addArtifact(ModificationType.ADDED, createArtifact(type2Name, artifact2Name));
         projectCommitDefinition.addArtifact(ModificationType.ADDED, createArtifact(type2Name, artifact3Name));
@@ -243,7 +243,7 @@ public class TestTim extends ApplicationBaseTest {
     }
 
     private void deleteArtifacts(ProjectVersion version, List<ArtifactAppEntity> artifacts) {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(version, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(getCurrentUser(), version, true);
         projectCommitDefinition.addArtifacts(ModificationType.REMOVED, artifacts);
         serviceProvider.getCommitService().performCommit(projectCommitDefinition, getCurrentUser());
     }
@@ -253,7 +253,7 @@ public class TestTim extends ApplicationBaseTest {
     }
 
     private void createLinks(ProjectVersion version) {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(version, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(getCurrentUser(), version, true);
         projectCommitDefinition.addTrace(ModificationType.ADDED,
             createTrace(artifact1Name, artifact2Name, ApprovalStatus.APPROVED, TraceType.MANUAL));
         projectCommitDefinition.addTrace(ModificationType.ADDED,
@@ -264,13 +264,13 @@ public class TestTim extends ApplicationBaseTest {
     }
 
     private void deleteLinks(ProjectVersion version, List<TraceAppEntity> links) {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(version, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(getCurrentUser(), version, true);
         projectCommitDefinition.addTraces(ModificationType.REMOVED, links);
         serviceProvider.getCommitService().performCommit(projectCommitDefinition, getCurrentUser());
     }
 
     private void approveLinks(ProjectVersion version, List<TraceAppEntity> links) {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(version, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(getCurrentUser(), version, true);
         for (TraceAppEntity link : links) {
             link.setApprovalStatus(ApprovalStatus.APPROVED);
             projectCommitDefinition.addTrace(ModificationType.MODIFIED, link);

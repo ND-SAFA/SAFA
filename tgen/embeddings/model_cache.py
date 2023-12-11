@@ -21,7 +21,9 @@ class ModelCache:
         else:
             cache_dir = ModelCache.get_cache_dir()
             logger.info(f"Loading model {model_name} from {cache_dir}")
-            return SentenceTransformer(model_name, cache_folder=cache_dir)
+            model = SentenceTransformer(model_name, cache_folder=cache_dir)
+            ModelCache.MODEL_MAP[model_name] = model
+            return model
 
     @staticmethod
     def get_cache_dir() -> str:

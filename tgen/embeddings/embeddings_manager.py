@@ -1,9 +1,9 @@
 import logging
+import math
 import os
 import uuid
 from typing import Any, Dict, List, Optional, Union
 
-import math
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
@@ -184,7 +184,9 @@ class EmbeddingsManager:
         Returns sentence transformer model.
         :return: The model.
         """
-        return ModelCache.get_model(self.model_name)
+        if self.__model is None:
+            self.__model = ModelCache.get_model(self.model_name)
+        return self.__model
 
     def to_yaml(self, export_path: str) -> "EmbeddingsManager":
         """

@@ -13,6 +13,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.model_cache import ModelCache
@@ -217,10 +218,12 @@ class EmbeddingsManager:
         if self._base_path:
             object_paths = self.get_object_paths()
             ordered_ids = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.ORDERED_IDS])
-            self.__set_embedding_order(ordered_ids)
+            self.__set_embedding_order(StrUtil.convert_all_items_to_string(ordered_ids))
             self._embedding_map = self.load_embeddings_from_file(file_path=object_paths[EmbeddingsManagerObjects.EMBEDDINGS],
                                                                  ordered_ids=self.__ordered_ids)
+            self._embedding_map = StrUtil.convert_all_items_to_string(self._embedding_map, keys_only=True)
             self._content_map = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.CONTENT_MAP])
+            self._content_map = StrUtil.convert_all_items_to_string(self._content_map)
 
     @staticmethod
     def load_embeddings_from_file(file_path: str, ordered_ids: List[Any]) -> Dict[Any, EmbeddingType]:
@@ -290,6 +293,9 @@ class EmbeddingsManager:
         :return: None
         """
         df_kwargs = {}
+        if len(content) == 0:
+            return
+
         if isinstance(content, dict):
             entries = [EnumDict({ArtifactKeys.ID: content_id, ArtifactKeys.CONTENT: content}) for content_id, content in
                        content.items()]

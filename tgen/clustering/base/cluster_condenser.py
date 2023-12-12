@@ -8,6 +8,7 @@ from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NE
     DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, DEFAULT_MIN_CLUSTER_SIZE, \
     MIN_PAIRWISE_AVG_PERCENTILE, \
     MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
@@ -182,12 +183,22 @@ class ClusterCondenser:
             clusters = list(sorted(filtered_clusters, key=lambda v: v.size_weighted_sim if v.size_weighted_sim else 0, reverse=True))
         return clusters
 
-    def __get_next_cluster_id(self) -> int:
+    def remove_duplicate_artifacts(self) -> None:
         """
-        Gets the id of the next new cluster.
-        :return: Next available index.
+        Ensures that there are no duplicated artifacts between clusters.
+        :return: None
         """
-        return len(self.cluster_map)
+        artifact2cluster = {}
+        for cluster_id, cluster in self.cluster_map.items():
+            for a_id in cluster.artifact_id_set:
+                art_cluster_relationship = (cluster_id, cluster.calculate_avg_pairwise_sim_for_artifact(a_id))
+                DictUtil.set_or_append_item(artifact2cluster, a_id, art_cluster_relationship)
+        for a_id, cluster_relationship in artifact2cluster.items():
+            if len(cluster_relationship) == 1:
+                continue
+            sorted_cluster_ids = ListUtil.unzip(sorted(cluster_relationship, key=lambda item: item[1]), 0)
+            for cluster_id in sorted_cluster_ids[1:]:  # remove from all but the top cluster
+                self.cluster_map[cluster_id].remove_artifacts([a_id])
 
     @staticmethod
     def calculate_intersection(source: Set, target: Set) -> float:
@@ -230,3 +241,10 @@ class ClusterCondenser:
         percentile_score = np.quantile(cluster_scores, MIN_PAIRWISE_AVG_PERCENTILE)
         final_score = min(percentile_score, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING)
         return final_score
+
+    def __get_next_cluster_id(self) -> int:
+        """
+        Gets the id of the next new cluster.
+        :return: Next available index.
+        """
+        return len(self.cluster_map)

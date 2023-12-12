@@ -23,7 +23,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :return: None, modifications done in place.
         """
         cluster_map: ClusterMapType = state.final_cluster_map
-        clusters: List[Cluster] = list(cluster_map.values())
+        clusters: List[Cluster] = list(filter(lambda cluster: len(cluster) > 1, cluster_map.values()))
 
         seen_artifacts = self.collect_seen_artifacts(clusters)
         all_artifacts = set(args.dataset.artifact_df.index)
@@ -34,8 +34,9 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         adopted_orphans = self.place_orphans_in_homes(args, clusters, orphan_artifact_id_set)
         remaining_orphans = orphan_artifact_id_set.difference(adopted_orphans)
         self.cluster_orphans(args, state, cluster_map, remaining_orphans, args.min_orphan_similarity)
-        for a in remaining_orphans:
-            self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
+        if args.allow_singleton_clusters:
+            for a in remaining_orphans:
+                self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
 
     @classmethod
     def cluster_orphans(cls, args: ClusteringArgs, state: ClusteringState, cluster_map: ClusterMapType,
@@ -101,11 +102,11 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         for i, (artifact, cluster, cluster_similarity) in enumerate(best_clusters):
             delta = cluster.min_sim - cluster_similarity if len(cluster) > 1 else 0
             within_similarity_threshold = delta < ALLOWED_ORPHAN_SIMILARITY_DELTA
-            within_cluster_size = len(cluster) <= args.cluster_max_size
+            within_cluster_size = len(cluster) < args.cluster_max_size
             above_minimum_score = cluster_similarity >= MIN_ORPHAN_HOME_SIMILARITY
             not_seen = artifact not in adopted_orphans
-            if args.add_orphans_to_best_home or (within_similarity_threshold and not_seen and above_minimum_score):
-                if not within_cluster_size:
+            if args.add_orphans_to_best_home or (within_similarity_threshold and above_minimum_score):
+                if not (within_cluster_size and not_seen):
                     continue
                 cluster.add_artifacts(artifact)
                 adopted_orphans.add(artifact)

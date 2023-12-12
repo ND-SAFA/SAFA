@@ -10,6 +10,7 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -32,6 +33,7 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
             if i < len(seeds):
                 cluster_id_to_seed.update({c_id: seeds[i] for c_id in batch_cluster_map.keys()})
             global_clusters.update(batch_cluster_map)
+
         state.cluster_id_2seeds = cluster_id_to_seed
         logger.info(f"Found {len(global_clusters)} clusters in the source artifacts.")
         state.final_cluster_map = global_clusters
@@ -95,6 +97,10 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
                                               filter_cohesiveness=args.filter_by_cohesiveness)
         clusters = list(cluster_map.values())
         unique_cluster_map.add_all(clusters)
+
+        if not args.allow_duplicates_between_clusters:
+            unique_cluster_map.remove_duplicate_artifacts()
+
         cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
         return cluster_map
 

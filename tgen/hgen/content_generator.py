@@ -1,10 +1,11 @@
 import uuid
 from typing import Union, Dict, List, Optional, Tuple, Set, Any
 
-from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
+from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE, EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
@@ -20,23 +21,24 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 class ContentGenerator:
     TASK_PROMPT_ID = str(uuid.uuid5(uuid.NAMESPACE_DNS, 'seed'))
-    SOURCE_TAG_ID = "source"
+    SOURCE_TAG_ID = "ids"
     TARGET_TAG_ID = "target"
 
-    def __init__(self, args: HGenArgs, state: HGenState):
+    def __init__(self, args: HGenArgs, state: HGenState, source_dataset: PromptDataset ):
         """
         Handles content generation for HGen given the current args and state.
         :param args: The arguments to HGen.
         :param state: The current state of HGen.
+        :param source_dataset: The dataset to use to create documentation for.
         """
         self.args = args
         self.state = state
+        self.source_dataset = source_dataset
 
-    def generate_content(self, source_dataset: PromptDataset, prompt_builder: PromptBuilder,
+    def generate_content(self, prompt_builder: PromptBuilder,
                          generations_filename: str = None) -> List[Dict]:
         """
         Generates content for a given dataset by using the prompt builder to create prompts for the LLM.
-        :param source_dataset: The dataset to use to create documentation for.
         :param prompt_builder: The builder to use to construct the prompt for the LLM.
         :param generations_filename: The filename to save the generations to.
         :return: The model's parsed generations.
@@ -47,14 +49,15 @@ class ContentGenerator:
         export_path = FileUtil.safely_join_paths(self.state.export_dir, generations_filename)
         generated_artifacts_tag, links_tag = task_prompt.response_manager.get_all_tag_ids()
         generations = HGenUtil.get_predictions(prompt_builder, hgen_args=self.args, prediction_step=PredictionStep.GENERATION,
-                                               dataset=source_dataset, response_prompt_ids={task_prompt.id},
+                                               dataset=self.source_dataset, response_prompt_ids={task_prompt.id},
                                                tags_for_response={generated_artifacts_tag}, return_first=False,
                                                export_path=export_path)
         return generations
 
     def create_prompt_builder(self, base_intro_prompt: SupportedPrompts, base_task_prompt: SupportedPrompts,
                               source_type: str, cluster2artifacts: Dict[str, List] = None,
-                              format_variables: Dict[str, List] = None) -> PromptBuilder:
+                              format_variables: Dict[str, List] = None,
+                              additional_task_response_instructions: str = EMPTY_STRING) -> PromptBuilder:
         """
         Creates the prompt builder for the generations using the provided prompts and variables.
         :param base_intro_prompt: Will be used to introduce the problem at the start of the prompt.
@@ -62,12 +65,14 @@ class ContentGenerator:
         :param cluster2artifacts: Maps cluster id to the list of artifacts in that cluster.
         :param source_type: The source type contained in the dataset that will be used to generate the content.
         :param format_variables: Any variables to give the prompt builder to dynamically format.
-        :return:
+        :param additional_task_response_instructions: Any additional instructions to include on how the model should format its res.
+        :return: The prompt builder for the generations using the provided prompts and variables.
         """
-        task_prompt = self._create_generations_task_prompt(base_task_prompt.value)
+        task_prompt = self._create_generations_task_prompt(base_task_prompt.value, cluster2artifacts,
+                                                           additional_response_instructions=additional_task_response_instructions)
         artifact_prompt = self._create_source_artifact_prompt(source_type, cluster2artifacts)
-        prompt_builder = self._get_prompt_builder_for_generation(task_prompt, base_intro_prompt.value,
-                                                                 artifact_prompt, format_variables)
+        prompt_builder = self._get_prompt_builder_for_generation(
+            task_prompt, base_intro_prompt.value, artifact_prompt, format_variables)
         return prompt_builder
 
     def map_generations_to_predicted_sources(self, generations: List) -> Tuple[Dict[str, Set[str]], Dict[Any, str]]:
@@ -91,22 +96,26 @@ class ContentGenerator:
                     logger.exception("A generation failed")
         return generations2sources, cluster2generations
 
-    def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt) -> QuestionnairePrompt:
+    def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt,  cluster2artifacts: Dict[str, List] = None,
+                                        additional_response_instructions: str = EMPTY_STRING) -> QuestionnairePrompt:
         """
         Creates the prompt used for the primary creation task
         :param task_prompt: The main prompt being used to prompt the model to generate artifacts.
+        :param cluster2artifacts: Maps cluster id to the list of artifacts in that cluster.
+        :param additional_response_instructions: If provided, will be used to instruct the model how to format the response.
         :return: The prompt used for the primary creation task
         """
         task_prompt.id = self.TASK_PROMPT_ID
         target_type_tag = HGenUtil.convert_spaces_to_dashes(self.args.target_type)
-        source_type_tag = HGenUtil.convert_spaces_to_dashes(self.args.source_type)
+        response_instructions_format = f"Enclose each {self.args.target_type} in " \
+                                       "{target}. " + additional_response_instructions
+        sources = {a[ArtifactKeys.ID] for artifacts in cluster2artifacts.values() for a in artifacts} \
+            if cluster2artifacts else set(self.state.source_dataset.artifact_df.index)
         task_prompt.response_manager = PromptResponseManager(
-            response_instructions_format=f"Enclose each {self.args.target_type} in "
-                                         "{target}. ",
-            expected_responses={self.SOURCE_TAG_ID: set(self.state.source_dataset.artifact_df.index)},
-            id2tag={self.TARGET_TAG_ID: target_type_tag,
-                    self.SOURCE_TAG_ID: source_type_tag},
-            response_tag={target_type_tag: [source_type_tag]},
+            response_instructions_format=response_instructions_format,
+            expected_responses={self.SOURCE_TAG_ID: sources},
+            id2tag={self.TARGET_TAG_ID: target_type_tag},
+            response_tag={target_type_tag: [self.SOURCE_TAG_ID]},
             value_formatter=lambda tag, val: self._format_generations(tag, val))
         task_prompt.format_value(format=self.state.format_of_artifacts, description=self.state.description_of_artifact)
         return task_prompt

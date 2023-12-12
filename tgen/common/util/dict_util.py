@@ -182,6 +182,7 @@ class DictUtil:
         else:
             mapping[item_key].append(item_value)
 
+    @staticmethod
     def get_missing_keys(obj: Dict, keys: List[str]) -> List[str]:
         """
         Extracts keys missing in dict.
@@ -202,3 +203,25 @@ class DictUtil:
         """
         missing_keys = cls.get_missing_keys(obj, keys)
         return len(missing_keys) == 0
+
+    @staticmethod
+    def get_first_key(dict_: Dict) -> Any:
+        """
+        Gets the first key from the dictionary.
+        :param dict_: The dictionary to get first key of.
+        :return: The first key from the dictionary.
+        """
+        if len(dict_) == 0:
+            return
+        return list(dict_.keys())[0]
+
+    @staticmethod
+    def get_first_value(dict_: Dict) -> Any:
+        """
+        Gets the first value from the dictionary.
+        :param dict_: The dictionary to get first value of.
+        :return: The first value from the dictionary.
+        """
+        key = DictUtil.get_first_key(dict_)
+        if key:
+            return dict_[key]

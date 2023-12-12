@@ -1,14 +1,13 @@
 import re
 import uuid
 
-from typing import List, Union
+from typing import List, Union, Set, Dict
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD
 from tgen.common.logging.logger_manager import logger
 
 
 class StrUtil:
-
     FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
 
     @staticmethod
@@ -118,5 +117,18 @@ class StrUtil:
         # Define a regular expression pattern to match floating-point numbers
         return re.sub(r'\d+\.\d+', lambda x: x.group().split(PERIOD)[0], string)
 
-
-
+    @staticmethod
+    def convert_all_items_to_string(iterable: Union[List, Set, Dict], keys_only: bool = False) -> Union[List, Set, Dict]:
+        """
+        Converts all values to string.
+        :param iterable: An iterable containing values to convert.
+        :return: The iterable with converted values.
+        """
+        if isinstance(iterable, list) or isinstance(iterable, set):
+            converted = [str(item) for item in iterable]
+            converted = type(iterable)(converted) if not isinstance(converted, type(iterable)) else converted
+        elif isinstance(iterable, dict):
+            converted = {str(k): (v if keys_only else str(v)) for k, v in iterable.items()}
+        else:
+            raise NotImplemented(f"Cannot perform conversion for {type(iterable)}")
+        return converted

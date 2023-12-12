@@ -203,11 +203,11 @@ class Cluster:
         :return: The avg pairwise similarity of each artifact to its neighbors.
         """
         if isinstance(artifact_ids, list):
-            return [self._calculate_avg_pairwise_sim_for_artifact(a_id) for a_id in artifact_ids]
+            return [self.calculate_avg_pairwise_sim_for_artifact(a_id) for a_id in artifact_ids]
         else:
-            return self._calculate_avg_pairwise_sim_for_artifact(artifact_ids)
+            return self.calculate_avg_pairwise_sim_for_artifact(artifact_ids)
 
-    def _calculate_avg_pairwise_sim_for_artifact(self, artifact_id: str) -> float:
+    def calculate_avg_pairwise_sim_for_artifact(self, artifact_id: str) -> float:
         """
         Calculates the avg pairwise similarity of an artifact to its neighbors.
         :param artifact_id: The id of the artifact to calculate the avg pairwise sim of.

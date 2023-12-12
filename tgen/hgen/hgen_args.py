@@ -65,7 +65,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, re-runs hgen multiple times to get the best results across runs
     """
-    run_refinement: bool = False
+    run_refinement: bool = True
     """
     If True, automatically generates trace links between the new hgen layers and the source
     """

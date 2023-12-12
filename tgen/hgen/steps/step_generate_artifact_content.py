@@ -37,14 +37,14 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
             format_variables.update({"n_targets": n_targets})
 
-        content_generator = ContentGenerator(args, state)
+        content_generator = ContentGenerator(args, state, dataset)
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION, base_task_prompt,
                                                                  args.source_type, state.get_cluster2artifacts(), format_variables)
 
         if args.seed_layer_id:
             self._add_seeds_to_prompt(dataset, prompt_builder, state)
 
-        generations = content_generator.generate_content(dataset, prompt_builder, generations_filename=self.GENERATION_FILENAME)
+        generations = content_generator.generate_content(prompt_builder, generations_filename=self.GENERATION_FILENAME)
         generations2sources, cluster2generation = content_generator.map_generations_to_predicted_sources(generations)
         state.generations2sources = generations2sources
         state.cluster2generation = cluster2generation

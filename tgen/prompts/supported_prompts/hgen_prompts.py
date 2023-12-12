@@ -111,4 +111,6 @@ REFINE_TASKS_QUESTIONNAIRE = QuestionnairePrompt([
         response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
     QuestionPrompt(
         "If duplicate pairs were found, then for each duplicate group, combine the information in the {target_type}s "
-        "to create one cohesive {target_type}.")])
+        "to create cohesive {target_type}(s). Importantly, the {target_type} should be specific to certain functionalities/features "
+        "and not too broad so the combined {target_type} may be broken down into multiple as long as there is no longer "
+        "duplicated information between them.")])

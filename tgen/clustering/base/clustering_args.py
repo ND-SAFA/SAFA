@@ -39,6 +39,8 @@ class ClusteringArgs(PipelineArgs):
     cluster_artifact_type: str = CLUSTER_ARTIFACT_TYPE
     filter_by_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS
     add_orphans_to_best_home: bool = False
+    allow_singleton_clusters: bool = True
+    allow_duplicates_between_clusters: bool = True
     subset_ids: List[str] = None
     seed_clustering_method: SupportedSeedClusteringMethods = DEFAULT_SEED_CLUSTERING_METHOD
 

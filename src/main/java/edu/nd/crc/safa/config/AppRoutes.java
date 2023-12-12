@@ -28,6 +28,13 @@ public class AppRoutes {
         public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
         public static final String SELF = Accounts.PREFIX + "/self";
         public static final String DEFAULT_ORG = Accounts.PREFIX + "/organization";
+
+        @NoArgsConstructor(access = AccessLevel.NONE)
+        public static class SuperUser {
+            public static final String ROOT = Accounts.PREFIX + "/superuser";
+            public static final String ACTIVATE = ROOT + "/activate";
+            public static final String DEACTIVATE = ROOT + "/deactivate";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

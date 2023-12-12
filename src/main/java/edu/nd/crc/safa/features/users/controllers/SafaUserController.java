@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordChangeRequest;
@@ -56,6 +57,7 @@ public class SafaUserController extends BaseController {
     private final SafaUserRepository safaUserRepository;
     private final SafaUserService safaUserService;
     private final EmailService emailService;
+    private final PermissionService permissionService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
@@ -63,6 +65,7 @@ public class SafaUserController extends BaseController {
     public SafaUserController(ResourceBuilder resourceBuilder,
                               ServiceProvider serviceProvider,
                               EmailService emailService,
+                              PermissionService permissionService,
                               EmailVerificationService emailVerificationService,
                               PasswordResetTokenRepository passwordResetTokenRepository) {
         super(resourceBuilder, serviceProvider);
@@ -71,6 +74,7 @@ public class SafaUserController extends BaseController {
         this.safaUserRepository = serviceProvider.getSafaUserRepository();
         this.safaUserService = serviceProvider.getSafaUserService();
         this.emailService = emailService;
+        this.permissionService = permissionService;
         this.emailVerificationService = emailVerificationService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
@@ -91,7 +95,7 @@ public class SafaUserController extends BaseController {
 
         emailVerificationService.sendVerificationEmail(createdAccount);
 
-        return new UserAppEntity(createdAccount);
+        return safaUserService.toAppEntity(createdAccount);
     }
 
     /**
@@ -115,7 +119,7 @@ public class SafaUserController extends BaseController {
 
         SafaUser createdAccount = safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
         createdAccount = safaUserService.setAccountVerification(createdAccount, true);
-        return new UserAppEntity(createdAccount);
+        return safaUserService.toAppEntity(createdAccount);
     }
 
     /**
@@ -201,7 +205,7 @@ public class SafaUserController extends BaseController {
         retrievedUser.setPassword(passwordEncoder.encode(newPassword));
         retrievedUser = this.safaUserRepository.save(retrievedUser);
         this.passwordResetTokenRepository.delete(passwordResetToken);
-        return new UserAppEntity(retrievedUser);
+        return safaUserService.toAppEntity(retrievedUser);
     }
 
     /**
@@ -224,18 +228,61 @@ public class SafaUserController extends BaseController {
 
         principal.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
         principal = this.safaUserRepository.save(principal);
-        return new UserAppEntity(principal);
+        return safaUserService.toAppEntity(principal);
     }
 
     @GetMapping(AppRoutes.Accounts.SELF)
     public UserAppEntity retrieveCurrentUser() {
-        return new UserAppEntity(safaUserService.getCurrentUser());
+        return safaUserService.toAppEntity(safaUserService.getCurrentUser());
     }
 
     @PutMapping(AppRoutes.Accounts.DEFAULT_ORG)
     public void updateDefaultOrg(@RequestBody DefaultOrgDTO newOrgDto) {
         SafaUser currentUser = getCurrentUser();
         safaUserService.updateDefaultOrg(currentUser, newOrgDto.defaultOrgId);
+    }
+
+    /**
+     * Set the user with the given email to be a superuser
+     *
+     * @param body The request body containing the user's email
+     */
+    @PutMapping(AppRoutes.Accounts.SuperUser.ROOT)
+    public void addSuperUser(@RequestBody CreateSuperUserDTO body) {
+        SafaUser currentUser = getCurrentUser();
+        permissionService.requireActiveSuperuser(currentUser);
+
+        SafaUser updatedUser = safaUserService.getUserByEmail(body.getEmail());
+        safaUserService.addSuperUser(updatedUser);
+    }
+
+    /**
+     * <p>Activate a user's superuser powers.</p>
+     *
+     * <p>A user's superuser powers are inactive by default to
+     * help prevent accidental misuse. By activating superuser
+     * powers, the user will be able to actually perform superuser
+     * actions.</p>
+     */
+    @PutMapping(AppRoutes.Accounts.SuperUser.ACTIVATE)
+    public void activateSuperuser() {
+        SafaUser currentUser = getCurrentUser();
+        permissionService.requireSuperuser(currentUser);
+        permissionService.setActiveSuperuser(currentUser, true);
+    }
+
+    /**
+     * <p>Deactivate a user's superuser powers.</p>
+     *
+     * <p>A user's superuser powers are inactive by default to
+     * help prevent accidental misuse. Deactivating superuser
+     * powers on a user whose powers are active will return them
+     * to functioning like a normal user.</p>
+     */
+    @PutMapping(AppRoutes.Accounts.SuperUser.DEACTIVATE)
+    public void deactivateSuperuser() {
+        SafaUser currentUser = getCurrentUser();
+        permissionService.setActiveSuperuser(currentUser, false);
     }
 
     @Data
@@ -248,5 +295,12 @@ public class SafaUserController extends BaseController {
     @NoArgsConstructor
     public static class AccountVerificationDTO {
         private String token;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreateSuperUserDTO {
+        private String email;
     }
 }

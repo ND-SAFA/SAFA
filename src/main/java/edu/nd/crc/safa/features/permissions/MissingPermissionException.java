@@ -2,7 +2,6 @@ package edu.nd.crc.safa.features.permissions;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -19,8 +18,7 @@ public class MissingPermissionException extends SafaError {
     private final Set<Permission> missingPermissions;
 
     public MissingPermissionException(Set<Permission> missingPermissions, boolean needAll) {
-        super("Missing permissions. User must have " + (needAll ? "all" : "any") + " of these permissions: "
-            + missingPermissions);
+        super(getPermissionMessage(missingPermissions, needAll));
         this.missingPermissions = missingPermissions;
     }
 
@@ -29,6 +27,19 @@ public class MissingPermissionException extends SafaError {
     }
 
     public List<String> getPermissions() {
-        return missingPermissions.stream().map(Permission::getName).collect(Collectors.toUnmodifiableList());
+        return getPermissionNames(missingPermissions);
+    }
+
+    private static List<String> getPermissionNames(Set<Permission> permissions) {
+        return permissions.stream().map(Permission::getName).toList();
+    }
+
+    private static String getPermissionMessage(Set<Permission> missingPermissions, boolean needAll) {
+        return
+            String.format(
+                "Missing permissions. User must have %s of these permissions: %s",
+                (needAll ? "all" : "any"),
+                getPermissionNames(missingPermissions)
+            );
     }
 }

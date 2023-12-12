@@ -11,7 +11,7 @@ phases:
         --build-arg JIRA_REDIRECT_LINK=${JIRA_REDIRECT_LINK}
         --build-arg GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
         --build-arg GITHUB_REDIRECT_LINK=${GITHUB_REDIRECT_LINK} .
-      - docker tag fend $ECR_LINK/fend:$STAGE
+      - docker tag fend $ECR_LINK/fend
   post_build:
     commands:
       - docker push $ECR_LINK/fend

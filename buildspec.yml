@@ -4,17 +4,17 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 178003569110.dkr.ecr.us-east-1.amazonaws.com
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_LINK
       - docker build -t fend
         --build-arg API_ENDPOINT=${API_ENDPOINT}
         --build-arg JIRA_CLIENT_ID=${JIRA_CLIENT_ID}
         --build-arg JIRA_REDIRECT_LINK=${JIRA_REDIRECT_LINK}
         --build-arg GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
         --build-arg GITHUB_REDIRECT_LINK=${GITHUB_REDIRECT_LINK} .
-      - docker tag fend 178003569110.dkr.ecr.us-east-1.amazonaws.com/fend:$STAGE
+      - docker tag fend $ECR_LINK/fend:$STAGE
   post_build:
     commands:
-      - docker push 178003569110.dkr.ecr.us-east-1.amazonaws.com/fend:$STAGE
+      - docker push $ECR_LINK/fend
 artifacts:
   files:
     - '**/*'

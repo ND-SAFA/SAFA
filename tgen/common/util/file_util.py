@@ -77,26 +77,39 @@ class FileUtil:
         return output_path
 
     @staticmethod
-    def read_file(file_path: str, raise_exception: bool = True, encoding: str = "utf-8") -> Optional[str]:
+    def read_file(file_path: str, raise_exception: bool = True, encoding: str = "utf-8", tries: int = 0) -> Optional[str]:
         """
         Reads file at given path if exists.
         :param file_path: Path of the file to read.
         :param raise_exception: If True, raises an exception if reading fails
         :param encoding: The encoding to use when reading the file
         :param encoding: The encoding the read the file in.
+        :param tries: The number of tries to read the file.
         :return: The content of the file.
         """
+
+        def handle_exception(e: Exception):
+            """
+            Handles file reading exceptions
+            :param e: The exception thrown
+            :return: None if no exception is raised.
+            """
+            logger.exception(f"Failed reading file: {file_path}")
+            if raise_exception:
+                raise e
+            return None
+
         try:
             with open(file_path, encoding=encoding) as file:
                 file_content = file.read()
                 return file_content
         except UnicodeDecodeError as e:
-            return FileUtil.read_file(file_path, raise_exception=raise_exception, encoding="windows-1252")
+            if tries < 1:
+                return FileUtil.read_file(file_path, raise_exception=raise_exception, encoding="windows-1252", tries=tries + 1)
+            else:
+                return handle_exception(e)
         except Exception as e:
-            logger.exception(f"Failed reading file: {file_path}")
-            if raise_exception:
-                raise e
-            return None
+            return handle_exception(e)
 
     @staticmethod
     def read_file_lines(file_path: str) -> List[str]:

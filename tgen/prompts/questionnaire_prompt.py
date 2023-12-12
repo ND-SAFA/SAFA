@@ -144,7 +144,7 @@ class QuestionnairePrompt(Prompt):
         :return: The formatted prompt
         """
         if self.use_multi_step_task_instructions and TASK_HEADER not in self.value:
-            self.value = self._create_multi_step_task_instructions(self.enumeration_chars, self.question_prompts, self.value)
+            self.value = self._create_multi_step_task_instructions()
         update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
         if update_value:
             self.format_value(**kwargs)
@@ -160,23 +160,19 @@ class QuestionnairePrompt(Prompt):
             final = StrUtil.format_selective(final, **kwargs)
         return final
 
-    @staticmethod
-    def _create_multi_step_task_instructions(enumeration_chars: List[str], question_prompts: List[Prompt],
-                                             special_instructions: str = None) -> str:
+    def _create_multi_step_task_instructions(self) -> str:
         """
         Creates the default instructions for a multi-step task
-        :param enumeration_chars: The enumeration chars being used
-        :param question_prompts: The prompts making up the questionnaire
-        :param special_instructions: Additional instructions to append to base instructions.
         :return: The instructions for a multi-step task
         """
-        n_questions = len(question_prompts)
-        enumerations_for_task = f'{COMMA}{SPACE}'.join(enumeration_chars[:n_questions - 1])
-        base_instructions = f"Below are {len(question_prompts)} steps to complete. " \
-                            f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions - 1]}"
+        n_questions = len(self.question_prompts)
+        enumerations_for_task = f'{COMMA}{SPACE}'.join(self.enumeration_chars[:n_questions - 1])
+        base_instructions = f"Below are {len(self.question_prompts)} steps to complete."
+        if not self.use_bullets_for_enumeration:
+            base_instructions += f"Ensure that you answer {enumerations_for_task} and {self.enumeration_chars[n_questions - 1]}"
         instructions = [PromptUtil.as_markdown_header(TASK_HEADER), PromptUtil.as_markdown_italics(base_instructions)]
-        if special_instructions:
-            instructions.append(special_instructions)
+        if self.value:
+            instructions.append(self.value)
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
     def set_instructions(self, instructions: str) -> None:

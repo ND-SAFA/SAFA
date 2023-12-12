@@ -5,7 +5,6 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.prompts.artifact_prompt import ArtifactPrompt
 
 INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must reverse engineer "
                                      "{target_type} from the {source_type}. "
@@ -145,3 +144,13 @@ SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
                        "The section will not create the {target_type}s themselves "
                        "but it will be useful to the other engineers who make them.",
                        response_manager=PromptResponseManager(response_tag="new-section-body"))])
+DUPLICATE_REMOVAL_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software system and your goal is to revise "
+                                           "a set of {target_type}s from a software project.")
+DUPLICATE_REMOVAL_PROMPT = QuestionnairePrompt([
+    QuestionPrompt(
+        "First identify any {target_type} groups that contain duplicated information. If none of the {target_type} contain "
+        "duplicate information, then your task is complete.",
+        response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+    QuestionPrompt(
+        "If duplicate pairs were found, then for each duplicate group, combine the information in the {target_type}s "
+        "to create one cohesive {target_type}.")])

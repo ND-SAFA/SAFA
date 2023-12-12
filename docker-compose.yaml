@@ -15,6 +15,10 @@ services:
     image: mysql:8.0
     hostname: mysql
     container_name: mysql-db
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     environment:
       MYSQL_ROOT_PASSWORD: secret2
       MYSQL_USER: user

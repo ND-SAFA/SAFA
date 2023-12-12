@@ -47,7 +47,7 @@ public class GenerateLinksApi {
         String predictEndpoint;
         int candidates = payload.getDataset().getNumOfCandidates();
         apiController.log(logger, String.format("Number of candidates: %s", candidates));
-        predictEndpoint = TGenConfig.getEndpoint("predict");
+        predictEndpoint = TGenConfig.getEndpoint("tgen");
         return apiController.performJob(predictEndpoint, payload, TGenResponse.class, logger);
     }
 

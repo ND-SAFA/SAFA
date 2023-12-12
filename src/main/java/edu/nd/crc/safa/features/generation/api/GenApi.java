@@ -104,7 +104,7 @@ public class GenApi implements ITraceGenerationController {
     public TGenResponse performSearch(TGenRequest searchRequest, JobLogger logger) {
         int candidates = searchRequest.getDataset().getNumOfCandidates();
         apiController.log(logger, String.format("Number of candidates: %s", candidates));
-        String searchEndpoint = TGenConfig.getEndpoint("predict-sync");
+        String searchEndpoint = TGenConfig.getEndpoint("tgen-sync");
         return this.requestService.sendPost(searchEndpoint, searchRequest, TGenResponse.class);
     }
 

@@ -55,17 +55,17 @@ public class BillingService {
      * and retries the transaction until it succeeds or a maximum number of tries is reached
      *
      * @param organization The organization to adjust
-     * @param balanceAmount The amount to adjust the balance by
-     * @param totalUsedAmount The amount to adjust the total used value by
-     * @param totalSuccessfulAmount The amount to adjust the total successful value by
+     * @param balanceDelta The amount to adjust the balance by
+     * @param totalUsedDelta The amount to adjust the total used value by
+     * @param totalSuccessfulDelta The amount to adjust the total successful value by
      * @return Whether it was successful
      */
-    private boolean tryAdjustAccountWithRetries(Organization organization, int balanceAmount,
-                                                int totalUsedAmount, int totalSuccessfulAmount) {
+    private boolean tryAdjustAccountWithRetries(Organization organization, int balanceDelta,
+                                                int totalUsedDelta, int totalSuccessfulDelta) {
         boolean success = false;
         for (int i = 0; i < MAX_TRANSACTION_RETRIES; ++i) {
             try {
-                tryAdjustAccount(organization, balanceAmount, totalUsedAmount, totalSuccessfulAmount);
+                tryAdjustAccount(organization, balanceDelta, totalUsedDelta, totalSuccessfulDelta);
                 success = true;
                 break;
             } catch (OptimisticLockException ignored) {
@@ -81,14 +81,14 @@ public class BillingService {
      * and retries the transaction until it succeeds or a maximum number of tries is reached
      *
      * @param transaction The transaction to adjust amounts for
-     * @param balanceAmount The amount to adjust the balance by
-     * @param totalUsedAmount The amount to adjust the total used value by
-     * @param totalSuccessfulAmount The amount to adjust the total successful value by
+     * @param balanceDelta The amount to adjust the balance by
+     * @param totalUsedDelta The amount to adjust the total used value by
+     * @param totalSuccessfulDelta The amount to adjust the total successful value by
      */
-    private void tryAdjustAccountForTransaction(Transaction transaction, int balanceAmount,
-                                                   int totalUsedAmount, int totalSuccessfulAmount) {
-        boolean success = tryAdjustAccountWithRetries(transaction.getOrganization(), balanceAmount,
-            totalUsedAmount, totalSuccessfulAmount);
+    private void tryAdjustAccountForTransaction(Transaction transaction, int balanceDelta,
+                                                int totalUsedDelta, int totalSuccessfulDelta) {
+        boolean success = tryAdjustAccountWithRetries(transaction.getOrganization(), balanceDelta,
+            totalUsedDelta, totalSuccessfulDelta);
         if (!success) {
             throw new SafaError("Failed to refund transaction with ID " + transaction.getId());
         }
@@ -98,23 +98,23 @@ public class BillingService {
      * Attempts to adjust an organization's balance by a certain delta amount
      *
      * @param organization The organization to adjust
-     * @param balanceAmount The amount to adjust the balance by
-     * @param totalUsedAmount The amount to adjust the total used value by
-     * @param totalSuccessfulAmount The amount to adjust the total successful value by
+     * @param balanceDelta The amount to adjust the balance by
+     * @param totalUsedDelta The amount to adjust the total used value by
+     * @param totalSuccessfulDelta The amount to adjust the total successful value by
      */
-    private void tryAdjustAccount(Organization organization, int balanceAmount,
-                                  int totalUsedAmount, int totalSuccessfulAmount) {
+    private void tryAdjustAccount(Organization organization, int balanceDelta,
+                                  int totalUsedDelta, int totalSuccessfulDelta) {
         BillingInfo billingInfo = getBillingInfoForOrg(organization);
 
         int currentBalance = billingInfo.getBalance();
 
-        if (balanceAmount < 0 && currentBalance < -balanceAmount) {
-            throw new InsufficientFundsException(currentBalance, -balanceAmount);
+        if (balanceDelta < 0 && currentBalance < -balanceDelta) {
+            throw new InsufficientFundsException(currentBalance, -balanceDelta);
         }
 
-        billingInfo.setBalance(currentBalance + balanceAmount);
-        billingInfo.setTotalUsed(billingInfo.getTotalUsed() + totalUsedAmount);
-        billingInfo.setTotalSuccessful(billingInfo.getTotalSuccessful() + totalSuccessfulAmount);
+        billingInfo.setBalance(currentBalance + balanceDelta);
+        billingInfo.setTotalUsed(billingInfo.getTotalUsed() + totalUsedDelta);
+        billingInfo.setTotalSuccessful(billingInfo.getTotalSuccessful() + totalSuccessfulDelta);
         billingInfoRepository.save(billingInfo);
     }
 

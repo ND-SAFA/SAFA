@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.controllers.SafaUserController;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
@@ -51,16 +51,14 @@ public class TestSuperuser extends ApplicationBaseTest {
         String newUserEmail = "new@user.com";
         String newUserPassword = "newuserpassword";
 
-        SafaUser newUser = rootBuilder.getAuthorizationTestService()
-            .createUser(newUserEmail, newUserPassword).and()
-            .getAccount(newUserEmail);
+        rootBuilder.getAuthorizationTestService()
+            .createUser(newUserEmail, newUserPassword);
 
         rootBuilder.getCommonRequestService().user()
             .makeUserSuperuser(getCurrentUser())
             .activateSuperuser();
-        SafaRequest.withRoute(AppRoutes.Accounts.SuperUser.BY_USER)
-            .withPathVariable("userId", newUser.getUserId().toString())
-            .putWithJsonObject(new JSONObject());
+        SafaRequest.withRoute(AppRoutes.Accounts.SuperUser.ROOT)
+            .putWithJsonObject(new SafaUserController.CreateSuperUserDTO(newUserEmail));
         rootBuilder.getCommonRequestService().user().deactivateSuperuser();
 
         rootBuilder.getAuthorizationTestService().loginUser(newUserEmail, newUserPassword, this);

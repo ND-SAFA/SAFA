@@ -37,4 +37,4 @@ export const DEMO_ACCOUNT = {
   password: "safa!",
 };
 
-export const DEMO_PROJECT_ID = "5d2c0bb9-16db-452f-a6ba-cd072b4786a0"; // fEMR
+export const DEMO_VERSION_ID = "72f40221-565f-4c90-9ab1-f5d4bf665390"; // Autoware

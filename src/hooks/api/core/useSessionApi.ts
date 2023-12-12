@@ -7,7 +7,7 @@ import {
   SessionApiHook,
   UserPasswordSchema,
 } from "@/types";
-import { DEMO_ACCOUNT, DEMO_PROJECT_ID } from "@/util";
+import { DEMO_ACCOUNT, DEMO_VERSION_ID } from "@/util";
 import {
   getProjectApiStore,
   setProjectApiStore,
@@ -123,7 +123,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     permissionStore.isDemo = true;
 
     await handleLogin(DEMO_ACCOUNT).then(() =>
-      getVersionApiStore.handleLoad(DEMO_PROJECT_ID)
+      getVersionApiStore.handleLoad(DEMO_VERSION_ID)
     );
   }
 

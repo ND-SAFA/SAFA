@@ -124,3 +124,12 @@ pre {
   border-width: 1px 1px 1px 4px !important;
   border-radius: 4px !important;
 }
+
+.q-markdown--link {
+  color: $color-primary !important;
+}
+
+.q-markdown--token {
+  background-color: $color-background !important;
+  color: $color-text !important;
+}

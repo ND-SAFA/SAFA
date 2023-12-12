@@ -41,7 +41,6 @@ class TestJobStepNames extends ApplicationBaseTest {
     void testFlatFileProjectCreationSteps() {
         List<String> stepNames = JobSteps.getJobSteps(FlatFileProjectCreationJob.class);
         String[] expectedStepNames = new String[]{
-            "Uploading Flat Files",
             "Parsing Files",
             "Summarizing Code Artifacts",
             "Generating Trace Links",

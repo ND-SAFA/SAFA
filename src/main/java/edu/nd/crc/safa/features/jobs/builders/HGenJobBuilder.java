@@ -28,7 +28,9 @@ public class HGenJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.projectVersion, false);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(getUser(),
+            this.projectVersion,
+            false);
         return new HGenJob(getUser(), this.getJobDbEntity(), this.getServiceProvider(), projectCommitDefinition,
             this.request);
     }

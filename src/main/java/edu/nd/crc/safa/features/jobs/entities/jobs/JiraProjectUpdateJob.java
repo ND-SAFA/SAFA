@@ -29,7 +29,7 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
                                 JiraImportSettings importSettings) {
         super(jobDbEntity, serviceProvider, jiraIdentifier, user, importSettings);
         this.jiraConnectionService = this.getServiceProvider().getJiraConnectionService();
-        setProjectCommitDefinition(new ProjectCommitDefinition(jiraIdentifier.getProjectVersion(), false));
+        setProjectCommitDefinition(new ProjectCommitDefinition(user, jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);
     }
 

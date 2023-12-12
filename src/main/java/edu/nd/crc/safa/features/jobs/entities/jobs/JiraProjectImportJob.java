@@ -24,7 +24,7 @@ public class JiraProjectImportJob extends CreateProjectViaJiraJob {
                                 SafaUser user,
                                 JiraImportSettings importSettings) {
         super(jobDbEntity, serviceProvider, jiraIdentifier, user, importSettings);
-        setProjectCommitDefinition(new ProjectCommitDefinition(jiraIdentifier.getProjectVersion(), false));
+        setProjectCommitDefinition(new ProjectCommitDefinition(user, jiraIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_INDEX);
     }
 

@@ -38,7 +38,7 @@ public class CommitJobUtility {
         }
 
         ProjectVersion projectVersion = versionService.createInitialProjectVersion(project);
-        return new ProjectCommitDefinition(projectVersion, false);
+        return new ProjectCommitDefinition(user, projectVersion, false);
     }
 
     public static void deleteCommitProject(CommitJob commitJob) throws IOException {

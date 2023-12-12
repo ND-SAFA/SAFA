@@ -28,7 +28,7 @@ class TestCommitJobProjectCreationCommonRequests extends ApplicationBaseTest {
     @Test
     void testCommitIntoExistingProject() throws Exception {
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(null, projectVersion, true);
 
         DummyCommitJobBuilder jobBuilder =
             new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, getCurrentUser(), false, false);
@@ -44,7 +44,7 @@ class TestCommitJobProjectCreationCommonRequests extends ApplicationBaseTest {
     @Test
     void testFailedCommitIntoExistingProject() throws Exception {
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
+        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(null, projectVersion, true);
 
         DummyCommitJobBuilder jobBuilder =
             new DummyCommitJobBuilder(serviceProvider, projectCommitDefinition, getCurrentUser(), false, true);

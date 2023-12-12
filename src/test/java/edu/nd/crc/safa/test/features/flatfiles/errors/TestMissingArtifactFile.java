@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Test that project with missing artifact file propagates error.
  */
 class TestMissingArtifactFile extends AbstractUpdateProjectViaFlatFileTestCommonRequests {
+    final int PARSE_STEP_INDEX = 0;
 
     @Autowired
     JobService jobService;
@@ -42,7 +43,8 @@ class TestMissingArtifactFile extends AbstractUpdateProjectViaFlatFileTestCommon
 
         String missingMessage = "Requirement.csv: Could not find CSV file";
         List<List<JobLogEntry>> logs = jobLogService.getLogsForJob(job);
-        List<JobLogEntry> step1Logs = logs.get(0);
+
+        List<JobLogEntry> step1Logs = logs.get(PARSE_STEP_INDEX);
 
         boolean messageFound = step1Logs.stream().anyMatch(log -> log.getEntry().contains(missingMessage));
         assertThat(messageFound).isTrue();

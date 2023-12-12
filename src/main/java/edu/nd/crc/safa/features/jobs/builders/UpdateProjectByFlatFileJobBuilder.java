@@ -1,14 +1,15 @@
 package edu.nd.crc.safa.features.jobs.builders;
 
 import java.io.IOException;
+import java.util.List;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
+import edu.nd.crc.safa.features.flatfiles.builder.steps.UploadFilesStep;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.FlatFileUtility;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,39 +26,50 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     /**
      * The files to parse
      */
-    private final MultipartFile[] files;
+    private final List<MultipartFile> files;
 
     /**
-     * Whether the code artifacts should be summarized if no summary exists
+     * Whether the uploaded files represents the complete artifactsets.
      */
-    private final boolean shouldSummarize;
+    private final boolean asCompleteSet;
+    /**
+     * Whether to summarize artifacts.
+     */
+    private final boolean summarizeArtifacts;
 
     public UpdateProjectByFlatFileJobBuilder(SafaUser user,
                                              ServiceProvider serviceProvider,
                                              ProjectVersion projectVersion,
-                                             MultipartFile[] files,
-                                             boolean shouldSummarize) {
+                                             List<MultipartFile> files,
+                                             boolean asCompleteSet,
+                                             boolean summarizeArtifacts) {
         super(user, serviceProvider);
         this.projectVersion = projectVersion;
         this.files = files;
-        this.shouldSummarize = shouldSummarize;
+        this.asCompleteSet = asCompleteSet;
+        this.summarizeArtifacts = summarizeArtifacts;
     }
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        String uploadLocation = FlatFileUtility.uploadFlatFiles(getServiceProvider(),
-            this.projectVersion.getProject(),
-            this.files);
-        ProjectCommitDefinition commit = new ProjectCommitDefinition(projectVersion, false);
+        FlatFileBuilderStore store = new FlatFileBuilderStore(
+            getUser(),
+            this.files,
+            this.projectVersion,
+            this.asCompleteSet,
+            this.summarizeArtifacts,
+            false
+        );
+
+        UploadFilesStep step = new UploadFilesStep();
+        step.perform(store, getServiceProvider());
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
             getUser(),
             this.getJobDbEntity(),
             getServiceProvider(),
-            commit,
-            uploadLocation,
-            this.shouldSummarize,
+            store,
             false);
     }
 

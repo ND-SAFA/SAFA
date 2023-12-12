@@ -25,8 +25,10 @@ public class GenerateLinksJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition(this.request.getProjectVersion(),
-            false);
+        ProjectCommitDefinition projectCommitDefinition =
+            new ProjectCommitDefinition(getUser(),
+                this.request.getProjectVersion(),
+                false);
         return new GenerateLinksJob(getUser(),
             this.getJobDbEntity(),
             this.getServiceProvider(),

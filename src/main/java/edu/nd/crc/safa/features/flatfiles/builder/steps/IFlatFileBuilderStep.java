@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.flatfiles.builder.steps;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderArgs;
+import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
 
 /**
  * Performs step in building project from flat files.
@@ -14,5 +14,5 @@ public interface IFlatFileBuilderStep {
      * @param state           The state of the flat file project builder.
      * @param serviceProvider Provide access to their services.
      */
-    void perform(FlatFileBuilderArgs state, ServiceProvider serviceProvider) throws Exception;
+    void perform(FlatFileBuilderStore state, ServiceProvider serviceProvider) throws Exception;
 }

@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderArgs;
+import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class ParsingSetupStep implements IFlatFileBuilderStep {
     @Override
-    public void perform(FlatFileBuilderArgs state, ServiceProvider serviceProvider) throws Exception {
+    public void perform(FlatFileBuilderStore state, ServiceProvider serviceProvider) throws Exception {
         Project project = state.getProjectVersion().getProject();
 
         JSONObject timFileJson = getTimFileContent(project);

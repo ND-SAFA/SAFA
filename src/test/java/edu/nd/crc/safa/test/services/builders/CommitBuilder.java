@@ -19,7 +19,7 @@ public class CommitBuilder {
     private final ProjectCommitDefinition projectCommitDefinition;
 
     public CommitBuilder(ProjectVersion projectVersion) {
-        projectCommitDefinition = new ProjectCommitDefinition(projectVersion, true);
+        projectCommitDefinition = new ProjectCommitDefinition(null, projectVersion, true);
     }
 
     public static CommitBuilder withVersion(ProjectVersion projectVersion) {

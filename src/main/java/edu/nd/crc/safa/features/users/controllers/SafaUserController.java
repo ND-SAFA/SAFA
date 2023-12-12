@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -244,16 +243,16 @@ public class SafaUserController extends BaseController {
     }
 
     /**
-     * Set the user with the given ID to be a superuser
+     * Set the user with the given email to be a superuser
      *
-     * @param userId The ID of the user to update
+     * @param body The request body containing the user's email
      */
-    @PutMapping(AppRoutes.Accounts.SuperUser.BY_USER)
-    public void addSuperUser(@PathVariable UUID userId) {
+    @PutMapping(AppRoutes.Accounts.SuperUser.ROOT)
+    public void addSuperUser(@RequestBody CreateSuperUserDTO body) {
         SafaUser currentUser = getCurrentUser();
         permissionService.requireActiveSuperuser(currentUser);
 
-        SafaUser updatedUser = safaUserService.getUserById(userId);
+        SafaUser updatedUser = safaUserService.getUserByEmail(body.getEmail());
         safaUserService.addSuperUser(updatedUser);
     }
 
@@ -296,5 +295,12 @@ public class SafaUserController extends BaseController {
     @NoArgsConstructor
     public static class AccountVerificationDTO {
         private String token;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreateSuperUserDTO {
+        private String email;
     }
 }

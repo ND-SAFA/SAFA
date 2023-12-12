@@ -32,7 +32,6 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class SuperUser {
             public static final String ROOT = Accounts.PREFIX + "/superuser";
-            public static final String BY_USER = ROOT + "/{userId}";
             public static final String ACTIVATE = ROOT + "/activate";
             public static final String DEACTIVATE = ROOT + "/deactivate";
         }

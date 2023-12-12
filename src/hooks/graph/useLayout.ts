@@ -106,7 +106,7 @@ export const useLayout = defineStore("layout", {
           }, 300);
         }
 
-        if (this.mode === "tim") {
+        if (type === "project" && this.mode === "tim") {
           appStore.openDetailsPanel("displayProject");
         }
       });

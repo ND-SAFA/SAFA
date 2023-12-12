@@ -6,6 +6,7 @@ from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY
 from tgen.common.constants.hgen_constants import CLUSTER_ARTIFACT_TYPE_PARAM, CLUSTER_SEEDS_PARAM
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
+from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -45,7 +46,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         clusters = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)  # converting all keys to str bc pd is stupid
         cluster_state.cluster_artifact_dataset.artifact_df.index = clusters
-        cluster_map = {str(k): v.artifact_ids for k, v in cluster_state.final_cluster_map.items()}
+        cluster_map = ClusteringUtil.convert_cluster_map_to_artifact_format(cluster_state.final_cluster_map)
 
         # Req: Clusters should be added to cluster data frame.
         state.update_total_costs_from_state(cluster_state)

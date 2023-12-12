@@ -65,11 +65,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, re-runs hgen multiple times to get the best results across runs
     """
-    optimize_with_reruns: bool = False
-    """
-    Number of re-runs of hgen to get the best results across runs
-    """
-    n_reruns: int = 4
+    run_refinement: bool = False
     """
     If True, automatically generates trace links between the new hgen layers and the source
     """

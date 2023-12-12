@@ -91,8 +91,7 @@ def get_all_responses(content=None, target_type="User Story", sources=None, sour
 def get_test_hgen_args(test_refinement: bool = False):
     return lambda: HGenArgs(source_layer_ids=["C++ Code"],
                             target_type="Test User Story",
-                            optimize_with_reruns=test_refinement,
-                            n_reruns=HGenTestConstants.n_reruns,
+                            run_refinement=test_refinement,
                             dataset_creator=PromptDatasetCreator(
                                 trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))
 

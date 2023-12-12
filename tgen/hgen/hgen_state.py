@@ -39,13 +39,11 @@ class HGenState(State):
     """
     generations2sources: Dict[str, Set[str]] = None  # dictionary mapping generated content to a list of related source ids
     cluster2generation: Dict[Any, List[str]] = None  # Maps cluster id to the generation that was produced for that cluster
-    n_generations: int = 0  # number of runs of artifact generation
 
     """
     Optional Step 5 - Refine content on rerun of hgen
     """
-    all_generated_content: Dict[str, Set[str]] = None  # All generated content across all runs
-    refined_content: Dict[str, Set[str]] = None  # The final selected artifact content
+    refined_generations2sources: Dict[str, Set[str]] = None  # The final selected artifact content
 
     """
     Step 6 - Rename the artifacts generated.

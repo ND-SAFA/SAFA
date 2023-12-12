@@ -88,48 +88,6 @@ SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact
                      "When creating the {target_type}(s) from {source_type}, "
                      "focus on the functionality in the {source_type} that was likely implemented/derived from it.\n\t"
                      "{seed_content}", title="Higher-level Reference Artifact")
-
-REFINE_PROMPT = Prompt("You are an engineer that is an expert on a software system and your goal is to refine "
-                       "{target_type}s. There are many duplicate {target_type} between the new and original {target_type}s "
-                       "so you must minimize the number of duplicates and select only the best artifacts to remain. "
-                       "You are given a summary of the system: ")
-REFINE_STEPS = {
-    1: QuestionPrompt("Compare each version of {target_type}s to identify duplicates and overlaps. "
-                      "Only some of the {target_type} are overlapping, and some new functionality has been introduced in each version."
-                      "Two {target_type} overlap if they describe substantially the same feature or functionality. "),
-    2: QuestionPrompt("Create a set of unique {target_type}s that describe unique functionality "
-                      "and do NOT have significant overlap in their descriptions with the other {target_type}s."),
-    3: QuestionnairePrompt(instructions="When duplicate/overlapping {target_type}s"
-                                        " are found, choose the best version to keep using these criteria:",
-                           question_prompts=[QuestionPrompt("Most complete and detailed description"),
-                                             QuestionPrompt("Clearer articulation of the desired functionality")],
-                           enumeration_chars=["*"]),
-    4: QuestionnairePrompt(instructions="Consolidate the {target_type}s into a master list "
-                                        "containing only the selected best versions. "
-                                        "The consolidated list should have:",
-                           question_prompts=[QuestionPrompt("No redundant or overlapping {target_type}s"),
-                                             QuestionPrompt("ALL unique functionality represented across both versions")],
-                           enumeration_chars=["*"]),
-    5: QuestionPrompt("Map and document where duplicates were found and the selection rationale. "
-                      "Add comments explaining the elimination decisions. "
-                      "Add comments explaining why remaining {target_type}s are unique. ",
-                      response_manager=PromptResponseManager(response_tag="notes")),
-    6: QuestionPrompt("Output just the {target_type} numbers for the refined list in the specified format:"
-                      f"{NEW_LINE}{PromptUtil.indent_for_markdown('* Comma delimited numbers')}",
-                      response_manager=PromptResponseManager(response_tag="selected-artifacts",
-                                                             response_instructions_format=f"{NEW_LINE}"
-                                                                                          f"{PromptUtil.indent_for_markdown('* Enclosed in {} XML tags.')}",
-                                                             expected_response_type=int,
-                                                             value_formatter=lambda tag, val: [v.strip().strip(NEW_LINE)
-                                                                                               for v in val.split(COMMA)])
-                      )
-
-}
-REFINE_TASKS = QuestionnairePrompt(instructions="Carefully review the v1 and v2 {target_type} lists. "
-                                                "Make sure you understand each one.",
-                                   enumeration_chars=["-"],
-                                   question_prompts=REFINE_STEPS)
-
 SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=[
         QuestionPrompt(
@@ -144,9 +102,9 @@ SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
                        "The section will not create the {target_type}s themselves "
                        "but it will be useful to the other engineers who make them.",
                        response_manager=PromptResponseManager(response_tag="new-section-body"))])
-DUPLICATE_REMOVAL_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software system and your goal is to revise "
+REFINE_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software system and your goal is to revise "
                                            "a set of {target_type}s from a software project.")
-DUPLICATE_REMOVAL_PROMPT = QuestionnairePrompt([
+REFINE_TASKS_QUESTIONNAIRE = QuestionnairePrompt([
     QuestionPrompt(
         "First identify any {target_type} groups that contain duplicated information. If none of the {target_type} contain "
         "duplicate information, then your task is complete.",

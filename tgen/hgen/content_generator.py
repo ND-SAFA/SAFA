@@ -1,7 +1,8 @@
 import uuid
-from typing import Union, Dict, List, Optional
+from typing import Union, Dict, List, Optional, Tuple, Set, Any
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -68,6 +69,27 @@ class ContentGenerator:
         prompt_builder = self._get_prompt_builder_for_generation(task_prompt, base_intro_prompt.value,
                                                                  artifact_prompt, format_variables)
         return prompt_builder
+
+    def map_generations_to_predicted_sources(self, generations: List) -> Tuple[Dict[str, Set[str]], Dict[Any, str]]:
+        """
+        Creates a mapping of the generated artifact to a list of the predicted links to it and the source artifacts
+        :param generations: The predictions from the LLM
+        :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
+        """
+        generations2sources = {}
+        cluster2generations = {cluster_id: [] for cluster_id in self.state.get_cluster_ids()} if self.state.cluster_dataset else {}
+        cluster_ids = self.state.get_cluster_ids() if self.state.cluster_dataset is not None else []
+        for i, generations4cluster in enumerate(generations):
+            for generation in generations4cluster:
+                try:
+                    target = generation[self.TARGET_TAG_ID][0]
+                    sources = set(generation[self.SOURCE_TAG_ID][0]) if len(generation[self.SOURCE_TAG_ID]) > 0 else set()
+                    generations2sources[target] = sources
+                    if cluster_ids:
+                        cluster2generations[cluster_ids[i]].append(target)
+                except Exception:
+                    logger.exception("A generation failed")
+        return generations2sources, cluster2generations
 
     def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt) -> QuestionnairePrompt:
         """

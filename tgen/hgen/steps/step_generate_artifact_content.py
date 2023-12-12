@@ -1,23 +1,17 @@
-import uuid
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, TAB
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
-from tgen.common.constants.hgen_constants import DEFAULT_TOKEN_TO_TARGETS_RATIO, TEMPERATURE_ON_RERUNS
+from tgen.common.constants.hgen_constants import DEFAULT_TOKEN_TO_TARGETS_RATIO
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.content_generator import ContentGenerator
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
-from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
@@ -51,13 +45,9 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             self._add_seeds_to_prompt(dataset, prompt_builder, state)
 
         generations = content_generator.generate_content(dataset, prompt_builder, generations_filename=self.GENERATION_FILENAME)
-        generations2sources, cluster2generation = self._map_generations_to_predicted_sources(generations,
-                                                                                             content_generator.SOURCE_TAG_ID,
-                                                                                             ContentGenerator.TARGET_TAG_ID,
-                                                                                             state)
+        generations2sources, cluster2generation = content_generator.map_generations_to_predicted_sources(generations)
         state.generations2sources = generations2sources
         state.cluster2generation = cluster2generation
-        state.n_generations += 1
 
     @staticmethod
     def _add_seeds_to_prompt(dataset: PromptDataset, prompt_builder: PromptBuilder, state: HGenState) -> None:
@@ -116,28 +106,4 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         n_artifacts_tokens = max(round(sum(token_counts) / token_to_target_ratio), n_artifacts_proportion)
         return n_artifacts_tokens
 
-    @staticmethod
-    def _map_generations_to_predicted_sources(generations: List, source_tag_id: str, target_tag_id: str,
-                                              state: HGenState) -> Tuple[Dict[str, Set[str]], Dict[Any, str]]:
-        """
-        Creates a mapping of the generated artifact to a list of the predicted links to it and the source artifacts
-        :param generations: The predictions from the LLM
-        :param source_tag_id: The id of the predicted sources tag
-        :param target_tag_id: The id of the generated target artifact tag
-        :param state: The current state of the hierarchy generator
-        :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
-        """
-        generations2sources = {}
-        cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
-        cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
-        for i, generations4cluster in enumerate(generations):
-            for generation in generations4cluster:
-                try:
-                    target = generation[target_tag_id][0]
-                    sources = set(generation[source_tag_id][0]) if len(generation[source_tag_id]) > 0 else set()
-                    generations2sources[target] = sources
-                    if cluster_ids:
-                        cluster2generations[cluster_ids[i]].append(target)
-                except Exception:
-                    logger.exception("A generation failed")
-        return generations2sources, cluster2generations
+

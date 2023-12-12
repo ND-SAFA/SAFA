@@ -97,8 +97,6 @@ export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
   ): Promise<void> {
     const installationId = integrationsStore.jiraOrganization?.id;
 
-    console.log({ installationId });
-
     if (!installationId) return;
 
     await jiraApi.handleRequest(async () => {

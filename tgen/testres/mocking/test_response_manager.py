@@ -90,15 +90,16 @@ class TestAIManager:
         if explanations is None:
             explanations = [default_explanation] * n_artifacts
 
-        response = EMPTY_STRING
+        responses = []
         for artifact_id, score, explanation in zip(artifact_ids, scores, explanations):
             tag2response = {
                 RANKING_ID_TAG: artifact_id,
                 RANKING_EXPLANATION_TAG: explanation,
                 RANKING_SCORE_TAG: score
             }
-            response += self.create_response_content(tag2response)
-            response = PromptUtil.create_xml(RANKING_ARTIFACT_TAG, tag_content=response)
+            explanation_content = self.create_response_content(tag2response)
+            responses.append(PromptUtil.create_xml(RANKING_ARTIFACT_TAG, tag_content=explanation_content))
+        response = NEW_LINE.join(responses)
         self.add_responses([response])
 
     def mock_explanations(self, n_explanations: int, scores: List[float] = None, default_score: float = 0.5) -> None:

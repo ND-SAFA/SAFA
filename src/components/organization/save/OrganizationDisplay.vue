@@ -25,10 +25,7 @@
     <save-organization-inputs v-else />
   </panel-card>
 
-  <panel-card
-    v-if="ENABLED_FEATURES.CREATE_VERIFIED_ACCOUNTS_TEST"
-    title="Admin Controls"
-  >
+  <panel-card v-if="permissionStore.isSuperuser" title="Admin Controls">
     <expansion-item label="Create Account">
       <text-input v-model="adminCreateEmail" label="Email" />
       <text-input v-model="adminCreatePassword" label="Password" />
@@ -54,8 +51,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ENABLED_FEATURES } from "@/util";
-import { appStore, orgStore, sessionApiStore } from "@/hooks";
+import { appStore, orgStore, permissionStore, sessionApiStore } from "@/hooks";
 import {
   AttributeChip,
   FlexBox,

@@ -24,3 +24,4 @@ export * from "./summarization-api";
 export * from "./hgen-api";
 export * from "./organization-api";
 export * from "./delta-api";
+export * from "./admin-api";

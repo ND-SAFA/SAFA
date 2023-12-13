@@ -19,11 +19,11 @@ def mock_ai(libraries: Union[str, List[str]], func=None):
     library_method_names = [library_mock_map[l] for l in libraries]
     library_ai_managers = [TestAIManager(l, library_formatter_map[l]) for l in libraries]
 
-    def decorator(test_func: Callable = None):
+    def decorator(test_func: Callable = None, *test_func_args, **test_func_kwargs):
 
-        def test_function_wrapper(local_managers, *local_args, **local_kwrags):
-            self, *local_args = local_args
-            res = test_func(self, *local_managers, *local_args, **local_kwrags)
+        def test_function_wrapper(local_managers, *wrapper_args, **wrapper_kwargs):
+            self, *local_args = wrapper_args
+            res = test_func(self, *local_managers, *test_func_args, *local_args, **test_func_kwargs, **wrapper_kwargs)
             for ai_manager in library_ai_managers:
                 ai_manager.on_test_end()
             return res

@@ -27,6 +27,8 @@ import {
   createUser,
   createPasswordReset,
   updatePassword,
+  saveUserVerification,
+  createVerifiedUser,
 } from "@/api";
 import { pinia } from "@/plugins";
 import { useApi } from "@/hooks/api/core/useApi";
@@ -62,12 +64,31 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     sessionApi.handleReset();
   }
 
-  async function handleCreateAccount(user: UserPasswordSchema): Promise<void> {
+  async function handleCreateAccount(
+    user: UserPasswordSchema,
+    verified?: boolean
+  ): Promise<void> {
     await sessionApi.handleRequest(async () => {
-      await createUser(user);
+      if (verified) {
+        await createVerifiedUser(user);
+      } else {
+        await createUser(user);
+      }
 
       createdAccount.value = true;
     });
+  }
+
+  async function handleVerifyAccount(token: string): Promise<void> {
+    await sessionApi.handleRequest(
+      async () => {
+        await saveUserVerification(token);
+      },
+      {
+        success: "Your account has been verified.",
+        error: "Unable to verify your account.",
+      }
+    );
   }
 
   async function handlePasswordReset(email: string): Promise<void> {
@@ -194,6 +215,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     loginErrorMessage,
     handleReset,
     handleCreateAccount,
+    handleVerifyAccount,
     handlePasswordReset,
     handlePasswordUpdate,
     handleLogin,

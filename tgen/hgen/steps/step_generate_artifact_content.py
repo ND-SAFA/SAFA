@@ -55,7 +55,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
             prompt_builder.format_variables = {"n_targets": n_targets}
 
-        if args.seed_layer_id:
+        if args.seed_layer_id and args.include_seed_in_prompt:
             self._add_seeds_to_prompt(dataset, task_prompt, prompt_builder, state)
 
         if state.project_summary:

@@ -36,3 +36,5 @@ export const DEMO_ACCOUNT = {
   email: "view@safa.ai",
   password: "safa!",
 };
+
+export const DEMO_VERSION_ID = "72f40221-565f-4c90-9ab1-f5d4bf665390"; // Autoware

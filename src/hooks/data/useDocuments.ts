@@ -174,7 +174,7 @@ export const useDocuments = defineStore("documents", {
     },
     /**
      * Sets the current document and initializes its artifacts and traces.
-     * - The view is set to the TIM if the graph is too large.
+     * - The view is set to the TIM if the base graph is too large and the tree view is selected.
      * @param document - The document to switch to.
      */
     async switchDocuments(document: DocumentSchema): Promise<void> {
@@ -188,7 +188,11 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
 
-      if (this.isBaseDocument && artifactStore.largeNodeCount) {
+      if (
+        this.isBaseDocument &&
+        artifactStore.largeNodeCount &&
+        layoutStore.mode === "tree"
+      ) {
         layoutStore.mode = "tim";
       }
 

@@ -22,6 +22,8 @@ export enum Endpoint {
   session = "accounts/session",
   login = "login",
   createAccount = "accounts/create",
+  createVerifiedAccount = "accounts/create-verified",
+  verifyAccount = "accounts/verify",
   logout = "logout",
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",

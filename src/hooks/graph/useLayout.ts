@@ -98,13 +98,17 @@ export const useLayout = defineStore("layout", {
         this.styleGeneratedLinks();
         this.applyAutomove();
 
-        if (animated) return;
+        if (!animated) {
+          // Wait for the graph to render.
+          setTimeout(() => {
+            cyStore.resetWindow(type);
+            appStore.onLoadEnd();
+          }, 300);
+        }
 
-        // Wait for the graph to render.
-        setTimeout(() => {
-          cyStore.resetWindow(type);
-          appStore.onLoadEnd();
-        }, 300);
+        if (type !== "creator" && this.mode === "tim") {
+          appStore.openDetailsPanel("displayProject");
+        }
       });
     },
     /**

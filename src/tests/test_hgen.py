@@ -18,7 +18,7 @@ class TestHGen(BaseTest):
         """
         Tests that user stories are able to be generated using clustering.
         """
-        n_links = 4
+        n_links = 5
         source_layer_id = CHILD_TYPE
         target_type = PARENT_TYPE
 
@@ -26,13 +26,13 @@ class TestHGen(BaseTest):
         target_artifacts = TestData.read_artifacts(TestArtifacts.PARENT)
         target_artifacts.reverse()
 
-        for t_artifact in target_artifacts:
-            test_manager.add_xml_response("functional-requirement", [t_artifact[ArtifactKeys.CONTENT]])
+        generation_xml_map = {"functional-requirement": [a[ArtifactKeys.CONTENT] for a in target_artifacts]}
+        title_xml_map = {"title": [a[ArtifactKeys.ID] for a in target_artifacts]}
 
-        for t_artifact in target_artifacts:
-            test_manager.add_xml_response("title", [t_artifact[ArtifactKeys.ID]])
+        test_manager.add_xml_response(generation_xml_map, as_single_res=True)
+        test_manager.add_xml_response(title_xml_map)
 
-        test_manager.mock_explanations([0, 1, 2, 3])
+        test_manager.mock_explanations(n_links)
 
         hgen_response = RequestProxy.hgen(source_artifacts, target_type, summary=TestData.read_summary())
         assert isinstance(hgen_response, dict), f"{hgen_response}"
@@ -40,7 +40,7 @@ class TestHGen(BaseTest):
         hgen_layers = hgen_response["layers"]
         hgen_links = hgen_response["links"]
 
-        self.assertEqual(6, len(hgen_artifacts))
+        self.assertEqual(len(source_artifacts) + len(target_artifacts), len(hgen_artifacts))
         for t in target_artifacts:
             t_id = t[ArtifactKeys.ID]
             artifact_query = [a for a in hgen_artifacts if f"] {t_id}" in a[ArtifactKeys.ID]]

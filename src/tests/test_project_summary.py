@@ -16,10 +16,7 @@ class TestProjectSummary(BaseTest):
         """
         Verifies that project summary endpoint is able to summarize artifacts and create project summary.
         """
-        n_artifacts = 6
-        layer_id = "TypeScript"
-        extension = ".ts"
-        artifacts = TestDataCreator.create_artifacts(layer_id, n_artifacts=n_artifacts, extension=extension)
+        artifacts = TestDataCreator.get_source_artifacts()
 
         section_body_map = {s: f"{s} body." for s in DEFAULT_PROJECT_SUMMARY_SECTIONS}
 

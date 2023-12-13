@@ -48,20 +48,25 @@ class TestVerifier:
             for a_key in ArtifactKeys:
                 if a_key in ignore_keys:
                     continue
-                test_case.assertEqual(expected_artifact[a_key], resulting_artifact[a_key.value])
+                e_value = expected_artifact[a_key]
+                r_value = resulting_artifact[a_key.value]
+
+                e_value = e_value.strip() if isinstance(e_value, str) else e_value
+                r_value = r_value.strip() if isinstance(r_value, str) else r_value
+                test_case.assertEqual(e_value, r_value, msg=f"{r_value}\n\nEXPECTED VALUE\n\n{e_value}")
 
     @staticmethod
-    def verify_order(tc: TestCase, predictions: List[Trace], parent2sorted_children: Dict) -> None:
+    def verify_order(tc: TestCase, expected_parent_predictions: Dict, resulting_predictions: List[Trace]) -> None:
         """
         Verifies the order of the trace links for each parent.
         :param tc: The test case to use to make assertions with.
-        :param predictions: The predictions to verify the ranked order of children.
-        :param parent2sorted_children: Map of parent to its ranked list of children.
+        :param expected_parent_predictions: Map of parent to its ranked list of children.
+        :param resulting_predictions: The predictions to verify the ranked order of children.
         :return: None.
         """
-        parent2children = RankingUtil.group_trace_predictions(predictions, TraceKeys.parent_label())
-        for parent_id, artifact_ids in parent2sorted_children.items():
-            parent_predictions = parent2children[parent_id]
-            sorted_parent_predictions = sorted(parent_predictions, key=lambda t: t["score"], reverse=True)
-            for t_prediction, a_id in zip(sorted_parent_predictions, artifact_ids):
-                tc.assertEqual(a_id, t_prediction[TraceKeys.child_label()])
+        resulting_parent2children = RankingUtil.group_trace_predictions(resulting_predictions, TraceKeys.parent_label())
+        for parent_id, expected_children_ids in expected_parent_predictions.items():
+            parent_preditions = sorted(resulting_parent2children[parent_id], key=lambda t: t["score"], reverse=True)
+            for expected_artifact_id, prediction in zip(expected_children_ids, parent_preditions):
+                predicted_artifact_id = prediction[TraceKeys.child_label()]
+                tc.assertEqual(expected_artifact_id, predicted_artifact_id, msg=f"Parent: {parent_id}")

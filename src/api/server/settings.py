@@ -160,7 +160,8 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 run_as_eager = ENV_NAME.lower() == "local"
 CELERY_TASK_ALWAYS_EAGER = run_as_eager
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = run_as_eager
-logger.info("Running in EAGER mode." if run_as_eager else "Running with online worker.")
+if run_as_eager:
+    logger.info("Running in EAGER mode.")
 
 
 # Encoder function

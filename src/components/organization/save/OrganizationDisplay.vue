@@ -26,6 +26,14 @@
   </panel-card>
 
   <panel-card v-if="permissionStore.isSuperuser" title="Admin Controls">
+    <expansion-item label="Toggle Superuser Mode">
+      <q-toggle v-model="adminApiStore.activeSuperuser" class="q-mr-md">
+        <template #default>
+          <typography value="Superuser mode" el="div" />
+          <typography secondary value="Enables all permissions" />
+        </template>
+      </q-toggle>
+    </expansion-item>
     <expansion-item label="Create Account">
       <text-input v-model="adminCreateEmail" label="Email" />
       <text-input v-model="adminCreatePassword" label="Password" />
@@ -51,7 +59,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { appStore, orgStore, permissionStore, sessionApiStore } from "@/hooks";
+import {
+  adminApiStore,
+  appStore,
+  orgStore,
+  permissionStore,
+  sessionApiStore,
+  sessionStore,
+} from "@/hooks";
 import {
   AttributeChip,
   FlexBox,

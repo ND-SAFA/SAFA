@@ -136,7 +136,7 @@ const customCells: (keyof FlatTraceLink | string)[] = [
 const currentRoute = useRoute();
 
 const countType = ref<TraceCountTypes>("all");
-const approvalTypes = ref<ApprovalType[]>(["UNREVIEWED"]);
+const approvalTypes = ref<ApprovalType[]>([]);
 const groupBy = ref<string | undefined>("targetName");
 
 const displayActions = computed(() =>

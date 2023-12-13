@@ -16,6 +16,7 @@ import {
   UploadPanelType,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
+import { ENABLED_FEATURES } from "@/util/enabled-features";
 
 /**
  * Converts an enum value into a selectable option with a title case name.
@@ -202,7 +203,9 @@ export function tableViewTabOptions(): SelectOption<ProjectTableTab>[] {
   return [
     createOption("artifact", "Artifacts"),
     createOption("trace", "Trace Links"),
-    createOption("approve", "Trace Approval"),
+    ...(ENABLED_FEATURES.TRACE_MATRIX_TABLE
+      ? [createOption("matrix", "Trace Matrix")]
+      : []),
   ];
 }
 

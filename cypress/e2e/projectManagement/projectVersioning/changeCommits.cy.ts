@@ -37,7 +37,7 @@ describe("Change Commits", () => {
       cy.getCy(DataCy.navUndoButton).should("be.disabled");
     });
 
-    it.only("Undoes edits to an artifact", () => {
+    it("Undoes edits to an artifact", () => {
       const name = "Test Undo Artifact";
       const changedName = "Test Changed Artifact";
 

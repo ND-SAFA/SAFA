@@ -22,17 +22,13 @@ export default {
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { LocalStorageKeys } from "@/types";
 import { useTheme } from "@/hooks";
 import { AppNav } from "@/components";
 
-const { toggleDarkMode } = useTheme();
+const theme = useTheme();
 
 onMounted(() => {
-  const storedDarkMode =
-    localStorage.getItem(LocalStorageKeys.darkMode) === "true";
-
-  toggleDarkMode(storedDarkMode);
+  theme.loadDarkMode();
 });
 </script>
 

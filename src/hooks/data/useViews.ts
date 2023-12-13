@@ -35,28 +35,29 @@ export const useViews = defineStore("useViews", {
       const neighbors = hideSubtrees
         ? subtreeStore.getParentsAndChildren(artifact.id)
         : subtreeStore.getNeighbors(artifact.id);
+      const visibleNeighbors =
+        selectionStore.ignoreTypes.length === 0
+          ? neighbors
+          : neighbors.filter(
+              (id) =>
+                !selectionStore.ignoreTypes.includes(
+                  artifactStore.getArtifactById(id)?.type || ""
+                )
+            );
 
       const document = buildDocument({
         project: projectStore.projectIdentifier,
         name: artifact.name,
-        artifactIds: [
-          artifact.id,
-          ...neighbors.filter(
-            (id) =>
-              !selectionStore.ignoreTypes.includes(
-                artifactStore.getArtifactById(id)?.type || ""
-              )
-          ),
-        ],
+        artifactIds: [artifact.id, ...visibleNeighbors],
       });
 
       await documentStore.addDocument(document);
-      layoutStore.mode = "tree";
-      subtreeStore.resetHiddenNodes();
 
       if (hideSubtrees) {
         await subtreeStore.hideChildSubtrees(artifact.id);
       }
+
+      layoutStore.mode = "tree";
     },
     /**
      * Shows the subtree of an artifact in the current document.

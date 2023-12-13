@@ -1,5 +1,5 @@
 <template>
-  <panel-card title="Project Overview">
+  <panel-card :title="props.hideTitle ? undefined : 'Project Overview'">
     <div v-if="!editMode">
       <typography
         v-if="displayDescription"
@@ -52,6 +52,8 @@ import { computed } from "vue";
 import { appStore, identifierSaveStore, projectStore } from "@/hooks";
 import { PanelCard, Typography } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
+
+const props = defineProps<{ hideTitle: boolean }>();
 
 const editMode = computed(() => appStore.popups.editProject);
 const editedIdentifier = computed(() => identifierSaveStore.editedIdentifier);

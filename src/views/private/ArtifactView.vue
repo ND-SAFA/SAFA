@@ -13,10 +13,10 @@
           <artifact-table />
         </template>
         <template #trace>
-          <trace-table />
-        </template>
-        <template #approve>
           <approval-table />
+        </template>
+        <template #matrix>
+          <trace-table />
         </template>
       </tab-list>
     </div>
@@ -35,7 +35,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { tableViewTabOptions } from "@/util";
-import { layoutStore, permissionStore } from "@/hooks";
+import { layoutStore } from "@/hooks";
 import {
   ArtifactTable,
   PrivatePage,
@@ -46,14 +46,9 @@ import {
   ApprovalTable,
 } from "@/components";
 
-const displayEditing = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
-);
+const tabs = tableViewTabOptions();
 
-const tabs = computed(() =>
-  displayEditing.value ? tableViewTabOptions() : [tableViewTabOptions()[0]]
-);
-const tab = ref(tabs.value[0].id);
+const tab = ref(tabs[0].id);
 
 const isTableMode = computed(() => layoutStore.isTableMode);
 </script>

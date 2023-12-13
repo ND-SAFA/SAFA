@@ -41,14 +41,14 @@ import { SelectInput } from "@/components/common";
 import { JiraAuthentication } from "@/components/integrations/authentication";
 
 const organizationName = computed(
-  () => integrationsStore.gitHubOrganization?.name
+  () => integrationsStore.jiraOrganization?.name
 );
 
 /**
  * Loads a user's GitHub projects for a selected organization.
  */
 function handleReload() {
-  if (!integrationsStore.gitHubOrganization) return;
+  if (!integrationsStore.jiraOrganization) return;
 
   jiraApiStore.handleLoadProjects();
 }

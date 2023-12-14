@@ -44,7 +44,7 @@ class ArtifactsSummarizer(BaseObject):
         :param project_summary: Default project summary to use.
         :param code_summary_type: The default prompt to use for summarization of code.
         :param nl_summary_type: The default prompt to use for summarization of natural language.
-        :param export_path: If provided, will save the responses there.
+        :param export_dir: If provided, will save the responses there.
         """
         self.save_responses_path = export_dir
         self.llm_manager = llm_manager_for_artifact_summaries if llm_manager_for_artifact_summaries \
@@ -169,6 +169,7 @@ class ArtifactsSummarizer(BaseObject):
     def _parse_responses(res: GenerationResponse) -> List[str]:
         """
         Parses the summary responses.
+        :param res: The response from the model to parse.
         :return: The parsed responses.
         """
         if res is None:

@@ -226,11 +226,14 @@ export const useSubtree = defineStore("subtrees", {
      */
     async hideSubtree(rootId: string): Promise<void> {
       const childrenInSubtree = this.getSubtree(rootId);
-      const visibleChildren = childrenInSubtree.filter(
-        (id) => !this.hiddenSubtreeNodes.includes(id)
-      );
+      const visibleChildren =
+        this.hiddenSubtreeNodes.length === 0
+          ? childrenInSubtree
+          : childrenInSubtree.filter(
+              (id) => !this.hiddenSubtreeNodes.includes(id)
+            );
 
-      if (childrenInSubtree.length === 0) return;
+      if (visibleChildren.length === 0) return;
 
       this.$patch({
         hiddenSubtreeNodes: [...this.hiddenSubtreeNodes, ...visibleChildren],

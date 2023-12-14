@@ -32,8 +32,7 @@ describe("Project Members Display", () => {
     it("Can display all project members", () => {
       cy.withinTableRows(DataCy.projectSettingsTable, (tr) => {
         // 1 header, 2 members.
-        // TODO: currently broken, your member should appear.
-        tr.should("have.length", 1 + 1);
+        tr.should("have.length", 1 + 2);
       });
     });
   });

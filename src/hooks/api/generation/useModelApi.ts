@@ -42,7 +42,7 @@ export const useModelApi = defineStore("modelApi", (): ModelApiHook => {
 
         const createdModel = await createModel(projectStore.projectId, model);
 
-        projectStore.models.push(createdModel);
+        projectStore.project.models.push(createdModel);
 
         return createdModel;
       },
@@ -55,7 +55,7 @@ export const useModelApi = defineStore("modelApi", (): ModelApiHook => {
   }
 
   async function handleDelete(model: GenerationModelSchema): Promise<void> {
-    await logStore.confirm(
+    logStore.confirm(
       "Delete Model",
       `Are you sure you want to delete ${model.name}?`,
       async (isConfirmed) => {
@@ -66,7 +66,9 @@ export const useModelApi = defineStore("modelApi", (): ModelApiHook => {
             await deleteModel(projectStore.projectId, model.id);
 
             projectStore.updateProject({
-              models: projectStore.models.filter(({ id }) => id !== model.id),
+              models: projectStore.project.models.filter(
+                ({ id }) => id !== model.id
+              ),
             });
           },
           {

@@ -56,6 +56,7 @@ export type DetailsOpenState =
   | boolean
   | "delta"
   | "document"
+  | "displayProject"
   | "displayArtifact"
   | "displayArtifactBody"
   | "generateArtifact"

@@ -47,7 +47,7 @@ Cypress.Commands.add("initProjectVersion", (waitForComplete = true) => {
     .login(validUser.email, validUser.password)
     .locationShouldEqual(Routes.MY_PROJECTS);
 
-  cy.expandViewport()
+  cy.expandViewport("l")
     .projectSelectorContinue("project")
     .projectSelectorContinue("version")
     .locationShouldEqual(Routes.ARTIFACT);

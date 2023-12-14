@@ -22,6 +22,8 @@ export enum Endpoint {
   session = "accounts/session",
   login = "login",
   createAccount = "accounts/create",
+  createVerifiedAccount = "accounts/create-verified",
+  verifyAccount = "accounts/verify",
   logout = "logout",
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",
@@ -29,6 +31,12 @@ export enum Endpoint {
   deleteAccount = "accounts/delete",
   getAccount = "accounts/self",
   editAccountOrg = "accounts/organization",
+
+  // Admin
+
+  setSuperuser = "accounts/superuser",
+  activateSuperuser = "accounts/superuser/activate",
+  deactivateSuperuser = "accounts/superuser/deactivate",
 
   // Jobs
   createProjectJob = "jobs/projects",

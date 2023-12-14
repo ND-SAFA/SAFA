@@ -7,6 +7,7 @@ import {
   OrganizationSchema,
   MembershipType,
 } from "@/types";
+import { ENABLED_FEATURES } from "@/util";
 import { projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -21,6 +22,14 @@ export const usePermission = defineStore("permissionStore", {
        */
       isDemo: false,
     };
+  },
+  getters: {
+    /**
+     * @return Whether the current user is a superuser.
+     */
+    isSuperuser(): boolean {
+      return !!sessionStore.user.admin || ENABLED_FEATURES.SUPERUSER_TEST;
+    },
   },
   actions: {
     /**
@@ -57,7 +66,7 @@ export const usePermission = defineStore("permissionStore", {
       } else if (permission === "safa.view") {
         return true;
       } else if (permission.startsWith("safa.")) {
-        return !!sessionStore.user.superuser;
+        return this.isSuperuser;
       } else {
         return context.permissions.includes(permission);
       }

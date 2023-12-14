@@ -25,6 +25,35 @@ export async function createUser(
 }
 
 /**
+ * Creates a new pre-verified account.
+ *
+ * @param user - The user to create.
+ * @return The session for the logged in user.
+ * @throws If the account cannot be created.
+ */
+export async function createVerifiedUser(
+  user: UserPasswordSchema
+): Promise<SessionSchema> {
+  return buildRequest<SessionSchema, string, UserPasswordSchema>(
+    "createVerifiedAccount"
+  ).post(user);
+}
+
+/**
+ * Verifies a new account.
+ *
+ * @param token - The account token to verify.
+ */
+export async function saveUserVerification(token: string): Promise<void> {
+  return buildRequest<void, string, { token: string }>(
+    "verifyAccount"
+  ).sessionRequest({
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+}
+
+/**
  * Logs the given user in.
  *
  * @param user - The user to log in.

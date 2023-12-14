@@ -70,6 +70,7 @@ import {
   gitHubApiStore,
   integrationsStore,
   onboardingStore,
+  permissionStore,
   sessionStore,
 } from "@/hooks";
 import { TextButton, Stepper, Typography } from "@/components/common";
@@ -91,7 +92,11 @@ onMounted(async () => {
 watch(
   () => userLoggedIn.value,
   (userLoggedIn) => {
-    if (userLoggedIn && !onboardingStore.isComplete) {
+    if (
+      userLoggedIn &&
+      !onboardingStore.isComplete &&
+      !permissionStore.isDemo
+    ) {
       onboardingStore.open = true;
     }
   }

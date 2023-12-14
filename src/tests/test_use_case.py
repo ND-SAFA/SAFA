@@ -14,6 +14,10 @@ from tgen.testres.mocking.test_response_manager import TestAIManager
 class TestUseCase(BaseTest):
     @mock_anthropic
     def test_use_case(self, ai_manager: TestAIManager):
+        """
+        Tests ability to summarize a project from source artifacts, generate higher level docs, and trace links
+        between them.
+        """
         source_artifacts = TestDataCreator.get_source_artifacts()
         source_summaries = [a[ArtifactKeys.SUMMARY] for a in source_artifacts]
         fake_summaries = ["mock_summary" for i in range(len(source_summaries))]

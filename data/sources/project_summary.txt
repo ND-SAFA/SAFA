@@ -1,8 +1,6 @@
 # Overview
 The software system provides capabilities for managing artifacts and traceability links across project versions. Artifacts represent unique entities such as documents, source code files, or other items that are produced and stored within software projects. Relationships between these artifacts are captured as trace links, which connect source artifacts to target artifacts.
-
 The system leverages a relational database and object-relational mapping to enable persisting artifacts and trace links. The Artifact and TraceLink classes define the structure of the data and map it to database tables using annotations like JPA. This allows the underlying data to be stored and queried from the database.
-
 To retrieve this data, the ArtifactService and TraceLinkService classes actively convert raw database entities into application-level objects. The ArtifactService takes a project version and retrieves all related artifact database entries, which are then constructed into Artifact application entities. The TraceLinkService utilizes these artifacts to identify related trace links, filter and convert trace database entries into TraceLink application entities.
 Configuration settings and filtering predicates can customize the data retrieval process. Overall, this architecture enables managing artifact and trace link data across versions, abstracting database persistence details behind services, and producing application entities to power additional behaviors in the system.
 # Features

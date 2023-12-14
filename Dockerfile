@@ -1,6 +1,9 @@
 ## Step - Build Arguments
-FROM python:3.9 as base
+FROM public.ecr.aws/docker/library/python:3.9-slim as base
 SHELL ["/bin/bash", "-c"]
+
+## Step - Prepare pip
+RUN pip install --upgrade pip
 
 ## Step - Install TGEN requirements
 COPY tgen/requirements.txt /app/tgen/

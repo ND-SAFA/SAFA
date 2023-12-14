@@ -12,5 +12,6 @@
   },
   "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["node_modules"],
-  "numTestsKeptInMemory": 0
+  "numTestsKeptInMemory": 0,
+  "video": false
 }

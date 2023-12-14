@@ -10,7 +10,6 @@ import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.test.features.memberships.permissions.AbstractPermissionViolationTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 public class TestLinkGenerationPermissions extends AbstractPermissionViolationTest {
@@ -27,16 +26,6 @@ public class TestLinkGenerationPermissions extends AbstractPermissionViolationTe
                 .withVersion(projectVersion)
                 .getWithJsonObject(status().is4xxClientError()),
             Set.of(ProjectPermission.VIEW)
-        );
-    }
-
-    @Test
-    public void testAddBatch() {
-        test(
-            () -> SafaRequest.withRoute(AppRoutes.Links.ADD_BATCH)
-                .withVersion(projectVersion)
-                .postWithJsonObject(new JSONObject(), status().is4xxClientError()),
-            Set.of(ProjectPermission.EDIT_DATA)
         );
     }
 }

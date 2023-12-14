@@ -18,3 +18,5 @@ SEED_RF_PARAM = "cluster_reduction_factor"
 CLUSTER_MAX_SIZE_PARAM = "cluster_max_size"
 MIN_SEED_SIMILARITY_QUANTILE = 0.10  # lower percentage of scores to exclude from linking to seeds
 UPPER_SEED_SIMILARITY_QUANTILE = 0.95  # percentage of scores to allow to link to multiple parents.
+USE_ALL_CODE_LAYERS = "USE_ALL_CODE_LAYERS"
+USE_ALL_LAYERS = "USE_ALL_LAYERS"

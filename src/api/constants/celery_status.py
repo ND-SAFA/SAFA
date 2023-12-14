@@ -1,7 +1,9 @@
-from enum import Enum, auto
+from enum import auto
+
+from tgen.common.util.supported_enum import SupportedEnum
 
 
-class CeleryStatus(Enum):
+class CeleryStatus(SupportedEnum):
     """
     The status of a job.
     """

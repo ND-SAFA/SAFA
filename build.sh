@@ -21,7 +21,7 @@ if [ $? -eq 0 ]; then
 
   # Run the Docker container
 
-  docker run --env-file .env -p 4000:80 -d --name $container_name --mount source=tgen-volume,destination=/vol $container_name
+  docker run --env-file .env -p 4000:80 -d --name $container_name --mount source=tgen-volume,destination=/vol --memory=8g $container_name
 else
   echo "Docker image build failed!"
   exit 1

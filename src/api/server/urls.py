@@ -22,12 +22,13 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from api.constants.config import get_current_version, get_home_page
-from api.endpoints.views.completion_view import perform_completion
+from api.endpoints.completion.completion_view import perform_completion
+from api.endpoints.summary.project_summary_view import perform_project_summary
 from api.endpoints.views.hgen_view import perform_hgen
-from api.endpoints.views.predict_view import perform_prediction, perform_search
-from api.endpoints.views.project_summary_view import perform_project_summary
 from api.endpoints.views.result_view import cancel_job, get_result, get_status
 from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
+from api.endpoints.views.trace_view import perform_prediction, perform_search
+from api.server.app_endpoints import AppEndpoints
 
 
 def wrap_html(body: str):
@@ -55,14 +56,14 @@ urlpatterns = [
     re_path(r'^playground/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', homePageView),
-    path('predict/', perform_prediction),
-    path('predict-sync/', perform_search),
-    path('complete/', perform_completion),
-    path('project-summary/', perform_project_summary),
-    path('summarize/', perform_summarization_job),
-    path('summarize-sync/', perform_summarization_sync),
-    path('hgen/', perform_hgen),
-    path('status/', get_status),
-    path('cancel/', cancel_job),
-    path('results/', get_result)
+    path(AppEndpoints.COMPLETE.as_path(), perform_completion),
+    path(AppEndpoints.TGEN.as_path(), perform_prediction),
+    path(AppEndpoints.TGEN.as_path(sync=True), perform_search),
+    path(AppEndpoints.HGEN.as_path(), perform_hgen),
+    path(AppEndpoints.PROJECT_SUMMARY.as_path(), perform_project_summary),
+    path(AppEndpoints.SUMMARIZE.as_path(), perform_summarization_job),
+    path(AppEndpoints.SUMMARIZE.as_path(sync=True), perform_summarization_sync),
+    path(AppEndpoints.STATUS.as_path(), get_status),
+    path(AppEndpoints.CANCEL.as_path(), cancel_job),
+    path(AppEndpoints.RESULTS.as_path(), get_result)
 ]

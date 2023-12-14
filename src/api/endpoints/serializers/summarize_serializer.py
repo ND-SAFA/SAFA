@@ -3,10 +3,10 @@ from typing import List
 
 from rest_framework import serializers
 
-from api.constants.api_constants import LONG_TEXT
+from api.constants.api_constants import TEXT_LONG
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.serializers.artifact_serializer import ArtifactSerializer
-from tgen.common.artifact import Artifact
+from tgen.common.objects.artifact import Artifact
 
 
 @dataclass
@@ -21,7 +21,7 @@ class SummarizeSerializer(AbstractSerializer):
     """
 
     artifacts = ArtifactSerializer(many=True, help_text="Artifact information for summarization.")
-    projectSummary = serializers.CharField(max_length=LONG_TEXT, help_text="The project summary to include in the summarization.",
+    projectSummary = serializers.CharField(max_length=TEXT_LONG, help_text="The project summary to include in the summarization.",
                                            required=False, allow_null=True, allow_blank=True)
 
     def create(self, validated_data) -> SummarizeRequest:

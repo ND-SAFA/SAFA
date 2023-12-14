@@ -11,7 +11,7 @@ TGEN_BAR = "-" * 125
 
 class ChangeLog:
     def __init__(self, file_path: str):
-        self.version = FileUtil.get_file_base_name(file_path)
+        self.version = FileUtil.get_file_name(file_path)
         self.description = FileUtil.read_file(file_path)
 
     def get_content(self) -> str:

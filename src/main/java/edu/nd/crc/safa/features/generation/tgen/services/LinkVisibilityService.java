@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LinkVisibilityService {
-    public static final double MIN_THRESHOLD = 0.6;
     /**
      * All links should be above a minimum threshold.
      * The next batch of links should be selected by children, allowing the next top links to be visible.
@@ -43,9 +42,7 @@ public class LinkVisibilityService {
                 .collect(Collectors.toList());
             if (selectedLinks.isEmpty() && !childLinks.isEmpty()) {
                 TraceAppEntity topParent = childLinks.get(0);
-                if (topParent.getScore() >= MIN_THRESHOLD) {
-                    selectedLinks.add(topParent);
-                }
+                selectedLinks.add(topParent);
             }
 
             finalLinks.addAll(selectedLinks);

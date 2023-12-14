@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -77,12 +76,7 @@ public class GenerateLinksJob extends GenerationJob {
             generationDataset.setSummary(this.projectVersion.getProject().getSpecification());
 
             ITraceGenerationController controller = this.getServiceProvider().getTraceGenerationController();
-            List<TraceAppEntity> tracePredictions = controller.generateLinks(generationDataset, this.getDbLogger());
-            tracePredictions =
-                tracePredictions.stream().filter(t -> t.getScore() >= LinkVisibilityService.MIN_THRESHOLD)
-                    .collect(Collectors.toList());
-            LinkVisibilityService.setLinksVisibility(tracePredictions);
-            this.generatedTraces = tracePredictions;
+            this.generatedTraces = controller.generateLinks(generationDataset, this.getDbLogger());
 
             logger.log("Generated %d traces.", generatedTraces.size());
 

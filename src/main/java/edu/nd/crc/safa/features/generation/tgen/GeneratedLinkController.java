@@ -6,10 +6,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -20,7 +18,6 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -55,30 +52,5 @@ public class GeneratedLinkController extends BaseController {
             .stream()
             .filter(t -> t.getTraceType() == TraceType.GENERATED)
             .collect(Collectors.toList());
-    }
-
-    /**
-     * Makes the most valuable predicted links as visible.
-     *
-     * @param versionId The version to commit the links to.
-     */
-    @PostMapping(AppRoutes.Links.ADD_BATCH)
-    public void addBatchOfLinks(@PathVariable UUID versionId) {
-        ServiceProvider serviceProvider = this.getServiceProvider();
-        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = this.getResourceBuilder().fetchVersion(versionId)
-            .withPermission(ProjectPermission.EDIT_DATA, user)
-            .get();
-        List<TraceAppEntity> links = serviceProvider
-            .getTraceService()
-            .getAppEntities(projectVersion, user, t -> true)
-            .stream()
-            .filter(t -> !t.isVisible())
-            .collect(Collectors.toList());
-        List<TraceAppEntity> modifiedLinks = LinkVisibilityService.setLinksVisibility(links);
-        ProjectCommitDefinition projectCommitDefinition = new ProjectCommitDefinition();
-        projectCommitDefinition.setCommitVersion(projectVersion);
-        projectCommitDefinition.getTraces().setModified(modifiedLinks);
-        serviceProvider.getCommitService().performCommit(projectCommitDefinition, user);
     }
 }

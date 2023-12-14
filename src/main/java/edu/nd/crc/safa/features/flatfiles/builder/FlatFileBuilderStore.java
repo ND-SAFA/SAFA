@@ -41,4 +41,15 @@ public class FlatFileBuilderStore {
         this.summarizeArtifacts = summarizeArtifacts;
         this.projectCommitDefinition = new ProjectCommitDefinition(user, projectVersion, failOnError);
     }
+
+    /**
+     * Logs given message to job logger if it exists.
+     *
+     * @param message The message to log.
+     */
+    public void log(String message) {
+        if (this.jobLogger != null) {
+            this.jobLogger.log(message);
+        }
+    }
 }

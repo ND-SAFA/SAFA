@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -29,7 +30,12 @@ public class ParseProjectSummaryStep implements IFlatFileBuilderStep {
         File projectSummaryFile = new File(projectSummaryFilePath);
         if (projectSummaryFile.exists()) {
             String projectSummary = FileUtils.readFileToString(projectSummaryFile, StandardCharsets.UTF_8);
-            state.getProjectVersion().getProject().setSpecification(projectSummary);
+            Project project = state.getProjectVersion().getProject();
+            project.setSpecification(projectSummary);
+            serviceProvider.getProjectRepository().save(project);
+            state.log("Specification is set.");
+        } else {
+            state.log("No project summary uploaded.");
         }
     }
 }

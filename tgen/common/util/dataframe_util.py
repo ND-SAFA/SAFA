@@ -163,5 +163,5 @@ class DataFrameUtil:
         nan_empty_indices = df.apply(lambda x: pd.isna(x) or x == EMPTY_STRING)
 
         nan_empty_indices = nan_empty_indices[nan_empty_indices].index
-        return nan_empty_indices
+        return list(nan_empty_indices)
 

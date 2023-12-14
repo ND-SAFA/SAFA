@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, Tuple
 
 import pandas as pd
 
@@ -46,26 +46,21 @@ class ArtifactsSummarizer(BaseObject):
         :param nl_summary_type: The default prompt to use for summarization of natural language.
         :param export_dir: If provided, will save the responses there.
         """
+        self.id = str(uuid.uuid4())
         self.save_responses_path = export_dir
         self.llm_manager = llm_manager_for_artifact_summaries if llm_manager_for_artifact_summaries \
             else get_efficient_default_llm_manager()
         self.args_for_summarizer_model = self.llm_manager.llm_args
         self.code_or_above_limit_only = summarize_code_only
+
+        # Setup prompts
         self.prompt_args = self.llm_manager.prompt_args
         self.project_summary = project_summary
-        code_prompts = code_summary_type.value
-        nl_prompts = nl_summary_type.value
-        if self.project_summary:
-            project_summary = self.project_summary.to_string([PS_ENTITIES_TITLE])
-
-            nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            nl_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
-
-            code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            code_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
-        self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
-        self.nl_prompt_builder = PromptBuilder(nl_prompts)
-        self._run_id = None
+        self.code_prompt_builder, self.nl_prompt_builder = self._create_prompt_builders(code_summary_type,
+                                                                                        nl_summary_type,
+                                                                                        self.project_summary)
+        # Used for saving responses
+        self._run_id, self._seed = None, 0
         self._update_run_id()
 
     def summarize_bulk(self, bodies: List[str], filenames: List[str] = None, use_content_if_unsummarized: bool = True) -> List[str]:
@@ -88,7 +83,7 @@ class ArtifactsSummarizer(BaseObject):
                 if FileUtil.is_code(filename):
                     prompt = PromptBuilder.remove_format_for_model(prompt, self.llm_manager.prompt_args)
                     prompt = TokenCalculator.truncate_to_fit_tokens(prompt, self.llm_manager.llm_args.model,
-                                                                              self.llm_manager.llm_args.get_max_tokens(),
+                                                                    self.llm_manager.llm_args.get_max_tokens(),
                                                                     is_code=True)
                     prompt = PromptBuilder.format_prompt_for_model(prompt, self.llm_manager.prompt_args)
                 summary_prompts.append(prompt)
@@ -220,4 +215,27 @@ class ArtifactsSummarizer(BaseObject):
         Creates a new id for the next run.
         :return: None
         """
-        self._run_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, 'seed'))
+        self._run_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(self._seed) + self.id))
+        self._seed += 1
+
+    @staticmethod
+    def _create_prompt_builders(code_summary_type: ArtifactSummaryTypes, nl_summary_type: ArtifactSummaryTypes,
+                                project_summary: Summary) -> Tuple[PromptBuilder, PromptBuilder]:
+        """
+        Creates the prompt builders for both code and nl summarizing.
+        :param code_summary_type: Specifies the prompt to use for the code summary.
+        :param nl_summary_type: Specifies the prompt to use for the NL summary.
+        :param project_summary: If provided, the project summary will be added to the prompt.
+        :return: The code and nl prompt builder.
+        """
+        code_prompts = code_summary_type.value
+        nl_prompts = nl_summary_type.value
+        if project_summary:
+            project_summary = project_summary.to_string([PS_ENTITIES_TITLE])
+
+            nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
+            nl_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
+
+            code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
+            code_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
+        return PromptBuilder(prompts=code_prompts), PromptBuilder(prompts=nl_prompts)

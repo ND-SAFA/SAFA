@@ -6,6 +6,7 @@ from tgen.models.tokens.token_limits import ModelTokenLimits
 
 TRUNCATE_BUFFER_WEIGHT = .25
 
+
 class TokenCalculator:
 
     @staticmethod
@@ -20,12 +21,13 @@ class TokenCalculator:
         return model_token_limit - max_completion_tokens - MAX_TOKENS_BUFFER
 
     @staticmethod
-    def estimate_num_tokens(content: str, model_name: str = None) -> int:
+    def estimate_num_tokens(content: str, model_name: str = None, is_code: bool = False) -> int:
         """
         Approximates the number of tokens that some content will be tokenized into by a given model by trying to tokenize
             and giving a rough estimate using a words to tokens conversion if that fails
         :param content: The content to be tokenized
         :param model_name: The model that will be doing the tokenization
+        :param is_code: If True, assumes content is code so there are less chars per token
         :return: The approximate number of tokens
         """
         try:
@@ -33,6 +35,8 @@ class TokenCalculator:
                 model_name = OPEN_AI_MODEL_DEFAULT  # titoken only works with open ai models so use default for approximation
             encoding = tiktoken.encoding_for_model(model_name)
             num_tokens = len(encoding.encode(content))
+            if is_code:
+                num_tokens = (len(content) + num_tokens) / 2  # this gives a better approx for code (less chars per token)
             return num_tokens
         except Exception:
             return TokenCalculator.rough_estimate_num_tokens(content)
@@ -59,10 +63,7 @@ class TokenCalculator:
         :param buffer_weight: The weight used to add a buffer to the number of chars to remove.
         :return: Truncated content.
         """
-        n_tokens = TokenCalculator.estimate_num_tokens(content, model_name)
-
-        if is_code:
-            n_tokens = (len(content) + n_tokens) / 2  # this gives a better approx for code (less chars per token)
+        n_tokens = TokenCalculator.estimate_num_tokens(content, model_name, is_code=is_code)
 
         max_tokens_allowed = TokenCalculator.calculate_max_prompt_tokens(model_name, max_completion_tokens)
         n_tokens_over = n_tokens - max_tokens_allowed

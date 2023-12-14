@@ -79,7 +79,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         for a in artifacts:
             self.add_artifact(**a)
 
-    def add_artifact(self, id: Any, content: str, layer_id: Any = 1, summary: str = EMPTY_STRING) -> EnumDict:
+    def add_artifact(self, id: Any, content: str, layer_id: Any = "1", summary: str = EMPTY_STRING) -> EnumDict:
         """
         Adds artifact to dataframe
         :param id: The id of the Artifact
@@ -203,11 +203,12 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :param code_only: If True, only checks that artifacts that are code are summarized
         :return: True if the artifacts (or artifacts in given layer) are summarized
         """
-        layer_ids = self.get_code_layers() if not layer_ids and code_only else layer_ids
+        if not layer_ids and code_only:
+            layer_ids = self.get_code_layers()
         if not isinstance(layer_ids, set):
             layer_ids = set(layer_ids) if isinstance(layer_ids, list) else {layer_ids}
         for layer_id in layer_ids:
-            df = self if not layer_id else self.get_type(layer_id)
+            df = self if layer_id is None else self.get_type(layer_id)
             summaries = df[ArtifactKeys.SUMMARY.value]
             missing_summaries = [self.get_row(i)[ArtifactKeys.ID] for i in DataFrameUtil.find_nan_empty_indices(summaries)]
             missing_summaries = [a_id for a_id in missing_summaries if FileUtil.is_code(a_id) or not code_only]

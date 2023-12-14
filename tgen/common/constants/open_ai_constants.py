@@ -11,4 +11,5 @@ LOGPROBS_DEFAULT = 2
 LEARNING_RATE_MULTIPLIER_DEFAULT = None
 COMPUTE_CLASSIFICATION_METRICS_DEFAULT = True
 OPEN_AI_MODEL_DEFAULT = "gpt-4"
-TOKENS_2_CHARS_CONVERSION = (1 / 2)  # open ai's rule of thumb for approximating tokens from number of words
+TOKENS_2_WORDS_CONVERSION = (3 / 4)  # open ai's rule of thumb for approximating tokens from number of words
+TOKENS_2_CHARS_CONVERSION = (1 / 4)  # open ai's rule of thumb for approximating tokens from number of chars

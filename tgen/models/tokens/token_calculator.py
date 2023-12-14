@@ -1,7 +1,7 @@
 import tiktoken
 
 from tgen.common.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
-    TOKENS_2_CHARS_CONVERSION, MAX_TOKENS_BUFFER, MAX_CHARS_BUFFER
+    TOKENS_2_WORDS_CONVERSION, MAX_TOKENS_BUFFER, MAX_CHARS_BUFFER
 from tgen.models.tokens.token_limits import ModelTokenLimits
 
 TRUNCATE_BUFFER_WEIGHT = .25
@@ -44,7 +44,7 @@ class TokenCalculator:
         :param content: The content to be tokenized
         :return: The approximate number of tokens
         """
-        return round(len(content) * (1 / TOKENS_2_CHARS_CONVERSION))
+        return round(len(content.split()) * (1 / TOKENS_2_WORDS_CONVERSION))
 
     @staticmethod
     def truncate_to_fit_tokens(content: str, model_name: str = None,

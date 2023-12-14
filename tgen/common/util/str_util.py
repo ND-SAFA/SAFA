@@ -118,8 +118,8 @@ class StrUtil:
         return re.sub(r'\d+\.\d+', lambda x: x.group().split(PERIOD)[0], string)
 
     @staticmethod
-    def remove_substring_from_of_string(string: str, str2remove: str, only_if_startswith: bool = False,
-                                        only_if_endswith: bool = False) -> str:
+    def remove_substring(string: str, str2remove: str, only_if_startswith: bool = False,
+                         only_if_endswith: bool = False) -> str:
         """
         Removes a substring from a string.
         :param string: The string to remove substring from.

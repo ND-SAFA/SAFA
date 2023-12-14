@@ -57,13 +57,13 @@ class TestStrUtil(BaseTest):
     def test_remove_substring(self):
         string = "hitesthitesthi"
         substring = "hi"
-        remove_all = StrUtil.remove_substring_from_of_string(string, substring)
+        remove_all = StrUtil.remove_substring(string, substring)
         self.assertNotIn(substring, remove_all)
 
-        remove_first = StrUtil.remove_substring_from_of_string(string, substring, only_if_startswith=True)
+        remove_first = StrUtil.remove_substring(string, substring, only_if_startswith=True)
         self.assertFalse(remove_first.startswith(substring))
         self.assertIn(substring, remove_first)
 
-        remove_last = StrUtil.remove_substring_from_of_string(string, substring, only_if_endswith=True)
+        remove_last = StrUtil.remove_substring(string, substring, only_if_endswith=True)
         self.assertFalse(remove_last.endswith(substring))
         self.assertIn(substring, remove_last)

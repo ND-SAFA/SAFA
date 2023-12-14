@@ -83,7 +83,7 @@ class TestPromptBuilder(BaseTest):
         self.assertEqual(1, formatted.count(AnthropicManager.prompt_args.prompt_prefix))
         self.assertTrue(formatted.endswith(AnthropicManager.prompt_args.prompt_suffix))
 
-        not_formatted = PromptBuilder.remove_format_for_model(formatted, AnthropicManager.prompt_args)
+        not_formatted = PromptBuilder.remove_format_for_model_from_prompt(formatted, AnthropicManager.prompt_args)
         self.assertNotIn(not_formatted, AnthropicManager.prompt_args.prompt_prefix)
         self.assertNotIn(not_formatted, AnthropicManager.prompt_args.prompt_suffix)
 

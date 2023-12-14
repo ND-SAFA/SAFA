@@ -160,15 +160,15 @@ class PromptBuilder:
         return f"{prefix}{base_prompt}{suffix}"
 
     @staticmethod
-    def remove_format_for_model(base_prompt: str, prompt_args: PromptArgs) -> str:
+    def remove_format_for_model_from_prompt(base_prompt: str, prompt_args: PromptArgs) -> str:
         """
         Formats the prompt with expected prefix + suffix tokens
         :param base_prompt: The base prompt
         :param prompt_args: The arguments for properly formatting the prompt
         :return: The formatted prompt
         """
-        base_prompt = StrUtil.remove_substring_from_of_string(base_prompt, prompt_args.prompt_prefix, only_if_startswith=True)
-        base_prompt = StrUtil.remove_substring_from_of_string(base_prompt, prompt_args.prompt_suffix, only_if_endswith=True)
+        base_prompt = StrUtil.remove_substring(base_prompt, prompt_args.prompt_prefix, only_if_startswith=True)
+        base_prompt = StrUtil.remove_substring(base_prompt, prompt_args.prompt_suffix, only_if_endswith=True)
         return base_prompt
 
     @staticmethod

@@ -82,7 +82,7 @@ class ArtifactsSummarizer(BaseObject):
             prompt = self._create_prompt(content, filename, self.code_or_above_limit_only)
             if prompt:
                 if FileUtil.is_code(filename):
-                    prompt = PromptBuilder.remove_format_for_model(prompt, self.llm_manager.prompt_args)
+                    prompt = PromptBuilder.remove_format_for_model_from_prompt(prompt, self.llm_manager.prompt_args)
                     prompt = TokenCalculator.truncate_to_fit_tokens(prompt, self.llm_manager.llm_args.model,
                                                                     self.llm_manager.llm_args.get_max_tokens(),
                                                                     is_code=True)

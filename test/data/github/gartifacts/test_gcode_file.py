@@ -1,6 +1,6 @@
 import os
 
-from tgen.common.constants.artifact_constants import ALLOWED_CODE_EXTENSIONS
+from tgen.common.constants.code_extensionss import ALLOWED_CODE_EXTENSIONS
 from tgen.common.util.file_util import FileUtil
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
 from tgen.testres.base_tests.base_test import BaseTest

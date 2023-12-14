@@ -54,7 +54,7 @@ class SummarizerArgs(PipelineArgs):
     """
     The name of the directory to save the summaries to
     """
-    summary_dirname = "summaries"
+    summary_dirname = "summarized"
     """
     List of file types to include when summarizing
     """

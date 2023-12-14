@@ -209,7 +209,9 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         for layer_id in layer_ids:
             df = self if not layer_id else self.get_type(layer_id)
             summaries = df[ArtifactKeys.SUMMARY.value]
-            if DataFrameUtil.contains_na(summaries) or DataFrameUtil.contains_empty_string(summaries):
+            missing_summaries = [self.get_row(i)[ArtifactKeys.ID] for i in DataFrameUtil.find_nan_empty_indices(summaries)]
+            missing_summaries = [a_id for a_id in missing_summaries if FileUtil.is_code(a_id) or not code_only]
+            if len(missing_summaries) > 0:
                 return False
         return True
 

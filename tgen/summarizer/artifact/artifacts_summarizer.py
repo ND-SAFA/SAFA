@@ -1,3 +1,4 @@
+import uuid
 from typing import Dict, List, Optional, Set, Union
 
 import pandas as pd
@@ -14,6 +15,7 @@ from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, \
@@ -33,7 +35,8 @@ class ArtifactsSummarizer(BaseObject):
                  summarize_code_only: bool = True,
                  project_summary: Summary = None,
                  code_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.CODE_BASE,
-                 nl_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.NL_BASE):
+                 nl_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.NL_BASE,
+                 export_dir: str = None):
         """
         Initializes a summarizer for a specific model
         :param llm_manager_for_artifact_summaries: LLM manager used for the individual artifact summaries.
@@ -41,7 +44,9 @@ class ArtifactsSummarizer(BaseObject):
         :param project_summary: Default project summary to use.
         :param code_summary_type: The default prompt to use for summarization of code.
         :param nl_summary_type: The default prompt to use for summarization of natural language.
+        :param export_path: If provided, will save the responses there.
         """
+        self.save_responses_path = export_dir
         self.llm_manager = llm_manager_for_artifact_summaries if llm_manager_for_artifact_summaries \
             else get_efficient_default_llm_manager()
         self.args_for_summarizer_model = self.llm_manager.llm_args
@@ -60,6 +65,8 @@ class ArtifactsSummarizer(BaseObject):
             code_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
         self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
         self.nl_prompt_builder = PromptBuilder(nl_prompts)
+        self._run_id = None
+        self._update_run_id()
 
     def summarize_bulk(self, bodies: List[str], filenames: List[str] = None, use_content_if_unsummarized: bool = True) -> List[str]:
         """
@@ -78,6 +85,12 @@ class ArtifactsSummarizer(BaseObject):
             content, filename = artifact_info
             prompt = self._create_prompt(content, filename, self.code_or_above_limit_only)
             if prompt:
+                if FileUtil.is_code(filename):
+                    prompt = PromptBuilder.remove_format_for_model(prompt, self.llm_manager.prompt_args)
+                    prompt = TokenCalculator.truncate_to_fit_tokens(prompt, self.llm_manager.llm_args.model,
+                                                                              self.llm_manager.llm_args.get_max_tokens(),
+                                                                    is_code=True)
+                    prompt = PromptBuilder.format_prompt_for_model(prompt, self.llm_manager.prompt_args)
                 summary_prompts.append(prompt)
                 indices2summarize.add(i)
         logger.info(f"Selected {len(indices2summarize)} artifacts to summarize.")
@@ -123,8 +136,7 @@ class ArtifactsSummarizer(BaseObject):
         summaries = self.summarize_bulk(list(df[col2summarize]), filenames, use_content_if_unsummarized=False)
         return summaries
 
-    @staticmethod
-    def _summarize(llm_manager: AbstractLLMManager, prompts: Union[List[str], str]) -> List[str]:
+    def _summarize(self, llm_manager: AbstractLLMManager, prompts: Union[List[str], str]) -> List[str]:
         """
         Summarizes all artifacts using a given model.
         :param llm_manager: The utility file containing API to AI library.
@@ -133,15 +145,38 @@ class ArtifactsSummarizer(BaseObject):
         """
         if not isinstance(prompts, List):
             prompts = [prompts]
-        res: GenerationResponse = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
-                                                                      prompt=prompts)
+
+        save_and_load_path = FileUtil.safely_join_paths(self.save_responses_path, FileUtil.add_ext(self._run_id, FileUtil.YAML_EXT))
+        reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
+        missing_generations = isinstance(reloaded, List) or reloaded is None
+
+        if missing_generations:
+            res: GenerationResponse = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
+                                                                          prompt=prompts,
+                                                                          original_responses=reloaded,
+                                                                          raise_exception=not self.save_responses_path)
+            LLMResponseUtil.save_responses(res, save_and_load_path)
+            LLMResponseUtil.get_failed_responses(res, raise_exception=True)
+        else:
+            res = reloaded
+
+        batch_responses = self._parse_responses(res)
+
+        self._update_run_id()
+        return batch_responses
+
+    @staticmethod
+    def _parse_responses(res: GenerationResponse) -> List[str]:
+        """
+        Parses the summary responses.
+        :return: The parsed responses.
+        """
         if res is None:
             batch_responses = [EMPTY_STRING]
         else:
             parsed_responses = [LLMResponseUtil.parse(r, ArtifactsSummarizer.SUMMARY_TAG, return_res_on_failure=True)[0] for r in
                                 res.batch_responses]
             batch_responses = [r.strip() for r in parsed_responses]
-
         return batch_responses
 
     def _create_prompt(self, content: str, filename: str = EMPTY_STRING, code_or_above_limit_only: bool = None) -> Optional[str]:
@@ -178,3 +213,10 @@ class ArtifactsSummarizer(BaseObject):
             summary = next(summaries_iter) if index in indices2summarize else default
             summaries.append(summary)
         return summaries
+
+    def _update_run_id(self) -> None:
+        """
+        Creates a new id for the next run.
+        :return: None
+        """
+        self._run_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, 'seed'))

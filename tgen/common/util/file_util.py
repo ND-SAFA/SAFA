@@ -3,14 +3,14 @@ import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union, Iterable
+from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union
 
 import numpy as np
 import yaml
 from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
-from tgen.common.constants.artifact_constants import CODE_EXTENSIONS
+from tgen.common.constants.code_extensions import CODE_EXTENSIONS, CODE_FILENAMES
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
@@ -570,11 +570,10 @@ class FileUtil:
         """
         if not isinstance(path_or_ext, str):
             path_or_ext = str(path_or_ext)
-        tmp = os.path.splitext(path_or_ext)
-        if tmp[-1]:
-            path_or_ext = tmp[-1].replace(os.extsep, EMPTY_STRING)
-        path_or_ext = path_or_ext.upper()
-        if path_or_ext in CODE_EXTENSIONS:
+        ext_from_path = os.path.splitext(path_or_ext)[-1]
+        ext = ext_from_path.replace(os.extsep, EMPTY_STRING) if ext_from_path else path_or_ext
+        filename = os.path.split(path_or_ext)[-1]
+        if ext.upper() in CODE_EXTENSIONS or filename.upper() in CODE_FILENAMES:
             return True
         return False
 

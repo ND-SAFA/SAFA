@@ -1,9 +1,10 @@
 import tiktoken
 
-from tgen.common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
-    TOKENS_2_WORDS_CONVERSION
+from tgen.common.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
+    TOKENS_2_CHARS_CONVERSION, MAX_TOKENS_BUFFER, MAX_CHARS_BUFFER
 from tgen.models.tokens.token_limits import ModelTokenLimits
 
+TRUNCATE_BUFFER_WEIGHT = .25
 
 class TokenCalculator:
 
@@ -43,4 +44,32 @@ class TokenCalculator:
         :param content: The content to be tokenized
         :return: The approximate number of tokens
         """
-        return round(len(content.split()) * (1 / TOKENS_2_WORDS_CONVERSION))
+        return round(len(content) * (1 / TOKENS_2_CHARS_CONVERSION))
+
+    @staticmethod
+    def truncate_to_fit_tokens(content: str, model_name: str = None,
+                               max_completion_tokens: int = MAX_TOKENS_DEFAULT,
+                               is_code: bool = True, buffer_weight: float = TRUNCATE_BUFFER_WEIGHT) -> str:
+        """
+        Truncates the content to fit within the token limit.
+        :param content: The content to be tokenized.
+        :param model_name: The name of the model.
+        :param max_completion_tokens: The max number of tokens for completion.
+        :param is_code: If True, assumes the content is code so higher char to token ratio.
+        :param buffer_weight: The weight used to add a buffer to the number of chars to remove.
+        :return: Truncated content.
+        """
+        n_tokens = TokenCalculator.estimate_num_tokens(content, model_name)
+
+        if is_code:
+            n_tokens = (len(content) + n_tokens) / 2  # this gives a better approx for code (less chars per token)
+
+        max_tokens_allowed = TokenCalculator.calculate_max_prompt_tokens(model_name, max_completion_tokens)
+        n_tokens_over = n_tokens - max_tokens_allowed
+        if n_tokens_over <= 0:
+            return content
+
+        n_chars_over = n_tokens_over
+        n_chars_over += buffer_weight * n_chars_over
+        truncated_content = content[:-round(n_chars_over)]
+        return truncated_content

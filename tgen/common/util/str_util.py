@@ -8,7 +8,6 @@ from tgen.common.logging.logger_manager import logger
 
 
 class StrUtil:
-
     FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
 
     @staticmethod
@@ -118,5 +117,24 @@ class StrUtil:
         # Define a regular expression pattern to match floating-point numbers
         return re.sub(r'\d+\.\d+', lambda x: x.group().split(PERIOD)[0], string)
 
-
+    @staticmethod
+    def remove_substring_from_of_string(string: str, str2remove: str, only_if_startswith: bool = False,
+                                        only_if_endswith: bool = False) -> str:
+        """
+        Removes a substring from a string.
+        :param string: The string to remove substring from.
+        :param str2remove: The sub-string to remove.
+        :param only_if_startswith: If True, only removes from start of string.
+        :param only_if_endswith: If True, only removes from end of string.
+        :return: The string without the substring.
+        """
+        assert not (only_if_startswith and only_if_endswith), "Cannot be only if startswith and only if endswith."
+        pattern = f"{re.escape(str2remove)}"
+        if only_if_startswith:
+            pattern = f"^{pattern}"
+        elif only_if_endswith:
+            pattern = f"{pattern}$"
+        pattern = re.compile(pattern)
+        result = pattern.sub(EMPTY_STRING, string)
+        return result
 

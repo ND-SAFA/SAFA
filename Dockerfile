@@ -1,15 +1,19 @@
 ## Step - Build Arguments
-FROM python:3.9 as base
+FROM public.ecr.aws/docker/library/python:3.9-slim-buster as base
 SHELL ["/bin/bash", "-c"]
 
-## Step - Install TGEN requirements
+## Step - Prepare deps
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip install --upgrade pip
+
+## Step - Install requirements
 COPY tgen/requirements.txt /app/tgen/
 ADD tgen/requirements/ /app/tgen/requirements/
-RUN pip3 install -r /app/tgen/requirements.txt
-
-## Step - Install API requirements
 COPY requirements.txt /app/
-RUN pip3 install -r /app/requirements.txt
+RUN pip3 install -r /app/requirements.txt # file calls tgen requirements
 
 ## Step - Copy source and build files
 COPY tgen/tgen/ /app/tgen/

@@ -10,6 +10,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.unique_id_manager import DeterministicUniqueIDManager
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -36,7 +37,8 @@ class ArtifactsSummarizer(BaseObject):
                  project_summary: Summary = None,
                  code_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.CODE_BASE,
                  nl_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.NL_BASE,
-                 export_dir: str = None):
+                 export_dir: str = None,
+                 summarizer_id: str = str(uuid.uuid4())):
         """
         Initializes a summarizer for a specific model
         :param llm_manager_for_artifact_summaries: LLM manager used for the individual artifact summaries.
@@ -45,8 +47,8 @@ class ArtifactsSummarizer(BaseObject):
         :param code_summary_type: The default prompt to use for summarization of code.
         :param nl_summary_type: The default prompt to use for summarization of natural language.
         :param export_dir: If provided, will save the responses there.
+        :param summarizer_id: Id assigned to this summarizer.
         """
-        self.id = str(uuid.uuid4())
         self.save_responses_path = export_dir
         self.llm_manager = llm_manager_for_artifact_summaries if llm_manager_for_artifact_summaries \
             else get_efficient_default_llm_manager()
@@ -59,9 +61,8 @@ class ArtifactsSummarizer(BaseObject):
         self.code_prompt_builder, self.nl_prompt_builder = self._create_prompt_builders(code_summary_type,
                                                                                         nl_summary_type,
                                                                                         self.project_summary)
-        # Used for saving responses
-        self._run_id, self._seed = None, 0
-        self._update_run_id()
+
+        self.uuid_manager = DeterministicUniqueIDManager(summarizer_id)
 
     def summarize_bulk(self, bodies: List[str], filenames: List[str] = None, use_content_if_unsummarized: bool = True) -> List[str]:
         """
@@ -141,7 +142,7 @@ class ArtifactsSummarizer(BaseObject):
         if not isinstance(prompts, List):
             prompts = [prompts]
 
-        save_and_load_path = FileUtil.safely_join_paths(self.save_responses_path, FileUtil.add_ext(self._run_id, FileUtil.YAML_EXT))
+        save_and_load_path = self._get_responses_save_and_load_path()
         reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
         missing_generations = isinstance(reloaded, List) or reloaded is None
 
@@ -157,7 +158,7 @@ class ArtifactsSummarizer(BaseObject):
 
         batch_responses = self._parse_responses(res)
 
-        self._update_run_id()
+        self.uuid_manager.generate_new_id()
         return batch_responses
 
     @staticmethod
@@ -210,13 +211,15 @@ class ArtifactsSummarizer(BaseObject):
             summaries.append(summary)
         return summaries
 
-    def _update_run_id(self) -> None:
+    def _get_responses_save_and_load_path(self) -> str:
         """
-        Creates a new id for the next run.
-        :return: None
+        Gets the save and load path for responses.
+        :return: The save and load path for responses.
         """
-        self._run_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(self._seed) + self.id))
-        self._seed += 1
+        save_and_load_path = FileUtil.safely_join_paths(self.save_responses_path,
+                                                        FileUtil.add_ext(f"art_sum_responses_{self.uuid_manager.get_uuid()}",
+                                                                         FileUtil.YAML_EXT))
+        return save_and_load_path
 
     @staticmethod
     def _create_prompt_builders(code_summary_type: ArtifactSummaryTypes, nl_summary_type: ArtifactSummaryTypes,

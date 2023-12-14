@@ -26,6 +26,8 @@ class StepCreateProjectSummaries(AbstractPipelineStep[SummarizerArgs, Summarizer
             args_for_cluster.export_dir = export_dir
             dataset = PromptDataset(artifact_df=state.dataset.artifact_df.filter_by_index(cluster_artifacts),
                                     project_summary=state.dataset.project_summary)
-            ps = ProjectSummarizer(args_for_cluster, dataset=dataset, reload_existing=True).summarize()
+            summarizer = ProjectSummarizer(args_for_cluster, dataset=dataset, reload_existing=True,
+                                           summarizer_id=f"Batch {cluster_id} PS")
+            ps = summarizer.summarize()
             project_summaries.append(ps)
         state.project_summaries = project_summaries

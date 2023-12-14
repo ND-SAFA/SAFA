@@ -21,7 +21,5 @@ class SelectCandidateLinksStep(AbstractPipelineStep[RankingArgs, RankingState]):
                                                              parent_thresholds=args.parent_thresholds)
             logger.info(f"Found {len(state.selected_entries)} links matching criteria.")
         if not state.selected_entries:
-            logger.info(f"Keeping all links.")
+            logger.info(f"Keeping all links ({len(candidate_entries)}).")
             state.selected_entries = candidate_entries
-
-

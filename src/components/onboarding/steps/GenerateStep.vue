@@ -13,10 +13,10 @@
     value="This process may take an additional 30 minutes depending on the size of your project."
   />
 
-  <flex-box column align="center" t="2">
+  <flex-box column align="center" t="4">
     <typography el="div" value="Project Size:" />
     <attribute-chip :value="codeFiles" icon="code" color="primary" />
-    <typography el="div" value="Generating Documents:" />
+    <typography el="div" value="Generating Documents:" class="q-mt-md" />
     <attribute-chip
       v-for="type in onboardingStore.generationTypes"
       :key="type"
@@ -32,7 +32,7 @@
         class="bd-gradient"
         icon="generate-artifacts"
         :disabled="onboardingStore.error"
-        @click="onboardingStore.handleGenerate"
+        @click="handleGenerate"
       >
         Generate Documentation
       </text-button>
@@ -101,8 +101,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { onboardingStore, projectApiStore } from "@/hooks";
+import { ref, watch } from "vue";
+import { artifactStore, onboardingStore, projectApiStore } from "@/hooks";
 import {
   AttributeChip,
   FlexBox,
@@ -113,9 +113,36 @@ import {
 } from "@/components/common";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
-const codeFiles = ref("[X] Files");
+const codeFiles = ref(artifactStore.allArtifacts.length + " Files");
 
-const status = computed<"initial" | "loading" | "success" | "error">(() =>
-  onboardingStore.error ? "error" : "initial"
+const status = ref<"initial" | "loading" | "success" | "error">("initial");
+
+watch(
+  () => onboardingStore.error,
+  (error) => {
+    if (!error) return;
+    status.value = "error";
+  }
 );
+
+watch(
+  () => onboardingStore.uploadedJob,
+  (job) => {
+    if (!job || status.value !== "loading") return;
+
+    if (job.status === "FAILED") {
+      status.value = "error";
+    } else if (job.status === "COMPLETED") {
+      status.value = "success";
+    }
+  }
+);
+
+/**
+ * Sets the status to loading and starts a generation job when the user clicks the import button.
+ */
+function handleGenerate() {
+  status.value = "loading";
+  onboardingStore.handleGenerateDocumentation();
+}
 </script>

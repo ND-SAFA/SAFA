@@ -125,15 +125,20 @@ export const useOnboarding = defineStore("useOnboarding", {
       // TODO
     },
     /**
-     * Generate documentation for the selected project.
-     * - Moves from Generate Documentation step if a project is created.
+     * Import from GitHub and summarize project files.
      */
-    async handleGenerate(): Promise<void> {
+    async handleImportProject(): Promise<void> {
       integrationsStore.gitHubConfig.summarize = true;
       await createProjectApiStore.handleGitHubImport({
         onSuccess: () => jobApiStore.handleReload(),
         onError: () => (this.error = true),
       });
+    },
+    /**
+     * Generate documentation for the selected project.
+     */
+    async handleGenerateDocumentation(): Promise<void> {
+      // TODO
     },
     /**
      * Export the selected project as a CSV.

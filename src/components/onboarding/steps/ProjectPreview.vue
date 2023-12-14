@@ -1,5 +1,5 @@
 <template>
-  <div v-if="onboardingStore.displayProject">
+  <div>
     <project-overview-display hide-overflow />
     <q-carousel
       v-model="artifactId"
@@ -43,7 +43,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { artifactStore, onboardingStore } from "@/hooks";
+import { artifactStore } from "@/hooks";
 import { ProjectOverviewDisplay } from "@/components/project";
 import { PanelCard } from "@/components/common";
 import { ArtifactBodyDisplay } from "@/components/artifact";

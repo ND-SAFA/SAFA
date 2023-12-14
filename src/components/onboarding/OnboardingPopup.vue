@@ -17,7 +17,7 @@
       </q-bar>
 
       <flex-box full-width justify="center" class="q-pa-lg q-mt-10">
-        <flex-item parts="6">
+        <flex-item parts="6" class="q-ma-md">
           <typography
             align="center"
             el="h1"
@@ -52,7 +52,7 @@
             </template>
           </stepper>
         </flex-item>
-        <flex-item parts="6">
+        <flex-item v-if="onboardingStore.displayProject" parts="6">
           <project-preview />
         </flex-item>
       </flex-box>

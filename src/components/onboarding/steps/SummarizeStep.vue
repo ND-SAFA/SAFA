@@ -17,11 +17,11 @@
   <flex-box v-if="status === 'initial'" column align="center" t="4">
     <typography el="div" value="Importing from GitHub:" />
     <attribute-chip
-      :value="integrationsStore.gitHubProject?.name || ''"
+      :value="integrationsStore.gitHubFullProjectName"
       icon="project-add"
       color="primary"
     />
-    <typography el="div" value="Generating Data:" />
+    <typography el="div" value="Generating Data:" class="q-mt-md" />
     <attribute-chip
       value="Project Summary"
       icon="create-artifact"
@@ -129,6 +129,6 @@ watch(
  */
 function handleGenerate() {
   status.value = "loading";
-  onboardingStore.handleGenerate();
+  onboardingStore.handleImportProject();
 }
 </script>

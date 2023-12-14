@@ -12,6 +12,7 @@ import {
   logStore,
   onboardingStore,
   projectApiStore,
+  projectStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -58,9 +59,16 @@ export const useOnboarding = defineStore("useOnboarding", {
      * @return The onboarding project's upload job, if the generation step is done.
      */
     uploadedJob(): JobSchema | undefined {
-      return this.steps[ONBOARDING_STEPS.generate.index].done
-        ? jobStore.jobs[0]
-        : undefined;
+      return jobStore.jobs[0];
+    },
+    /**
+     * @return Whether the onboarding workflow should display the generated project overview.
+     */
+    displayProject(): boolean {
+      return (
+        this.step === ONBOARDING_STEPS.generate.number &&
+        projectStore.isProjectDefined
+      );
     },
     /**
      * @return A display string for the onboarding project's upload job.
@@ -121,10 +129,9 @@ export const useOnboarding = defineStore("useOnboarding", {
      * - Moves from Generate Documentation step if a project is created.
      */
     async handleGenerate(): Promise<void> {
+      integrationsStore.gitHubConfig.summarize = true;
       await createProjectApiStore.handleGitHubImport({
-        onSuccess: () => {
-          this.handleNextStep("generate");
-        },
+        onSuccess: () => jobApiStore.handleReload(),
         onError: () => (this.error = true),
       });
     },

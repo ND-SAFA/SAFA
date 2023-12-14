@@ -1,8 +1,12 @@
 <template>
-  <panel-card :title="props.hideTitle ? undefined : 'Project Overview'">
-    <div v-if="!editMode">
+  <panel-card :title="props.hideTitle ? undefined : 'Project Summary'">
+    <div
+      v-if="!editMode"
+      class="overflow-auto"
+      :style="hideOverflow ? 'max-height: 40vh' : ''"
+    >
       <typography
-        v-if="displayDescription"
+        v-if="!!specification && displayDescription"
         variant="caption"
         value="Description"
       />
@@ -15,7 +19,7 @@
         :collapse-length="0"
       />
       <typography
-        v-if="!!specification"
+        v-if="!!specification && displayDescription"
         variant="caption"
         value="Specification"
       />
@@ -53,7 +57,7 @@ import { appStore, identifierSaveStore, projectStore } from "@/hooks";
 import { PanelCard, Typography } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
 
-const props = defineProps<{ hideTitle: boolean }>();
+const props = defineProps<{ hideTitle?: boolean; hideOverflow?: boolean }>();
 
 const editMode = computed(() => appStore.popups.editProject);
 const editedIdentifier = computed(() => identifierSaveStore.editedIdentifier);

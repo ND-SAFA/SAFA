@@ -39,7 +39,7 @@
         class="bd-gradient"
         icon="generate-artifacts"
         :disabled="onboardingStore.error"
-        @click="onboardingStore.handleGenerate"
+        @click="handleGenerate"
       >
         Import & Summarize
       </text-button>
@@ -83,8 +83,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { integrationsStore, onboardingStore } from "@/hooks";
+import { ref, watch } from "vue";
+import {
+  getVersionApiStore,
+  integrationsStore,
+  onboardingStore,
+} from "@/hooks";
 import {
   AttributeChip,
   FlexBox,
@@ -94,7 +98,37 @@ import {
 } from "@/components/common";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
-const status = computed<"initial" | "loading" | "success" | "error">(() =>
-  onboardingStore.error ? "error" : "initial"
+const status = ref<"initial" | "loading" | "success" | "error">("initial");
+
+watch(
+  () => onboardingStore.error,
+  (error) => {
+    if (!error) return;
+    status.value = "error";
+  }
 );
+
+watch(
+  () => onboardingStore.uploadedJob,
+  (job) => {
+    if (!job || status.value !== "loading") return;
+
+    if (job.status === "FAILED") {
+      status.value = "error";
+    } else if (job.status === "COMPLETED" && job.completedEntityId) {
+      status.value = "success";
+      getVersionApiStore.handleLoad(job.completedEntityId).then(() => {
+        onboardingStore.handleNextStep("summarize");
+      });
+    }
+  }
+);
+
+/**
+ * Sets the status to loading and starts a generation job when the user clicks the import button.
+ */
+function handleGenerate() {
+  status.value = "loading";
+  onboardingStore.handleGenerate();
+}
 </script>

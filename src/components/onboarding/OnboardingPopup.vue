@@ -16,41 +16,46 @@
         </text-button>
       </q-bar>
 
-      <div class="q-mx-auto q-mt-10" style="width: 700px; margin-top: 100px">
-        <typography
-          align="center"
-          el="h1"
-          variant="title"
-          value="Generate Code Documentation"
-        />
-        <typography
-          align="center"
-          el="p"
-          secondary
-          value="Follow the onboarding steps below to generate documentation for your code."
-        />
+      <flex-box full-width justify="center" class="q-pa-lg q-mt-10">
+        <flex-item parts="6">
+          <typography
+            align="center"
+            el="h1"
+            variant="title"
+            value="Generate Code Documentation"
+          />
+          <typography
+            align="center"
+            el="p"
+            secondary
+            value="Follow the onboarding steps below to generate documentation for your code."
+          />
 
-        <stepper
-          v-model="onboardingStore.step"
-          vertical
-          :steps="onboardingStore.steps"
-          hide-actions
-          color="gradient"
-        >
-          <template #1>
-            <connect-git-hub-step />
-          </template>
-          <template #2>
-            <select-repo-step />
-          </template>
-          <template #3>
-            <summarize-step />
-          </template>
-          <template #4>
-            <generate-step />
-          </template>
-        </stepper>
-      </div>
+          <stepper
+            v-model="onboardingStore.step"
+            vertical
+            :steps="onboardingStore.steps"
+            hide-actions
+            color="gradient"
+          >
+            <template #1>
+              <connect-git-hub-step />
+            </template>
+            <template #2>
+              <select-repo-step />
+            </template>
+            <template #3>
+              <summarize-step />
+            </template>
+            <template #4>
+              <generate-step />
+            </template>
+          </stepper>
+        </flex-item>
+        <flex-item parts="6">
+          <project-preview />
+        </flex-item>
+      </flex-box>
     </q-card>
   </q-dialog>
 </template>
@@ -73,13 +78,15 @@ import {
   permissionStore,
   sessionStore,
 } from "@/hooks";
-import { TextButton, Stepper, Typography } from "@/components/common";
+import { TextButton, Stepper, Typography, FlexBox } from "@/components/common";
 import {
   ConnectGitHubStep,
   SelectRepoStep,
   SummarizeStep,
   GenerateStep,
+  ProjectPreview,
 } from "@/components/onboarding/steps";
+import FlexItem from "@/components/common/display/content/FlexItem.vue";
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 

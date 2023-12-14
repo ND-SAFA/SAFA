@@ -7,6 +7,7 @@
     dense
     :title="uploadedJob.name"
     :subtitle="onboardingStore.uploadProgress"
+    class="q-mt-md"
   >
     <template #icon>
       <q-circular-progress

@@ -4,12 +4,12 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 178003569110.dkr.ecr.us-east-1.amazonaws.com
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_LINK
       - docker build -t tgen .
-      - docker tag tgen 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:$STAGE
+      - docker tag tgen $ECR_LINK/gen:latest
   post_build:
     commands:
-      - docker push 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:$STAGE
+      - docker push $ECR_LINK/gen:latest
 artifacts:
   files:
     - '**/*'

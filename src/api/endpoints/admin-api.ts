@@ -5,7 +5,7 @@ import { buildRequest } from "@/api";
  * @param email - The email of the user to make a superuser.
  */
 export async function createSuperuser(email: string): Promise<void> {
-  await buildRequest<void, string, { email: string }>("setSuperuser").post({
+  await buildRequest<void, string, { email: string }>("setSuperuser").put({
     email,
   });
 }

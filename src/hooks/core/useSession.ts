@@ -8,7 +8,7 @@ import {
   TeamSchema,
   UserSchema,
 } from "@/types";
-import { buildSession, buildUser, ENABLED_FEATURES } from "@/util";
+import { buildSession, buildUser } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -52,12 +52,6 @@ export const useSession = defineStore("session", {
      */
     userId(): string {
       return this.user.userId || "";
-    },
-    /**
-     * @return Whether the current user is a superuser.
-     */
-    superuser(): boolean {
-      return !!this.user.admin || ENABLED_FEATURES.SUPERUSER_TEST;
     },
   },
   actions: {

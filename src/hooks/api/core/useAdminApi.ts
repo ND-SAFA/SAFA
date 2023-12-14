@@ -19,15 +19,25 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
       return sessionStore.user?.admin?.active || false;
     },
     set(active: boolean) {
-      adminApi.handleRequest(async () => {
-        if (active) {
-          await activateSuperuser();
-        } else {
-          await deactivateSuperuser();
-        }
+      adminApi.handleRequest(
+        async () => {
+          if (active) {
+            await activateSuperuser();
+          } else {
+            await deactivateSuperuser();
+          }
 
-        sessionStore.updateUser({ admin: { active } });
-      });
+          sessionStore.updateUser({ admin: { active } });
+        },
+        {
+          success: active
+            ? "Superuser powers activated."
+            : "Superuser powers deactivated.",
+          error: active
+            ? "Failed to activate superuser powers."
+            : "Failed to deactivate superuser powers.",
+        }
+      );
     },
   });
 

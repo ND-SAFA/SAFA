@@ -4,7 +4,7 @@ from string import ascii_lowercase
 from bs4 import BeautifulSoup
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE
+from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE, MULTI_LINE_ITEMS, SPECIAL_TAGS_ITEMS
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -99,7 +99,7 @@ class TestSummarizer(BaseTest):
     @mock_anthropic
     def test_with_large_project(self, ai_manager: TestAIManager):
         def assert_summary(summary, n_expected_ids):
-            n_ids = len(find_ids(summary.to_string())) / (n_project_summary_sections - 1)
+            n_ids = len(find_ids(summary.to_string())) / (n_project_summary_sections - 2)
             self.assertEqual(n_ids, n_expected_ids)
 
         def find_ids(body):
@@ -117,7 +117,7 @@ class TestSummarizer(BaseTest):
             tag = pattern.findall(prompt)[-1]
             tag = StrUtil.remove_chars(tag, ["</", ">"])
             section_title = SECTION_TAG_TO_TILE.get(tag, PS_SUBSYSTEM_TITLE)
-            body_prefix = artifact_ids if section_title != PS_SUBSYSTEM_TITLE else None
+            body_prefix = artifact_ids if section_title not in SPECIAL_TAGS_ITEMS else None
             return create(title=section_title, body_prefix=body_prefix)
 
         n_clusters = 2

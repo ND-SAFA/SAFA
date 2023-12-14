@@ -56,7 +56,7 @@ class SummarizeJob(AbstractJob):
         if self.args.export_dir or dataset_dir:
             export_dir = FileUtil.safely_join_paths(dataset_dir, self.args.summary_dirname) \
                 if dataset_dir else summarizer.state.export_dir
-            exporter = PromptDatasetExporter(os.path.join(export_dir, "final_dataset"),
+            exporter = PromptDatasetExporter(export_dir,
                                              trace_dataset_exporter_type=SafaExporter,
                                              dataset=dataset)
             exporter.export()

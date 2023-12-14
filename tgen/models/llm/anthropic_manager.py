@@ -106,7 +106,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
             local_response = get_client().completion(**prompt_params)
             return local_response
-
+        
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
                                                                          thread_work,
                                                                          retries=retries,
@@ -123,7 +123,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                 if raise_exception:
                     raise Exception(res["exception"])
                 global_state.failed_responses.add(i)
-        if retries:
+        if retries is not None:
             global_responses = self._combine_original_responses_and_retries(global_responses, original_responses, retries)
         global_state.results = [res for res in global_responses]
         return global_state

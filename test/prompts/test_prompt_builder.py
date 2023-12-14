@@ -77,6 +77,16 @@ class TestPromptBuilder(BaseTest):
         self.assertTrue(prompt_builder.config.requires_artifact_per_prompt)
         self.assertTrue(prompt_builder.config.requires_all_artifacts)
 
+    def test_add_remove_format_for_model(self):
+        has_start = AnthropicManager.prompt_args.prompt_prefix + "a prompt"
+        formatted = PromptBuilder.format_prompt_for_model(has_start, AnthropicManager.prompt_args)
+        self.assertEqual(1, formatted.count(AnthropicManager.prompt_args.prompt_prefix))
+        self.assertTrue(formatted.endswith(AnthropicManager.prompt_args.prompt_suffix))
+
+        not_formatted = PromptBuilder.remove_format_for_model_from_prompt(formatted, AnthropicManager.prompt_args)
+        self.assertNotIn(not_formatted, AnthropicManager.prompt_args.prompt_prefix)
+        self.assertNotIn(not_formatted, AnthropicManager.prompt_args.prompt_suffix)
+
     def get_prompt_builder(self, data_type=MultiArtifactPrompt.DataType.TRACES):
         prompts = [ArtifactPrompt(),
                    BinaryChoiceQuestionPrompt(["yes", "no"], "answer with the following:"),

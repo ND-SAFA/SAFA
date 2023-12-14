@@ -132,7 +132,6 @@ class TestFileUtil(BaseTest):
         self.assertEqual(len(expanded_path_without_none), 1)
         self.assertIn(1, expanded_path_without_none)
 
-
     def test_expand_paths_int(self):
         """
         Tests that numbers can replace variables.
@@ -170,3 +169,9 @@ class TestFileUtil(BaseTest):
 
         with_empty = FileUtil.safely_join_paths("path1", "")
         self.assertEqual(with_empty, "")
+
+    def test_is_code(self):
+        code_files = ["test/code.py", "CODE.JAVA", ".h", "CPP", "test/makefile"]
+        for file in code_files:
+            self.assertTrue(FileUtil.is_code(file))
+        self.assertFalse(FileUtil.is_code("not_code.txt"))

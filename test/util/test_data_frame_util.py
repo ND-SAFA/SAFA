@@ -86,3 +86,9 @@ class TestDataFrameUtil(BaseTest):
         self.assertTrue(DataFrameUtil.contains_empty_string(df["column1"]))
         df = pd.DataFrame({"id": [1, 2], "column1": ["hello", "world"]})
         self.assertFalse(DataFrameUtil.contains_empty_string(df))
+
+    def test_find_nan_empty_indices(self):
+        expected_empty_indices = [2, 4, 5]
+        df = pd.DataFrame({"column": [1, 2, np.NaN, 3, "", None]})
+        empty_indices = DataFrameUtil.find_nan_empty_indices(df["column"])
+        self.assertListEqual(expected_empty_indices, empty_indices)

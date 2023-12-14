@@ -1,6 +1,6 @@
 import os.path
 
-from tgen.common.constants.artifact_constants import CODE_EXTENSIONS
+from tgen.common.constants.code_extensions import CODE_EXTENSIONS
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.supported_enum import SupportedEnum

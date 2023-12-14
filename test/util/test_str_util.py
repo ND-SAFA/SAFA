@@ -16,11 +16,11 @@ class TestStrUtil(BaseTest):
         self.assertEqual(formatted, "I need to format these: A B but not this: {}")
 
         str2format = "I need to format these: {} and {this} but not this {}"
-        formatted = StrUtil.format_selective(str2format, "A", this="B",  random="four")
+        formatted = StrUtil.format_selective(str2format, "A", this="B", random="four")
         self.assertEqual(formatted, "I need to format these: A and B but not this {}")
 
         str2format = "Nothing should be formatted: {} and {this}"
-        formatted = StrUtil.format_selective(str2format,  random="four")
+        formatted = StrUtil.format_selective(str2format, random="four")
         self.assertEqual(formatted, "Nothing should be formatted: {} and {this}")
 
     def test_is_uuid(self):
@@ -53,3 +53,17 @@ class TestStrUtil(BaseTest):
         string = "blah1.23something. and 4.56another 7.890here."
         result = StrUtil.remove_decimal_points_from_floats(string)
         self.assertEqual("blah1something. and 4another 7here.", result)
+
+    def test_remove_substring(self):
+        string = "hitesthitesthi"
+        substring = "hi"
+        remove_all = StrUtil.remove_substring(string, substring)
+        self.assertNotIn(substring, remove_all)
+
+        remove_first = StrUtil.remove_substring(string, substring, only_if_startswith=True)
+        self.assertFalse(remove_first.startswith(substring))
+        self.assertIn(substring, remove_first)
+
+        remove_last = StrUtil.remove_substring(string, substring, only_if_endswith=True)
+        self.assertFalse(remove_last.endswith(substring))
+        self.assertIn(substring, remove_last)

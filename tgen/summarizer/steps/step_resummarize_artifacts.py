@@ -23,6 +23,6 @@ class StepResummarizeArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerSt
                                              ArtifactKeys.CONTENT: orig_artifact_df[ArtifactKeys.CONTENT],
                                              ArtifactKeys.LAYER_ID: orig_artifact_df[ArtifactKeys.LAYER_ID]})
             params = SummarizerUtil.get_params_for_artifact_summarizer(args)
-            summarizer = ArtifactsSummarizer(**params, project_summary=state.final_project_summary)
+            summarizer = ArtifactsSummarizer(**params, project_summary=state.final_project_summary, summarizer_id="Second Summary")
             artifact_df.summarize_content(summarizer, re_summarize=True)
             state.re_summarized_artifacts_dataset = PromptDataset(artifact_df=artifact_df)

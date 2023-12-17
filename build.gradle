@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 
     // database
+    implementation 'com.amazonaws.secretsmanager:aws-secretsmanager-jdbc:2.0.1'
     implementation 'mysql:mysql-connector-java:8.0.29'
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
     implementation 'org.hibernate.orm:hibernate-core:6.3.1.Final'

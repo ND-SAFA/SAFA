@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  StackName:
+    Type: String
+    Description: "Name of stack."
+  AccountID:
+    Type: String
+    Description: "ID of Account"
+  FileSystemName:
+    Type: String
+    Description: "Elastic File System Name"
+  Region:
+    Type: String
+    Description: "AWS Region"
+    Default: "us-east-1"
+  ContainerName:
+    Type: String
+    Description: "Name of ECS container"
+    Default: "core"
+
+Resources:
+  GenEFS:
+    Type: "AWS::EFS::FileSystem"
+    Properties:
+      FileSystemTags:
+      - Key: Name
+        Value: !Ref FileSystemName
+      Encrypted: true  # Enable encryption
+
+  GenTaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: !Ref StackName
+      Cpu: "2048" # 2 vCPU
+      Memory: "8192" # 8GB
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - EC2
+      - FARGATE
+      ExecutionRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsTaskExecutionRole"
+      ContainerDefinitions:
+      - Name: !Ref ContainerName
+        Image: !Sub "${AccountID}.dkr.ecr.${Region}.amazonaws.com/gen:latest"
+        Cpu: 2048
+        Memory: 8192
+        PortMappings:
+        - ContainerPort: 80
+          HostPort: 80
+          Protocol: tcp
+          AppProtocol: http
+        EnvironmentFiles:
+        - Type: s3
+          Value: !Sub "arn:aws:s3:::safa-envs/gen.env"
+        LogConfiguration:
+          LogDriver: "awslogs"
+          Options:
+            awslogs-create-group: true
+            awslogs-group: !Sub "/ecs/${StackName}"
+            awslogs-region: !Ref Region
+            awslogs-stream-prefix: ecs
+      RuntimePlatform:
+        CpuArchitecture: "x86_64"
+        OperatingSystemFamily: "LINUX"
+      Volumes:
+      - Name: !Sub "${StackName}-volume"
+        EFSVolumeConfiguration:
+          RootDirectory: /
+          FileSystemId: !GetAtt GenEFS.FileSystemId

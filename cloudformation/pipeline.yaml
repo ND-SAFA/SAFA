@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  AccountId:
+    Type: String
+    NoEcho: true
+    Description: 'ID of account containing ECR repository.'
+  StackName:
+    Type: String
+    NoEcho: true
+    Description: 'The name of the entire stack.'
+  GitHubConnectionArn:
+    Type: String
+    NoEcho: true
+    Description: 'GitHub Connection ARN.'
+  GithubRepository:
+    Type: String
+    NoEcho: true
+    Description: 'GitHub repository to build.'
+  Region:
+    Type: String
+    NoEcho: true
+    Description: 'The region ECR repository is located in.'
+    DefaultValue: 'us-east-1'
+
+Resources:
+  ArtifactBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub "${StackName}-pipeline-bucket"
+      AccessControl: Private
+
+  Pipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: !Ref StackName
+      RoleArn: !GetAtt PipelineRole.Arn
+      ArtifactStore:
+        Location: !Ref ArtifactBucket  # Use the S3 bucket created above
+        Type: S3
+      Stages:
+      - Name: Source
+        Actions:
+        - Name: SourceAction
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Version: 1
+            Provider: CodeStarSourceConnection
+          OutputArtifacts:
+          - Name: SourceOutput
+          Configuration:
+            ConnectionArn: !Ref GitHubConnectionArn
+            FullRepositoryId: !Ref GithubRepository
+            BranchName: staging
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: BuildAction
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: 1
+            Provider: CodeBuild
+          InputArtifacts:
+          - Name: SourceOutput
+          OutputArtifacts:
+          - Name: BuildOutput
+          Configuration:
+            ProjectName: !Ref StackName
+          RunOrder: 1
+
+  PipelineRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: codepipeline.amazonaws.com
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: !Sub "${StackName}-pipeline-role"
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:*
+            - codepipeline:*
+            - codebuild:*
+            - ecr:*
+            - cloudwatch:*
+            - codestar-connections:*
+            - logs:*
+            Resource: '*'
+
+
+  BuildRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: !Sub "${StackName}-build-role"
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:*
+            - codebuild:*
+            - ecr:*
+            - cloudwatch:*
+            - codestar-connections:*
+            - logs:*
+            Resource: '*'
+
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Ref StackName
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Cache:
+        Type: LOCAL
+        Modes:
+        - LOCAL_DOCKER_LAYER_CACHE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        EnvironmentVariables:
+        - Name: ECR_LINK
+          Type: PLAINTEXT
+          Value: !Sub "${AccountId}.dkr.ecr.${Region}.amazonaws.com"
+      ServiceRole: !GetAtt [BuildRole, Arn]
+      Source:
+        Type: GITHUB
+        Location: !Sub "https://github.com/${GithubRepository}"
+        Auth:
+          Type: OAUTH
+          Resource: !Ref GitHubConnectionArn
+        GitSubmodulesConfig:
+          FetchSubmodules: true  # Enable fetching submodules
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref StackName
+          StreamName: !Sub "${StackName}-buildlogs"
+          Status: ENABLED
+

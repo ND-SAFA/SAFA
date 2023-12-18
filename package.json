@@ -37,6 +37,7 @@
     "glob-parent": "^6.0.2",
     "minimatch": "^9.0.3",
     "pinia": "^2.1.6",
+    "postcss": "8.4.31",
     "quasar": "^2.12.7",
     "register-service-worker": "^1.7.2",
     "sockjs-client": "^1.6.1",

@@ -23,8 +23,8 @@ export const ONBOARDING_STEPS = {
     caption: ENABLED_FEATURES.BILLING_ONBOARDING
       ? "Review costs and generate documentation for your code."
       : ENABLED_FEATURES.GENERATE_ONBOARDING
-      ? "Generate documentation for your code."
-      : "Import your code from GitHub.",
+        ? "Generate documentation for your code."
+        : "Import your code from GitHub.",
     index: 2,
     number: 3,
   },

@@ -19,8 +19,8 @@ export function sortRows(
       return String(x[sortBy]) > String(y[sortBy])
         ? 1
         : String(x[sortBy]) < String(y[sortBy])
-        ? -1
-        : 0;
+          ? -1
+          : 0;
     });
   }
 

@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  ExecutionPolicyArn:
+    Type: String
+    Description: "ARN of customer managed policy to attach to the roles."
+
+Resources:
+  ecsExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecsExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ecs.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Ref ExecutionPolicyArn
+
+  ec2ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ec2ExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Ref ExecutionPolicyArn
+
+  pipelineExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: pipelineExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: codepipeline.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Ref ExecutionPolicyArn
+
+  buildExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: buildExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Ref ExecutionPolicyArn

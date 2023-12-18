@@ -31,8 +31,6 @@ read -e stackName
 echo "Enter Account ID:"
 read -e accountId
 
-
-
 echo "Stack: $stackName"
 echo "File: $fileName"
 echo "GitHub username: $githubUsername"

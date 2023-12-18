@@ -16,11 +16,19 @@ Parameters:
     Type: String
     NoEcho: true
     Description: 'GitHub repository to build.'
+  PipelineRoleArn:
+    Type: String
+    NoEcho: true
+    Description: 'ARN for pipeline role'
+  BuildRoleArn:
+    Type: String
+    NoEcho: true
+    Description: 'ARN for build role.'
   Region:
     Type: String
     NoEcho: true
     Description: 'The region ECR repository is located in.'
-    DefaultValue: 'us-east-1'
+    Default: 'us-east-1'
 
 Resources:
   ArtifactBucket:
@@ -33,7 +41,7 @@ Resources:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
       Name: !Ref StackName
-      RoleArn: !GetAtt PipelineRole.Arn
+      RoleArn: !Ref PipelineRoleArn
       ArtifactStore:
         Location: !Ref ArtifactBucket  # Use the S3 bucket created above
         Type: S3
@@ -69,58 +77,6 @@ Resources:
             ProjectName: !Ref StackName
           RunOrder: 1
 
-  PipelineRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: codepipeline.amazonaws.com
-          Action: 'sts:AssumeRole'
-      Policies:
-      - PolicyName: !Sub "${StackName}-pipeline-role"
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - s3:*
-            - codepipeline:*
-            - codebuild:*
-            - ecr:*
-            - cloudwatch:*
-            - codestar-connections:*
-            - logs:*
-            Resource: '*'
-
-
-  BuildRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: codebuild.amazonaws.com
-          Action: 'sts:AssumeRole'
-      Policies:
-      - PolicyName: !Sub "${StackName}-build-role"
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - s3:*
-            - codebuild:*
-            - ecr:*
-            - cloudwatch:*
-            - codestar-connections:*
-            - logs:*
-            Resource: '*'
-
   BuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -139,7 +95,7 @@ Resources:
         - Name: ECR_LINK
           Type: PLAINTEXT
           Value: !Sub "${AccountId}.dkr.ecr.${Region}.amazonaws.com"
-      ServiceRole: !GetAtt [BuildRole, Arn]
+      ServiceRole: !Ref BuildRoleArn
       Source:
         Type: GITHUB
         Location: !Sub "https://github.com/${GithubRepository}"

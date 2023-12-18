@@ -35,4 +35,5 @@ Resources:
           - ecr:*
           - s3:*
           - secretsmanager:*
+          - logs:*
           Resource: '*'

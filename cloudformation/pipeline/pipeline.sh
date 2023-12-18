@@ -6,8 +6,7 @@ aws configure list-profiles
 
 defaultGithubUsername=thearod5
 defaultGithubRepository=ND-SAFA/tgen-api
-fileName=pipeline.yaml
-connectionName=gen
+fileName=gen-pipeline.yaml
 
 # PROFILE
 echo "Enter your AWS CLI profile:"
@@ -31,10 +30,14 @@ read -e stackName
 echo "Enter Account ID:"
 read -e accountId
 
-echo "Stack: $stackName"
-echo "File: $fileName"
-echo "GitHub username: $githubUsername"
-echo "GitHub repository: $githubRepository"
+echo "Enter Github Connection Name:"
+read -e connectionName
+
+echo "Enter Pipeline ARN:"
+read -e pipelineRoleArn
+
+echo "Enter Build ARN:"
+read -e buildRoleArn
 
 # Get the GitHub connection ARN using AWS CLI
 githubConnectionArn=$(aws codestar-connections list-connections \
@@ -42,6 +45,14 @@ githubConnectionArn=$(aws codestar-connections list-connections \
     --provider-type GitHub \
     --query "Connections[?ConnectionName=='$connectionName'].ConnectionArn" \
     --output text)
+
+echo "Profile: $awsProfile"
+echo "Stack: $stackName"
+echo "File: $fileName"
+echo "GitHub username: $githubUsername"
+echo "GitHub repository: $githubRepository"
+echo "Connection ARN: $githubConnectionArn"
+
 
 # Define an array of variables
 variables=(
@@ -64,10 +75,12 @@ done
 aws cloudformation deploy \
   --profile "$awsProfile" \
   --template-file "$fileName" \
-  --stack-name "$stackName" \
+  --stack-name "$stackName-pipeline" \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
     AccountId="$accountId" \
     StackName="gen" \
     GitHubConnectionArn="$githubConnectionArn" \
-    GithubRepository="$githubRepository"
+    GithubRepository="$githubRepository" \
+    PipelineRoleArn="$pipelineRoleArn" \
+    BuildRoleArn="$buildRoleArn"

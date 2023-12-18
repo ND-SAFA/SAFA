@@ -83,6 +83,7 @@ export const useApp = defineStore("app", {
     closeSidePanels(): void {
       this.close("detailsPanel");
       this.close("saveArtifact");
+      console.trace("!");
     },
     /**
      * Opens the details panel.

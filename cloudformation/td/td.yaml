@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  AccountID:
+    Type: String
+    Description: "ID of Account"
+  Region:
+    Type: String
+    Description: "AWS Region"
+    Default: "us-east-1"
+
+  GenFileSystemId:
+    Type: String
+    Description: "ID of file system to mount."
+  GenContainerName:
+    Type: String
+    Description: "Name of ECS container"
+    Default: "gen-core"
+  GenContainerCpu:
+    Type: Number
+    Description: "Amount of CPU to allocate per container."
+    Default: 2048
+  GenContainerMemory:
+    Type: Number
+    Description: "Amount of RAM memory per container."
+    Default: 8192
+  GenEnvFile:
+    Type: String
+    Description: "Name of .env file to use."
+    Default: "tgen-dev"
+  GenVolumeName:
+    Type: String
+    Description: "Name of gen volume to attach."
+    Default: "gen-volume"
+  
+  FendContainerName:
+    Type: String
+    Description: "Name of ECS container"
+    Default: "fend-core"
+  FendContainerCpu:
+    Type: Number
+    Description: "Amount of CPU to allocate per container."
+    Default: 1024
+  FendContainerMemory:
+    Type: Number
+    Description: "Amount of RAM memory per container."
+    Default: 2048
+  FendEnvFile:
+    Type: String
+    Description: "Name of .env file to use."
+    Default: "fend-dev"
+
+  BendContainerName:
+    Type: String
+    Description: "Name of ECS container"
+    Default: "bend-core"
+  BendContainerCpu:
+    Type: Number
+    Description: "Amount of CPU to allocate per container."
+    Default: 1024
+  BendContainerMemory:
+    Type: Number
+    Description: "Amount of RAM memory per container."
+    Default: 2048
+  BendEnvFile:
+    Type: String
+    Description: "Name of .env file to use."
+    Default: "bend-dev"
+
+Resources:
+  FendTaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: "fend"
+      Cpu: !Sub "${FendContainerCpu}"
+      Memory: !Sub "${FendContainerMemory}"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - EC2
+      - FARGATE
+      ExecutionRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
+      ContainerDefinitions:
+      - Name: !Ref FendContainerName
+        Image: !Sub "${AccountID}.dkr.ecr.${Region}.amazonaws.com/fend:latest"
+        Cpu: !Ref FendContainerCpu
+        Memory: !Ref FendContainerMemory
+        PortMappings:
+        - ContainerPort: 80
+          HostPort: 80
+          Protocol: tcp
+          AppProtocol: http
+        LogConfiguration:
+          LogDriver: "awslogs"
+          Options:
+            awslogs-create-group: true
+            awslogs-group: !Sub "/ecs/fend"
+            awslogs-region: !Ref Region
+            awslogs-stream-prefix: ecs
+      RuntimePlatform:
+        CpuArchitecture: "x86_64"
+        OperatingSystemFamily: "LINUX"
+
+  BendTaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: "bend"
+      Cpu: !Sub "${BendContainerCpu}"
+      Memory: !Sub "${BendContainerMemory}"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - EC2
+      - FARGATE
+      ExecutionRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
+      ContainerDefinitions:
+      - Name: !Ref BendContainerName
+        Image: !Sub "${AccountID}.dkr.ecr.${Region}.amazonaws.com/bend:latest"
+        Cpu: !Ref BendContainerCpu
+        Memory: !Ref BendContainerMemory
+        PortMappings:
+        - ContainerPort: 80
+          HostPort: 80
+          Protocol: tcp
+          AppProtocol: http
+        EnvironmentFiles:
+        - Type: s3
+          Value: !Sub "arn:aws:s3:::safa-envs/${BendEnvFile}.env"
+        LogConfiguration:
+          LogDriver: "awslogs"
+          Options:
+            awslogs-create-group: true
+            awslogs-group: !Sub "/ecs/bend"
+            awslogs-region: !Ref Region
+            awslogs-stream-prefix: ecs
+      RuntimePlatform:
+        CpuArchitecture: "x86_64"
+        OperatingSystemFamily: "LINUX"
+
+  GenTaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: "gen"
+      Cpu: !Sub "${GenContainerCpu}"
+      Memory: !Sub "${GenContainerMemory}"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - EC2
+      - FARGATE
+      ExecutionRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
+      ContainerDefinitions:
+      - Name: !Ref GenContainerName
+        Image: !Sub "${AccountID}.dkr.ecr.${Region}.amazonaws.com/gen:latest"
+        Cpu: !Ref GenContainerCpu
+        Memory: !Ref GenContainerMemory
+        PortMappings:
+        - ContainerPort: 80
+          HostPort: 80
+          Protocol: tcp
+          AppProtocol: http
+        EnvironmentFiles:
+        - Type: s3
+          Value: !Sub "arn:aws:s3:::safa-envs/${GenEnvFile}.env"
+        LogConfiguration:
+          LogDriver: "awslogs"
+          Options:
+            awslogs-create-group: true
+            awslogs-group: !Sub "/ecs/gen"
+            awslogs-region: !Ref Region
+            awslogs-stream-prefix: ecs
+      RuntimePlatform:
+        CpuArchitecture: "x86_64"
+        OperatingSystemFamily: "LINUX"
+      Volumes:
+      - Name: !Ref GenVolumeName
+        EFSVolumeConfiguration:
+          RootDirectory: /
+          FileSystemId: !Ref GenFileSystemId

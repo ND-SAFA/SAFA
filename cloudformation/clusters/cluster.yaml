@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  FendCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: fend
+
+  BendCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: bend
+
+  GenCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: gen

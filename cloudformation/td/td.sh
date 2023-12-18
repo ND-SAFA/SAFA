@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fileName=task-definition.yaml
+fileName=td.yaml
 stackName=gen
 
 echo "Enter Account ID:"
@@ -9,13 +9,15 @@ read -e accountId
 echo "Enter Profile:"
 read -e profile
 
+echo "Enter Gen File System ID:"
+read -e fileSystemId
+
 # Deploy CloudFormation stack with parameters
 aws cloudformation deploy \
   --profile "$profile" \
   --template-file "$fileName" \
-  --stack-name "$stackName-task-definition" \
+  --stack-name "task-definitions" \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
-    StackName="$stackName" \
     AccountID="$accountId" \
-    FileSystemName="$stackName"
+    GenFileSystemId="$fileSystemId"

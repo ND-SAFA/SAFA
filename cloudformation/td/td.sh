@@ -12,6 +12,9 @@ read -e profile
 echo "Enter Gen File System ID:"
 read -e fileSystemId
 
+echo "Enter ENV (stage,dev,prod):"
+read -e stage
+
 # Deploy CloudFormation stack with parameters
 aws cloudformation deploy \
   --profile "$profile" \
@@ -20,4 +23,6 @@ aws cloudformation deploy \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
     AccountID="$accountId" \
-    GenFileSystemId="$fileSystemId"
+    GenFileSystemId="$fileSystemId" \
+    BendEnvFile="bend-$stage.env" \
+    GenEnvFile="tgen-$stage.env"

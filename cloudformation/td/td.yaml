@@ -27,7 +27,6 @@ Parameters:
   GenEnvFile:
     Type: String
     Description: "Name of .env file to use."
-    Default: "tgen-dev"
   GenVolumeName:
     Type: String
     Description: "Name of gen volume to attach."
@@ -45,10 +44,6 @@ Parameters:
     Type: Number
     Description: "Amount of RAM memory per container."
     Default: 2048
-  FendEnvFile:
-    Type: String
-    Description: "Name of .env file to use."
-    Default: "fend-dev"
 
   BendContainerName:
     Type: String
@@ -65,7 +60,6 @@ Parameters:
   BendEnvFile:
     Type: String
     Description: "Name of .env file to use."
-    Default: "bend-dev"
 
 Resources:
   FendTaskDefinition:

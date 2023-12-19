@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * An implementation of {@link IBillingService} that
+ * An implementation of {@link IExternalBillingService} that
  * uses Stripe
  */
 @Service
-public class StripeService implements IBillingService {
+public class StripeService implements IExternalBillingService {
     private static final Logger logger = LoggerFactory.getLogger(StripeService.class);
 
     @Value("${stripe.success_url}")
@@ -38,7 +38,7 @@ public class StripeService implements IBillingService {
     }
 
     @Override
-    public String startTransaction(String referenceId) {
+    public String startTransaction(String referenceId, int amount) {
         logger.info("Starting transaction with reference ID {}", referenceId);
 
         SessionCreateParams params =
@@ -52,7 +52,7 @@ public class StripeService implements IBillingService {
                         .build())
                 .addLineItem(
                     SessionCreateParams.LineItem.builder()
-                        .setQuantity(1L)
+                        .setQuantity((long) amount)
                         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                         .setPrice(creditProductKey)
                         .build())

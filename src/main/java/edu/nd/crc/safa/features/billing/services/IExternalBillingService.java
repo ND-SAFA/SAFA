@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.billing.services;
 /**
  * Interface for services that handle charging users money
  */
-public interface IBillingService {
+public interface IExternalBillingService {
 
     // TODO temp interface
 
@@ -12,7 +12,7 @@ public interface IBillingService {
      * @param referenceId Some string to reference the transaction
      * @return The url to redirect to TODO this might not be the most reusable interface
      */
-    String startTransaction(String referenceId);
+    String startTransaction(String referenceId, int amount);
 
     void endTransaction(String referenceId);
 }

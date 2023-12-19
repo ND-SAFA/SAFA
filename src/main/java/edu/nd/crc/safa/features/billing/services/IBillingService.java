@@ -7,7 +7,12 @@ public interface IBillingService {
 
     // TODO temp interface
 
-    void startTransaction(String referenceId);
+    /**
+     *
+     * @param referenceId Some string to reference the transaction
+     * @return The url to redirect to TODO this might not be the most reusable interface
+     */
+    String startTransaction(String referenceId);
 
     void endTransaction(String referenceId);
 }

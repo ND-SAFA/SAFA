@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create three subnets, a route table, and an internet gateway in different Availability Zones"
+
+Parameters:
+  VPC:
+    Type: String
+    Description: "ID of VPC to create subnets in."
+  CIDRBlockA:
+    Type: String
+    Description: "CIDR block for subnet A"
+  CIDRBlockB:
+    Type: String
+    Description: "CIDR block for subnet B"
+  CIDRBlockC:
+    Type: String
+    Description: "CIDR block for subnet C"
+  PublicRouteTableName:
+    Type: String
+    Description: "Name of public route table."
+    Default: "public-route-table"
+  SubnetAName:
+    Type: String
+    Description: "Name of subnet A."
+    Default: "public-A"
+  SubnetBName:
+    Type: String
+    Description: "Name of subnet B."
+    Default: "public-B"
+  SubnetCName:
+    Type: String
+    Description: "Name of subnet C."
+    Default: "public-C"
+  InternetGatewayName:
+    Type: String
+    Description: "Name of internet gateway."
+    Default: "public-internet-gateway"
+
+Resources:
+  SubnetA:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: "us-east-1a"
+      CidrBlock: !Ref CIDRBlockA
+      MapPublicIpOnLaunch: true
+      Tags:
+      - Key: "Name"
+        Value: !Ref SubnetAName
+
+  SubnetB:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: "us-east-1b"
+      CidrBlock: !Ref CIDRBlockB
+      MapPublicIpOnLaunch: true
+      Tags:
+      - Key: "Name"
+        Value: !Ref SubnetBName
+
+  SubnetC:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: "us-east-1c"
+      CidrBlock: !Ref CIDRBlockC
+      MapPublicIpOnLaunch: true
+      Tags:
+      - Key: "Name"
+        Value: !Ref SubnetCName
+
+  RouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+      - Key: "Name"
+        Value: !Ref PublicRouteTableName
+
+  SubnetARouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref SubnetA
+      RouteTableId: !Ref RouteTable
+
+  SubnetBRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref SubnetB
+      RouteTableId: !Ref RouteTable
+
+  SubnetCRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref SubnetC
+      RouteTableId: !Ref RouteTable
+
+  InternetGateway:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+      - Key: "Name"
+        Value: !Ref InternetGatewayName
+
+  AttachGateway:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  DefaultRoute:
+    Type: "AWS::EC2::Route"
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway

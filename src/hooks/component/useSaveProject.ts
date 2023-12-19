@@ -10,7 +10,13 @@ import {
   UploadPanelType,
 } from "@/types";
 import { buildEmptyPanel, buildProject } from "@/util";
-import { integrationsStore, orgStore, sessionStore, teamStore } from "@/hooks";
+import {
+  identifierSaveStore,
+  integrationsStore,
+  orgStore,
+  sessionStore,
+  teamStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -18,8 +24,6 @@ import { pinia } from "@/plugins";
  */
 export const useSaveProject = defineStore("saveProject", {
   state: () => ({
-    name: "",
-    description: "",
     uploadPanels: [buildEmptyPanel()] as CreatorFilePanel[],
     artifactMap: {} as ArtifactMap,
   }),
@@ -53,7 +57,9 @@ export const useSaveProject = defineStore("saveProject", {
      */
     creationRequest(): CreateProjectByJsonSchema {
       const artifacts = this.artifactPanels
-        .map(({ artifacts = [] }) => artifacts)
+        .map(({ artifacts = [], type }) =>
+          artifacts.map((artifact) => ({ ...artifact, type }))
+        )
         .reduce((acc, cur) => [...acc, ...cur], []);
       const traces = this.tracePanels
         .map(({ traces = [] }) => traces)
@@ -76,8 +82,8 @@ export const useSaveProject = defineStore("saveProject", {
         entityId: "",
       };
       const project = buildProject({
-        name: this.name,
-        description: this.description,
+        name: identifierSaveStore.editedIdentifier.name,
+        description: identifierSaveStore.editedIdentifier.description,
         owner: user.email,
         members: [user],
         artifacts,
@@ -167,10 +173,9 @@ export const useSaveProject = defineStore("saveProject", {
      * Resets the created project state.
      */
     resetProject(): void {
-      this.name = "";
-      this.description = "";
       this.uploadPanels = [buildEmptyPanel()];
       this.artifactMap = {};
+      identifierSaveStore.resetIdentifier(true);
     },
     /**
      * Adds a new creator panel.

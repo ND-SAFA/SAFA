@@ -10,13 +10,7 @@ import {
   CSSCursor,
 } from "@/types";
 import { LARGE_NODE_LAYOUT_COUNT } from "@/util";
-import {
-  appStore,
-  artifactStore,
-  cyStore,
-  selectionStore,
-  subtreeStore,
-} from "@/hooks";
+import { appStore, artifactStore, cyStore, selectionStore } from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -128,7 +122,6 @@ export const useLayout = defineStore("layout", {
       appStore.onLoadStart();
 
       cyStore.drawMode("disable");
-      subtreeStore.resetHiddenNodes();
       selectionStore.clearSelections();
       this.setGraphLayout();
       appStore.onLoadEnd();

@@ -107,6 +107,9 @@ dependencies {
     // email
     implementation 'com.infobip:infobip-api-java-client:4.0.0'
 
+    // stripe
+    implementation "com.stripe:stripe-java:24.8.0"
+
     // testing
     implementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.h2database:h2:2.1.210' // Most up-to-date version compatible with flyway

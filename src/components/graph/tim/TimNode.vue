@@ -100,8 +100,8 @@ const countLabel = computed(() =>
   props.count < 0
     ? "1 Import"
     : props.count === 1
-    ? "1 Artifact"
-    : `${props.count} Artifacts`
+      ? "1 Artifact"
+      : `${props.count} Artifacts`
 );
 
 const definition = computed<TimNodeCytoElement>(() => ({

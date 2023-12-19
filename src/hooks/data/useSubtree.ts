@@ -246,8 +246,14 @@ export const useSubtree = defineStore("subtrees", {
      * Hides the subtrees of all children of the given artifact.
      * @param rootId - The Id of the root artifact whose subtree is being hidden.
      */
-    async hideChildSubtrees(rootId: string): Promise<void> {
+    hideChildSubtrees(rootId: string): void {
       this.getChildren(rootId).forEach((id) => this.hideSubtree(id));
+    },
+    /**
+     * Hides the subtrees of all leaf nodes in the current document.
+     */
+    hideLeafSubtrees(): void {
+      artifactStore.leaves.forEach((id) => this.hideSubtree(id));
     },
     /**
      * Un-hides the given artifact's subtree if hidden.

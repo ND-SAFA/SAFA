@@ -52,13 +52,21 @@ export function getParam(key: QueryParams): URLParameter {
  *
  * @param key - The query param key.
  * @param value - The query param value.
+ * @param preserveQuery - Whether to preserve the current query parameters.
  */
-export async function updateParam(key: string, value: string): Promise<void> {
+export async function updateParam(
+  key: string,
+  value: string | undefined,
+  preserveQuery?: boolean
+): Promise<void> {
   const currentRoute = router.currentRoute.value;
+  const query = preserveQuery
+    ? { ...currentRoute.query, [key]: value }
+    : { [key]: value };
 
   if (currentRoute.query[key] === value) return;
 
-  return navigateTo(currentRoute.path, { [key]: value });
+  return navigateTo(currentRoute.path, query);
 }
 
 /**

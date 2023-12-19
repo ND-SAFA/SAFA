@@ -44,8 +44,8 @@ const definition = computed<TimEdgeCytoElement>(() => ({
       props.count < 0
         ? "1 Import"
         : props.count === 1
-        ? `1 Link`
-        : `${props.count} Links`,
+          ? `1 Link`
+          : `${props.count} Links`,
     dark: darkMode.value,
     generated: props.generated,
   },

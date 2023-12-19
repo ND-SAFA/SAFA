@@ -31,3 +31,4 @@ Resources:
       Protocol: "HTTP"
       Port: 80
       VpcId: !Ref VPCId
+      HealthCheckPath: /swagger-ui/index.html

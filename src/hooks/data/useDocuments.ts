@@ -14,6 +14,7 @@ import {
   artifactStore,
   selectionStore,
 } from "@/hooks";
+import { QueryParams, updateParam } from "@/router";
 import { pinia } from "@/plugins";
 
 /**
@@ -204,10 +205,16 @@ export const useDocuments = defineStore("documents", {
 
       await layoutStore.updatePositions(document.layout);
 
-      // In subsets of the base document, hide children of leaf nodes.
-      if (this.isBaseDocument) return;
+      await updateParam(
+        QueryParams.VIEW,
+        document.documentId || undefined,
+        true
+      );
 
-      subtreeStore.hideLeafSubtrees();
+      // In subsets of the base document, hide children of leaf nodes.
+      if (!this.isBaseDocument) {
+        subtreeStore.hideLeafSubtrees();
+      }
     },
     /**
      * Switches to the next or previous document in the history.

@@ -48,6 +48,7 @@ export enum QueryParams {
   ACCOUNT_TOKEN = "token",
   TAB = "tab",
   VERSION = "version",
+  VIEW = "view",
   ORG = "org",
   TEAM = "team",
   INTEGRATION_TOKEN = "code",

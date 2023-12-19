@@ -10,6 +10,7 @@ import {
   selectionStore,
   subtreeStore,
 } from "@/hooks";
+import { QueryParams, updateParam } from "@/router";
 import { pinia } from "@/plugins";
 
 /**
@@ -54,10 +55,12 @@ export const useViews = defineStore("useViews", {
       await documentStore.addDocument(document);
 
       if (hideSubtrees) {
-        await subtreeStore.hideChildSubtrees(artifact.id);
+        subtreeStore.hideChildSubtrees(artifact.id);
       }
 
       layoutStore.mode = "tree";
+
+      await updateParam(QueryParams.VIEW, artifact.id, true);
     },
     /**
      * Shows the subtree of an artifact in the current document.

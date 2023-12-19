@@ -19,9 +19,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * This service updates organization balances and tracks
+ * the transactions that caused the updates. It does not handle
+ * any actual money, just the credits that are tied to the
+ * organization.
+ */
 @Service
 @RequiredArgsConstructor
-public class BillingService {
+public class BalanceTransactionService {
 
     private static final int MAX_TRANSACTION_RETRIES = 5;
 

@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.billing.entities.MonthlyUsage;
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
-import edu.nd.crc.safa.features.billing.services.BillingService;
+import edu.nd.crc.safa.features.billing.services.BalanceTransactionService;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
@@ -40,7 +40,7 @@ public class OrganizationService {
     private final TeamService teamService;
     private final OrganizationMembershipService organizationMembershipService;
     private final PermissionService permissionService;
-    private final BillingService billingService;
+    private final BalanceTransactionService balanceTransactionService;
 
     /**
      * Create a new organization. This will also create a new team for the organization.
@@ -158,8 +158,8 @@ public class OrganizationService {
 
         List<TeamAppEntity> teamAppEntities = teamService.getAppEntities(teams, currentUser);
 
-        BillingInfo billingInfo = billingService.getBillingInfoForOrg(organization);
-        MonthlyUsage monthlyUsage = billingService.getMonthlyUsageForOrg(organization);
+        BillingInfo billingInfo = balanceTransactionService.getBillingInfoForOrg(organization);
+        MonthlyUsage monthlyUsage = balanceTransactionService.getMonthlyUsageForOrg(organization);
 
         return new OrganizationAppEntity(organization, membershipAppEntities, teamAppEntities,
             permissions, billingInfo, monthlyUsage);

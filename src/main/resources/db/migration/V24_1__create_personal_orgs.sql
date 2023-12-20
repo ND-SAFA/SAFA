@@ -1,8 +1,6 @@
 /*
  * Create personal organizations
  */
-SET SESSION sql_require_primary_key = 0;
-
 
 INSERT INTO organization (name, description, owner_id, personal_org, full_org_team_id, payment_tier, id)
 SELECT email, '', user_id, TRUE, '', 'free', (SELECT ${uuid_generator})

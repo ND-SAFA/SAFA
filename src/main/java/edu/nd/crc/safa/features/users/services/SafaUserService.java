@@ -44,7 +44,7 @@ public class SafaUserService {
     private final OrganizationService organizationService;
     private final PermissionService permissionService;
     private final Predicate<String> httpThreadPredicate = Pattern
-        .compile("https(?:-jsse)?-nio-\\S{1,20}-exec-\\d+")
+        .compile("http(?:s-jsse)?-nio-\\S{1,20}-exec-\\d+")
         .asMatchPredicate();
 
     /**

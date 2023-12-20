@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.billing.entities.InsufficientFundsException;
 import edu.nd.crc.safa.features.billing.entities.MonthlyUsage;
@@ -33,6 +35,10 @@ public class BalanceTransactionService {
 
     private final BillingInfoRepository billingInfoRepository;
     private final TransactionRepository transactionRepository;
+
+    public Optional<Transaction> getTransactionOptionalById(UUID id) {
+        return transactionRepository.findById(id);
+    }
 
     /**
      * Apply a transaction to an account. Make sure to update the

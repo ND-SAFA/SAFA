@@ -56,6 +56,7 @@ public class StripeService implements IExternalBillingService {
                         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                         .setPrice(creditProductKey)
                         .build())
+                .setClientReferenceId(referenceId)
                 .build();
 
         try {
@@ -69,6 +70,6 @@ public class StripeService implements IExternalBillingService {
 
     @Override
     public void endTransaction(String referenceId) {
-        logger.info("Ending transaction with reference ID {}", referenceId);
+        logger.info("Finished transaction with reference ID {}", referenceId);
     }
 }

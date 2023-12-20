@@ -324,4 +324,11 @@ public class AppRoutes {
         public static final String BY_ENTITY_ID = ROOT + "/{entityId}";
         public static final String BY_ENTITY_ID_AND_MEMBERSHIP_ID = BY_ENTITY_ID + "/{membershipId}";
     }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Stripe {
+        public static final String ROOT = "/stripe";
+        public static final String CHECKOUT = ROOT + "/checkout/{amount}";
+        public static final String WEBHOOK = ROOT + "/webhook";
+    }
 }

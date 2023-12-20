@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.features.billing.services;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 
@@ -32,6 +35,13 @@ public class BillingService {
     }
 
     public void endTransaction(String referenceId) {
+        UUID transactionId = UUID.fromString(referenceId);
+        Optional<Transaction> transactionOptional = transactionService.getTransactionOptionalById(transactionId);
 
+        if (transactionOptional.isPresent()) {
+            Transaction transaction = transactionOptional.get();
+            transactionService.markTransactionSuccessful(transaction);
+            externalBillingService.endTransaction(referenceId);
+        }
     }
 }

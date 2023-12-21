@@ -1,10 +1,6 @@
 <template>
   <panel-card :title="props.hideTitle ? undefined : 'Project Summary'">
-    <div
-      v-if="!editMode"
-      class="overflow-auto"
-      :style="hideOverflow ? 'max-height: 40vh' : ''"
-    >
+    <div class="overflow-auto" :style="hideOverflow ? 'max-height: 40vh' : ''">
       <typography
         v-if="!!specification && displayDescription"
         variant="caption"
@@ -17,6 +13,7 @@
         :value="description"
         default-expanded
         :collapse-length="0"
+        copyable
       />
       <typography
         v-if="!!specification && displayDescription"
@@ -30,15 +27,17 @@
         :value="specification"
         default-expanded
         :collapse-length="0"
+        copyable
       />
     </div>
-    <text-input
-      v-else
-      v-model="editedIdentifier.specification"
-      type="textarea"
-      :rows="20"
-      label="Specification"
-    />
+    <!--    <text-input-->
+    <!--      v-else-->
+    <!--      v-model="editedIdentifier.specification"-->
+    <!--      disabled-->
+    <!--      type="textarea"-->
+    <!--      :rows="4"-->
+    <!--      label="Specification"-->
+    <!--    />-->
   </panel-card>
 </template>
 
@@ -53,14 +52,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, identifierSaveStore, projectStore } from "@/hooks";
+import { projectStore } from "@/hooks";
 import { PanelCard, Typography } from "@/components/common";
-import TextInput from "@/components/common/input/TextInput.vue";
 
 const props = defineProps<{ hideTitle?: boolean; hideOverflow?: boolean }>();
 
-const editMode = computed(() => appStore.popups.editProject);
-const editedIdentifier = computed(() => identifierSaveStore.editedIdentifier);
+// const editMode = computed(() => appStore.popups.editProject);
+// const editedIdentifier = computed(() => identifierSaveStore.editedIdentifier);
 
 // Hide the description if it is just a copy of the generated specification.
 const displayDescription = computed(

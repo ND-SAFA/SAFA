@@ -126,8 +126,8 @@ export const useProject = defineStore("project", {
 
       selectionStore.clearSelections();
       timStore.initializeProject(project);
-      documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);
+      documentStore.initializeProject(project); // Must be after subtree store reset.
       attributesStore.initializeProject(project);
     },
   },

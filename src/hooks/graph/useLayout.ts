@@ -10,13 +10,7 @@ import {
   CSSCursor,
 } from "@/types";
 import { LARGE_NODE_LAYOUT_COUNT } from "@/util";
-import {
-  appStore,
-  artifactStore,
-  cyStore,
-  selectionStore,
-  subtreeStore,
-} from "@/hooks";
+import { appStore, artifactStore, cyStore, selectionStore } from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -98,31 +92,38 @@ export const useLayout = defineStore("layout", {
         this.styleGeneratedLinks();
         this.applyAutomove();
 
-        if (!animated) {
-          // Wait for the graph to render.
-          setTimeout(() => {
-            cyStore.resetWindow(type);
-            appStore.onLoadEnd();
-          }, 300);
-        }
-
-        if (type !== "creator" && this.mode === "tim") {
+        // On the home page, load the project details panel.
+        if (
+          this.mode === "tim" &&
+          appStore.popups.detailsPanel !== "displayProject"
+        ) {
+          // On the home page, load the project details panel.
           appStore.openDetailsPanel("displayProject");
         }
+
+        // Wait for the graph to render and panel to open.
+        setTimeout(() => {
+          if (animated) return;
+
+          if (this.mode === "tim") {
+            cyStore.centerNodes(true);
+          } else {
+            cyStore.resetWindow(type);
+          }
+
+          appStore.onLoadEnd();
+        }, 350);
       });
     },
     /**
-     * Resets the layout of the graph.
+     * Resets the layout of the project graph.
      */
     async resetLayout(): Promise<void> {
       appStore.onLoadStart();
 
       cyStore.drawMode("disable");
-      subtreeStore.resetHiddenNodes();
       selectionStore.clearSelections();
-      appStore.closeSidePanels();
       this.setGraphLayout();
-
       appStore.onLoadEnd();
     },
 

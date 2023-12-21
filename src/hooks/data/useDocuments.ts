@@ -14,6 +14,7 @@ import {
   artifactStore,
   selectionStore,
 } from "@/hooks";
+import { QueryParams, updateParam } from "@/router";
 import { pinia } from "@/plugins";
 
 /**
@@ -119,6 +120,11 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
       traceStore.initializeTraces({ traces, currentArtifactIds });
       layoutStore.updatePositions(loadedDocument.layout);
+
+      // In subsets of the base document, hide children of leaf nodes.
+      if (this.isBaseDocument) return;
+
+      subtreeStore.hideLeafSubtrees();
     },
     /**
      * Updates the given document's layout, and reruns the layout if on the base document.
@@ -188,6 +194,7 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
 
+      // Switch to TIM if the base graph is too large and the tree view is selected.
       if (
         this.isBaseDocument &&
         artifactStore.largeNodeCount &&
@@ -197,6 +204,17 @@ export const useDocuments = defineStore("documents", {
       }
 
       await layoutStore.updatePositions(document.layout);
+
+      await updateParam(
+        QueryParams.VIEW,
+        document.documentId || undefined,
+        true
+      );
+
+      // In subsets of the base document, hide children of leaf nodes.
+      if (!this.isBaseDocument) {
+        subtreeStore.hideLeafSubtrees();
+      }
     },
     /**
      * Switches to the next or previous document in the history.

@@ -15,6 +15,7 @@ import {
   projectStore,
   selectionStore,
   timStore,
+  traceStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -57,6 +58,27 @@ export const useArtifacts = defineStore("artifacts", {
      */
     largeNodeCount(): boolean {
       return this.currentArtifacts.length > LARGE_NODE_COUNT;
+    },
+    /**
+     * @return The IDs of all current artifacts that have a parent and no children.
+     */
+    leaves(): string[] {
+      const withParents = new Set();
+      const withChildren = new Set();
+      const leaves: string[] = [];
+
+      traceStore.currentTraces.forEach(({ sourceId, targetId }) => {
+        withParents.add(sourceId);
+        withChildren.add(targetId);
+      });
+
+      this.currentArtifacts.forEach(({ id }) => {
+        if (withParents.has(id) && !withChildren.has(id)) {
+          leaves.push(id);
+        }
+      });
+
+      return leaves;
     },
   },
   actions: {

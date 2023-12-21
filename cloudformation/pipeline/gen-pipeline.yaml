@@ -8,6 +8,9 @@ Parameters:
     Type: String
     NoEcho: true
     Description: 'The name of the entire stack.'
+  BucketName:
+    Type: String
+    Description: "Name of artifact bucket."
   GitHubConnectionArn:
     Type: String
     NoEcho: true
@@ -34,7 +37,7 @@ Resources:
   ArtifactBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Sub "${StackName}-pipeline-bucket"
+      BucketName: !Ref BucketName
       AccessControl: Private
 
   Pipeline:

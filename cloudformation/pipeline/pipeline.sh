@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# List available AWS CLI profiles
-echo "AWS Profiles"
-aws configure list-profiles
-
 defaultGithubUsername=thearod5
 defaultGithubRepository=ND-SAFA/tgen-api
 fileName=gen-pipeline.yaml
@@ -24,7 +20,7 @@ echo "Entry the GitHub repository($defaultGithubRepository):"
 githubRepository=${githubRepository:-$defaultGithubRepository}
 
 # STACK
-echo "Enter the stack name:"
+echo "Service Name (gen|fend|bend):"
 read -e stackName
 
 echo "Enter Account ID:"
@@ -33,11 +29,11 @@ read -e accountId
 echo "Enter Github Connection Name:"
 read -e connectionName
 
-echo "Enter Pipeline ARN:"
-read -e pipelineRoleArn
+echo "Bucket Name:"
+read -e bucketName
 
-echo "Enter Build ARN:"
-read -e buildRoleArn
+pipelineRoleArn="arn:aws:iam::$accountId:role/buildExecutionRole"
+buildRoleArn="arn:aws:iam::$accountId:role/pipelineExecutionRole"
 
 # Get the GitHub connection ARN using AWS CLI
 githubConnectionArn=$(aws codestar-connections list-connections \
@@ -83,4 +79,5 @@ aws cloudformation deploy \
     GitHubConnectionArn="$githubConnectionArn" \
     GithubRepository="$githubRepository" \
     PipelineRoleArn="$pipelineRoleArn" \
+    BucketName="$bucketName" \
     BuildRoleArn="$buildRoleArn"

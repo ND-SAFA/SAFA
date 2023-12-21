@@ -57,3 +57,10 @@ Resources:
       - IpProtocol: '-1'
         SourceSecurityGroupId: !GetAtt DatabaseConnectorSecurityGroup.GroupId
       SecurityGroupEgress: []
+
+  InstanceIdentityRule:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt InstancesSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt InstancesSecurityGroup.GroupId
+      IpProtocol: '-1'

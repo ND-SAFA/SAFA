@@ -36,4 +36,5 @@ Resources:
           - s3:*
           - secretsmanager:*
           - logs:*
+          - codedeploy:*
           Resource: '*'

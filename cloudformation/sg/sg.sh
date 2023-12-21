@@ -1,12 +1,12 @@
 #!/bin/bash
 
 fileName=sg.yaml
-vpcId=vpc-0dc18129c0f9083f9
 
 echo "Enter Profile Name:"
 read -e awsProfile
 
-echo "File: $fileName"
+echo "VPC ID:"
+read -e vpcId
 
 # Deploy CloudFormation stack with parameters
 aws cloudformation deploy \

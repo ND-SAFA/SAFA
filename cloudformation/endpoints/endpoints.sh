@@ -17,7 +17,7 @@ read -e subnet2
 echo "Subnet ID 3:"
 read -e subnet3
 
-echo "Security Group Id:"
+echo "Instance Security Group Id:"
 read -e securityGroup
 
 # Deploy CloudFormation stack with parameters

@@ -117,7 +117,7 @@ Resources:
           AppProtocol: http
         EnvironmentFiles:
         - Type: s3
-          Value: !Sub "arn:aws:s3:::safa-envs/${BendEnvFile}.env"
+          Value: !Sub "arn:aws:s3:::safa-envs/${BendEnvFile}"
         LogConfiguration:
           LogDriver: "awslogs"
           Options:
@@ -152,7 +152,7 @@ Resources:
           AppProtocol: http
         EnvironmentFiles:
         - Type: s3
-          Value: !Sub "arn:aws:s3:::safa-envs/${GenEnvFile}.env"
+          Value: !Sub "arn:aws:s3:::safa-envs/${GenEnvFile}"
         LogConfiguration:
           LogDriver: "awslogs"
           Options:

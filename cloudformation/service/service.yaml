@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'The template used to create an ECS Service from the ECS Console.'
+Parameters:
+  ClusterName:
+    Type: String
+    Description: "Name of cluster to create service for."
+  ServiceName:
+    Type: String
+    Description: "Name of the service to create."
+  TaskDefinitionArn:
+    Type: String
+    Description: "ARN of task definition."
+  SecurityGroupIds:
+    Type: 'CommaDelimitedList'
+    Description: 'Comma delimited list of security group Ids.'
+  SubnetIds:
+    Type: 'CommaDelimitedList'
+    Description: "Comma delimiter list of security group ids."
+  TargetGroupArn:
+    Type: String
+    Description: "ARN of target group to use within load balancer."
+
+Resources:
+  ECSService:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      Cluster: !Sub "${ClusterName}-core"
+      TaskDefinition: !Ref TaskDefinitionArn
+      LaunchType: 'FARGATE'
+      ServiceName: !Ref ServiceName
+      SchedulingStrategy: 'REPLICA'
+      DesiredCount: 1
+      LoadBalancers:
+      - ContainerName: !Ref ContainerName
+        ContainerPort: 80
+        LoadBalancerName: !Ref "AWS::NoValue"
+        TargetGroupArn: !Ref TargetGroupArn
+      HealthCheckGracePeriodSeconds: '30'
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: 'DISABLED'
+          SecurityGroups: !Ref SecurityGroupIds
+          Subnets: !Ref SubnetIds
+      PlatformVersion: 'LATEST'
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      DeploymentController:
+        Type: 'ECS'
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags: []
+      EnableECSManagedTags: true
+

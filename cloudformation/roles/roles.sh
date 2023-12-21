@@ -1,12 +1,14 @@
 #!/bin/bash
 
 fileName=roles.yaml
-executionPolicyArn=arn:aws:iam::238179308728:policy/general-execution-policy
 
 echo "Enter Profile Name:"
 read -e awsProfile
 
-echo "File: $fileName"
+echo "Acount ID:"
+read -e accountId
+
+executionPolicyArn="arn:aws:iam::$accountId:policy/general-execution-policy"
 
 # Deploy CloudFormation stack with parameters
 aws cloudformation deploy \

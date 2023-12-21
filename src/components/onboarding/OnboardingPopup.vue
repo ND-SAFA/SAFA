@@ -71,14 +71,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
+import { onboardingStore, permissionStore, sessionStore } from "@/hooks";
 import {
-  gitHubApiStore,
-  integrationsStore,
-  onboardingStore,
-  permissionStore,
-  sessionStore,
-} from "@/hooks";
-import { TextButton, Stepper, Typography, FlexBox } from "@/components/common";
+  TextButton,
+  Stepper,
+  Typography,
+  FlexBox,
+  FlexItem,
+} from "@/components/common";
 import {
   ConnectGitHubStep,
   SelectRepoStep,
@@ -86,7 +86,6 @@ import {
   GenerateStep,
   ProjectPreview,
 } from "@/components/onboarding/steps";
-import FlexItem from "@/components/common/display/content/FlexItem.vue";
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 
@@ -106,17 +105,6 @@ watch(
     ) {
       onboardingStore.open = true;
     }
-  }
-);
-
-// Move from Connect GitHub step if credentials are set.
-watch(
-  () => integrationsStore.validGitHubCredentials,
-  (valid) => {
-    if (!valid) return;
-
-    onboardingStore.handleNextStep("connect");
-    gitHubApiStore.handleLoadProjects();
   }
 );
 </script>

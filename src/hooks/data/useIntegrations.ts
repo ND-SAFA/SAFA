@@ -58,6 +58,20 @@ export const useIntegrations = defineStore("integrations", {
   },
   actions: {
     /**
+     * Resets the state of this store.
+     */
+    handleReset(): void {
+      this.validJiraCredentials = false;
+      this.jiraOrganization = undefined;
+      this.jiraProject = undefined;
+      this.validGitHubCredentials = false;
+      this.gitHubOrganization = undefined;
+      this.gitHubProject = undefined;
+      this.gitHubConfig = {
+        exclude: GITHUB_DEFAULT_EXCLUDE,
+      };
+    },
+    /**
      * Selects a Jira organization.
      *
      * @param organization - The organization to select.

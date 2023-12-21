@@ -38,7 +38,7 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     steps: Object.values(ONBOARDING_STEPS).map((step) => ({
       ...step,
-      done: true,
+      done: false,
     })),
     /**
      * The types of artifacts that will be generated.
@@ -66,7 +66,7 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     displayProject(): boolean {
       return (
-        this.step === ONBOARDING_STEPS.generate.number &&
+        this.step >= ONBOARDING_STEPS.summarize.number &&
         projectStore.isProjectDefined
       );
     },
@@ -92,11 +92,24 @@ export const useOnboarding = defineStore("useOnboarding", {
         return;
       }
 
+      await jobApiStore.handleReload();
+
       if (integrationsStore.validGitHubCredentials) {
         await gitHubApiStore.handleLoadProjects();
       }
 
-      await jobApiStore.handleReload();
+      // Move from Connect GitHub step if credentials are set.
+      if (integrationsStore.validGitHubCredentials) {
+        onboardingStore.handleNextStep("connect");
+      }
+      // Skip to the Summarize step if a job has been uploaded.
+      if (onboardingStore.uploadedJob) {
+        onboardingStore.handleNextStep("code");
+      }
+      // Skip to the Generate step if a job has been completed.
+      if (onboardingStore.uploadedJob?.completedEntityId) {
+        onboardingStore.handleNextStep("summarize");
+      }
     },
     /**
      * Close the popup and mark onboarding as complete.
@@ -116,6 +129,14 @@ export const useOnboarding = defineStore("useOnboarding", {
 
       if (this.step === index + 1) {
         this.step = index + 2;
+      }
+
+      if (step === "connect") {
+        gitHubApiStore.handleLoadProjects();
+      }
+
+      if (step === "summarize" && this.uploadedJob?.completedEntityId) {
+        getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
       }
     },
     /**

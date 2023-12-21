@@ -165,4 +165,23 @@ watch(
   () => organizationName.value,
   () => handleReload()
 );
+
+watch(
+  () => filePaths.value,
+  (newPaths, oldPaths) => {
+    const newGlobs = newPaths.map((path) =>
+      path.endsWith("/") ? `${path}**` : `${path}/**`
+    );
+    const oldGlobs = oldPaths.map((path) =>
+      path.endsWith("/") ? `${path}**` : `${path}/**`
+    );
+
+    integrationsStore.gitHubConfig.include = [
+      ...(integrationsStore.gitHubConfig.include || []).filter(
+        (pattern) => !oldGlobs.includes(pattern)
+      ),
+      ...newGlobs,
+    ];
+  }
+);
 </script>

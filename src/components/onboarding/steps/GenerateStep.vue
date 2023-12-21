@@ -13,7 +13,7 @@
     value="This process may take an additional 30 minutes depending on the size of your project."
   />
 
-  <flex-box column align="center" t="4">
+  <flex-box v-if="status === 'initial'" column align="center" t="4">
     <typography el="div" value="Project Size:" />
     <attribute-chip :value="codeFiles" icon="code" color="primary" />
     <typography el="div" value="Generating Documents:" class="q-mt-md" />
@@ -41,7 +41,7 @@
 
   <job-loading-sub-step v-if="status === 'loading'" />
 
-  <flex-box v-if="status === 'success'" column align="center" t="2">
+  <flex-box v-if="status === 'success'" column align="center" t="4">
     <text-button
       text
       color="gradient"
@@ -101,7 +101,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { artifactStore, onboardingStore, projectApiStore } from "@/hooks";
 import {
   AttributeChip,
@@ -117,6 +117,31 @@ const codeFiles = ref(artifactStore.allArtifacts.length + " Files");
 
 const status = ref<"initial" | "loading" | "success" | "error">("initial");
 
+/**
+ * Sets the status to loading and starts a generation job when the user clicks the import button.
+ */
+function handleGenerate() {
+  status.value = "loading";
+  onboardingStore.handleGenerateDocumentation();
+}
+
+/**
+ * Updates the status when the job changes.
+ */
+function updateStatus() {
+  if (onboardingStore.uploadedJob?.status === "IN_PROGRESS") {
+    status.value = "loading";
+  }
+  if (onboardingStore.uploadedJob?.status === "FAILED") {
+    status.value = "error";
+  } else if (onboardingStore.uploadedJob?.status === "COMPLETED") {
+    status.value = "success";
+    onboardingStore.steps[onboardingStore.steps.length - 1].done = true;
+  }
+}
+
+onMounted(updateStatus);
+
 watch(
   () => onboardingStore.error,
   (error) => {
@@ -125,24 +150,5 @@ watch(
   }
 );
 
-watch(
-  () => onboardingStore.uploadedJob,
-  (job) => {
-    if (!job || status.value !== "loading") return;
-
-    if (job.status === "FAILED") {
-      status.value = "error";
-    } else if (job.status === "COMPLETED") {
-      status.value = "success";
-    }
-  }
-);
-
-/**
- * Sets the status to loading and starts a generation job when the user clicks the import button.
- */
-function handleGenerate() {
-  status.value = "loading";
-  onboardingStore.handleGenerateDocumentation();
-}
+watch(() => onboardingStore.uploadedJob, updateStatus);
 </script>

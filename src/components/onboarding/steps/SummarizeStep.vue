@@ -83,12 +83,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import {
-  getVersionApiStore,
-  integrationsStore,
-  onboardingStore,
-} from "@/hooks";
+import { onMounted, ref, watch } from "vue";
+import { integrationsStore, onboardingStore } from "@/hooks";
 import {
   AttributeChip,
   FlexBox,
@@ -100,6 +96,34 @@ import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
 const status = ref<"initial" | "loading" | "success" | "error">("initial");
 
+/**
+ * Sets the status to loading and starts a generation job when the user clicks the import button.
+ */
+function handleGenerate() {
+  status.value = "loading";
+  onboardingStore.handleImportProject();
+}
+
+/**
+ * Updates the status when the job changes.
+ */
+function updateStatus(moveNext?: boolean) {
+  if (onboardingStore.uploadedJob?.status === "IN_PROGRESS") {
+    status.value = "loading";
+  }
+  if (onboardingStore.uploadedJob?.status === "FAILED") {
+    status.value = "error";
+  } else if (onboardingStore.uploadedJob?.status === "COMPLETED") {
+    status.value = "success";
+
+    if (!moveNext) return;
+
+    onboardingStore.handleNextStep("summarize");
+  }
+}
+
+onMounted(() => updateStatus());
+
 watch(
   () => onboardingStore.error,
   (error) => {
@@ -110,25 +134,6 @@ watch(
 
 watch(
   () => onboardingStore.uploadedJob,
-  (job) => {
-    if (!job || status.value !== "loading") return;
-
-    if (job.status === "FAILED") {
-      status.value = "error";
-    } else if (job.status === "COMPLETED" && job.completedEntityId) {
-      status.value = "success";
-      getVersionApiStore.handleLoad(job.completedEntityId).then(() => {
-        onboardingStore.handleNextStep("summarize");
-      });
-    }
-  }
+  () => updateStatus(true)
 );
-
-/**
- * Sets the status to loading and starts a generation job when the user clicks the import button.
- */
-function handleGenerate() {
-  status.value = "loading";
-  onboardingStore.handleImportProject();
-}
 </script>

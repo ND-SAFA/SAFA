@@ -202,11 +202,26 @@ def get_client():
     """
     :return:  Returns the singleton anthropic client.
     """
-    if not environment_constants.IS_TEST:
+    if environment_constants.IS_TEST:
+        return MockAnthropicClient()
+    else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-        if AnthropicManager.Client is None:
-            return anthropic.Client(ANTHROPIC_KEY)
+        if AnthropicManager.Client is None or not is_connection_alive(AnthropicManager.Client):
+            client = anthropic.Client(ANTHROPIC_KEY)
+            AnthropicManager.Client = client
+            return client
         else:
             return AnthropicManager.Client
-    else:
-        return MockAnthropicClient()
+
+
+def is_connection_alive(client: anthropic.Client) -> bool:
+    """
+    Checks to see if the current anthropic client is alive.
+    :param client: The anthropic client to check if connection is alive.
+    :return: Whether client is alive.
+    """
+    try:
+        client.completion(prompt="ping")
+        return True
+    except:
+        return False

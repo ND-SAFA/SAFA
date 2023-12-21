@@ -95,6 +95,7 @@ export const useLayout = defineStore("layout", {
         // On the home page, load the project details panel.
         if (
           this.mode === "tim" &&
+          type !== "creator" &&
           appStore.popups.detailsPanel !== "displayProject"
         ) {
           // On the home page, load the project details panel.
@@ -105,7 +106,7 @@ export const useLayout = defineStore("layout", {
         setTimeout(() => {
           if (animated) return;
 
-          if (this.mode === "tim") {
+          if (this.mode === "tim" && type !== "creator") {
             cyStore.centerNodes(true);
           } else {
             cyStore.resetWindow(type);

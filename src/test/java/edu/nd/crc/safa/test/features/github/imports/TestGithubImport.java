@@ -68,7 +68,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         // We should have the corespondent project and user set
         Assertions.assertNotNull(githubProject.getProject());
         // We should have as many artifacts as the number of files produced by the mock service
-        Assertions.assertEquals(23, importedFiles.size());
+        Assertions.assertEquals(26, importedFiles.size());
 
         // These assertions are just to contrast the ones in the next test
         Assertions.assertTrue(importedFiles.stream().anyMatch(artifact -> !artifact.getName().endsWith(".cpp")));
@@ -115,7 +115,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
         String typeName = "test github artifact type";
         GithubImportDTO importSettings = new GithubImportDTO();
-        importSettings.setInclude(List.of("**/*.cpp", "**/*.hpp"));
+        importSettings.setInclude(List.of("**/*.{cpp,hpp}"));
         importSettings.setExclude(List.of("include/**"));
         importSettings.setArtifactType(typeName);
 
@@ -178,7 +178,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         Assertions.assertTrue(serviceProvider.getGithubProjectRepository()
             .findByProjectAndOwnerAndRepositoryName(project, owner, repositoryName).isPresent());
 
-        int importedArtifactsCount = 23;
+        int importedArtifactsCount = 26;
 
         // We should have the correct number of artifacts and links
         List<ArtifactAppEntity> artifacts = serviceProvider.getArtifactService().getAppEntities(project);
@@ -206,7 +206,8 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
 
         String typeName = "test github artifact type";
         GithubImportDTO importSettings = new GithubImportDTO();
-        importSettings.setInclude(List.of("**/*.cpp", "**/*.hpp"));
+        importSettings.setInclude(List.of("**/*.{cpp,hpp}", ".gitignore", "src/filename_with_a_{comma\\,,brace\\{}",
+            "**/another_filename_with_a_comma\\,"));
         importSettings.setExclude(List.of("include/**"));
         importSettings.setArtifactType(typeName);
 
@@ -234,7 +235,7 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         Assertions.assertTrue(serviceProvider.getGithubProjectRepository()
             .findByProjectAndOwnerAndRepositoryName(project, owner, repositoryName).isPresent());
 
-        int importedArtifactsCount = 7;
+        int importedArtifactsCount = 11;
 
         // We should have the correct number of artifacts and links
         List<ArtifactAppEntity> artifacts = serviceProvider.getArtifactService().getAppEntities(project);
@@ -243,7 +244,14 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         for (ArtifactAppEntity artifact : artifacts) {
             if (artifact.getType().equals(typeName)) {
                 importedArtifactsCount--;
-                Assertions.assertTrue(artifact.getName().endsWith(".cpp"));
+                Assertions.assertTrue(
+                    artifact.getName().endsWith(".cpp")
+                        || artifact.getName().equals(".gitignore")
+                        || artifact.getName().equals("src/filename_with_a_comma,")
+                        || artifact.getName().equals("src/filename_with_a_brace{")
+                        || artifact.getName().equals("src/another_filename_with_a_comma,"),
+                    () -> "Unexpected file:" + artifact.getName()
+                );
                 Assertions.assertFalse(artifact.getName().startsWith("include/"));
 
                 ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
@@ -283,6 +291,6 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         // We should have the corespondent project and user set
         Assertions.assertNotNull(githubProject.getProject());
         // We should have as many artifacts as the number of files produced by the mock service
-        Assertions.assertEquals(23, importedFiles.size());
+        Assertions.assertEquals(26, importedFiles.size());
     }
 }

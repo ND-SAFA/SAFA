@@ -1,6 +1,7 @@
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TAG, PS_ENTITIES_TAG, PS_FEATURE_TAG, PS_NOTES_TAG, \
     PS_OVERVIEW_TAG, PS_SUBSYSTEM_TAG
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -40,17 +41,35 @@ FEATURE_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                    "Be as thorough as you possibly can.",
                    response_manager=PromptResponseManager(response_tag=PS_FEATURE_TAG,
                                                           response_instructions_format="Enclose each feature "
-                                                                                       "inside of a set of {}"))
+                                                                                       "inside of a set of {}",
+                                                          value_formatter=lambda t, v: PromptUtil.as_bullet_point(v)))
 ])
+
+
+def entities_formatter(t, v):
+    """
+    Formats the expected sub-systems section.
+    :param t: Ignored.
+    :param v: The dictionary mapping tag to response.
+    :return: The title and description of the subsection parsed.
+    """
+    name_query = v["name"]
+    descr_query = v["descr"]
+    if len(name_query) == 0 or len(descr_query) == 0:
+        return EMPTY_STRING
+    formatted = PromptUtil.as_bullet_point(f"{name_query[0]}: {descr_query[0]}")
+    return formatted
+
 
 ENTITIES_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("List all the domain entities and vocabulary that are needed to understand the project.",
                    response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
-    QuestionPrompt("Using your notes, create a comprehensive list of all domain entities and key vocabularly used in the system. "
-                   "Format each entity as '{name}: {description}'",
-                   response_manager=PromptResponseManager(response_tag=PS_ENTITIES_TAG,
-                                                          response_instructions_format="and enclose each individual entity "
-                                                                                       "inside of a set of {}"))
+    QuestionPrompt("Using your notes, create a comprehensive list of all domain entities and key vocabularly used in the system. ",
+                   response_manager=PromptResponseManager(response_tag={PS_ENTITIES_TAG: ["name", "descr"]},
+                                                          response_instructions_format="Enclose each entity in {} "
+                                                                                       "with the name of the entity inside of "
+                                                                                       "{} and the description inside of {}.",
+                                                          entry_formatter=entities_formatter))
 ])
 
 

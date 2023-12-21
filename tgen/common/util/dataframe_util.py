@@ -152,3 +152,16 @@ class DataFrameUtil:
         """
         query = np.where(df.apply(lambda x: x == EMPTY_STRING))
         return len([1 for q in query if len(q) > 0]) > 0
+
+    @staticmethod
+    def find_nan_empty_indices(df: pd.Series) -> List:
+        """
+        Returns the indices where the data frame or series has empty strings or nan.
+        :param df: The data to check.
+        :return: List of indices without values.
+        """
+        nan_empty_indices = df.apply(lambda x: pd.isna(x) or x == EMPTY_STRING)
+
+        nan_empty_indices = nan_empty_indices[nan_empty_indices].index
+        return list(nan_empty_indices)
+

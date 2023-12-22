@@ -1,4 +1,10 @@
 import os
+import sys
+
+ROOT_PATH = os.path.expanduser("~/projects/safa/tgen-api")
+TGEN_PATH = os.path.join(ROOT_PATH, "tgen")
+sys.path.append(ROOT_PATH)
+sys.path.append(TGEN_PATH)
 
 from cloudformation.services.accounts import get_account_id
 from cloudformation.services.file_loader import collect_user_inputs

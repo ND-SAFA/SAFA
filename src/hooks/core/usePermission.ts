@@ -7,7 +7,6 @@ import {
   OrganizationSchema,
   MembershipType,
 } from "@/types";
-import { ENABLED_FEATURES } from "@/util";
 import { projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 

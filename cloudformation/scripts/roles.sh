@@ -5,7 +5,8 @@ fileName=roles.yaml
 echo "Enter Profile Name:"
 read -e awsProfile
 
-echo "Acount ID:"
+aws sts get-caller-identity --profile "$awsProfile"
+echo "Acount ID: $accountId"
 read -e accountId
 
 executionPolicyArn="arn:aws:iam::$accountId:policy/general-execution-policy"

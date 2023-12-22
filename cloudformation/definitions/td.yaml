@@ -73,6 +73,7 @@ Resources:
       - EC2
       - FARGATE
       ExecutionRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
+      TaskRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
       ContainerDefinitions:
       - Name: !Ref FendContainerName
         Image: !Sub "${AccountID}.dkr.ecr.${Region}.amazonaws.com/fend:latest"
@@ -105,6 +106,7 @@ Resources:
       - EC2
       - FARGATE
       ExecutionRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
+      TaskRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
       ContainerDefinitions:
       - Name: !Ref BendContainerName
         Image: !Sub "${AccountID}.dkr.ecr.${Region}.amazonaws.com/bend:latest"
@@ -140,6 +142,7 @@ Resources:
       - EC2
       - FARGATE
       ExecutionRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
+      TaskRoleArn: !Sub "arn:aws:iam::${AccountID}:role/ecsExecutionRole"
       ContainerDefinitions:
       - Name: !Ref GenContainerName
         Image: !Sub "${AccountID}.dkr.ecr.${Region}.amazonaws.com/gen:latest"

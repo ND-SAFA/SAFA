@@ -46,25 +46,28 @@ echo "Target Group Arn:"
 read -e targetGroupArn
 
 stackName="$clusterName-service"
+containerName="$clusterName-core"
 
 echo "Stack: $stackName"
 echo "Cluster: $clusterName"
 echo "Service Name: $serviceName"
+echo "Container Name: $containerName"
 echo "Task Definition Arn: $taskDefinitionArn"
 echo "Security Groups: $securityGroupIds"
 echo "SubnetIds: $subnetIds"
 echo "Target Groups: $targetGroupArn"
 
 
-# aws cloudformation deploy \
-#   --profile "$profile" \
-#   --template-file "$fileName" \
-#   --stack-name "$stackName" \
-#   --capabilities CAPABILITY_NAMED_IAM \
-#   --parameter-overrides \
-#     ClusterName="$clusterName" \
-#     ServiceName="$serviceName"
-#     TaskDefinitionARN="$taskDefinitionArn" \
-#     SecurityGroupIds="$securityGroupIds" \
-#     SubnetIds="$subnetIds" \
-#     TargetGroupArn="$targetGroupArn"
+ aws cloudformation deploy \
+   --profile "$profile" \
+   --template-file "$fileName" \
+   --stack-name "$stackName" \
+   --capabilities CAPABILITY_NAMED_IAM \
+   --parameter-overrides \
+     ClusterName="$clusterName" \
+     ServiceName="$serviceName" \
+     TaskDefinitionArn="$taskDefinitionArn" \
+     SecurityGroupIds="$securityGroupIds" \
+     SubnetIds="$subnetIds" \
+     TargetGroupArn="$targetGroupArn" \
+     ContainerName="$containerName"

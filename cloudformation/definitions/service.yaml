@@ -11,14 +11,17 @@ Parameters:
     Type: String
     Description: "ARN of task definition."
   SecurityGroupIds:
-    Type: 'CommaDelimitedList'
+    Type: CommaDelimitedList
     Description: 'Comma delimited list of security group Ids.'
   SubnetIds:
-    Type: 'CommaDelimitedList'
+    Type: CommaDelimitedList
     Description: "Comma delimiter list of security group ids."
   TargetGroupArn:
     Type: String
     Description: "ARN of target group to use within load balancer."
+  ContainerName:
+    Type: String
+    Description: "Name to give container running inside of service.."
 
 Resources:
   ECSService:

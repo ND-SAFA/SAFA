@@ -12,6 +12,7 @@ import {
   logStore,
   onboardingStore,
   projectApiStore,
+  projectStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -29,6 +30,10 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     error: false,
     /**
+     * Whether the onboarding workflow is loading.
+     */
+    loading: false,
+    /**
      * The current step of the onboarding workflow, starting at 1.
      */
     step: 1,
@@ -43,8 +48,8 @@ export const useOnboarding = defineStore("useOnboarding", {
      * The types of artifacts that will be generated.
      */
     generationTypes: [
-      ARTIFACT_GENERATION_TYPES.USER_STORY,
-      ARTIFACT_GENERATION_TYPES.SUB_SYSTEM,
+      ARTIFACT_GENERATION_TYPES.FUNCTIONAL_REQ,
+      ARTIFACT_GENERATION_TYPES.FEATURE,
     ],
   }),
   getters: {
@@ -58,9 +63,16 @@ export const useOnboarding = defineStore("useOnboarding", {
      * @return The onboarding project's upload job, if the generation step is done.
      */
     uploadedJob(): JobSchema | undefined {
-      return this.steps[ONBOARDING_STEPS.generate.index].done
-        ? jobStore.jobs[0]
-        : undefined;
+      return jobStore.jobs[0];
+    },
+    /**
+     * @return Whether the onboarding workflow should display the generated project overview.
+     */
+    displayProject(): boolean {
+      return (
+        this.step >= ONBOARDING_STEPS.summarize.number &&
+        projectStore.isProjectDefined
+      );
     },
     /**
      * @return A display string for the onboarding project's upload job.
@@ -78,17 +90,34 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Reloads the GitHub projects and jobs for the onboarding workflow.
      */
     async handleReload(open?: boolean): Promise<void> {
+      this.loading = true;
+
       if (open) {
         this.open = true;
       } else if (onboardingStore.isComplete) {
         return;
       }
 
+      await jobApiStore.handleReload();
+
       if (integrationsStore.validGitHubCredentials) {
         await gitHubApiStore.handleLoadProjects();
       }
 
-      await jobApiStore.handleReload();
+      // Move from Connect GitHub step if credentials are set.
+      if (integrationsStore.validGitHubCredentials) {
+        onboardingStore.handleNextStep("connect");
+      }
+      // Skip to the Summarize step if a job has been uploaded.
+      if (onboardingStore.uploadedJob) {
+        onboardingStore.handleNextStep("code");
+      }
+      // Skip to the Generate step if a job has been completed.
+      if (onboardingStore.uploadedJob?.completedEntityId) {
+        onboardingStore.handleNextStep("summarize");
+      }
+
+      this.loading = false;
     },
     /**
      * Close the popup and mark onboarding as complete.
@@ -109,6 +138,18 @@ export const useOnboarding = defineStore("useOnboarding", {
       if (this.step === index + 1) {
         this.step = index + 2;
       }
+
+      if (step === "connect") {
+        gitHubApiStore.handleLoadProjects();
+      }
+
+      if (step === "summarize" && this.uploadedJob?.completedEntityId) {
+        getVersionApiStore.handleLoad(
+          this.uploadedJob?.completedEntityId,
+          undefined,
+          false
+        );
+      }
     },
     /**
      * Schedule a call with the SAFA team.
@@ -117,16 +158,20 @@ export const useOnboarding = defineStore("useOnboarding", {
       // TODO
     },
     /**
-     * Generate documentation for the selected project.
-     * - Moves from Generate Documentation step if a project is created.
+     * Import from GitHub and summarize project files.
      */
-    async handleGenerate(): Promise<void> {
+    async handleImportProject(): Promise<void> {
+      integrationsStore.gitHubConfig.summarize = true;
       await createProjectApiStore.handleGitHubImport({
-        onSuccess: () => {
-          this.handleNextStep("generate");
-        },
+        onSuccess: () => jobApiStore.handleReload(),
         onError: () => (this.error = true),
       });
+    },
+    /**
+     * Generate documentation for the selected project.
+     */
+    async handleGenerateDocumentation(): Promise<void> {
+      // TODO
     },
     /**
      * Export the selected project as a CSV.
@@ -134,16 +179,11 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleExportProject() {
       if (!this.uploadedJob?.completedEntityId) return;
 
-      await getVersionApiStore.handleLoadCurrent({
-        projectId: this.uploadedJob.completedEntityId,
-      });
-
-      await projectApiStore.handleDownload(
-        "csv",
-        this.uploadedJob.completedEntityId
-      );
+      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
+      await projectApiStore.handleDownload("csv");
 
       logStore.onSuccess("Your data is being exported.");
+
       this.handleClose();
     },
     /**
@@ -152,9 +192,7 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleViewProject() {
       if (!this.uploadedJob?.completedEntityId) return;
 
-      await getVersionApiStore.handleLoadCurrent({
-        projectId: this.uploadedJob.completedEntityId,
-      });
+      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
 
       this.handleClose();
     },

@@ -4,6 +4,7 @@ import { buildProject, buildProjectIdentifier, removeMatches } from "@/util";
 import {
   attributesStore,
   documentStore,
+  layoutStore,
   logStore,
   selectionStore,
   subtreeStore,
@@ -124,6 +125,7 @@ export const useProject = defineStore("project", {
     initializeProject(project: ProjectSchema): void {
       this.project = project;
 
+      layoutStore.mode = "tim";
       selectionStore.clearSelections();
       timStore.initializeProject(project);
       subtreeStore.initializeProject(project);

@@ -30,6 +30,10 @@ export interface GitHubImportSchema {
    * The artifact type id to import as.
    */
   artifactType?: string;
+  /**
+   * Whether to generate artifact summaries and a project overview.
+   */
+  summarize?: boolean;
 }
 
 /**

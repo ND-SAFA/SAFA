@@ -113,7 +113,9 @@ export const useCy = defineStore("cy", {
         }
       } else {
         this.creatorCy.then((cy) => {
+          cy.maxZoom(0.8);
           cy.fit(cy.nodes(), 150);
+          cy.maxZoom(100);
         });
       }
     },

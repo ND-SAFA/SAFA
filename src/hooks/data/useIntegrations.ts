@@ -46,8 +46,31 @@ export const useIntegrations = defineStore("integrations", {
       exclude: GITHUB_DEFAULT_EXCLUDE,
     } as GitHubImportSchema,
   }),
-  getters: {},
+  getters: {
+    /**
+     * @return The full name of the selected GitHub organization.
+     */
+    gitHubFullProjectName(): string {
+      return this.gitHubOrganization && this.gitHubProject
+        ? `${this.gitHubOrganization.name}/${this.gitHubProject.name}`
+        : "";
+    },
+  },
   actions: {
+    /**
+     * Resets the state of this store.
+     */
+    handleReset(): void {
+      this.validJiraCredentials = false;
+      this.jiraOrganization = undefined;
+      this.jiraProject = undefined;
+      this.validGitHubCredentials = false;
+      this.gitHubOrganization = undefined;
+      this.gitHubProject = undefined;
+      this.gitHubConfig = {
+        exclude: GITHUB_DEFAULT_EXCLUDE,
+      };
+    },
     /**
      * Selects a Jira organization.
      *

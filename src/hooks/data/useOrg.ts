@@ -31,6 +31,15 @@ export const useOrg = defineStore("org", {
     orgId(): string {
       return this.org.id;
     },
+    /**
+     * @return Whether this org has automatic billing, and does not need to see as-needed billing details.
+     */
+    automaticBilling(): boolean {
+      return (
+        this.org.paymentTier === "UNLIMITED" ||
+        this.org.paymentTier === "RECURRING"
+      );
+    },
   },
   actions: {
     /**

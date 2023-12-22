@@ -1,5 +1,7 @@
 import { IdentifierSchema, MembershipSchema, PermissionType } from "@/types";
 
+export type OrgPaymentTier = "UNLIMITED" | "RECURRING" | "AS_NEEDED";
+
 /**
  * Represents a team with members and projects.
  */
@@ -49,7 +51,7 @@ export interface OrganizationSchema {
   /**
    * The payment tier of this organization.
    */
-  paymentTier: string;
+  paymentTier: OrgPaymentTier;
   /**
    * List of members and their roles in the organization.
    */

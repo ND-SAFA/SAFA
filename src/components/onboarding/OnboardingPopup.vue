@@ -16,7 +16,21 @@
         </text-button>
       </q-bar>
 
-      <flex-box full-width justify="center" class="q-pa-lg q-mt-10">
+      <flex-box
+        v-if="onboardingStore.loading"
+        full-width
+        justify="center"
+        class="q-pa-lg q-mt-lg"
+      >
+        <q-spinner-ball class="nav-gradient" size="4em" />
+      </flex-box>
+
+      <flex-box
+        v-show="!onboardingStore.loading"
+        full-width
+        justify="center"
+        class="q-pa-lg"
+      >
         <flex-item parts="6" class="q-ma-md">
           <typography
             align="center"
@@ -48,7 +62,14 @@
               <summarize-step />
             </template>
             <template #4>
-              <generate-step />
+              <generate-step v-if="ENABLED_FEATURES.ONBOARDING_GENERATE" />
+              <typography
+                v-else
+                value="
+                  Now that your data has been imported, our team will run SAFA's document generation ASAP!
+                  Check back soon to see your generated documentation.
+                "
+              />
             </template>
           </stepper>
         </flex-item>
@@ -71,6 +92,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import { onboardingStore, permissionStore, sessionStore } from "@/hooks";
 import {
   TextButton,

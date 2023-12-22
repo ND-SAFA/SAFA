@@ -11,6 +11,7 @@
       padding
       arrows
       height="auto"
+      navigation-position="top"
     >
       <q-carousel-slide
         v-for="artifact in artifacts"

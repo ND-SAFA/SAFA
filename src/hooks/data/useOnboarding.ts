@@ -30,6 +30,10 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     error: false,
     /**
+     * Whether the onboarding workflow is loading.
+     */
+    loading: false,
+    /**
      * The current step of the onboarding workflow, starting at 1.
      */
     step: 1,
@@ -86,6 +90,8 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Reloads the GitHub projects and jobs for the onboarding workflow.
      */
     async handleReload(open?: boolean): Promise<void> {
+      this.loading = true;
+
       if (open) {
         this.open = true;
       } else if (onboardingStore.isComplete) {
@@ -110,6 +116,8 @@ export const useOnboarding = defineStore("useOnboarding", {
       if (onboardingStore.uploadedJob?.completedEntityId) {
         onboardingStore.handleNextStep("summarize");
       }
+
+      this.loading = false;
     },
     /**
      * Close the popup and mark onboarding as complete.
@@ -136,7 +144,11 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (step === "summarize" && this.uploadedJob?.completedEntityId) {
-        getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
+        getVersionApiStore.handleLoad(
+          this.uploadedJob?.completedEntityId,
+          undefined,
+          false
+        );
       }
     },
     /**
@@ -167,16 +179,11 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleExportProject() {
       if (!this.uploadedJob?.completedEntityId) return;
 
-      await getVersionApiStore.handleLoadCurrent({
-        projectId: this.uploadedJob.completedEntityId,
-      });
-
-      await projectApiStore.handleDownload(
-        "csv",
-        this.uploadedJob.completedEntityId
-      );
+      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
+      await projectApiStore.handleDownload("csv");
 
       logStore.onSuccess("Your data is being exported.");
+
       this.handleClose();
     },
     /**
@@ -185,9 +192,7 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleViewProject() {
       if (!this.uploadedJob?.completedEntityId) return;
 
-      await getVersionApiStore.handleLoadCurrent({
-        projectId: this.uploadedJob.completedEntityId,
-      });
+      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
 
       this.handleClose();
     },

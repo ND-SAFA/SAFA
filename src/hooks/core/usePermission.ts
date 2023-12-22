@@ -28,7 +28,7 @@ export const usePermission = defineStore("permissionStore", {
      * @return Whether the current user is a superuser.
      */
     isSuperuser(): boolean {
-      return !!sessionStore.user.admin || ENABLED_FEATURES.SUPERUSER_TEST;
+      return !!sessionStore.user.admin;
     },
   },
   actions: {

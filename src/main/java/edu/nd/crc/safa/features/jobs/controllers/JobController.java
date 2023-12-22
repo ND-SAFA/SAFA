@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.jobs.controllers;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,11 +27,11 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.JobUtil;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,9 +47,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 public class JobController extends BaseController {
-
-    private static final String TIM_FILE_NAME = "tim.json";
-    private static final String EMPTY_TIM_CONTENT = "{\"artifacts\": [], \"traces\": []}";
 
     private final JobService jobService;
     private final SafaUserService safaUserService;
@@ -121,9 +117,10 @@ public class JobController extends BaseController {
     /**
      * Parses given job payload by the jobType and returns the job created.
      *
-     * @param versionId The project version to save the entities to.
-     * @param files     The flat files to be parsed and uploaded.
-     * @param summarize Whether to summarize code artifacts on upload.
+     * @param versionId     The project version to save the entities to.
+     * @param files         The flat files to be parsed and uploaded.
+     * @param summarize     Whether to summarize code artifacts on upload.
+     * @param asCompleteSet Whether the uploaded files contain the complete set of project artifacts.
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
@@ -131,8 +128,9 @@ public class JobController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(
         @PathVariable UUID versionId,
-        @RequestParam Optional<MultipartFile[]> files,
-        @RequestParam(required = false, defaultValue = "false") boolean summarize)
+        @RequestParam Optional<List<MultipartFile>> files,
+        @RequestParam(required = false, defaultValue = "false") boolean summarize,
+        @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet)
         throws Exception {
         SafaUser user = safaUserService.getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
@@ -144,8 +142,9 @@ public class JobController extends BaseController {
                 user,
                 getServiceProvider(),
                 projectVersion,
-                files.orElseGet(this::defaultFileListSupplier),
-                summarize);
+                files.orElseGet(JobUtil::defaultFileListSupplier),
+                summarize,
+                asCompleteSet);
 
         return jobBuilder.perform();
     }
@@ -165,7 +164,7 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.Projects.PROJECT_BULK_UPLOAD)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectCreationJob(
-        @RequestParam Optional<MultipartFile[]> files,
+        @RequestParam Optional<List<MultipartFile>> files,
         @RequestParam String name,
         @RequestParam String description,
         @RequestParam(required = false, defaultValue = "false") boolean summarize,
@@ -176,7 +175,7 @@ public class JobController extends BaseController {
         CreateProjectByFlatFileJobBuilder jobBuilder =
             new CreateProjectByFlatFileJobBuilder(
                 getServiceProvider(),
-                files.orElseGet(this::defaultFileListSupplier),
+                files.orElseGet(JobUtil::defaultFileListSupplier),
                 safaUserService.getCurrentUser(),
                 name,
                 description,
@@ -229,17 +228,5 @@ public class JobController extends BaseController {
         // Step - Create and start job.
         GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(user, getServiceProvider(), request);
         return jobBuilder.perform();
-    }
-
-    /**
-     * Supplies a default list of files for an upload in case an empty upload is given.
-     *
-     * @return The default files. Currently, just the most basic tim.json
-     */
-    private MultipartFile[] defaultFileListSupplier() {
-        return new MultipartFile[]{
-            new MockMultipartFile(TIM_FILE_NAME, TIM_FILE_NAME,
-                null, EMPTY_TIM_CONTENT.getBytes(StandardCharsets.UTF_8))
-        };
     }
 }

@@ -5,12 +5,12 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.flatfiles.builder.steps.CommitStep;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.CommitJobUtility;
 import edu.nd.crc.safa.utilities.ProjectOwner;
@@ -32,6 +32,8 @@ public abstract class CommitJob extends AbstractJob {
     private ProjectCommitDefinition projectCommitDefinition;
     @Setter
     private ProjectVersion createdProjectVersion;
+    @Setter
+    private boolean asCompleteSet = false;
 
     /**
      * Create a commit job for a project that already exists.
@@ -54,11 +56,12 @@ public abstract class CommitJob extends AbstractJob {
 
     @IJobStep(value = "Committing Entities", position = -2)
     public void commitArtifactsAndTraceLinks() throws SafaError {
-        assertProjectVersionIsSet();
-        this.getDbLogger().log(this.projectCommitDefinition.getSummary());
-        ProjectChanger projectChanger = new ProjectChanger(projectCommitDefinition.getCommitVersion(),
-            this.getServiceProvider());
-        projectChanger.commit(getJobDbEntity().getUser(), projectCommitDefinition);
+        projectCommitDefinition.setUser(getUser());
+        CommitStep.performCommit(
+            getServiceProvider(),
+            projectCommitDefinition,
+            this.asCompleteSet
+        );
     }
 
     /**

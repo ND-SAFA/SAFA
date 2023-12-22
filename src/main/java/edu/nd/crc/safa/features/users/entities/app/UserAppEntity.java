@@ -5,6 +5,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.users.entities.IUser;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserAppEntity implements IUser {
     /**
      * Unique identifier for user.
@@ -29,9 +31,16 @@ public class UserAppEntity implements IUser {
     @NotEmpty
     private String email;
 
+    private UserAdminInfo admin;
+
     public UserAppEntity(SafaUser safaUser) {
         this.userId = safaUser.getUserId();
         this.email = safaUser.getEmail();
+
+        if (safaUser.isSuperuser()) {
+            this.admin = new UserAdminInfo();
+            this.admin.setActive(null);
+        }
     }
 
     @Override

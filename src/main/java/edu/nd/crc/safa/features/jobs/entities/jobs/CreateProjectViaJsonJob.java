@@ -51,6 +51,9 @@ public class CreateProjectViaJsonJob extends CommitJob {
 
     @IJobStep(value = "Generating Trace Links", position = 2)
     public void generateLinks(JobLogger logger) {
+        if (this.tgenRequestAppEntity.getRequests().isEmpty()) {
+            return;
+        }
         getServiceProvider().getPermissionService()
             .requirePermission(ProjectPermission.GENERATE, getProjectVersion().getProject(), getUser());
 

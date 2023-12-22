@@ -147,4 +147,16 @@ public class ArtifactAppEntity implements IAppEntity {
 
         return missingFields;
     }
+
+    /**
+     * Makes it impossible to set a summary to null.
+     *
+     * @param summary The summary to set artifact to.
+     */
+    public void setSummary(String summary) {
+        if (summary == null) {
+            summary = "";
+        }
+        this.summary = summary;
+    }
 }

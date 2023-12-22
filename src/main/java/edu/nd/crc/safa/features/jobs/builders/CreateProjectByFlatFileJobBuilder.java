@@ -1,16 +1,17 @@
 package edu.nd.crc.safa.features.jobs.builders;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
+import edu.nd.crc.safa.features.flatfiles.builder.steps.UploadFilesStep;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.CommitJobUtility;
-import edu.nd.crc.safa.utilities.FlatFileUtility;
 import edu.nd.crc.safa.utilities.ProjectOwner;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -20,19 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
-    /**
-     * The files to parse
-     */
-    private final MultipartFile[] files;
-
+    private final List<MultipartFile> files;
     private final String projectName;
     private final String projectDescription;
-
     private final boolean shouldSummarize;
     private final UUID teamId;
     private final UUID orgId;
 
-    public CreateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider, MultipartFile[] files, SafaUser user,
+    public CreateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider, List<MultipartFile> files, SafaUser user,
                                              String projectName, String projectDescription, boolean shouldSummarize,
                                              UUID teamId, UUID orgId) {
         super(user, serviceProvider);
@@ -51,17 +47,25 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
             ProjectOwner.fromUUIDs(getServiceProvider(), teamId, orgId, user);
         ProjectCommitDefinition commit = CommitJobUtility.createProject(getServiceProvider(), owner, this.projectName,
             this.projectDescription, getUser());
-        Project project = commit.getCommitVersion().getProject();
-        String uploadLocation = FlatFileUtility.uploadFlatFiles(this.getServiceProvider(), project, this.files);
+
+        FlatFileBuilderStore store = new FlatFileBuilderStore(
+            user,
+            this.files,
+            commit.getCommitVersion(),
+            true,
+            this.shouldSummarize,
+            false
+        );
+
+        UploadFilesStep step = new UploadFilesStep();
+        step.perform(store, getServiceProvider());
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
             user,
             this.getJobDbEntity(),
             this.getServiceProvider(),
-            commit,
-            uploadLocation,
-            this.shouldSummarize,
+            store,
             true);
     }
 

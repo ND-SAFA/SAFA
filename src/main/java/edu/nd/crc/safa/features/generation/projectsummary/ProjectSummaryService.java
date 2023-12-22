@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.generation.projectsummary;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,11 +54,7 @@ public class ProjectSummaryService {
                 summaryService.addSummariesToCode(artifacts, projectSummary, logger);
             }
         } else {
-            Map<String, Boolean> kwargs = new HashMap<>();
-            kwargs.put("do_resummarize_project", true);
-            kwargs.put("do_resummarize_artifacts", true);
-            logger.log(String.format("Kwargs: %s", kwargs));
-            ProjectSummaryResponse summarizationResponse = this.summarizeProject(artifacts, kwargs, logger);
+            ProjectSummaryResponse summarizationResponse = this.summarizeProject(artifacts, logger);
 
             // Save project summary
             projectSummary = summarizationResponse.getSummary();
@@ -75,16 +70,14 @@ public class ProjectSummaryService {
      * Creates project summary.
      *
      * @param artifacts The artifacts in the project.
-     * @param kwargs    Additional keyword arguments for summarization process.
      * @param jobLogger Optional. Job logger to store logs under.
      * @return The project summary.
      */
     public ProjectSummaryResponse summarizeProject(List<ArtifactAppEntity> artifacts,
-                                                   Map<String, Boolean> kwargs,
                                                    JobLogger jobLogger) {
         artifacts = artifacts.stream().filter(a -> a.getTraceString().length() > 0).collect(Collectors.toList());
         ProjectSummaryRequest request = new ProjectSummaryRequest(artifacts.stream().map(GenerationArtifact::new)
-            .collect(Collectors.toList()), kwargs);
+            .collect(Collectors.toList()));
         return this.genApi.generateProjectSummary(request, jobLogger);
     }
 

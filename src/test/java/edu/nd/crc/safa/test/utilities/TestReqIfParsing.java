@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.test;
+package edu.nd.crc.safa.test.utilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;

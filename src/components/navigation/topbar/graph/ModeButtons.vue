@@ -107,7 +107,6 @@ function updateValue(): void {
  */
 function handleTimView(): void {
   layoutStore.mode = "tim";
-  updateValue();
 }
 
 /**
@@ -115,7 +114,6 @@ function handleTimView(): void {
  */
 function handleTreeView(): void {
   layoutStore.mode = "tree";
-  updateValue();
 }
 
 /**
@@ -123,7 +121,6 @@ function handleTreeView(): void {
  */
 function handleTableView(): void {
   layoutStore.mode = "table";
-  updateValue();
 }
 /**
  * Opens delta view.

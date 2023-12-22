@@ -10,7 +10,13 @@ import {
   CSSCursor,
 } from "@/types";
 import { LARGE_NODE_LAYOUT_COUNT } from "@/util";
-import { appStore, artifactStore, cyStore, selectionStore } from "@/hooks";
+import {
+  appStore,
+  artifactStore,
+  cyStore,
+  selectionStore,
+  subtreeStore,
+} from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -102,7 +108,7 @@ export const useLayout = defineStore("layout", {
           appStore.openDetailsPanel("displayProject");
         }
 
-        // Wait for the graph to render and panel to open.
+        // Wait for the graph to render and panel to open, then center on the nodes.
         setTimeout(() => {
           if (animated) return;
 
@@ -122,9 +128,12 @@ export const useLayout = defineStore("layout", {
     async resetLayout(): Promise<void> {
       appStore.onLoadStart();
 
-      cyStore.drawMode("disable");
-      selectionStore.clearSelections();
-      this.setGraphLayout();
+      await subtreeStore.restoreHiddenNodesAfter(async () => {
+        cyStore.drawMode("disable");
+        selectionStore.clearSelections();
+        this.setGraphLayout();
+      });
+
       appStore.onLoadEnd();
     },
 

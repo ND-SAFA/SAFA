@@ -247,7 +247,7 @@ export const useNotificationApi = defineStore(
      */
     projectStore.$subscribe((mutation) => {
       if (mutation.type === MutationType.direct) {
-        if (mutation.events.key === "project") {
+        if (mutation.events?.key === "project") {
           const oldProject: ProjectSchema = mutation.events.oldValue;
           const newProject: ProjectSchema = mutation.events.newValue;
           const oldProjectVersion = oldProject.projectVersion?.versionId || "";

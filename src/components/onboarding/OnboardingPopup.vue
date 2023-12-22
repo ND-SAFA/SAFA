@@ -74,6 +74,7 @@ import {
   gitHubApiStore,
   integrationsStore,
   onboardingStore,
+  permissionStore,
   sessionStore,
 } from "@/hooks";
 import { TextButton, Stepper, Typography } from "@/components/common";
@@ -100,6 +101,7 @@ watch(
     if (
       userLoggedIn &&
       !onboardingStore.isComplete &&
+      !permissionStore.isDemo &&
       ENABLED_FEATURES.ONBOARDING
     ) {
       onboardingStore.open = true;

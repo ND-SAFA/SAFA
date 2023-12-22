@@ -4,6 +4,8 @@ export default defineConfig({
   projectId: "5kk96a",
   chromeWebSecurity: false,
   e2e: {
+    numTestsKeptInMemory: 0,
+    video: false,
     baseUrl: "https://localhost.safa.ai:8080",
     experimentalInteractiveRunEvents: true,
     env: {

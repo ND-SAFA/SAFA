@@ -2,7 +2,7 @@
   <flex-box align="center" justify="between" class="overflow-hidden">
     <flex-box column full-width>
       <typography
-        v-if="isCode"
+        v-if="splitLines"
         variant="caption"
         :value="codePath"
         ellipsis
@@ -11,7 +11,7 @@
       />
       <typography
         :align="props.align"
-        :class="isCode ? 'full-width text-word-break-all' : 'full-width'"
+        :class="splitLines ? 'full-width text-word-break-all' : 'full-width'"
         :el="props.isHeader ? 'h1' : undefined"
         :variant="props.isHeader ? 'subtitle' : undefined"
         :value="displayName"
@@ -49,17 +49,18 @@ import { FlexBox, Typography, AttributeChip } from "@/components/common";
 const props = defineProps<ArtifactNameDisplayProps>();
 
 const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
-const isCode = computed(() => props.artifact.isCode);
+
+const splitLines = computed(
+  () => props.artifact.isCode || props.artifact.name.includes("/")
+);
 
 const codePath = computed(() =>
-  isCode.value
+  splitLines.value
     ? props.artifact.name.split("/").slice(0, -1).join("/")
     : undefined
 );
 
-const displayName = computed(
-  () =>
-    (isCode.value && props.artifact.name.split("/").pop()) ||
-    props.artifact.name
+const displayName = computed(() =>
+  splitLines.value ? props.artifact.name.split("/").pop() : props.artifact.name
 );
 </script>

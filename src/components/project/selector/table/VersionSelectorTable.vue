@@ -93,7 +93,13 @@ const deletable = computed(() => addable.value && versions.value.length > 1);
  */
 function handleReload() {
   getVersionApiStore.handleReload(props.project.projectId, {
-    onSuccess: (loadedVersions) => (versions.value = loadedVersions),
+    onSuccess: (loadedVersions) => {
+      versions.value = loadedVersions;
+
+      if (loadedVersions.length === 1 && props.minimal) {
+        emit("selected", loadedVersions[0]);
+      }
+    },
   });
 }
 

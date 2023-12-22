@@ -83,7 +83,7 @@ function handleReset() {
  * Loads the password reset token on mount.
  */
 onMounted(() => {
-  const loadedToken = getParam(QueryParams.PW_RESET);
+  const loadedToken = getParam(QueryParams.ACCOUNT_TOKEN);
 
   if (!loadedToken) return;
 

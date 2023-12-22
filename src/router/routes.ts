@@ -23,6 +23,7 @@ import {
 export enum Routes {
   LOGIN_ACCOUNT = "/login",
   CREATE_ACCOUNT = "/create-account",
+  VERIFY_ACCOUNT = "/verify-email",
   FORGOT_PASSWORD = "/forgot",
   RESET_PASSWORD = "/reset",
   HOME = "/",
@@ -44,9 +45,10 @@ export enum Routes {
  */
 export enum QueryParams {
   LOGIN_PATH = "to",
-  PW_RESET = "token",
+  ACCOUNT_TOKEN = "token",
   TAB = "tab",
   VERSION = "version",
+  VIEW = "view",
   ORG = "org",
   TEAM = "team",
   INTEGRATION_TOKEN = "code",
@@ -65,6 +67,14 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: Routes.CREATE_ACCOUNT,
     name: "Create Account",
+    component: CreateAccountView,
+    meta: {
+      isPublic: true,
+    },
+  },
+  {
+    path: Routes.VERIFY_ACCOUNT,
+    name: "Verify Account",
     component: CreateAccountView,
     meta: {
       isPublic: true,

@@ -15,11 +15,16 @@ export interface ThemeHook {
    */
   darkMode: WritableComputedRef<boolean>;
   /**
+   * Loads the stored dark mode setting.
+   */
+  loadDarkMode(): void;
+  /**
    * Toggles whether the theme is in dark mode.
    * @param dark - The explicit mode to set.
    *        If none is given, the current mode is toggled.
+   *        If "auto" is given, the mode is set based on the time of day.
    */
-  toggleDarkMode(dark?: boolean): void;
+  toggleDarkMode(dark?: boolean | "auto"): void;
 }
 
 /**

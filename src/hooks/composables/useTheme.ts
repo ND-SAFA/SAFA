@@ -19,12 +19,31 @@ export function useTheme(): ThemeHook {
     });
   }
 
-  function toggleDarkMode(mode?: boolean): void {
+  function loadDarkMode(): void {
+    const storedDarkMode =
+      localStorage.getItem(LocalStorageKeys.darkMode) || "";
+    const darkMode =
+      (
+        {
+          true: true,
+          false: false,
+          auto: "auto",
+        } as Record<string, boolean | "auto">
+      )[storedDarkMode] || "auto";
+
+    toggleDarkMode(darkMode);
+  }
+
+  function toggleDarkMode(mode?: boolean | "auto"): void {
+    const now = new Date();
+    const hour = now.getHours();
+    const isNight = hour < 6 || hour >= 18; // Assuming night is from 6PM to 6AM
+
     if (mode === undefined) {
       mode = !darkMode.value;
     }
 
-    darkMode.value = mode;
+    darkMode.value = typeof mode === "boolean" ? mode : isNight;
     localStorage.setItem(LocalStorageKeys.darkMode, String(mode));
     setTheme();
   }
@@ -32,6 +51,7 @@ export function useTheme(): ThemeHook {
   return {
     theme: $q,
     darkMode,
+    loadDarkMode,
     toggleDarkMode,
   };
 }

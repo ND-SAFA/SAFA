@@ -1,7 +1,12 @@
 import { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 import { getVersionApiStore, sessionApiStore } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
-import { projectStore } from "@/hooks/data";
+import {
+  artifactStore,
+  documentStore,
+  projectStore,
+  viewsStore,
+} from "@/hooks/data";
 import { QueryParams, Routes } from "@/router/routes";
 
 type RouteChecks = Record<
@@ -28,6 +33,15 @@ export const routerBeforeChecks: RouteChecks = {
     if (!isPublic) return;
 
     sessionApiStore.handleReset();
+  },
+  async verifyEmail(to) {
+    if (to.path !== Routes.VERIFY_ACCOUNT) return;
+
+    const token = to.query[QueryParams.ACCOUNT_TOKEN];
+
+    await sessionApiStore.handleVerifyAccount(String(token));
+
+    return { path: Routes.HOME };
   },
   async redirectToLoginIfNoSessionFound(to) {
     const isPublic = to.matched.some(({ meta }) => meta.isPublic);
@@ -65,9 +79,23 @@ export const routerAfterChecks: RouteChecks = {
     if (projectStore.isProjectDefined || !requiresProject) return;
 
     const versionId = to.query[QueryParams.VERSION];
+    const viewId = to.query[QueryParams.VIEW];
 
     if (typeof versionId !== "string") return;
 
     await getVersionApiStore.handleLoad(versionId, undefined, false);
+
+    if (!viewId) return;
+
+    const artifact = artifactStore.artifactsById.get(String(viewId));
+    const document = documentStore.allDocuments.find(
+      ({ documentId }) => documentId === viewId
+    );
+
+    if (artifact) {
+      await viewsStore.addDocumentOfNeighborhood(artifact);
+    } else if (document) {
+      await documentStore.switchDocuments(document);
+    }
   },
 };

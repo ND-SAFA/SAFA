@@ -138,6 +138,7 @@ Cypress.Commands.add("dbGenerateUsers", () => {
     cy.request<{ token: string }>({
       failOnStatusCode: false,
       method: "POST",
+      // TODO: update to `${apiUrl}/accounts/create-verified` once the API is updated.
       url: `${apiUrl}/accounts/create`,
       body: { email: user.email, password: user.password },
     });

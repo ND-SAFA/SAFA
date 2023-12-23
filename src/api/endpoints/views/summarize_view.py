@@ -24,9 +24,8 @@ def perform_summarize_request(data: SummarizeRequest):
     :param data: Serialized data.
     :return: The same artifacts with content as summary.
     """
-    dataset_creator = create_api_dataset(data.artifacts)
+    dataset_creator = create_api_dataset(data.artifacts, project_summary=data.project_summary)
     summarize_job = SummarizeJob(dataset_creator=dataset_creator,
-                                 project_summary=data.project_summary,
                                  do_resummarize_project=False,
                                  is_subset=True)
 

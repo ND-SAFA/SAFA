@@ -10,7 +10,7 @@ from tgen.common.util.dataframe_util import DataFrameUtil
 
 class ArtifactSerializer(AbstractSerializer):
     id = serializers.CharField(help_text="The identifier of the artifact.", required=True)
-    content = serializers.CharField(help_text="The body of the artifact", max_length=TEXT_LONG, required=True)
+    content = serializers.CharField(help_text="The body of the artifact", max_length=TEXT_LONG, required=True, allow_blank=True)
     layer_id = serializers.CharField(help_text="The layer this artifact is associated with.", max_length=TEXT_MEDIUM, required=True)
     name = serializers.CharField(help_text="The human readable name of the artifact.", required=False)
     summary = serializers.CharField(help_text="The summary of the artifact", max_length=TEXT_LONG, required=False, allow_null=True,

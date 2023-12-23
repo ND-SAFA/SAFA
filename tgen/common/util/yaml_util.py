@@ -145,6 +145,8 @@ class CustomDumper(Dumper):
                 data = converted_data
             except Exception:
                 pass
+        elif hasattr(data, "item"):
+            data = data.item()
         node = super().represent_data(data)
         return node
 
@@ -173,7 +175,6 @@ class YamlUtil:
     def write(content: Any, output_path: str) -> None:
         """
         Writes the yaml file.
-        TODO: Handle case where value is dictionary, since it does not call its members `to_yaml` function.
         :param content: The content as a python obj
         :param output_path: The path to save to
         :return: None

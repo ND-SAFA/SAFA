@@ -151,6 +151,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generations2sources = {}
         cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
         cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
+        n_failed = 0
         for i, generations4cluster in enumerate(generations):
             for generation in generations4cluster:
                 try:
@@ -160,7 +161,10 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                     if cluster_ids:
                         cluster2generations[cluster_ids[i]].append(target)
                 except Exception:
+                    n_failed += 1
                     logger.exception("A generation failed")
+        logger.warning(f"{n_failed} generations failed. ")
+        assert n_failed < len(generations), "All generations have failed."
         return generations2sources, cluster2generations
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:

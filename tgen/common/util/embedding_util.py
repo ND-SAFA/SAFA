@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Union
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-from tgen.embeddings.embeddings_manager import EmbeddingType
+EmbeddingType = np.array
+IdType = Union[int, str]
 
 
 class EmbeddingUtil:

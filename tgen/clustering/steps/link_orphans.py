@@ -26,7 +26,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         clusters: List[Cluster] = list(cluster_map.values())
 
         seen_artifacts = self.collect_seen_artifacts(clusters)
-        all_artifacts = set(args.dataset.artifact_df.index)
+        all_artifacts = set(args.get_artifact_ids())
         orphan_artifact_id_set = all_artifacts.difference(seen_artifacts)
 
         logger.info(f"{len(orphan_artifact_id_set)} artifacts were not clustered.")

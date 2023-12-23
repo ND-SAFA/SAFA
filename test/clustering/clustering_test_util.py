@@ -12,7 +12,8 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.embeddings.embeddings_manager import EmbeddingType, EmbeddingsManager
+from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.common.util.embedding_util import EmbeddingType
 
 
 class ClusteringTestUtil:

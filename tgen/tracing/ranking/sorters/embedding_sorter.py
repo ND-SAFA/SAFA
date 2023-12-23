@@ -1,11 +1,9 @@
 from typing import Dict, List
 
-from sklearn.preprocessing import _data
-from tqdm import tqdm
-
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
 
 
@@ -31,13 +29,9 @@ class EmbeddingSorter(iSorter):
         for parent_id in iterable:
             parent_embedding = embedding_manager.get_embedding(parent_id)
             scores = EmbeddingUtil.calculate_similarities([parent_embedding], children_embeddings)[0]
-            sorted_children = sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])
-            sorted_artifact_ids = [c[1] for c in sorted_children]
-            sorted_artifact_scores = [c[0] for c in sorted_children]
+            scores = ListUtil.convert_numpy_array_to_native_types(scores)
 
-            if return_scores:
-                sorted_artifact_scores = ListUtil.convert_numpy_array_to_native_types(sorted_artifact_scores)
-                parent2rankings[parent_id] = (sorted_artifact_ids, sorted_artifact_scores)
-            else:
-                parent2rankings[parent_id] = sorted_artifact_ids
+            parent2rankings[parent_id] = RankingUtil.create_parent_child_ranking(zip(child_ids, scores), all_child_ids=set(child_ids),
+                                                                                 return_scores=return_scores)
+
         return parent2rankings

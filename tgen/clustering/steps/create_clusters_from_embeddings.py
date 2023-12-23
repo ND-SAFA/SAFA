@@ -27,23 +27,27 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         seeds = list(state.seed2artifacts.keys()) if state.seed2artifacts else []
         cluster_id_to_seed = {}
         global_clusters = {}
+        initial_clusters = {}
         for i, batch_ids in enumerate(batches):
-            batch_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids, prefix=str(i))
+            initial_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids)
+            initial_clusters.update(initial_cluster_map)
+            batch_cluster_map = self.process_clusters(args, state.embedding_manager, initial_cluster_map, prefix=str(i))
             if i < len(seeds):
                 cluster_id_to_seed.update({c_id: seeds[i] for c_id in batch_cluster_map.keys()})
             global_clusters.update(batch_cluster_map)
         state.cluster_id_2seeds = cluster_id_to_seed
         logger.info(f"Found {len(global_clusters)} clusters in the source artifacts.")
         state.final_cluster_map = global_clusters
+        if args.save_initial_clusters:
+            state.initial_cluster_map = initial_clusters
 
     @staticmethod
-    def create_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager, batch_ids: List[str], prefix: str = None):
+    def create_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager, batch_ids: List[str]) -> ClusterMapType:
         """
-        Creates list of candidate batches and condenses them.
+        Creates list of candidate batches of clusters them.
         :param args: Configuration of the clustering pipeline used to construct clusters.
         :param embeddings_manager: Contains the embeddings used to create clusters.
         :param batch_ids: IDs of subset of artifacts to cluster. If none, all artifacts in embeddings manager are used.
-        :param prefix: The prefix to append to the final cluster map.
         :return: Map of cluster ID to clusters.
         """
         if len(batch_ids) <= args.cluster_max_size:
@@ -52,6 +56,19 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
             batch_cluster_map = CreateClustersFromEmbeddings.get_batch_clusters(args,
                                                                                 embeddings_manager,
                                                                                 batch_artifact_ids=batch_ids)
+        return batch_cluster_map
+
+    @staticmethod
+    def process_clusters(args: ClusteringArgs, embeddings_manager: EmbeddingsManager,
+                         batch_cluster_map: ClusterMapType, prefix: str = None) -> ClusterMapType:
+        """
+        Creates list of candidate batches and condenses them.
+        :param args: Configuration of the clustering pipeline used to construct clusters.
+        :param embeddings_manager: Contains the embeddings used to create clusters.
+        :param batch_cluster_map: Map of cluster ID to clusters from batch.
+        :param prefix: The prefix to append to the final cluster map.
+        :return: Map of the selected cluster ID to clusters.
+        """
         batch_cluster_map = CreateClustersFromEmbeddings.condense_clusters(args, embeddings_manager, batch_cluster_map)
         if prefix:
             batch_cluster_map = {f"{prefix}: {k}": v for k, v in batch_cluster_map.items()}

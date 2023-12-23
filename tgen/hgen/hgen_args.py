@@ -125,7 +125,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """
-    export_original_dataset: bool = False
+    export_hgen_artifacts_only: bool = False
     """
     The sections of the project summary to include in content generation.
     """

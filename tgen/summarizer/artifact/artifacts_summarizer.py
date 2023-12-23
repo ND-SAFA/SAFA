@@ -157,24 +157,36 @@ class ArtifactsSummarizer(BaseObject):
             res = reloaded
 
         batch_responses = self._parse_responses(res)
+        debugging = list(zip(prompts, batch_responses))
 
         self.uuid_manager.generate_new_id()
         return batch_responses
 
-    @staticmethod
-    def _parse_responses(res: GenerationResponse) -> List[str]:
+    def _parse_responses(self, res: GenerationResponse) -> List[str]:
         """
         Parses the summary responses.
         :param res: The response from the model to parse.
         :return: The parsed responses.
         """
         if res is None:
-            batch_responses = [EMPTY_STRING]
+            parsed_responses = [EMPTY_STRING]
         else:
-            parsed_responses = [LLMResponseUtil.parse(r, ArtifactsSummarizer.SUMMARY_TAG, return_res_on_failure=True)[0] for r in
-                                res.batch_responses]
-            batch_responses = [r.strip() for r in parsed_responses]
-        return batch_responses
+            parsed_responses = [self._parse_response(r) for r in res.batch_responses]
+        return parsed_responses
+
+    def _parse_response(self, response: str) -> str:
+        """
+        Parses each of the responses using either the code or nl prompt builder.
+        :param response: The LLM response.
+        :return: The parsed response.
+        """
+        parsed_response = self.code_prompt_builder.parse_responses(response)
+        summary = LLMResponseUtil.get_non_empty_responses(parsed_response)
+        if not summary:
+            parsed_response = self.nl_prompt_builder.parse_responses(response)
+            summary = LLMResponseUtil.get_non_empty_responses(parsed_response)
+        summary = summary if summary else response
+        return summary.strip()
 
     def _create_prompt(self, content: str, filename: str = EMPTY_STRING, code_or_above_limit_only: bool = None) -> Optional[str]:
         """
@@ -190,7 +202,8 @@ class ArtifactsSummarizer(BaseObject):
             return  # skip summarizing content below token limit unless code
         prompt_builder = self.code_prompt_builder if FileUtil.is_code(filename) else self.nl_prompt_builder
         return prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
-                                    artifact={StructuredKeys.Artifact.CONTENT: content})[PromptKeys.PROMPT.value]
+                                    artifact={StructuredKeys.Artifact.CONTENT: content,
+                                              StructuredKeys.Artifact.ID: filename})[PromptKeys.PROMPT.value]
 
     def _summarize_selective(self, contents: List[str], indices2summarize: Set[int], prompts_for_summaries: List[str],
                              use_content_if_unsummarized: bool) -> List[str]:

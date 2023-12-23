@@ -160,6 +160,10 @@ class ProjectSummarizer(BaseObject):
             if not self.dataset else [self.dataset]
         generated_section_responses = self._generate_sections(prompt_builders, dataset)
         for i, (section_id, section_prompt) in enumerate(self.get_generation_iterator(async_sections_only=async_sections_only)):
+            if isinstance(generated_section_responses[i], Exception):
+                logger.warning(f"Generating {section_id} failed due to {generated_section_responses[i]}")
+                continue
+
             self._create_section(generated_section_responses[i], section_id, section_prompt)
 
     def _create_section(self, section_response: Dict, section_id: str, section_prompt: QuestionnairePrompt) -> bool:

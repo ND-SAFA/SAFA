@@ -1,9 +1,0 @@
-{
-  "profile": "staging",
-  "ServiceName": "fend-1",
-  "ClusterName": "fend",
-  "TaskDefinitionArn": "arn:aws:ecs:us-east-1:310072273153:task-definition/fend:6",
-  "SecurityGroupId": "sg-0e5ffcfa2e2553936",
-  "SubnetIds": "subnet-0f93a81ef0829cb7f,subnet-075eb529bd4ddd803,subnet-0940d01e9f8a1f770",
-  "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:310072273153:targetgroup/fend/b0181948e9b59a64\n"
-}

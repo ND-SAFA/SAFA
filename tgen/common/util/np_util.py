@@ -137,4 +137,4 @@ class NpUtil:
             if isinstance(item, list):
                 item = NpUtil.convert_to_np_matrix(item)
             outer_list.append(item)
-        return np.as_array(outer_list)
+        return np.asarray(outer_list)

@@ -163,8 +163,9 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 except Exception:
                     n_failed += 1
                     logger.exception("A generation failed")
-        logger.warning(f"{n_failed} generations failed. ")
-        assert n_failed < len(generations), "All generations have failed."
+        if n_failed > 0:
+            assert n_failed < len(generations), "All generations have failed."
+            logger.warning(f"{n_failed} generations failed. ")
         return generations2sources, cluster2generations
 
     def _create_task_prompt(self, args: HGenArgs, state: HGenState) -> Tuple[QuestionnairePrompt, str, str]:

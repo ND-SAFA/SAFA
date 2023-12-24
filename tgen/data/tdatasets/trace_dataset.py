@@ -8,6 +8,7 @@ import pandas as pd
 from datasets import Dataset
 from tqdm import tqdm
 
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.logging.logger_manager import logger
@@ -68,10 +69,11 @@ class TraceDataset(iDataset):
             self.__trace_matrix = TraceMatrix(self.trace_df, randomize=self.randomize)
         return self.__trace_matrix
 
-    def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
+    def to_dataframe(self, include_ids: bool = True, use_summary_for_code_only: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
         :param include_ids: Whether to include artifact ids in resulting data frame.
+        :param use_summary_for_code_only: If True, only uses the summary as content for code.
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
@@ -80,8 +82,8 @@ class TraceDataset(iDataset):
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])
             label = link[TraceKeys.LABEL]
-            source_text = Artifact.get_summary_or_content(source, use_summary_for_code_only=False)
-            target_text = Artifact.get_summary_or_content(target, use_summary_for_code_only=False)
+            source_text = Artifact.get_summary_or_content(source, use_summary_for_code_only=use_summary_for_code_only)
+            target_text = Artifact.get_summary_or_content(target, use_summary_for_code_only=use_summary_for_code_only)
             new_row = [source_text, target_text, label] if not include_ids else \
                 [source[ArtifactKeys.ID], source_text, target[ArtifactKeys.ID], target_text, label]
             link_ids_to_rows[index] = new_row
@@ -296,8 +298,8 @@ class TraceDataset(iDataset):
         source_target_pairs = []
         for link_id in self._pos_link_ids:
             source_artifact, target_artifact = self.get_link_source_target_artifact(link_id)
-            source_text = Artifact.get_summary_or_content(source_artifact, use_summary_for_code_only=False)
-            target_text = Artifact.get_summary_or_content(target_artifact, use_summary_for_code_only=False)
+            source_text = Artifact.get_summary_or_content(source_artifact, use_summary_for_code_only=not USE_NL_SUMMARY_EMBEDDINGS)
+            target_text = Artifact.get_summary_or_content(target_artifact, use_summary_for_code_only=not USE_NL_SUMMARY_EMBEDDINGS)
             source_target_pairs.append((source_text, target_text))
         return self._pos_link_ids, source_target_pairs
 
@@ -322,8 +324,8 @@ class TraceDataset(iDataset):
                                          source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
 
     def _get_feature_entry(self, arch_type: ModelArchitectureType, feature_func: Callable,
-                           link_id: int = None,
-                           source_text: str = None, target_text: str = None, label: int = None, score: float = None) -> Dict[str, any]:
+                           link_id: int = None, source_text: str = None, target_text: str = None,
+                           label: int = None, score: float = None) -> Dict[str, any]:
         """
         Gets a representational dictionary of the feature to be used in the data
         :param arch_type: The model architecture determining features.
@@ -343,8 +345,8 @@ class TraceDataset(iDataset):
             score = DataFrameUtil.get_optional_value_from_df(link, TraceKeys.SCORE)
             label = link[TraceKeys.LABEL]
 
-            source_text = Artifact.get_summary_or_content(source_artifact, use_summary_for_code_only=False)
-            target_text = Artifact.get_summary_or_content(target_artifact, use_summary_for_code_only=False)
+            source_text = Artifact.get_summary_or_content(source_artifact, use_summary_for_code_only=not USE_NL_SUMMARY_EMBEDDINGS)
+            target_text = Artifact.get_summary_or_content(target_artifact, use_summary_for_code_only=not USE_NL_SUMMARY_EMBEDDINGS)
 
         if arch_type == ModelArchitectureType.SIAMESE:
             entry = {CSVKeys.SOURCE: source_text, CSVKeys.TARGET: target_text, CSVKeys.LABEL: label, CSVKeys.SCORE: score}

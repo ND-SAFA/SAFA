@@ -92,7 +92,8 @@ class ClusterChildrenSorter(iSorter):
         """
         parent_cluster_score = cluster.similarity_to_neighbors(parent_id)
         child_cluster_score = cluster.similarity_to_neighbors(child_id)
-        score = 0.5 * parent_cluster_score + 0.5 * child_cluster_score
+        child_parent_score = cluster.embedding_manager.compare_embeddings(parent_id, child_id)
+        score = .25 * parent_cluster_score + .25 * child_cluster_score + .5 * child_parent_score
         return score
 
     @staticmethod

@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Set, Union
 
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.common.objects.trace import Trace
@@ -210,8 +210,8 @@ class RankingUtil:
         requests = []
         artifact_map = artifact_df.to_map() if not artifact_map else artifact_map
         for child_type, parent_type in layers:
-            parent_df = artifact_df.get_type(parent_type)
-            child_df = artifact_df.get_type(child_type)
+            parent_df = artifact_df.get_artifacts_by_type(parent_type)
+            child_df = artifact_df.get_artifacts_by_type(child_type)
 
             parent_names = list(parent_df.index)
             child_names = list(child_df.index)
@@ -278,3 +278,18 @@ class RankingUtil:
             n_traces = 0
         return {"N Selected Traces": n_traces}
 
+    @staticmethod
+    def create_parent_child_ranking(children_scores: List[Tuple[str, float]], all_child_ids: Set[str],
+                                    return_scores: bool = False) -> Union[Tuple[List[str], List[float]], List[str]]:
+        """
+        Given the children and associated scores for a parent, ranks them + fills in missing children.
+        :param all_child_ids: The set of all possible children.
+        :param children_scores: List of pairs of child id, score for each child related to the parent.
+        :param return_scores: If True, returns the ranked scores as well.
+        :return: Either just the ranked children or the ranked children with the corresponding ranked scores.
+        """
+        ranked_children, ranked_scores = ListUtil.unzip(list(sorted(children_scores, key=lambda item: item[1], reverse=True)))
+        children_un_accounted = list(all_child_ids.difference(ranked_children))
+        ranked_children += children_un_accounted
+        ranked_scores += [0 for _ in children_un_accounted]
+        return (ranked_children, ranked_scores) if return_scores else ranked_children

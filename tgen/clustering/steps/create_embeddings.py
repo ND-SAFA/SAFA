@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -38,6 +39,7 @@ class CreateEmbeddings(AbstractPipelineStep):
         for artifact_type in artifact_types:
             if artifact_type not in available_types:
                 raise Exception(f"Expected one of ({available_types}) but got ({artifact_type}).")
-            artifact_type_map = artifact_df.get_type(artifact_type).to_map()
+            artifact_type_map = artifact_df.get_artifacts_by_type(artifact_type).\
+                to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
             artifact_map.update(artifact_type_map)
         return artifact_map

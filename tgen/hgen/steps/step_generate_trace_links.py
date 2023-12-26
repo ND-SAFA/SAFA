@@ -1,5 +1,6 @@
 from typing import Dict, List, Set, Tuple
 
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
 from tgen.common.logging.logger_manager import logger
@@ -11,7 +12,6 @@ from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
@@ -54,9 +54,9 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state of HGen
         :return: The trace predictions for all candidates (that were not filtered)
         """
-        children_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.source_layer_ids).index)
-        parent_ids = list(state.all_artifacts_dataset.artifact_df.get_type(args.target_type).index)
-        run_name = RankingJob.get_run_name(args.source_type, children_ids, args.target_type, parent_ids)
+        children_ids = list(state.all_artifacts_dataset.artifact_df.get_artifacts_by_type(args.source_layer_ids).index)
+        parent_ids = list(state.all_artifacts_dataset.artifact_df.get_artifacts_by_type(args.target_type).index)
+        run_name = RankingArgs.get_run_name(args.source_type, children_ids, args.target_type, parent_ids)
         pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids,
                                     children_ids=children_ids,
                                     dataset=state.all_artifacts_dataset,
@@ -79,7 +79,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         trace_predictions, selected_traces = [], []
         generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
-        new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map()
+        new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
         state.embedding_manager.update_or_add_contents(new_artifact_map)
         subset_ids = list({a_id for a_ids in state.cluster2artifacts.values() for a_id in a_ids})
         subset_ids += list(state.new_artifact_dataset.artifact_df.index)
@@ -99,8 +99,8 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                             if a_id in state.source_dataset.artifact_df
                             or a_id in orphans]
             cluster_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), str(cluster_id))
-            run_name = f"Cluster{cluster_id}: " + RankingJob.get_run_name(args.source_type, children_ids,
-                                                                          args.target_type, parent_ids)
+            run_name = f"Cluster{cluster_id}: " + RankingArgs.get_run_name(args.source_type, children_ids,
+                                                                           args.target_type, parent_ids)
             pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids,
                                         export_dir=cluster_dir,
                                         **pipeline_kwargs)

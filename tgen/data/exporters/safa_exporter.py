@@ -67,7 +67,7 @@ class SafaExporter(AbstractDatasetExporter):
 
         artifact_type_to_artifacts = {}
         for artifact_type in self.artifact_types:
-            artifact_type_df = artifact_df.get_type(artifact_type)
+            artifact_type_df = artifact_df.get_artifacts_by_type(artifact_type)
             artifact_type_to_artifacts[artifact_type] = artifact_type_df
             # Export artifacts of type
             file_name = f"{artifact_type}.csv"

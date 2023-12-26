@@ -28,7 +28,7 @@ class TestAddToDataset(TestCase):
         self.assertIn(args.cluster_artifact_type, artifact_types)
 
         # Verifies artifacts were added
-        cluster_artifacts = artifact_df.get_type(args.cluster_artifact_type)
+        cluster_artifacts = artifact_df.get_artifacts_by_type(args.cluster_artifact_type)
         self.assertEqual(2, len(cluster_artifacts))
         self.assertIsNotNone(artifact_df.get_artifact(0))
         self.assertIsNotNone(artifact_df.get_artifact(1))

@@ -11,7 +11,7 @@ from tgen.common.util.prompt_util import PromptUtil
 
 DEFAULT_SCORE = 0.5
 DEFAULT_EXPLANATION = "EXPLANATION"
-
+SUMMARY_TAGS = {"summary", "description"}
 
 class TestAIManager:
     def __init__(self, library: str, response_formatter: Callable, require_used_all_responses: bool = True):
@@ -151,10 +151,11 @@ class TestAIManager:
             return
 
         def summarization_handler(p: str):
-            summary_tag = "<summary>"
-            if summary_tag in p:
-                self.mock_calls += 1
-                return self.create_summarization_response(p)
+            summary_tags = {"summary", "description"}
+            for tag in summary_tags:
+                if PromptUtil.create_xml_opening(tag) in p and f"a polished {tag}" in p:
+                    self.mock_calls += 1
+                    return self.create_summarization_response(p, tag_name=tag)
             return None
 
         if summarization_handler not in self.handlers:
@@ -265,13 +266,14 @@ class TestAIManager:
             self.handlers.append(response_handler)
 
     @staticmethod
-    def create_summarization_response(p: str):
+    def create_summarization_response(p: str, tag_name: str ="summary"):
         """
         Generically creates a summarize response from the body of the artifact.
         :param p: The summarization prompt.
+        :param tag_name: The summary tag name.
         :return: The summarization response for prompt.
         """
-        start_body_tag = "</summary>"
+        start_body_tag = PromptUtil.create_xml_closing(tag_name)
         end_body_tag = "Assistant:"
         artifact_body = LLMResponseUtil.parse(p, "artifact", return_res_on_failure=False)
         if not artifact_body:
@@ -285,5 +287,5 @@ class TestAIManager:
             artifact_body = p[body_start + len(start_body_tag): body_end].strip()
         else:
             artifact_body = artifact_body[0].strip()
-        summary = f"<summary>Summary of {artifact_body}</summary>"
+        summary = PromptUtil.create_xml(tag_name, f"Summary of {artifact_body}")
         return summary

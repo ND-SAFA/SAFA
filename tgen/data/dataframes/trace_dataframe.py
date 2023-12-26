@@ -88,14 +88,16 @@ class TraceDataFrame(AbstractProjectDataFrame):
             self.link_as_dict(source_id=source, target_id=target, label=label, link_id=link_id, score=score,
                               explanation=explanation))
 
-    def get_links(self) -> List[EnumDict]:
+    def get_links(self, true_only: bool = False) -> List[EnumDict]:
         """
         Returns the links in the data frame.
+        :param true_only: If True, only returns links with positive id.
         :return: Traces in data frame.
         """
         links = []
-        for link_id in self.index:
-            links.append(self.get_link(link_id))
+        for link_id, link in self.itertuples():
+            if not true_only or link[TraceKeys.LABEL] == 1:
+                links.append(link)
         return links
 
     def get_link(self, link_id: int = None, source_id: Any = None, target_id: Any = None) -> EnumDict:

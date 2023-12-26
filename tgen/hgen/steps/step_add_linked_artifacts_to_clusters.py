@@ -2,6 +2,7 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.link_orphans import LinkOrphans
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -33,7 +34,8 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
                 cluster_artifacts.extend(additional_artifacts)
             children_ids = {trace[TraceKeys.child_label()] for i, trace in original_trace_dataset.trace_df.filter_by_row(
                 lambda row: row[TraceKeys.parent_label().value] in state.source_dataset.artifact_df).itertuples()}
-            children_map = {a_id: content for a_id, content in state.original_dataset.artifact_df.to_map().items()
+            children_map = {a_id: content for a_id, content in state.original_dataset.artifact_df.to_map(
+                use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS).items()
                             if a_id in children_ids or a_id in state.source_dataset.artifact_df}
             state.embedding_manager.update_or_add_contents(children_map, create_embedding=True)
             clustering_args = ClusteringArgs(dataset=state.original_dataset)

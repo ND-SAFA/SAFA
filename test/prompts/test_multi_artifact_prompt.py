@@ -9,7 +9,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestMultiArtifactPrompt(BaseTest):
-    ARTIFACTS = [EnumDict({ArtifactKeys.ID: "id1", ArtifactKeys.CONTENT: "content1", ArtifactKeys.SUMMARY: "summary1"}),
+    ARTIFACTS = [EnumDict({ArtifactKeys.ID: "id1.py", ArtifactKeys.CONTENT: "content1", ArtifactKeys.SUMMARY: "summary1"}),
                  EnumDict({ArtifactKeys.ID: "id2", ArtifactKeys.CONTENT: "content2", ArtifactKeys.SUMMARY: "summary1"})]
     PROMPT = "This is a prompt"
 
@@ -19,13 +19,13 @@ class TestMultiArtifactPrompt(BaseTest):
         num_with_id = MultiArtifactPrompt(self.PROMPT, build_method=MultiArtifactPrompt.BuildMethod.NUMBERED, include_ids=True)
         prompt = num_with_id._build(self.ARTIFACTS)
         expected_artifact_format = [f"1. {artifact1[ArtifactKeys.ID]}: {artifact1[ArtifactKeys.SUMMARY]}",
-                                    f"2. {artifact2[ArtifactKeys.ID]}: {artifact2[ArtifactKeys.SUMMARY]}"]
+                                    f"2. {artifact2[ArtifactKeys.ID]}: {artifact2[ArtifactKeys.CONTENT]}"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
         num_without_id = MultiArtifactPrompt(self.PROMPT, build_method=MultiArtifactPrompt.BuildMethod.NUMBERED, include_ids=False)
         prompt = num_without_id._build(self.ARTIFACTS)
         expected_artifact_format = [f"1. {artifact1[ArtifactKeys.SUMMARY]}",
-                                    f"2. {artifact2[ArtifactKeys.SUMMARY]}"]
+                                    f"2. {artifact2[ArtifactKeys.CONTENT]}"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
     def test_build_markdown(self):
@@ -37,13 +37,13 @@ class TestMultiArtifactPrompt(BaseTest):
         trace_artifacts[1][TraceKeys.TARGET] = True
         prompt = markdown_id_with_prompt._build(trace_artifacts)
         expected_artifact_format = [f"## {artifact1[ArtifactKeys.ID]} (Child)\n    {artifact1[ArtifactKeys.SUMMARY]}",
-                                    f"## {artifact2[ArtifactKeys.ID]} (Parent)\n    {artifact2[ArtifactKeys.SUMMARY]}"]
+                                    f"## {artifact2[ArtifactKeys.ID]} (Parent)\n    {artifact2[ArtifactKeys.CONTENT]}"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
         markdown_without_id = MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                                   include_ids=False)
         prompt = markdown_without_id._build(trace_artifacts)
         expected_artifact_format = [f"# Child\n    {artifact1[ArtifactKeys.SUMMARY]}",
-                                    f"# Parent\n    {artifact2[ArtifactKeys.SUMMARY]}"]
+                                    f"# Parent\n    {artifact2[ArtifactKeys.CONTENT]}"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, '', expected_artifact_format)
 
     def test_build_xml(self):
@@ -52,12 +52,12 @@ class TestMultiArtifactPrompt(BaseTest):
         prompt = xml_with_id._build(self.ARTIFACTS)
         expected_artifact_format = [
             f"<artifact>\n\t<id>{artifact1[ArtifactKeys.ID]}</id>\n\t<body>{artifact1[ArtifactKeys.SUMMARY]}</body>\n</artifact>",
-            f"<artifact>\n\t<id>{artifact2[ArtifactKeys.ID]}</id>\n\t<body>{artifact2[ArtifactKeys.SUMMARY]}</body>\n</artifact>"]
+            f"<artifact>\n\t<id>{artifact2[ArtifactKeys.ID]}</id>\n\t<body>{artifact2[ArtifactKeys.CONTENT]}</body>\n</artifact>"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
         xml_without_id = MultiArtifactPrompt(self.PROMPT, build_method=MultiArtifactPrompt.BuildMethod.XML, include_ids=False)
         prompt = xml_without_id._build(self.ARTIFACTS)
         expected_artifact_format = [f"<artifact>\n\t{artifact1[ArtifactKeys.SUMMARY]}\n</artifact>",
-                                    f"<artifact>\n\t{artifact2[ArtifactKeys.SUMMARY]}\n</artifact>"]
+                                    f"<artifact>\n\t{artifact2[ArtifactKeys.CONTENT]}\n</artifact>"]
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
     def test_build_with_no_summaries(self):
@@ -75,6 +75,5 @@ class TestMultiArtifactPrompt(BaseTest):
         prompt = num_with_id._build([self.ARTIFACTS[i % 2] for i in range(MAX_TOKENS_FOR_NO_SUMMARIES + 1)])
         # should use summary if more than 65K tokens are used os using 65K artifacts.
         self.assertIn(artifact1[ArtifactKeys.SUMMARY], prompt)
-        self.assertIn(artifact2[ArtifactKeys.SUMMARY], prompt)
+        self.assertIn(artifact2[ArtifactKeys.CONTENT], prompt)
         self.assertNotIn(artifact1[ArtifactKeys.CONTENT], prompt)
-        self.assertNotIn(artifact2[ArtifactKeys.CONTENT], prompt)

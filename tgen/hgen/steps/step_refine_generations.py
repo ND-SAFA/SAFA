@@ -75,21 +75,21 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                     build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                                     include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT,
                                                     starting_num=len(refined_artifact_content) + 1) \
-                .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content}) for content in new_generated_artifact_content.keys()])
+                .build(artifacts=[EnumDict({ArtifactKeys.CONTENT: content,
+                                            ArtifactKeys.ID: i}) for i, content in enumerate(new_generated_artifact_content.keys())])
             prompt_builder.add_prompt(Prompt(refined_artifacts), -1)
             artifacts, _ = HGenUtil.create_artifact_df_from_generated_artifacts(hgen_args,
                                                                                 generations2sources=refined_artifact_content,
                                                                                 target_layer_id=hgen_args.target_type,
                                                                                 generate_names=False)
             generated_artifacts_tag: str = questionnaire.get_response_tags_for_question(-1)
-            selected_artifact_nums = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
-                                                              prediction_step=PredictionStep.REFINEMENT,
-                                                              dataset=PromptDataset(artifact_df=artifacts),
-                                                              response_prompt_ids=questionnaire.id,
-                                                              tags_for_response={generated_artifacts_tag}, return_first=True,
-                                                              export_path=FileUtil.safely_join_paths(export_path,
-                                                                                                     "gen_refinement_response.yaml"))[
-                0]
+            selected_artifact_nums = HGenUtil.get_predictions(
+                prompt_builder, hgen_args=hgen_args,
+                prediction_step=PredictionStep.REFINEMENT,
+                dataset=PromptDataset(artifact_df=artifacts),
+                response_prompt_ids=questionnaire.id,
+                tags_for_response={generated_artifacts_tag}, return_first=True,
+                export_path=FileUtil.safely_join_paths(export_path, "gen_refinement_response.yaml"))[0]
             selected_artifact_nums = set(selected_artifact_nums)
             selected_artifacts = RefineGenerationsStep._get_selected_artifacts(refined_artifact_content, selected_artifact_nums)
             selected_artifacts.update(RefineGenerationsStep._get_selected_artifacts(new_generated_artifact_content,

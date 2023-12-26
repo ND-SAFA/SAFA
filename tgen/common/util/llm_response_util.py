@@ -217,3 +217,20 @@ class LLMResponseUtil:
         filename = FileUtil.add_ext(filename, FileUtil.YAML_EXT)
         path = os.path.join(base_dir, RESPONSES_DIRNAME, filename)
         return path
+
+    @staticmethod
+    def get_non_empty_responses(response_dict: Dict, return_first: bool = True) -> Any:
+        """
+        Extracts only the prompt ids and tags that have responses.
+        :param response_dict: The original parsed response dict.
+        :param return_first: If True, returns the first non-empty response.
+        :return: Only the prompt ids and tags that have responses.
+        """
+        responses = []
+        for k, v in response_dict.items():
+            if v:
+                if isinstance(v, dict):
+                    responses.extend(LLMResponseUtil.get_non_empty_responses(v))
+                else:
+                    responses.append(v)
+        return responses[0] if return_first and len(responses) > 0 else responses

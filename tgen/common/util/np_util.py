@@ -25,15 +25,16 @@ class NpUtil:
         return quantile_score
 
     @staticmethod
-    def get_similarity_matrix_outliers(similarity_matrix: np.array) -> Tuple[float, float]:
+    def get_similarity_matrix_outliers(similarity_matrix: np.array, sigma: float = None) -> Tuple[float, float]:
         """
         Returns the indices in the matrix whose values are outliers in the matrix.
         :param similarity_matrix: The matrix whose similarities are analyzed.
+        :param sigma: How many stds from the mean are allowed.
         :return: The lower and upper threshold scores for filtering out outliers.
         """
         unique_values = NpUtil.get_unique_values(similarity_matrix)
         unique_scores = ListUtil.unzip(unique_values, -1)
-        lower_threshold, upper_threshold = NpUtil.detect_outlier_scores(unique_scores)
+        lower_threshold, upper_threshold = NpUtil.detect_outlier_scores(unique_scores, sigma=sigma)
         return lower_threshold, upper_threshold
 
     @staticmethod
@@ -53,15 +54,17 @@ class NpUtil:
         return result
 
     @staticmethod
-    def detect_outlier_scores(scores: List[float], epsilon=0.01) -> Tuple[float, float]:
+    def detect_outlier_scores(scores: List[float], epsilon: float = 0.01, sigma: float = None) -> Tuple[float, float]:
         """
         Detects the list of outlier scores within sigma.
         :param scores: List of scores to detect outliers from.
         :param sigma: Number of Std Deviations to include in valid boundary.
         :param epsilon: The small number to use instead of negative or zero values.
+        :param sigma: How many stds from the mean are allowed.
         :return: The lower and upper threshold scores for filtering out outliers.
         """
-        sigma = 2.5 if len(scores) > 20 else 1.5
+        if sigma is None:
+            sigma = 2.5 if len(scores) > 20 else 1.5
         scores = pd.Series(scores)
         scores[scores < 0] = epsilon
         harmonic_mean = hmean(scores)
@@ -121,3 +124,17 @@ class NpUtil:
         """
         values = [matrix[i][j] for i, j in indices]
         return values
+
+    @staticmethod
+    def convert_to_np_matrix(lists: List) -> np.ndarray:
+        """
+        Converts a list or list of lists to numpy array/matrix
+        :param lists: Python list or list of lists
+        :return: A numpy array/matrix.
+        """
+        outer_list = []
+        for item in lists:
+            if isinstance(item, list):
+                item = NpUtil.convert_to_np_matrix(item)
+            outer_list.append(item)
+        return np.asarray(outer_list)

@@ -2,6 +2,7 @@ from api.endpoints.common.dataset_converter import create_api_dataset
 from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
 from api.utils.view_util import ViewUtil
+from tgen.common.constants.project_summary_constants import PS_FEATURE_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.hgen.hgen_args import HGenArgs
@@ -18,7 +19,7 @@ def perform_hgen(request: HGenRequest):
     :param request: The request containing cluster of artifacts to summarize.
     :return: The generated artifact(s).
     """
-    artifacts = request.artifacts
+    artifacts = list(filter(lambda a: a[ArtifactKeys.CONTENT], request.artifacts))
     target_types = request.target_types
     source_layer_ids = list(set([a[ArtifactKeys.LAYER_ID] for a in artifacts]))
 
@@ -28,7 +29,8 @@ def perform_hgen(request: HGenRequest):
     dataset_creator = create_api_dataset(artifacts, project_summary=summary)
     hgen_args = HGenArgs(source_layer_ids=source_layer_ids,
                          target_type=base_type,
-                         dataset_creator=dataset_creator)
+                         dataset_creator=dataset_creator,
+                         seed_project_summary_section=PS_FEATURE_TITLE)
     base_job = BaseHGenJob(hgen_args)
     job = MultiLayerHGenJob(base_job,
                             target_types=other_types)

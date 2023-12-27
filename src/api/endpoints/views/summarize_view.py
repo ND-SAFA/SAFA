@@ -25,9 +25,6 @@ def perform_summarize_request(data: SummarizeRequest):
     :return: The same artifacts with content as summary.
     """
     dataset_creator = create_api_dataset(data.artifacts, project_summary=data.project_summary)
-    summarize_job = SummarizeJob(dataset_creator=dataset_creator,
-                                 do_resummarize_project=False,
-                                 is_subset=True)
-
+    summarize_job = SummarizeJob(dataset_creator=dataset_creator)
     summarized_artifacts = ViewUtil.run_job(summarize_job)
     return summarized_artifacts

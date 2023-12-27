@@ -61,6 +61,7 @@ def cancel_job(payload: ResultPayload):
 
 @endpoint(ResultSerializer)
 def get_status(payload: ResultPayload):
+    print("hi")
     task_id = payload["task_id"]
     result = AsyncResult(task_id)
     results_obj = result.result

@@ -36,7 +36,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-*@=lz%&bco*9i4sjo_2kp5eb$yp%j#xdn@5!a6*v2v1b(-rahg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -162,6 +161,8 @@ CELERY_TASK_ALWAYS_EAGER = run_as_eager
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = run_as_eager
 if run_as_eager:
     logger.info("Running in EAGER mode.")
+
+DEBUG = run_as_eager
 
 
 # Encoder function

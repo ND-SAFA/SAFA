@@ -61,6 +61,10 @@ export interface TypographyProps
    * Sets the text to wrap.
    */
   wrap?: boolean;
+  /**
+   * On expandable text, whether the text can be copied.
+   */
+  copyable?: boolean;
 
   /**
    * The variant of text to render.

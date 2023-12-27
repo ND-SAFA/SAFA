@@ -7,7 +7,7 @@
         :value="codePath"
         ellipsis
         :align="props.align"
-        class="full-width"
+        class="full-width text-word-break-all"
       />
       <typography
         :align="props.align"

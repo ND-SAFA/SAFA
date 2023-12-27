@@ -11,9 +11,19 @@
     </div>
     <div class="full-width flex justify-end">
       <q-btn
+        v-if="props.copyable"
         flat
         dense
-        align="right"
+        round
+        icon="download"
+        size="sm"
+        color="textCaption"
+        :class="buttonClassName"
+        @click.stop="handleCopy"
+      />
+      <q-btn
+        flat
+        dense
         size="sm"
         color="textCaption"
         :class="buttonClassName"
@@ -80,7 +90,7 @@ export default {
 import { ref, computed, withDefaults, watch } from "vue";
 import { QMarkdown } from "@quasar/quasar-ui-qmarkdown";
 import { TypographyProps } from "@/types";
-import { useMargins, useTheme } from "@/hooks";
+import { logStore, useMargins, useTheme } from "@/hooks";
 
 const props = withDefaults(defineProps<TypographyProps>(), {
   value: "",
@@ -159,6 +169,14 @@ const codeExt = computed(() => {
     );
   }
 });
+
+/**
+ * Copy the text to the clipboard.
+ */
+function handleCopy() {
+  navigator.clipboard.writeText(String(props.value));
+  logStore.onInfo("Copied to clipboard");
+}
 
 /**
  * When the variant or value changes, reset the expanded state.

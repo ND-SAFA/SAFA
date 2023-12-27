@@ -7,7 +7,6 @@ import {
   OrganizationSchema,
   MembershipType,
 } from "@/types";
-import { ENABLED_FEATURES } from "@/util";
 import { projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -28,7 +27,7 @@ export const usePermission = defineStore("permissionStore", {
      * @return Whether the current user is a superuser.
      */
     isSuperuser(): boolean {
-      return !!sessionStore.user.admin || ENABLED_FEATURES.SUPERUSER_TEST;
+      return !!sessionStore.user.admin;
     },
   },
   actions: {

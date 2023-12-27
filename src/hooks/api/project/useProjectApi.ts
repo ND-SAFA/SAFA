@@ -55,7 +55,6 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
           projectStore.updateProject({
             name: project.name,
             description: project.description,
-            specification: project.specification,
           });
         }
 

@@ -1,51 +1,33 @@
-import { ENABLED_FEATURES } from "@/util/enabled-features";
-
 /**
  * The steps involved in the initial onboarding process.
  */
 export const ONBOARDING_STEPS = {
+  // Connect to GitHub
   connect: {
     title: "Connect GitHub",
     caption: "Connect your GitHub account to get started.",
     index: 0,
     number: 1,
   },
+  // Select GitHUb org, repo, branch, file path.
   code: {
     title: "Select Repository",
-    caption: "Select code from GitHub to import.",
+    caption: "Select code to import from GitHub.",
     index: 1,
     number: 2,
   },
-  generate: {
-    title: ENABLED_FEATURES.GENERATE_ONBOARDING
-      ? "Generate Documentation"
-      : "Import Code",
-    caption: ENABLED_FEATURES.BILLING_ONBOARDING
-      ? "Review costs and generate documentation for your code."
-      : ENABLED_FEATURES.GENERATE_ONBOARDING
-        ? "Generate documentation for your code."
-        : "Import your code from GitHub.",
+  // Import, await job, show summary to the right when complete.
+  summarize: {
+    title: "Import & Summarize",
+    caption: "Generate system and code level summaries while importing.",
     index: 2,
     number: 3,
   },
-  job: {
-    title: ENABLED_FEATURES.GENERATE_ONBOARDING
-      ? "Await Generation"
-      : "Await Upload",
-    caption: ENABLED_FEATURES.GENERATE_ONBOARDING
-      ? "Wait for data generation to complete."
-      : "Wait for your upload to complete.",
+  // Generate, await job, show buttons for export and view when complete.
+  generate: {
+    title: "Generate Documentation",
+    caption: "Generate documentation on the functionality of your system.",
     index: 3,
     number: 4,
-  },
-  view: {
-    title: ENABLED_FEATURES.GENERATE_ONBOARDING
-      ? "View Documentation"
-      : "Generate Documentation",
-    caption: ENABLED_FEATURES.GENERATE_ONBOARDING
-      ? "Export generated data or view within SAFA."
-      : "Generate documentation for your code.",
-    index: 4,
-    number: 5,
   },
 };

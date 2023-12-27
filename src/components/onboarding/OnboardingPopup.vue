@@ -16,44 +16,67 @@
         </text-button>
       </q-bar>
 
-      <div class="q-mx-auto q-mt-10" style="width: 700px; margin-top: 100px">
-        <typography
-          align="center"
-          el="h1"
-          variant="title"
-          value="Generate Code Documentation"
-        />
-        <typography
-          align="center"
-          el="p"
-          secondary
-          value="Follow the onboarding steps below to generate documentation for your code."
-        />
+      <flex-box
+        v-if="onboardingStore.loading"
+        full-width
+        justify="center"
+        class="q-pa-lg q-mt-lg"
+      >
+        <q-spinner-ball class="nav-gradient" size="4em" />
+      </flex-box>
 
-        <stepper
-          v-model="onboardingStore.step"
-          vertical
-          :steps="onboardingStore.steps"
-          hide-actions
-          color="gradient"
-        >
-          <template #1>
-            <select-repo-step />
-          </template>
-          <template #2>
-            <git-hub-project-input />
-          </template>
-          <template #3>
-            <generate-step />
-          </template>
-          <template #4>
-            <await-generate-step />
-          </template>
-          <template #5>
-            <view-step />
-          </template>
-        </stepper>
-      </div>
+      <flex-box
+        v-show="!onboardingStore.loading"
+        full-width
+        justify="center"
+        class="q-pa-lg"
+      >
+        <flex-item parts="6" class="q-ma-md">
+          <typography
+            align="center"
+            el="h1"
+            variant="title"
+            value="Generate Code Documentation"
+          />
+          <typography
+            align="center"
+            el="p"
+            secondary
+            value="Follow the onboarding steps below to generate documentation for your code."
+          />
+
+          <stepper
+            v-model="onboardingStore.step"
+            vertical
+            :steps="onboardingStore.steps"
+            hide-actions
+            color="gradient"
+          >
+            <template #1>
+              <connect-git-hub-step />
+            </template>
+            <template #2>
+              <select-repo-step />
+            </template>
+            <template #3>
+              <summarize-step />
+            </template>
+            <template #4>
+              <generate-step v-if="ENABLED_FEATURES.ONBOARDING_GENERATE" />
+              <typography
+                v-else
+                value="
+                  Now that your data has been imported, our team will run SAFA's document generation ASAP!
+                  Check back soon to see your generated documentation.
+                "
+              />
+            </template>
+          </stepper>
+        </flex-item>
+        <flex-item v-if="onboardingStore.displayProject" parts="6">
+          <project-preview />
+        </flex-item>
+      </flex-box>
     </q-card>
   </q-dialog>
 </template>
@@ -70,24 +93,23 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
 import { ENABLED_FEATURES } from "@/util";
+import { onboardingStore, permissionStore, sessionStore } from "@/hooks";
 import {
-  gitHubApiStore,
-  integrationsStore,
-  onboardingStore,
-  permissionStore,
-  sessionStore,
-} from "@/hooks";
-import { TextButton, Stepper, Typography } from "@/components/common";
-import { GitHubProjectInput } from "@/components/integrations";
+  TextButton,
+  Stepper,
+  Typography,
+  FlexBox,
+  FlexItem,
+} from "@/components/common";
 import {
+  ConnectGitHubStep,
   SelectRepoStep,
-  ViewStep,
+  SummarizeStep,
   GenerateStep,
-  AwaitGenerateStep,
+  ProjectPreview,
 } from "@/components/onboarding/steps";
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
-const uploadedJob = computed(() => onboardingStore.uploadedJob);
 
 // Preload GitHub projects if credentials are already set.
 onMounted(async () => {
@@ -101,42 +123,10 @@ watch(
     if (
       userLoggedIn &&
       !onboardingStore.isComplete &&
-      !permissionStore.isDemo &&
-      ENABLED_FEATURES.ONBOARDING
+      !permissionStore.isDemo
     ) {
       onboardingStore.open = true;
     }
-  }
-);
-
-// Move from Connect GitHub step if credentials are set.
-watch(
-  () => integrationsStore.validGitHubCredentials,
-  (valid) => {
-    if (!valid) return;
-
-    onboardingStore.handleNextStep("connect");
-    gitHubApiStore.handleLoadProjects();
-  }
-);
-
-// Move from Generate Data step if repo is selected.
-watch(
-  () => !!integrationsStore.gitHubProject,
-  (valid) => {
-    if (!valid) return;
-
-    onboardingStore.handleNextStep("code");
-  }
-);
-
-// Move from Await Generation step if the job completes.
-watch(
-  () => uploadedJob.value?.status,
-  (status) => {
-    if (status !== "COMPLETED") return;
-
-    onboardingStore.handleNextStep("job");
   }
 );
 </script>

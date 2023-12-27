@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.ranking_constants import PRE_SORTED_SCORE
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import TraceKeys
@@ -22,7 +23,7 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :return: NOne
         """
         state.embedding_manager = args.embeddings_manager if args.embeddings_manager else state.embedding_manager
-        state.artifact_map = args.dataset.artifact_df.to_map()
+        state.artifact_map = args.dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
         use_sorter = args.sorter is not None
         use_pre_ranked = args.pre_sorted_parent2children is not None
 

@@ -30,7 +30,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         missing_types = [s for s in args.source_layer_ids if s not in artifact_types]
         assert len(missing_types) == 0, f"Unknown artifact types: {missing_types}. Should be one of {artifact_types}."
 
-        source_artifact_df = original_dataset_complete.artifact_df.get_type(args.source_layer_ids)
+        source_artifact_df = original_dataset_complete.artifact_df.get_artifacts_by_type(args.source_layer_ids)
         source_layer_only_dataset = PromptDataset(artifact_df=source_artifact_df)
 
         state.source_dataset = source_layer_only_dataset

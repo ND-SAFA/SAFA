@@ -30,20 +30,23 @@ class RankingPipelineTest:
         :param kwargs: Custom keyword arguments to ranking args.
         :return: Ranking args and state.
         """
-        if parent_ids is None:
-            parent_ids = []
-        if children_ids is None:
-            children_ids = []
-        if state_kwargs is None:
-            state_kwargs = {}
         project_reader = TestDataManager.get_project_reader()
         artifact_df, _, _ = project_reader.read_project()
+
+        types_to_trace = ("target_1", "source_1")
+        if parent_ids is None:
+            parent_ids = list(artifact_df.get_artifacts_by_type(types_to_trace[0]).index)
+        if children_ids is None:
+            children_ids = list(artifact_df.get_artifacts_by_type(types_to_trace[1]).index)
+        if state_kwargs is None:
+            state_kwargs = {}
+
         project_summary = kwargs.pop("project_summary") if "project_summary" in kwargs else None
         project_summary = Summary({k: {"title": k, "chunks": v} for k, v in project_summary.items()}) if project_summary else None
 
         args = RankingArgs(dataset=PromptDataset(artifact_df=artifact_df, project_summary=project_summary),
                            selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD,
-                           parent_ids=parent_ids, children_ids=children_ids, types_to_trace=("target", "source"), **kwargs)
+                           parent_ids=parent_ids, children_ids=children_ids, types_to_trace=types_to_trace, **kwargs)
         state = RankingState(**state_kwargs, artifact_map=artifact_df.to_map())
         return args, state
 

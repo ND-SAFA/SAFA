@@ -148,7 +148,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         state.format_of_artifacts = HGenTestConstants.format_
 
         state.original_dataset = args.dataset
-        source_artifact_df = state.original_dataset.artifact_df.get_type(args.source_layer_ids)
+        source_artifact_df = state.original_dataset.artifact_df.get_artifacts_by_type(args.source_layer_ids)
         state.source_dataset = PromptDataset(artifact_df=source_artifact_df)
 
         user_story_responses = [PromptUtil.create_xml("user-story", us) for i, us in enumerate(HGenTestConstants.user_stories)]

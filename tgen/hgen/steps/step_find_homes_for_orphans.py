@@ -38,8 +38,8 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param trace_selections:  List of selected trace links.
         :return: None. Selections are added to list.
         """
-        all_children_ids = list(state.selected_artifacts_dataset.artifact_df.get_type(args.source_layer_ids).index)
-        all_parent_ids = list(state.selected_artifacts_dataset.artifact_df.get_type(args.target_type).index)
+        all_children_ids = list(state.selected_artifacts_dataset.artifact_df.get_artifacts_by_type(args.source_layer_ids).index)
+        all_parent_ids = list(state.selected_artifacts_dataset.artifact_df.get_artifacts_by_type(args.target_type).index)
 
         child2predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label())
         child2selected = RankingUtil.group_trace_predictions(trace_selections, TraceKeys.child_label())
@@ -57,8 +57,9 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     export_dir=export_dir,
                                     types_to_trace=(args.source_type, args.target_type),
                                     generate_explanations=False,
-                                    selection_method=None)
-        pipeline = EmbeddingRankingPipeline(pipeline_args, embedding_manager=state.embedding_manager,
+                                    selection_method=None,
+                                    embeddings_manager=state.embedding_manager)
+        pipeline = EmbeddingRankingPipeline(pipeline_args,
                                             skip_summarization=True)
         pipeline.run()
 

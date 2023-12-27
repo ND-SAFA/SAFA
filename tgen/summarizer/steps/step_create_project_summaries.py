@@ -18,7 +18,7 @@ class StepCreateProjectSummaries(AbstractPipelineStep[SummarizerArgs, Summarizer
         :return: None
         """
         project_summaries = []
-        for cluster_id, cluster_artifacts in state.cluster_id_to_artifacts.items():
+        for cluster_id, cluster_artifacts in state.batch_id_to_artifacts.items():
             logger.log_title(f"Creating project summary for {len(cluster_artifacts)} artifacts.")
             export_dir = FileUtil.safely_join_paths(args.export_dir, cluster_id)
             params = DataclassUtil.convert_to_dict(args)

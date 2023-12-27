@@ -41,6 +41,7 @@ class ClusteringArgs(PipelineArgs):
     add_orphans_to_best_home: bool = False
     subset_ids: List[str] = None
     seed_clustering_method: SupportedSeedClusteringMethods = DEFAULT_SEED_CLUSTERING_METHOD
+    save_initial_clusters: bool = False
 
     def __post_init__(self) -> None:
         """
@@ -59,5 +60,9 @@ class ClusteringArgs(PipelineArgs):
         """
         :return: Returns the artifact ids in scope for this pipeline.
         """
-        artifact_ids = list(self.dataset.artifact_df.index)
+        if self.artifact_types:
+            artifact_df = self.dataset.artifact_df.get_artifacts_by_type(self.artifact_types)
+        else:
+            artifact_df = self.dataset.artifact_df
+        artifact_ids = list(artifact_df.index)
         return self.subset_ids if self.subset_ids else artifact_ids

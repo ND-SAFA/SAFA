@@ -7,6 +7,7 @@ from scipy.special import softmax
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
+from tgen.common.util.dict_util import DictUtil
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
@@ -51,14 +52,18 @@ class MetricsManager:
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = {}
         trace_matrix_metrics = SupportedTraceMetric.get_query_metrics()
-        scores = list(map(lambda p: 1 if p >= 0.5 else 0, self.trace_matrix.scores))
+        scores = self.trace_matrix.scores
+        predicted_labels = list(map(lambda p: 1 if p >= 0.5 else 0, self.trace_matrix.scores))
         labels = self.trace_matrix.labels
+        supported_metrics = {e.value.name for e in SupportedTraceMetric}
         for metric_path in metric_paths:
             metric = load(metric_path, keep_in_memory=True)
             args = {"trace_matrix": self.trace_matrix} if metric.name in trace_matrix_metrics else {}
+            if metric.name in supported_metrics:
+                args = DictUtil.update_kwarg_values(args, scores=scores)
             metric_name = get_metric_name(metric)
             try:
-                metric_result = metric.compute(predictions=scores, references=labels, **args)
+                metric_result = metric.compute(predictions=predicted_labels, references=labels, **args)
             except Exception:
                 logger.exception(f"Unable to compute {metric_name}")
                 continue

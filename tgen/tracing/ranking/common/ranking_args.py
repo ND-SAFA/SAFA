@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from tgen.common.constants import environment_constants
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EMBEDDING_MODEL, \
     DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
@@ -37,7 +38,7 @@ class RankingArgs(PipelineArgs):
     """
     - run_name: The unique identifier of this run.
     """
-    run_name: str = "default_run"
+    run_name: str = EMPTY_STRING
     """
     - max_children_per_query: The number of maximum children to give to claude
     """
@@ -129,10 +130,38 @@ class RankingArgs(PipelineArgs):
             path = os.path.expanduser(path)
         return path
 
+    def parent_type(self) -> str:
+        """
+        Gets the parent type being traces
+        :return: The parent type being traces
+        """
+        return self.types_to_trace[0]
+
+    def child_type(self) -> str:
+        """
+        Gets the child type being traces
+        :return: The child type being traces
+        """
+        return self.types_to_trace[1]
+
+    @staticmethod
+    def get_run_name(child_type: str, children_ids: List, parent_type: str, parent_ids: List) -> str:
+        """
+        Gets the run name for the child and parent type
+        :param child_type: The type of the child artifacts
+        :param children_ids: The list of ids of each possible child
+        :param parent_type: The type of the parent artifacts
+        :param parent_ids: The list of ids of each parent being linked
+        :return: The run name
+        """
+        return f"{child_type}({len(children_ids)}) --> {parent_type}({len(parent_ids)})"
+
     def __post_init__(self) -> None:
         """
         Initializes ranking args with default embedding model if in production.
         :return: None
         """
+        if not self.run_name:
+            self.run_name = self.get_run_name(self.child_type(), self.children_ids, self.parent_type(), self.parent_ids)
         super().__post_init__()
         self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else self.embedding_model_name

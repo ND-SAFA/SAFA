@@ -18,9 +18,7 @@ class DataFrameUtil:
         Renames the columns of the data frame.
         :param df: The data frame whose columns should be renamed.
         :param column_translation: Mapping from source to target column names.
-        :param drop_na: Whether to drop entries containing na values.
         :return: DataFrame with columns converted and na's dropped (when specified)
-        :rtype:
         """
         if column_translation is None or len(column_translation) == 0:
             column_translation = {col: col for col in df.columns}

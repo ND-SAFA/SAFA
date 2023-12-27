@@ -42,3 +42,20 @@ class TestRankingUtil(BaseTest):
         self.assertEqual(1, len(grouped_predictions))
         child_predictions = grouped_predictions["c0"]
         self.assertEqual(3, len(child_predictions))
+
+    def test_create_parent_child_ranking(self):
+        scores = [0.8, 0.5, 0.7, 0.95]
+        child_ids = [str(i) for i in range(len(scores))]
+        missing_id = "missing_id"
+        all_child_ids = child_ids + [missing_id]
+        with_scores = RankingUtil.create_parent_child_ranking(zip(child_ids, scores), set(all_child_ids), return_scores=True)
+        self.assertEqual(len(with_scores), 2)
+        ordered_ids, ordered_scores = with_scores
+        self.assertEqual(ordered_scores[:-1], sorted(scores, reverse=True))
+        for i, score in enumerate(ordered_scores[:-1]):
+            expected_id = scores.index(score)
+            self.assertEqual(ordered_ids[i], str(expected_id))
+        self.assertEqual(ordered_ids[-1], missing_id)
+        self.assertEqual(ordered_scores[-1], 0)
+        without_scores = RankingUtil.create_parent_child_ranking(zip(child_ids, scores), set(all_child_ids), return_scores=False)
+        self.assertEqual(ordered_ids, without_scores)

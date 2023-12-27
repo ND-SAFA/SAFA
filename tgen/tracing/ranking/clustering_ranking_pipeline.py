@@ -1,21 +1,21 @@
 from typing import Dict
 
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.common.constants.ranking_constants import CLUSTERING_LINK_THRESHOLD
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
+from tgen.tracing.ranking.steps.cluster_and_sort_artifacts_step import ClusterAndSortArtifactsStep
 from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
-from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
-class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
+class ClusteringRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     """
     Ranks a set of artifacts by using their embeddings to their parents.
     """
-    steps = [SortChildrenStep, CreateExplanationsStep, SelectCandidateLinksStep]
+    steps = [ClusterAndSortArtifactsStep, CreateExplanationsStep, SelectCandidateLinksStep]
 
     def __init__(self, args: RankingArgs, skip_summarization: bool = False):
         """
@@ -23,8 +23,9 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :param args: Arguments to ranking pipeline.
         :param skip_summarization: Whether to skip summarization of artifacts.
         """
-        super().__init__(args, EmbeddingRankingPipeline.steps, skip_summarization=skip_summarization, no_project_summary=True)
+        super().__init__(args, ClusteringRankingPipeline.steps, skip_summarization=skip_summarization, no_project_summary=True)
         self.state.embedding_manager = args.embeddings_manager
+        self.args.link_threshold = CLUSTERING_LINK_THRESHOLD
 
     def state_class(self) -> RankingState:
         """
@@ -32,14 +33,6 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :return: The new state.
         """
         return RankingState
-
-    def run(self, **kwargs) -> None:
-        """
-
-        :return: List of parents mapped to their ranked children.
-        """
-        self.args.sorter = SupportedSorter.EMBEDDING.name
-        super().run()
 
     def get_input_output_counts(self) -> Dict[str, int]:
         """

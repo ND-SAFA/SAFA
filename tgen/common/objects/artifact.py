@@ -1,7 +1,10 @@
 from typing import Optional
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.typed_enum_dict import TypedEnumDict
-from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys
 
 
 class Artifact(TypedEnumDict, keys=ArtifactKeys):
@@ -12,3 +15,17 @@ class Artifact(TypedEnumDict, keys=ArtifactKeys):
     content: str
     layer_id: str
     summary: Optional[str]
+
+    @staticmethod
+    def get_summary_or_content(artifact: EnumDict, use_summary_for_code_only: bool = True) -> str:
+        """
+        Returns the summary if it exists else the content.
+        :param artifact: The artifact whose summary or content is extracted.
+        :param use_summary_for_code_only: If True, only uses the summary if the artifact is code.
+        :return: The traceable string.
+        """
+        use_summary = FileUtil.is_code(artifact[ArtifactKeys.ID]) or not use_summary_for_code_only
+        artifact_summary = DataFrameUtil.get_optional_value_from_df(artifact, StructuredKeys.Artifact.SUMMARY)
+        if artifact_summary is None or not use_summary:
+            return artifact[StructuredKeys.Artifact.CONTENT]
+        return artifact_summary

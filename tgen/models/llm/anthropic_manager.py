@@ -106,7 +106,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
             local_response = get_client().completion(**prompt_params)
             return local_response
-        
+
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
                                                                          thread_work,
                                                                          retries=retries,
@@ -198,15 +198,17 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         return log_probs
 
 
-def get_client():
+def get_client(refresh: bool = False):
     """
+    Returns the current anthropic client.
+    :param refresh: Whether to re-create client regardless of whether a cached version exists.
     :return:  Returns the singleton anthropic client.
     """
     if environment_constants.IS_TEST:
         return MockAnthropicClient()
     else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-        if AnthropicManager.Client is None or not is_connection_alive(AnthropicManager.Client):
+        if AnthropicManager.Client is None or refresh:
             client = anthropic.Client(ANTHROPIC_KEY)
             AnthropicManager.Client = client
             return client

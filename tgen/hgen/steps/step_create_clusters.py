@@ -3,13 +3,14 @@ from typing import Dict
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY
 from tgen.common.constants.hgen_constants import CLUSTER_ARTIFACT_TYPE_PARAM, CLUSTER_SEEDS_PARAM
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
+from tgen.common.objects.artifact import Artifact
 from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
@@ -84,8 +85,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         kwargs = {}
         seed_artifact_type = args.get_seed_id()
-        seed_contents = [a[ArtifactKeys.CONTENT] for a in
-                         state.original_dataset.artifact_df.get_type(seed_artifact_type).to_artifacts()]
+        seed_contents = [Artifact.get_summary_or_content(a, use_summary_for_code_only=not USE_NL_SUMMARY_EMBEDDINGS)
+                         for a in state.original_dataset.artifact_df.get_artifacts_by_type(seed_artifact_type).to_artifacts()]
         kwargs[CLUSTER_SEEDS_PARAM] = seed_contents
         kwargs[CLUSTER_ARTIFACT_TYPE_PARAM] = seed_artifact_type
         return kwargs

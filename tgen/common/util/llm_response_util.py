@@ -2,7 +2,7 @@ import html
 import logging
 import os
 import re
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Set, Union, Optional, Tuple, Any
 
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
@@ -13,7 +13,9 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.trace_output.stage_eval import TracePredictions
+from tgen.models.llm.llm_responses import SupportedLLMResponses, GenerationResponse
 
 
 class LLMResponseUtil:
@@ -139,6 +141,61 @@ class LLMResponseUtil:
         return props
 
     @staticmethod
+    def reload_responses(load_path: str) -> Union[GenerationResponse, List]:
+        """
+        Reloads existing responses if they exist and returns
+        :param load_path:
+        :return:
+        """
+        responses_for_retry = None
+        if FileUtil.safely_check_path_exists(load_path):
+            logger.info(f"IMPORTANT!!! Loading previous LLM responses from {load_path}")
+            res = YamlUtil.read(load_path)
+            failed_responses = LLMResponseUtil.get_failed_responses(res)
+            if len(failed_responses) > 0:
+                responses_for_retry = LLMResponseUtil.get_batch_responses(res)
+            return responses_for_retry if responses_for_retry else res
+
+    @staticmethod
+    def save_responses(responses: GenerationResponse, save_path: str) -> bool:
+        """
+        Saves the model's responses.
+        :param responses: The responses to save.
+        :param save_path: The path to save responses to.
+        :return: Whether the save was successful or not.
+        """
+        if save_path:
+            logger.info(f"Saved LLM responses to {save_path}")
+            FileUtil.create_dir_safely(save_path)
+            YamlUtil.write(responses, save_path)
+            return True
+        return False
+
+    @staticmethod
+    def get_failed_responses(res: SupportedLLMResponses, raise_exception: bool = False) -> List[Exception]:
+        """
+        Gets failed responses from the response.
+        :param res: The LLM Response.
+        :param raise_exception: If True, raises an exception if there are failed responses.
+        :return: A list of failed responses.
+        """
+        batch_responses = LLMResponseUtil.get_batch_responses(res)
+        failed_responses = [r for r in batch_responses if isinstance(r, Exception)]
+        if raise_exception and len(failed_responses) > 0:
+            raise Exception(failed_responses[0])
+        return failed_responses
+
+    @staticmethod
+    def get_batch_responses(res: SupportedLLMResponses) -> List[str]:
+        """
+        Gets batch responses from the response.
+        :param res: The LLM Response.
+        :return: Batch responses.
+        """
+        batch_responses = res.batch_responses if isinstance(res, GenerationResponse) else [r.text for r in res.batch_responses]
+        return batch_responses
+
+    @staticmethod
     def strip_non_digits_and_periods(string: str):
         """
         Removes all characters except digits and periods.
@@ -160,3 +217,20 @@ class LLMResponseUtil:
         filename = FileUtil.add_ext(filename, FileUtil.YAML_EXT)
         path = os.path.join(base_dir, RESPONSES_DIRNAME, filename)
         return path
+
+    @staticmethod
+    def get_non_empty_responses(response_dict: Dict, return_first: bool = True) -> Any:
+        """
+        Extracts only the prompt ids and tags that have responses.
+        :param response_dict: The original parsed response dict.
+        :param return_first: If True, returns the first non-empty response.
+        :return: Only the prompt ids and tags that have responses.
+        """
+        responses = []
+        for k, v in response_dict.items():
+            if v:
+                if isinstance(v, dict):
+                    responses.extend(LLMResponseUtil.get_non_empty_responses(v))
+                else:
+                    responses.append(v)
+        return responses[0] if return_first and len(responses) > 0 else responses

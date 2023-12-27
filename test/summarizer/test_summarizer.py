@@ -4,7 +4,7 @@ from string import ascii_lowercase
 from bs4 import BeautifulSoup
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE
+from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE, MULTI_LINE_ITEMS, SPECIAL_TAGS_ITEMS
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -99,7 +99,7 @@ class TestSummarizer(BaseTest):
     @mock_anthropic
     def test_with_large_project(self, ai_manager: TestAIManager):
         def assert_summary(summary, n_expected_ids):
-            n_ids = len(find_ids(summary.to_string())) / (n_project_summary_sections - 1)
+            n_ids = len(find_ids(summary.to_string())) / (n_project_summary_sections - 2)
             self.assertEqual(n_ids, n_expected_ids)
 
         def find_ids(body):
@@ -117,7 +117,7 @@ class TestSummarizer(BaseTest):
             tag = pattern.findall(prompt)[-1]
             tag = StrUtil.remove_chars(tag, ["</", ">"])
             section_title = SECTION_TAG_TO_TILE.get(tag, PS_SUBSYSTEM_TITLE)
-            body_prefix = artifact_ids if section_title != PS_SUBSYSTEM_TITLE else None
+            body_prefix = artifact_ids if section_title not in SPECIAL_TAGS_ITEMS else None
             return create(title=section_title, body_prefix=body_prefix)
 
         n_clusters = 2
@@ -137,9 +137,9 @@ class TestSummarizer(BaseTest):
         ai_manager.set_responses(project_summary_responses)
         summarizer.summarize()
         state: SummarizerState = summarizer.state
-        clustered_artifacts = {a_id for c in state.cluster_id_to_artifacts.values() for a_id in c}
-        self.assertGreater(len(state.cluster_id_to_artifacts), 1)
-        for project_summary, cluster in zip(state.project_summaries, state.cluster_id_to_artifacts.values()):
+        clustered_artifacts = {a_id for c in state.batch_id_to_artifacts.values() for a_id in c}
+        self.assertGreater(len(state.batch_id_to_artifacts), 1)
+        for project_summary, cluster in zip(state.project_summaries, state.batch_id_to_artifacts.values()):
             assert_summary(project_summary, len(cluster))
         assert_summary(state.final_project_summary, len(clustered_artifacts))
 

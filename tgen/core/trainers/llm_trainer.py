@@ -95,32 +95,22 @@ class LLMTrainer(AbstractTrainer):
             assert len(datasets) == 1, "If prompts are provided, only one dataset may be used"
             prompt_df = datasets[0].get_prompt_dataframe()
 
-        reloaded = False
-        original_responses = None
-        if FileUtil.safely_check_path_exists(save_and_load_path):
-            logger.info(f"IMPORTANT!!! Loading previous LLM responses from {save_and_load_path}")
-            res = YamlUtil.read(save_and_load_path)
-            reloaded = True
-            failed_responses = self._get_failed_responses(res)
-            if len(failed_responses) > 0:
-                original_responses = self._get_batch_responses(res)
+        reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
+        missing_generations = isinstance(reloaded, List) or reloaded is None
 
-        if not reloaded or original_responses is not None:
+        if missing_generations:
             res = self.llm_manager.make_completion_request(
                 completion_type=self.completion_type,
                 prompt=prompts,
-                original_responses=original_responses,
+                original_responses=reloaded,
                 raise_exception=raise_exception and not save_and_load_path)
-            if save_and_load_path:
-                logger.info(f"Saved LLM responses to {save_and_load_path}")
-                FileUtil.create_dir_safely(save_and_load_path)
-                YamlUtil.write(res, save_and_load_path)
+            LLMResponseUtil.save_responses(res, save_and_load_path)
+        else:
+            res = reloaded
 
-        batch_responses = self._get_batch_responses(res)
-        failed_responses = self._get_failed_responses(res)
-        if raise_exception and len(failed_responses) > 0:
-            raise Exception(failed_responses[0])
+        LLMResponseUtil.get_failed_responses(res, raise_exception=raise_exception)
 
+        batch_responses = LLMResponseUtil.get_batch_responses(res)
         debugging = [p + NEW_LINE + str(r) for p, r in zip(prompts, batch_responses)]
         prompt_builder_map = OrderedDict({prompt_builder.id: prompt_builder
                                           for prompt_builder in (self.prompt_builders
@@ -134,27 +124,6 @@ class LLMTrainer(AbstractTrainer):
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
-
-    @staticmethod
-    def _get_failed_responses(res: SupportedLLMResponses) -> List[Exception]:
-        """
-        Gets failed responses from the response.
-        :param res: The LLM Response.
-        :return: A list of failed responses.
-        """
-        batch_responses = LLMTrainer._get_batch_responses(res)
-        failed_responses = [r for r in batch_responses if isinstance(r, Exception)]
-        return failed_responses
-
-    @staticmethod
-    def _get_batch_responses(res: SupportedLLMResponses) -> List[str]:
-        """
-        Gets batch responses from the response.
-        :param res: The LLM Response.
-        :return: Batch responses.
-        """
-        batch_responses = res.batch_responses if isinstance(res, GenerationResponse) else [r.text for r in res.batch_responses]
-        return batch_responses
 
     def _get_prompts_for_prediction(self, datasets: Union[PromptDataset, List[PromptDataset]],
                                     prompt_builders: Union[PromptBuilder, List[PromptBuilder]]) -> PromptDataFrame:

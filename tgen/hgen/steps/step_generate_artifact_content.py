@@ -40,8 +40,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         content_generator = ContentGenerator(args, state, dataset)
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION, base_task_prompt,
                                                                  args.source_type, state.get_cluster2artifacts(), format_variables)
-
-        if args.seed_layer_id:
+        if args.seed_layer_id and args.include_seed_in_prompt:
             self._add_seeds_to_prompt(dataset, prompt_builder, state)
 
         generations = content_generator.generate_content(prompt_builder, generations_filename=self.GENERATION_FILENAME)
@@ -106,4 +105,34 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         n_artifacts_tokens = max(round(sum(token_counts) / token_to_target_ratio), n_artifacts_proportion)
         return n_artifacts_tokens
 
+    @staticmethod
+    def _map_generations_to_predicted_sources(generations: List, source_tag_id: str, target_tag_id: str,
+                                              state: HGenState) -> Tuple[Dict[str, Set[str]], Dict[Any, str]]:
+        """
+        Creates a mapping of the generated artifact to a list of the predicted links to it and the source artifacts
+        :param generations: The predictions from the LLM
+        :param source_tag_id: The id of the predicted sources tag
+        :param target_tag_id: The id of the generated target artifact tag
+        :param state: The current state of the hierarchy generator
+        :return: A mapping of the generated artifact to a list of the predicted links to it and the source artifacts
+        """
+        generations2sources = {}
+        cluster2generations = {cluster_id: [] for cluster_id in state.get_cluster_ids()} if state.cluster_dataset else {}
+        cluster_ids = state.get_cluster_ids() if state.cluster_dataset is not None else []
+        n_failed = 0
+        for i, generations4cluster in enumerate(generations):
+            for generation in generations4cluster:
+                try:
+                    target = generation[target_tag_id][0]
+                    sources = set(generation[source_tag_id][0]) if len(generation[source_tag_id]) > 0 else set()
+                    generations2sources[target] = sources
+                    if cluster_ids:
+                        cluster2generations[cluster_ids[i]].append(target)
+                except Exception:
+                    n_failed += 1
+                    logger.exception("A generation failed")
+        if n_failed > 0:
+            assert n_failed < len(generations), "All generations have failed."
+            logger.warning(f"{n_failed} generations failed. ")
+        return generations2sources, cluster2generations
 

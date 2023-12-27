@@ -3,7 +3,7 @@ from enum import Enum, auto
 from typing import Dict, List, Union
 
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
-    DEFAULT_ORPHAN_THRESHOLD, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
+    DEFAULT_ORPHAN_THRESHOLD, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS
 from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
@@ -115,9 +115,13 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     add_seeds_as_artifacts: bool = False
     """
+    If True, seed will be provided to model when generating.
+    """
+    include_seed_in_prompt: bool = False
+    """
     Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
     """
-    export_original_dataset: bool = False
+    export_hgen_artifacts_only: bool = False
     """
     The sections of the project summary to include in content generation.
     """
@@ -129,13 +133,22 @@ class HGenArgs(PipelineArgs, BaseObject):
         :return: None
         """
         super().__post_init__()
+        self._replace_constants_in_source_layer_ids()
         if not self.source_type:
-            is_code = all([layer_id in self.dataset.artifact_df.get_code_layers() for layer_id in self.source_layer_ids])
-            self.source_type = "code" if is_code else self.source_layer_ids[0]
+            self._determine_source_type()
+        self._set_export_dir()
+        self._set_llm_variables()
+
+        if isinstance(self.source_layer_ids, str):
+            self.source_layer_ids = [self.source_layer_ids]
+
+    def _set_llm_variables(self) -> None:
+        """
+        Sets the llm manager map and the max tokens for each hgen step.
+        :return: None
+        """
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
-        self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \
-            if not self.export_dir.endswith(self.target_type) else self.export_dir
         self.llm_managers[PredictionStep.FORMAT.value] = self.inputs_llm_manager
         for e in PredictionStep:
             if e.value not in self.max_tokens:
@@ -144,8 +157,33 @@ class HGenArgs(PipelineArgs, BaseObject):
                 else:
                     self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
 
-        if isinstance(self.source_layer_ids, str):
-            self.source_layer_ids = [self.source_layer_ids]
+    def _set_export_dir(self) -> None:
+        """
+        Sets the export dir to the appropriate sub folder to save to.
+        :return: None
+        """
+        self.export_dir = FileUtil.safely_join_paths(self.export_dir, self.target_type) \
+            if not self.export_dir.endswith(self.target_type) else self.export_dir
+
+    def _determine_source_type(self) -> None:
+        """
+        Determines and sets the source type using the source layer ids.
+        :return: None
+        """
+        is_code = all([layer_id in self.dataset.artifact_df.get_code_layers() for layer_id in self.source_layer_ids])
+        self.source_type = "code" if is_code else self.source_layer_ids[0]
+
+    def _replace_constants_in_source_layer_ids(self) -> None:
+        """
+        Replaces any constant values in the source layer ids.
+        :return: None.
+        """
+        if USE_ALL_CODE_LAYERS in self.source_layer_ids:
+            self.source_layer_ids.remove(USE_ALL_CODE_LAYERS)
+            self.source_layer_ids.extend(self.dataset.artifact_df.get_code_layers())
+        elif USE_ALL_LAYERS in self.source_layer_ids:
+            self.source_layer_ids.remove(USE_ALL_LAYERS)
+            self.source_layer_ids.extend(self.dataset.artifact_df.get_artifact_types())
 
     def get_seed_id(self, raise_exception: bool=True) -> str:
         """

@@ -62,13 +62,14 @@ class HGenDatasetBuilder:
         Adds the content from the original dataset. If ignored, only source artifacts are added.
         :return: None.
         """
-        if self.args.export_original_dataset:
+        if self.args.export_hgen_artifacts_only:
             self.add_source_artifacts()
         else:
             original_dataset = self.args.dataset
             self._artifact_data_frames.append(self.get_original_artifacts())
-            self._trace_data_frames.append(original_dataset.trace_df)
-            self._layer_data_frames.append(original_dataset.layer_df)
+            if original_dataset.trace_dataset is not None:
+                self._trace_data_frames.append(original_dataset.trace_df)
+                self._layer_data_frames.append(original_dataset.layer_df)
 
     def get_original_artifacts(self):
         """
@@ -95,7 +96,7 @@ class HGenDatasetBuilder:
         Adds the artifacts and trace links generated to linked content.
         :return: None.
         """
-        generated_artifact_df = self.state.selected_artifacts_dataset.artifact_df.get_type(self.args.target_type)
+        generated_artifact_df = self.state.selected_artifacts_dataset.artifact_df.get_artifacts_by_type(self.args.target_type)
         self._artifact_data_frames.append(generated_artifact_df)
 
         layer_df = LayerDataFrame.from_types(self.args.source_layer_ids, self.args.target_type)
@@ -111,11 +112,11 @@ class HGenDatasetBuilder:
         :return: None
         """
         seed_id = self.args.get_seed_id()
-        seed_artifact_df = self.state.original_dataset.artifact_df.get_type(seed_id)
+        seed_artifact_df = self.state.original_dataset.artifact_df.get_artifacts_by_type(seed_id)
         seed2generated = self.create_seed2generated(self.state, generated_trace_df)
 
         # Removing the above...
-        self.state.cluster_dataset.artifact_df.get_type(seed_id)
+        self.state.cluster_dataset.artifact_df.get_artifacts_by_type(seed_id)
         self._artifact_data_frames.append(seed_artifact_df)
 
         cluster_trace_df = self.create_cluster_trace_df(seed2generated, seed_artifact_df)

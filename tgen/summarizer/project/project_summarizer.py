@@ -1,9 +1,10 @@
+import uuid
 from collections.abc import Generator
 from copy import deepcopy
 from typing import List, Tuple, Dict, Union
 
 from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, UNDERSCORE
 from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
     USE_PROJECT_SUMMARY_SECTIONS
 from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, BODY_VERSION_TITLE
@@ -11,6 +12,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.unique_id_manager import DeterministicUniqueIDManager
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -35,7 +37,8 @@ class ProjectSummarizer(BaseObject):
 
     def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset = None,
                  project_summary_versions: List[Summary] = None,
-                 reload_existing: bool = True, n_tokens: int = DEFAULT_SUMMARY_TOKENS):
+                 reload_existing: bool = True, n_tokens: int = DEFAULT_SUMMARY_TOKENS,
+                 summarizer_id: str = str(uuid.uuid4())):
         """
         Generates a system specification document for containing all artifacts.
         :param summarizer_args: The args necessary for the summary
@@ -43,6 +46,7 @@ class ProjectSummarizer(BaseObject):
         :param project_summary_versions: A list of different versions of the project summary from unique subsets.
         :param reload_existing: If True, reloads an existing project summary if it exists
         :param n_tokens: The token limit for the LLM
+        :param summarizer_id: Id assigned to this summarizer
         """
         super().__init__()
         self.args = summarizer_args
@@ -61,6 +65,8 @@ class ProjectSummarizer(BaseObject):
         self.section_display_order = self._get_section_display_order(self.args.section_display_order,
                                                                      self.all_project_sections)
 
+        self.uuid_manager = DeterministicUniqueIDManager(summarizer_id)
+
     def summarize(self) -> Summary:
         """
         Creates the project summary from the project artifacts.
@@ -77,6 +83,7 @@ class ProjectSummarizer(BaseObject):
         self._create_sections(async_sections_only=True)  # create sections that can be created asynchronously
         self._create_sections(async_sections_only=False)  # create sections that require other sections to be included in the prompt
         self.project_summary.re_order_sections(self.section_display_order, remove_unordered_sections=True)
+        self.uuid_manager.generate_new_id()
         return self.project_summary
 
     def get_generation_iterator(self, async_sections_only: bool = False) -> Generator:
@@ -153,6 +160,10 @@ class ProjectSummarizer(BaseObject):
             if not self.dataset else [self.dataset]
         generated_section_responses = self._generate_sections(prompt_builders, dataset)
         for i, (section_id, section_prompt) in enumerate(self.get_generation_iterator(async_sections_only=async_sections_only)):
+            if isinstance(generated_section_responses[i], Exception):
+                logger.warning(f"Generating {section_id} failed due to {generated_section_responses[i]}")
+                continue
+
             self._create_section(generated_section_responses[i], section_id, section_prompt)
 
     def _create_section(self, section_response: Dict, section_id: str, section_prompt: QuestionnairePrompt) -> bool:
@@ -193,7 +204,8 @@ class ProjectSummarizer(BaseObject):
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
                                              prompt_builders=list(prompt_builders.values()),
                                              trainer_dataset_manager=trainer_dataset_manager))
-        res = trainer.perform_prediction(raise_exception=False)
+        save_and_load_path = self._get_responses_save_and_load_path(list(prompt_builders.keys()))
+        res = trainer.perform_prediction(raise_exception=False, save_and_load_path=save_and_load_path)
         failures = {i for i, r in enumerate(res.original_response) if isinstance(r, Exception)}
         parsed_responses = [(res.predictions[i][prompt_builder.get_prompt(-1).id] if i not in failures else res.original_response[i])
                             for i, prompt_builder in enumerate(prompt_builders.values())]
@@ -284,3 +296,14 @@ class ProjectSummarizer(BaseObject):
                                          ArtifactKeys.CONTENT: versions,
                                          ArtifactKeys.LAYER_ID: ["summary_version" for _ in versions]})
         return PromptDataset(artifact_df=artifact_df)
+
+    def _get_responses_save_and_load_path(self, section_names: List[str]) -> str:
+        """
+        Gets the save and load path for responses.
+        :param section_names: The sections being generated.
+        :return: The save and load path for responses.
+        """
+        sections = UNDERSCORE.join(section_names)
+        return FileUtil.safely_join_paths(self.args.export_dir,
+                                          FileUtil.add_ext(f"ps_{sections}{self.uuid_manager.get_uuid()}", FileUtil.YAML_EXT)
+                                          )

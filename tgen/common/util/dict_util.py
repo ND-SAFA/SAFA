@@ -152,18 +152,19 @@ class DictUtil:
         return orig_kwargs
 
     @staticmethod
-    def set_or_increment_count(mapping: Dict, item_key: str, item_value: int) -> None:
+    def set_or_increment_count(mapping: Dict, item_key: Any, increment_value: int = 1, initial_value: int = 1) -> None:
         """
         Adds item to mapping if it does not exists, otherwise increments it.
         :param mapping: The map to add item to.
         :param item_key: The key to store item under.
-        :param item_value: The value to place under key if key is not contained.
+        :param increment_value: The value to increment the count by if the key is in the dict.
+        :param initial_value: The value to place under key if key is not contained.
         :return: None
         """
         if item_key not in mapping:
-            mapping[item_key] = item_value
+            mapping[item_key] = initial_value
         else:
-            mapping[item_key] += item_value
+            mapping[item_key] += increment_value
 
     @staticmethod
     def set_or_append_item(mapping: Dict, item_key: str, item_value: Any, iterable_type: Type = list) -> None:
@@ -179,6 +180,9 @@ class DictUtil:
             mapping[item_key] = iterable_type()
         if isinstance(mapping[item_key], set):
             mapping[item_key].add(item_value)
+        elif isinstance(mapping[item_key], dict):
+            child_key, child_value = item_value
+            mapping[item_key][child_key] = child_value
         else:
             mapping[item_key].append(item_value)
 

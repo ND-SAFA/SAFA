@@ -10,6 +10,7 @@ from sentence_transformers import SentenceTransformer
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.embedding_util import EmbeddingUtil, EmbeddingType, IdType
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -23,10 +24,6 @@ class EmbeddingsManagerObjects(SupportedEnum):
     EMBEDDINGS = "embeddings"
     CONTENT_MAP = "content_map"
     ORDERED_IDS = "ordered_ids"
-
-
-EmbeddingType = np.array
-IdType = Union[int, str]
 
 
 class EmbeddingsManager:
@@ -326,6 +323,16 @@ class EmbeddingsManager:
         need_save = not self._base_path or self.__state_changed_since_last_save
         return need_save
 
+    def compare_embeddings(self, id1: str, id2: str) -> float:
+        """
+        Calculates the similarities between two embeddings.
+        :param id1: Id for first embedding.
+        :param id2: Id for second embedding.
+        :return: The similarity.
+        """
+        score = EmbeddingUtil.calculate_similarities([self.get_embedding(id1)], [self.get_embedding(id2)])[0][0]
+        return score
+
     def calculate_centroid(self, cluster: List[str]):
         """
         Calculates the embedding pointing at the center of the cluster.
@@ -376,3 +383,11 @@ class EmbeddingsManager:
         """
         ordered_ids = list(self._embedding_map.keys()) if not ordered_ids else ordered_ids
         self.__ordered_ids = ordered_ids
+
+    def __contains__(self, item: str) -> bool:
+        """
+        Returns True if the item is in the content map, else False.
+        :param item: The artifact id to check if it is in the content map.
+        :return: True if the item is in the content map, else False.
+        """
+        return item in self._content_map

@@ -2,6 +2,8 @@ from enum import Enum, auto
 from typing import Dict, List, Optional, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_PROMPT
+from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
@@ -60,10 +62,12 @@ class ArtifactPrompt(Prompt):
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]
         artifact_id = artifact.get(StructuredKeys.Artifact.ID.value, EMPTY_STRING)
-        content = DataFrameUtil.get_optional_value(artifact.get(StructuredKeys.Artifact.SUMMARY, None))
         relation = self.get_relationship(artifact)
-        if not content or not self.use_summary:
+        if not self.use_summary:
             content = artifact[StructuredKeys.Artifact.CONTENT]
+        else:
+            content = Artifact.get_summary_or_content(artifact, use_summary_for_code_only=not USE_NL_SUMMARY_PROMPT)
+
         artifact = build_method(artifact_id=artifact_id, artifact_body=content, xml_tags=self.xml_tags,
                                 include_id=self.include_id, relation=relation, **kwargs)
         return f"{prompt}{artifact}"

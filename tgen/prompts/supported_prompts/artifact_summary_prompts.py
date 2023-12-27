@@ -22,16 +22,15 @@ NL_SUMMARY = [
     Prompt("# Task\n"
            "1. Provide a list of answers to the following questions about the software artifact:"
            "\n- What is the functionality described by the artifact?"
-           "\n- What part of the system does the artifact affect? "
-           "\n- Why is this artifact important to the overall system? "
            "\nEnclose your answer in <notes></notes>"
-           "\n\n2. Write a polished summary of the software artifacts in one cohesive, detailed paragraph. "
+           "\n\n2. Then, write a polished description of the software artifacts in a few, cohesive sentences. "
            "Elaborate on the meaning of any acronyms or system terminology. "
            "Write in an active voice and assume your audience is familiar with software system this artifact belongs to."
+           "Importantly, do not remove or add information. Merely describe the artifact in a few sentences."
            "\n\n",
-           PromptResponseManager(response_tag="summary")),
+           PromptResponseManager(response_tag="description")),
     ArtifactPrompt(include_id=False, prompt_start="\n", build_method=ArtifactPrompt.BuildMethod.XML)]
 
 CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX = QuestionPrompt("Use the information below to understand the project.")
 NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX = Prompt("# Goal\nBelow is a description of software project. "
-                                                "You are given a software artifact from the system and asked to summarize it.\n")
+                                                "You are given a software artifact from the system and asked to describe it.\n")

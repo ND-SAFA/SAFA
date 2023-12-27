@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Set, Type, TypeVar
+from typing import Any, Dict, Generic, List, Set, Type, TypeVar, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.threading_state import MultiThreadState
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dict_util import DictUtil
@@ -33,12 +34,14 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         self.state = state if state else State()
 
     def make_completion_request(self, completion_type: LLMCompletionType,
+                                prompt: Union[str, List],
                                 original_responses: List = None,
                                 raise_exception: bool = True,
                                 **params) -> SupportedLLMResponses:
         """
         Makes a request to fine-tune a model.
         :param completion_type: The task to translate response to.
+        :param prompt: The prompt(s) to use for completion.
         :param original_responses: List of the original responses from the model if retrying.
         :param raise_exception: If True, raises an exception if the request has failed.
         :param params: Named parameters to pass to AI library.
@@ -52,10 +55,13 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
                                                                                      model_name=self.llm_args.model,
                                                                                      input_or_output=INPUT_TOKENS,
                                                                                      raise_exception=False)
-        retries = self._get_indices_to_retry(original_responses)
+
+        retries = self._get_indices_to_retry(original_responses, n_expected=len(prompt))
+
         global_state: MultiThreadState = self.make_completion_request_impl(raise_exception=raise_exception,
                                                                            original_responses=original_responses,
                                                                            retries=retries,
+                                                                           prompt=prompt,
                                                                            **completion_params)
         llm_response = global_state.results
 
@@ -170,14 +176,19 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         return SupportedLLMManager
 
     @staticmethod
-    def _get_indices_to_retry(original_responses: List[Any]) -> Set[int]:
+    def _get_indices_to_retry(original_responses: List[Any], n_expected: int) -> Set[int]:
         """
         Gets what indices need retried because of an exception from the original LLM responses.
         :param original_responses: The list of original responses.
+        :param n_expected: The number of expected responses.
         :return: The set of indices that need retried because of an exception.
         """
-        retries = {i for i, r in enumerate(original_responses) if isinstance(r, Exception)} if original_responses is not None else None
-        return retries
+        if original_responses is not None:
+            if len(original_responses) == n_expected:
+                retries = {i for i, r in enumerate(original_responses) if isinstance(r, Exception)}
+                return retries
+            else:
+                logger.warning(f"Unable to reuse responses because the length does not match expected.")
 
     def _combine_original_responses_and_retries(self, new_response: List[Any], original_responses: List[Any],
                                                 retries: Set[int]) -> List[SupportedLLMResponses]:

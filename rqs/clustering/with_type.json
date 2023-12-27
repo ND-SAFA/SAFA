@@ -4,9 +4,9 @@
       "jobs": [
         {
           "object_type": "CLUSTERING",
-          "export_dir": "[DATA_PATH]/clustering/[CURRENT_PROJECT]",
+          "export_dir": "[OUTPUT_PATH]/clustering/[CURRENT_PROJECT]",
           "artifact_types": [
-            "Vue"
+            "[ARTIFACT_TYPES]"
           ],
           "dataset_creator": {
             "object_type": "PROMPT",

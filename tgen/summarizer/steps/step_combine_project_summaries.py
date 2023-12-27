@@ -16,4 +16,5 @@ class StepCombineProjectSummaries(AbstractPipelineStep[SummarizerArgs, Summarize
         if len(state.project_summaries) == 1:
             state.final_project_summary = state.project_summaries[0]
         else:
-            state.final_project_summary = ProjectSummarizer(args, project_summary_versions=state.project_summaries).summarize()
+            state.final_project_summary = ProjectSummarizer(args, project_summary_versions=state.project_summaries,
+                                                            summarizer_id="Combined summaries").summarize()

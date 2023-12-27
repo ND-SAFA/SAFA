@@ -45,28 +45,17 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return ArtifactKeys
 
-    @staticmethod
-    def get_summary_or_content(artifact: EnumDict) -> str:
-        """
-        Returns the summary if it exists else the content.
-        :param artifact: The artifact whose summary or content is extracted.
-        :return: The traceable string.
-        """
-        artifact_summary = DataFrameUtil.get_optional_value_from_df(artifact, StructuredKeys.Artifact.SUMMARY)
-        if artifact_summary is None:
-            return artifact[StructuredKeys.Artifact.CONTENT]
-        return artifact_summary
-
-    def get_summaries_or_contents(self, artifact_ids: List[Any] = None) -> List[str]:
+    def get_summaries_or_contents(self, artifact_ids: List[Any] = None, use_summary_for_code_only: bool = True) -> List[str]:
         """
         Returns the summary for each artifact if it exists else the content.
         :param artifact_ids: The list of artifact ids whose summary or content is return.
+        :param use_summary_for_code_only: If True, only uses the summary if the artifact is code.
         :return: The list of contents or summaries.
         """
         artifact_df = self.filter_by_index(artifact_ids) if artifact_ids else self
         contents = []
         for _, artifact in artifact_df.itertuples():
-            content = self.get_summary_or_content(artifact)
+            content = Artifact.get_summary_or_content(artifact, use_summary_for_code_only=use_summary_for_code_only)
             contents.append(content)
         return contents
 
@@ -79,7 +68,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         for a in artifacts:
             self.add_artifact(**a)
 
-    def add_artifact(self, id: Any, content: str, layer_id: Any = 1, summary: str = EMPTY_STRING) -> EnumDict:
+    def add_artifact(self, id: Any, content: str, layer_id: Any = "1", summary: str = EMPTY_STRING) -> EnumDict:
         """
         Adds artifact to dataframe
         :param id: The id of the Artifact
@@ -108,7 +97,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return self.get_artifact(trace[TraceKeys.SOURCE]), self.get_artifact(trace[TraceKeys.TARGET])
 
-    def get_type(self, artifact_types: Union[str, List[str]]) -> "ArtifactDataFrame":
+    def get_artifacts_by_type(self, artifact_types: Union[str, List[str]]) -> "ArtifactDataFrame":
         """
         Returns data frame with artifacts of given type.
         :param artifact_types: The type to filter by.
@@ -137,13 +126,14 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return list(self[ArtifactKeys.LAYER_ID].unique())
 
-    def to_map(self) -> Dict[str, str]:
+    def to_map(self, use_code_summary_only: bool = True) -> Dict[str, str]:
         """
+        :param use_code_summary_only: If True, only uses the summary if the artifact is code.
         :return: Returns map of artifact ids to content.
         """
         artifact_map = {}
         for name, row in self.itertuples():
-            content = DataFrameUtil.get_optional_value_from_df(row, ArtifactKeys.SUMMARY)
+            content = Artifact.get_summary_or_content(row, use_code_summary_only)
             if content is None or len(content) == 0:
                 content = row[ArtifactKeys.CONTENT]
             artifact_map[name] = content
@@ -203,13 +193,16 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :param code_only: If True, only checks that artifacts that are code are summarized
         :return: True if the artifacts (or artifacts in given layer) are summarized
         """
-        layer_ids = self.get_code_layers() if not layer_ids and code_only else layer_ids
+        if not layer_ids and code_only:
+            layer_ids = self.get_code_layers()
         if not isinstance(layer_ids, set):
             layer_ids = set(layer_ids) if isinstance(layer_ids, list) else {layer_ids}
         for layer_id in layer_ids:
-            df = self if not layer_id else self.get_type(layer_id)
+            df = self if layer_id is None else self.get_artifacts_by_type(layer_id)
             summaries = df[ArtifactKeys.SUMMARY.value]
-            if DataFrameUtil.contains_na(summaries) or DataFrameUtil.contains_empty_string(summaries):
+            missing_summaries = [self.get_row(i)[ArtifactKeys.ID] for i in DataFrameUtil.find_nan_empty_indices(summaries)]
+            missing_summaries = [a_id for a_id in missing_summaries if FileUtil.is_code(a_id) or not code_only]
+            if len(missing_summaries) > 0:
                 return False
         return True
 

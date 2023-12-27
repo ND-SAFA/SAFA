@@ -1,5 +1,6 @@
 from typing import Dict, List, Set
 
+from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD
 from tgen.common.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -25,7 +26,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         embeddings_manager = state.embedding_manager
 
-        new_artifact_map = state.new_artifact_dataset.artifact_df.to_map()
+        new_artifact_map = state.new_artifact_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
         new_artifact_embeddings_map = embeddings_manager.update_or_add_contents(new_artifact_map, create_embedding=True)
         new_artifact_ids = list(new_artifact_embeddings_map.keys())
 
@@ -53,7 +54,8 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         trace_predictions, selected_predictions, existing_traces = [], [], set()
         selected_artifact_pairs = {(trace[TraceKeys.parent_label()], trace[TraceKeys.child_label()])
                                    for trace in state.selected_predictions}
-        state.embedding_manager.update_or_add_contents(content_map=state.all_artifacts_dataset.artifact_df.to_map())
+        content_map = state.all_artifacts_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
+        state.embedding_manager.update_or_add_contents(content_map=content_map)
         for trace in state.trace_predictions:
             parent_key = TraceKeys.parent_label()
 

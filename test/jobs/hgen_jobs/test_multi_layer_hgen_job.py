@@ -106,7 +106,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         layers = args.source_layer_ids + [args.target_type, self.higher_levels[0], self.higher_levels[1]]
         n_expected_links = 0
         for i, layer in enumerate(layers):
-            target_artifacts = dataset.artifact_df.get_type(layer)
+            target_artifacts = dataset.artifact_df.get_artifacts_by_type(layer)
             if layer in orig_layers:
                 n_source_artifacts = orig_dataset.artifact_df.get_type_counts()[layer]
                 self.assertSize(n_source_artifacts, target_artifacts)

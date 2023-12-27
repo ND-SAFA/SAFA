@@ -17,15 +17,14 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     """
     steps = [SortChildrenStep, CreateExplanationsStep, SelectCandidateLinksStep]
 
-    def __init__(self, args: RankingArgs, embedding_manager: EmbeddingsManager = None, skip_summarization: bool = False):
+    def __init__(self, args: RankingArgs, skip_summarization: bool = False):
         """
         Ranks children artifacts from most to least related to source.
         :param args: Arguments to ranking pipeline.
-        :param embedding_manager: Stores and computes artifact embeddings.
         :param skip_summarization: Whether to skip summarization of artifacts.
         """
-        super().__init__(args, EmbeddingRankingPipeline.steps, skip_summarization=skip_summarization)
-        self.state.embedding_manager = embedding_manager
+        super().__init__(args, EmbeddingRankingPipeline.steps, skip_summarization=skip_summarization, no_project_summary=True)
+        self.state.embedding_manager = args.embeddings_manager
 
     def state_class(self) -> RankingState:
         """

@@ -122,6 +122,7 @@ class StrUtil:
         """
         Converts all values to string.
         :param iterable: An iterable containing values to convert.
+        :param keys_only: If True, only converts the keys in the dictionary, else values too.
         :return: The iterable with converted values.
         """
         if isinstance(iterable, list) or isinstance(iterable, set):
@@ -132,3 +133,24 @@ class StrUtil:
         else:
             raise NotImplemented(f"Cannot perform conversion for {type(iterable)}")
         return converted
+
+    @staticmethod
+    def remove_substring(string: str, str2remove: str, only_if_startswith: bool = False,
+                         only_if_endswith: bool = False) -> str:
+        """
+        Removes a substring from a string.
+        :param string: The string to remove substring from.
+        :param str2remove: The sub-string to remove.
+        :param only_if_startswith: If True, only removes from start of string.
+        :param only_if_endswith: If True, only removes from end of string.
+        :return: The string without the substring.
+        """
+        assert not (only_if_startswith and only_if_endswith), "Cannot be only if startswith and only if endswith."
+        pattern = f"{re.escape(str2remove)}"
+        if only_if_startswith:
+            pattern = f"^{pattern}"
+        elif only_if_endswith:
+            pattern = f"{pattern}$"
+        pattern = re.compile(pattern)
+        result = pattern.sub(EMPTY_STRING, string)
+        return result

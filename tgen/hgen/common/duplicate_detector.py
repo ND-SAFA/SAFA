@@ -99,8 +99,8 @@ class DuplicateDetector:
             source_artifact_id = artifact_ids[source_index]
             target_artifact_id = artifact_ids[target_index]
 
-            DictUtil.set_or_increment_count(dup_counter, source_artifact_id, 1)
-            DictUtil.set_or_increment_count(dup_counter, target_artifact_id, 1)
+            DictUtil.set_or_increment_count(dup_counter, source_artifact_id)
+            DictUtil.set_or_increment_count(dup_counter, target_artifact_id)
 
             dup_pairs.add((source_artifact_id, target_artifact_id))
         return dup_counter, dup_pairs

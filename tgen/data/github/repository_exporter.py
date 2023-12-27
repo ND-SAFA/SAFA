@@ -2,7 +2,7 @@ import os
 import re
 from typing import Dict, Union
 
-from tgen.common.constants.artifact_constants import ALLOWED_CODE_EXTENSIONS
+from tgen.common.constants.code_extensions import ALLOWED_CODE_EXTENSIONS
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType

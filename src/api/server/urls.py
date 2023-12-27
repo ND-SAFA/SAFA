@@ -37,6 +37,7 @@ def wrap_html(body: str):
 
 
 def homePageView(request):
+    print("hi")
     home_page = get_home_page()
     return HttpResponse(wrap_html(home_page))
 

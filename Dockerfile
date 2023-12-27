@@ -1,12 +1,7 @@
 ## Step - Build Arguments
-FROM public.ecr.aws/docker/library/python:3.9-slim-buster as base
+FROM public.ecr.aws/docker/library/python:3.9 as base
 SHELL ["/bin/bash", "-c"]
 
-## Step - Prepare deps
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip
 
 ## Step - Install requirements

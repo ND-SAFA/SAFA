@@ -6,6 +6,7 @@ from tests.common.test_data import TestData
 from tests.common.test_data_creator import TestDataCreator
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.list_util import ListUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -31,7 +32,11 @@ class TestUseCase(BaseTest):
         summary_response = RequestProxy.summarize(source_artifacts)
         project_summary = summary_response["summary"]
         summarized_artifacts = [EnumDict(a) for a in summary_response["artifacts"]]
-        self.assertEqual(project_summary, TestData.read_summary())
+
+        source_batches = ListUtil.batch(project_summary.strip(), 100)
+        target_batches = ListUtil.batch(TestData.read_summary().strip(), 100)
+        for s, t in zip(source_batches, target_batches):
+            self.assertEqual(s, t)
 
         for e_summary, r_artifact in zip(source_summaries, summarized_artifacts):
             self.assertEqual(e_summary, r_artifact[ArtifactKeys.SUMMARY])

@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_TAGS, PS_DATA_FLOW_TAG, \
-    PS_SUBSYSTEM_TAG
+    PS_ENTITIES_TAG, PS_SUBSYSTEM_TAG
 from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATION_TAG, ENTITIES_TAG, JUSTIFICATION_TAG, \
     RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_SCORE_TAG, SUB_SYSTEMS_TAG
 from tgen.common.util.llm_response_util import LLMResponseUtil
@@ -227,25 +227,27 @@ class TestAIManager:
 
     @staticmethod
     def create_project_summary_response(tag: str, tag_body: Union[str, Dict]):
+        NAMED_RESPONSE_TAGS = [PS_SUBSYSTEM_TAG, PS_ENTITIES_TAG]
         if isinstance(tag_body, dict):
             chunks = tag_body["chunks"]
-            if tag == PS_SUBSYSTEM_TAG:
-                body = [TestAIManager.create_subsystem_response(c) for c in chunks]
+            if tag in NAMED_RESPONSE_TAGS:
+                body = [TestAIManager.create_named_response(tag, c) for c in chunks]
             elif tag == PS_DATA_FLOW_TAG:
                 body = PromptUtil.create_xml(tag, NEW_LINE.join(chunks))
             else:
                 body = [PromptUtil.create_xml(tag, c) for c in chunks]
         else:
-            if tag == PS_SUBSYSTEM_TAG:
-                tag_body = TestAIManager.create_subsystem_response(tag_body)
+            if tag in NAMED_RESPONSE_TAGS:
+                tag_body = TestAIManager.create_named_response(tag, tag_body)
             body = f"<{tag}>{tag_body}</{tag}>"
         return f"<notes></notes>{body}" if isinstance(body, str) else NEW_LINE.join([f"<notes></notes>{b}" for b in body])
 
     @staticmethod
-    def create_subsystem_response(content: str) -> str:
+    def create_named_response(tag_id: str, content: str) -> str:
         """
         Creates subsystem project summary response that contains given content.
         First line is used to name the subsystem. If no newline if found then content is used as name.
+        :param tag_id: The tag to encapsulate named responsed.
         :param content: The content of the sub-system.
         :return:The response with XML tags.
         """
@@ -253,7 +255,7 @@ class TestAIManager:
         desc = NEW_LINE.join(desc)
         name = name.replace("#", EMPTY_STRING)
         content = f"<name>{name}</name><descr>{desc}</descr>"
-        content = PromptUtil.create_xml(PS_SUBSYSTEM_TAG, content)
+        content = PromptUtil.create_xml(tag_id, content)
         return content
 
     @staticmethod

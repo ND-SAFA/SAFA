@@ -88,7 +88,8 @@ class RankingJob(AbstractJob):
         export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
             export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
-        pipeline_args = RankingArgs(dataset=PromptDataset(artifact_df=selected_artifacts),
+        layer_dataset = PromptDataset(artifact_df=selected_artifacts, project_summary=self.dataset.project_summary)
+        pipeline_args = RankingArgs(dataset=layer_dataset,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
                                     export_dir=export_dir,

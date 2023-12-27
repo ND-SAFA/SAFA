@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Any, Callable, Dict, List, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.constants.deliminator_constants import COLON, EMPTY_STRING, NEW_LINE
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, PROJECT_SUMMARY_TAGS, PS_DATA_FLOW_TAG, \
     PS_ENTITIES_TAG, PS_SUBSYSTEM_TAG
 from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATION_TAG, ENTITIES_TAG, JUSTIFICATION_TAG, \
@@ -12,6 +12,7 @@ from tgen.common.util.prompt_util import PromptUtil
 DEFAULT_SCORE = 0.5
 DEFAULT_EXPLANATION = "EXPLANATION"
 SUMMARY_TAGS = {"summary", "description"}
+
 
 class TestAIManager:
     def __init__(self, library: str, response_formatter: Callable, require_used_all_responses: bool = True):
@@ -252,12 +253,27 @@ class TestAIManager:
         :param content: The content of the sub-system.
         :return:The response with XML tags.
         """
-        name, *desc = content.split(NEW_LINE) if NEW_LINE in content else [content, content]
-        desc = NEW_LINE.join(desc)
+        delimiter = TestAIManager.find_first(content, [NEW_LINE, COLON])
+        name, desc = content.split(delimiter) if delimiter else [content, content]
+        name = name.strip()
+        desc = desc.strip()
         name = name.replace("#", EMPTY_STRING)
         content = f"<name>{name}</name><descr>{desc}</descr>"
         content = PromptUtil.create_xml(tag_id, content)
         return content
+
+    @staticmethod
+    def find_first(content: str, items: List[str]) -> str:
+        """
+        Finds first item that's within content.
+        :param content: The text to search within.
+        :param items: The items to check one by one if they are in content.
+        :return item found.
+        """
+        for i in items:
+            if i in content:
+                return i
+        return None
 
     @staticmethod
     def mock_responses(self):
@@ -268,7 +284,7 @@ class TestAIManager:
             self.handlers.append(response_handler)
 
     @staticmethod
-    def create_summarization_response(p: str, tag_name: str ="summary"):
+    def create_summarization_response(p: str, tag_name: str = "summary"):
         """
         Generically creates a summarize response from the body of the artifact.
         :param p: The summarization prompt.

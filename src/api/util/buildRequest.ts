@@ -1,5 +1,6 @@
 import { APIMethods } from "@/types";
 import { LOGOUT_ERROR, LOGOUT_STATUS_CODE } from "@/util";
+import { logStore } from "@/hooks";
 import { BASE_URL, Endpoint } from "@/api";
 
 /**
@@ -44,6 +45,18 @@ class RequestBuilder<
   }
 
   /**
+   * Builds a new request for the given endpoint.
+   * @param endpoint - The endpoint to build a request for.
+   * @param pathVariables - Any path variables to fill in.
+   */
+  static buildRequest<R = void, Q extends string = string, B = void>(
+    endpoint: keyof typeof Endpoint,
+    pathVariables?: Record<Q, string>
+  ): RequestBuilder<R, Q, B> {
+    return new RequestBuilder<R, Q, B>(endpoint, pathVariables);
+  }
+
+  /**
    * Updates the request response type.
    * @param type - The response type to use.
    */
@@ -58,56 +71,6 @@ class RequestBuilder<
   withFormData(): this {
     this.jsonBody = false;
     return this;
-  }
-
-  /**
-   * Performs an API request.
-   * @param method - The method to use for the request.
-   * @param body - The body of the request.
-   * @return The response data.
-   */
-  private async request(
-    method: APIMethods,
-    body?: BodyType
-  ): Promise<ReturnType> {
-    let url = `${BASE_URL}/${this.relativeUrl}`;
-
-    Object.entries(this.pathVariables).forEach(([key, value]) => {
-      url = url.replace(`:${key}`, value);
-    });
-
-    const res = await fetch(url, {
-      credentials: "include",
-      headers: this.jsonBody
-        ? {
-            ...(this.headers || {}),
-            "Content-Type": "application/json",
-          }
-        : this.headers,
-      method,
-      body: this.jsonBody ? JSON.stringify(body) : (body as unknown as string),
-    });
-
-    if (this.responseType === "arraybuffer") {
-      return (await res.arrayBuffer()) as unknown as ReturnType;
-    }
-
-    const content = await res.text();
-
-    if (res.status === LOGOUT_STATUS_CODE && !url.includes("credentials")) {
-      // Log out of the app if credentials expire, and not if integration credentials expire.
-      throw Error(LOGOUT_ERROR);
-    } else if (this.responseType !== "json") {
-      return content as unknown as ReturnType;
-    }
-
-    const data = content ? JSON.parse(content) : undefined;
-
-    if (!res.ok) {
-      throw Error(data.error);
-    } else {
-      return data as ReturnType;
-    }
   }
 
   /**
@@ -167,15 +130,54 @@ class RequestBuilder<
   }
 
   /**
-   * Builds a new request for the given endpoint.
-   * @param endpoint - The endpoint to build a request for.
-   * @param pathVariables - Any path variables to fill in.
+   * Performs an API request.
+   * @param method - The method to use for the request.
+   * @param body - The body of the request.
+   * @return The response data.
    */
-  static buildRequest<R = void, Q extends string = string, B = void>(
-    endpoint: keyof typeof Endpoint,
-    pathVariables?: Record<Q, string>
-  ): RequestBuilder<R, Q, B> {
-    return new RequestBuilder<R, Q, B>(endpoint, pathVariables);
+  private async request(
+    method: APIMethods,
+    body?: BodyType
+  ): Promise<ReturnType> {
+    let url = `${BASE_URL}/${this.relativeUrl}`;
+
+    Object.entries(this.pathVariables).forEach(([key, value]) => {
+      url = url.replace(`:${key}`, value);
+    });
+
+    const res = await fetch(url, {
+      credentials: "include",
+      headers: this.jsonBody
+        ? {
+            ...(this.headers || {}),
+            "Content-Type": "application/json",
+          }
+        : this.headers,
+      method,
+      body: this.jsonBody ? JSON.stringify(body) : (body as unknown as string),
+    });
+
+    if (this.responseType === "arraybuffer") {
+      return (await res.arrayBuffer()) as unknown as ReturnType;
+    }
+
+    const content = await res.text();
+
+    if (res.status === LOGOUT_STATUS_CODE && !url.includes("credentials")) {
+      // Log out of the app if credentials expire, and not if integration credentials expire.
+      throw Error(LOGOUT_ERROR);
+    } else if (this.responseType !== "json") {
+      return content as unknown as ReturnType;
+    }
+
+    const data = content ? JSON.parse(content) : undefined;
+
+    if (!res.ok) {
+      logStore.onError(data.message);
+      throw Error(data.error);
+    } else {
+      return data as ReturnType;
+    }
   }
 }
 

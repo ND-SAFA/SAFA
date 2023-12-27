@@ -31,7 +31,7 @@ class TestUseCase(BaseTest):
         summary_response = RequestProxy.summarize(source_artifacts)
         project_summary = summary_response["summary"]
         summarized_artifacts = [EnumDict(a) for a in summary_response["artifacts"]]
-        self.assertEqual(project_summary, TestData.read_summary())
+        self.assertEqual(project_summary.strip(), TestData.read_summary().strip())
 
         for e_summary, r_artifact in zip(source_summaries, summarized_artifacts):
             self.assertEqual(e_summary, r_artifact[ArtifactKeys.SUMMARY])

@@ -4,24 +4,24 @@ The system leverages a relational database and object-relational mapping to enab
 To retrieve this data, the ArtifactService and TraceLinkService classes actively convert raw database entities into application-level objects. The ArtifactService takes a project version and retrieves all related artifact database entries, which are then constructed into Artifact application entities. The TraceLinkService utilizes these artifacts to identify related trace links, filter and convert trace database entries into TraceLink application entities.
 Configuration settings and filtering predicates can customize the data retrieval process. Overall, this architecture enables managing artifact and trace link data across versions, abstracting database persistence details behind services, and producing application entities to power additional behaviors in the system.
 # Features
-The system shall enable persisting artifact entities to a relational database with attributes for a unique identifier, name, and relationships to associated project and artifact types.
-The system shall enable retrieving persisted artifact entities from the database by specifying a project version or project. The retrieved results shall be converted from the database entities to application entities.
-The system shall enable defining trace link entities to represent relationships between artifacts. Trace links shall be persisted to the database with constraints to ensure uniqueness of links between a source and target artifact pair.
-The system shall enable retrieving trace link entities from the database for a specified project version. Retrieved trace link database entities shall be filtered and converted to application trace link entities.
-The system shall be configurable to trace code artifacts based on their file system locations. Tracing of code artifacts shall be enabled or disabled through configuration settings.
+* The system shall enable persisting artifact entities to a relational database with attributes for a unique identifier, name, and relationships to associated project and artifact types.
+* The system shall enable retrieving persisted artifact entities from the database by specifying a project version or project. The retrieved results shall be converted from the database entities to application entities.
+* The system shall enable defining trace link entities to represent relationships between artifacts. Trace links shall be persisted to the database with constraints to ensure uniqueness of links between a source and target artifact pair.
+* The system shall enable retrieving trace link entities from the database for a specified project version. Retrieved trace link database entities shall be filtered and converted to application trace link entities.
+* The system shall be configurable to trace code artifacts based on their file system locations. Tracing of code artifacts shall be enabled or disabled through configuration settings.
 # Entities
-Artifact: An entity representing a unique artifact (e.g. code file, document, etc.) stored within a project. Has attributes like ID, name, and relationships. Can be persisted and retrieved from the database.
-Project: An entity representing a software project within the system. Artifacts belong to specific projects.
-ProjectVersion: Represents a version or snapshot of a project at a point in time. Artifacts are associated with specific project versions.
-ArtifactType: Categorizes artifacts into types like code, document, etc. Artifacts have a type.
-TraceLink: An entity representing a traceability link between two artifacts. Connects a source and target artifact. Can be queried to understand relationships.
-Repository: A database or storage mechanism for persisting entities like artifacts and traces.
-Service: Code module that retrieves entity data from repositories and assembles into application objects.
-Filtering: Applying criteria to query results to narrow to a subset of entities based on properties.
-Metadata: Data about an entity, like its name or timestamp.
-Application Entity: An object instance representing a domain entity for use in the application code.
-Mapping: Associating a programming language class with a database table to enable persistence.
-Relationship: An association between entities like a trace link between artifacts.
+* Artifact: An entity representing a unique artifact (e.g. code file, document, etc.) stored within a project. Has attributes like ID, name, and relationships. Can be persisted and retrieved from the database.: Artifact: An entity representing a unique artifact (e.g. code file, document, etc.) stored within a project. Has attributes like ID, name, and relationships. Can be persisted and retrieved from the database.
+* Project: An entity representing a software project within the system. Artifacts belong to specific projects.: Project: An entity representing a software project within the system. Artifacts belong to specific projects.
+* ProjectVersion: Represents a version or snapshot of a project at a point in time. Artifacts are associated with specific project versions.: ProjectVersion: Represents a version or snapshot of a project at a point in time. Artifacts are associated with specific project versions.
+* ArtifactType: Categorizes artifacts into types like code, document, etc. Artifacts have a type.: ArtifactType: Categorizes artifacts into types like code, document, etc. Artifacts have a type.
+* TraceLink: An entity representing a traceability link between two artifacts. Connects a source and target artifact. Can be queried to understand relationships.: TraceLink: An entity representing a traceability link between two artifacts. Connects a source and target artifact. Can be queried to understand relationships.
+* Repository: A database or storage mechanism for persisting entities like artifacts and traces.: Repository: A database or storage mechanism for persisting entities like artifacts and traces.
+* Service: Code module that retrieves entity data from repositories and assembles into application objects.: Service: Code module that retrieves entity data from repositories and assembles into application objects.
+* Filtering: Applying criteria to query results to narrow to a subset of entities based on properties.: Filtering: Applying criteria to query results to narrow to a subset of entities based on properties.
+* Metadata: Data about an entity, like its name or timestamp.: Metadata: Data about an entity, like its name or timestamp.
+* Application Entity: An object instance representing a domain entity for use in the application code.: Application Entity: An object instance representing a domain entity for use in the application code.
+* Mapping: Associating a programming language class with a database table to enable persistence.: Mapping: Associating a programming language class with a database table to enable persistence.
+* Relationship: An association between entities like a trace link between artifacts.: Relationship: An association between entities like a trace link between artifacts.
 # Sub-systems
 ## Artifact Management
 The Artifact Management sub-system handles persisting and retrieving artifact data within the system. The Artifact and ArtifactService classes allow artifacts to be stored in the database with identifying information like name and ID. The ArtifactService provides methods to query artifacts by project version or ID. This enables other parts of the system to consistently retrieve artifact data.

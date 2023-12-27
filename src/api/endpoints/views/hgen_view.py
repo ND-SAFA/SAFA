@@ -23,6 +23,8 @@ def perform_hgen(request: HGenRequest):
     target_types = request.target_types
     source_layer_ids = list(set([a[ArtifactKeys.LAYER_ID] for a in artifacts]))
 
+    seed_title_section = None if len(artifacts) <= 10 else PS_FEATURE_TITLE
+
     summary = request.summary
     base_type, *other_types = target_types
     logger.info(f"Starting HGEN request for: {target_types}")
@@ -30,7 +32,7 @@ def perform_hgen(request: HGenRequest):
     hgen_args = HGenArgs(source_layer_ids=source_layer_ids,
                          target_type=base_type,
                          dataset_creator=dataset_creator,
-                         seed_project_summary_section=PS_FEATURE_TITLE)
+                         seed_project_summary_section=seed_title_section)
     base_job = BaseHGenJob(hgen_args)
     job = MultiLayerHGenJob(base_job,
                             target_types=other_types)

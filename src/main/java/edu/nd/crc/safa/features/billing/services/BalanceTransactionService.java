@@ -41,8 +41,14 @@ public class BalanceTransactionService {
     }
 
     /**
-     * Apply a transaction to an account. Make sure to update the
-     * status of the transaction with the markTransaction* functions
+     * Apply a transaction to an account. The transaction will be in the PENDING
+     * state. Make sure to update the status of the transaction with the
+     * markTransaction* functions.<br>
+     * <br>
+     * If the transaction is a charge (i.e. the amount is negative), adjust the
+     * balance of the account immediately. If the transaction is a credit
+     * (i.e. the amount is positive), wait to adjust the balance until the
+     * transaction is marked successful.
      *
      * @param organization The account to apply the transaction to
      * @param amount The amount of the transaction
@@ -54,8 +60,10 @@ public class BalanceTransactionService {
             throw new IllegalArgumentException("Amount cannot be zero");
         }
 
-        if (!tryAdjustAccountWithRetries(organization, amount, 0, 0)) {
-            throw new SafaError("Unable to adjust account balance, please try again later.");
+        if (isDebit(amount)) {
+            if (!tryAdjustAccountWithRetries(organization, amount, 0, 0)) {
+                throw new SafaError("Unable to adjust account balance, please try again later.");
+            }
         }
 
         Transaction transaction = new Transaction(amount, description, organization);
@@ -102,7 +110,7 @@ public class BalanceTransactionService {
         boolean success = tryAdjustAccountWithRetries(transaction.getOrganization(), balanceDelta,
             totalUsedDelta, totalSuccessfulDelta);
         if (!success) {
-            throw new SafaError("Failed to refund transaction with ID " + transaction.getId());
+            throw new SafaError("Failed to adjust transaction with ID " + transaction.getId());
         }
     }
 
@@ -120,7 +128,7 @@ public class BalanceTransactionService {
 
         int currentBalance = billingInfo.getBalance();
 
-        if (balanceDelta < 0 && currentBalance < -balanceDelta) {
+        if (isDebit(balanceDelta) && currentBalance < -balanceDelta) {
             throw new InsufficientFundsException(currentBalance, -balanceDelta);
         }
 
@@ -162,6 +170,14 @@ public class BalanceTransactionService {
         return transact(organization, amount, description);
     }
 
+    private boolean isCredit(int amount) {
+        return amount > 0;
+    }
+
+    private boolean isDebit(int amount) {
+        return amount < 0;
+    }
+
     /**
      * Mark a transaction as failed. This will fail if the transaction already finished.
      *
@@ -175,7 +191,12 @@ public class BalanceTransactionService {
             throw new IllegalArgumentException("Cannot mark a finished transaction as failed.");
         }
 
-        tryAdjustAccountForTransaction(transaction, -amount, toUsedCreditAmount(amount), 0);
+        int balanceAdjustment = 0;
+        if (isDebit(amount)) {
+            balanceAdjustment = -amount;
+        }
+
+        tryAdjustAccountForTransaction(transaction, balanceAdjustment, toUsedCreditAmount(amount), 0);
 
         transaction.setStatus(Transaction.Status.FAILED);
         return transactionRepository.save(transaction);
@@ -194,32 +215,48 @@ public class BalanceTransactionService {
             throw new IllegalArgumentException("Cannot mark a finished transaction as successful.");
         }
 
-        tryAdjustAccountForTransaction(transaction, 0, toUsedCreditAmount(amount), toUsedCreditAmount(amount));
+        int balanceAdjustment = 0;
+        if (isCredit(amount)) {
+            balanceAdjustment = amount;
+        }
+
+        int usedCreditAmount = toUsedCreditAmount(amount);
+
+        tryAdjustAccountForTransaction(transaction, balanceAdjustment, usedCreditAmount, usedCreditAmount);
 
         transaction.setStatus(Transaction.Status.SUCCESSFUL);
         return transactionRepository.save(transaction);
     }
 
     /**
-     * Mark a transaction as refunded and return the funds to the account (if not already done)
+     * Mark a transaction as canceled and return the funds to the account (if not already done)
      *
-     * @param transaction The transaction to mark refunded
+     * @param transaction The transaction to mark canceled
      * @return The updated transaction
      */
-    public Transaction markTransactionRefunded(Transaction transaction) {
+    public Transaction markTransactionCanceled(Transaction transaction) {
         Transaction.Status status = transaction.getStatus();
         int amount = transaction.getAmount();
 
+        int usedCreditAmount = toUsedCreditAmount(amount);
+
+        int debitAmount = 0;
+        if (isDebit(amount)) {
+            debitAmount = amount;
+        }
+
         switch (status) {
-            case FAILED -> tryAdjustAccountForTransaction(transaction, 0, -toUsedCreditAmount(amount), 0);
-            case PENDING -> tryAdjustAccountForTransaction(transaction, -amount, 0, 0);
-            case SUCCESSFUL -> tryAdjustAccountForTransaction(transaction, -amount, -toUsedCreditAmount(amount),
-                                                                -toUsedCreditAmount(amount));
+            case FAILED ->
+                tryAdjustAccountForTransaction(transaction, 0, -usedCreditAmount, 0);
+            case PENDING ->
+                tryAdjustAccountForTransaction(transaction, -debitAmount, 0, 0);
+            case SUCCESSFUL ->
+                tryAdjustAccountForTransaction(transaction, -amount, -usedCreditAmount, -usedCreditAmount);
             default -> {
             }
         }
 
-        transaction.setStatus(Transaction.Status.REFUNDED);
+        transaction.setStatus(Transaction.Status.CANCELED);
         return transactionRepository.save(transaction);
     }
 
@@ -236,7 +273,7 @@ public class BalanceTransactionService {
      * @return How many credits were used by this transaction
      */
     private int toUsedCreditAmount(int transactionAmount) {
-        if (transactionAmount < 0) {
+        if (isDebit(transactionAmount)) {
             return -transactionAmount;
         }
         return 0;

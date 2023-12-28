@@ -36,7 +36,7 @@ public class Transaction {
         PENDING,
         SUCCESSFUL,
         FAILED,
-        REFUNDED
+        CANCELED
     }
 
     @JdbcTypeCode(SqlTypes.BINARY)

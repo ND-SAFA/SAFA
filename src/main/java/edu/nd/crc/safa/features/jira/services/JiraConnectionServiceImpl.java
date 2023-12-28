@@ -183,7 +183,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .method(ApiRoute.PERMISSIONS.getMethod())
                 .uri(uri, builder ->
                     builder
-                        .queryParam("permissions", JiraProjectPermissionDTO.ADMINISTER_PROJECTS_PERMISSION)
+                        .queryParam("permissions", JiraProjectPermissionDTO.BROWSE_PROJECTS_PERMISSION)
                         .queryParam("projectId", jiraProjectId)
                         .build()
                 ).header(HttpHeaders.AUTHORIZATION,
@@ -192,12 +192,13 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .bodyToMono(JiraProjectPermissionDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve JIRA permission"));
 
-        if (!permissionDTO.getPermissions().containsKey(JiraProjectPermissionDTO.ADMINISTER_PROJECTS_PERMISSION)) {
+        System.out.println(permissionDTO);
+        if (!permissionDTO.getPermissions().containsKey(JiraProjectPermissionDTO.BROWSE_PROJECTS_PERMISSION)) {
             return false;
         }
 
         return permissionDTO.getPermissions()
-            .get(JiraProjectPermissionDTO.ADMINISTER_PROJECTS_PERMISSION).getHavePermission();
+            .get(JiraProjectPermissionDTO.BROWSE_PROJECTS_PERMISSION).getHavePermission();
     }
 
     @Override

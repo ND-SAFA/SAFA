@@ -5,14 +5,20 @@ package edu.nd.crc.safa.features.billing.services;
  */
 public interface IExternalBillingService {
 
-    // TODO temp interface
-
     /**
+     * Begin a transaction with the external interface
      *
      * @param referenceId Some string to reference the transaction
-     * @return The url to redirect to TODO this might not be the most reusable interface
+     * @param amount The amount of the transaction
+     * @return The url to redirect to in order to complete the transaction
      */
     String startTransaction(String referenceId, int amount);
 
+    /**
+     * Complete a transaction with the external interface
+     *
+     * @param referenceId The same string for the transaction that was passed into
+     *                    {@link #startTransaction(String, int)}
+     */
     void endTransaction(String referenceId);
 }

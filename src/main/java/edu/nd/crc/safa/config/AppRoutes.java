@@ -328,7 +328,7 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Stripe {
         public static final String ROOT = "/stripe";
-        public static final String CHECKOUT = ROOT + "/checkout/{amount}";
+        public static final String CHECKOUT = ROOT + "/checkout";
         public static final String WEBHOOK = ROOT + "/webhook";
     }
 }

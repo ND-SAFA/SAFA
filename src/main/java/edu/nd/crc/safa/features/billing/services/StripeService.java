@@ -1,11 +1,19 @@
 package edu.nd.crc.safa.features.billing.services;
 
+import java.util.UUID;
+
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Event;
+import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
+import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +36,14 @@ public class StripeService implements IExternalBillingService {
     @Value("${stripe.credit_product_key}")
     private String creditProductKey;
 
-    public StripeService(@Value("${stripe.api_key}") String apiKey) {
+    @Value("${stripe.webhook_secret}")
+    private String webhookSecret;
+
+    private final BillingService billingService;
+
+    public StripeService(@Value("${stripe.api_key}") String apiKey, BillingService billingService) {
+        this.billingService = billingService;
+
         if (apiKey != null && !apiKey.isBlank()) {
             Stripe.apiKey = apiKey;
         } else {
@@ -53,7 +68,6 @@ public class StripeService implements IExternalBillingService {
                 .addLineItem(
                     SessionCreateParams.LineItem.builder()
                         .setQuantity((long) amount)
-                        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                         .setPrice(creditProductKey)
                         .build())
                 .setClientReferenceId(referenceId)
@@ -71,5 +85,86 @@ public class StripeService implements IExternalBillingService {
     @Override
     public void endTransaction(String referenceId) {
         logger.info("Finished transaction with reference ID {}", referenceId);
+    }
+
+    /**
+     * Process a stripe webhook event
+     *
+     * @param eventBody The body of the webhook event
+     * @param signatureHeader The stripe signature header from the event
+     */
+    public void processWebhookEvent(String eventBody, String signatureHeader) {
+        Event event = parseEvent(eventBody, signatureHeader);
+        StripeObject stripeObject = parseStripeObject(event);
+
+        StripeEventType eventType = StripeEventType.fromApiName(event.getType());
+        switch (eventType) {
+            case SESSION_COMPLETED -> handleSessionCompletedEvent((Session) stripeObject);
+            default -> logger.debug("Ignoring event of unknown type " + event.getType());
+        }
+    }
+
+    /**
+     * Parse the webhook body and signature to create a stripe event object
+     *
+     * @param eventBody The body of the webhook event
+     * @param signatureHeader The stripe signature header from the event
+     * @return The parsed stripe event
+     */
+    private Event parseEvent(String eventBody, String signatureHeader) {
+        try {
+            return Webhook.constructEvent(
+                eventBody, signatureHeader, webhookSecret
+            );
+        }  catch (Exception e) {
+            // Invalid signature
+            throw new SafaError("Failed to validate stripe event", e);
+        }
+    }
+
+    /**
+     * Further parse the stripe event object to retrieve the stripe object containing the event details
+     *
+     * @param event The parsed stripe event
+     * @return The stripe object containing event details
+     */
+    private StripeObject parseStripeObject(Event event) {
+        EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+        if (dataObjectDeserializer.getObject().isPresent()) {
+            return dataObjectDeserializer.getObject().get();
+        } else {
+            throw new SafaError("Failed to parse object");
+        }
+    }
+
+    /**
+     * Handle the stripe session completed event
+     *
+     * @param session The session object contained in the event
+     */
+    private void handleSessionCompletedEvent(Session session) {
+        UUID transactionId = UUID.fromString(session.getClientReferenceId());
+        billingService.endTransaction(transactionId);
+    }
+
+    @Getter
+    @AllArgsConstructor
+    private enum StripeEventType {
+        SESSION_COMPLETED("checkout.session.completed"),
+        UNKNOWN("");
+
+        private final String apiName;
+
+        public static StripeEventType fromApiName(String apiName) {
+            for (StripeEventType eventType : StripeEventType.values()) {
+                if (eventType.getApiName().isEmpty()) {
+                    continue;
+                }
+                if (eventType.getApiName().equals(apiName)) {
+                    return eventType;
+                }
+            }
+            return UNKNOWN;
+        }
     }
 }

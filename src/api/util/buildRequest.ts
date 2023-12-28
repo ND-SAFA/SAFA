@@ -1,6 +1,5 @@
 import { APIMethods } from "@/types";
 import { LOGOUT_ERROR, LOGOUT_STATUS_CODE } from "@/util";
-import { logStore } from "@/hooks";
 import { BASE_URL, Endpoint } from "@/api";
 
 /**
@@ -173,7 +172,6 @@ class RequestBuilder<
     const data = content ? JSON.parse(content) : undefined;
 
     if (!res.ok) {
-      logStore.onError(data.message);
       throw Error(data.error);
     } else {
       return data as ReturnType;

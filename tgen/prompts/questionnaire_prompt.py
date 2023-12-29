@@ -37,16 +37,16 @@ class QuestionnairePrompt(Prompt):
         self.question_prompts = [deepcopy(prompt) for prompt in question_prompts]
         self.enumeration_chars = enumeration_chars
         self.use_bullets_for_enumeration = len(self.enumeration_chars) == 1
-        if self.use_bullets_for_enumeration:
-            self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
         self.use_multi_step_task_instructions = use_multi_step_task_instructions
-        if response_manager and not isinstance(response_manager.response_tag, dict):
-            all_tags = self.get_all_response_tags()
-            if len(all_tags) > 0:
-                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags})
-                response_manager = PromptResponseManager(**params)
-
         super().__init__(instructions, response_manager=response_manager, prompt_id=prompt_id)
+
+    def set_instructions(self, instructions: str) -> None:
+        """
+        Sets the string as the instructions for the questionnaire.
+        :param instructions: The prefix to the questions.
+        :return: None
+        """
+        self.value = instructions
 
     def get_response_tags_for_question(self, question_index: int) -> Union[str, List[str]]:
         """
@@ -102,6 +102,7 @@ class QuestionnairePrompt(Prompt):
         :param response: The model response
         :return: The formatted response
         """
+        self.response_manager = self._update_response_manager_for_questions(self.response_manager)
         parsed = self.response_manager.parse_response(response)
         if isinstance(self.response_manager.response_tag, dict):
             start = 0
@@ -116,7 +117,8 @@ class QuestionnairePrompt(Prompt):
                 start = end
             parsed[parent_tag] = parsed_items
         else:
-            parsed = self._parse_for_each_question(response)
+            parsed_children = self._parse_for_each_question(response)
+            parsed.update(parsed_children)
 
         return parsed
 
@@ -143,6 +145,8 @@ class QuestionnairePrompt(Prompt):
         :param child: If True, adds additional indents
         :return: The formatted prompt
         """
+        if self.use_bullets_for_enumeration:
+            self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
         if self.use_multi_step_task_instructions and TASK_HEADER not in self.value:
             self.value = self._create_multi_step_task_instructions()
         update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
@@ -168,20 +172,25 @@ class QuestionnairePrompt(Prompt):
         n_questions = len(self.question_prompts)
         enumerations_for_task = f'{COMMA}{SPACE}'.join(self.enumeration_chars[:n_questions - 1])
         base_instructions = f"Below are {len(self.question_prompts)} steps to complete."
-        if not self.use_bullets_for_enumeration:
-            base_instructions += f"Ensure that you answer {enumerations_for_task} and {self.enumeration_chars[n_questions - 1]}"
+        if not self.use_bullets_for_enumeration and len(self.question_prompts) > 1:
+            base_instructions += f" Ensure that you answer {enumerations_for_task} and {self.enumeration_chars[n_questions - 1]}"
         instructions = [PromptUtil.as_markdown_header(TASK_HEADER), PromptUtil.as_markdown_italics(base_instructions)]
         if self.value:
             instructions.append(self.value)
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
-    def set_instructions(self, instructions: str) -> None:
+    def _update_response_manager_for_questions(self, response_manager: PromptResponseManager) -> PromptResponseManager:
         """
-        Sets the string as the instructions for the questionnaire.
-        :param instructions: The prefix to the questions.
-        :return: None
+        Updates the response manager to be able to parse each child question.
+        :param response_manager: The original response manager for questionnaire.
+        :return: The updated response manager.
         """
-        self.value = instructions
+        if response_manager and not isinstance(response_manager.response_tag, dict):
+            all_tags = self.get_all_response_tags()
+            if len(all_tags) > 0:
+                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags})
+                response_manager = PromptResponseManager(**params)
+        return response_manager
 
     def __repr__(self) -> str:
         """

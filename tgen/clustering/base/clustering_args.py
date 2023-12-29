@@ -34,6 +34,7 @@ class ClusteringArgs(PipelineArgs):
     cluster_intersection_threshold: float = DEFAULT_CLUSTER_SIMILARITY_THRESHOLD  # 80% or more of intersection equals same cluster
     create_dataset: bool = DEFAULT_ADD_CLUSTERS_TO_DATASET
     cluster_min_votes: int = DEFAULT_CLUSTER_MIN_VOTES
+    add_orphans_to_homes: bool = False
     min_orphan_similarity: float = DEFAULT_MIN_ORPHAN_SIMILARITY
     cluster_seeds: List[str] = None
     cluster_artifact_type: str = CLUSTER_ARTIFACT_TYPE

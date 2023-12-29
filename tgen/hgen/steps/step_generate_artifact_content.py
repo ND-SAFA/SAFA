@@ -44,7 +44,9 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             self._add_seeds_to_prompt(dataset, prompt_builder, state)
 
         generations = content_generator.generate_content(prompt_builder, generations_filename=self.GENERATION_FILENAME)
-        generations2sources, cluster2generation = content_generator.map_generations_to_predicted_sources(generations)
+        cluster_ids = state.get_cluster_ids() if state.cluster_dataset else []
+        generations2sources, cluster2generation = content_generator.map_generations_to_predicted_sources(generations,
+                                                                                                         cluster_ids=cluster_ids)
         state.generations2sources = generations2sources
         state.cluster2generation = cluster2generation
 

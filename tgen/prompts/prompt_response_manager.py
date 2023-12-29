@@ -79,7 +79,7 @@ class PromptResponseManager:
         self.expected_response_type = self._convert2dict(self.expected_response_type)
         self.expected_responses = self._convert2dict(self.expected_responses)
         if self.required_tag_ids == REQUIRE_ALL_TAGS:
-            self.required_tag_ids = set(self._all_tag_ids)
+            self.required_tag_ids = set(self.get_all_tag_ids())
         elif not isinstance(self.required_tag_ids, set):
             self.required_tag_ids = {self.required_tag_ids}
 
@@ -90,7 +90,7 @@ class PromptResponseManager:
         :return: A dictionary mapping tag id to a value
         """
         if not isinstance(initial_val, dict):
-            return {id_: initial_val for id_ in self._all_tag_ids}
+            return {id_: initial_val for id_ in self.get_all_tag_ids()}
         return initial_val
 
     def _init_tag_attrs(self) -> None:
@@ -121,7 +121,7 @@ class PromptResponseManager:
         p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
         :return: All the response tag ids in the order they are provided
         """
-        return self._all_tag_ids
+        return list(self._tag2id.values())
 
     def format_response_instructions(self) -> str:
         """

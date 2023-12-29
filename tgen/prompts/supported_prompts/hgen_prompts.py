@@ -102,15 +102,25 @@ SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
                        "The section will not create the {target_type}s themselves "
                        "but it will be useful to the other engineers who make them.",
                        response_manager=PromptResponseManager(response_tag="new-section-body"))])
-REFINE_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software system and your goal is to revise "
-                                           "a set of {target_type}s from a software project.")
-REFINE_TASKS_QUESTIONNAIRE = QuestionnairePrompt([
-    QuestionPrompt(
-        "First identify any {target_type} groups that contain duplicated information. If none of the {target_type} contain "
-        "duplicate information, then your task is complete.",
-        response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
-    QuestionPrompt(
-        "If duplicate pairs were found, then for each duplicate group, combine the information in the {target_type}s "
-        "to create cohesive {target_type}(s). Importantly, the {target_type} should be specific to certain functionalities/features "
-        "and not too broad so the combined {target_type} may be broken down into multiple as long as there is no longer "
-        "duplicated information between them.")])
+REFINE_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software system and your goal is to summarize "
+                                "a set of {target_type}s from a software project.")
+DUP_SUMMARY_TASKS = QuestionnairePrompt([
+    Prompt(
+        "Identify the unique features of the system mentioned in the {target_type}. "
+        f"Enclose your answer in {PromptUtil.create_xml('notes')} "),
+    Prompt(
+        "In a bullet list, make a concise list of the features and functionalities, condensing similar or overlapping ones "
+        "into a single bullet. ")],
+    response_manager=PromptResponseManager(response_tag="answer"))
+
+REFINEMENT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
+    QuestionPrompt("Consider the features and functionality in the {source_type}s, focusing on the following: {dup_summaries} "),
+    QuestionPrompt("Then reverse engineer a {n_targets} {target_type}(s) for these features. "),
+    QuestionPrompt("Do not make up any information "
+                   "- all details in the {target_type} must accurately reflect the provided {source_type}. "),
+    QuestionPrompt("{description} "),
+    QuestionPrompt("Each {target_type} should use a consistent format. Use this format as a guideline: "
+                   "{format} "),
+    QuestionPrompt("Ensure you do not include too many features within a single {target_type}, "
+                   "but group together features that are overlap. ")],
+    enumeration_chars=["-"])

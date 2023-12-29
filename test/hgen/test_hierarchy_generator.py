@@ -161,7 +161,7 @@ class TestHierarchyGenerator(BaseTest):
         #     self.assertEqual(set(self.HGEN_STATE.refined_content[us]), set(HGenTestConstants.code_files[i]))
 
     def assert_name_artifacts_step(self, anthropic_ai_manager: TestAIManager):
-        names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.refined_generations2sources)
+        names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.get_generations2sources())
         anthropic_ai_manager.add_responses(name_responses)
         NameArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         for name in expected_names:
@@ -189,7 +189,7 @@ class TestHierarchyGenerator(BaseTest):
                 self.assertGreater(new_pred[TraceKeys.SCORE], 0.8)  # these should be weighted higher than original prediction
 
     def assert_detect_duplicates_step(self):
-        content = list(self.HGEN_STATE.refined_generations2sources.keys())
+        content = list(self.HGEN_STATE.get_generations2sources().keys())
         dup_artifact_id = "dup1"
         dup_indices = [0, 1]
         dup_content = NEW_LINE.join([content[dup_indices[0]], content[dup_indices[1]]])
@@ -228,7 +228,7 @@ class TestHierarchyGenerator(BaseTest):
             found_link = self.HGEN_STATE.final_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
                                                                          target_id=link[TraceKeys.TARGET])
             self.assertIsNotNone(found_link)
-        for content in self.HGEN_STATE.refined_generations2sources.keys():
+        for content in self.HGEN_STATE.get_generations2sources().keys():
             found_artifact = self.HGEN_STATE.final_dataset.artifact_df.filter_by_row(lambda row:
                                                                                      row[ArtifactKeys.CONTENT.value] == content
                                                                                      and row[

@@ -1,4 +1,5 @@
 import re
+import string
 import uuid
 
 from typing import List, Union, Set, Dict
@@ -9,6 +10,17 @@ from tgen.common.logging.logger_manager import logger
 
 class StrUtil:
     FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
+
+    @staticmethod
+    def get_letter_from_number(number: int, lower_case: bool = False) -> str:
+        """
+        Gets the letter in the alphabet in the given number position.
+        :param number: Position of letter in alphabet.
+        :param lower_case: If True, returns the lower case letter.
+        :return:  The letter in the alphabet in the given number position.
+        """
+        alpha = string.ascii_lowercase if lower_case else string.ascii_uppercase
+        return alpha[number % len(alpha)]
 
     @staticmethod
     def format_selective(string, *args: object, **kwargs: object) -> str:

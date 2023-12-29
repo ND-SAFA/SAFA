@@ -13,6 +13,22 @@ class DictUtil:
     """
 
     @staticmethod
+    def flip(dict_: Dict) -> Dict:
+        """
+        Flips the keys and values in the dictionary.
+        :param dict_: Original dictionary.
+        :return: Dictionary with keys and values flipped.
+        """
+        flipped_dict = {}
+        for k, v in dict_.items():
+            if isinstance(v, set) or isinstance(v, list):
+                for child_val in v:
+                    flipped_dict[child_val] = k
+            else:
+                flipped_dict[v] = k
+        return flipped_dict
+
+    @staticmethod
     def assert_same_keys(links: List[Dict]) -> None:
         """
         Asserts that links are the same size and have the same keys.

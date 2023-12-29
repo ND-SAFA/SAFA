@@ -4,12 +4,12 @@ from typing import Dict, List, Set, Tuple, Union
 
 import pandas as pd
 
-from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE, COMMA
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -18,16 +18,12 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
-from tgen.hgen.hgen_state import HGenState
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.artifact_prompt import ArtifactPrompt
-from tgen.prompts.context_prompt import ContextPrompt
-from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from string import ascii_uppercase
 
 TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
 SAVE_DATASET_DIRNAME = "final_generated_dataset"
@@ -92,7 +88,8 @@ class HGenUtil:
         :param generate_names: If True, generates names for the new artifacts
         :return: The dataframe of generated artifacts and a dictionary mapping the new name to the list of predicted related artifacts
         """
-        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(generations2sources))],
+        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [f"{StrUtil.get_letter_from_number(i)}{i}"
+                                                               for i in range(len(generations2sources))],
                                              ArtifactKeys.CONTENT: list(generations2sources.keys()),
                                              ArtifactKeys.LAYER_ID: [target_layer_id for _ in generations2sources]})
         if generate_names:

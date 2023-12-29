@@ -100,10 +100,11 @@ class AbstractProjectDataFrame(pd.DataFrame):
                 self.loc[index] = [row_as_dict.get(col, None) for col in self.get_all_column_names() if col in self.columns]
         return self.get_row(index)
 
-    def get_row(self, index: Any) -> EnumDict:
+    def get_row(self, index: Any, throw_exception: bool = False) -> EnumDict:
         """
         Gets the row of the dataframe with the given index
         :param index: The index of the row to get
+        :param throw_exception: If True, throws exception if item is missing.
         :return: The row as a dictionary if index is found else None
         """
         try:
@@ -112,6 +113,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
             if self.index_name():
                 row_as_dict[self.index_name()] = index
         except KeyError as e:  # index not in dataframe
+            if throw_exception:
+                raise KeyError(f"{index} not found in {self.__class__.__name__}")
             row_as_dict = None
         return row_as_dict
 

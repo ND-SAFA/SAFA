@@ -50,7 +50,7 @@ def get_generated_artifacts_response(contents=None, sources=None, target_type="u
     if not use_clustering:
         for i, content in enumerate(contents):
             source = sources[i % len(sources)]
-            content += PromptUtil.create_xml(source_type, COMMA.join(source))
+            content += PromptUtil.create_xml("ids", COMMA.join(source))
             contents[i] = content
         response = ""
         for us in contents:

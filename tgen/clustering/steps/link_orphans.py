@@ -22,6 +22,8 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param state: The current state of the clustering pipeline.
         :return: None, modifications done in place.
         """
+        if not args.add_orphans_to_homes:
+            return
         cluster_map: ClusterMapType = state.final_cluster_map
         clusters: List[Cluster] = list(filter(lambda cluster: len(cluster) > 1, cluster_map.values()))
 

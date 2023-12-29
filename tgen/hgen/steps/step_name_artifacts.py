@@ -15,7 +15,7 @@ class NameArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         new_artifact_df, id_to_related_children = HGenUtil.create_artifact_df_from_generated_artifacts(args,
-                                                                                                       state.refined_generations2sources,
+                                                                                                       state.get_generations2sources(),
                                                                                                        args.target_type)
 
         new_artifact_dataset = PromptDataset(artifact_df=new_artifact_df)

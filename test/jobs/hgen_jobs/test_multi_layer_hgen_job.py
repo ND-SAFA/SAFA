@@ -57,6 +57,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         self.ranking_calls = 0
         self.clustering_calls = 0
         args: HGenArgs = self.get_args()
+        args.run_refinement = False
         source_arts = args.dataset.artifact_df.filter_by_row(lambda row:
                                                              row[ArtifactKeys.LAYER_ID.value]
                                                              ==

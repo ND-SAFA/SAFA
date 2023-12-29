@@ -30,7 +30,7 @@ class HGenState(State):
     """
     cluster2artifacts: dict = None  # maps cluster id to the list of artifacts in that cluster
     seed2artifact_ids: ClusterIdType = None  # If given seeds, maps seeds to cluster artifacts.
-    cluster_id2seeds: Dict = None # If given seeds, maps cluster to seed.
+    cluster_id2seeds: Dict = None  # If given seeds, maps cluster to seed.
     cluster_dataset: PromptDataset = None  # contains prompt dataset with just the artifact df of the clusters.
     embedding_manager: EmbeddingsManager = None  # allows embeddings to be reused
 
@@ -43,7 +43,9 @@ class HGenState(State):
     """
     Optional Step 5 - Refine content on rerun of hgen
     """
+    refined_cluster2artifacts: dict = None  # maps cluster id to the list of artifacts in that cluster
     refined_generations2sources: Dict[str, Set[str]] = None  # The final selected artifact content
+    refined_cluster2generation: Dict[Any, List[str]] = None  # Maps cluster id to the generation that was produced for that cluster
 
     """
     Step 6 - Rename the artifacts generated.
@@ -74,10 +76,28 @@ class HGenState(State):
         """
         return list(self.cluster_dataset.artifact_df.index)
 
-    def get_cluster2artifacts(self):
+    def get_cluster2artifacts(self, ids_only: bool = False):
         """
         Optionally returns the map from cluster ids to list of artifacts in cluster if clustering is enabled.
+        :param ids_only: If True, only returns the ids of th artifacts in the cluster else the full artifacts.
         :return: Map if clusters are available, otherwise none.
         """
-        return ClusteringUtil.replace_ids_with_artifacts(self.cluster2artifacts,
-                                                         self.source_dataset.artifact_df) if self.cluster2artifacts else None
+        cluster2artifacts = self.cluster2artifacts if not self.refined_cluster2artifacts else self.refined_cluster2artifacts
+        if not ids_only:
+            cluster2artifacts = ClusteringUtil.replace_ids_with_artifacts(cluster2artifacts, self.source_dataset.artifact_df) \
+                if self.cluster2artifacts else None
+        return cluster2artifacts
+
+    def get_generations2sources(self) -> Dict[str, Set[str]]:
+        """
+        Gets the dictionary mapping the generated targets to the suggested sources.
+        :return: The dictionary mapping the generated targets to the suggested sources.
+        """
+        return self.refined_generations2sources if self.refined_generations2sources else self.generations2sources
+
+    def get_cluster2generation(self) -> Dict[Any, List[str]]:
+        """
+        Gets the dictionary mapping cluster id to the generations that came from it.
+        :return: The dictionary mapping cluster id to the generations that came from it.
+        """
+        return self.refined_cluster2generation if self.refined_cluster2generation else self.cluster2generation

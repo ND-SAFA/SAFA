@@ -13,7 +13,7 @@ class ClusteringUtil:
         :param artifact_df: Artifact data frame containing artifacts referenced by clusters.
         :return: Cluster map with artifacts instead of artifact ids.
         """
-        return {cluster_id: [artifact_df.get_artifact(a_id) for a_id in artifact_ids]
+        return {cluster_id: [artifact_df.get_artifact(a_id, throw_exception=True) for a_id in artifact_ids]
                 for cluster_id, artifact_ids in cluster_map.items()}
 
     @staticmethod

@@ -345,6 +345,15 @@ class EmbeddingsManager:
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
 
+    def merge(self, other: "EmbeddingsManager") -> None:
+        """
+        Combines the embeddings and contents maps of the two embedding managers.
+        :param other: The embedding manager to merge with.
+        :return: None.
+        """
+        self.update_or_add_contents(other._content_map, create_embedding=False)
+        self._embedding_map.update(other._embedding_map)
+
     def _get_default_artifact_ids(self, artifact_ids: List[str] = None):
         """
         Returns the artifact ids if not None otherwise return list of all artifact ids.

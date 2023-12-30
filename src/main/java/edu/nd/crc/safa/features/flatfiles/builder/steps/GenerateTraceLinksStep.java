@@ -17,7 +17,7 @@ public class GenerateTraceLinksStep implements IFlatFileBuilderStep {
         FlatFileParser flatFileParser = state.getFlatFileParser();
         TGenRequestAppEntity tgenRequest = flatFileParser.getTGenRequestAppEntity();
 
-        if (flatFileParser.getTGenRequestAppEntity().size() > 0) {
+        if (tgenRequest.size() > 0) {
             serviceProvider.getPermissionService()
                 .requirePermission(ProjectPermission.GENERATE, state.getProjectVersion().getProject(), state.getUser());
         }

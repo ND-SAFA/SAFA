@@ -13,7 +13,9 @@ import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
+import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
@@ -143,7 +145,8 @@ public class ResourceBuilder {
     private <T extends IEntityWithMembership> ObjectHolder<T> membershipEntityHolder(T value) {
         return new ObjectHolder<>(value,
             (permissions, user, lambdaVal) -> getPermissionService().hasPermissions(permissions, lambdaVal, user),
-            (permissions, user, lambdaVal) -> getPermissionService().hasAnyPermission(permissions, lambdaVal, user));
+            (permissions, user, lambdaVal) -> getPermissionService().hasAnyPermission(permissions, lambdaVal, user),
+            (check, user, lambdaVal) -> getPermissionService().hasAdditionalCheck(check, lambdaVal, user));
     }
 
     /**
@@ -159,7 +162,9 @@ public class ResourceBuilder {
             (permissions, user, lambdaVal) ->
                 getPermissionService().hasPermissions(permissions, projectRetriever.apply(lambdaVal), user),
             (permissions, user, lambdaVal) ->
-                getPermissionService().hasAnyPermission(permissions, projectRetriever.apply(lambdaVal), user));
+                getPermissionService().hasAnyPermission(permissions, projectRetriever.apply(lambdaVal), user),
+            (check, user, lambdaVal) ->
+                getPermissionService().hasAdditionalCheck(check, projectRetriever.apply(lambdaVal), user));
     }
 
     /**
@@ -185,13 +190,28 @@ public class ResourceBuilder {
         private boolean allowed = true;
         private final CheckPermissionFunction<T> hasPermissionFunction;
         private final CheckPermissionFunction<T> hasAnyPermissionFunction;
+        private final CheckAdditionalCheckFunction<T> hasAdditionalCheckFunction;
+        private SafaUser checkUser = null;
 
         private ObjectHolder(T value,
                              CheckPermissionFunction<T> hasPermissionFunction,
-                             CheckPermissionFunction<T> hasAnyPermissionFunction) {
+                             CheckPermissionFunction<T> hasAnyPermissionFunction,
+                             CheckAdditionalCheckFunction<T> hasAdditionalCheckFunction) {
             this.value = value;
             this.hasPermissionFunction = hasPermissionFunction;
             this.hasAnyPermissionFunction = hasAnyPermissionFunction;
+            this.hasAdditionalCheckFunction = hasAdditionalCheckFunction;
+        }
+
+        /**
+         * Sets the user that checks will be performed against
+         *
+         * @param user The user to check
+         * @return This
+         */
+        public ObjectHolder<T> asUser(SafaUser user) {
+            checkUser = user;
+            return this;
         }
 
         /**
@@ -208,6 +228,19 @@ public class ResourceBuilder {
                 missingPermissions.add(permission);
             }
             return this;
+        }
+
+        /**
+         * Check the user has the given permission on the contained object.
+         * Requires that {@link #asUser(SafaUser)} was called first
+         *
+         * @param permission Permission to check
+         * @return This
+         * @throws SafaError If the user doesn't have the permission
+         */
+        public ObjectHolder<T> withPermission(Permission permission) throws SafaError {
+            assert checkUser != null : "asUser must be called before this function";
+            return withPermission(permission, checkUser);
         }
 
         /**
@@ -228,6 +261,19 @@ public class ResourceBuilder {
 
         /**
          * Check the user has the given permissions on the contained object.
+         * Requires that {@link #asUser(SafaUser)} was called first
+         *
+         * @param permissions Permissions to check
+         * @return This
+         * @throws SafaError If the user doesn't have the permission
+         */
+        public ObjectHolder<T> withPermissions(Set<Permission> permissions) throws SafaError {
+            assert checkUser != null : "asUser must be called before this function";
+            return withPermissions(permissions, checkUser);
+        }
+
+        /**
+         * Check the user has the given permissions on the contained object.
          *
          * @param permissions Permissions to check
          * @param user        The user to check permissions for
@@ -240,6 +286,50 @@ public class ResourceBuilder {
                 missingPermissions.addAll(permissions);
             }
             return this;
+        }
+
+        /**
+         * Check the user has the given permissions on the contained object.
+         * Requires that {@link #asUser(SafaUser)} was called first
+         *
+         * @param permissions Permissions to check
+         * @return This
+         * @throws SafaError If the user doesn't have the permissions
+         */
+        public ObjectHolder<T> withAnyPermission(Set<Permission> permissions) throws SafaError {
+            assert checkUser != null : "asUser must be called before this function";
+            return withAnyPermission(permissions, checkUser);
+        }
+
+        /**
+         * Check the check object passes for the given user
+         *
+         * @param check The thing to check
+         * @param checkName The name of the check, so we can display what permission is missing
+         * @param user The user to check for
+         * @return This
+         * @throws SafaError If the user doesn't have the permissions
+         */
+        public ObjectHolder<T> withAdditionalCheck(AdditionalPermissionCheck check,
+                                                   String checkName, SafaUser user) throws SafaError {
+            if (!hasAdditionalCheckFunction.apply(check, user, getValue())) {
+                allowed = false;
+                missingPermissions.add((SimplePermission)() -> checkName);
+            }
+            return this;
+        }
+
+        /**
+         * Check the check object passes for the given user. Requires that {@link #asUser(SafaUser)} was called first
+         *
+         * @param check The thing to check
+         * @param checkName The name of the check, so we can display what permission is missing
+         * @return This
+         * @throws SafaError If the user doesn't have the permissions
+         */
+        public ObjectHolder<T> withAdditionalCheck(AdditionalPermissionCheck check, String checkName) throws SafaError {
+            assert checkUser != null : "asUser must be called before this function";
+            return withAdditionalCheck(check, checkName, checkUser);
         }
 
         /**
@@ -278,13 +368,30 @@ public class ResourceBuilder {
     @FunctionalInterface
     private interface CheckPermissionFunction<T> {
         /**
-         * Check that the user has  given permissions for the held object and thrown an error if not.
+         * Check that the user has given permissions for the held object and thrown an error if not.
          *
          * @param permissions The permissions to check
          * @param user        The user to check for
          * @param value       The value of the object in the object holder
          */
         boolean apply(Set<Permission> permissions, SafaUser user, T value) throws SafaError;
+    }
+
+    /**
+     * Functional interface for checking if a user has an {@link AdditionalPermissionCheck} associated with some object
+     *
+     * @param <T> The type of the object
+     */
+    @FunctionalInterface
+    private interface CheckAdditionalCheckFunction<T> {
+        /**
+         * Check that the user has a given additional check for the held object and thrown an error if not.
+         *
+         * @param check The thing to check
+         * @param user  The user to check for
+         * @param value The value of the object in the object holder
+         */
+        boolean apply(AdditionalPermissionCheck check, SafaUser user, T value) throws SafaError;
     }
 
 }

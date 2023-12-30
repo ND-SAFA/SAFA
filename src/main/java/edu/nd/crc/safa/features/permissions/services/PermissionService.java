@@ -19,9 +19,13 @@ import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.AndPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.OrPermissionCheck;
 import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.SafaApplicationPermission;
+import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -95,6 +99,20 @@ public class PermissionService {
         PermissionCheckContext context = createContext(entity, user);
         Set<Permission> userPermissions = getUserPermissions(user, entity);
         return checkPermissionsAnyMatch(permissions, userPermissions, user, context);
+    }
+
+    /**
+     * Checks if an {@link AdditionalPermissionCheck} passes for the given user in the given entity.
+     *
+     * @param check The additional permission check to perform. These can be chained together using
+     *              {@link AndPermissionCheck} and {@link OrPermissionCheck}
+     * @param entity The entity we're considering
+     * @param user The user in question
+     * @return Whether the check passes for that user
+     */
+    public boolean hasAdditionalCheck(AdditionalPermissionCheck check, IEntityWithMembership entity, SafaUser user) {
+        PermissionCheckContext context = createContext(entity, user);
+        return check.doCheck(context);
     }
 
     /**
@@ -220,6 +238,23 @@ public class PermissionService {
     public void requireSuperuser(SafaUser user) {
         if (!isSuperuser(user)) {
             throw new MissingPermissionException(SafaApplicationPermission.SUPERUSER);
+        }
+    }
+
+    /**
+     * Throws an exception if the check does not pass for the given user in the given entity.
+     *
+     * @param check The additional permission check to perform. These can be chained together using
+     *              {@link AndPermissionCheck} and {@link OrPermissionCheck}
+     * @param checkName The name for the check, which will be used as the name of the missing permission
+     *                  in the exception
+     * @param entity The entity we're considering
+     * @param user The user in question
+     */
+    public void requireAdditionalCheck(AdditionalPermissionCheck check, String checkName,
+                                       IEntityWithMembership entity, SafaUser user) {
+        if (!hasAdditionalCheck(check, entity, user)) {
+            throw new MissingPermissionException((SimplePermission)(() -> checkName));
         }
     }
 

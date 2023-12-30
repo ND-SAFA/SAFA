@@ -326,9 +326,14 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Billing {
+        public static final String ROOT = "/billing";
+        public static final String CHECKOUT = ROOT + "/checkout";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Stripe {
         public static final String ROOT = "/stripe";
-        public static final String CHECKOUT = ROOT + "/checkout";
         public static final String WEBHOOK = ROOT + "/webhook";
         public static final String CANCEL = ROOT + "/cancel/{sessionId}";
     }

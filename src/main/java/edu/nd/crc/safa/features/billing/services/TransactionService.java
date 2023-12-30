@@ -1,22 +1,15 @@
 package edu.nd.crc.safa.features.billing.services;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.billing.entities.InsufficientFundsException;
-import edu.nd.crc.safa.features.billing.entities.MonthlyUsage;
-import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.entities.db.Transaction;
-import edu.nd.crc.safa.features.billing.repositories.BillingInfoRepository;
 import edu.nd.crc.safa.features.billing.repositories.TransactionRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,12 +22,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class CreditBalanceService {
+public class TransactionService {
 
-    private static final int MAX_TRANSACTION_RETRIES = 5;
-
-    private final BillingInfoRepository billingInfoRepository;
     private final TransactionRepository transactionRepository;
+    private final BillingService billingService;
 
     public Optional<Transaction> getTransactionOptionalById(UUID id) {
         return transactionRepository.findById(id);
@@ -61,39 +52,13 @@ public class CreditBalanceService {
         }
 
         if (isDebit(amount)) {
-            if (!tryAdjustAccountWithRetries(organization, amount, 0, 0)) {
+            if (!billingService.tryAdjustAccountWithRetries(organization, amount, 0, 0)) {
                 throw new SafaError("Unable to adjust account balance, please try again later.");
             }
         }
 
         Transaction transaction = new Transaction(amount, description, organization);
         return saveTransaction(transaction);
-    }
-
-    /**
-     * Attempts to adjust an organization's balance by a certain delta amount,
-     * and retries the transaction until it succeeds or a maximum number of tries is reached
-     *
-     * @param organization The organization to adjust
-     * @param balanceDelta The amount to adjust the balance by
-     * @param totalUsedDelta The amount to adjust the total used value by
-     * @param totalSuccessfulDelta The amount to adjust the total successful value by
-     * @return Whether it was successful
-     */
-    private boolean tryAdjustAccountWithRetries(Organization organization, int balanceDelta,
-                                                int totalUsedDelta, int totalSuccessfulDelta) {
-        boolean success = false;
-        for (int i = 0; i < MAX_TRANSACTION_RETRIES; ++i) {
-            try {
-                tryAdjustAccount(organization, balanceDelta, totalUsedDelta, totalSuccessfulDelta);
-                success = true;
-                break;
-            } catch (OptimisticLockException ignored) {
-                // This will happen if the balance was modified by another source while we were processing
-                // Retry the transaction unless we've hit the max retries
-            }
-        }
-        return success;
     }
 
     /**
@@ -107,35 +72,11 @@ public class CreditBalanceService {
      */
     private void tryAdjustAccountForTransaction(Transaction transaction, int balanceDelta,
                                                 int totalUsedDelta, int totalSuccessfulDelta) {
-        boolean success = tryAdjustAccountWithRetries(transaction.getOrganization(), balanceDelta,
+        boolean success = billingService.tryAdjustAccountWithRetries(transaction.getOrganization(), balanceDelta,
             totalUsedDelta, totalSuccessfulDelta);
         if (!success) {
             throw new SafaError("Failed to adjust transaction with ID " + transaction.getId());
         }
-    }
-
-    /**
-     * Attempts to adjust an organization's balance by a certain delta amount
-     *
-     * @param organization The organization to adjust
-     * @param balanceDelta The amount to adjust the balance by
-     * @param totalUsedDelta The amount to adjust the total used value by
-     * @param totalSuccessfulDelta The amount to adjust the total successful value by
-     */
-    private void tryAdjustAccount(Organization organization, int balanceDelta,
-                                  int totalUsedDelta, int totalSuccessfulDelta) {
-        BillingInfo billingInfo = getBillingInfoForOrg(organization);
-
-        int currentBalance = billingInfo.getBalance();
-
-        if (isDebit(balanceDelta) && currentBalance < -balanceDelta) {
-            throw new InsufficientFundsException(currentBalance, -balanceDelta);
-        }
-
-        billingInfo.setBalance(currentBalance + balanceDelta);
-        billingInfo.setTotalUsed(billingInfo.getTotalUsed() + totalUsedDelta);
-        billingInfo.setTotalSuccessful(billingInfo.getTotalSuccessful() + totalSuccessfulDelta);
-        billingInfoRepository.save(billingInfo);
     }
 
     /**
@@ -282,7 +223,7 @@ public class CreditBalanceService {
      * @param transactionAmount The amount of the transaction
      * @return How many credits were used by this transaction
      */
-    private int toUsedCreditAmount(int transactionAmount) {
+    public int toUsedCreditAmount(int transactionAmount) {
         if (isDebit(transactionAmount)) {
             return -transactionAmount;
         }
@@ -290,49 +231,14 @@ public class CreditBalanceService {
     }
 
     /**
-     * Retrieve billing info for an organization.
+     * Get all transactions for an organization that occurred after a particular time
      *
-     * @param organization The organization to get billing info for
-     * @return The billing info for that organization
+     * @param organization The organization
+     * @param startTime The moment after which transactions should be included
+     * @return The list of matching transactions
      */
-    public BillingInfo getBillingInfoForOrg(Organization organization) {
-        return billingInfoRepository.findByOrganization(organization)
-            .orElseGet(() -> {
-                BillingInfo billingInfo = new BillingInfo(organization);
-                return billingInfoRepository.save(billingInfo);
-            });
+    public List<Transaction> getOrgTransactionsAfter(Organization organization, LocalDateTime startTime) {
+        return transactionRepository.findByOrganizationAndTimestampIsAfter(organization, startTime);
     }
 
-    /**
-     * Get monthly usage statistics for an organization
-     *
-     * @param organization The org to get stats for
-     * @return The org's stats
-     */
-    public MonthlyUsage getMonthlyUsageForOrg(Organization organization) {
-        LocalDateTime monthStart = LocalDateTime.now()
-            .with(TemporalAdjusters.firstDayOfMonth())
-            .with(ChronoField.NANO_OF_DAY, 0);
-        List<Transaction> thisMonthTransactions =
-            transactionRepository.findByOrganizationAndTimestampIsAfter(organization, monthStart);
-
-        int usedCredits = 0;
-        int successfulCredits = 0;
-
-        for (Transaction transaction : thisMonthTransactions) {
-            int usedCreditAmount = toUsedCreditAmount(transaction.getAmount());
-
-            switch (transaction.getStatus()) {
-                case FAILED -> usedCredits += usedCreditAmount;
-                case SUCCESSFUL -> {
-                    usedCredits += usedCreditAmount;
-                    successfulCredits += usedCreditAmount;
-                }
-                default -> {
-                }
-            }
-        }
-
-        return new MonthlyUsage(usedCredits, successfulCredits);
-    }
 }

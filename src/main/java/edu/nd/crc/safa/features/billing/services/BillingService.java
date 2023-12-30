@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class BillingService {
 
-    private final BalanceTransactionService transactionService;
+    private final CreditBalanceService transactionService;
     private final IExternalBillingService externalBillingService;
 
-    public BillingService(BalanceTransactionService transactionService,
+    public BillingService(CreditBalanceService transactionService,
                           IExternalBillingService externalBillingService) {
         this.transactionService = transactionService;
         this.externalBillingService = externalBillingService;

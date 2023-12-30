@@ -7,6 +7,8 @@ import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
+import edu.nd.crc.safa.features.billing.services.BillingService;
+import edu.nd.crc.safa.features.billing.services.CreditBalanceService;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
@@ -185,6 +187,9 @@ public class ServiceProvider {
     private SummaryService summaryService;
     // HGen
     private HGenService hGenService;
+    // Billing
+    private BillingService billingService;
+    private CreditBalanceService creditBalanceService;
 
     @PostConstruct
     public void postInit() {

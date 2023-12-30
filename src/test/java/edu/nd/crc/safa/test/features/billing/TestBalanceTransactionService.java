@@ -13,7 +13,7 @@ import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.billing.repositories.BillingInfoRepository;
 import edu.nd.crc.safa.features.billing.repositories.TransactionRepository;
-import edu.nd.crc.safa.features.billing.services.BalanceTransactionService;
+import edu.nd.crc.safa.features.billing.services.CreditBalanceService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Autowired
-    private BalanceTransactionService balanceTransactionService;
+    private CreditBalanceService creditBalanceService;
 
     @Autowired
     private BillingInfoRepository billingInfoRepository;
@@ -45,7 +45,7 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testBillingInfoRetrieval() {
-        BillingInfo billingInfo = balanceTransactionService.getBillingInfoForOrg(myOrg);
+        BillingInfo billingInfo = creditBalanceService.getBillingInfoForOrg(myOrg);
         assertThat(billingInfo).isNotNull();
         assertThat(billingInfo.getOrganization()).isEqualTo(myOrg);
 
@@ -53,7 +53,7 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
         billingInfo.setBalance(newBalance);
         billingInfoRepository.save(billingInfo);
 
-        BillingInfo updatedBillingInfo = balanceTransactionService.getBillingInfoForOrg(myOrg);
+        BillingInfo updatedBillingInfo = creditBalanceService.getBillingInfoForOrg(myOrg);
         assertThat(updatedBillingInfo).isNotNull();
         assertThat(updatedBillingInfo.getBalance()).isEqualTo(newBalance);
     }
@@ -62,12 +62,12 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
     public void testSimpleTransactionUpdatesBalance() {
         // Credits do not count until marked successful, whereas charges are deducted immediately
 
-        Transaction transaction = balanceTransactionService.credit(myOrg, 100, "test credit");
+        Transaction transaction = creditBalanceService.credit(myOrg, 100, "test credit");
         assertBalance(myOrg, 0);
         markSuccessful(transaction);
         assertBalance(myOrg, 100);
 
-        balanceTransactionService.charge(myOrg, 25, "test charge");
+        creditBalanceService.charge(myOrg, 25, "test charge");
         assertBalance(myOrg, 75);
     }
 
@@ -76,40 +76,40 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
         int balance = 10;
         int charge = 100;
 
-        markSuccessful(balanceTransactionService.credit(myOrg, balance, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, balance, "test credit"));
 
         InsufficientFundsException expected = new InsufficientFundsException(balance, charge);
-        assertThatThrownBy(() -> balanceTransactionService.charge(myOrg, charge, "test charge"))
+        assertThatThrownBy(() -> creditBalanceService.charge(myOrg, charge, "test charge"))
             .isInstanceOf(InsufficientFundsException.class)
             .isEqualTo(expected);
     }
 
     @Test
     public void testTransactionAmountMustBePositive() {
-        assertThatThrownBy(() -> balanceTransactionService.charge(myOrg, -1, "test charge"))
+        assertThatThrownBy(() -> creditBalanceService.charge(myOrg, -1, "test charge"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Amount cannot be negative");
 
-        assertThatThrownBy(() -> balanceTransactionService.credit(myOrg, -1, "test charge"))
+        assertThatThrownBy(() -> creditBalanceService.credit(myOrg, -1, "test charge"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Amount cannot be negative");
 
-        assertThatThrownBy(() -> balanceTransactionService.charge(myOrg, 0, "test charge"))
+        assertThatThrownBy(() -> creditBalanceService.charge(myOrg, 0, "test charge"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Amount cannot be zero");
 
-        assertThatThrownBy(() -> balanceTransactionService.credit(myOrg, 0, "test charge"))
+        assertThatThrownBy(() -> creditBalanceService.credit(myOrg, 0, "test charge"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Amount cannot be zero");
     }
 
     private void assertBalance(Organization organization, int balance) {
-        BillingInfo billingInfo = balanceTransactionService.getBillingInfoForOrg(organization);
+        BillingInfo billingInfo = creditBalanceService.getBillingInfoForOrg(organization);
         assertThat(billingInfo.getBalance()).isEqualTo(balance);
     }
 
     private void assertBalances(Organization organization, int balance, int totalUsed, int totalSuccessful) {
-        BillingInfo billingInfo = balanceTransactionService.getBillingInfoForOrg(organization);
+        BillingInfo billingInfo = creditBalanceService.getBillingInfoForOrg(organization);
         assertThat(billingInfo.getBalance()).isEqualTo(balance);
         assertThat(billingInfo.getTotalUsed()).isEqualTo(totalUsed);
         assertThat(billingInfo.getTotalSuccessful()).isEqualTo(totalSuccessful);
@@ -117,7 +117,7 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testTransactionReturnValue() {
-        Transaction transaction = balanceTransactionService.credit(myOrg, 100, "test credit");
+        Transaction transaction = creditBalanceService.credit(myOrg, 100, "test credit");
         assertThat(transaction).isNotNull();
         assertThat(transaction.getStatus()).isSameAs(Transaction.Status.PENDING);
         assertThat(transaction.getDescription()).isEqualTo("test credit");
@@ -129,13 +129,13 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkPendingTransactionSuccessful() {
-        Transaction credit = balanceTransactionService.credit(myOrg, 100, "test credit");
+        Transaction credit = creditBalanceService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markSuccessful(credit);
 
         assertBalances(myOrg, 100, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.SUCCESSFUL);
 
-        Transaction charge = balanceTransactionService.charge(myOrg, 100, "test charge");
+        Transaction charge = creditBalanceService.charge(myOrg, 100, "test charge");
         Transaction updatedCharge = markSuccessful(charge);
 
         assertBalances(myOrg, 0, 100, 100);
@@ -144,15 +144,15 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkPendingTransactionFailed() {
-        Transaction credit = balanceTransactionService.credit(myOrg, 100, "test credit");
+        Transaction credit = creditBalanceService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markFailed(credit);
 
         assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.FAILED);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
-        Transaction charge = balanceTransactionService.charge(myOrg, 100, "test charge");
+        Transaction charge = creditBalanceService.charge(myOrg, 100, "test charge");
         Transaction updatedCharge = markFailed(charge);
 
         assertBalances(myOrg, 100, 100, 0);
@@ -161,15 +161,15 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkPendingTransactionCanceled() {
-        Transaction credit = balanceTransactionService.credit(myOrg, 100, "test credit");
+        Transaction credit = creditBalanceService.credit(myOrg, 100, "test credit");
         Transaction updatedCredit = markCanceled(credit);
 
         assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.CANCELED);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
-        Transaction charge = balanceTransactionService.charge(myOrg, 100, "test charge");
+        Transaction charge = creditBalanceService.charge(myOrg, 100, "test charge");
         Transaction updatedCharge = markCanceled(charge);
 
         assertBalances(myOrg, 100, 0, 0);
@@ -178,13 +178,13 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkSuccessfulTransactionFailed() {
-        Transaction credit = markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        Transaction credit = markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markFailed(credit))
             .isInstanceOf(IllegalArgumentException.class);
         assertBalances(myOrg, 100, 0, 0);
 
-        Transaction charge = markSuccessful(balanceTransactionService.charge(myOrg, 100, "test charge"));
+        Transaction charge = markSuccessful(creditBalanceService.charge(myOrg, 100, "test charge"));
 
         assertThatThrownBy(() -> markFailed(charge))
             .isInstanceOf(IllegalArgumentException.class);
@@ -193,15 +193,15 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkSuccessfulTransactionCanceled() {
-        Transaction credit = markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        Transaction credit = markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
         Transaction updatedCredit = markCanceled(credit);
 
         assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.CANCELED);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
-        Transaction charge = markSuccessful(balanceTransactionService.charge(myOrg, 100, "test charge"));
+        Transaction charge = markSuccessful(creditBalanceService.charge(myOrg, 100, "test charge"));
         Transaction updatedCharge = markCanceled(charge);
 
         assertBalances(myOrg, 100, 0, 0);
@@ -210,15 +210,15 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkFailedTransactionCanceled() {
-        Transaction credit = markFailed(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        Transaction credit = markFailed(creditBalanceService.credit(myOrg, 100, "test credit"));
         Transaction updatedCredit = markCanceled(credit);
 
         assertBalances(myOrg, 0, 0, 0);
         assertThat(updatedCredit.getStatus()).isSameAs(Transaction.Status.CANCELED);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
-        Transaction charge = markFailed(balanceTransactionService.charge(myOrg, 100, "test charge"));
+        Transaction charge = markFailed(creditBalanceService.charge(myOrg, 100, "test charge"));
         Transaction updatedCharge = markCanceled(charge);
 
         assertBalances(myOrg, 100, 0, 0);
@@ -227,15 +227,15 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkFailedTransactionSuccessful() {
-        Transaction credit = markFailed(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        Transaction credit = markFailed(creditBalanceService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markSuccessful(credit))
             .isInstanceOf(IllegalArgumentException.class);
         assertBalances(myOrg, 0, 0, 0);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
-        Transaction charge = markFailed(balanceTransactionService.charge(myOrg, 100, "test charge"));
+        Transaction charge = markFailed(creditBalanceService.charge(myOrg, 100, "test charge"));
 
         assertThatThrownBy(() -> markSuccessful(charge))
             .isInstanceOf(IllegalArgumentException.class);
@@ -244,15 +244,15 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkCanceledTransactionSuccessful() {
-        Transaction credit = markCanceled(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        Transaction credit = markCanceled(creditBalanceService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markSuccessful(credit))
             .isInstanceOf(IllegalArgumentException.class);
         assertBalances(myOrg, 0, 0, 0);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
-        Transaction charge = markCanceled(balanceTransactionService.charge(myOrg, 100, "test charge"));
+        Transaction charge = markCanceled(creditBalanceService.charge(myOrg, 100, "test charge"));
 
         assertThatThrownBy(() -> markSuccessful(charge))
             .isInstanceOf(IllegalArgumentException.class);
@@ -261,15 +261,15 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testMarkCanceledTransactionFailed() {
-        Transaction credit = markCanceled(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        Transaction credit = markCanceled(creditBalanceService.credit(myOrg, 100, "test credit"));
 
         assertThatThrownBy(() -> markFailed(credit))
             .isInstanceOf(IllegalArgumentException.class);
         assertBalances(myOrg, 0, 0, 0);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 100, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 100, "test credit"));
 
-        Transaction charge = markCanceled(balanceTransactionService.charge(myOrg, 100, "test charge"));
+        Transaction charge = markCanceled(creditBalanceService.charge(myOrg, 100, "test charge"));
 
         assertThatThrownBy(() -> markFailed(charge))
             .isInstanceOf(IllegalArgumentException.class);
@@ -278,62 +278,62 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
 
     @Test
     public void testTotalsWithMultipleTransactions() {
-        balanceTransactionService.credit(myOrg, 10_000_000, "test credit");
-        markSuccessful(balanceTransactionService.credit(myOrg, 1_000_000, "test credit"));
-        markFailed(balanceTransactionService.credit(myOrg, 100_000, "test credit"));
-        markCanceled(balanceTransactionService.credit(myOrg, 10_000, "test credit"));
+        creditBalanceService.credit(myOrg, 10_000_000, "test credit");
+        markSuccessful(creditBalanceService.credit(myOrg, 1_000_000, "test credit"));
+        markFailed(creditBalanceService.credit(myOrg, 100_000, "test credit"));
+        markCanceled(creditBalanceService.credit(myOrg, 10_000, "test credit"));
 
         assertBalances(myOrg, 1_000_000, 0, 0);
 
-        balanceTransactionService.charge(myOrg, 1_000, "test credit");
-        markSuccessful(balanceTransactionService.charge(myOrg, 100, "test credit"));
-        markFailed(balanceTransactionService.charge(myOrg, 10, "test credit"));
-        markCanceled(balanceTransactionService.charge(myOrg, 1, "test credit"));
+        creditBalanceService.charge(myOrg, 1_000, "test credit");
+        markSuccessful(creditBalanceService.charge(myOrg, 100, "test credit"));
+        markFailed(creditBalanceService.charge(myOrg, 10, "test credit"));
+        markCanceled(creditBalanceService.charge(myOrg, 1, "test credit"));
 
         assertBalances(myOrg, 998_900, 110, 100);
 
-        balanceTransactionService.credit(myOrg, 10_000_000, "test credit");
-        markSuccessful(balanceTransactionService.credit(myOrg, 1_000_000, "test credit"));
-        markFailed(balanceTransactionService.credit(myOrg, 100_000, "test credit"));
-        markCanceled(balanceTransactionService.credit(myOrg, 10_000, "test credit"));
+        creditBalanceService.credit(myOrg, 10_000_000, "test credit");
+        markSuccessful(creditBalanceService.credit(myOrg, 1_000_000, "test credit"));
+        markFailed(creditBalanceService.credit(myOrg, 100_000, "test credit"));
+        markCanceled(creditBalanceService.credit(myOrg, 10_000, "test credit"));
 
         assertBalances(myOrg, 1_998_900, 110, 100);
 
-        balanceTransactionService.charge(myOrg, 1_000, "test credit");
-        markSuccessful(balanceTransactionService.charge(myOrg, 100, "test credit"));
-        markFailed(balanceTransactionService.charge(myOrg, 10, "test credit"));
-        markCanceled(balanceTransactionService.charge(myOrg, 1, "test credit"));
+        creditBalanceService.charge(myOrg, 1_000, "test credit");
+        markSuccessful(creditBalanceService.charge(myOrg, 100, "test credit"));
+        markFailed(creditBalanceService.charge(myOrg, 10, "test credit"));
+        markCanceled(creditBalanceService.charge(myOrg, 1, "test credit"));
 
         assertBalances(myOrg, 1_997_800, 220, 200);
     }
 
     private Transaction markFailed(Transaction transaction) {
-        return balanceTransactionService.markTransactionFailed(transaction);
+        return creditBalanceService.markTransactionFailed(transaction);
     }
 
     private Transaction markSuccessful(Transaction transaction) {
-        return balanceTransactionService.markTransactionSuccessful(transaction);
+        return creditBalanceService.markTransactionSuccessful(transaction);
     }
 
     private Transaction markCanceled(Transaction transaction) {
-        return balanceTransactionService.markTransactionCanceled(transaction);
+        return creditBalanceService.markTransactionCanceled(transaction);
     }
 
     @Test
     public void testMonthlyUsageStats() {
         LocalDateTime beforeThisMonth = LocalDateTime.now().minusYears(1);
 
-        markSuccessful(balanceTransactionService.credit(myOrg, 10_000, "test credit"));
+        markSuccessful(creditBalanceService.credit(myOrg, 10_000, "test credit"));
 
-        balanceTransactionService.charge(myOrg, 1_000, "test charge");
-        markSuccessful(balanceTransactionService.charge(myOrg, 100, "test charge"));
-        markFailed(balanceTransactionService.charge(myOrg, 10, "test charge"));
-        markCanceled(balanceTransactionService.charge(myOrg, 1, "test charge"));
+        creditBalanceService.charge(myOrg, 1_000, "test charge");
+        markSuccessful(creditBalanceService.charge(myOrg, 100, "test charge"));
+        markFailed(creditBalanceService.charge(myOrg, 10, "test charge"));
+        markCanceled(creditBalanceService.charge(myOrg, 1, "test charge"));
 
-        Transaction pending = balanceTransactionService.charge(myOrg, 1_000, "test charge");
-        Transaction successful = markSuccessful(balanceTransactionService.charge(myOrg, 100, "test charge"));
-        Transaction failed = markFailed(balanceTransactionService.charge(myOrg, 10, "test charge"));
-        Transaction canceled = markCanceled(balanceTransactionService.charge(myOrg, 1, "test charge"));
+        Transaction pending = creditBalanceService.charge(myOrg, 1_000, "test charge");
+        Transaction successful = markSuccessful(creditBalanceService.charge(myOrg, 100, "test charge"));
+        Transaction failed = markFailed(creditBalanceService.charge(myOrg, 10, "test charge"));
+        Transaction canceled = markCanceled(creditBalanceService.charge(myOrg, 1, "test charge"));
 
         pending.setTimestamp(beforeThisMonth);
         successful.setTimestamp(beforeThisMonth);
@@ -345,7 +345,7 @@ public class TestBalanceTransactionService extends ApplicationBaseTest {
         transactionRepository.save(failed);
         transactionRepository.save(canceled);
 
-        MonthlyUsage monthlyUsage = balanceTransactionService.getMonthlyUsageForOrg(myOrg);
+        MonthlyUsage monthlyUsage = creditBalanceService.getMonthlyUsageForOrg(myOrg);
         assertThat(monthlyUsage).isNotNull();
         assertThat(monthlyUsage.getUsedCredits()).isEqualTo(110);
         assertThat(monthlyUsage.getSuccessfulCredits()).isEqualTo(100);

@@ -1,4 +1,7 @@
-package edu.nd.crc.safa.features.permissions.checks;
+package edu.nd.crc.safa.features.permissions.checks.utility;
+
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 
 /**
  * This is a convenience class used to give names to checks which

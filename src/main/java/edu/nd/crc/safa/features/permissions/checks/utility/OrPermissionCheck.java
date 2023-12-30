@@ -1,6 +1,9 @@
-package edu.nd.crc.safa.features.permissions.checks;
+package edu.nd.crc.safa.features.permissions.checks.utility;
 
 import java.util.List;
+
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 
 import lombok.AllArgsConstructor;
 

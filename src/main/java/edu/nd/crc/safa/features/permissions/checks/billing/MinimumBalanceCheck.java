@@ -1,8 +1,10 @@
-package edu.nd.crc.safa.features.permissions.checks;
+package edu.nd.crc.safa.features.permissions.checks.billing;
 
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.services.CreditBalanceService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 
 /**
  * Checks that the credit balance of an organization is greater than some

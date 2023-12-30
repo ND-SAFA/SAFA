@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.permissions.entities;
 
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
-import edu.nd.crc.safa.features.permissions.checks.NoAdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.utility.NoAdditionalPermissionCheck;
 
 /**
  * A simple permission is a permission that is just a name

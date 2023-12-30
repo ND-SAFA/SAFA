@@ -34,7 +34,10 @@ public class BillingService {
         
         try {
             transaction = transactionService.credit(organization, amount, description);
-            String redirectUrl = externalBillingService.startTransaction(transaction.getId().toString(), amount);
+            String redirectUrl = externalBillingService.startTransaction(transaction);
+
+            // Save again in case the external service made updates
+            transaction = transactionService.saveTransaction(transaction);
 
             return new TransactionAppEntity(transaction, redirectUrl);
         } catch (Exception e) {
@@ -55,8 +58,29 @@ public class BillingService {
 
         if (transactionOptional.isPresent()) {
             Transaction transaction = transactionOptional.get();
-            transactionService.markTransactionSuccessful(transaction);
-            externalBillingService.endTransaction(transactionId.toString());
+            transaction = transactionService.markTransactionSuccessful(transaction);
+            externalBillingService.endTransaction(transaction);
+
+            // Save again in case the external service made updates
+            transactionService.saveTransaction(transaction);
+        }
+    }
+
+    /**
+     * Cancel a transaction with an external interface
+     *
+     * @param transactionId The ID of the transaction from {@link #startTransaction(Organization, int, String)}
+     */
+    public void cancelTransaction(UUID transactionId) {
+        Optional<Transaction> transactionOptional = transactionService.getTransactionOptionalById(transactionId);
+
+        if (transactionOptional.isPresent()) {
+            Transaction transaction = transactionOptional.get();
+            transaction = transactionService.markTransactionCanceled(transaction);
+            externalBillingService.cancelTransaction(transaction);
+
+            // Save again in case the external service made updates
+            transactionService.saveTransaction(transaction);
         }
     }
 }

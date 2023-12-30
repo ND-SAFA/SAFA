@@ -330,5 +330,6 @@ public class AppRoutes {
         public static final String ROOT = "/stripe";
         public static final String CHECKOUT = ROOT + "/checkout";
         public static final String WEBHOOK = ROOT + "/webhook";
+        public static final String CANCEL = ROOT + "/cancel/{sessionId}";
     }
 }

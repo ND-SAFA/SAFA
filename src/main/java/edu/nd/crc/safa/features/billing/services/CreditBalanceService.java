@@ -67,7 +67,7 @@ public class CreditBalanceService {
         }
 
         Transaction transaction = new Transaction(amount, description, organization);
-        return transactionRepository.save(transaction);
+        return saveTransaction(transaction);
     }
 
     /**
@@ -199,7 +199,7 @@ public class CreditBalanceService {
         tryAdjustAccountForTransaction(transaction, balanceAdjustment, toUsedCreditAmount(amount), 0);
 
         transaction.setStatus(Transaction.Status.FAILED);
-        return transactionRepository.save(transaction);
+        return saveTransaction(transaction);
     }
 
     /**
@@ -225,7 +225,7 @@ public class CreditBalanceService {
         tryAdjustAccountForTransaction(transaction, balanceAdjustment, usedCreditAmount, usedCreditAmount);
 
         transaction.setStatus(Transaction.Status.SUCCESSFUL);
-        return transactionRepository.save(transaction);
+        return saveTransaction(transaction);
     }
 
     /**
@@ -257,6 +257,16 @@ public class CreditBalanceService {
         }
 
         transaction.setStatus(Transaction.Status.CANCELED);
+        return saveTransaction(transaction);
+    }
+
+    /**
+     * Saves a transaction object to the database and returns the saved copy
+     *
+     * @param transaction The transaction to save
+     * @return The saved copy of the transaction
+     */
+    public Transaction saveTransaction(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
 

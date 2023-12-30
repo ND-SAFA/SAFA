@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -40,6 +41,11 @@ public class BillingController extends BaseController {
             .get();
         return billingService.startTransaction(organization, purchaseDetails.getAmount(),
             purchaseDetails.getDescription());
+    }
+
+    @PostMapping(AppRoutes.Stripe.CANCEL)
+    public void cancelSession(@PathVariable String sessionId) {
+        stripeService.cancelSession(sessionId);
     }
 
     @PostMapping(AppRoutes.Stripe.WEBHOOK)

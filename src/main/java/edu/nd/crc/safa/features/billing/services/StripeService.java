@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.billing.services;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.stripe.Stripe;
@@ -54,8 +55,8 @@ public class StripeService implements IExternalBillingService {
     }
 
     @Override
-    public String startTransaction(String referenceId, int amount) {
-        logger.info("Starting transaction with reference ID {}", referenceId);
+    public String startTransaction(Transaction transaction) {
+        String referenceId = transaction.getId().toString();
 
         SessionCreateParams params =
             SessionCreateParams.builder()
@@ -68,14 +69,16 @@ public class StripeService implements IExternalBillingService {
                         .build())
                 .addLineItem(
                     SessionCreateParams.LineItem.builder()
-                        .setQuantity((long) amount)
+                        .setQuantity((long) transaction.getAmount())
                         .setPrice(creditProductKey)
                         .build())
-                .setClientReferenceId(referenceId)
+                .setClientReferenceId(transaction.getId().toString())
                 .build();
 
         try {
             Session session = Session.create(params);
+            transaction.setExternalReferenceId(session.getId());
+            logger.info("Started transaction with reference ID {}", referenceId);
             return session.getUrl();
         } catch (StripeException e) {
             throw new SafaError("Failed to create Stripe session: %s", e.getMessage());
@@ -84,8 +87,32 @@ public class StripeService implements IExternalBillingService {
     }
 
     @Override
-    public void endTransaction(String referenceId) {
-        logger.info("Finished transaction with reference ID {}", referenceId);
+    public void endTransaction(Transaction transaction) {
+        logger.info("Finished transaction with reference ID {}", transaction.getId());
+    }
+
+    @Override
+    public void cancelTransaction(Transaction transaction) {
+        String sessionId = transaction.getExternalReferenceId();
+        Session session = getSession(sessionId);
+        if ("open".equals(session.getStatus())) {
+            expireSession(session);
+        }
+        logger.info("Canceled transaction with reference ID {}", transaction.getId());
+    }
+
+    /**
+     * Get a stripe session using the session ID
+     *
+     * @param sessionId The ID of the session
+     * @return The session
+     */
+    private Session getSession(String sessionId) {
+        try {
+            return Session.retrieve(sessionId);
+        } catch (StripeException e) {
+            throw new SafaError("Failed to retrieve Stripe session", e);
+        }
     }
 
     /**
@@ -101,7 +128,30 @@ public class StripeService implements IExternalBillingService {
         StripeEventType eventType = StripeEventType.fromApiName(event.getType());
         switch (eventType) {
             case SESSION_COMPLETED -> handleSessionCompletedEvent((Session) stripeObject);
+            case SESSION_EXPIRED -> handleSessionExpiredEvent((Session) stripeObject);
             default -> logger.debug("Ignoring event of unknown type " + event.getType());
+        }
+    }
+
+    /**
+     * Cancel a session with the given ID by marking it as expired
+     *
+     * @param sessionId The ID of the session
+     */
+    public void cancelSession(String sessionId) {
+        expireSession(getSession(sessionId));
+    }
+
+    /**
+     * Mark a session as expired
+     *
+     * @param session The session
+     */
+    private void expireSession(Session session) {
+        try {
+            session.expire();
+        } catch (StripeException e) {
+            throw new SafaError("Failed to mark session as expired", e);
         }
     }
 
@@ -148,10 +198,21 @@ public class StripeService implements IExternalBillingService {
         billingService.endTransaction(transactionId);
     }
 
+    /**
+     * Handle the stripe session expired event
+     *
+     * @param session The session that expired
+     */
+    private void handleSessionExpiredEvent(Session session) {
+        UUID transactionId = UUID.fromString(session.getClientReferenceId());
+        billingService.cancelTransaction(transactionId);
+    }
+
     @Getter
     @AllArgsConstructor
     private enum StripeEventType {
         SESSION_COMPLETED("checkout.session.completed"),
+        SESSION_EXPIRED("checkout.session.expired"),
         UNKNOWN("");
 
         private final String apiName;

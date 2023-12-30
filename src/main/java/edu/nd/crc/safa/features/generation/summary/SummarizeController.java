@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.jobs.builders.ProjectSummaryJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -43,8 +44,10 @@ public class SummarizeController extends BaseController {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
-            .withPermission(ProjectPermission.GENERATE, user)
-            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .asUser(user)
+            .withPermission(ProjectPermission.GENERATE)
+            .withPermission(ProjectPermission.EDIT_DATA)
+            .withAdditionalCheck(new HasUnlimitedCreditsCheck(), "Summarize Artifacts")
             .get();
         request.setProjectVersion(projectVersion);
         request.setProjectSummary(projectVersion.getProject().getSpecification());
@@ -58,8 +61,10 @@ public class SummarizeController extends BaseController {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
-            .withPermission(ProjectPermission.GENERATE, user)
-            .withPermission(ProjectPermission.EDIT_DATA, user)
+            .asUser(user)
+            .withPermission(ProjectPermission.GENERATE)
+            .withPermission(ProjectPermission.EDIT_DATA)
+            .withAdditionalCheck(new HasUnlimitedCreditsCheck(), "Summarize Project")
             .get();
         return new ProjectSummaryJobBuilder(user, this.getServiceProvider(), projectVersion).perform();
     }

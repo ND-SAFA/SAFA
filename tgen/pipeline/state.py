@@ -190,7 +190,7 @@ class State(BaseObject):
         self.total_input_cost += other_state.total_input_cost
         self.total_output_cost += other_state.total_output_cost
 
-    def get_total_costs(self) -> int:
+    def get_total_costs(self) -> float:
         """
         Gets the combined cost of input and output tokens
         :return: The combined cost of input and output tokens

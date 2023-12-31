@@ -192,10 +192,9 @@ class TestHierarchyGenerator(BaseTest):
         content = list(self.HGEN_STATE.get_generations2sources().keys())
         dup_artifact_id = "dup1"
         dup_indices = [0, 1]
-        dup_content = NEW_LINE.join([content[dup_indices[0]], content[dup_indices[1]]])
+        dup_content = NEW_LINE.join([content[dup_indices[1]], content[dup_indices[0]]])
         expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[dup_indices[0]]
         n_generations = len(self.HGEN_STATE.new_artifact_dataset.artifact_df)
-        all_indices = [i for i in range(n_generations)]
 
         self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
         self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)

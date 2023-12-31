@@ -187,8 +187,9 @@ class QuestionnairePrompt(Prompt):
         """
         if response_manager and not isinstance(response_manager.response_tag, dict):
             all_tags = self.get_all_response_tags()
-            if len(all_tags) > 0:
-                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags})
+            if len(all_tags) > 0 and response_manager.response_tag != all_tags:
+                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags}
+                                                       if response_manager.response_tag else all_tags)
                 response_manager = PromptResponseManager(**params)
         return response_manager
 

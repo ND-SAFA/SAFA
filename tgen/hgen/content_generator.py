@@ -48,7 +48,7 @@ class ContentGenerator:
         prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
 
         export_path = FileUtil.safely_join_paths(self.state.export_dir, generations_filename)
-        generated_artifacts_tag = task_prompt.response_manager.get_all_tag_ids().pop(0)
+        generated_artifacts_tag = task_prompt.response_manager.get_all_tag_ids()[0]
         generations = HGenUtil.get_predictions(prompt_builder, hgen_args=self.args, prediction_step=PredictionStep.GENERATION,
                                                dataset=self.source_dataset, response_prompt_ids={task_prompt.id},
                                                tags_for_response={generated_artifacts_tag}, return_first=return_first,

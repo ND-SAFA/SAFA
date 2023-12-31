@@ -71,7 +71,7 @@ class NpUtil:
         lower_limit = harmonic_mean - sigma * scores.std()
         upper_limit = harmonic_mean + sigma * scores.std()
 
-        return lower_limit, upper_limit
+        return lower_limit + epsilon, upper_limit - epsilon
 
     @staticmethod
     def get_unique_indices(n_rows: int, n_cols: int = None) -> List[Tuple[int, int]]:

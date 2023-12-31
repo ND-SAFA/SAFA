@@ -141,6 +141,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
     def _get_job(self):
         args: HGenArgs = self.get_args(export_dir=EMPTY_STRING)
         args.generate_explanations = False
+        args.run_refinement = False
         starting_hgen_job = BaseHGenJob(args)
         return MultiLayerHGenJob(starting_hgen_job, self.higher_levels)
 

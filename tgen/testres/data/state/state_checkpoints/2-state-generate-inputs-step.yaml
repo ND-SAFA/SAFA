@@ -1,63 +1,41 @@
 _CHECKPOINT_DIRNAME: state_checkpoints
-all_generated_content: null
+all_artifacts_dataset: null
+cluster2artifacts: null
+cluster2generation: null
+cluster_dataset: null
+cluster_id2seeds: null
 completed_steps:
   GenerateInputsStep: 1
   InitializeDatasetStep: 1
 description_of_artifact: A User story is a concise, informal description of a software
   feature or functionality, written from the perspective of the end user
-export_dir: "[ROOT_PATH]/tgen/testres/output"
+embedding_manager: null
+export_dir: '[ROOT_PATH]/tgen/testres/output'
 final_dataset: null
 format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
   or benefit].
 generations2sources: null
-n_generations: 0
+id_to_related_children: null
+new_artifact_dataset: null
 original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
-  project_file_id: null
-  ensure_code_is_summarized: True
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
-    _AbstractProjectReader__processed_project_path: false
-    overrides: {}
-    project_path: "[ROOT_PATH]/tgen/testres/data/state/original_dataset"
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
-      _AbstractProjectReader__processed_project_path: true
-      _definition: null
-      conversions: {}
-      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
-      overrides: {}
-      project_path: "[ROOT_PATH]/tgen/testres/data/state/original_dataset"
-      summarizer: null
-    summarizer: null
-  summarizer: null
-  trace_dataset_creator: null
-questions:
-- What are the main classes/functions in the code?
-- What are the inputs and outputs of the main functions?
-- Is there any user interface code and what does it do?
-refined_content: null
-source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  ensure_code_is_summarized: True
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
-    ordered_steps: []
-    steps: []
-  data_export_path: null
+  ensure_code_is_summarized: false
   project_file_id: null
   project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
-    _AbstractProjectReader__processed_project_path: false
     overrides: {}
-    project_path: "[ROOT_PATH]/tgen/testres/data/state/source_dataset"
+    project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
     structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
-      _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
-      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      definition_reader: null
       overrides: {}
-      project_path: "[ROOT_PATH]/tgen/testres/data/state/source_dataset"
+      project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
       summarizer: null
     summarizer: null
+  project_summary: null
   summarizer: null
   trace_dataset_creator: null
 project_summary: !!python/object/apply:tgen.summarizer.summary.Summary
@@ -68,3 +46,37 @@ project_summary: !!python/object/apply:tgen.summarizer.summary.Summary
         - Here is a summary of the key technical details and design aspects of the
           system based on the provided code
         title: overview
+questions:
+- What are the main classes/functions in the code?
+- What are the inputs and outputs of the main functions?
+- Is there any user interface code and what does it do?
+refined_cluster2artifacts: null
+refined_cluster2generation: null
+refined_generations2sources: null
+seed2artifact_ids: null
+selected_artifacts_dataset: null
+selected_predictions: null
+source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  ensure_code_is_summarized: false
+  project_file_id: null
+  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+    overrides: {}
+    project_path: '[ROOT_PATH]/tgen/testres/data/state/source_dataset'
+    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+      _definition: null
+      conversions: {}
+      definition_reader: null
+      overrides: {}
+      project_path: '[ROOT_PATH]/tgen/testres/data/state/source_dataset'
+      summarizer: null
+    summarizer: null
+  project_summary: null
+  summarizer: null
+  trace_dataset_creator: null
+total_input_cost: 0
+total_output_cost: 0
+trace_predictions: null

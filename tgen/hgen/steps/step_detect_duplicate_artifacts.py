@@ -33,7 +33,8 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         duplicate_detector = DuplicateDetector(embeddings_manager, duplicate_similarity_threshold=args.duplicate_similarity_threshold)
         duplicate_artifact_ids, duplicate_map = duplicate_detector.get_duplicates(new_artifact_ids)
-        duplicate_map = self._remove_duplicates_from_same_cluster(duplicate_artifact_ids, duplicate_map, state)
+        if args.perform_clustering:
+            duplicate_map = self._remove_duplicates_from_same_cluster(duplicate_artifact_ids, duplicate_map, state)
         logger.info(f"Removing: {len(duplicate_artifact_ids)} duplicates.")
 
         selected_artifacts_df = ArtifactDataFrame(state.all_artifacts_dataset.artifact_df.to_dict("list", index=True))

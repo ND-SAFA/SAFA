@@ -28,7 +28,7 @@ NL_SUMMARY = [
            "Write in an active voice and assume your audience is familiar with software system this artifact belongs to."
            "Importantly, do not remove or add information. Merely describe the artifact in a few sentences."
            "\n\n",
-           PromptResponseManager(response_tag="description")),
+           PromptResponseManager(response_tag="descrip")),
     ArtifactPrompt(include_id=False, prompt_start="\n", build_method=ArtifactPrompt.BuildMethod.XML)]
 
 CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX = QuestionPrompt("Use the information below to understand the project.")

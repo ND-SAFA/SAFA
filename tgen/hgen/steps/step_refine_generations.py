@@ -124,9 +124,12 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.embedding_manager.merge(clustering_state.embedding_manager)
 
         target_df = clustering_state.cluster_dataset.artifact_df.get_artifacts_by_type(args.target_type)  # ensure matches saved state
-        cluster2duplicates = ClusteringUtil.convert_cluster_map_to_artifact_format(clustering_state.final_cluster_map,
+        final_cluster_map = {c_id: cluster for c_id, cluster in clustering_state.final_cluster_map.items()
+                             if cluster.avg_pairwise_sim and cluster.avg_pairwise_sim >= 0.4}
+        cluster2duplicates = ClusteringUtil.convert_cluster_map_to_artifact_format(final_cluster_map,
                                                                                    target_df)
         cluster_artifacts = clustering_state.cluster_dataset.artifact_df.get_artifacts_by_type(ClusteringArgs.cluster_artifact_type)
+        cluster_artifacts = cluster_artifacts.filter_by_index(list(cluster2duplicates.keys()))
         cluster2duplicates = {f"r-{c_id}": duplicates for c_id, duplicates in cluster2duplicates.items()}
         cluster_artifacts.index = list(cluster2duplicates.keys())
         return cluster2duplicates, cluster_artifacts

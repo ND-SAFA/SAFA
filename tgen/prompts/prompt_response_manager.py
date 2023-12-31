@@ -121,7 +121,7 @@ class PromptResponseManager:
         p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
         :return: All the response tag ids in the order they are provided
         """
-        return list(self._tag2id.values())
+        return self._all_tag_ids
 
     def format_response_instructions(self) -> str:
         """

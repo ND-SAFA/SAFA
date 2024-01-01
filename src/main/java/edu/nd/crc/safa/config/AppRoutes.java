@@ -100,6 +100,7 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class HGen {
         public static final String GENERATE = "/hgen/{versionId}";
+        public static final String ESTIMATE = GENERATE + "/estimate";
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

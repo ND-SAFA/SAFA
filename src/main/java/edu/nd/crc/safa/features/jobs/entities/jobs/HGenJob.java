@@ -51,7 +51,8 @@ public class HGenJob extends GenerationJob {
         TransactionService transactionService = getServiceProvider().getTransactionService();
 
         Organization organization = projectVersion.getProject().getOwningTeam().getOrganization();
-        int cost = costEstimationService.estimateHgen(projectVersion, hGenRequest.getTargetTypes().size());
+        int cost = costEstimationService.estimateHgen(hGenRequest.getArtifacts().size(),
+            hGenRequest.getTargetTypes().size());
         String chargeDescription = "HGen run for " + projectVersion.getProject().getName();
         billingTransaction = transactionService.charge(organization, cost,  chargeDescription);
     }

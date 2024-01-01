@@ -1,11 +1,15 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
+import edu.nd.crc.safa.features.billing.entities.db.Transaction;
+import edu.nd.crc.safa.features.billing.services.CostEstimationService;
+import edu.nd.crc.safa.features.billing.services.TransactionService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.StringUtil;
@@ -23,6 +27,8 @@ public class HGenJob extends GenerationJob {
      */
     private final ProjectVersion projectVersion;
 
+    private Transaction billingTransaction;
+
     public HGenJob(SafaUser user,
                    JobDbEntity jobDbEntity,
                    ServiceProvider serviceProvider,
@@ -31,6 +37,7 @@ public class HGenJob extends GenerationJob {
         super(user, jobDbEntity, serviceProvider, projectCommitDefinition);
         this.hGenRequest = hGenRequest;
         this.projectVersion = projectCommitDefinition.getCommitVersion();
+        billingTransaction = null;
     }
 
     public static String getJobName(HGenRequest request) {
@@ -38,7 +45,18 @@ public class HGenJob extends GenerationJob {
         return String.format("Generating artifacts: %s", result);
     }
 
-    @IJobStep(value = "Generating Artifacts", position = 3)
+    @IJobStep(value = "Billing Account", position = 3)
+    public void billAccount() {
+        CostEstimationService costEstimationService = getServiceProvider().getCostEstimationService();
+        TransactionService transactionService = getServiceProvider().getTransactionService();
+
+        Organization organization = projectVersion.getProject().getOwningTeam().getOrganization();
+        int cost = costEstimationService.estimateHgen(projectVersion, hGenRequest.getTargetTypes().size());
+        String chargeDescription = "HGen run for " + projectVersion.getProject().getName();
+        billingTransaction = transactionService.charge(organization, cost,  chargeDescription);
+    }
+
+    @IJobStep(value = "Generating Artifacts", position = 4)
     public void generatingArtifacts() {
         HGenService hGenService = this.getServiceProvider().getHGenService();
         String summary = this.projectVersion.getProject().getSpecification();
@@ -46,5 +64,19 @@ public class HGenJob extends GenerationJob {
         ProjectCommitDefinition projectCommitDefinition = hGenService.generateHierarchy(this.projectVersion,
             this.hGenRequest, this.getDbLogger());
         this.setProjectCommitDefinition(projectCommitDefinition);
+    }
+
+    @Override
+    public void afterJob(boolean success) throws Exception {
+        super.afterJob(success);
+
+        if (billingTransaction != null) {
+            TransactionService transactionService = getServiceProvider().getTransactionService();
+            if (success) {
+                transactionService.markTransactionSuccessful(billingTransaction);
+            } else {
+                transactionService.markTransactionFailed(billingTransaction);
+            }
+        }
     }
 }

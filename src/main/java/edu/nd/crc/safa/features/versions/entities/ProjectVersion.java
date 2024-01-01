@@ -114,6 +114,7 @@ public class ProjectVersion implements Serializable, IEntityWithMembership {
     }
 
     @Override
+    @JsonIgnore
     public UUID getId() {
         return versionId;
     }

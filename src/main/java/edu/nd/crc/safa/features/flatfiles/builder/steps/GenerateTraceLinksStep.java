@@ -8,6 +8,7 @@ import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
+import edu.nd.crc.safa.features.permissions.entities.PricePermission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -25,8 +26,8 @@ public class GenerateTraceLinksStep implements IFlatFileBuilderStep {
             Project project = state.getProjectVersion().getProject();
 
             permissionService.requirePermission(ProjectPermission.GENERATE, project, state.getUser());
-            permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(), "Generate Trace Links",
-                project, state.getUser());
+            permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
+                PricePermission.GENERATE_TRACES.getName(), project, state.getUser());
         }
         ProjectAppEntity projectAppEntity = new ProjectAppEntity();
         ProjectCommitDefinition commit = state.getProjectCommitDefinition();

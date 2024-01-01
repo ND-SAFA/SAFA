@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
+import edu.nd.crc.safa.features.permissions.entities.PricePermission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -48,8 +49,8 @@ public abstract class GenerationJob extends CommitJob {
             project,
             getUser()
         );
-        permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(), "Summarize Entities",
-            project, getUser());
+        permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
+            PricePermission.SUMMARIZE_ARTIFACTS.getName(), project, getUser());
 
         ProjectRetrievalService projectRetrievalService = this.getServiceProvider().getProjectRetrievalService();
         this.projectAppEntity = projectRetrievalService.getProjectAppEntity(

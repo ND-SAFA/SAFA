@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.billing.repositories.BillingInfoRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.context.annotation.Lazy;
@@ -196,7 +197,10 @@ public class BillingService {
 
         int currentBalance = billingInfo.getBalance();
 
-        if (isDebit(balanceDelta) && currentBalance < -balanceDelta) {
+        // TODO this will allow unlimited/monthly accounts to go into the negative, but
+        //      fixing it the right way will take enough work that I'm pushing it to a new PR
+        if (isDebit(balanceDelta) && currentBalance < -balanceDelta
+            && organization.getPaymentTier() == PaymentTier.AS_NEEDED) {
             throw new InsufficientFundsException(currentBalance, -balanceDelta);
         }
 

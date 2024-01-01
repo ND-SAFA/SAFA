@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.billing.repositories.TransactionRepository;
 import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.billing.services.TransactionService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
@@ -45,6 +46,8 @@ public class TestTransactionService extends ApplicationBaseTest {
     @BeforeEach
     public void setup() {
         myOrg = organizationService.getPersonalOrganization(getCurrentUser());
+        myOrg.setPaymentTier(PaymentTier.AS_NEEDED);
+        myOrg = organizationService.updateOrganization(myOrg);
     }
 
     @Test

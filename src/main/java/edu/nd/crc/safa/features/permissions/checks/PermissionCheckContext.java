@@ -6,6 +6,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.Getter;
 
@@ -20,6 +21,7 @@ public class PermissionCheckContext {
     private Organization organization;
     private Team team;
     private Project project;
+    private ProjectVersion projectVersion;
     private SafaUser user;
     private ServiceProvider serviceProvider;
 
@@ -69,6 +71,7 @@ public class PermissionCheckContext {
             context.organization = organization;
             context.team = null;
             context.project = null;
+            context.projectVersion = null;
             return this;
         }
 
@@ -83,6 +86,7 @@ public class PermissionCheckContext {
             context.organization = team.getOrganization();
             context.team = team;
             context.project = null;
+            context.projectVersion = null;
             return this;
         }
 
@@ -97,6 +101,22 @@ public class PermissionCheckContext {
             context.organization = project.getOwningTeam().getOrganization();
             context.team = project.getOwningTeam();
             context.project = project;
+            context.projectVersion = null;
+            return this;
+        }
+
+        /**
+         * Add a project version to the context. This also implicitly adds
+         * the team, organization, and project associated with the project version.
+         *
+         * @param projectVersion The project version
+         * @return The builder
+         */
+        public PermissionCheckContextBuilder add(ProjectVersion projectVersion) {
+            context.organization = projectVersion.getProject().getOwningTeam().getOrganization();
+            context.team = projectVersion.getProject().getOwningTeam();
+            context.project = projectVersion.getProject();
+            context.projectVersion = projectVersion;
             return this;
         }
 
@@ -114,6 +134,8 @@ public class PermissionCheckContext {
                 add((Team) entity);
             } else if (entity instanceof Project) {
                 add((Project) entity);
+            } else if (entity instanceof ProjectVersion) {
+                add((ProjectVersion) entity);
             } else {
                 throw new IllegalArgumentException("Unknown type: " + entity.getClass());
             }

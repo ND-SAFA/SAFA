@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.permissions.services;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ExpiringValue;
 
 import lombok.AllArgsConstructor;
@@ -53,7 +55,9 @@ public class PermissionService {
             Team.class, new ConfigForType(teamMembershipService::getRolesForUser,
                 entity -> ((Team) entity).getOrganization()),
             Project.class, new ConfigForType(projectMembershipService::getRolesForUser,
-                entity -> ((Project) entity).getOwningTeam())
+                entity -> ((Project) entity).getOwningTeam()),
+            ProjectVersion.class, new ConfigForType((user, entity) -> new ArrayList<>(),
+                entity -> ((ProjectVersion) entity).getProject())
         );
         this.isSuperuserActiveMap = new HashMap<>();
         this.serviceProvider = serviceProvider;

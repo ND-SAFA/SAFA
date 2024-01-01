@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -38,7 +39,7 @@ import org.hibernate.type.SqlTypes;
 )
 @Data
 @NoArgsConstructor
-public class ProjectVersion implements Serializable {
+public class ProjectVersion implements Serializable, IEntityWithMembership {
 
     @Id
     @GeneratedValue
@@ -110,5 +111,10 @@ public class ProjectVersion implements Serializable {
 
     public String toString() {
         return String.format("%s.%s.%s", majorVersion, minorVersion, revision);
+    }
+
+    @Override
+    public UUID getId() {
+        return versionId;
     }
 }

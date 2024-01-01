@@ -71,7 +71,7 @@ public class ResourceBuilder {
             throw new SafaItemNotFoundError("Unable to find project version with id: %s.", versionId);
         }
 
-        return entityWithProjectHolder(projectVersion, ProjectVersion::getProject);
+        return membershipEntityHolder(projectVersion);
     }
 
     /**

@@ -13,6 +13,7 @@ import {
   artifactCommitApiStore,
   artifactSaveStore,
   artifactStore,
+  jobApiStore,
   jobStore,
   projectStore,
   useApi,
@@ -153,7 +154,7 @@ export const useArtifactGenerationApi = defineStore(
             projectStore.versionId
           );
 
-          jobStore.updateJob(job);
+          await jobApiStore.handleCreate(job);
         },
         {
           ...callbacks,

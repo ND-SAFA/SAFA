@@ -123,7 +123,7 @@ export async function getJiraProjects(
   return (
     (
       await buildRequest<{ payload: JiraProjectSchema[] }, "cloudId">(
-        "jiraGetInstallations",
+        "jiraGetProjects",
         { cloudId }
       ).get()
     ).payload || []

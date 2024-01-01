@@ -14,7 +14,6 @@ import {
   artifactSaveStore,
   artifactStore,
   jobApiStore,
-  jobStore,
   projectStore,
   useApi,
 } from "@/hooks";

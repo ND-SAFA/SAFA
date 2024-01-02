@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.email;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.annotation.PostConstruct;
 
@@ -13,6 +14,7 @@ import com.infobip.ApiKey;
 import com.infobip.BaseUrl;
 import com.infobip.api.EmailApi;
 import com.infobip.model.EmailSendResponse;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,9 +52,6 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Value("${fend.verify-email-path}")
     private String verifyEmailUrl;
 
-    // TODO this is unused until we can implement Infobip
-    //      templates, which is blocked by this issue:
-    //      https://github.com/infobip/infobip-api-java-client/issues/37
     @Value("${email.infobip.verify-email-template-id}")
     private Long verifyEmailTemplateId;
 
@@ -85,17 +84,16 @@ public class InfobipEmailServiceImpl implements EmailService {
     public void sendEmailVerification(String recipient, String token) {
         EmailSendResponse response = wrapSendEmail(() -> {
             String url = String.format(fendBase + verifyEmailUrl, token);
-            String emailTemplate = getVerificationEmailTemplate();
 
-            String[] parts = emailTemplate.split("\n", 2);
-            String emailSubject = parts[0];
-            String emailText = String.format(parts[1], url);
+            JSONObject placeholdersObject = new JSONObject(
+                Map.of("accountlink", url)
+            );
 
             return emailApi
                 .sendEmail(List.of(recipient))
                 .from(senderEmailAddress)
-                .subject(emailSubject)
-                .html(emailText)
+                .templateId(verifyEmailTemplateId)
+                .defaultPlaceholders(placeholdersObject.toString())
                 .execute();
         });
 

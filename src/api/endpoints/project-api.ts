@@ -62,6 +62,13 @@ export async function createProjectUploadJob(
     .post(formData);
 }
 
+createProjectUploadJob.FORM_DATA_NAME = "name";
+createProjectUploadJob.FORM_DATA_ORG_ID = "orgId";
+createProjectUploadJob.FORM_DATA_TEAM_ID = "teamId";
+createProjectUploadJob.FORM_DATA_DESCRIPTION = "description";
+createProjectUploadJob.FORM_DATA_SUMMARIZE = "summarize";
+createProjectUploadJob.FORM_DATA_FILES = "files";
+
 /**
  * Updates an existing project from the given flat files.
  *
@@ -80,6 +87,9 @@ export async function createFlatFileUploadJob(
     .withFormData()
     .post(formData);
 }
+
+createFlatFileUploadJob.FORM_DATA_FILES = "files";
+createFlatFileUploadJob.FORM_DATA_REPLACE = "asCompleteSet";
 
 /**
  * Returns all project identifiers.

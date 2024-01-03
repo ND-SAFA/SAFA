@@ -19,6 +19,7 @@ export const WEBSOCKET_URL = (): string => `${BASE_URL}/websocket`;
  */
 export enum Endpoint {
   // Accounts
+
   session = "accounts/session",
   login = "login",
   createAccount = "accounts/create",
@@ -39,6 +40,7 @@ export enum Endpoint {
   deactivateSuperuser = "accounts/superuser/deactivate",
 
   // Jobs
+
   createProjectJob = "jobs/projects",
   createProjectThroughFlatFiles = "jobs/projects/upload",
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
@@ -52,6 +54,7 @@ export enum Endpoint {
   versionTopic = "/topic/version/:versionId",
 
   // Projects
+
   project = "projects",
   updateProject = "projects/:projectId",
   getProjectMembers = "projects/:projectId/members",
@@ -59,6 +62,7 @@ export enum Endpoint {
   deleteProjectMember = "projects/members/:projectMemberId",
 
   // Integrations
+
   getInstallations = "projects/installations/by-project/:projectId",
 
   jiraCreateCredentials = "accounts/jira/credentials/:accessCode",
@@ -77,30 +81,36 @@ export enum Endpoint {
   githubSyncProject = "projects/versions/:versionId/import/github/:owner/:repositoryName",
 
   // Commits
+
   commit = "projects/versions/:versionId/commit",
   isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/",
   sync = "projects/versions/:versionId/changes",
 
   // Types
+
   createArtifactType = "projects/:projectId/artifactTypes",
   editArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
   deleteArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
 
   // Trace Matrices
+
   createTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
   deleteTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
 
   // Links
+
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
   generateLinksJob = "jobs/projects/links/generate",
   trainModelJob = "jobs/projects/:projectId/models/train",
 
   // Entity Retrieval
+
   projectVersion = "projects/versions/:versionId",
   getArtifactsInVersion = "projects/versions/:versionId/artifacts",
   getTracesInVersion = "projects/versions/:versionId/traces",
 
   // Versions
+
   getProjectVersions = "projects/:projectId/versions",
   getCurrentVersion = "projects/:projectId/versions/current",
   createNewMajorVersion = "projects/:projectId/versions/major",
@@ -108,36 +118,44 @@ export enum Endpoint {
   createNewRevisionVersion = "projects/:projectId/versions/revision",
 
   // Attributes
+
   createAttribute = "projects/:projectId/attributes",
   editAttribute = "projects/:projectId/attributes/:key",
   createAttributeLayout = "projects/:projectId/attribute-layouts",
   editAttributeLayout = "projects/:projectId/attribute-layouts/:id",
 
   // Layout
+
   refreshLayout = "projects/versions/:versionId/layout",
 
   // Documents
+
   createOrUpdateDocument = "projects/versions/:versionId/documents",
   getProjectDocuments = "projects/versions/:versionId/documents",
   deleteDocument = "projects/documents/:documentId",
 
   // Document Artifacts
+
   addArtifactsToDocument = "projects/versions/:versionId/documents/:documentId/artifacts",
   removeArtifactFromDocument = "projects/versions/:versionId/documents/:documentId/artifacts/:artifactId",
   setCurrentDocument = "projects/documents/current/:documentId",
   clearCurrentDocument = "projects/documents/current",
 
   // Delta
+
   getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",
 
   // Parse Entities
+
   parseArtifactFile = "projects/parse/artifacts/:artifactType",
   parseTraceFile = "projects/parse/traces",
 
   // Warnings
+
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
 
   // Models
+
   getModels = "projects/:projectId/models",
   createModel = "projects/:projectId/models",
   editModel = "projects/:projectId/models/:modelId",
@@ -145,6 +163,7 @@ export enum Endpoint {
   shareModel = "projects/models/share",
 
   // Files
+
   getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
 
   // Search
@@ -175,6 +194,7 @@ export enum Endpoint {
   deleteMember = "members/:entityId/:memberId",
 
   // Billing
+
   createCostEstimate = "hgen/:versionId/estimate",
   createCheckoutSession = "billing/checkout",
   deleteCheckoutSession = "stripe/cancel/:sessionId",

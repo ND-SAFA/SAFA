@@ -50,9 +50,15 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
       async (confirmed) => {
         if (!confirmed) return;
 
-        await adminApi.handleRequest(async () => {
-          await createSuperuser(member.email);
-        });
+        await adminApi.handleRequest(
+          async () => {
+            await createSuperuser(member.email);
+          },
+          {
+            success: `User is now a superuser: ${member.email}`,
+            error: `Unable to set as a superuser: ${member.email}`,
+          }
+        );
       }
     );
   }

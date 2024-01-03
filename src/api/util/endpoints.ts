@@ -173,6 +173,11 @@ export enum Endpoint {
   createMember = "members/:entityId",
   editMember = "members/:entityId/:memberId",
   deleteMember = "members/:entityId/:memberId",
+
+  // Billing
+  createCostEstimate = "hgen/:versionId/estimate",
+  createCheckoutSession = "billing/checkout",
+  deleteCheckoutSession = "stripe/cancel/:sessionId",
 }
 
 /**

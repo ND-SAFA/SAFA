@@ -94,7 +94,7 @@ const identifier = computed(() => identifierSaveStore.editedIdentifier);
 
 const uploadMode = computed(() => projectSaveStore.mode);
 
-const continueDisabled = computed(() => !identifier.value.name);
+const continueDisabled = computed(() => !identifierSaveStore.canSave);
 
 const uploadDisabled = computed(
   () =>

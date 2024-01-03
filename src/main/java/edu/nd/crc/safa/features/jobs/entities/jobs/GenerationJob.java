@@ -47,6 +47,9 @@ public abstract class GenerationJob extends CommitJob {
             project,
             getUser()
         );
+        // TODO making summarization free for the moment
+        /*permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
+            PricePermission.SUMMARIZE_ARTIFACTS.getName(), project, getUser());*/
 
         ProjectRetrievalService projectRetrievalService = this.getServiceProvider().getProjectRetrievalService();
         this.projectAppEntity = projectRetrievalService.getProjectAppEntity(

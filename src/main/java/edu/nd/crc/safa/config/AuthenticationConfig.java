@@ -38,10 +38,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class AuthenticationConfig {
-    public static final List<String> OPEN_ENDPOINTS = List.of(AppRoutes.Accounts.LOGIN,
+    public static final List<String> OPEN_ENDPOINTS = List.of(
+        AppRoutes.Accounts.LOGIN,
         AppRoutes.Accounts.CREATE_ACCOUNT,
         AppRoutes.Accounts.FORGOT_PASSWORD,
-        AppRoutes.Accounts.RESET_PASSWORD);
+        AppRoutes.Accounts.RESET_PASSWORD,
+        AppRoutes.Stripe.WEBHOOK,
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/docs/**"
+    );
 
     private final AuthorizationService authorizationService;
     private final TokenService tokenService;
@@ -55,14 +61,7 @@ public class AuthenticationConfig {
             .cors(Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(requests -> requests
-                .requestMatchers(
-                    AppRoutes.Accounts.LOGIN,
-                    AppRoutes.Accounts.CREATE_ACCOUNT,
-                    AppRoutes.Accounts.FORGOT_PASSWORD,
-                    AppRoutes.Accounts.RESET_PASSWORD,
-                    "/swagger-ui/**", // Needed to get config
-                    "/v3/api-docs/**",
-                    "/docs/**")
+                .requestMatchers(OPEN_ENDPOINTS.toArray(new String[0]))
                 .permitAll()
                 .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                 .anyRequest()

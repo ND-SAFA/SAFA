@@ -10,8 +10,12 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
+import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
+import edu.nd.crc.safa.features.permissions.entities.PricePermission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -54,8 +58,13 @@ public class CreateProjectViaJsonJob extends CommitJob {
         if (this.tgenRequestAppEntity.getRequests().isEmpty()) {
             return;
         }
-        getServiceProvider().getPermissionService()
-            .requirePermission(ProjectPermission.GENERATE, getProjectVersion().getProject(), getUser());
+
+        PermissionService permissionService = getServiceProvider().getPermissionService();
+        Project project = getProjectVersion().getProject();
+
+        permissionService.requirePermission(ProjectPermission.GENERATE, project, getUser());
+        permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
+            PricePermission.GENERATE_TRACES.getName(), project, getUser());
 
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommitDefinition());
 

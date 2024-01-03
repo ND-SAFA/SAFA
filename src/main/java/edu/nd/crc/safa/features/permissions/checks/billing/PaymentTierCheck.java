@@ -1,9 +1,11 @@
-package edu.nd.crc.safa.features.permissions.checks;
+package edu.nd.crc.safa.features.permissions.checks.billing;
 
 import java.util.Set;
 
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 
 import lombok.AllArgsConstructor;
 

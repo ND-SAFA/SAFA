@@ -47,10 +47,13 @@ export async function createVerifiedUser(
 export async function saveUserVerification(token: string): Promise<void> {
   return buildRequest<void, string, { token: string }>(
     "verifyAccount"
-  ).sessionRequest({
-    method: "POST",
-    body: JSON.stringify({ token }),
-  });
+  ).sessionRequest(
+    {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    },
+    true
+  );
 }
 
 /**

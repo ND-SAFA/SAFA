@@ -75,9 +75,13 @@ class RequestBuilder<
   /**
    * Performs a request to the session endpoints.
    * @param req - The arguments to pass to the fetch function.
+   * @param ignoreResponse - Whether to ignore the response.
    * @return The response data.
    */
-  async sessionRequest(req: Parameters<typeof fetch>[1]): Promise<ReturnType> {
+  async sessionRequest(
+    req: Parameters<typeof fetch>[1],
+    ignoreResponse?: boolean
+  ): Promise<ReturnType> {
     const response = await fetch(`${BASE_URL}/${this.relativeUrl}`, {
       ...req,
       credentials: "include",
@@ -90,7 +94,7 @@ class RequestBuilder<
       throw Error("Unable to find a session.");
     }
 
-    return response.json();
+    return ignoreResponse ? undefined : response.json();
   }
 
   /**

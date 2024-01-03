@@ -36,6 +36,7 @@ export enum Routes {
   ORG = "/organization",
   TEAM = "/team",
   SEARCH = "/search",
+  PAYMENT = "/payment",
 
   DEMO = "/demo",
 }
@@ -52,6 +53,8 @@ export enum QueryParams {
   ORG = "org",
   TEAM = "team",
   INTEGRATION_TOKEN = "code",
+  PAYMENT_STATUS = "status",
+  PAYMENT_SESSION = "session_id",
 }
 
 export const routes: Array<RouteRecordRaw> = [
@@ -171,6 +174,14 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.SEARCH,
     name: "Project Search",
     component: SearchView,
+    meta: {
+      requiresProject: true,
+    },
+  },
+  {
+    path: Routes.PAYMENT,
+    name: "Billing",
+    component: {},
     meta: {
       requiresProject: true,
     },

@@ -66,7 +66,7 @@ export const useCreateVersionApi = defineStore(
             formData.append("files", file);
           });
 
-          formData.append("isCompleteSet", JSON.stringify(isCompleteSet));
+          formData.append("asCompleteSet", JSON.stringify(isCompleteSet));
 
           const job = await createFlatFileUploadJob(versionId, formData);
 

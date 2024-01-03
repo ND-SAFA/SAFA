@@ -6,6 +6,7 @@ import {
   MessageType,
   ThemeColor,
 } from "@/types";
+import { GENERATION_SCORE_VALUES } from "@/util/generation-config";
 
 export enum Colors {
   white = "#FFFFFF",
@@ -179,12 +180,11 @@ export function convertTypeToColor(
  * @return The color.
  */
 export function getScoreColor(score: number | string): ThemeColor {
-  const [ints, decimals = "0"] = String(score).split(".");
-  const tenths = decimals[0];
+  const numScore = typeof score === "string" ? Number(score) : score;
 
-  if (ints === "1" || ["8", "9"].includes(tenths)) {
+  if (numScore > GENERATION_SCORE_VALUES.HIGH) {
     return "positive";
-  } else if (["6", "7"].includes(tenths)) {
+  } else if (numScore > GENERATION_SCORE_VALUES.MEDIUM) {
     return "secondary";
   } else {
     return "negative";

@@ -32,3 +32,13 @@ export const ARTIFACT_GENERATION_OPTIONS =
         ARTIFACT_GENERATION_TYPES.GRAPH_QL,
         ARTIFACT_GENERATION_TYPES.BUS_LOGIC,
       ];
+
+/**
+ * The values between 0 and 1 that correspond to the confidence score,
+ * broken into three categories.
+ */
+export const GENERATION_SCORE_VALUES = {
+  HIGH: 0.8,
+  MEDIUM: 0.5,
+  LOW: 0.3,
+};

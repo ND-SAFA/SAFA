@@ -28,7 +28,7 @@ export const EDGE_SHAPE = {
 export const TRACE_CURVE_STYLE = "bezier";
 export const TRACE_FADED_OPACITY = 0.3;
 
-export const GENERATED_TRACE_MAX_WIDTH = 4;
+export const GENERATED_TRACE_MAX_WIDTH = 6;
 
 export const TRACE_LINE_STYLE = {
   DEFAULT: "solid",

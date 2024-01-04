@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 import { JobSchema, LocalStorageKeys } from "@/types";
 import { ARTIFACT_GENERATION_TYPES, ONBOARDING_STEPS } from "@/util";
 import {
+  artifactGenerationApiStore,
+  artifactStore,
   createProjectApiStore,
   getVersionApiStore,
   gitHubApiStore,
@@ -51,6 +53,10 @@ export const useOnboarding = defineStore("useOnboarding", {
       ARTIFACT_GENERATION_TYPES.FUNCTIONAL_REQ,
       ARTIFACT_GENERATION_TYPES.FEATURE,
     ],
+    /**
+     * The cost of generating the selected project data.
+     */
+    cost: null as number | null,
   }),
   getters: {
     /**
@@ -73,6 +79,13 @@ export const useOnboarding = defineStore("useOnboarding", {
         this.step >= ONBOARDING_STEPS.summarize.number &&
         projectStore.isProjectDefined
       );
+    },
+    /**
+     * @return Whether the onboarding workflow should display billing information.
+     */
+    displayBilling(): boolean {
+      // TODO
+      return true;
     },
     /**
      * @return A display string for the onboarding project's upload job.
@@ -144,11 +157,9 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (step === "summarize" && this.uploadedJob?.completedEntityId) {
-        getVersionApiStore.handleLoad(
-          this.uploadedJob?.completedEntityId,
-          undefined,
-          false
-        );
+        getVersionApiStore
+          .handleLoad(this.uploadedJob?.completedEntityId, undefined, false)
+          .then(() => this.handleEstimateCost());
       }
     },
     /**
@@ -168,10 +179,43 @@ export const useOnboarding = defineStore("useOnboarding", {
       });
     },
     /**
-     * Generate documentation for the selected project.
+     * Calculate the cost of generating the selected project data.
+     * Skipped if billing information is not displayed.
      */
-    async handleGenerateDocumentation(): Promise<void> {
-      // TODO
+    async handleEstimateCost(): Promise<void> {
+      if (!this.displayBilling) return;
+
+      await artifactGenerationApiStore.handleGenerateArtifactsEstimate(
+        {
+          artifacts: artifactStore.allArtifacts.map(({ id }) => id),
+          targetTypes: this.generationTypes,
+        },
+        {
+          onSuccess: (cost) => (this.cost = cost),
+          onError: () => (this.error = true),
+        }
+      );
+    },
+    /**
+     * Generate documentation for the selected project.
+     * @param paymentConfirmed - Whether the user has confirmed payment.
+     */
+    async handleGenerateDocumentation(
+      paymentConfirmed?: boolean
+    ): Promise<void> {
+      if (this.displayBilling && !paymentConfirmed) {
+        // TODO
+      } else {
+        await artifactGenerationApiStore.handleGenerateArtifacts(
+          {
+            artifacts: artifactStore.allArtifacts.map(({ id }) => id),
+            targetTypes: this.generationTypes,
+          },
+          {
+            onError: () => (this.error = true),
+          }
+        );
+      }
     },
     /**
      * Export the selected project as a CSV.

@@ -19,7 +19,7 @@
         :key="artifact.id"
         :name="artifact.id"
       >
-        <div class="width-fit q-mx-auto">
+        <div class="width-fit q-mx-auto q-mt-sm">
           <panel-card>
             <artifact-body-display
               display-title

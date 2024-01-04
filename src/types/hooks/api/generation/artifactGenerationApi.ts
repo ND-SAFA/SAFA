@@ -74,4 +74,15 @@ export interface ArtifactGenerationApiHook {
     configuration: GenerateArtifactSchema,
     callbacks: IOHandlerCallback
   ): Promise<void>;
+  /**
+   * Estimates the cost of generating artifacts.
+   *
+   * @param configuration - The configuration for generating the artifacts.
+   * @param callbacks - The callbacks for the action.
+   * @return The estimated cost of generating the artifacts, in dollars.
+   */
+  handleGenerateArtifactsEstimate(
+    configuration: GenerateArtifactSchema,
+    callbacks: IOHandlerCallback<number>
+  ): Promise<void>;
 }

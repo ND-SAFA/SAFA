@@ -1,5 +1,6 @@
 <template>
   <typography
+    v-if="status !== 'success'"
     el="div"
     value="
       Now that your code has been imported and summarized,
@@ -8,9 +9,18 @@
     "
   />
   <typography
+    v-if="status !== 'success'"
     el="div"
     secondary
     value="This process may take an additional 30 minutes depending on the size of your project."
+  />
+  <typography
+    v-if="status === 'success'"
+    el="div"
+    value="
+      Your documentation is ready!
+      You can either export the documentation, or view the data in SAFA's knowledge graph below.
+    "
   />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
@@ -24,7 +34,18 @@
       icon="create-artifact"
       color="primary"
     />
-    <!-- TODO: confirm data generation cost estimate, pay with stripe -->
+    <typography
+      v-if="onboardingStore.cost"
+      class="q-mt-md"
+      el="div"
+      value="Generation Cost:"
+    />
+    <attribute-chip
+      v-if="onboardingStore.cost"
+      :value="'$' + onboardingStore.cost"
+      color="primary"
+    />
+
     <flex-box t="4">
       <text-button
         text
@@ -34,7 +55,7 @@
         :disabled="onboardingStore.error"
         @click="handleGenerate"
       >
-        Generate Documentation
+        {{ generateLabel }}
       </text-button>
     </flex-box>
   </flex-box>
@@ -101,7 +122,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { artifactStore, onboardingStore, projectApiStore } from "@/hooks";
 import {
   AttributeChip,
@@ -117,6 +138,12 @@ const codeFiles = ref(artifactStore.allArtifacts.length + " Files");
 
 const status = ref<"initial" | "loading" | "success" | "error">("initial");
 
+const generateLabel = computed(() =>
+  onboardingStore.displayBilling
+    ? "Checkout & Generate"
+    : "Generate Documentation"
+);
+
 /**
  * Sets the status to loading and starts a generation job when the user clicks the import button.
  */
@@ -129,6 +156,11 @@ function handleGenerate() {
  * Updates the status when the job changes.
  */
 function updateStatus() {
+  // Skip jobs that are not for generation.
+  if (!onboardingStore.uploadedJob?.steps.includes("Generating Artifacts")) {
+    return;
+  }
+
   if (onboardingStore.uploadedJob?.status === "IN_PROGRESS") {
     status.value = "loading";
   }

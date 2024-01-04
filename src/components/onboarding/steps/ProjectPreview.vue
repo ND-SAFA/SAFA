@@ -10,8 +10,9 @@
       navigation
       padding
       arrows
-      height="auto"
+      height="600px"
       navigation-position="top"
+      control-color="primary"
     >
       <q-carousel-slide
         v-for="artifact in artifacts"

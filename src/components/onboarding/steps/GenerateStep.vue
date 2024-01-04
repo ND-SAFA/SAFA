@@ -42,7 +42,7 @@
     />
     <attribute-chip
       v-if="onboardingStore.cost"
-      :value="'$' + onboardingStore.cost"
+      :value="generateCost"
       color="primary"
     />
 
@@ -53,7 +53,7 @@
         class="bd-gradient"
         icon="generate-artifacts"
         :disabled="onboardingStore.error"
-        @click="handleGenerate"
+        @click="onboardingStore.handleGenerateDocumentation"
       >
         {{ generateLabel }}
       </text-button>
@@ -134,7 +134,8 @@ import {
 } from "@/components/common";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
-const codeFiles = ref(artifactStore.allArtifacts.length + " Files");
+const codeFiles = computed(() => artifactStore.allArtifacts.length + " Files");
+const generateCost = computed(() => "$" + onboardingStore.cost);
 
 const status = ref<"initial" | "loading" | "success" | "error">("initial");
 
@@ -143,14 +144,6 @@ const generateLabel = computed(() =>
     ? "Checkout & Generate"
     : "Generate Documentation"
 );
-
-/**
- * Sets the status to loading and starts a generation job when the user clicks the import button.
- */
-function handleGenerate() {
-  status.value = "loading";
-  onboardingStore.handleGenerateDocumentation();
-}
 
 /**
  * Updates the status when the job changes.

@@ -112,6 +112,7 @@ export const useOnboarding = defineStore("useOnboarding", {
         return;
       }
 
+      await gitHubApiStore.handleVerifyCredentials();
       await jobApiStore.handleReload();
 
       if (integrationsStore.validGitHubCredentials) {

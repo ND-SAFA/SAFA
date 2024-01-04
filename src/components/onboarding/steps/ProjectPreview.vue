@@ -17,7 +17,7 @@
           :key="artifact.id"
           :name="artifact.id"
         >
-          <div class="q-px-md q-pb-xl full-width">
+          <div class="q-px-md full-width">
             <artifact-body-display
               display-title
               default-expanded

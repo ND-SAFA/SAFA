@@ -7,8 +7,8 @@
     transition-show="slide-up"
     transition-hide="slide-down"
   >
-    <q-card>
-      <q-bar class="bg-neutral q-mt-md">
+    <q-card class="bg-background">
+      <q-bar class="bg-background q-mt-md">
         <q-space />
 
         <text-button text icon="cancel" @click="onboardingStore.handleClose">

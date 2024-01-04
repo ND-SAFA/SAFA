@@ -17,12 +17,7 @@ import {
   projectStore,
   useApi,
 } from "@/hooks";
-import {
-  createCostEstimate,
-  createGeneratedArtifacts,
-  createPrompt,
-  createSummary,
-} from "@/api";
+import { createGeneratedArtifacts, createPrompt, createSummary } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -169,18 +164,6 @@ export const useArtifactGenerationApi = defineStore(
       );
     }
 
-    async function handleGenerateArtifactsEstimate(
-      configuration: GenerateArtifactSchema,
-      callbacks: IOHandlerCallback<number>
-    ): Promise<void> {
-      await artifactGenerationApi.handleRequest(
-        async () =>
-          (await createCostEstimate(configuration, projectStore.versionId))
-            .cost,
-        callbacks
-      );
-    }
-
     return {
       summaryGenConfirm,
       nameGenLoading,
@@ -192,7 +175,6 @@ export const useArtifactGenerationApi = defineStore(
       handleGenerateName,
       handleGenerateBody,
       handleGenerateArtifacts,
-      handleGenerateArtifactsEstimate,
     };
   }
 );

@@ -5,6 +5,7 @@ import { ARTIFACT_GENERATION_TYPES, ONBOARDING_STEPS } from "@/util";
 import {
   artifactGenerationApiStore,
   artifactStore,
+  billingApiStore,
   createProjectApiStore,
   getVersionApiStore,
   gitHubApiStore,
@@ -185,7 +186,7 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleEstimateCost(): Promise<void> {
       if (!this.displayBilling) return;
 
-      await artifactGenerationApiStore.handleGenerateArtifactsEstimate(
+      await billingApiStore.handleEstimateCost(
         {
           artifacts: artifactStore.allArtifacts.map(({ id }) => id),
           targetTypes: this.generationTypes,
@@ -203,12 +204,14 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleGenerateDocumentation(
       paymentConfirmed?: boolean
     ): Promise<void> {
+      const artifactIds = artifactStore.allArtifacts.map(({ id }) => id);
+
       if (this.displayBilling && !paymentConfirmed) {
-        // TODO
+        await billingApiStore.handleCheckoutSession(artifactIds.length);
       } else {
         await artifactGenerationApiStore.handleGenerateArtifacts(
           {
-            artifacts: artifactStore.allArtifacts.map(({ id }) => id),
+            artifacts: artifactIds,
             targetTypes: this.generationTypes,
           },
           {

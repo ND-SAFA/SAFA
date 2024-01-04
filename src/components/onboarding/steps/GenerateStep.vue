@@ -137,10 +137,12 @@ import {
 } from "@/components/common";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
-const codeFiles = computed(() => artifactStore.allArtifacts.length + " Files");
-const generateCost = computed(() => "$" + onboardingStore.cost);
-
 const status = ref<"initial" | "loading" | "success" | "error">("initial");
+
+const codeFiles = computed(() => artifactStore.allArtifacts.length + " Files");
+const generateCost = computed(() =>
+  onboardingStore.cost ? `$${Math.floor(onboardingStore.cost)}.00` : ""
+);
 
 const generateLabel = computed(() =>
   onboardingStore.displayBilling

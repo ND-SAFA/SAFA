@@ -98,7 +98,8 @@ export type IconVariant =
   | "disconnected"
   | "onboarding"
   | "changelog"
-  | "security";
+  | "security"
+  | "payment";
 
 /**
  * Defines props for an icon.

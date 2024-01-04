@@ -159,6 +159,8 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (step === "summarize" && this.uploadedJob?.completedEntityId) {
+        this.steps[this.steps.length - 1].done = true;
+
         getVersionApiStore
           .handleLoad(this.uploadedJob?.completedEntityId, undefined, false)
           .then(() => this.handleEstimateCost());

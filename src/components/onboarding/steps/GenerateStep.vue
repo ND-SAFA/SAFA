@@ -24,27 +24,29 @@
   />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
-    <typography el="div" value="Project Size:" />
-    <attribute-chip :value="codeFiles" icon="code" color="primary" />
-    <typography el="div" value="Generating Documents:" class="q-mt-md" />
-    <attribute-chip
-      v-for="type in onboardingStore.generationTypes"
-      :key="type"
-      :value="type"
-      icon="create-artifact"
-      color="primary"
-    />
-    <typography
-      v-if="onboardingStore.cost"
-      class="q-mt-md"
-      el="div"
-      value="Generation Cost:"
-    />
-    <attribute-chip
-      v-if="onboardingStore.cost"
-      :value="generateCost"
-      color="primary"
-    />
+    <list class="full-width">
+      <list-item
+        color="primary"
+        title="Project Size"
+        :subtitle="codeFiles"
+        icon="code"
+      />
+      <separator inset />
+      <list-item
+        color="primary"
+        title="Generating Documents"
+        :subtitle="onboardingStore.generationTypes.join(', ')"
+        icon="create-artifact"
+      />
+      <separator inset />
+      <list-item
+        v-if="onboardingStore.cost"
+        color="primary"
+        title="Generation Cost"
+        :subtitle="generateCost"
+        icon="payment"
+      />
+    </list>
 
     <flex-box t="4">
       <text-button
@@ -125,12 +127,13 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { artifactStore, onboardingStore, projectApiStore } from "@/hooks";
 import {
-  AttributeChip,
   FlexBox,
   Icon,
   Separator,
   TextButton,
   Typography,
+  List,
+  ListItem,
 } from "@/components/common";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 

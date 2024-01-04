@@ -15,23 +15,22 @@
   />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
-    <typography el="div" value="Importing from GitHub:" />
-    <attribute-chip
-      :value="integrationsStore.gitHubFullProjectName"
-      icon="project-add"
-      color="primary"
-    />
-    <typography el="div" value="Generating Data:" class="q-mt-md" />
-    <attribute-chip
-      value="Project Summary"
-      icon="create-artifact"
-      color="primary"
-    />
-    <attribute-chip
-      value="File Summaries"
-      icon="create-artifact"
-      color="primary"
-    />
+    <list class="full-width">
+      <list-item
+        color="primary"
+        title="Importing From GitHub"
+        :subtitle="integrationsStore.gitHubFullProjectName"
+        icon="project-add"
+      />
+      <separator inset />
+      <list-item
+        color="primary"
+        title="Generating Data"
+        subtitle="Project Summary, File Summaries"
+        icon="create-artifact"
+      />
+    </list>
+
     <flex-box t="4">
       <text-button
         text
@@ -86,9 +85,11 @@ export default {
 import { onMounted, ref, watch } from "vue";
 import { integrationsStore, onboardingStore } from "@/hooks";
 import {
-  AttributeChip,
   FlexBox,
   Icon,
+  List,
+  ListItem,
+  Separator,
   TextButton,
   Typography,
 } from "@/components/common";

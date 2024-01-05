@@ -3,11 +3,7 @@
 
   <git-hub-authentication inactive />
 
-  <q-banner rounded class="bd-secondary q-mt-md">
-    <template #avatar>
-      <icon variant="security" color="secondary" size="md" />
-    </template>
-    <typography :value="ONBOARDING_GITHUB_SECURITY" />
+  <callout-sub-step icon="security" :message="ONBOARDING_GITHUB_SECURITY">
     <template #action>
       <text-button
         text
@@ -18,7 +14,7 @@
         Security Practices
       </text-button>
     </template>
-  </q-banner>
+  </callout-sub-step>
 </template>
 
 <script lang="ts">
@@ -37,7 +33,8 @@ import {
   SECURITY_LINK,
 } from "@/util";
 import { GitHubAuthentication } from "@/components/integrations";
-import { Icon, TextButton, Typography } from "@/components";
+import { TextButton, Typography } from "@/components";
+import CalloutSubStep from "./CalloutSubStep.vue";
 
 /**
  * Opens the security practices link in a new tab.

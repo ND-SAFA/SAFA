@@ -37,22 +37,11 @@
 
   <div v-if="status === 'success'" />
 
-  <q-banner v-if="status === 'error'" rounded class="bg-background q-mt-md">
-    <template #avatar>
-      <icon variant="error" color="secondary" size="md" class="q-mr-sm" />
-    </template>
-    <typography :value="ONBOARDING_SUMMARIZE_ERROR" />
-    <template #action>
-      <text-button
-        text
-        color="secondary"
-        icon="calendar"
-        @click="onboardingStore.handleScheduleCall"
-      >
-        Schedule a Call
-      </text-button>
-    </template>
-  </q-banner>
+  <callout-sub-step
+    v-if="status === 'error'"
+    icon="error"
+    :message="ONBOARDING_SUMMARIZE_ERROR"
+  />
 </template>
 
 <script lang="ts">
@@ -74,13 +63,13 @@ import {
 import { integrationsStore, onboardingStore } from "@/hooks";
 import {
   FlexBox,
-  Icon,
   List,
   ListItem,
   Separator,
   TextButton,
   Typography,
 } from "@/components/common";
+import CalloutSubStep from "./CalloutSubStep.vue";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
 const status = ref<"initial" | "loading" | "success" | "error">("initial");

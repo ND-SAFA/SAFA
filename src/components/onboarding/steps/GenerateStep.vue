@@ -17,26 +17,11 @@
   />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
-    <q-banner
+    <callout-sub-step
       v-if="onboardingStore.blockGeneration"
-      rounded
-      class="bd-secondary q-mt-md"
-    >
-      <template #avatar>
-        <icon variant="payment" color="secondary" size="md" />
-      </template>
-      <typography :value="ONBOARDING_GENERATE_LARGE" />
-      <template #action>
-        <text-button
-          text
-          color="secondary"
-          icon="calendar"
-          @click="onboardingStore.handleScheduleCall"
-        >
-          Schedule a Call
-        </text-button>
-      </template>
-    </q-banner>
+      icon="payment"
+      :message="ONBOARDING_GENERATE_LARGE"
+    />
     <list v-else class="full-width">
       <list-item
         color="primary"
@@ -104,22 +89,11 @@
     </text-button>
   </flex-box>
 
-  <q-banner v-if="status === 'error'" rounded class="bg-background q-mt-md">
-    <template #avatar>
-      <icon variant="error" color="secondary" size="md" class="q-mr-sm" />
-    </template>
-    <typography :value="ONBOARDING_GENERATE_ERROR" />
-    <template #action>
-      <text-button
-        text
-        color="secondary"
-        icon="calendar"
-        @click="onboardingStore.handleScheduleCall"
-      >
-        Schedule a Call
-      </text-button>
-    </template>
-  </q-banner>
+  <callout-sub-step
+    v-if="status === 'error'"
+    icon="error"
+    :message="ONBOARDING_GENERATE_ERROR"
+  />
 </template>
 
 <script lang="ts">
@@ -143,13 +117,13 @@ import {
 import { artifactStore, onboardingStore, projectApiStore } from "@/hooks";
 import {
   FlexBox,
-  Icon,
   Separator,
   TextButton,
   Typography,
   List,
   ListItem,
 } from "@/components/common";
+import CalloutSubStep from "./CalloutSubStep.vue";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
 const status = ref<"initial" | "loading" | "success" | "error">("initial");

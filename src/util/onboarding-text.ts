@@ -16,6 +16,12 @@ export const ONBOARDING_REPO_SELECT = `
   to ensure that SAFA is applied to the correct data.
 `;
 
+export const ONBOARDING_REPO_FREE = `
+  Do you work on an open source project? 
+  We are offering free generation on projects that will benefit the open source community.
+  Please reach out below to learn more.
+`;
+
 export const ONBOARDING_SUMMARIZE_MESSAGE = `
   During the import process,
   a summary of each individual code file will be generated

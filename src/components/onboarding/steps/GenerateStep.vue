@@ -38,7 +38,7 @@
         :subtitle="onboardingStore.generationTypes.join(', ')"
         icon="create-artifact"
       />
-      <separator inset />
+      <separator v-if="onboardingStore.cost" inset />
       <list-item
         v-if="onboardingStore.cost"
         color="primary"

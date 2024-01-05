@@ -181,7 +181,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: Routes.PAYMENT,
     name: "Billing",
-    component: {},
+    component: HomeView,
     meta: {
       requiresProject: true,
     },

@@ -55,3 +55,11 @@ export interface TransactionSchema {
    */
   redirectUrl: string;
 }
+
+/**
+ * Represents the status of a payment.
+ */
+export enum PaymentStatus {
+  success = "success",
+  cancel = "cancel",
+}

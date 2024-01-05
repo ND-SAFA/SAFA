@@ -1,8 +1,12 @@
 import { defineStore } from "pinia";
 
 import { GenerateArtifactSchema, IOHandlerCallback } from "@/types";
-import { orgStore, projectStore, useApi } from "@/hooks";
-import { createCheckoutSession, createCostEstimate } from "@/api";
+import { onboardingStore, orgStore, projectStore, useApi } from "@/hooks";
+import {
+  createCheckoutSession,
+  createCostEstimate,
+  deleteCheckoutSession,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -45,7 +49,30 @@ export const useBillingApi = defineStore("billingApi", () => {
     });
   }
 
-  return { handleEstimateCost, handleCheckoutSession };
+  /**
+   * Accepts the payment for the checkout session.
+   * Internally, the BE will still ensure that the
+   * user has enough credits to generate.
+   */
+  async function handleAcceptPayment(): Promise<void> {
+    await onboardingStore.handleReload(true);
+    await onboardingStore.handleGenerateDocumentation(true);
+  }
+
+  /**
+   * Cancels the payment for the checkout session.
+   * @param sessionId - The id of the session to cancel.
+   */
+  async function handleCancelPayment(sessionId: string): Promise<void> {
+    await billingApi.handleRequest(() => deleteCheckoutSession(sessionId));
+  }
+
+  return {
+    handleEstimateCost,
+    handleCheckoutSession,
+    handleAcceptPayment,
+    handleCancelPayment,
+  };
 });
 
 export default useBillingApi(pinia);

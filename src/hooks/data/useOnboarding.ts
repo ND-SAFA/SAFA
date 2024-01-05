@@ -14,6 +14,7 @@ import {
   jobStore,
   logStore,
   onboardingStore,
+  orgStore,
   projectApiStore,
   projectStore,
 } from "@/hooks";
@@ -58,6 +59,10 @@ export const useOnboarding = defineStore("useOnboarding", {
      * The cost of generating the selected project data.
      */
     cost: null as number | null,
+    /**
+     * Whether payment has been confirmed.
+     */
+    paymentConfirmed: false,
   }),
   getters: {
     /**
@@ -85,8 +90,7 @@ export const useOnboarding = defineStore("useOnboarding", {
      * @return Whether the onboarding workflow should display billing information.
      */
     displayBilling(): boolean {
-      // TODO
-      return true;
+      return !orgStore.automaticBilling && !this.paymentConfirmed;
     },
     /**
      * @return A display string for the onboarding project's upload job.
@@ -104,13 +108,15 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Reloads the GitHub projects and jobs for the onboarding workflow.
      */
     async handleReload(open?: boolean): Promise<void> {
-      this.loading = true;
-
       if (open) {
         this.open = true;
       } else if (onboardingStore.isComplete) {
         return;
       }
+
+      if (this.loading) return; // Skip reset if already loading.
+
+      this.loading = true;
 
       await gitHubApiStore.handleVerifyCredentials();
       await jobApiStore.handleReload();
@@ -207,6 +213,8 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleGenerateDocumentation(
       paymentConfirmed?: boolean
     ): Promise<void> {
+      this.paymentConfirmed = paymentConfirmed || false;
+
       const artifactIds = artifactStore.allArtifacts.map(({ id }) => id);
 
       if (this.displayBilling && !paymentConfirmed) {

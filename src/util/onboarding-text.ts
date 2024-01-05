@@ -63,5 +63,6 @@ export const ONBOARDING_GENERATE_LARGE = `
 
 export const ONBOARDING_GENERATE_ERROR = `
   Oh no! It looks like there was an issue with generating documentation.
+  Your invoice will not be finalized until the generation completes.
   You can schedule a call with us below to ensure your data gets generated properly.
 `;

@@ -24,7 +24,35 @@
   />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
-    <list class="full-width">
+    <q-banner
+      v-if="onboardingStore.blockGeneration"
+      rounded
+      class="bd-secondary q-mt-md"
+    >
+      <template #avatar>
+        <icon variant="payment" color="secondary" size="md" />
+      </template>
+      <typography
+        value="
+          SAFA is currently in early release.
+          if you would like to generate documentation on a larger code base,
+          please reach out to us!
+          You can also add additional filters to the
+          'Select Repository' step to reduce the size of your project.
+        "
+      />
+      <template #action>
+        <text-button
+          text
+          color="secondary"
+          icon="calendar"
+          @click="onboardingStore.handleScheduleCall"
+        >
+          Schedule a Call
+        </text-button>
+      </template>
+    </q-banner>
+    <list v-else class="full-width">
       <list-item
         color="primary"
         title="Project Size"
@@ -54,7 +82,7 @@
         color="gradient"
         class="bd-gradient"
         icon="generate-artifacts"
-        :disabled="onboardingStore.error"
+        :disabled="onboardingStore.blockGeneration || onboardingStore.error"
         @click="onboardingStore.handleGenerateDocumentation"
       >
         {{ generateLabel }}

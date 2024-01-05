@@ -32,3 +32,8 @@ export const ARTIFACT_GENERATION_OPTIONS =
         ARTIFACT_GENERATION_TYPES.GRAPH_QL,
         ARTIFACT_GENERATION_TYPES.BUS_LOGIC,
       ];
+
+/**
+ * The maximum number of artifacts that can be generated on.
+ */
+export const MAX_GENERATED_BASE_ARTIFACTS = 1000;

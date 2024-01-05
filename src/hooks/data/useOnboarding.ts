@@ -1,7 +1,11 @@
 import { defineStore } from "pinia";
 
 import { JobSchema, LocalStorageKeys } from "@/types";
-import { ARTIFACT_GENERATION_TYPES, ONBOARDING_STEPS } from "@/util";
+import {
+  ARTIFACT_GENERATION_TYPES,
+  MAX_GENERATED_BASE_ARTIFACTS,
+  ONBOARDING_STEPS,
+} from "@/util";
 import {
   artifactGenerationApiStore,
   artifactStore,
@@ -101,6 +105,15 @@ export const useOnboarding = defineStore("useOnboarding", {
             this.uploadedJob.steps.length
           }: ${this.uploadedJob.steps[this.uploadedJob.currentStep]}`
         : "";
+    },
+    /**
+     * @return Whether the onboarding workflow should block generation because of project size.
+     */
+    blockGeneration(): boolean {
+      return (
+        projectStore.isProjectDefined &&
+        artifactStore.allArtifacts.length > MAX_GENERATED_BASE_ARTIFACTS
+      );
     },
   },
   actions: {

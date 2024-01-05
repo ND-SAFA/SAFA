@@ -10,9 +10,9 @@
 
   <git-hub-authentication inactive />
 
-  <q-banner rounded class="bg-background q-mt-md">
+  <q-banner rounded class="bd-secondary q-mt-md">
     <template #avatar>
-      <icon variant="security" color="secondary" size="md" class="q-mr-sm" />
+      <icon variant="security" color="secondary" size="md" />
     </template>
     <typography
       value="

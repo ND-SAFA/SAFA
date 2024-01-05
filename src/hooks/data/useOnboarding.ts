@@ -134,21 +134,17 @@ export const useOnboarding = defineStore("useOnboarding", {
       await gitHubApiStore.handleVerifyCredentials();
       await jobApiStore.handleReload();
 
-      if (integrationsStore.validGitHubCredentials) {
-        await gitHubApiStore.handleLoadProjects();
-      }
-
       // Move from Connect GitHub step if credentials are set.
       if (integrationsStore.validGitHubCredentials) {
-        onboardingStore.handleNextStep("connect");
+        await onboardingStore.handleNextStep("connect");
       }
       // Skip to the Summarize step if a job has been uploaded.
       if (onboardingStore.uploadedJob) {
-        onboardingStore.handleNextStep("code");
+        await onboardingStore.handleNextStep("code");
       }
       // Skip to the Generate step if a job has been completed.
       if (onboardingStore.uploadedJob?.completedEntityId) {
-        onboardingStore.handleNextStep("summarize");
+        await onboardingStore.handleNextStep("summarize");
       }
 
       this.loading = false;
@@ -164,7 +160,7 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Proceeds to the next step of the onboarding workflow.
      * @param step - The step to proceed to. If not provided, proceeds to the next step.
      */
-    handleNextStep(step?: keyof typeof ONBOARDING_STEPS): void {
+    async handleNextStep(step?: keyof typeof ONBOARDING_STEPS): Promise<void> {
       const index = step ? ONBOARDING_STEPS[step].index : this.step - 1;
 
       this.steps[index].done = true;
@@ -174,13 +170,13 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (step === "connect") {
-        gitHubApiStore.handleLoadProjects();
+        await gitHubApiStore.handleLoadProjects();
       }
 
       if (step === "summarize" && this.uploadedJob?.completedEntityId) {
         this.steps[this.steps.length - 1].done = true;
 
-        getVersionApiStore
+        await getVersionApiStore
           .handleLoad(this.uploadedJob?.completedEntityId, undefined, false)
           .then(() => this.handleEstimateCost());
       }

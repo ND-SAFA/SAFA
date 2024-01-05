@@ -2,25 +2,18 @@
   <typography
     v-if="status !== 'success'"
     el="div"
-    value="
-      Now that your code has been imported and summarized,
-      we can generate additional documentation to group related functionality.
-      You will receive an email when the import completes.
-    "
+    :value="ONBOARDING_GENERATE_MESSAGE"
   />
   <typography
     v-if="status !== 'success'"
     el="div"
     secondary
-    value="This process may take an additional 30 minutes depending on the size of your project."
+    :value="ONBOARDING_GENERATE_DURATION"
   />
   <typography
     v-if="status === 'success'"
     el="div"
-    value="
-      Your documentation is ready!
-      You can either export the documentation, or view the data in SAFA's knowledge graph below.
-    "
+    :value="ONBOARDING_GENERATE_SUCCESS"
   />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
@@ -32,15 +25,7 @@
       <template #avatar>
         <icon variant="payment" color="secondary" size="md" />
       </template>
-      <typography
-        value="
-          SAFA is currently in early release.
-          if you would like to generate documentation on a larger code base,
-          please reach out to us!
-          You can also add additional filters to the
-          'Select Repository' step to reduce the size of your project.
-        "
-      />
+      <typography :value="ONBOARDING_GENERATE_LARGE" />
       <template #action>
         <text-button
           text
@@ -123,12 +108,7 @@
     <template #avatar>
       <icon variant="error" color="secondary" size="md" class="q-mr-sm" />
     </template>
-    <typography
-      value="
-          On no! It looks like there was an issue with generating documentation.
-          You can schedule a call with us below to ensure your data gets generated properly.
-        "
-    />
+    <typography :value="ONBOARDING_GENERATE_ERROR" />
     <template #action>
       <text-button
         text
@@ -153,6 +133,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import {
+  ONBOARDING_GENERATE_DURATION,
+  ONBOARDING_GENERATE_ERROR,
+  ONBOARDING_GENERATE_LARGE,
+  ONBOARDING_GENERATE_MESSAGE,
+  ONBOARDING_GENERATE_SUCCESS,
+} from "@/util";
 import { artifactStore, onboardingStore, projectApiStore } from "@/hooks";
 import {
   FlexBox,

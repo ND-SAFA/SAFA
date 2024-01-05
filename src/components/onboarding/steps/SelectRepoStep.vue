@@ -1,12 +1,5 @@
 <template>
-  <typography
-    el="p"
-    value="
-        Select which repository you want to import below.
-        Include the main branch and file path to your code
-        to ensure that SAFA is applied to the correct data.
-    "
-  />
+  <typography el="p" :value="ONBOARDING_REPO_SELECT" />
 
   <git-hub-project-input minimal />
 
@@ -25,6 +18,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { ONBOARDING_REPO_SELECT } from "@/util";
 import { integrationsStore, onboardingStore } from "@/hooks";
 import { GitHubProjectInput } from "@/components/integrations";
 import { Typography, TextButton, FlexBox } from "@/components/common";

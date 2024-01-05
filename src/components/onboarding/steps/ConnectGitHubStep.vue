@@ -1,12 +1,5 @@
 <template>
-  <typography
-    el="p"
-    value="
-      To import code, you will need to connect to our GitHub integration,
-      and be a contributor on the repository.
-      Your organization will also need to approve our integration.
-    "
-  />
+  <typography el="p" :value="ONBOARDING_GITHUB_IMPORT" />
 
   <git-hub-authentication inactive />
 
@@ -14,13 +7,7 @@
     <template #avatar>
       <icon variant="security" color="secondary" size="md" />
     </template>
-    <typography
-      value="
-        Our integration will only use read access from the repository you select,
-        and does not train on any data you import.
-        As we work toward SOC II compliance, you can track our current security practices below.
-      "
-    />
+    <typography :value="ONBOARDING_GITHUB_SECURITY" />
     <template #action>
       <text-button
         text
@@ -44,7 +31,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { SECURITY_LINK } from "@/util";
+import {
+  ONBOARDING_GITHUB_IMPORT,
+  ONBOARDING_GITHUB_SECURITY,
+  SECURITY_LINK,
+} from "@/util";
 import { GitHubAuthentication } from "@/components/integrations";
 import { Icon, TextButton, Typography } from "@/components";
 

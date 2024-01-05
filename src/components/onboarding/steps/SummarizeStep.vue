@@ -1,18 +1,6 @@
 <template>
-  <typography
-    el="div"
-    value="
-      During the import process,
-      a summary of each individual code file will be generated
-      along with an overall summary of the project.
-      You will receive an email when the import completes.
-    "
-  />
-  <typography
-    el="div"
-    secondary
-    value="This process may take up to 30 minutes depending on the size of your project."
-  />
+  <typography el="div" :value="ONBOARDING_SUMMARIZE_MESSAGE" />
+  <typography el="div" secondary :value="ONBOARDING_SUMMARIZE_DURATION" />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
     <list class="full-width">
@@ -53,12 +41,7 @@
     <template #avatar>
       <icon variant="error" color="secondary" size="md" class="q-mr-sm" />
     </template>
-    <typography
-      value="
-          On no! It looks like there was an issue with importing from GitHub.
-          You can schedule a call with us below to ensure your data gets uploaded properly.
-        "
-    />
+    <typography :value="ONBOARDING_SUMMARIZE_ERROR" />
     <template #action>
       <text-button
         text
@@ -83,6 +66,11 @@ export default {
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
+import {
+  ONBOARDING_SUMMARIZE_DURATION,
+  ONBOARDING_SUMMARIZE_ERROR,
+  ONBOARDING_SUMMARIZE_MESSAGE,
+} from "@/util";
 import { integrationsStore, onboardingStore } from "@/hooks";
 import {
   FlexBox,

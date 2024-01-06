@@ -57,18 +57,19 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
     await jobApi.handleRequest(async () => {
       const logs = await getJobLog(job.id);
 
-      jobLog.value = logs.map((logItems, index) => {
-        const entry = logItems.map(({ entry }) => entry).join("\n\n");
+      jobLog.value = logs
+        .map((logItems, index) => {
+          const entry = logItems.map(({ entry }) => entry).join("\n\n");
+          const isoTimestamp = logItems[logItems.length - 1]?.timestamp;
 
-        return {
-          stepName: job.steps[index],
-          timestamp: timestampToDisplay(
-            logItems[logItems.length - 1]?.timestamp || ""
-          ),
-          entry,
-          error: entry.includes("Error executing job"),
-        };
-      });
+          return {
+            stepName: job.steps[index],
+            timestamp: isoTimestamp ? timestampToDisplay(isoTimestamp) : "",
+            entry,
+            error: entry.includes("Error executing job"),
+          };
+        })
+        .filter(({ entry }) => !!entry);
     });
   }
 

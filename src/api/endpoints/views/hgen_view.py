@@ -2,7 +2,7 @@ from api.endpoints.common.dataset_converter import create_api_dataset
 from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
 from api.utils.view_util import ViewUtil
-from tgen.common.constants.project_summary_constants import PS_FEATURE_TITLE
+from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.hgen.hgen_args import HGenArgs
@@ -23,7 +23,7 @@ def perform_hgen(request: HGenRequest):
     target_types = request.target_types
     source_layer_ids = list(set([a[ArtifactKeys.LAYER_ID] for a in artifacts]))
 
-    seed_title_section = None if len(artifacts) <= 10 else PS_FEATURE_TITLE
+    seed_title_section = None if len(artifacts) <= 10 else PS_SUBSYSTEM_TITLE
 
     summary = request.summary
     base_type, *other_types = target_types

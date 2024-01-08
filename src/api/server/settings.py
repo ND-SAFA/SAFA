@@ -163,6 +163,7 @@ if run_as_eager:
     logger.info("Running in EAGER mode.")
 
 DEBUG = run_as_eager
+DATA_UPLOAD_MAX_MEMORY_SIZE = 25_000_000
 
 
 # Encoder function

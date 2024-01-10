@@ -10,7 +10,6 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -32,6 +31,8 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         for i, batch_ids in enumerate(batches):
             initial_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids)
             initial_clusters.update(initial_cluster_map)
+            debugging_cluster = {k: [args.dataset.artifact_df.get_artifact(a)["content"] for a in b] for k, b in
+                                 initial_cluster_map.items()}
             batch_cluster_map = self.process_clusters(args, state.embedding_manager, initial_cluster_map, prefix=str(i))
             if i < len(seeds):
                 cluster_id_to_seed.update({c_id: seeds[i] for c_id in batch_cluster_map.keys()})
@@ -111,12 +112,11 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
                                               threshold=args.cluster_intersection_threshold,
                                               min_cluster_size=args.cluster_min_size,
                                               max_cluster_size=args.cluster_max_size,
-                                              filter_cohesiveness=args.filter_by_cohesiveness)
+                                              filter_cohesiveness=args.filter_by_cohesiveness,
+                                              sort_metric=args.metric_to_order_clusters,
+                                              allow_overlapping_clusters=args.allow_duplicates_between_clusters)
         clusters = list(cluster_map.values())
         unique_cluster_map.add_all(clusters)
-
-        if not args.allow_duplicates_between_clusters:
-            unique_cluster_map.remove_duplicate_artifacts()
 
         cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
         return cluster_map

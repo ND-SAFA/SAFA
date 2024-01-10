@@ -7,7 +7,7 @@ from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, DEFAULT_CLUSTER_MIN_VOTES, \
     DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, DEFAULT_MIN_CLUSTER_SIZE, \
     MIN_PAIRWISE_AVG_PERCENTILE, \
-    MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
+    MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING, DEFAULT_SORT_METRIC, DEFAULT_ALLOW_OVERLAPPING_CLUSTERS
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -22,7 +22,9 @@ class ClusterCondenser:
                  threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD,
                  min_cluster_size: int = DEFAULT_MIN_CLUSTER_SIZE,
                  max_cluster_size: int = DEFAULT_MAX_CLUSTER_SIZE,
-                 filter_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS):
+                 filter_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS,
+                 sort_metric: str = DEFAULT_SORT_METRIC,
+                 allow_overlapping_clusters: bool = DEFAULT_ALLOW_OVERLAPPING_CLUSTERS):
         """
         Creates map with similarity threshold.
         :param embeddings_manager: Manages embeddings used to calculate distances between artifacts and clusters.
@@ -30,6 +32,8 @@ class ClusterCondenser:
         :param min_cluster_size: The minimum size of a cluster.
         :param max_cluster_size: The maximum size of a cluster.
         :param filter_cohesiveness: If True, first filters the clusters by their cohesiveness.
+        :param sort_metric: The metric to prioritize clusters by.
+        :param allow_overlapping_clusters: If True, artifacts may exist in multiple clusters.
         """
         self.embeddings_manager = embeddings_manager
         self.cluster_map = {}
@@ -38,6 +42,8 @@ class ClusterCondenser:
         self.min_cluster_size = min_cluster_size
         self.max_cluster_size = max_cluster_size
         self.filter_cohesiveness = filter_cohesiveness
+        self.sort_metric = sort_metric
+        self.allow_overlapping_clusters = allow_overlapping_clusters
 
     def get_clusters(self, min_votes: int = DEFAULT_CLUSTER_MIN_VOTES) -> ClusterMapType:
         """
@@ -99,11 +105,12 @@ class ClusterCondenser:
         :return: Whether cluster should be added to map.
         """
         contains_new_artifacts = self.contains_new_artifacts(cluster)
+        should_include = self.allow_overlapping_clusters or not any([a in self.seen_artifacts for a in cluster])
         contains_cluster = self.contains_cluster(cluster, add_votes=True)
         did_merge = self.try_merge(cluster)
         if len(cluster) == 1 and not contains_new_artifacts:
             return False
-        return (contains_new_artifacts or not contains_cluster) and not did_merge
+        return (contains_new_artifacts or not contains_cluster) and not did_merge and should_include
 
     def try_merge(self, cluster: Cluster, min_similarity_score: float = 0.85):
         """
@@ -180,7 +187,10 @@ class ClusterCondenser:
         if min_pairwise_avg is not None:
             if self.filter_cohesiveness:
                 filtered_clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
-            clusters = list(sorted(filtered_clusters, key=lambda v: v.size_weighted_sim if v.size_weighted_sim else 0, reverse=True))
+
+            clusters = list(sorted(filtered_clusters,
+                                   key=lambda v: getattr(v, self.sort_metric) if getattr(v, self.sort_metric) else 0, reverse=True))
+        debugging = [cluster.get_content_of_artifacts_in_cluster() for cluster in clusters]
         return clusters
 
     def remove_duplicate_artifacts(self) -> None:

@@ -21,12 +21,12 @@ CODE_SUMMARY = [Prompt("\n\n# Task\n"
 NL_SUMMARY = [
     Prompt("# Task\n"
            "1. Provide a list of answers to the following questions about the software artifact:"
-           "\n- What is the functionality described by the artifact?"
+           "\n- What functionality is described by the artifact?"
+           "\n- What are the keywords that capture the functionality of the artifact?"
            "\nEnclose your answer in <notes></notes>"
-           "\n\n2. Then, write a polished description of the software artifacts in a few, cohesive sentences. "
-           "Elaborate on the meaning of any acronyms or system terminology. "
+           "\n\n2. Then, write a short title describing the artifact's functionality followed by its important keywords. "
+           "Follow the format TITLE - KEYWORDS. "
            "Write in an active voice and assume your audience is familiar with software system this artifact belongs to."
-           "Importantly, do not remove or add information. Merely describe the artifact in a few sentences."
            "\n\n",
            PromptResponseManager(response_tag="descrip")),
     ArtifactPrompt(include_id=False, prompt_start="\n", build_method=ArtifactPrompt.BuildMethod.XML)]

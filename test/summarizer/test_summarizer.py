@@ -105,7 +105,7 @@ class TestSummarizer(BaseTest):
         def find_ids(body):
             pattern = r'\[[a-zA-Z]\]'
             matches = re.findall(pattern, body)
-            matches = [StrUtil.remove_chars(match, ["[", "]"]) for match in matches]
+            matches = [StrUtil.remove_substrings(match, ["[", "]"]) for match in matches]
             return matches
 
         def project_summary_response(prompt, **kwargs):
@@ -115,7 +115,7 @@ class TestSummarizer(BaseTest):
             artifact_ids = EMPTY_STRING.join([f"[{id_}]" for id_ in artifact_ids])
             pattern = re.compile(r'<[^>]+>')
             tag = pattern.findall(prompt)[-1]
-            tag = StrUtil.remove_chars(tag, ["</", ">"])
+            tag = StrUtil.remove_substrings(tag, ["</", ">"])
             section_title = SECTION_TAG_TO_TILE.get(tag, PS_SUBSYSTEM_TITLE)
             body_prefix = artifact_ids if section_title not in SPECIAL_TAGS_ITEMS else None
             return create(title=section_title, body_prefix=body_prefix)

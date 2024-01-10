@@ -4,7 +4,7 @@ import uuid
 
 from typing import List, Union, Set, Dict
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD, SPACE, DASH
 from tgen.common.logging.logger_manager import logger
 
 
@@ -106,18 +106,18 @@ class StrUtil:
         return re.findall(StrUtil.FIND_FLOAT_PATTERN, string)
 
     @staticmethod
-    def remove_chars(string: str, chars2remove: Union[List[str], str]) -> str:
+    def remove_substrings(input_string: str, sub_string2remove: Union[List[str], str]) -> str:
         """
         Removes all characters from the string
-        :param string: The string to remove characters from
-        :param chars2remove: The characters to remove
+        :param input_string: The string to remove characters from
+        :param sub_string2remove: The characters to remove
         :return: The string without the characters
         """
-        if not isinstance(chars2remove, list):
-            chars2remove = [chars2remove]
-        for char in chars2remove:
-            string = string.replace(char, EMPTY_STRING)
-        return string
+        if not isinstance(sub_string2remove, list):
+            sub_string2remove = [sub_string2remove]
+        for char in sub_string2remove:
+            input_string = input_string.replace(char, EMPTY_STRING)
+        return input_string
 
     @staticmethod
     def remove_decimal_points_from_floats(string: str) -> str:
@@ -147,11 +147,11 @@ class StrUtil:
         return converted
 
     @staticmethod
-    def remove_substring(string: str, str2remove: str, only_if_startswith: bool = False,
+    def remove_substring(input_string: str, str2remove: str, only_if_startswith: bool = False,
                          only_if_endswith: bool = False) -> str:
         """
         Removes a substring from a string.
-        :param string: The string to remove substring from.
+        :param input_string: The string to remove substring from.
         :param str2remove: The sub-string to remove.
         :param only_if_startswith: If True, only removes from start of string.
         :param only_if_endswith: If True, only removes from end of string.
@@ -164,5 +164,30 @@ class StrUtil:
         elif only_if_endswith:
             pattern = f"{pattern}$"
         pattern = re.compile(pattern)
-        result = pattern.sub(EMPTY_STRING, string)
+        result = pattern.sub(EMPTY_STRING, input_string)
         return result
+
+    @staticmethod
+    def separate_camel_case(input_string: str):
+        """
+        Finds words written in camel casing and separates them into individual words.
+        :param input_string: The string to split camel case words.
+        :return: Processed string.
+        """
+        split_doc = re.sub("([A-Z][a-z]+)", r" \1", re.sub("([A-Z]+)", r" \1", input_string)).split()
+        return SPACE.join(split_doc)
+
+    @staticmethod
+    def separate_joined_words(input_string: str, deliminators: List = None):
+        """
+        Splits camel case, snake case, and pascal case words.
+        :param input_string: The string to split.
+        :param deliminators: Deliminators to split on.
+        :return: Processed string.
+        """
+        if deliminators is None:
+            deliminators = [DASH, UNDERSCORE]
+        processed_string = StrUtil.separate_camel_case(input_string)
+        for d in deliminators:
+            processed_string = SPACE.join(processed_string.split(d))
+        return processed_string

@@ -22,7 +22,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
     LAYER_ID = "diff"
     ARTIFACT_CONTENT = "{}" + NEW_LINE + "{}"
     UNKNOWN_CHANGE_TYPE_KEY = "other"
-    IMPACT_TAG_ID: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value.get_response_tags_for_question(-1)
+    IMPACT_TAG_ID: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value.get_response_tags_for_prompt(-1)
 
     OVERVIEW_TITLE = "Overview"
     USER_LEVEL_SUMMARY_TITLE = "User-level Summary"

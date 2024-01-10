@@ -135,4 +135,4 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :return: None. Map modified in place.
         """
         next_cluster_index = len(cluster_map)
-        cluster_map[next_cluster_index] = cluster
+        cluster_map[str(next_cluster_index)] = cluster

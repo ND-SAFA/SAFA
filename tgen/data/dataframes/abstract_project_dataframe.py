@@ -275,6 +275,15 @@ class AbstractProjectDataFrame(pd.DataFrame):
         for id_, val in zip(ids2update, new_values):
             self.update_value(column2update, id_, val)
 
+    def update_index(self, new_ids: List[Any]) -> "AbstractProjectDataFrame":
+        """
+        Updates the indices of the data frame to the new values.
+        :param new_ids: The new ids to set on the index.
+        :return: DataFrame of base class.
+        """
+        new_df = self.reindex(new_ids)
+        return self.__class__(new_df)
+
     def drop_nan_indices(self) -> pd.DataFrame:
         """
         Drops all columns containing NaN in the index

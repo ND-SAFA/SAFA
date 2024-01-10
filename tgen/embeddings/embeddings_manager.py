@@ -376,7 +376,8 @@ class EmbeddingsManager:
             return_as_list = False
         artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
         if include_ids:
-            artifact_contents = [f"{a_id}: {content}" for a_id, content in zip(subset_ids, artifact_contents)]
+            artifact_contents = [f"{FileUtil.convert_path_to_human_readable(a_id)}: {content}"  # converts code file paths to NL
+                                 for a_id, content in zip(subset_ids, artifact_contents)]
         show_progress_bar = self.show_progress_bar and math.ceil(len(artifact_contents) / DEFAULT_ENCODING_BATCH_SIZE) > 1
         if not show_progress_bar:
             logger.log_without_spam(msg="Calculating embeddings for artifacts...", level=logging.INFO)

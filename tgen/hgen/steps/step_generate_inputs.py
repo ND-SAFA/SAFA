@@ -26,14 +26,14 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state of the HGEN run.
         :return: None
         """
-        state.questions, state.format_of_artifacts, state.description_of_artifact = self._get_inputs(args)
+        state.questions, state.format_of_artifacts, state.description_of_artifact, state.example_artifact = self._get_inputs(args)
 
     @staticmethod
-    def _get_inputs(hgen_args: HGenArgs) -> Tuple[List, str, str]:
+    def _get_inputs(hgen_args: HGenArgs) -> Tuple[List, str, str, str]:
         """
         Gest the inputs that are used to generate the new artifacts
         :param hgen_args: The args for the hgen run
-        :return: The inputs that is used to generate the new artifacts (questions, format, description)
+        :return: The inputs that is used to generate the new artifacts (questions, format, description, example)
         """
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
         instructions_prompt.response_manager.value_formatter = lambda tag, val: HGenUtil.parse_generated_artifacts(val)
@@ -42,11 +42,12 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         inputs_response = GenerateInputsStep._get_inputs_response(hgen_args, format_questionnaire, instructions_prompt)
         question_id = instructions_prompt.response_manager.response_tag
         questions = inputs_response[question_id][0]
-        artifact_description_tag = format_questionnaire.question_prompts[0].response_manager.response_tag
+        artifact_description_tag = format_questionnaire.child_prompts[0].response_manager.response_tag
         artifact_description = inputs_response[artifact_description_tag][0]
-        format_of_artifacts = inputs_response[format_questionnaire.question_prompts[-1].response_manager.response_tag][0]
+        example_artifact = inputs_response[format_questionnaire.child_prompts[-2].response_manager.response_tag][0]
+        format_of_artifacts = inputs_response[format_questionnaire.child_prompts[-1].response_manager.response_tag][0]
 
-        return questions, format_of_artifacts, artifact_description
+        return questions, format_of_artifacts, artifact_description, example_artifact
 
     @classmethod
     def _get_inputs_response(cls, hgen_args: HGenArgs, format_questionnaire: QuestionnairePrompt,

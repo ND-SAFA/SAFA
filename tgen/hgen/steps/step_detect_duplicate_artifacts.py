@@ -8,7 +8,8 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.hgen.common.duplicate_detector import DuplicateDetector
+from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
+from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -28,13 +29,12 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         embeddings_manager = state.embedding_manager
 
         new_artifact_map = state.new_artifact_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
-        new_artifact_embeddings_map = embeddings_manager.update_or_add_contents(new_artifact_map, create_embedding=True)
-        new_artifact_ids = list(new_artifact_embeddings_map.keys())
+        embeddings_manager.update_or_add_contents(new_artifact_map, create_embedding=True)
 
         duplicate_detector = DuplicateDetector(embeddings_manager, duplicate_similarity_threshold=args.duplicate_similarity_threshold)
-        duplicate_artifact_ids, duplicate_map = duplicate_detector.get_duplicates(new_artifact_ids)
-        if args.perform_clustering:
-            duplicate_map = self._remove_duplicates_from_same_cluster(duplicate_artifact_ids, duplicate_map, state)
+        duplicate_artifact_ids, duplicate_map = duplicate_detector.get_duplicates(
+            state.new_artifact_dataset.artifact_df, original_clusters_to_contents=state.get_cluster2generation(),
+            duplicate_type=DuplicateType.ALL if not args.perform_clustering else DuplicateType.INTER_CLUSTER)
         logger.info(f"Removing: {len(duplicate_artifact_ids)} duplicates.")
 
         selected_artifacts_df = ArtifactDataFrame(state.all_artifacts_dataset.artifact_df.to_dict("list", index=True))
@@ -43,32 +43,6 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                          project_summary=state.all_artifacts_dataset.project_summary)
 
         self._re_trace_duplicates(state, duplicate_artifact_ids, duplicate_map)
-
-    @staticmethod
-    def _remove_duplicates_from_same_cluster(duplicate_artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]],
-                                             state: HGenState) -> Dict[str, Set[str]]:
-        """
-        Removes duplicates that originated from the same cluster because less likely to be real duplicates (just related).
-        :param duplicate_artifact_ids: Set of all selected duplicate ids.
-        :param duplicate_map: The map of identified duplicate families.
-        :param state: The current state of HGen.
-        :return: The refined duplicate map.
-        """
-        generation2cluster = DictUtil.flip(state.get_cluster2generation())
-        refined_duplicate_map = {}
-        for a_id, duplicates in duplicate_map.items():
-            content = state.new_artifact_dataset.artifact_df.get_artifact(a_id)[ArtifactKeys.CONTENT]
-            cluster = generation2cluster[content]
-            refined_duplicates = set()
-            for dup_id in duplicates:
-                dup_content = state.new_artifact_dataset.artifact_df.get_artifact(dup_id)[ArtifactKeys.CONTENT]
-                if generation2cluster[dup_content] != cluster:
-                    refined_duplicates.add(dup_id)
-            if refined_duplicates:
-                refined_duplicate_map[a_id] = refined_duplicates
-            elif a_id in duplicate_artifact_ids:
-                duplicate_artifact_ids.remove(a_id)
-        return refined_duplicate_map
 
     @staticmethod
     def _re_trace_duplicates(state: HGenState, duplicate_artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]]) -> None:

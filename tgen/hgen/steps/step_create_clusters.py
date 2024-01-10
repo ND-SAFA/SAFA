@@ -1,5 +1,6 @@
 from typing import Dict
 
+from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
@@ -34,15 +35,16 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         cluster_args = self.create_clustering_args(args, state)
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
-        self.update_hgen_state(args, state, clustering_pipeline.state)
+        self.update_hgen_state(args, state, clustering_pipeline.state, cluster_args.cluster_max_size)
 
     @staticmethod
-    def update_hgen_state(args: HGenArgs, state: HGenState, cluster_state: ClusteringState) -> None:
+    def update_hgen_state(args: HGenArgs, state: HGenState, cluster_state: ClusteringState, cluster_max_size: int) -> None:
         """
         Updates the state of hgen with the result of the clustering pipeline.
         :param args: Arguments to hgen pipeline.
         :param state: The state of the hgen pipeline.
         :param cluster_state: The final state of the clustering pipeline.
+        :param cluster_max_size: The max size allowed for a cluster.
         :return: None
         """
         clusters = cluster_state.cluster_artifact_dataset.artifact_df.index.astype(str)  # converting all keys to str bc pd is stupid
@@ -55,6 +57,10 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
         state.cluster2artifacts = cluster_map
+
+        max_cohesion = Cluster.weight_average_pairwise_sim_with_size(1, cluster_max_size)
+        state.cluster2cohesion = {cluster_id: (cluster.size_weighted_sim/max_cohesion if cluster.avg_pairwise_sim else max_cohesion)
+                                  for cluster_id, cluster in cluster_state.final_cluster_map.items()}
 
         if cluster_state.seed2artifacts:
             state.seed2artifact_ids = cluster_state.seed2artifacts

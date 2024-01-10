@@ -93,7 +93,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Threshold for which all orphan links have to exceed or equal.
     """
-    min_orphan_score_threshold: float = DEFAULT_ORPHAN_THRESHOLD
+    min_orphan_score_threshold: float = None
     """
     Threshold for which generated artifacts are deemed duplicates.
     """
@@ -147,8 +147,7 @@ class HGenArgs(PipelineArgs, BaseObject):
         Sets the llm manager map and the max tokens for each hgen step.
         :return: None
         """
-        self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
-                                       else self.hgen_llm_manager_efficient) for e in PredictionStep}
+        self.llm_managers = {e.value: self.hgen_llm_manager_best for e in PredictionStep}
         self.llm_managers[PredictionStep.FORMAT.value] = self.inputs_llm_manager
         for e in PredictionStep:
             if e.value not in self.max_tokens:

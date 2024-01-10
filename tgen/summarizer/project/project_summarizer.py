@@ -229,7 +229,7 @@ class ProjectSummarizer(BaseObject):
                                                if self.dataset else {"versions": ["id", "body"]},
                                                include_ids=self.dataset is not None)
         section_prompt.set_instructions(f"{PS_QUESTIONS_HEADER}{NEW_LINE}"
-                                        f"*Importantly, ONLY answer the {len(section_prompt.question_prompts)} questions below "
+                                        f"*Importantly, ONLY answer the {len(section_prompt.child_prompts)} questions below "
                                         f"and ensure the ALL tags {section_prompt.get_all_response_tags()} "
                                         f"are included in your answer*")
         prompt_builder = PromptBuilder(prompts=[content_prompt,

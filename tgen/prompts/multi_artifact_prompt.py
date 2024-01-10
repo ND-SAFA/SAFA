@@ -73,7 +73,7 @@ class MultiArtifactPrompt(Prompt):
                                                               starting_num=self.starting_num,
                                                               prompt=prompt,
                                                               artifact_params=artifact_params)
-            return f"{prompt}{artifacts}"
+            return f"{prompt}{artifacts}" if artifacts else EMPTY_STRING
         else:
             raise NameError(f"Unknown Build Method: {self.build_method}")
 

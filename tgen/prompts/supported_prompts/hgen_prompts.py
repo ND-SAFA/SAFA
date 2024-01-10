@@ -1,6 +1,7 @@
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_NOTES_TAG
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.prompts.conditional_prompt import ConditionalPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -60,7 +61,7 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
                    "- all details in the {target_type} must accurately reflect the provided {source_type}. "),
     QuestionPrompt("{description} "),
     QuestionPrompt("Each {target_type} should use a consistent format. Use this format as a guideline: "
-                   "{format} "),
+                   "\t{format}\n For example: {example} "),
     QuestionPrompt("Make sure the {target_type} are concise but technically detailed"),
     QuestionPrompt("Avoid ambiguous language, and only include information contained in the {source_type}. "),
     QuestionPrompt("Ensure that all features and functionality are included in the {target_type}s.")],
@@ -68,22 +69,33 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     Prompt(
-        "First, describe the unique functionality of the {source_type}(s) within the system.",
-        response_manager=PromptResponseManager(response_tag="notes")
-    ),
-    QuestionPrompt(
-        "For your next task, the primary objective is to create a minimal set ({n_targets}) of detailed {target_type}s "
-        "specifying the functionality achieved by the {source_type}s."
-    ),
-    QuestionPrompt(
-        "The {target_type}s should generalize the important functionality into {n_targets} {target_type}(s). "
-        "Each {target_type} should be detailed and focused on a single, clear purpose. "
-        "Their should be enough details to guide the implementation of the {target_type}. "
-        "Use the `Overview of System` to understand the greater context of the system containing the {source_type}s."
-    ),
-    QuestionPrompt("{description} "),
-    QuestionPrompt("The {target_type} should use this format as a guideline: \n{format}.")
-], enumeration_chars=["-"])
+        "First you must identify the important information (e.g. features, functionality, etc.) from the {source_type}. "
+        "Put this information in a section called Information. "
+        "Put each unique feature, functionality or other information as its own markdown bullet. "
+        f"Enclose the section in {PromptUtil.create_xml('information')}. "
+        "Example:\n# Information\n  - info1\n - info2\n"),
+    QuestionnairePrompt(
+        instructions="Next, your primary objective is to select the information "
+                     "that is relevant for the scope and purpose of {target_type}s "
+                     "from that which was identified in the 'Information' section "
+                     "and encapsulate it as a set of {n_targets} detailed {target_type}.",
+        question_prompts=[
+            QuestionPrompt("{description} "),
+            QuestionnairePrompt(instructions="The {target_type} should use this format as a guideline:",
+                                question_prompts=[QuestionPrompt("{format}"), QuestionPrompt("For example: {example}")],
+                                enumeration_chars=["*"]),
+            QuestionPrompt(
+                "The {target_type}s should describe the information in the 'Information' into {n_targets} {target_type}. "
+                "Group common functionality together. "
+                "Use keywords and general language from the 'Information' section. "
+                "Ensure that all {n_targets} {target_type} are distinct from the others. "),
+            QuestionPrompt(
+                "Their should be enough details to understand the functionality of the {target_type}, "
+                "but each of the {n_targets} {target_type} should remain focused on a single, clear purpose. "
+                "Remember to use the 'Information' section to make sure you include the appropriate details.")
+
+        ], enumeration_chars=["-"]
+    )])
 SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "
                      "When creating the {target_type}(s) from {source_type}, "
                      "focus on the functionality in the {source_type} that was likely implemented/derived from it.\n\t"
@@ -106,21 +118,24 @@ REFINE_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software syste
                                 "a set of {target_type}s from a software project.")
 DUP_SUMMARY_TASKS = QuestionnairePrompt([
     Prompt(
-        "Identify the unique features of the system mentioned in the {target_type}. "
+        "Identify the unique features of the system mentioned in the {target_type} in detail. Focus on the key aspects of the system."
         f"Enclose your answer in {PromptUtil.create_xml('notes')} "),
     Prompt(
-        "In a bullet list, make a concise list of the features and functionalities, condensing similar or overlapping ones "
-        "into a single bullet. ")],
+        "Produced a polished bulleted list detailing the unique features in the {target_type}.")],
     response_manager=PromptResponseManager(response_tag="answer"))
 
 REFINEMENT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("Consider the features and functionality in the {source_type}s, focusing on the following: {dup_summaries} "),
-    QuestionPrompt("Then reverse engineer a {n_targets} {target_type}(s) for these features. "),
-    QuestionPrompt("Do not make up any information "
-                   "- all details in the {target_type} must accurately reflect the provided {source_type}. "),
-    QuestionPrompt("{description} "),
-    QuestionPrompt("Each {target_type} should use a consistent format. Use this format as a guideline: "
-                   "{format} "),
-    QuestionPrompt("Ensure you do not include too many features within a single {target_type}, "
-                   "but group together features that are overlap. ")],
+    ConditionalPrompt(candidate_prompts=[CLUSTERING_QUESTIONNAIRE.child_prompts[0],
+                                         QuestionPrompt("Cover the information in this section that is most important "
+                                                        "for {target_type} in your {target_type}: "
+                                                        f"{NEW_LINE}{PromptUtil.as_markdown_header('Information')}{NEW_LINE}"
+                                                        "{functionality}")],
+                      prompt_selector=lambda kwargs: int(kwargs.get("functionality") is not None)),
+    CLUSTERING_QUESTIONNAIRE.child_prompts[1]
+],
     enumeration_chars=["-"])
+TITLE_PROMPT = Prompt("Create a title for the {target_type} below. "
+                      "Titles should be a short identifier containing keywords describing the functionality in the {target_type}. "
+                      "\nExample: User Profile Creation for Admins\n",
+                      PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS)
+                      )

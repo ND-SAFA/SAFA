@@ -6,6 +6,7 @@ import pandas as pd
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -24,6 +25,8 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from string import ascii_uppercase
+
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
 SAVE_DATASET_DIRNAME = "final_generated_dataset"
@@ -79,15 +82,18 @@ class HGenUtil:
     def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs,
                                                     generations2sources: Dict[str, Set],
                                                     target_layer_id: str,
-                                                    generate_names: bool = True) -> Tuple[ArtifactDataFrame, Dict[str, Set]]:
+                                                    generate_names: bool = True,
+                                                    generation_id: Union[int, str] = 0) -> Tuple[ArtifactDataFrame, Dict[str, Set]]:
         """
         Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
         :param hgen_args: The arguments for the hierarchy generation
         :param generations2sources: A dictionary mapping generated artifact content to the predicted links
         :param target_layer_id: The id for the layer with the new generated artifacts
         :param generate_names: If True, generates names for the new artifacts
+        :param generation_id: How many times has the name generation currently run.
         :return: The dataframe of generated artifacts and a dictionary mapping the new name to the list of predicted related artifacts
         """
+        filename = f"artifact_names_{generation_id}.yaml"
         new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [f"{StrUtil.get_letter_from_number(i)}{i}"
                                                                for i in range(len(generations2sources))],
                                              ArtifactKeys.CONTENT: list(generations2sources.keys()),
@@ -102,14 +108,12 @@ class HGenUtil:
                     names = list(use_content_as_names.values())
                 else:
                     logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
-                    name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
-                                         f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
-                                         PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS)
-                                         )
-                    artifact_prompt = ArtifactPrompt(include_id=False)
+                    name_prompt: Prompt = SupportedPrompts.HGEN_TITLE_PROMPT.value
+                    name_prompt.format_value(target_type=hgen_args.target_type)
+                    artifact_prompt = ArtifactPrompt(include_id=False, build_method=ArtifactPrompt.BuildMethod.XML)
                     prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
                     dataset = PromptDataset(artifact_df=new_artifact_df)
-                    predictions_path = FileUtil.safely_join_paths(hgen_args.export_dir, "artifact_names.json")
+                    predictions_path = FileUtil.safely_join_paths(hgen_args.export_dir, filename)
                     names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
                                                      prediction_step=PredictionStep.NAME,
                                                      dataset=dataset, response_prompt_ids=name_prompt.id,

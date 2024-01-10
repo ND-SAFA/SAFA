@@ -21,7 +21,11 @@ class CreateEmbeddings(AbstractPipelineStep):
         artifact_df = args.dataset.artifact_df
 
         artifact_map = self.create_artifact_map(artifact_df, artifact_types)
-        embeddings_manager = EmbeddingsManager(content_map=artifact_map, model_name=args.embedding_model)
+        if args.embedding_manager:
+            embeddings_manager = args.embedding_manager
+            embeddings_manager.update_or_add_contents(artifact_map)
+        else:
+            embeddings_manager = EmbeddingsManager(content_map=artifact_map, model_name=args.embedding_model)
         embeddings_manager.create_embedding_map(include_ids=True)
 
         state.embedding_manager = embeddings_manager

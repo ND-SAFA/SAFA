@@ -190,17 +190,6 @@ class LLMTrainer(AbstractTrainer):
         pass
 
     @staticmethod
-    def convert_dataset_to_prompt_dataset(dataset: Union[PromptDataset, TraceDataset]) -> PromptDataset:
-        """
-        If the dataset is not a prompt dataset, it is converted to one
-        :param dataset: The original dataset
-        :return: The dataset a a prompt dataset
-        """
-        if not isinstance(dataset, PromptDataset):
-            dataset = PromptDataset(trace_dataset=dataset)
-        return dataset
-
-    @staticmethod
     def _create_generation_output(responses: List[str], prompt_builder_map: Dict[str, PromptBuilder],
                                   prompt_builder_ids: List[str]) -> TracePredictionOutput:
         """

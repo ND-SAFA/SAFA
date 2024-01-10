@@ -27,6 +27,7 @@ from tgen.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonA
 from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
@@ -93,19 +94,24 @@ class VSMTrainer(AbstractTrainer):
             raise exceptions.NotFittedError("Model must be trained before calling predict")
         return output
 
-    def train(self, train_dataset: TraceDataset) -> None:
+    def train(self, train_dataset: Union[TraceDataset, PromptDataset]) -> None:
         """
         Fits the model on the set of raw source and target tokens in training dataset.
         :param train_dataset: The dataset to use for training
         :return: None
         """
-        tracing_requests = RankingUtil.extract_tracing_requests(train_dataset.artifact_df,
-                                                                train_dataset.layer_df.as_list(),
-                                                                train_dataset.artifact_df.to_map())
-        artifacts = []
-        for tracing_request in tracing_requests:
-            artifacts = artifacts + self.get_artifacts(tracing_request.parent_ids)
-            artifacts = artifacts + self.get_artifacts(tracing_request.child_ids)
+        dataset = self.convert_dataset_to_prompt_dataset(train_dataset)
+
+        if dataset.trace_dataset:
+            tracing_requests = RankingUtil.extract_tracing_requests(train_dataset.artifact_df,
+                                                                    train_dataset.layer_df.as_list(),
+                                                                    train_dataset.artifact_df.to_map())
+            artifacts = []
+            for tracing_request in tracing_requests:
+                artifacts = artifacts + self.get_artifacts(tracing_request.parent_ids)
+                artifacts = artifacts + self.get_artifacts(tracing_request.child_ids)
+        else:
+            artifacts = dataset.artifact_df[ArtifactKeys.CONTENT]
         combined = pd.Series(artifacts)
         self.model.fit(combined)
 
@@ -149,7 +155,7 @@ class VSMTrainer(AbstractTrainer):
 
         if self.select_predictions:
             self.convert_to_percentiles(prediction_entries)
-            prediction_entries = RankingUtil.select_predictions(prediction_entries, *VSM_SELECTION_THRESHOLDS)
+            prediction_entries = RankingUtil.select_predictions_by_thresholds(prediction_entries, *VSM_SELECTION_THRESHOLDS)
         metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries)
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)

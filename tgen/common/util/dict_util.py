@@ -183,7 +183,7 @@ class DictUtil:
             mapping[item_key] += increment_value
 
     @staticmethod
-    def set_or_append_item(mapping: Dict, item_key: str, item_value: Any, iterable_type: Type = list) -> None:
+    def set_or_append_item(mapping: Dict, item_key: str, item_value: Any, iterable_type: Type[Iterable] = list) -> None:
         """
         Initializes a list/set to mapping if it does not exists, and appends item either way.
         :param mapping: The map to add item to.
@@ -194,6 +194,11 @@ class DictUtil:
         """
         if item_key not in mapping:
             mapping[item_key] = iterable_type()
+        if isinstance(item_value, iterable_type):
+            for item in item_value:
+                DictUtil.set_or_append_item(mapping, item_key, item, iterable_type)
+            return
+
         if isinstance(mapping[item_key], set):
             mapping[item_key].add(item_value)
         elif isinstance(mapping[item_key], dict):

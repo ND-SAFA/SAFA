@@ -17,6 +17,7 @@ from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
+from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_across_all import SelectByThresholdScaledAcrossAll
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
@@ -76,7 +77,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The trace predictions for the clusters
         """
         new_artifact_map = state.new_artifact_dataset.artifact_df.to_map()
-        trace_predictions, selected_traces = [], []
+        trace_predictions, trace_selections = [], []
         generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
         state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
@@ -104,14 +105,38 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                         export_dir=cluster_dir,
                                         **pipeline_kwargs)
             cluster_predictions = self._run_embedding_pipeline(pipeline_args)
+            cluster_selections = SelectByThresholdScaledAcrossAll.select(cluster_predictions, args.link_selection_threshold)
+            parent2selections = RankingUtil.group_trace_predictions(cluster_selections, TraceKeys.parent_label())
             parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
             for parent, parent_preds in parent2predictions.items():
-                parent_selected_traces = SelectByThreshold.select(parent_preds, FIRST_PASS_LINK_THRESHOLD)
+                parent_selected_traces = parent2selections.get(parent, [])
                 if len(parent_selected_traces) == 0:
-                    parent_selected_traces = sorted(parent_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[:1]
-                selected_traces.extend(parent_selected_traces)
+                    best_trace = sorted(parent_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[0]
+                    lower_threshold = args.link_selection_threshold - 0.1
+                    if best_trace[TraceKeys.SCORE] >= lower_threshold:
+                        # grab all at lower threshold
+                        parent_selected_traces = SelectByThreshold.select(parent_preds, args.link_selection_threshold - 0.1)
+                    else:
+                        parent_selected_traces = [best_trace]  # just grab the best one
+                trace_selections.extend(parent_selected_traces)
             trace_predictions.extend(cluster_predictions)
-        return trace_predictions, selected_traces
+        self._trace_orphans(state, trace_predictions, trace_selections)
+        return trace_predictions, trace_selections
+
+    @staticmethod
+    def _trace_orphans(state: HGenState, trace_predictions: List[Trace], trace_selections: List[Trace]) -> None:
+        """
+        Traces any orphans to their top parent.
+        :param state: The current state of HGen.
+        :param trace_predictions: All predictions.
+        :param trace_selections: Selected predictions.
+        :return: None (adds directly to trace selections list).
+        """
+        child2selections = RankingUtil.group_trace_predictions(trace_selections, TraceKeys.child_label())
+        orphans = set(state.source_dataset.artifact_df.index).difference(child2selections.keys())
+        all_child_predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label(), sort_entries=True)
+        selected_traces = [all_child_predictions[orphan][0] for orphan in orphans]
+        trace_selections.extend(selected_traces)
 
     @staticmethod
     def _run_embedding_pipeline(ranking_args: RankingArgs) -> List[Trace]:

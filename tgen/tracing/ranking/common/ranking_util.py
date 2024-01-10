@@ -137,27 +137,30 @@ class RankingUtil:
             logger.info(f"{group_key}:{group_items}")
 
     @staticmethod
-    def select_predictions(trace_predictions: List[Trace], parent_primary_threshold: float,
-                           parent_secondary_threshold: float, parent_min_threshold: float) -> List[Trace]:
+    def select_predictions_by_thresholds(trace_predictions: List[Trace], primary_threshold: float,
+                                         secondary_threshold: float = None, min_threshold: float = 0,
+                                         artifact_key: TraceKeys = TraceKeys.child_label()) -> List[Trace]:
         """
-        Selects the top parents per child.
+        Selects the top parent or child per artifact.
         :param trace_predictions: The trace predictions.
-        :param parent_primary_threshold: The threshold to establish first tier parents from.
-        :param parent_secondary_threshold: The threshold to establish second tier parents from.
-        :param parent_min_threshold: The minimum threshold to establish a parent from
+        :param primary_threshold: The threshold to establish first tier trace from.
+        :param secondary_threshold: The threshold to establish second tier trace from.
+        :param min_threshold: The minimum threshold to establish a trace from
+        :param artifact_key: The key of the primary artifact, from which top candidates will be established.
         :return: List of selected predictions.
         """
-        children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label().value)
+        secondary_threshold = primary_threshold - 0.1 if not secondary_threshold else secondary_threshold
+        artifact2entries = RankingUtil.group_trace_predictions(trace_predictions, artifact_key.value)
         predictions = []
 
-        for child, child_predictions in children2entry.items():
-            sorted_entries = sorted(child_predictions, key=lambda e: e[TraceKeys.SCORE], reverse=True)
+        for artifact, artifact_preds in artifact2entries.items():
+            sorted_entries = sorted(artifact_preds, key=lambda e: e[TraceKeys.SCORE], reverse=True)
             if not sorted_entries:
                 continue
 
-            t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE] >= parent_primary_threshold]
-            t2_preds = [s for s in sorted_entries if parent_secondary_threshold <= s[TraceKeys.SCORE] < parent_min_threshold]
-            t3_preds = sorted_entries[:1] if sorted_entries[0][TraceKeys.SCORE] >= parent_min_threshold else []
+            t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE] >= primary_threshold]
+            t2_preds = [s for s in sorted_entries if secondary_threshold <= s[TraceKeys.SCORE] < min_threshold]
+            t3_preds = sorted_entries[:1] if sorted_entries[0][TraceKeys.SCORE] >= min_threshold else []
             if len(t1_preds) > 0:
                 selected_entries = t1_preds
             elif len(t2_preds) > 0:
@@ -170,20 +173,24 @@ class RankingUtil:
         return predictions
 
     @staticmethod
-    def group_trace_predictions(predictions: List[Trace], key_id: str):
+    def group_trace_predictions(predictions: List[Trace], key_id: str, sort_entries: bool = False):
         """
         Groups the predictions by the property given.
         :param predictions: The predictions to group.
         :param key_id: The id of the key to access the child from the entry
+        :param sort_entries: If True, sorts all predictions for each grouping.
         :return: Dictionary of keys in key_id and their associated entries.
         """
-        children2entry = {}
+        artifact_id2entries = {}
         for entry in predictions:
-            child_id = entry[key_id]
-            if child_id not in children2entry:
-                children2entry[child_id] = []
-            children2entry[child_id].append(entry)
-        return children2entry
+            a_id = entry[key_id]
+            if a_id not in artifact_id2entries:
+                artifact_id2entries[a_id] = []
+            artifact_id2entries[a_id].append(entry)
+        if sort_entries:
+            artifact_id2entries = {a_id: sorted(entries, key=lambda entry: entry[TraceKeys.SCORE], reverse=True)
+                                   for a_id, entries in artifact_id2entries.items()}
+        return artifact_id2entries
 
     @staticmethod
     def format_link(a: Dict, artifact_id_key: str):

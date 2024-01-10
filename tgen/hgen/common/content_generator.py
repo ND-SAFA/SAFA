@@ -1,8 +1,11 @@
+import math
 import uuid
 from typing import Union, Dict, List, Optional, Tuple, Set, Any
 
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE, EMPTY_STRING
+from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -24,7 +27,7 @@ class ContentGenerator:
     SOURCE_TAG_ID = "ids"
     TARGET_TAG_ID = "target"
 
-    def __init__(self, args: HGenArgs, state: HGenState, source_dataset: PromptDataset ):
+    def __init__(self, args: HGenArgs, state: HGenState, source_dataset: PromptDataset):
         """
         Handles content generation for HGen given the current args and state.
         :param args: The arguments to HGen.
@@ -59,6 +62,7 @@ class ContentGenerator:
                               source_type: str, cluster2artifacts: Dict[str, List] = None,
                               format_variables: Dict[str, List] = None,
                               additional_task_response_instructions: str = EMPTY_STRING,
+                              artifact_prompt_build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
                               include_summary: bool = True) -> PromptBuilder:
         """
         Creates the prompt builder for the generations using the provided prompts and variables.
@@ -69,11 +73,15 @@ class ContentGenerator:
         :param format_variables: Any variables to give the prompt builder to dynamically format.
         :param additional_task_response_instructions: Any additional instructions to include on how the model should format its res.
         :param include_summary: If True, includes summary in prompt.
+        :param artifact_prompt_build_method: How to construct the source artifacts in prompt.
         :return: The prompt builder for the generations using the provided prompts and variables.
         """
         task_prompt = self._create_generations_task_prompt(base_task_prompt.value, cluster2artifacts,
                                                            additional_response_instructions=additional_task_response_instructions)
-        artifact_prompt = self.create_source_artifact_prompt(source_type, cluster2artifacts)
+        artifact_prompt = self.create_source_artifact_prompt(source_type, cluster2artifacts,
+                                                             build_method=artifact_prompt_build_method) \
+            if artifact_prompt_build_method else None
+
         prompt_builder = self._get_prompt_builder_for_generation(
             task_prompt, base_intro_prompt.value, artifact_prompt, format_variables, include_summary)
         return prompt_builder
@@ -100,7 +108,45 @@ class ContentGenerator:
                     logger.exception("A generation failed")
         return generations2sources, cluster2generations
 
-    def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt,  cluster2artifacts: Dict[str, List] = None,
+    @staticmethod
+    def calculate_number_of_targets_per_cluster(artifact_ids: List, cluster2artifacts: Dict[str, List[EnumDict]],
+                                                cluster2cohesion: Dict[str, float], source_dataset: PromptDataset) -> List[int]:
+        """
+        Calculates the expected number of targets for each cluster based on the number of artifacts in each cluster
+        :param artifact_ids: The ids of the artifact representing each cluster
+        :param cluster2artifacts: Dictionary mapping cluster id to the artifacts in that cluster.
+        :param cluster2cohesion: Dictionary mapping cluster id to the cohesion of the cluster.
+        :param source_dataset: Contains all source artifacts.
+        :return: A list of the expected number of target artifacts for each cluster
+        """
+        file_lengths = [len(content.splitlines()) for content in source_dataset.artifact_df[ArtifactKeys.CONTENT]]
+        avg_file_size = sum(file_lengths) / len(file_lengths)
+        cluster2artifacts = cluster2artifacts
+        max_cohesion = max(cluster2cohesion.values())
+        cluster2reduction_percentage = {cluster_id: 1 - math.log(cohesion + 1) / math.log(max_cohesion + 1)
+                                        for cluster_id, cohesion in cluster2cohesion.items()}
+        n_targets = [ContentGenerator._calculate_n_targets_for_cluster(artifacts=cluster2artifacts[i],
+                                                                                  avg_file_size=avg_file_size,
+                                                                                  reduction_percentage=cluster2reduction_percentage[i])
+                     for i in artifact_ids]
+        return n_targets
+
+    @staticmethod
+    def _calculate_n_targets_for_cluster(artifacts: List[str], avg_file_size: float,
+                                         reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, ) -> int:
+        """
+        Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
+        :param artifacts: The artifacts in the cluster.
+        :param avg_file_size: The average size of files for the project.
+        :param reduction_percentage: Determines the proportion of source artifacts to use for # of generations
+        :return: The number of artifacts equal to a proportion of the total
+        """
+        length_of_artifacts = sum([len(artifact[ArtifactKeys.CONTENT].splitlines()) for artifact in artifacts])
+        n_artifacts = max(length_of_artifacts / avg_file_size, 1)
+        n_targets = min(max(math.ceil(n_artifacts * reduction_percentage), 1), len(artifacts))
+        return min(round(n_artifacts), len(artifacts))
+
+    def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt, cluster2artifacts: Dict[str, List] = None,
                                         additional_response_instructions: str = EMPTY_STRING) -> QuestionnairePrompt:
         """
         Creates the prompt used for the primary creation task
@@ -122,7 +168,8 @@ class ContentGenerator:
                 id2tag={self.TARGET_TAG_ID: target_type_tag},
                 response_tag={target_type_tag: [self.SOURCE_TAG_ID]},
                 value_formatter=lambda tag, val: self._format_generations(tag, val))
-        task_prompt.format_value(format=self.state.format_of_artifacts, description=self.state.description_of_artifact)
+        task_prompt.format_value(format=self.state.format_of_artifacts, description=self.state.description_of_artifact,
+                                 example=self.state.example_artifact)
         return task_prompt
 
     def _get_prompt_builder_for_generation(self, task_prompt: QuestionnairePrompt, base_prompt: Prompt,

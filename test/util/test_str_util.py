@@ -43,10 +43,10 @@ class TestStrUtil(BaseTest):
 
     def test_remove_chars(self):
         string = "<These ^ chars ? need to be removed />"
-        removed_chars_string = StrUtil.remove_chars(string, ["?", "^", "/>", "<"])
+        removed_chars_string = StrUtil.remove_substrings(string, ["?", "^", "/>", "<"])
         self.assertEqual("These  chars  need to be removed ", removed_chars_string)
 
-        removed_chars_string = StrUtil.remove_chars(string, "<")
+        removed_chars_string = StrUtil.remove_substrings(string, "<")
         self.assertEqual("These ^ chars ? need to be removed />", removed_chars_string)
 
     def test_remove_decimal_points_from_floats(self):

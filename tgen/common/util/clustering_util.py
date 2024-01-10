@@ -24,7 +24,8 @@ class ClusteringUtil:
         :param artifact_df: Artifact data frame containing artifacts referenced by clusters.
         :return: Cluster map with artifacts or artifact ids.
         """
-        converted = {str(k): v.artifact_ids for k, v in cluster_map.items()}
+        converted = {str(k): sorted(v.artifact_ids, key=lambda a_id: v.similarity_to_neighbors(a_id))
+                     for k, v in cluster_map.items()}
         if artifact_df is None:
             return converted
         return ClusteringUtil.replace_ids_with_artifacts(converted, artifact_df)

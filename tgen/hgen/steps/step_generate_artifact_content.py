@@ -1,15 +1,11 @@
 from typing import Any, Dict, List, Set, Tuple
 
 from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, TAB
-from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
-from tgen.common.constants.hgen_constants import DEFAULT_TOKEN_TO_TARGETS_RATIO
 from tgen.common.logging.logger_manager import logger
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.hgen.content_generator import ContentGenerator
-from tgen.hgen.hgen_args import HGenArgs, PredictionStep
+from tgen.hgen.common.content_generator import ContentGenerator
+from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
-from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -17,6 +13,7 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
     GENERATION_FILENAME = "artifact_gen_response"
+    FUNCTIONALITY_FILENAME = "gen_functionality_response"
 
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
@@ -34,12 +31,18 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
         format_variables = {}
         if state.cluster2artifacts:
-            n_targets = self._calculate_number_of_targets_per_cluster(dataset.artifact_df.index, args, state)
+            n_targets = ContentGenerator.calculate_number_of_targets_per_cluster(dataset.artifact_df.index,
+                                                                                 state.get_cluster2artifacts(),
+                                                                                 state.cluster2cohesion,
+                                                                                 state.source_dataset)
             format_variables.update({"n_targets": n_targets})
 
         content_generator = ContentGenerator(args, state, dataset)
-        prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION, base_task_prompt,
-                                                                 args.source_type, state.get_cluster2artifacts(), format_variables)
+        prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,
+                                                                 base_task_prompt,
+                                                                 args.source_type, state.get_cluster2artifacts(),
+                                                                 format_variables=format_variables, include_summary=False)
+
         if args.seed_layer_id and args.include_seed_in_prompt:
             self._add_seeds_to_prompt(dataset, prompt_builder, state)
 
@@ -48,7 +51,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generations2sources, cluster2generation = content_generator.map_generations_to_predicted_sources(generations,
                                                                                                          cluster_ids=cluster_ids)
         state.generations2sources = generations2sources
-        state.cluster2generation = cluster2generation
+        state.cluster2generations = cluster2generation
 
     @staticmethod
     def _add_seeds_to_prompt(dataset: PromptDataset, prompt_builder: PromptBuilder, state: HGenState) -> None:
@@ -64,48 +67,22 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         prompt_builder.add_prompt(SupportedPrompts.HGEN_SEED_PROMPT.value, -2)
         prompt_builder.format_variables.update({"seed_content": seed_contents})
 
-    @staticmethod
-    def _calculate_number_of_targets_per_cluster(artifact_ids: List, args: HGenArgs, state: HGenState) -> List[int]:
+    def _identify_functionality(self, args: HGenArgs, state: HGenState) -> List[str]:
         """
-        Calculates the expected number of targets for each cluster based on the number of artifacts in each cluster
-        :param artifact_ids: The ids of the artifact representing each cluster
-        :param args: Arguments to HGEN
-        :param state: The current HGEN state
-        :return: A list of the expected number of target artifacts for each cluster
+        Identifies the functionality in each cluster.
+        :param args: The arguments to Hierarchy Generator
+        :param state: The current state for the generator
+        :return: List of the functionalities in each cluster.
         """
-        cluster2artifacts = state.get_cluster2artifacts()
-        n_targets = [GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(cluster2artifacts[i]),
-                                                                                    reduction_percentage=args.reduction_percentage)
-                     for i in artifact_ids]
-        return n_targets
-
-    @staticmethod
-    def _calculate_proportion_of_artifacts(n_artifacts: int,
-                                           reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS) -> int:
-        """
-        Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
-        :param n_artifacts: Total number of artifacts
-        :param reduction_percentage: Determines the proportion of source artifacts to use for # of generations
-        :return: The number of artifacts equal to a proportion of the total
-        """
-        return max(round(n_artifacts * reduction_percentage), 1)
-
-    @staticmethod
-    def _calculate_proportion_of_tokens(artifacts: List, args: HGenArgs,
-                                        token_to_target_ratio: float = DEFAULT_TOKEN_TO_TARGETS_RATIO) -> int:
-        """
-        Calculates how many artifacts to generate based on proportion of total artifact tokens
-        :param artifacts: List of artifact in the given cluster
-        :param args: The arguments to HGEN
-        :param token_to_target_ratio: The token to target token ratio.
-        :return: The number of artifacts equal to a proportion of the artifact tokens
-        """
-        model_name = args.llm_managers[PredictionStep.GENERATION.value].llm_args.model
-        contents = [artifact[ArtifactKeys.CONTENT] for artifact in artifacts]
-        token_counts = [TokenCalculator.estimate_num_tokens(content, model_name) for content in contents]
-        n_artifacts_proportion = GenerateArtifactContentStep._calculate_proportion_of_artifacts(len(contents))
-        n_artifacts_tokens = max(round(sum(token_counts) / token_to_target_ratio), n_artifacts_proportion)
-        return n_artifacts_tokens
+        content_generator = ContentGenerator(args, state, state.cluster_dataset)
+        prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,
+                                                                 SupportedPrompts.HGEN_CLUSTERING_QUESTIONNAIRE,
+                                                                 args.source_type, state.get_cluster2artifacts(),
+                                                                 include_summary=False)
+        functionality_from_clusters = content_generator.generate_content(prompt_builder,
+                                                                         generations_filename=self.FUNCTIONALITY_FILENAME,
+                                                                         return_first=True)
+        return functionality_from_clusters
 
     @staticmethod
     def _map_generations_to_predicted_sources(generations: List, source_tag_id: str, target_tag_id: str,
@@ -137,4 +114,3 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             assert n_failed < len(generations), "All generations have failed."
             logger.warning(f"{n_failed} generations failed. ")
         return generations2sources, cluster2generations
-

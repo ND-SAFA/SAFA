@@ -27,6 +27,7 @@ class Cluster:
         self.artifact_ids = []
         self.artifact_id_set = set()
         self.votes = 1
+        self.__originating_clusters = []
         self.__init_stats()
 
     @staticmethod
@@ -91,21 +92,6 @@ class Cluster:
         """
         self._commit_action(self._add_artifact, artifact_ids, update_stats)
 
-    def _commit_action(self, action: Callable, artifact_ids: Union[List[str], str], update_stats: bool) -> None:
-        """
-        Performs an action on all given artifacts.
-        :param action: The method used to perform the action.
-        :param artifact_ids: The ids of the artifacts to perform action for.
-        :param update_stats: If True, updates the clusters stats.
-        :return: None.
-        """
-        if isinstance(artifact_ids, str):
-            artifact_ids = [artifact_ids]
-        for artifact_id in artifact_ids:
-            action(artifact_id)
-        if update_stats:
-            self.__update_stats()
-
     def similarity_to(self, cluster: "Cluster") -> float:
         """
         Calculates the cosine similarity between the centroid of this cluster to the cluster given.
@@ -128,51 +114,20 @@ class Cluster:
         avg_sim = sum(similarities) / len(similarities)
         return avg_sim
 
-    def _add_artifact(self, artifact_id: str) -> None:
+    def get_content_of_artifacts_in_cluster(self) -> List[str]:
         """
-        Adds an artifact to the cluster.
-        :param artifact_id: ID of artifact to add to cluster.
-        :return: None
+        Gets the content of all artifacts in the cluster.
+        :return: A list of the content of all artifacts in the cluster.
         """
-        if artifact_id not in self.artifact_id_set:
-            self.artifact_id_set.add(artifact_id)
-            self.artifact_ids.append(artifact_id)
+        return [self.embedding_manager.get_content(a_id) for a_id in self.artifact_ids]
 
-    def _remove_artifact(self, artifact_id: str) -> None:
+    def get_content(self, a_id: str) -> str:
         """
-        Adds an artifact to the cluster.
-        :param artifact_id: ID of artifact to add to cluster.
-        :return: None
+        Gets content for a specific artifact.
+        :param a_id: The id of the artifact to get content for.
+        :return: The content of the specified artifact.
         """
-        if artifact_id in self.artifact_id_set:
-            self.artifact_id_set.remove(artifact_id)
-            self.artifact_ids.remove(artifact_id)
-
-    def __update_stats(self) -> None:
-        """
-        Calculates all statistics for the cluster.
-        :return: None, stats are set in place
-        """
-        self.centroid = self.embedding_manager.calculate_centroid(self.artifact_ids)
-        self.avg_similarity = self.__calculate_average_similarity()
-        if len(self.artifact_id_set) > 1:
-            self.similarity_matrix = self.__calculate_similarity_matrix()
-            self.min_sim, self.max_sim, self.med_sim = self.__calculate_min_max_median_similarity()
-            self.avg_pairwise_sim = self.__calculate_avg_pairwise_distance()
-            self.size_weighted_sim = self.__weight_average_pairwise_sim_with_size(self.avg_pairwise_sim)
-
-    def __init_stats(self) -> None:
-        """
-        Sets all stats back to their initial state
-        :return:
-        """
-        self.avg_similarity = None
-        self.centroid = None
-        self.similarity_matrix = None
-        self.min_sim = None
-        self.max_sim = None
-        self.avg_pairwise_sim = None
-        self.size_weighted_sim = None
+        return self.embedding_manager.get_content(a_id)
 
     def to_yaml(self, export_path: str = None, **kwargs) -> "Cluster":
         """
@@ -218,6 +173,87 @@ class Cluster:
         neighbor_similarities = self.similarity_matrix[artifact_index, neighbor_indices]
         return sum(neighbor_similarities) / len(neighbor_similarities)
 
+    def combine_with_cluster(self, other_cluster: "Cluster") -> None:
+        """
+        Merges another cluster in with this one.
+        :param other_cluster: Cluster to merge in.
+        :return: A cluster that is a combination of the original and other cluster.
+        """
+        if not self.__originating_clusters:
+            current_cluster = Cluster.from_artifacts(self.artifact_ids, self.embedding_manager)
+            self.__originating_clusters.append(current_cluster)
+        self.embedding_manager.merge(other_cluster.embedding_manager)
+        self.add_artifacts(other_cluster.artifact_ids, update_stats=True)
+        self.__originating_clusters.append(other_cluster)
+
+    def get_originating_clusters(self) -> List["Cluster"]:
+        """
+        If the cluster originated from the combination of multiple clusters, then returns a list of all original clusters.
+        :return: List of all original clusters from which the current one came.
+        """
+        return self.__originating_clusters
+
+    def _commit_action(self, action: Callable, artifact_ids: Union[List[str], str], update_stats: bool) -> None:
+        """
+        Performs an action on all given artifacts.
+        :param action: The method used to perform the action.
+        :param artifact_ids: The ids of the artifacts to perform action for.
+        :param update_stats: If True, updates the clusters stats.
+        :return: None.
+        """
+        if isinstance(artifact_ids, str):
+            artifact_ids = [artifact_ids]
+        for artifact_id in artifact_ids:
+            action(artifact_id)
+        if update_stats:
+            self.__update_stats()
+
+    def _add_artifact(self, artifact_id: str) -> None:
+        """
+        Adds an artifact to the cluster.
+        :param artifact_id: ID of artifact to add to cluster.
+        :return: None
+        """
+        if artifact_id not in self.artifact_id_set:
+            self.artifact_id_set.add(artifact_id)
+            self.artifact_ids.append(artifact_id)
+
+    def _remove_artifact(self, artifact_id: str) -> None:
+        """
+        Adds an artifact to the cluster.
+        :param artifact_id: ID of artifact to add to cluster.
+        :return: None
+        """
+        if artifact_id in self.artifact_id_set:
+            self.artifact_id_set.remove(artifact_id)
+            self.artifact_ids.remove(artifact_id)
+
+    def __update_stats(self) -> None:
+        """
+        Calculates all statistics for the cluster.
+        :return: None, stats are set in place
+        """
+        self.centroid = self.embedding_manager.calculate_centroid(self.artifact_ids)
+        self.avg_similarity = self.__calculate_average_similarity()
+        if len(self.artifact_id_set) > 1:
+            self.similarity_matrix = self.__calculate_similarity_matrix()
+            self.min_sim, self.max_sim, self.med_sim = self.__calculate_min_max_median_similarity()
+            self.avg_pairwise_sim = self.__calculate_avg_pairwise_distance()
+            self.size_weighted_sim = self.weight_average_pairwise_sim_with_size(self.avg_pairwise_sim, len(self))
+
+    def __init_stats(self) -> None:
+        """
+        Sets all stats back to their initial state
+        :return:
+        """
+        self.avg_similarity = None
+        self.centroid = None
+        self.similarity_matrix = None
+        self.min_sim = None
+        self.max_sim = None
+        self.avg_pairwise_sim = None
+        self.size_weighted_sim = None
+
     def __calculate_avg_pairwise_distance(self) -> float:
         """
         Calculates the average pairwise distance between all points of a matrix.
@@ -226,16 +262,19 @@ class Cluster:
         n_artifacts = len(self.artifact_id_set)
         indices = NpUtil.get_unique_indices(n_artifacts)
         unique_scores = NpUtil.get_values(self.similarity_matrix, indices)
+        unique_scores.append(min(unique_scores))  # increase weight of min
         return sum(unique_scores) / len(unique_scores)
 
-    def __weight_average_pairwise_sim_with_size(self, avg_pairwise_sim: float, size_weight: float = 0.15) -> float:
+    @staticmethod
+    def weight_average_pairwise_sim_with_size(avg_pairwise_sim: float, size: int, size_weight: float = 0.15) -> float:
         """
         Calculates the average pairwise distance between all points of a matrix, weighted with the size of the cluster.
         :param avg_pairwise_sim: The average pairwise distance.
+        :param size: The size of the cluster.
         :param size_weight: The amount by which the log of the size should be weighted with the avg. pairwise sim
         :return: Calculates the pairwise distances and returns its average, weighted with the size of the cluster.
         """
-        return (size_weight * np.log(len(self))) + avg_pairwise_sim
+        return (size_weight * np.log(size)) + avg_pairwise_sim
 
     def __calculate_average_similarity(self) -> float:
         """

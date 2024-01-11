@@ -24,7 +24,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         if FileUtil.safely_check_path_exists(intra_refinement_state):
             tmp = state.load_state_from_path(intra_refinement_state)
             if isinstance(tmp, HGenState):
-                state = tmp
+                [setattr(state, name, val) for name, val in vars(tmp).items()]
                 duplicate_types = [DuplicateType.INTER_CLUSTER]
 
         for duplicate_type in duplicate_types:

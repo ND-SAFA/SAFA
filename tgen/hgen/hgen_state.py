@@ -105,7 +105,7 @@ class HGenState(State):
     def get_cluster2generation(self) -> Dict[Any, List[str]]:
         """
         Gets the dictionary mapping cluster id to the generations that came from it.
-        :return: The dictionary mapping cluster id to the generations that came from it.
+        :return: The dictionary mapping cluster id to   the generations that came from it.
         """
         return self.get_most_recent_refinement_run(self.refined_cluster2generation) \
             if self.refined_cluster2generation else self.cluster2generations

@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Any, Dict, List, Set, Union
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Set, Union, Optional
 
 from tgen.clustering.base.cluster_type import ClusterIdType
 from tgen.common.objects.trace import Trace
@@ -45,9 +45,12 @@ class HGenState(State):
     """
     Optional Step 5 - Refine content on rerun of hgen
     """
-    refined_cluster2artifacts: Dict[Dict] = None  # maps cluster id to the list of artifacts in that cluster
-    refined_generations2sources: Dict[Dict[str, Set[str]]] = None  # The final selected artifact content
-    refined_cluster2generation: Dict[Dict[Any, List[str]]] = None  # Maps cluster id to the generation produced for that cluster
+    # maps cluster id to the list of artifacts in that cluster
+    refined_cluster2artifacts: Dict[int, Dict] = field(default_factory=dict)
+    # The final selected artifact content
+    refined_generations2sources: Dict[int, Dict[str, Set[str]]] = field(default_factory=dict)
+    # Maps cluster id to the generation produced for that cluster
+    refined_cluster2generation: Dict[int, Dict[Any, List[str]]] = field(default_factory=dict)
 
     """
     Step 6 - Rename the artifacts generated.

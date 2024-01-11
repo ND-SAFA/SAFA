@@ -126,13 +126,13 @@ class ContentGenerator:
         cluster2reduction_percentage = {cluster_id: 1 - math.log(cohesion + 1) / math.log(max_cohesion + 1)
                                         for cluster_id, cohesion in cluster2cohesion.items()}
         n_targets = [ContentGenerator._calculate_n_targets_for_cluster(artifacts=cluster2artifacts[i],
-                                                                                  avg_file_size=avg_file_size,
-                                                                                  reduction_percentage=cluster2reduction_percentage[i])
+                                                                       avg_file_size=avg_file_size,
+                                                                       reduction_percentage=cluster2reduction_percentage[i])
                      for i in artifact_ids]
         return n_targets
 
     @staticmethod
-    def _calculate_n_targets_for_cluster(artifacts: List[str], avg_file_size: float,
+    def _calculate_n_targets_for_cluster(artifacts: List[EnumDict], avg_file_size: float,
                                          reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, ) -> int:
         """
         Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor

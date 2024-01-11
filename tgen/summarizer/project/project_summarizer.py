@@ -175,7 +175,7 @@ class ProjectSummarizer(BaseObject):
         :return: Whether the creation was successful.
         """
         try:
-            task_tag = section_prompt.get_response_tags_for_question(-1)
+            task_tag = section_prompt.get_response_tags_for_prompt(-1)
             task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
             section_body, section_title = self._parse_section(response=section_response,
                                                               task_tag=task_tag, multi_line_items=section_id in MULTI_LINE_ITEMS)

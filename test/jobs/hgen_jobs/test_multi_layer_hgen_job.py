@@ -150,7 +150,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         divisor = 3 - self.clustering_calls
         n = math.floor(len(artifacts) / divisor)
         state.final_cluster_map = {
-            i: Cluster.from_artifacts([a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]], state.embedding_manager) for i in
+            str(i): Cluster.from_artifacts([a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]], state.embedding_manager) for i in
             range(divisor)}
         cluster_dataset = ClusterDatasetCreator(args.dataset, state.final_cluster_map).create()
         state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)

@@ -57,6 +57,7 @@ class TestHierarchyGenerator(BaseTest):
         anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
         self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
         self.HGEN_ARGS.perform_clustering = False
+        self.HGEN_ARGS.duplicate_similarity_threshold = 0.65
         hgen = HierarchyGenerator(self.HGEN_ARGS)
         hgen.run_setup_for_pipeline()
         self.HGEN_STATE = hgen.state

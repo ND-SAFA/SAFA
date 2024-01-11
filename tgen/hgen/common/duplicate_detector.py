@@ -88,7 +88,7 @@ class DuplicateDetector:
 
         # ensure matches saved state
         artifacts_df = clustering_state.cluster_dataset.artifact_df.filter_by_row(
-            lambda row: row[ArtifactKeys.LAYER_ID] != cluster_args.cluster_artifact_type)
+            lambda row: row[ArtifactKeys.LAYER_ID.value] != cluster_args.cluster_artifact_type)
         assert len(artifact_df) == len(artifacts_df), "Possibly reloading outdated clustering state."
         artifact_df.index = artifacts_df.index
         artifact_df[ArtifactKeys.CONTENT] = artifacts_df[ArtifactKeys.CONTENT]
@@ -228,18 +228,19 @@ class DuplicateDetector:
         inter_cluster_dups = cluster.artifact_id_set.difference(all_dups_from_same_cluster)
         if inter_cluster_dups:
             base_cluster = Cluster.from_artifacts(inter_cluster_dups, cluster.embedding_manager)
+            selected_artifacts = base_cluster.artifact_ids
         elif len(all_dups_from_same_cluster):
             base_cluster = cluster
+            selected_artifacts = []
         else:  # all dups are from the same cluster (so not inter cluster)
             return
 
-        selected_artifacts = []
         for dup_set in dups_from_same_cluster.values():
             best_match = sorted(dup_set, key=lambda dup: base_cluster.similarity_to_neighbors(dup), reverse=True)[0]
             selected_artifacts.append(best_match)
 
         new_cluster = Cluster.from_artifacts(selected_artifacts, cluster.embedding_manager)
-        if self._should_add_duplicate_cluster(base_cluster):
+        if self._should_add_duplicate_cluster(new_cluster):
             final_cluster_map[self.rename_clusters(c_id, DuplicateType.INTER_CLUSTER)] = new_cluster
 
     def _add_intra_cluster_duplicates(self, cluster: Cluster, dups_from_same_cluster: Dict,

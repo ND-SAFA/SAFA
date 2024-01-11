@@ -69,11 +69,10 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     Prompt(
-        "First you must identify the important information (e.g. features, functionality, etc.) from the {source_type}. "
-        "Put this information in a section called Information. "
-        "Put each unique feature, functionality or other information as its own markdown bullet. "
-        f"Enclose the section in {PromptUtil.create_xml('information')}. "
-        "Example:\n# Information\n  - info1\n - info2\n"),
+        "First you must identify the important information (e.g. features, functionality, etc.) "
+        "from the {source_type} for the {target_type}. "
+        "Create a bulleted list of the important information you identified. "
+        f"Enclose the section in {PromptUtil.create_xml('information')}."),
     QuestionnairePrompt(
         instructions="Next, your primary objective is to select the information "
                      "that is relevant for the scope and purpose of {target_type}s "

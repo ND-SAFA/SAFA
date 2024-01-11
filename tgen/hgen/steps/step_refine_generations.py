@@ -1,3 +1,4 @@
+from tgen.common.util.file_util import FileUtil
 from tgen.hgen.common.content_refiner import ContentRefiner
 from tgen.hgen.common.duplicate_detector import DuplicateType
 from tgen.hgen.hgen_args import HGenArgs
@@ -17,7 +18,16 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         if not args.run_refinement or not args.perform_clustering:
             return
 
-        for duplicate_type in [DuplicateType.INTRA_CLUSTER, DuplicateType.INTER_CLUSTER]:
+        duplicate_types = [DuplicateType.INTRA_CLUSTER, DuplicateType.INTER_CLUSTER]
+        intra_refinement_state = state.get_path_to_state_checkpoint(state.export_dir, self.get_step_name(), run_num=0,
+                                                                    step_num=len(state.completed_steps))
+        if FileUtil.safely_check_path_exists(intra_refinement_state):
+            tmp = state.load_state_from_path(intra_refinement_state)
+            if isinstance(tmp, HGenState):
+                state = tmp
+                duplicate_types = [DuplicateType.INTER_CLUSTER]
+
+        for duplicate_type in duplicate_types:
             refiner = ContentRefiner(args, state, duplicate_type)
             refined_state_vars = refiner.refine()
             if refined_state_vars:
@@ -25,3 +35,5 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 state.refined_generations2sources[duplicate_type.value] = refined_generation2sources
                 state.refined_cluster2generation[duplicate_type.value] = refined_cluster2generations
                 state.refined_cluster2artifacts[duplicate_type.value] = refined_cluster2artifacts
+                if duplicate_type.value == 0:
+                    state.save(step_name=self.get_step_name(), run_num=0)

@@ -16,5 +16,5 @@ class SelectByTopParents(iSelector):
         :return: filtered list of entries
         """
         return RankingUtil.select_predictions_by_thresholds(candidate_entries, primary_threshold=parent_thresholds[0],
-                                                            parent_secondary_threshold=parent_thresholds[1],
+                                                            secondary_threshold=parent_thresholds[1],
                                                             min_threshold=parent_thresholds[2])

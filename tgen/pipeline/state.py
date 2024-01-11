@@ -177,7 +177,7 @@ class State(BaseObject):
             logger.info(f"Loaded previous state from {path}")
             return obj
         except Exception as e:
-            if raise_exception:
+            if raise_exception or True:
                 raise e
             return e
 

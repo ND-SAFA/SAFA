@@ -92,7 +92,7 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         logger.info("Creating new format, description and questions inputs for generation prompt.\n")
         if "title" not in hgen_args.target_type.lower():
-            format_questionnaire.question_prompts[-1].value += \
+            format_questionnaire.child_prompts[-1].value += \
                 "The format should be for only the body of the {target_type} and should exclude any title. "
         inputs = {}
         for prompt, step in [(format_questionnaire, PredictionStep.FORMAT), (summary_questions_prompt, PredictionStep.INSTRUCTIONS)]:

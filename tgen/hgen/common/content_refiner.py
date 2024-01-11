@@ -50,9 +50,11 @@ class ContentRefiner:
                                                                                          generation_id=self.duplicate_type.name.lower())
         clustering_export_path = FileUtil.safely_join_paths(self.args.export_dir, CLUSTERING_SUBDIRECTORY,
                                                             f"refine_clusters_{self.duplicate_type.name.lower()}")
-        duplicate_cluster_map = DuplicateDetector.cluster_duplicates(generated_artifacts_df, duplicate_type=self.duplicate_type,
-                                                                     original_clusters_to_contents=self.state.get_cluster2generation(),
-                                                                     export_path=clustering_export_path)
+        duplicate_detector = DuplicateDetector(embeddings_manager=self.state.embedding_manager)
+        duplicate_cluster_map = duplicate_detector.cluster_duplicates(artifact_df=generated_artifacts_df,
+                                                                      duplicate_type=self.duplicate_type,
+                                                                      original_clusters_to_contents=self.state.get_cluster2generation(),
+                                                                      export_path=clustering_export_path)
         if len(duplicate_cluster_map) == 0:
             return
 
@@ -60,10 +62,11 @@ class ContentRefiner:
         duplicate_cluster_artifacts = ArtifactDataFrame({ArtifactKeys.ID: duplicate_cluster_map.keys(),
                                                          ArtifactKeys.CONTENT: [EMPTY_STRING for _ in duplicate_cluster_map],
                                                          ArtifactKeys.LAYER_ID: ["duplicate_cluster" for _ in duplicate_cluster_map]})
-        format_variables = self._create_prompt_variables(duplicate_cluster_map, new_source_clusters, generated_artifacts_df)
+        format_variables = self._create_prompt_variables(duplicate_cluster_map, new_source_clusters, generated_artifacts_df,
+                                                         duplicate_cluster_artifacts)
 
-        refined_generation2sources, refined_cluster2generations = self._regenerate_for_duplicates(new_source_clusters,
-                                                                                                  duplicate_cluster_artifacts,
+        refined_generation2sources, refined_cluster2generations = self._regenerate_for_duplicates(duplicate_cluster_artifacts,
+                                                                                                  new_source_clusters,
                                                                                                   format_variables)
         self._merge_original_with_refined_generations(refined_cluster2generations, refined_generation2sources,
                                                       new_source_clusters, dups2remove)
@@ -135,6 +138,7 @@ class ContentRefiner:
         cluster2children = state.get_cluster2artifacts(ids_only=True)
         cluster2parents = state.get_cluster2generation()
         content2id = DictUtil.flip(parent_artifact_df.to_map())
+        state.embedding_manager.update_or_add_contents(parent_artifact_df.to_map())
         for cluster_id, child_artifact_ids in cluster2children.items():
             parent_ids = [content2id[parent] for parent in cluster2parents[cluster_id]]
             # switching parent and child so that we can grab best parent for child this time
@@ -146,18 +150,21 @@ class ContentRefiner:
         return dup_artifact_to_related_sources
 
     def _create_prompt_variables(self, duplicate_cluster_map: ClusterMapType, new_source_clusters: Dict[str, List[EnumDict]],
-                                 generated_artifacts_df: ArtifactDataFrame) -> Dict[str, List]:
+                                 generated_artifacts_df: ArtifactDataFrame,
+                                 duplicate_cluster_artifact_df: ArtifactDataFrame) -> Dict[str, List]:
         """
         Creates the necessary variables to format the regeneration prompts with.
         :param duplicate_cluster_map: Dictionary mapping cluster id to a cluster containing duplicates.
         :param new_source_clusters: Maps cluster_id to the list of source artifacts in that cluster.
         :param generated_artifacts_df: Contains the generated artifacts.
+        :param duplicate_cluster_artifact_df: Contains the clusters of the duplicates.
         :return: Dictionary mapping format variable name to its value.
         """
         format_variables = {}
         if self.duplicate_type == DuplicateType.INTER_CLUSTER:
             format_variables["functionality"] = self._summarize_duplicates(duplicate_cluster_map,
-                                                                           generated_artifacts_df)
+                                                                           generated_artifacts_df,
+                                                                           duplicate_cluster_artifact_df)
         format_variables["n_targets"] = self._calculate_n_targets(duplicate_cluster_map, new_source_clusters)
 
         return format_variables
@@ -171,10 +178,10 @@ class ContentRefiner:
         """
         if self.duplicate_type == DuplicateType.INTRA_CLUSTER:
             cluster2cohesion = {cluster_id: cluster.avg_pairwise_sim for cluster_id, cluster in duplicate_cluster_map.items()}
-            n_targets = ContentGenerator.calculate_number_of_targets_per_cluster(list(duplicate_cluster_map.keys()),
-                                                                                 new_source_clusters,
-                                                                                 cluster2cohesion,
-                                                                                 self.state.source_dataset)
+            n_targets = ContentGenerator.calculate_number_of_targets_per_cluster(artifact_ids=list(duplicate_cluster_map.keys()),
+                                                                                 cluster2artifacts=new_source_clusters,
+                                                                                 cluster2cohesion=cluster2cohesion,
+                                                                                 source_dataset=self.state.source_dataset)
             for i, c_id in enumerate(duplicate_cluster_map.keys()):
                 originating_clusters = duplicate_cluster_map[c_id].get_originating_clusters()
                 if not originating_clusters:
@@ -184,16 +191,18 @@ class ContentRefiner:
             n_targets = [max(math.floor(len(duplicates) / 2), 1) for cluster_id, duplicates in duplicate_cluster_map.items()]
         return n_targets
 
-    def _summarize_duplicates(self, duplicate_cluster_map: ClusterMapType, generated_artifacts_df: ArtifactDataFrame) -> List[str]:
+    def _summarize_duplicates(self, duplicate_cluster_map: ClusterMapType, generated_artifacts_df: ArtifactDataFrame,
+                              duplicate_cluster_artifact_df: ArtifactDataFrame) -> List[str]:
         """
         Summarizes the features of each duplicate cluster.
         :param duplicate_cluster_map: Dictionary mapping cluster id to a cluster containing duplicates.
         :param generated_artifacts_df: Contains the generated artifacts.
+        :param duplicate_cluster_artifact_df: Contains the clusters of the duplicates.
         :return: List of the summarized duplicate clusters.
         """
         cluster2duplicates = ClusteringUtil.convert_cluster_map_to_artifact_format(duplicate_cluster_map,
                                                                                    generated_artifacts_df)
-        content_generator = ContentGenerator(self.args, self.state, PromptDataset(artifact_df=generated_artifacts_df))
+        content_generator = ContentGenerator(self.args, self.state, PromptDataset(artifact_df=duplicate_cluster_artifact_df))
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_REFINEMENT,
                                                                  SupportedPrompts.HGEN_DUP_SUMMARY_TASKS,
                                                                  self.args.target_type, cluster2duplicates, include_summary=False,
@@ -219,7 +228,7 @@ class ContentRefiner:
                                                                  format_variables=format_variables, include_summary=False)
         generations = content_generator.generate_content(prompt_builder,
                                                          generations_filename=f"{self.REFINED_GENERATIONS_FILENAME}"
-                                                                              f"_{self.duplicate_type}")
+                                                                              f"_{self.duplicate_type.name}")
         return content_generator.map_generations_to_predicted_sources(generations, cluster_ids=list(new_source_clusters.keys()))
 
     def _merge_original_with_refined_generations(self, refined_cluster2generations: Dict[Any, List[str]],
@@ -241,4 +250,3 @@ class ContentRefiner:
             if refined_generations:
                 refined_cluster2generations[cluster] = refined_generations
                 new_source_clusters[cluster] = original_cluster2artifacts[cluster]
-        new_source_clusters.update(self.state.get_cluster2artifacts())

@@ -135,7 +135,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         child2selections = RankingUtil.group_trace_predictions(trace_selections, TraceKeys.child_label())
         orphans = set(state.source_dataset.artifact_df.index).difference(child2selections.keys())
         all_child_predictions = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.child_label(), sort_entries=True)
-        selected_traces = [all_child_predictions[orphan][0] for orphan in orphans]
+        selected_traces = [all_child_predictions[orphan][0] for orphan in orphans if orphan in all_child_predictions]
         trace_selections.extend(selected_traces)
 
     @staticmethod

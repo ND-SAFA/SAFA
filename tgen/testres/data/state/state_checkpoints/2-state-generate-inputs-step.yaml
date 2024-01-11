@@ -1,7 +1,8 @@
 _CHECKPOINT_DIRNAME: state_checkpoints
 all_artifacts_dataset: null
 cluster2artifacts: null
-cluster2generation: null
+cluster2cohesion: null
+cluster2generations: null
 cluster_dataset: null
 cluster_id2seeds: null
 completed_steps:
@@ -10,6 +11,7 @@ completed_steps:
 description_of_artifact: A User story is a concise, informal description of a software
   feature or functionality, written from the perspective of the end user
 embedding_manager: null
+example_artifact: null
 export_dir: '[ROOT_PATH]/tgen/testres/output'
 final_dataset: null
 format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason

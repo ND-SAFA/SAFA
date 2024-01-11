@@ -77,7 +77,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param task_prompt: The prompt used to create the output
         :return: A dictionary mapping change type to the associated changes which are mapped to the affected filenames
         """
-        group_tag, filenames_tag, change_tag, type_tag = task_prompt.get_response_tags_for_question(0)
+        group_tag, filenames_tag, change_tag, type_tag = task_prompt.get_response_tags_for_prompt(0)
         groups = change_summary_output[group_tag]
         change_type_mapping = OrderedDict({ct.value.lower(): {} for ct in ChangeType.get_granular_change_type_categories()})
         change_type_mapping[self.UNKNOWN_CHANGE_TYPE_KEY] = {}
@@ -155,5 +155,5 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param prompt_num: The number of the prompt that produced the summary
         :return: The summary
         """
-        tag = task_prompt.get_response_tags_for_question(prompt_num)
+        tag = task_prompt.get_response_tags_for_prompt(prompt_num)
         return change_summary_output[tag][0]

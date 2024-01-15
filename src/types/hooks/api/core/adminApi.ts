@@ -15,5 +15,5 @@ export interface AdminApiHook {
    * - Must be a superuser yourself.
    * @param member - The member to toggle.
    */
-  enableSuperuser(member: MembershipSchema): Promise<void>;
+  enableSuperuser(member: Pick<MembershipSchema, "email">): Promise<void>;
 }

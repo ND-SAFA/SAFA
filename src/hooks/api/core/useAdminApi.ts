@@ -41,16 +41,24 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
     },
   });
 
-  async function enableSuperuser(member: MembershipSchema): Promise<void> {
+  async function enableSuperuser(
+    member: Pick<MembershipSchema, "email">
+  ): Promise<void> {
     logStore.confirm(
       "Enable Superuser",
       `Are you sure you want to enable superuser for "${member.email}"?`,
       async (confirmed) => {
         if (!confirmed) return;
 
-        await adminApi.handleRequest(async () => {
-          await createSuperuser(member.email);
-        });
+        await adminApi.handleRequest(
+          async () => {
+            await createSuperuser(member.email);
+          },
+          {
+            success: `User is now a superuser: ${member.email}`,
+            error: `Unable to set as a superuser: ${member.email}`,
+          }
+        );
       }
     );
   }

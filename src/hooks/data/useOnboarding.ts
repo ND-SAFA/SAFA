@@ -164,6 +164,7 @@ export const useOnboarding = defineStore("useOnboarding", {
       const index = step ? ONBOARDING_STEPS[step].index : this.step - 1;
 
       this.steps[index].done = true;
+      this.steps[index + 1].done = true;
 
       if (this.step === index + 1) {
         this.step = index + 2;
@@ -174,8 +175,6 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (step === "summarize" && this.uploadedJob?.completedEntityId) {
-        this.steps[this.steps.length - 1].done = true;
-
         await getVersionApiStore
           .handleLoad(this.uploadedJob?.completedEntityId, undefined, false)
           .then(() => this.handleEstimateCost());

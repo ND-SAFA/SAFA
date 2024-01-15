@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="q-ma-md">
     <project-overview-display hide-overflow />
     <panel-card>
       <q-carousel
@@ -9,8 +9,9 @@
         swipeable
         animated
         arrows
+        navigation
         height="400px"
-        control-color="primary"
+        control-color="grey"
       >
         <q-carousel-slide
           v-for="artifact in artifacts"
@@ -22,6 +23,7 @@
               display-title
               default-expanded
               display-divider
+              full-width
               :artifact="artifact"
             />
           </div>

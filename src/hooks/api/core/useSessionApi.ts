@@ -9,26 +9,26 @@ import {
 } from "@/types";
 import { DEMO_ACCOUNT, DEMO_VERSION_ID } from "@/util";
 import {
+  getOrgApiStore,
   getProjectApiStore,
-  setProjectApiStore,
-  sessionStore,
+  getVersionApiStore,
   logStore,
   permissionStore,
-  getOrgApiStore,
-  getVersionApiStore,
+  sessionStore,
+  setProjectApiStore,
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
   createLoginSession,
-  savePassword,
-  deleteAccount,
-  getCurrentUser,
-  deleteSession,
-  createUser,
   createPasswordReset,
-  updatePassword,
-  saveUserVerification,
+  createUser,
   createVerifiedUser,
+  deleteAccount,
+  deleteSession,
+  getCurrentUser,
+  savePassword,
+  saveUserVerification,
+  updatePassword,
 } from "@/api";
 import { pinia } from "@/plugins";
 import { useApi } from "@/hooks/api/core/useApi";
@@ -148,12 +148,17 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     );
   }
 
-  async function handleLogout(sendLogoutRequest = false): Promise<void> {
+  async function handleLogout(
+    sendLogoutRequest = false,
+    createAccount?: boolean
+  ): Promise<void> {
     await sessionApi.handleRequest(async () => {
       document.cookie = "";
 
       await setProjectApiStore.handleClear();
-      await navigateTo(Routes.LOGIN_ACCOUNT);
+      await navigateTo(
+        createAccount ? Routes.CREATE_ACCOUNT : Routes.LOGIN_ACCOUNT
+      );
       sessionStore.clearSession();
       logStore.notifications = [];
 

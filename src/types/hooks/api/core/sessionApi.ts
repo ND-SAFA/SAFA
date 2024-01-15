@@ -88,8 +88,12 @@ export interface SessionApiHook {
    * Logs a user out to the login screen.
    *
    * @param sendLogoutRequest - Whether to send the API request to log out.
+   * @param createAccount - Whether to create a new account.
    */
-  handleLogout(sendLogoutRequest?: boolean): Promise<void>;
+  handleLogout(
+    sendLogoutRequest?: boolean,
+    createAccount?: boolean
+  ): Promise<void>;
   /**
    * Verifies the stored authentication token,
    * and loads the last project if routing to the artifact tree.

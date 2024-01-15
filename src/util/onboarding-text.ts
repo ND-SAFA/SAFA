@@ -50,7 +50,9 @@ export const ONBOARDING_GENERATE_DURATION = `
 
 export const ONBOARDING_GENERATE_SUCCESS = `
   Your documentation is ready!
-  You can either export the documentation, or view the data in SAFA's knowledge graph below.
+  Below you can either export the documentation, or view the data in SAFA.
+  If you are unhappy with the results, 
+  please reach out and we can regenerate the data for you.
 `;
 
 export const ONBOARDING_GENERATE_LARGE = `
@@ -63,6 +65,6 @@ export const ONBOARDING_GENERATE_LARGE = `
 
 export const ONBOARDING_GENERATE_ERROR = `
   Oh no! It looks like there was an issue with generating documentation.
-  Your invoice will not be finalized until the generation completes.
+  Your invoice will not be finalized until the generation completes successfully.
   You can schedule a call with us below to ensure your data gets generated properly.
 `;

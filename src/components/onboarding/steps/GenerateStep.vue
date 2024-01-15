@@ -10,10 +10,10 @@
     secondary
     :value="ONBOARDING_GENERATE_DURATION"
   />
-  <typography
+  <callout-sub-step
     v-if="status === 'success'"
-    el="div"
-    :value="ONBOARDING_GENERATE_SUCCESS"
+    icon="success"
+    :message="ONBOARDING_GENERATE_SUCCESS"
   />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">

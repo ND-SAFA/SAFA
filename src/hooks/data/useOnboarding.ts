@@ -4,7 +4,9 @@ import { JobSchema, LocalStorageKeys } from "@/types";
 import {
   ARTIFACT_GENERATION_TYPES,
   MAX_GENERATED_BASE_ARTIFACTS,
+  ONBOARDING_MEET_LINK,
   ONBOARDING_STEPS,
+  ONBOARDING_SUPPORT_LINK,
 } from "@/util";
 import {
   artifactGenerationApiStore,
@@ -182,9 +184,10 @@ export const useOnboarding = defineStore("useOnboarding", {
     },
     /**
      * Schedule a call with the SAFA team.
+     * @param error - Whether the call was scheduled because of an error.
      */
-    handleScheduleCall(): void {
-      // TODO
+    handleScheduleCall(error: boolean): void {
+      window.open(error ? ONBOARDING_SUPPORT_LINK : ONBOARDING_MEET_LINK);
     },
     /**
      * Import from GitHub and summarize project files.

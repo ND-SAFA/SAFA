@@ -11,7 +11,7 @@
         text
         color="secondary"
         icon="calendar"
-        @click="onboardingStore.handleScheduleCall"
+        @click="onboardingStore.handleScheduleCall(props.error)"
       >
         Schedule a Call
       </text-button>
@@ -34,7 +34,11 @@ import { IconVariant } from "@/types";
 import { onboardingStore } from "@/hooks";
 import { Icon, TextButton, Typography } from "@/components";
 
-const props = defineProps<{ icon: IconVariant; message: string }>();
+const props = defineProps<{
+  icon: IconVariant;
+  message: string;
+  error?: boolean;
+}>();
 
 const slots = useSlots();
 </script>

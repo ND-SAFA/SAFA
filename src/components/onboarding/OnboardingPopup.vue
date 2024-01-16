@@ -111,22 +111,13 @@ import {
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 
-// Preload GitHub projects if credentials are already set.
-onMounted(async () => {
-  await onboardingStore.handleReload();
-});
-
-// Open the popup when the user logs in, if they have not already completed it.
+// Check the onboarding workflow status when the user logs in, and open the popup if it's not complete.
 watch(
   () => userLoggedIn.value,
-  (userLoggedIn) => {
-    if (
-      userLoggedIn &&
-      !onboardingStore.isComplete &&
-      !permissionStore.isDemo
-    ) {
-      onboardingStore.open = true;
-    }
+  async (userLoggedIn) => {
+    if (!userLoggedIn || permissionStore.isDemo) return;
+
+    await onboardingStore.handleReload();
   }
 );
 </script>

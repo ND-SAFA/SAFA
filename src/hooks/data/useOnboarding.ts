@@ -120,14 +120,16 @@ export const useOnboarding = defineStore("useOnboarding", {
   actions: {
     /**
      * Reloads the GitHub projects and jobs for the onboarding workflow.
+     * @param open - Whether to force open the onboarding workflow.
      */
     async handleReload(open?: boolean): Promise<void> {
-      // Open the onboarding workflow if it has not yet been completed.
-      if (open) {
+      // Open the onboarding workflow if it has not yet been completed, or is manually opened.
+      if (
+        open ||
+        localStorage.getItem(LocalStorageKeys.onboarding) !== "true"
+      ) {
         this.open = true;
-      } else if (localStorage.getItem(LocalStorageKeys.onboarding) === "true") {
-        return;
-      }
+      } else return;
 
       // Skip reset if already loading.
       if (this.loading) return;

@@ -87,12 +87,13 @@ function handleGenerate() {
  * Updates the status when the job changes.
  */
 function updateStatus(moveNext?: boolean) {
-  if (onboardingStore.uploadedJob?.status === "IN_PROGRESS") {
-    status.value = "loading";
-  }
-  if (onboardingStore.uploadedJob?.status === "FAILED") {
+  const jobStatus = onboardingStore.uploadedJob?.status;
+
+  if (jobStatus === "FAILED" || onboardingStore.error) {
     status.value = "error";
-  } else if (onboardingStore.uploadedJob?.status === "COMPLETED") {
+  } else if (jobStatus === "IN_PROGRESS") {
+    status.value = "loading";
+  } else if (jobStatus === "COMPLETED") {
     status.value = "success";
 
     if (!moveNext) return;
@@ -107,7 +108,7 @@ watch(
   () => onboardingStore.error,
   (error) => {
     if (!error) return;
-    status.value = "error";
+    updateStatus();
   }
 );
 

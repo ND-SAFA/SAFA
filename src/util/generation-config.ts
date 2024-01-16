@@ -34,6 +34,14 @@ export const ARTIFACT_GENERATION_OPTIONS =
       ];
 
 /**
+ * The types of artifacts that will be generated during onboarding.
+ */
+export const ARTIFACT_GENERATION_ONBOARDING = [
+  ARTIFACT_GENERATION_TYPES.FUNCTIONAL_REQ,
+  ARTIFACT_GENERATION_TYPES.FEATURE,
+];
+
+/**
  * The maximum number of artifacts that can be generated on.
  */
 export const MAX_GENERATED_BASE_ARTIFACTS = 1000;

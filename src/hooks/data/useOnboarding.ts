@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { JobSchema, LocalStorageKeys } from "@/types";
 import {
-  ARTIFACT_GENERATION_TYPES,
+  ARTIFACT_GENERATION_ONBOARDING,
   MAX_GENERATED_BASE_ARTIFACTS,
   ONBOARDING_MEET_LINK,
   ONBOARDING_STEPS,
@@ -19,7 +19,6 @@ import {
   jobApiStore,
   jobStore,
   logStore,
-  onboardingStore,
   orgStore,
   projectApiStore,
   projectStore,
@@ -44,6 +43,10 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     loading: false,
     /**
+     * The ID of the project used in onboarding.
+     */
+    projectId: null as string | null,
+    /**
      * The current step of the onboarding workflow, starting at 1.
      */
     step: 1,
@@ -55,13 +58,6 @@ export const useOnboarding = defineStore("useOnboarding", {
       done: false,
     })),
     /**
-     * The types of artifacts that will be generated.
-     */
-    generationTypes: [
-      ARTIFACT_GENERATION_TYPES.FUNCTIONAL_REQ,
-      ARTIFACT_GENERATION_TYPES.FEATURE,
-    ],
-    /**
      * The cost of generating the selected project data.
      */
     cost: null as number | null,
@@ -69,19 +65,23 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Whether payment has been confirmed.
      */
     paymentConfirmed: false,
+    /**
+     * Whether the generation step has been completed.
+     */
+    generationCompleted: false,
   }),
   getters: {
-    /**
-     * @return Whether the onboarding workflow is complete.
-     */
-    isComplete(): boolean {
-      return localStorage.getItem(LocalStorageKeys.onboarding) === "true";
-    },
     /**
      * @return The onboarding project's upload job, if the generation step is done.
      */
     uploadedJob(): JobSchema | undefined {
       return jobStore.jobs[0];
+    },
+    /**
+     * @return Whether the onboarding project's upload job is generating artifacts.
+     */
+    isGenerationJob(): boolean {
+      return this.uploadedJob?.steps.includes("Generating Artifacts") || false;
     },
     /**
      * @return Whether the onboarding workflow should display the generated project overview.
@@ -102,10 +102,9 @@ export const useOnboarding = defineStore("useOnboarding", {
      * @return A display string for the onboarding project's upload job.
      */
     uploadProgress(): string {
+      const { steps = [], currentStep = 0 } = this.uploadedJob || {};
       return this.uploadedJob
-        ? `Step ${this.uploadedJob.currentStep + 1} of ${
-            this.uploadedJob.steps.length
-          }: ${this.uploadedJob.steps[this.uploadedJob.currentStep]}`
+        ? `Step ${currentStep + 1} of ${steps.length}: ${steps[currentStep]}`
         : "";
     },
     /**
@@ -123,30 +122,43 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Reloads the GitHub projects and jobs for the onboarding workflow.
      */
     async handleReload(open?: boolean): Promise<void> {
+      // Open the onboarding workflow if it has not yet been completed.
       if (open) {
         this.open = true;
-      } else if (onboardingStore.isComplete) {
+      } else if (localStorage.getItem(LocalStorageKeys.onboarding) === "true") {
         return;
       }
 
-      if (this.loading) return; // Skip reset if already loading.
+      // Skip reset if already loading.
+      if (this.loading) return;
 
       this.loading = true;
+      this.projectId =
+        this.projectId ||
+        localStorage.getItem(LocalStorageKeys.onboardingProject);
+      this.generationCompleted =
+        this.generationCompleted ||
+        (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED") ||
+        localStorage.getItem(LocalStorageKeys.onboardingGenerated) === "true";
 
       await gitHubApiStore.handleVerifyCredentials();
       await jobApiStore.handleReload();
 
-      // Move from Connect GitHub step if credentials are set.
       if (integrationsStore.validGitHubCredentials) {
-        await onboardingStore.handleNextStep("connect");
+        // Skip to Code step if credentials are set.
+        await this.handleNextStep("connect");
       }
-      // Skip to the Summarize step if a job has been uploaded.
-      if (onboardingStore.uploadedJob) {
-        await onboardingStore.handleNextStep("code");
+      if (this.uploadedJob) {
+        // Skip to the Summarize step if a job has been uploaded.
+        await this.handleNextStep("code");
       }
-      // Skip to the Generate step if a job has been completed.
-      if (onboardingStore.uploadedJob?.completedEntityId) {
-        await onboardingStore.handleNextStep("summarize");
+      if (this.projectId) {
+        // Skip to the Generate step if a job has been completed.
+        await this.handleNextStep("summarize");
+      }
+      if (this.generationCompleted) {
+        // Skip to everything completed if the generation is complete.
+        await this.handleNextStep("generate");
       }
 
       this.loading = false;
@@ -160,10 +172,21 @@ export const useOnboarding = defineStore("useOnboarding", {
     },
     /**
      * Proceeds to the next step of the onboarding workflow.
-     * @param step - The step to proceed to. If not provided, proceeds to the next step.
+     * @param currentStep - The current step. If not provided, proceeds to the next step.
      */
-    async handleNextStep(step?: keyof typeof ONBOARDING_STEPS): Promise<void> {
-      const index = step ? ONBOARDING_STEPS[step].index : this.step - 1;
+    async handleNextStep(
+      currentStep?: keyof typeof ONBOARDING_STEPS
+    ): Promise<void> {
+      const index = currentStep
+        ? ONBOARDING_STEPS[currentStep].index
+        : this.step - 1;
+
+      if (currentStep === "generate") {
+        this.generationCompleted = true;
+        localStorage.setItem(LocalStorageKeys.onboardingGenerated, "true");
+
+        return;
+      }
 
       this.steps[index].done = true;
       this.steps[index + 1].done = true;
@@ -172,13 +195,19 @@ export const useOnboarding = defineStore("useOnboarding", {
         this.step = index + 2;
       }
 
-      if (step === "connect") {
+      if (currentStep === "connect") {
         await gitHubApiStore.handleLoadProjects();
       }
 
-      if (step === "summarize" && this.uploadedJob?.completedEntityId) {
+      if (currentStep === "summarize" && this.uploadedJob?.completedEntityId) {
+        this.projectId = this.uploadedJob?.completedEntityId;
+        localStorage.setItem(
+          LocalStorageKeys.onboardingProject,
+          this.projectId
+        );
+
         await getVersionApiStore
-          .handleLoad(this.uploadedJob?.completedEntityId, undefined, false)
+          .handleLoad(this.projectId, undefined, false)
           .then(() => this.handleEstimateCost());
       }
     },
@@ -209,7 +238,7 @@ export const useOnboarding = defineStore("useOnboarding", {
       await billingApiStore.handleEstimateCost(
         {
           artifacts: artifactStore.allArtifacts.map(({ id }) => id),
-          targetTypes: this.generationTypes,
+          targetTypes: ARTIFACT_GENERATION_ONBOARDING,
         },
         {
           onSuccess: (cost) => (this.cost = cost),
@@ -224,21 +253,20 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleGenerateDocumentation(
       paymentConfirmed?: boolean
     ): Promise<void> {
-      this.paymentConfirmed = paymentConfirmed || false;
-
       const artifactIds = artifactStore.allArtifacts.map(({ id }) => id);
+      this.paymentConfirmed = paymentConfirmed || false;
 
       if (this.displayBilling && !paymentConfirmed) {
         await billingApiStore.handleCheckoutSession(artifactIds.length);
       } else {
+        localStorage.setItem(LocalStorageKeys.onboardingGenerated, "true");
+
         await artifactGenerationApiStore.handleGenerateArtifacts(
           {
             artifacts: artifactIds,
-            targetTypes: this.generationTypes,
+            targetTypes: ARTIFACT_GENERATION_ONBOARDING,
           },
-          {
-            onError: () => (this.error = true),
-          }
+          { onError: () => (this.error = true) }
         );
       }
     },
@@ -246,23 +274,21 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Export the selected project as a CSV.
      */
     async handleExportProject() {
-      if (!this.uploadedJob?.completedEntityId) return;
+      if (!this.projectId) return;
 
-      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
+      await getVersionApiStore.handleLoad(this.projectId);
       await projectApiStore.handleDownload("csv");
 
       logStore.onSuccess("Your data is being exported.");
-
       this.handleClose();
     },
     /**
      * View the selected project in SAFA.
      */
     async handleViewProject() {
-      if (!this.uploadedJob?.completedEntityId) return;
+      if (!this.projectId) return;
 
-      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
-
+      await getVersionApiStore.handleLoad(this.projectId);
       this.handleClose();
     },
   },

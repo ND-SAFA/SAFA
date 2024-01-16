@@ -33,7 +33,7 @@
       <list-item
         color="primary"
         title="Generating Documents"
-        :subtitle="onboardingStore.generationTypes.join(', ')"
+        :subtitle="ARTIFACT_GENERATION_ONBOARDING.join(', ')"
         icon="create-artifact"
       />
       <separator v-if="onboardingStore.cost" inset />
@@ -109,6 +109,7 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import {
+  ARTIFACT_GENERATION_ONBOARDING,
   ONBOARDING_GENERATE_DURATION,
   ONBOARDING_GENERATE_ERROR,
   ONBOARDING_GENERATE_LARGE,
@@ -144,19 +145,20 @@ const generateLabel = computed(() =>
  * Updates the status when the job changes.
  */
 function updateStatus() {
-  // Skip jobs that are not for generation.
-  if (!onboardingStore.uploadedJob?.steps.includes("Generating Artifacts")) {
-    return;
-  }
+  const jobStatus = onboardingStore.uploadedJob?.status;
+  const correctJobType = onboardingStore.isGenerationJob;
 
-  if (onboardingStore.uploadedJob?.status === "IN_PROGRESS") {
-    status.value = "loading";
-  }
-  if (onboardingStore.uploadedJob?.status === "FAILED") {
+  if ((correctJobType && jobStatus === "FAILED") || onboardingStore.error) {
     status.value = "error";
-  } else if (onboardingStore.uploadedJob?.status === "COMPLETED") {
+  } else if (correctJobType && jobStatus === "IN_PROGRESS") {
+    status.value = "loading";
+  } else if (
+    (correctJobType && jobStatus === "COMPLETED") ||
+    onboardingStore.generationCompleted
+  ) {
     status.value = "success";
-    onboardingStore.steps[onboardingStore.steps.length - 1].done = true;
+
+    onboardingStore.handleNextStep("generate");
   }
 }
 
@@ -166,7 +168,7 @@ watch(
   () => onboardingStore.error,
   (error) => {
     if (!error) return;
-    status.value = "error";
+    updateStatus();
   }
 );
 

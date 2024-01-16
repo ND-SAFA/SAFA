@@ -56,19 +56,14 @@ export const useCreateVersionApi = defineStore(
       versionId: string,
       selectedFiles: File[],
       setVersionIfSuccessful: boolean,
-      isCompleteSet = false
+      asCompleteSet = false
     ): Promise<void> {
       await createVersionApi.handleRequest(
         async () => {
-          const formData = new FormData();
-
-          selectedFiles.forEach((file: File) => {
-            formData.append("files", file);
+          const job = await createFlatFileUploadJob(versionId, {
+            asCompleteSet,
+            files: selectedFiles,
           });
-
-          formData.append("isCompleteSet", JSON.stringify(isCompleteSet));
-
-          const job = await createFlatFileUploadJob(versionId, formData);
 
           await jobApiStore.handleCreate(job);
         },

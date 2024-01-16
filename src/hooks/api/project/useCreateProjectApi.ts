@@ -65,31 +65,14 @@ export const useCreateProjectApi = defineStore(
     ): Promise<void> {
       await createProjectApi.handleRequest(
         async () => {
-          const formData = new FormData();
-
-          formData.append(createProjectUploadJob.FORM_DATA_NAME, project.name);
-          formData.append(
-            createProjectUploadJob.FORM_DATA_ORG_ID,
-            orgStore.orgId
-          );
-          formData.append(
-            createProjectUploadJob.FORM_DATA_TEAM_ID,
-            teamStore.teamId
-          );
-          formData.append(
-            createProjectUploadJob.FORM_DATA_DESCRIPTION,
-            project.description
-          );
-          formData.append(
-            createProjectUploadJob.FORM_DATA_SUMMARIZE,
-            summarize.toString()
-          );
-
-          files.forEach((file: File) => {
-            formData.append(createProjectUploadJob.FORM_DATA_FILES, file);
+          const job = await createProjectUploadJob({
+            name: project.name,
+            orgId: orgStore.orgId,
+            teamId: teamStore.teamId,
+            description: project.description,
+            summarize,
+            files,
           });
-
-          const job = await createProjectUploadJob(formData);
 
           await jobApiStore.handleCreate(job);
         },

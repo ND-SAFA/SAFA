@@ -17,3 +17,23 @@ export interface GeneratedMatrixSchema {
    */
   artifactLevels: MatrixSchema[];
 }
+
+/**
+ * Represents form data for uploading a project.
+ */
+export interface ProjectUploadFormData {
+  name: string;
+  orgId: string;
+  teamId: string;
+  description: string;
+  summarize: boolean;
+  files: File[];
+}
+
+/**
+ * Represents form data for uploading a version.
+ */
+export interface VersionUploadFormData {
+  asCompleteSet: boolean;
+  files: File[];
+}

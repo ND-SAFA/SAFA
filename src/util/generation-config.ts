@@ -45,3 +45,13 @@ export const ARTIFACT_GENERATION_ONBOARDING = [
  * The maximum number of artifacts that can be generated on.
  */
 export const MAX_GENERATED_BASE_ARTIFACTS = 1000;
+
+/**
+ * The values between 0 and 1 that correspond to the confidence score,
+ * broken into three categories.
+ */
+export const GENERATION_SCORE_VALUES = {
+  HIGH: 0.8,
+  MEDIUM: 0.5,
+  LOW: 0.3,
+};

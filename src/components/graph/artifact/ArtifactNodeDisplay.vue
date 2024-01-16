@@ -12,6 +12,7 @@
       align="center"
       :artifact="props.artifact"
       is-header
+      dense
       class="cy-node-artifact-name"
       data-cy="tree-node-name"
     />

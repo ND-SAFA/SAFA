@@ -21,6 +21,10 @@ export interface ArtifactNameDisplayProps extends ArtifactProps {
    */
   isHeader?: boolean;
   /**
+   * Whether to display the name more densely, such as on artifact nodes.
+   */
+  dense?: boolean;
+  /**
    * Testing selector for the name.
    */
   dataCyName?: string;

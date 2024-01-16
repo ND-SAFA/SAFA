@@ -3,6 +3,8 @@ import {
   IdentifierSchema,
   JobSchema,
   ProjectSchema,
+  ProjectUploadFormData,
+  VersionUploadFormData,
 } from "@/types";
 import { buildRequest } from "@/api";
 
@@ -49,12 +51,23 @@ export async function createProjectCreationJob(
 /**
  * Creates a project from the given flat files.
  *
- * @param formData - Form data containing the project files.
+ * @param uploadData - Form data containing the project files.
  * @return The created project.
  */
 export async function createProjectUploadJob(
-  formData: FormData
+  uploadData: ProjectUploadFormData
 ): Promise<JobSchema> {
+  const formData = new FormData();
+
+  formData.append("name", uploadData.name);
+  formData.append("orgId", uploadData.orgId);
+  formData.append("teamId", uploadData.teamId);
+  formData.append("description", uploadData.description);
+  formData.append("summarize", uploadData.summarize.toString());
+  uploadData.files.forEach((file: File) => {
+    formData.append("files", file);
+  });
+
   return buildRequest<JobSchema, string, FormData>(
     "createProjectThroughFlatFiles"
   )
@@ -66,13 +79,20 @@ export async function createProjectUploadJob(
  * Updates an existing project from the given flat files.
  *
  * @param versionId - The project version to update.
- * @param formData - Form data containing the project files.
+ * @param uploadData - Form data containing the project files.
  * @return The updated project.
  */
 export async function createFlatFileUploadJob(
   versionId: string,
-  formData: FormData
+  uploadData: VersionUploadFormData
 ): Promise<JobSchema> {
+  const formData = new FormData();
+
+  formData.append("asCompleteSet", uploadData.asCompleteSet.toString());
+  uploadData.files.forEach((file: File) => {
+    formData.append("files", file);
+  });
+
   return buildRequest<JobSchema, "versionId", FormData>(
     "updateProjectThroughFlatFiles",
     { versionId }

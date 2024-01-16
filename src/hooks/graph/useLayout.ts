@@ -9,7 +9,7 @@ import {
   CytoEvent,
   CSSCursor,
 } from "@/types";
-import { LARGE_NODE_LAYOUT_COUNT } from "@/util";
+import { LARGE_NODE_LAYOUT_COUNT, GENERATION_SCORE_VALUES } from "@/util";
 import {
   appStore,
   artifactStore,
@@ -201,7 +201,7 @@ export const useLayout = defineStore("layout", {
       });
     },
     /**
-     * Applies style changes to graph links.
+     * Sets the width of generated links to reflect their score.
      * - This action is skipped if the graph is too large.
      */
     styleGeneratedLinks(): void {
@@ -209,12 +209,15 @@ export const useLayout = defineStore("layout", {
 
       cyStore.getCy("project").then((cy) => {
         cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach((edge) => {
-          edge.style({
-            width: Math.min(
-              edge.data().score * CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH,
-              CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
-            ),
-          });
+          const width =
+            (edge.data().score >= GENERATION_SCORE_VALUES.HIGH
+              ? CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH
+              : edge.data().score >= GENERATION_SCORE_VALUES.MEDIUM
+                ? CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH / 2
+                : CYTO_CONFIG.GENERATED_TRACE_MAX_WIDTH / 3) *
+            edge.data().score;
+
+          edge.style({ width });
         });
       });
     },

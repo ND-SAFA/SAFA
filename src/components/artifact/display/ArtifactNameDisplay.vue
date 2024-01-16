@@ -7,7 +7,7 @@
         :value="codePath"
         ellipsis
         :align="props.align"
-        class="full-width text-word-break-all"
+        :class="codePathClass"
       />
       <typography
         :align="props.align"
@@ -58,6 +58,10 @@ const codePath = computed(() =>
   splitLines.value
     ? props.artifact.name.split("/").slice(0, -1).join("/")
     : undefined
+);
+
+const codePathClass = computed(
+  () => "full-width " + (props.dense ? "text-no-wrap" : "text-word-break-all")
 );
 
 const displayName = computed(() =>

@@ -30,7 +30,7 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
      * @return Whether the identifier can be saved.
      */
     canSave(): boolean {
-      return this.editedIdentifier.name.length > 0;
+      return this.editedIdentifier.name.trim().length > 0;
     },
   },
   actions: {

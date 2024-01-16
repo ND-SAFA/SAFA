@@ -12,11 +12,23 @@
       <text-input v-model="adminCreateEmail" label="Email" />
       <text-input v-model="adminCreatePassword" label="Password" />
       <text-button
-        text
+        block
+        outlined
         color="primary"
         label="Create Account"
         icon="invite"
         @click="handleAdminCreate"
+      />
+    </expansion-item>
+    <expansion-item label="Enable Superuser">
+      <text-input v-model="adminSuperuserEmail" label="Email" />
+      <text-button
+        block
+        outlined
+        color="primary"
+        label="Enable Superuser"
+        icon="invite"
+        @click="handleAdminSuperuser"
       />
     </expansion-item>
   </panel-card>
@@ -44,6 +56,7 @@ import {
 
 const adminCreateEmail = ref("");
 const adminCreatePassword = ref("");
+const adminSuperuserEmail = ref("");
 
 /**
  * As an admin, creates a pre-verified account.
@@ -56,5 +69,13 @@ function handleAdminCreate() {
     },
     true
   );
+}
+/**
+ * As an admin, sets an account as a superuser.
+ */
+function handleAdminSuperuser() {
+  adminApiStore.enableSuperuser({
+    email: adminSuperuserEmail.value,
+  });
 }
 </script>

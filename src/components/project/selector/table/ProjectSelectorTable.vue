@@ -23,15 +23,13 @@
     @row:delete="identifierSaveStore.selectIdentifier($event, 'delete')"
   >
     <template #body-cell-name="{ row }: { row: ProjectSchema }">
-      <q-td>
+      <q-td style="max-width: 400px">
         <typography :value="row.name" />
         <typography
-          v-if="!props.minimal"
           :value="row.description"
           secondary
           el="div"
           class="text-ellipsis"
-          style="max-width: 500px"
         />
       </q-td>
     </template>

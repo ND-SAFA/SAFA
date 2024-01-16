@@ -1,6 +1,7 @@
 <template>
   <div class="full-width">
     <flex-box full-width justify="between" align="center" y="1">
+      <icon v-if="permissionStore.isDemo" variant="safa" class="q-mr-md" />
       <nav-breadcrumbs />
       <members-bar />
       <q-space />
@@ -36,6 +37,7 @@ import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { ProjectSearchbar } from "@/components/search";
 import TextButton from "@/components/common/button/TextButton.vue";
+import Icon from "@/components/common/display/icon/Icon.vue";
 import MembersBar from "./MembersBar.vue";
 import NavBreadcrumbs from "./NavBreadcrumbs.vue";
 

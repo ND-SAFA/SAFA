@@ -46,7 +46,7 @@
       />
       <tim-link
         v-for="matrix in traceMatrices"
-        :key="matrix.sourceType + matrix.targetType"
+        :key="matrix.id"
         :count="matrix.count"
         :target-type="matrix.targetType"
         :source-type="matrix.sourceType"

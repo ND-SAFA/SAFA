@@ -65,6 +65,10 @@ $graph-border-radius: 8px;
   &:hover, &.cy-node-selected {
     background-color: $color-neutral;
     box-shadow: rgba(0, 0, 0, 0.24) 1px 3px 8px !important;
+
+    &:after {
+      background-image: linear-gradient(to bottom, rgba(255,255,255,0), $color-neutral 50%);
+    }
   }
 
   &:active {
@@ -141,6 +145,18 @@ $graph-border-radius: 8px;
       width: 32.5%;
       margin-right: 2px;
     }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0), $color-background 70%);
+    width: 100%;
+    height: 14px;
   }
 }
 

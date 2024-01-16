@@ -91,7 +91,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, watch } from "vue";
 import { ENABLED_FEATURES } from "@/util";
 import { onboardingStore, permissionStore, sessionStore } from "@/hooks";
 import {

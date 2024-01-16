@@ -14,7 +14,7 @@ export async function parseArtifactFile(
 ): Promise<ParseArtifactFileSchema> {
   const formData = new FormData();
 
-  formData.append(parseArtifactFile.FORM_DATA_FILE, file);
+  formData.append("file", file);
 
   return buildRequest<ParseArtifactFileSchema, "artifactType", FormData>(
     "parseArtifactFile",
@@ -23,8 +23,6 @@ export async function parseArtifactFile(
     .withFormData()
     .post(formData);
 }
-
-parseArtifactFile.FORM_DATA_FILE = "file";
 
 /**
  * Parses a trace file into trace links.
@@ -37,11 +35,9 @@ export async function parseTraceFile(
 ): Promise<ParseTraceFileSchema> {
   const formData = new FormData();
 
-  formData.append(parseTraceFile.FORM_DATA_FILE, file);
+  formData.append("file", file);
 
   return buildRequest<ParseTraceFileSchema, string, FormData>("parseTraceFile")
     .withFormData()
     .post(formData);
 }
-
-parseTraceFile.FORM_DATA_FILE = "file";

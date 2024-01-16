@@ -18,7 +18,7 @@ class SummarizerArgs(PipelineArgs):
     """
     LLM manager used for the individual artifact summaries
     """
-    llm_manager_for_artifact_summaries: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
+    llm_manager_for_artifact_summaries: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
     """
     LLM manager used for the full project summary
     """

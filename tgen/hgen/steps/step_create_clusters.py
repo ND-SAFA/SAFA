@@ -59,7 +59,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.cluster2artifacts = cluster_map
 
         max_cohesion = Cluster.weight_average_pairwise_sim_with_size(1, cluster_max_size)
-        state.cluster2cohesion = {cluster_id: (cluster.size_weighted_sim/max_cohesion if cluster.avg_pairwise_sim else max_cohesion)
+        state.cluster2cohesion = {cluster_id: (cluster.size_weighted_sim / max_cohesion if cluster.avg_pairwise_sim else max_cohesion)
                                   for cluster_id, cluster in cluster_state.final_cluster_map.items()}
 
         if cluster_state.seed2artifacts:
@@ -77,8 +77,9 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         uses_seeds = args.seed_project_summary_section or args.seed_layer_id
         seed_kwargs = CreateClustersStep.create_clustering_kwargs(args, state) if uses_seeds else {}
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, CLUSTERING_SUBDIRECTORY)
-        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True, export_dir=clustering_export_path,
-                                      **seed_kwargs)
+        cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True,
+                                      cluster_max_size=15,
+                                      export_dir=clustering_export_path, add_orphans_to_best_home=True, **seed_kwargs)
         return cluster_args
 
     @staticmethod
@@ -96,5 +97,3 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         kwargs[CLUSTER_SEEDS_PARAM] = seed_contents
         kwargs[CLUSTER_ARTIFACT_TYPE_PARAM] = seed_artifact_type
         return kwargs
-
-

@@ -62,7 +62,7 @@ class ContentGenerator:
                               source_type: str, cluster2artifacts: Dict[str, List] = None,
                               format_variables: Dict[str, List] = None,
                               additional_task_response_instructions: str = EMPTY_STRING,
-                              artifact_prompt_build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
+                              artifact_prompt_build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.MARKDOWN,
                               include_summary: bool = True) -> PromptBuilder:
         """
         Creates the prompt builder for the generations using the provided prompts and variables.
@@ -123,28 +123,36 @@ class ContentGenerator:
         avg_file_size = sum(file_lengths) / len(file_lengths)
         cluster2artifacts = cluster2artifacts
         max_cohesion = max(cluster2cohesion.values())
-        cluster2reduction_percentage = {cluster_id: 1 - math.log(cohesion + 1) / math.log(max_cohesion + 1)
+        cluster2retention_percentage = {cluster_id: ContentGenerator.convert_cohesion_to_reduction_percentage(cohesion, max_cohesion)
                                         for cluster_id, cohesion in cluster2cohesion.items()}
+        retention_percentage_delta = max(1 - max(cluster2retention_percentage.values()), 0)
+        cluster2retention_percentage = {cluster_id: rp + retention_percentage_delta
+                                        for cluster_id, rp in cluster2retention_percentage.items()}
         n_targets = [ContentGenerator._calculate_n_targets_for_cluster(artifacts=cluster2artifacts[i],
                                                                        avg_file_size=avg_file_size,
-                                                                       reduction_percentage=cluster2reduction_percentage[i])
+                                                                       retention_percentage=cluster2retention_percentage[i])
                      for i in artifact_ids]
         return n_targets
 
     @staticmethod
+    def convert_cohesion_to_reduction_percentage(cohesion: float, max_cohesion: float) -> float:
+        return 1 - math.log(cohesion + 1) / math.log(max_cohesion + 1)
+
+    @staticmethod
     def _calculate_n_targets_for_cluster(artifacts: List[EnumDict], avg_file_size: float,
-                                         reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, ) -> int:
+                                         retention_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, ) -> int:
         """
         Calculates how many artifacts would be equal to a proportion of the total based on a given branching factor
         :param artifacts: The artifacts in the cluster.
         :param avg_file_size: The average size of files for the project.
-        :param reduction_percentage: Determines the proportion of source artifacts to use for # of generations
+        :param retention_percentage: Determines the proportion of source artifacts to use for # of generations
         :return: The number of artifacts equal to a proportion of the total
         """
         length_of_artifacts = sum([len(artifact[ArtifactKeys.CONTENT].splitlines()) for artifact in artifacts])
         n_artifacts = max(length_of_artifacts / avg_file_size, 1)
-        n_targets = min(max(math.ceil(n_artifacts * reduction_percentage), 1), len(artifacts))
-        return min(round(n_artifacts), len(artifacts))
+        min_acceptable = 2 if n_artifacts > 4 or len(artifacts) > 4 else 1
+        n_targets = max(round(n_artifacts * retention_percentage), min_acceptable)
+        return min(round(n_targets), len(artifacts) - 1)
 
     def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt, cluster2artifacts: Dict[str, List] = None,
                                         additional_response_instructions: str = EMPTY_STRING) -> QuestionnairePrompt:
@@ -158,7 +166,7 @@ class ContentGenerator:
         task_prompt.id = self.TASK_PROMPT_ID
         if not task_prompt.response_manager.response_tag:
             target_type_tag = HGenUtil.convert_spaces_to_dashes(self.args.target_type)
-            response_instructions_format = f"Enclose each {self.args.target_type} in " \
+            response_instructions_format = f"Enclose each final {self.args.target_type} in " \
                                            "{target}. " + additional_response_instructions
             sources = {a[ArtifactKeys.ID] for artifacts in cluster2artifacts.values() for a in artifacts} \
                 if cluster2artifacts else set(self.state.source_dataset.artifact_df.index)
@@ -213,7 +221,7 @@ class ContentGenerator:
 
     @staticmethod
     def create_source_artifact_prompt(source_type: str, id_to_context_artifacts: Dict[str, List] = None,
-                                      build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
+                                      build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                       **multi_artifact_params) -> MultiArtifactPrompt:
         """
         Creates the prompt that will be used to supply the LLM with the source artifacts.

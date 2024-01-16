@@ -1,14 +1,16 @@
 import math
 from typing import Dict, List, Tuple, Set, Any, Optional
 
+import numpy as np
+
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.objects.trace import Trace
 from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.str_util import StrUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -50,7 +52,9 @@ class ContentRefiner:
                                                                                          generation_id=self.duplicate_type.name.lower())
         clustering_export_path = FileUtil.safely_join_paths(self.args.export_dir, CLUSTERING_SUBDIRECTORY,
                                                             f"refine_clusters_{self.duplicate_type.name.lower()}")
-        duplicate_detector = DuplicateDetector(embeddings_manager=self.state.embedding_manager)
+        duplicate_detector = DuplicateDetector(embeddings_manager=self.state.embedding_manager,
+                                               duplicate_cluster_cohesion_threshold=0.5,
+                                               duplicate_similarity_threshold=0.5)
         duplicate_cluster_map = duplicate_detector.cluster_duplicates(artifact_df=generated_artifacts_df,
                                                                       duplicate_type=self.duplicate_type,
                                                                       original_clusters_to_contents=self.state.get_cluster2generation(),
@@ -84,21 +88,25 @@ class ContentRefiner:
         new_source_clusters, dups2remove = {}, set()
         parent2children = self._find_top_parents_for_children(self.state, generated_artifacts_df) \
             if self.duplicate_type == DuplicateType.INTER_CLUSTER else {}
-        generation2cluster = DictUtil.flip(self.state.get_cluster2generation())
+        cluster2generation = self.state.get_cluster2generation()
+        generation2cluster = DictUtil.flip(cluster2generation)
         original_cluster_to_artifacts = self.state.get_cluster2artifacts(ids_only=True)
+        content2id = DictUtil.flip(generated_artifacts_df.to_map())
         for cluster_id, cluster in duplicate_cluster_map.items():
             new_source_clusters[cluster_id] = set()
             for a_id in cluster.artifact_ids:
                 content = cluster.get_content(a_id)
                 orig_cluster_id = generation2cluster[content]
                 candidate_children = set(original_cluster_to_artifacts[orig_cluster_id])
+                parent_candidates = [content2id.get(gen) for gen in cluster2generation[orig_cluster_id]]
                 if self.duplicate_type == DuplicateType.INTER_CLUSTER:
-                    self._add_best_children_for_parent(a_id, list(candidate_children),
+                    self._add_best_children_for_parent(a_id, parent_candidates, list(candidate_children),
                                                        parent2children,
                                                        embedding_manager=self.state.embedding_manager,
                                                        link_threshold=self.args.link_selection_threshold)
                 else:
                     parent2children[a_id] = candidate_children
+                    dups2remove.update(cluster2generation[orig_cluster_id])
                 new_source_clusters[cluster_id].update({child_id for child_id in parent2children[a_id]
                                                         if child_id in candidate_children})
                 dups2remove.add(content)
@@ -107,24 +115,30 @@ class ContentRefiner:
         return new_source_clusters, dups2remove
 
     @staticmethod
-    def _add_best_children_for_parent(p_id: str, candidate_children: List[str], parent2children: Dict[str, set],
-                                      embedding_manager: EmbeddingsManager, link_threshold: float) -> None:
+    def _add_best_children_for_parent(p_id: str, candidate_parents: List[str], candidate_children: List[str],
+                                      parent2children: Dict[str, set], embedding_manager: EmbeddingsManager,
+                                      link_threshold: float) -> None:
         """
         Adds the best children (highest sim score) to the parent2children mapping.
         :param p_id: The id of the parent.
+        :param candidate_parents: All generations from the same cluster as the parent.
         :param candidate_children: All possible children for the parent.
         :param parent2children: Dictionary mapping parent artifact to a list of related children.
         :param embedding_manager: Contains the parent, children embeddings.
         :param link_threshold: The threshold above which a child is selected as related to parent.
         :return: None (selections added to parent2children dict)
         """
-        sorted_children, sorted_scores = EmbeddingSorter.sort(parent_ids=[p_id],
-                                                              child_ids=candidate_children,
-                                                              embedding_manager=embedding_manager, return_scores=True)[p_id]
-        trace_preds = [RankingUtil.create_entry(p_id, child, score) for child, score in zip(sorted_children, sorted_scores)]
-        selected_preds = RankingUtil.select_predictions_by_thresholds(trace_preds, primary_threshold=link_threshold,
-                                                                      artifact_key=TraceKeys.parent_label())
-        DictUtil.set_or_append_item(parent2children, p_id, {p[TraceKeys.child_label()] for p in selected_preds}, set)
+        parent2ranking = EmbeddingSorter.sort(parent_ids=candidate_parents,
+                                              child_ids=candidate_children,
+                                              embedding_manager=embedding_manager, return_scores=True)
+        all_trace_preds: List[Trace] = [RankingUtil.create_entry(p_id, child, score) for p_id, (children, scores) in
+                                        parent2ranking.items() for child, score in zip(children, scores)]
+        RankingUtil.normalized_scores_based_on_parent(all_trace_preds)
+        link_threshold = 1 - 2 * np.std([trace[TraceKeys.SCORE] for trace in all_trace_preds])
+        parent_selected = RankingUtil.select_predictions_by_thresholds([p for p in all_trace_preds
+                                                                        if p[TraceKeys.parent_label()] == p_id],
+                                                                       primary_threshold=link_threshold)
+        DictUtil.set_or_append_item(parent2children, p_id, {p[TraceKeys.child_label()] for p in parent_selected}, set)
 
     @staticmethod
     def _find_top_parents_for_children(state: HGenState, parent_artifact_df: ArtifactDataFrame) -> Dict[str, List[str]]:
@@ -160,12 +174,13 @@ class ContentRefiner:
         :param duplicate_cluster_artifact_df: Contains the clusters of the duplicates.
         :return: Dictionary mapping format variable name to its value.
         """
-        format_variables = {}
+        format_variables = {"n_targets": self._calculate_n_targets(duplicate_cluster_map, new_source_clusters)}
+        format_variables["n_bullets"] = [2 * n for n in format_variables["n_targets"]]
         if self.duplicate_type == DuplicateType.INTER_CLUSTER:
             format_variables["functionality"] = self._summarize_duplicates(duplicate_cluster_map,
                                                                            generated_artifacts_df,
-                                                                           duplicate_cluster_artifact_df)
-        format_variables["n_targets"] = self._calculate_n_targets(duplicate_cluster_map, new_source_clusters)
+                                                                           duplicate_cluster_artifact_df,
+                                                                           format_variables=format_variables)
 
         return format_variables
 
@@ -177,22 +192,25 @@ class ContentRefiner:
         :return: Dictionary mapping format variable name to its value.
         """
         if self.duplicate_type == DuplicateType.INTRA_CLUSTER:
-            cluster2cohesion = {cluster_id: cluster.avg_pairwise_sim for cluster_id, cluster in duplicate_cluster_map.items()}
-            n_targets = ContentGenerator.calculate_number_of_targets_per_cluster(artifact_ids=list(duplicate_cluster_map.keys()),
-                                                                                 cluster2artifacts=new_source_clusters,
-                                                                                 cluster2cohesion=cluster2cohesion,
-                                                                                 source_dataset=self.state.source_dataset)
+            cluster2generations = [self.state.get_cluster2generation()[DuplicateDetector.identify_original_cluster(c_id)]
+                                   for c_id in duplicate_cluster_map]
+            n_generated = [len(c) for c in cluster2generations]
+            n_targets = []
             for i, c_id in enumerate(duplicate_cluster_map.keys()):
                 originating_clusters = duplicate_cluster_map[c_id].get_originating_clusters()
                 if not originating_clusters:
                     originating_clusters = [duplicate_cluster_map[c_id]]
-                n_targets[i] = n_targets[i] - len(duplicate_cluster_map[c_id].artifact_id_set) + len(originating_clusters)
+                reduced_duplicate_n = sum([round(len(cluster) * (1 - cluster.avg_pairwise_sim))
+                                           for cluster in originating_clusters])
+                new_n = n_generated[i] - len(duplicate_cluster_map[c_id].artifact_id_set) + reduced_duplicate_n
+                n_target = max(new_n, 2 if n_generated[i] > 3 or len(new_source_clusters[c_id]) > 3 else 1)
+                n_targets.append(n_target)
         else:
-            n_targets = [max(math.floor(len(duplicates) / 2), 1) for cluster_id, duplicates in duplicate_cluster_map.items()]
+            n_targets = [max(math.ceil(len(duplicates) / 2), 1) for cluster_id, duplicates in duplicate_cluster_map.items()]
         return n_targets
 
     def _summarize_duplicates(self, duplicate_cluster_map: ClusterMapType, generated_artifacts_df: ArtifactDataFrame,
-                              duplicate_cluster_artifact_df: ArtifactDataFrame) -> List[str]:
+                              duplicate_cluster_artifact_df: ArtifactDataFrame, format_variables) -> List[str]:
         """
         Summarizes the features of each duplicate cluster.
         :param duplicate_cluster_map: Dictionary mapping cluster id to a cluster containing duplicates.
@@ -205,7 +223,8 @@ class ContentRefiner:
         content_generator = ContentGenerator(self.args, self.state, PromptDataset(artifact_df=duplicate_cluster_artifact_df))
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_REFINEMENT,
                                                                  SupportedPrompts.HGEN_DUP_SUMMARY_TASKS,
-                                                                 self.args.target_type, cluster2duplicates, include_summary=False,
+                                                                 self.args.target_type, cluster2duplicates,
+                                                                 include_summary=False, format_variables=format_variables,
                                                                  artifact_prompt_build_method=MultiArtifactPrompt.BuildMethod.NUMBERED)
         summary_of_dups = content_generator.generate_content(prompt_builder, generations_filename=self.DUPLICATE_SUMMARIES_FILENAME,
                                                              return_first=True)

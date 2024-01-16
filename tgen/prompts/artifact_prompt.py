@@ -1,10 +1,9 @@
 from enum import Enum, auto
 from typing import Dict, List, Optional, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_PROMPT
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
@@ -123,13 +122,15 @@ class ArtifactPrompt(Prompt):
         :param header_level: The header level used to print each artifact ID.
         :return: The formatted prompt
         """
-        assert artifact_id or relation, \
-            f"Building artifact as {ArtifactPrompt.BuildMethod.MARKDOWN.name} requires an artifact id to be given."
-        if artifact_id and relation and include_id:
-            artifact_id = f"{artifact_id} ({relation})"
-        elif relation:
-            artifact_id = relation
-        header = PromptUtil.as_markdown_header(original_string=artifact_id, level=header_level)
+        if include_id:
+            if artifact_id and relation:
+                artifact_id = f"{artifact_id} ({relation})"
+            elif relation and include_id:
+                artifact_id = relation
+
+            header = PromptUtil.as_markdown_header(original_string=artifact_id, level=header_level)
+        else:
+            header = EMPTY_STRING
         content = PromptUtil.indent_for_markdown(artifact_body)
         return f"{header}{NEW_LINE}{content}"
 

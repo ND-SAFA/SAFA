@@ -8,7 +8,6 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
@@ -20,10 +19,9 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder

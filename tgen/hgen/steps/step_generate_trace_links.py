@@ -8,6 +8,7 @@ from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.math_util import MathUtil
+from tgen.common.util.np_util import NpUtil
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
@@ -19,6 +20,7 @@ from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_across_all import SelectByThresholdScaledAcrossAll
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
+import numpy as np
 
 
 class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -44,7 +46,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
             trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
                                                                                       state.id_to_related_children)
-            selected_predictions = SelectByThreshold.select(trace_predictions, args.link_selection_threshold)
+            selected_predictions = SelectByThresholdScaledAcrossAll.select(trace_predictions, args.link_selection_threshold)
         state.selected_predictions = selected_predictions
         state.trace_predictions = trace_predictions
 
@@ -105,7 +107,8 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                         export_dir=cluster_dir,
                                         **pipeline_kwargs)
             cluster_predictions = self._run_embedding_pipeline(pipeline_args)
-            cluster_selections = SelectByThresholdScaledAcrossAll.select(cluster_predictions, args.link_selection_threshold)
+            link_selection_threshold = 1 - 2 * np.std([trace[TraceKeys.SCORE] for trace in cluster_predictions])
+            cluster_selections = SelectByThresholdScaledAcrossAll.select(cluster_predictions, link_selection_threshold)
             parent2selections = RankingUtil.group_trace_predictions(cluster_selections, TraceKeys.parent_label())
             parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
             for parent, parent_preds in parent2predictions.items():

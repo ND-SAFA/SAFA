@@ -100,6 +100,4 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                              embedding_manager=embeddings_manager,
                                                              return_scores=True)[artifact_id]
         top_parent, top_parent_score = sorted_parents[0], sorted_scores[0]
-        if top_parent_score < min_score:
-            return None
         return top_parent

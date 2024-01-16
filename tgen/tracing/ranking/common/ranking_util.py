@@ -6,6 +6,7 @@ from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
@@ -226,7 +227,7 @@ class RankingUtil:
         return requests
 
     @staticmethod
-    def create_entry(parent: str, child: str, score: float = 0.0) -> EnumDict:
+    def create_entry(parent: str, child: str, score: float = 0.0) -> Union[EnumDict, Trace]:
         """
         Creates a prediction entry
         :param parent: The parent artifact id
@@ -300,3 +301,15 @@ class RankingUtil:
         ranked_children += children_un_accounted
         ranked_scores += [0 for _ in children_un_accounted]
         return (ranked_children, ranked_scores) if return_scores else ranked_children
+
+    @staticmethod
+    def normalized_scores_based_on_parent(candidate_entries: List[Trace]) -> None:
+        """
+        Normalizes all scores based on the min and max of all scores
+        :param candidate_entries: Candidate trace entries
+        :return: None
+        """
+        scores = [e[TraceKeys.SCORE] for e in candidate_entries]
+        min_score, max_score = min(scores), max(scores)
+        for entry in candidate_entries:
+            entry[TraceKeys.SCORE] = MathUtil.convert_to_new_range(entry[TraceKeys.SCORE], (0, max_score), (0, 1))

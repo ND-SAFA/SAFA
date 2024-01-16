@@ -39,8 +39,7 @@
 
   <callout-sub-step
     v-if="status === 'error'"
-    icon="error"
-    error
+    status="error"
     :message="ONBOARDING_SUMMARIZE_ERROR"
   />
 </template>

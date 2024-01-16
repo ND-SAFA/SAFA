@@ -64,7 +64,8 @@ export const useGetVersionApi = defineStore(
     async function handleLoad(
       versionId: string,
       document?: DocumentSchema,
-      doNavigate = true
+      doNavigate = true,
+      callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       const routeRequiresProject = router.currentRoute.value.matched.some(
         ({ meta }) => meta.requiresProject
@@ -99,7 +100,7 @@ export const useGetVersionApi = defineStore(
             [QueryParams.VERSION]: versionId,
           });
         },
-        { useAppLoad: true }
+        { useAppLoad: true, ...callbacks }
       );
     }
 

@@ -23,6 +23,7 @@ import {
   projectApiStore,
   projectStore,
 } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
 import { pinia } from "@/plugins";
 
 /**
@@ -76,6 +77,15 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     uploadedJob(): JobSchema | undefined {
       return jobStore.jobs[0];
+    },
+    /**
+     * @return Whether the onboarding project's upload job is uploading artifacts.
+     */
+    isUploadJob(): boolean {
+      return (
+        this.uploadedJob?.steps.includes("Retrieving Github Repository") ||
+        false
+      );
     },
     /**
      * @return Whether the onboarding project's upload job is generating artifacts.
@@ -135,23 +145,26 @@ export const useOnboarding = defineStore("useOnboarding", {
       if (this.loading) return;
 
       this.loading = true;
+
+      await gitHubApiStore.handleVerifyCredentials();
+      await jobApiStore.handleReload();
+
+      // Load the project ID and generation status based on stored state, job state, or local storage.
       this.projectId =
         this.projectId ||
+        (this.isUploadJob && this.uploadedJob?.completedEntityId) ||
         localStorage.getItem(LocalStorageKeys.onboardingProject);
       this.generationCompleted =
         this.generationCompleted ||
         (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED") ||
         localStorage.getItem(LocalStorageKeys.onboardingGenerated) === "true";
 
-      await gitHubApiStore.handleVerifyCredentials();
-      await jobApiStore.handleReload();
-
       if (integrationsStore.validGitHubCredentials) {
         // Skip to Code step if credentials are set.
         await this.handleNextStep("connect");
       }
-      if (this.uploadedJob) {
-        // Skip to the Summarize step if a job has been uploaded.
+      if (this.isUploadJob || this.projectId) {
+        // Skip to the Summarize step if a job has been uploaded, or a project has been stored.
         await this.handleNextStep("code");
       }
       if (this.projectId) {
@@ -165,9 +178,7 @@ export const useOnboarding = defineStore("useOnboarding", {
 
       this.loading = false;
     },
-    /**
-     * Close the popup and mark onboarding as complete.
-     */
+    /** Close the popup and mark onboarding as complete. */
     handleClose(): void {
       this.open = false;
       localStorage.setItem(LocalStorageKeys.onboarding, "true");
@@ -182,6 +193,7 @@ export const useOnboarding = defineStore("useOnboarding", {
       const index = currentStep
         ? ONBOARDING_STEPS[currentStep].index
         : this.step - 1;
+      const projectId = this.projectId || this.uploadedJob?.completedEntityId;
 
       if (currentStep === "generate") {
         this.generationCompleted = true;
@@ -201,16 +213,18 @@ export const useOnboarding = defineStore("useOnboarding", {
         await gitHubApiStore.handleLoadProjects();
       }
 
-      if (currentStep === "summarize" && this.uploadedJob?.completedEntityId) {
-        this.projectId = this.uploadedJob?.completedEntityId;
-        localStorage.setItem(
-          LocalStorageKeys.onboardingProject,
-          this.projectId
-        );
-
-        await getVersionApiStore
-          .handleLoad(this.projectId, undefined, false)
-          .then(() => this.handleEstimateCost());
+      if (currentStep === "summarize" && projectId) {
+        await getVersionApiStore.handleLoad(projectId, undefined, false, {
+          onSuccess: () => {
+            this.projectId = projectId;
+            localStorage.setItem(LocalStorageKeys.onboardingProject, projectId);
+            this.handleEstimateCost();
+          },
+          onError: () => {
+            this.projectId = "";
+            localStorage.setItem(LocalStorageKeys.onboardingProject, "");
+          },
+        });
       }
     },
     /**
@@ -220,9 +234,7 @@ export const useOnboarding = defineStore("useOnboarding", {
     handleScheduleCall(error: boolean): void {
       window.open(error ? ONBOARDING_SUPPORT_LINK : ONBOARDING_MEET_LINK);
     },
-    /**
-     * Import from GitHub and summarize project files.
-     */
+    /** Import from GitHub and summarize project files. */
     async handleImportProject(): Promise<void> {
       integrationsStore.gitHubConfig.summarize = true;
       await createProjectApiStore.handleGitHubImport({
@@ -261,8 +273,6 @@ export const useOnboarding = defineStore("useOnboarding", {
       if (this.displayBilling && !paymentConfirmed) {
         await billingApiStore.handleCheckoutSession(artifactIds.length);
       } else {
-        localStorage.setItem(LocalStorageKeys.onboardingGenerated, "true");
-
         await artifactGenerationApiStore.handleGenerateArtifacts(
           {
             artifacts: artifactIds,
@@ -272,25 +282,15 @@ export const useOnboarding = defineStore("useOnboarding", {
         );
       }
     },
-    /**
-     * Export the selected project as a CSV.
-     */
+    /** Export the selected project as a CSV. */
     async handleExportProject() {
-      if (!this.projectId) return;
-
-      await getVersionApiStore.handleLoad(this.projectId);
       await projectApiStore.handleDownload("csv");
-
       logStore.onSuccess("Your data is being exported.");
       this.handleClose();
     },
-    /**
-     * View the selected project in SAFA.
-     */
+    /** View the selected project in SAFA */
     async handleViewProject() {
-      if (!this.projectId) return;
-
-      await getVersionApiStore.handleLoad(this.projectId);
+      await navigateTo(Routes.ARTIFACT, { projectId: this.projectId });
       this.handleClose();
     },
   },

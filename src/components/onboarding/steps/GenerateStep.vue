@@ -10,11 +10,6 @@
     secondary
     :value="ONBOARDING_GENERATE_DURATION"
   />
-  <callout-sub-step
-    v-if="status === 'success'"
-    icon="success"
-    :message="ONBOARDING_GENERATE_SUCCESS"
-  />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
     <callout-sub-step
@@ -62,7 +57,7 @@
 
   <job-loading-sub-step v-if="status === 'loading'" />
 
-  <flex-box v-if="status === 'success'" column align="center" t="4">
+  <flex-box v-if="status === 'success'" column align="center" y="4">
     <text-button
       text
       color="gradient"
@@ -90,9 +85,13 @@
   </flex-box>
 
   <callout-sub-step
+    v-if="status === 'success'"
+    status="success"
+    :message="ONBOARDING_GENERATE_SUCCESS"
+  />
+  <callout-sub-step
     v-if="status === 'error'"
-    icon="error"
-    error
+    status="error"
     :message="ONBOARDING_GENERATE_ERROR"
   />
 </template>

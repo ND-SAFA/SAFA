@@ -5,8 +5,8 @@ from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
-from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_SIMILARITY_DELTA, MIN_ORPHAN_HOME_SIMILARITY, \
-    ALLOWED_ORPHAN_CLUSTER_SIZE_DELTA
+from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_CLUSTER_SIZE_DELTA, ALLOWED_ORPHAN_SIMILARITY_DELTA, \
+    MIN_ORPHAN_HOME_SIMILARITY
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.list_util import ListUtil
@@ -34,11 +34,11 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
 
         logger.info(f"{len(orphan_artifact_id_set)} artifacts were not clustered.")
 
-        adopted_orphans = self.place_orphans_in_homes(args, clusters, orphan_artifact_id_set)
-        remaining_orphans = orphan_artifact_id_set.difference(adopted_orphans)
-        self.cluster_orphans(args, state, cluster_map, remaining_orphans, args.min_orphan_similarity)
+        self.cluster_orphans(args, state, cluster_map, orphan_artifact_id_set, args.min_orphan_similarity)
+        self.place_orphans_in_homes(args, clusters, orphan_artifact_id_set)
+
         if args.allow_singleton_clusters:
-            for a in remaining_orphans:
+            for a in orphan_artifact_id_set:
                 self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
 
     @classmethod
@@ -85,7 +85,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         return seen_artifacts
 
     @staticmethod
-    def place_orphans_in_homes(args: ClusteringArgs, clusters: List[Cluster], orphan_artifacts: Set[str]) -> Set[str]:
+    def place_orphans_in_homes(args: ClusteringArgs, clusters: List[Cluster], orphan_artifacts: Set[str]) -> None:
         """
         Attempts to house orphans from best to worst houses for them.
         :param args: The arguments to the clustering pipeline.
@@ -113,7 +113,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
                     continue
                 cluster.add_artifacts(artifact)
                 adopted_orphans.add(artifact)
-        return adopted_orphans
+                orphan_artifacts.remove(artifact)
 
     @classmethod
     def add_singleton_cluster(cls, a_id: str, cluster_map: ClusterMapType, embeddings_manager: EmbeddingsManager) -> None:

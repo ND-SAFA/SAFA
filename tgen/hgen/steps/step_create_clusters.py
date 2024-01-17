@@ -80,7 +80,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True,
                                       cluster_max_size=5,
                                       allow_duplicates_between_clusters=False,
-                                      export_dir=clustering_export_path, add_orphans_to_best_home=True, **seed_kwargs)
+                                      export_dir=clustering_export_path,
+                                      add_orphans_to_best_home=False, **seed_kwargs)
         return cluster_args
 
     @staticmethod

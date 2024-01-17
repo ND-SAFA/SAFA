@@ -17,9 +17,13 @@ Options:
       -f    Specifies an environment file to source before commands.
 
 Commands:
-      build    Build the backend with Gradle
-      run      Run the backend
-      clean    Run a gradle clean
+      build          Build the backend with Gradle
+      run            Run the backend
+      clean          Run a gradle clean
+      print_path     Print the path to where the jar will be built based on build.gradle.
+                     No other commands will be run even if they are supplied.
+      print_version  Print the version of the app based on the contents of build.gradle.
+                     No other commands will be run even if they are supplied.
 "
 
 function help {
@@ -75,8 +79,16 @@ function getBuildVariable {
   awk -F= "/$1/"'{gsub(/^[ \t]*'\''?/,"",$2); gsub(/'\''?[ \t]*$/,"",$2); print $2}' "${SCRIPT_DIR}"/build.gradle
 }
 
+function getVersion {
+  getBuildVariable archiveVersion
+}
+
+function getArchiveBaseName {
+  getBuildVariable archivesBaseName
+}
+
 function getJarPath {
-  echo "$SCRIPT_DIR/build/libs/$(getBuildVariable archivesBaseName)-$(getBuildVariable archiveVersion).jar"
+  echo "$SCRIPT_DIR/build/libs/$(getArchiveBaseName)-$(getVersion).jar"
 }
 
 # Parse arguments
@@ -105,6 +117,8 @@ while [ $OPTIND -le "$#" ]; do
       build) BUILD=true;;
       run) RUN=true;;
       clean) CLEAN=true;;
+      print_path) getJarPath; exit 0;;
+      print_version) getVersion; exit 0;;
       *) echo -e "Unknown command $command"; help 1;;
     esac
   fi

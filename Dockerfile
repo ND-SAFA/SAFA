@@ -10,6 +10,7 @@ RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install gradle $GRADLE_VERS
 
 # Step 3 - Install deps
 WORKDIR /app
+ADD builder.sh .
 ADD build.gradle .
 ADD settings.gradle .
 ADD gradlew .
@@ -39,9 +40,5 @@ RUN \
     cat "$RUN_SCRIPT"
 
 ENV PORT=80
-RUN \
-    function getBuildVariable { \
-      awk -F= "/$1/"'{gsub(/^[ \t]*'\''?/,"",$2); gsub(/'\''?[ \t]*$/,"",$2); print $2}' /app/build.gradle; \
-    }; \
-    mv /app/build/libs/"$(getBuildVariable archivesBaseName)"-"$(getBuildVariable archiveVersion)".jar $JAR_PATH
+RUN mv "$(/app/builder.sh print_path)" $JAR_PATH
 ENTRYPOINT /bin/bash $RUN_SCRIPT

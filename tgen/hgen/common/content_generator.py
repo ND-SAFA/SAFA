@@ -62,7 +62,7 @@ class ContentGenerator:
                               source_type: str, cluster2artifacts: Dict[str, List] = None,
                               format_variables: Dict[str, List] = None,
                               additional_task_response_instructions: str = EMPTY_STRING,
-                              artifact_prompt_build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.MARKDOWN,
+                              artifact_prompt_build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
                               include_summary: bool = True) -> PromptBuilder:
         """
         Creates the prompt builder for the generations using the provided prompts and variables.
@@ -149,7 +149,7 @@ class ContentGenerator:
         :return: The number of artifacts equal to a proportion of the total
         """
         length_of_artifacts = sum([len(artifact[ArtifactKeys.CONTENT].splitlines()) for artifact in artifacts])
-        n_artifacts = max(length_of_artifacts / avg_file_size, 1)
+        n_artifacts = max(length_of_artifacts / avg_file_size, math.ceil(len(artifacts) / 2))
         min_acceptable = 2 if n_artifacts > 4 or len(artifacts) > 4 else 1
         n_targets = max(round(n_artifacts * retention_percentage), min_acceptable)
         return min(round(n_targets), len(artifacts) - 1)

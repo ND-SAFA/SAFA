@@ -11,9 +11,9 @@ CODE_SUMMARY = [Prompt("\n\n# Task\n"
                        "\n- What are the inputs/outputs of this code?"
                        "\n- What is the code achieving?"
                        "\n Enclose your answer in <notes></notes>."
-                       f"\n\nThen, write a polished summary focusing on just the code in Section `{CODE_SECTION_ID}` "
-                       f"in one cohesive, detailed paragraph. "
-                       "Write in an active voice and assume your audience is familiar with software system this code belongs to."
+                       f"\n\nThen, write a polished summary in one cohesive, detailed paragraph. "
+                       "Write in an active voice and assume your audience is familiar with software system this code belongs to. "
+                       "There should be NO specific class or function names, but otherwise include key details about the code."
                        "\n\n",
                        PromptResponseManager(response_tag="summary")),
                 ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADER)]

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Dict, List
 
 from tgen.clustering.base.cluster_type import ClusterIdType, ClusterMapType
@@ -13,8 +14,8 @@ class ClusteringUtil:
         :param artifact_df: Artifact data frame containing artifacts referenced by clusters.
         :return: Cluster map with artifacts instead of artifact ids.
         """
-        return {cluster_id: [artifact_df.get_artifact(a_id, throw_exception=True) for a_id in artifact_ids]
-                for cluster_id, artifact_ids in cluster_map.items()}
+        return OrderedDict({cluster_id: [artifact_df.get_artifact(a_id, throw_exception=True) for a_id in artifact_ids]
+                            for cluster_id, artifact_ids in cluster_map.items()})
 
     @staticmethod
     def convert_cluster_map_to_artifact_format(cluster_map: ClusterMapType, artifact_df: ArtifactDataFrame = None) -> Dict[str, List]:
@@ -24,7 +25,7 @@ class ClusteringUtil:
         :param artifact_df: Artifact data frame containing artifacts referenced by clusters.
         :return: Cluster map with artifacts or artifact ids.
         """
-        converted = {str(k): sorted(v.artifact_ids, key=lambda a_id: v.similarity_to_neighbors(a_id))
+        converted = {str(k): sorted(v.artifact_ids, key=lambda a_id: v.similarity_to_neighbors(a_id), reverse=True)
                      for k, v in cluster_map.items()}
         if artifact_df is None:
             return converted

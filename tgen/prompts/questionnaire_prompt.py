@@ -1,6 +1,6 @@
-from copy import deepcopy
 from string import ascii_uppercase
-from typing import Any, Dict, List, Union
+from string import ascii_uppercase
+from typing import Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
 from tgen.common.util.dataclass_util import DataclassUtil
@@ -47,7 +47,7 @@ class QuestionnairePrompt(MultiPrompt):
         self.value = instructions
 
     @overrides(Prompt)
-    def _build(self, child: bool = False, **kwargs) -> str:
+    def _build(self, child_num: int = 0, **kwargs) -> str:
         """
         Constructs the prompt in the following format:
         [Instructions]
@@ -65,10 +65,10 @@ class QuestionnairePrompt(MultiPrompt):
         if update_value:
             self.format_value(**kwargs)
         question_format = "{}) {}" if not self.use_bullets_for_enumeration else "{} {}"
-        if child:
-            question_format = PromptUtil.indent_for_markdown(question_format)
+        if child_num > 0:
+            question_format = PromptUtil.indent_for_markdown(question_format, level=child_num)
         formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i % len(self.enumeration_chars)],
-                                                                    question.build(child=True, **kwargs))
+                                                                    question.build(child_num=child_num + 1, **kwargs))
                                              for i, question in enumerate(self.child_prompts)])
         instructions = f"{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         final = f"{instructions}{formatted_questions}{NEW_LINE}"
@@ -101,6 +101,6 @@ class QuestionnairePrompt(MultiPrompt):
             all_tags = self.get_all_response_tags()
             if len(all_tags) > 0 and response_manager.response_tag != all_tags:
                 params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags}
-                                                       if response_manager.response_tag else all_tags)
+                if response_manager.response_tag else all_tags)
                 response_manager = PromptResponseManager(**params)
         return response_manager

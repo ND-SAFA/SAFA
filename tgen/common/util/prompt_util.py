@@ -97,7 +97,7 @@ class PromptUtil:
         :return: The string indented as markdown
         """
         markdown_tab = "    "
-        return f"{level*markdown_tab}{original_string}"
+        return f"{level * markdown_tab}{original_string}"
 
     @staticmethod
     def markdown_divider() -> str:

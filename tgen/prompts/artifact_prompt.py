@@ -128,11 +128,11 @@ class ArtifactPrompt(Prompt):
             elif relation and include_id:
                 artifact_id = relation
 
-            header = PromptUtil.as_markdown_header(original_string=artifact_id, level=header_level)
+            header = f"{PromptUtil.as_markdown_header(original_string=artifact_id, level=header_level)}{NEW_LINE}"
         else:
             header = EMPTY_STRING
-        content = PromptUtil.indent_for_markdown(artifact_body)
-        return f"{header}{NEW_LINE}{content}"
+        content = PromptUtil.indent_for_markdown(artifact_body, level=2)
+        return f"{header}{content}"
 
     @staticmethod
     def _build_as_base(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True, **kwargs) -> str:

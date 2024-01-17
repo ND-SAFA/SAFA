@@ -112,8 +112,7 @@ class DuplicateDetector:
             elif duplicate_type == DuplicateType.INTER_CLUSTER:
                 self._add_inter_cluster_duplicates(c_id, cluster, dups_from_same_cluster, final_cluster_map)
 
-        if duplicate_type == DuplicateType.INTRA_CLUSTER:
-            return final_cluster_map
+        return final_cluster_map
 
         duplicate_artifact_ids, duplicate_map = self.get_duplicates(artifact_df,
                                                                     original_clusters_to_contents=original_clusters_to_contents,

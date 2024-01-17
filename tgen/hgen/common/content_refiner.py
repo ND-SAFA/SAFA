@@ -87,7 +87,7 @@ class ContentRefiner:
         """
         new_source_clusters, dups2remove = {}, set()
         parent2children = self._find_top_parents_for_children(self.state, generated_artifacts_df) \
-            if self.duplicate_type == DuplicateType.INTER_CLUSTER else {}
+            if self.duplicate_type != DuplicateType.INTRA_CLUSTER else {}
         cluster2generation = self.state.get_cluster2generation()
         generation2cluster = DictUtil.flip(cluster2generation)
         original_cluster_to_artifacts = self.state.get_cluster2artifacts(ids_only=True)
@@ -99,14 +99,15 @@ class ContentRefiner:
                 orig_cluster_id = generation2cluster[content]
                 candidate_children = set(original_cluster_to_artifacts[orig_cluster_id])
                 parent_candidates = [content2id.get(gen) for gen in cluster2generation[orig_cluster_id]]
-                if self.duplicate_type == DuplicateType.INTER_CLUSTER:
+                if self.duplicate_type == DuplicateType.INTRA_CLUSTER:
+                    parent2children[a_id] = candidate_children
+                    dups2remove.update(cluster2generation[orig_cluster_id])
+
+                else:
                     self._add_best_children_for_parent(a_id, parent_candidates, list(candidate_children),
                                                        parent2children,
                                                        embedding_manager=self.state.embedding_manager,
                                                        link_threshold=self.args.link_selection_threshold)
-                else:
-                    parent2children[a_id] = candidate_children
-                    dups2remove.update(cluster2generation[orig_cluster_id])
                 new_source_clusters[cluster_id].update({child_id for child_id in parent2children[a_id]
                                                         if child_id in candidate_children})
                 dups2remove.add(content)
@@ -176,7 +177,7 @@ class ContentRefiner:
         """
         format_variables = {"n_targets": self._calculate_n_targets(duplicate_cluster_map, new_source_clusters)}
         format_variables["n_bullets"] = [2 * n for n in format_variables["n_targets"]]
-        if self.duplicate_type == DuplicateType.INTER_CLUSTER:
+        if self.duplicate_type != DuplicateType.INTRA_CLUSTER:
             format_variables["functionality"] = self._summarize_duplicates(duplicate_cluster_map,
                                                                            generated_artifacts_df,
                                                                            duplicate_cluster_artifact_df,

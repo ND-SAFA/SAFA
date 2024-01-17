@@ -78,7 +78,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         seed_kwargs = CreateClustersStep.create_clustering_kwargs(args, state) if uses_seeds else {}
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, CLUSTERING_SUBDIRECTORY)
         cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True,
-                                      cluster_max_size=15,
+                                      cluster_max_size=5,
+                                      allow_duplicates_between_clusters=False,
                                       export_dir=clustering_export_path, add_orphans_to_best_home=True, **seed_kwargs)
         return cluster_args
 

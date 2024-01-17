@@ -35,7 +35,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                                  state.get_cluster2artifacts(),
                                                                                  state.cluster2cohesion,
                                                                                  state.source_dataset)
-            # format_variables.update({"n_targets": n_targets, "n_bullets": [2 * n for n in n_targets]})
+            format_variables.update({"n_targets": n_targets, "n_bullets": [2 * n for n in n_targets]})
 
         content_generator = ContentGenerator(args, state, dataset)
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,

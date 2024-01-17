@@ -68,51 +68,36 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     enumeration_chars=["-"])
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
-    Prompt("Please create as many {target_type}s from the {source_type} as possible. "
-           "Group the {target_type}s groups to create a hierarchy of related {target_type}s. "
-           "Make them as small and concise as possible. "
-           "Focus on the cross-cutting functionality achieved by this cluster of {source_type}s. "
-           "Use bulleted lists to organize the information."
-           f"Enclose the section in {PromptUtil.create_xml('notes')}."),
-    ConditionalPrompt(
-        candidate_prompts=[Prompt(
-            "Then, your objective is produce a polished set of {target_type}s capturing the primary "
-            f"functionality described by the {PromptUtil.create_xml('notes')} section. "),
-            Prompt(
-                "Then, your objective is produce a polished set of {n_targets} (or less) {target_type}s capturing the primary "
-                f"functionality described by the {PromptUtil.create_xml('notes')} section. "
-            )],
-        prompt_selector=lambda kwargs: int(kwargs.get("n_targets") is not None)),
     QuestionnairePrompt(
-        instructions="When creating the {target_type} ensure that:",
+        instructions="Your objective is produce a polished set of {n_targets} (or less) {target_type}s capturing the important "
+                     "functionality described by the {source_type}. When creating the {target_type} ensure that they are:",
         question_prompts=[
             QuestionPrompt(
-                "You focus on the important overlapping functionality between the {source_type}s, "
-                "ignore details not relating to most {source_type}s."),
+                "Focused on the overlapping, cross-cutting functionality and features common among most of the {source_type}s"),
             QuestionPrompt(
                 "Related or overlapping features and functionality are condensed into a single, cohesive {target_type}"),
-            QuestionPrompt("Each {target_type} is focused on one clear single purpose "
-                           "(such as a specific feature or functionality). "),
             QuestionnairePrompt(
                 instructions="The {target_type} fits the following description:",
                 question_prompts=[QuestionPrompt("{description}")],
                 enumeration_chars=["*"]),
             QuestionPrompt(
                 "There is enough details to understand the functionality of the {target_type}, "
-                "but the {source_type} are not quoted verbatim. "
-                f"Remember to use the {PromptUtil.create_xml('notes')} section to make sure you include all key details."),
+                "but the {source_type} are not quoted verbatim. "),
             QuestionnairePrompt(
-                instructions="The {target_type} should use this format as a guideline:",
+                instructions="The {target_type} uses this format as a guideline:",
                 question_prompts=[QuestionPrompt("{format}"),
                                   QuestionPrompt("For example: {example}")],
                 enumeration_chars=["*"]),
+            QuestionPrompt("Importantly, EACH {target_type} should be unique from the others and focused on a clear single purpose "
+                           "which is separate from all others so that "
+                           "EACH {target_type} focuses on its own specific feature or functionality. "),
             ConditionalPrompt(
-                candidate_prompts=[Prompt("Create ONLY {n_targets} {target_type}")],
+                candidate_prompts=[Prompt("Create {n_targets} DISTINCT {target_type}")],
                 prompt_selector=lambda kwargs: 1 - int(
                     kwargs.get("n_targets") is not None))
 
         ], enumeration_chars=["-"]
-    )], enumeration_chars=["A", "B", "B2"])
+    )])
 SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "
                      "When creating the {target_type}(s) from {source_type}, "
                      "focus on the functionality in the {source_type} that was likely implemented/derived from it.\n\t"

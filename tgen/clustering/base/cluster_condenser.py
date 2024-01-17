@@ -93,7 +93,7 @@ class ClusterCondenser:
             if a_id in source_cluster:
                 continue
             similarity = source_cluster.similarity_to_neighbors(a_id)
-            if similarity >= 0.8:
+            if similarity >= source_cluster.min_sim:
                 artifacts_to_add.append(a_id)
                 self.seen_artifacts.add(a_id)
         source_cluster.add_artifacts(artifacts_to_add)
@@ -104,15 +104,19 @@ class ClusterCondenser:
         :param cluster: The candidate cluster to add.
         :return: Whether cluster should be added to map.
         """
+        if not self.allow_overlapping_clusters:
+            overlapping_artifacts = [a for a in cluster if a in self.seen_artifacts]
+            if len(cluster) - len(overlapping_artifacts) < self.min_cluster_size:
+                return False
+            cluster.remove_artifacts(overlapping_artifacts, update_stats=True)
         contains_new_artifacts = self.contains_new_artifacts(cluster)
-        should_include = self.allow_overlapping_clusters or not any([a in self.seen_artifacts for a in cluster])
         contains_cluster = self.contains_cluster(cluster, add_votes=True)
         did_merge = self.try_merge(cluster)
         if len(cluster) == 1 and not contains_new_artifacts:
             return False
-        return (contains_new_artifacts or not contains_cluster) and not did_merge and should_include
+        return (contains_new_artifacts or not contains_cluster) and not did_merge
 
-    def try_merge(self, cluster: Cluster, min_similarity_score: float = 0.85):
+    def try_merge(self, cluster: Cluster, min_similarity_score: float = 0.7):
         """
         Tries to merge cluster into those similar enough to it.
         :param cluster: The cluster to try to merge.
@@ -120,9 +124,11 @@ class ClusterCondenser:
         :return: Whether the cluster was merged into any others.
         """
         clusters = list(self.cluster_map.values())
-        clusters_to_merge_into: List[Cluster] = [c for c in clusters if cluster.similarity_to(c) >= min_similarity_score]
-        for source_cluster in clusters_to_merge_into:
-            self.merge_clusters(source_cluster, cluster)
+        clusters_to_merge_into: List[Cluster] = sorted([c for c in clusters if cluster.similarity_to(c) >= min_similarity_score],
+                                                       reverse=True, key=lambda c: cluster.similarity_to(c))
+        most_similar_cluster = clusters_to_merge_into[0] if len(clusters_to_merge_into) > 0 else None
+        if most_similar_cluster:
+            self.merge_clusters(most_similar_cluster, cluster)
         return len(clusters_to_merge_into) > 0
 
     def contains_cluster(self, other_cluster: ClusterType, add_votes: bool = False) -> bool:

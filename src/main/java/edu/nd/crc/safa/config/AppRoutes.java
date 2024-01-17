@@ -169,6 +169,7 @@ public class AppRoutes {
         public static final String GET_PROJECTS = ROOT;
         public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
+        public static final String TRANSFER_OWNERSHIP = BY_ID + "/transfer";
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {

@@ -13,6 +13,7 @@ public enum ProjectPermission implements SimplePermission {
     EDIT_MEMBERS("project.edit_members"),
     EDIT_VERSIONS("project.edit_versions"),
     GENERATE("project.generate"),
+    MOVE("project.move"),
     VIEW("project.view");
 
     private final String name;

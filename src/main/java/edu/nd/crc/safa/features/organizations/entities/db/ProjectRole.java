@@ -20,12 +20,13 @@ public enum ProjectRole implements IRole {
     )),
     ADMIN(Set.of(
         ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_MEMBERS, ProjectPermission.EDIT_DATA,
-        ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS, ProjectPermission.GENERATE
+        ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS, ProjectPermission.GENERATE,
+        ProjectPermission.MOVE
     )),
     OWNER(Set.of(
         ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_MEMBERS, ProjectPermission.EDIT_DATA,
         ProjectPermission.EDIT_INTEGRATIONS, ProjectPermission.EDIT_VERSIONS, ProjectPermission.GENERATE,
-        ProjectPermission.DELETE
+        ProjectPermission.DELETE, ProjectPermission.MOVE
     )),
     GENERATOR(Set.of(
         ProjectPermission.VIEW, ProjectPermission.EDIT, ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE

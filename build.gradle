@@ -19,7 +19,7 @@ plugins {
 
 bootJar {
     archivesBaseName = 'edu.nd.crc.safa'
-    archiveVersion = '0.1.0'
+    archiveVersion = '2.2.0'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 

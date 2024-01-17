@@ -63,8 +63,10 @@ class ClusterCondenser:
         :return: None
         """
         clusters = self.cohesiveness_filter(clusters)
+        i = 0
         for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
             self.add(c)
+            i += 1
 
     def add(self, cluster: Cluster) -> Optional[ClusterType]:
         """
@@ -81,7 +83,7 @@ class ClusterCondenser:
             self.seen_artifacts.add(a)
         return cluster
 
-    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster):
+    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster) -> List[str]:
         """
         Adds the artifacts of the new cluster to the source. Source is updated after being modified.
         :param source_cluster: The existing cluster to add new cluster to.
@@ -93,10 +95,11 @@ class ClusterCondenser:
             if a_id in source_cluster:
                 continue
             similarity = source_cluster.similarity_to_neighbors(a_id)
-            if similarity >= source_cluster.min_sim:
+            if similarity >= 0.8:
                 artifacts_to_add.append(a_id)
                 self.seen_artifacts.add(a_id)
         source_cluster.add_artifacts(artifacts_to_add)
+        return artifacts_to_add
 
     def should_add(self, cluster: Cluster) -> bool:
         """
@@ -104,13 +107,13 @@ class ClusterCondenser:
         :param cluster: The candidate cluster to add.
         :return: Whether cluster should be added to map.
         """
+        contains_cluster = self.contains_cluster(cluster, add_votes=True)
         if not self.allow_overlapping_clusters:
             overlapping_artifacts = [a for a in cluster if a in self.seen_artifacts]
             if len(cluster) - len(overlapping_artifacts) < self.min_cluster_size:
                 return False
             cluster.remove_artifacts(overlapping_artifacts, update_stats=True)
         contains_new_artifacts = self.contains_new_artifacts(cluster)
-        contains_cluster = self.contains_cluster(cluster, add_votes=True)
         did_merge = self.try_merge(cluster)
         if len(cluster) == 1 and not contains_new_artifacts:
             return False
@@ -128,8 +131,9 @@ class ClusterCondenser:
                                                        reverse=True, key=lambda c: cluster.similarity_to(c))
         most_similar_cluster = clusters_to_merge_into[0] if len(clusters_to_merge_into) > 0 else None
         if most_similar_cluster:
-            self.merge_clusters(most_similar_cluster, cluster)
-        return len(clusters_to_merge_into) > 0
+            added_artifacts = self.merge_clusters(most_similar_cluster, cluster)
+            return len(added_artifacts) > 0
+        return False
 
     def contains_cluster(self, other_cluster: ClusterType, add_votes: bool = False) -> bool:
         """

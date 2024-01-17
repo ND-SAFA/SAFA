@@ -149,10 +149,14 @@ class ContentGenerator:
         :return: The number of artifacts equal to a proportion of the total
         """
         length_of_artifacts = sum([len(artifact[ArtifactKeys.CONTENT].splitlines()) for artifact in artifacts])
-        n_artifacts = max(length_of_artifacts / avg_file_size, math.ceil(len(artifacts) / 2))
-        min_acceptable = 2 if n_artifacts > 4 or len(artifacts) > 4 else 1
+        # adjust for amount of content
+        n_artifacts = length_of_artifacts / avg_file_size
+        n_artifacts = min(max(n_artifacts, math.ceil(len(artifacts) / 2)), len(artifacts) + 1)
+
+        # adjust for cohesion
+        min_acceptable = max(math.floor(len(artifacts) / 2), 1)
         n_targets = max(round(n_artifacts * retention_percentage), min_acceptable)
-        return min(round(n_targets), len(artifacts) - 1)
+        return min(round(n_targets), len(artifacts))
 
     def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt, cluster2artifacts: Dict[str, List] = None,
                                         additional_response_instructions: str = EMPTY_STRING) -> QuestionnairePrompt:

@@ -54,7 +54,8 @@ class ContentRefiner:
                                                             f"refine_clusters_{self.duplicate_type.name.lower()}")
         duplicate_detector = DuplicateDetector(embeddings_manager=self.state.embedding_manager,
                                                duplicate_cluster_cohesion_threshold=0.5,
-                                               duplicate_similarity_threshold=0.5)
+                                               duplicate_similarity_threshold=0.5,
+                                               duplicate_sim_sigma=None if self.duplicate_type == DuplicateType.INTRA_CLUSTER else 2)
         duplicate_cluster_map = duplicate_detector.cluster_duplicates(artifact_df=generated_artifacts_df,
                                                                       duplicate_type=self.duplicate_type,
                                                                       original_clusters_to_contents=self.state.get_cluster2generation(),

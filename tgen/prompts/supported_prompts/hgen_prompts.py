@@ -139,7 +139,7 @@ REFINEMENT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
                                                         f"{NEW_LINE}{PromptUtil.create_xml_closing('notes')}")
                                          ],
                       prompt_selector=lambda kwargs: int(kwargs.get("functionality") is not None)),
-    *CLUSTERING_QUESTIONNAIRE.child_prompts[1:]
+    *CLUSTERING_QUESTIONNAIRE.child_prompts[0:]
 ],
     enumeration_chars=["-"])
 REFINEMENT_QUESTIONNAIRE_INTER = QuestionnairePrompt(question_prompts=[

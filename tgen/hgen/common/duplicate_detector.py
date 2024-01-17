@@ -30,7 +30,8 @@ class DuplicateDetector:
 
     def __init__(self, embeddings_manager: EmbeddingsManager,
                  duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD,
-                 duplicate_cluster_cohesion_threshold: float = DEFAULT_DUPLICATE_CLUSTER_COHESION_THRESHOLD):
+                 duplicate_cluster_cohesion_threshold: float = DEFAULT_DUPLICATE_CLUSTER_COHESION_THRESHOLD,
+                 duplicate_sim_sigma: float = None):
         """
         Initializes detector with access to embeddings from manager.
         :param embeddings_manager: Contains the embeddings for the artifacts to be compared.
@@ -40,6 +41,7 @@ class DuplicateDetector:
         self.embeddings_manager = embeddings_manager
         self.duplicate_similarity_threshold = duplicate_similarity_threshold
         self.duplicate_cluster_cohesion_threshold = duplicate_cluster_cohesion_threshold
+        self.duplicate_sim_sigma = duplicate_sim_sigma
 
     def get_duplicates(self, artifact_df: ArtifactDataFrame,
                        duplicate_type: DuplicateType = DuplicateType.ALL,
@@ -83,8 +85,8 @@ class DuplicateDetector:
         cluster_args = ClusteringArgs(dataset=generated_artifact_dataset, export_dir=export_path,
                                       create_dataset=True, allow_duplicates_between_clusters=False,
                                       add_orphans_to_homes=False, allow_singleton_clusters=False,
-                                      metric_to_order_clusters="avg_pairwise_sim",
-                                      embedding_manager=self.embeddings_manager)
+                                      embedding_manager=self.embeddings_manager,
+                                      use_ids_as_content=True)
 
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
@@ -112,21 +114,24 @@ class DuplicateDetector:
             elif duplicate_type == DuplicateType.INTER_CLUSTER:
                 self._add_inter_cluster_duplicates(c_id, cluster, dups_from_same_cluster, final_cluster_map)
 
-        return final_cluster_map
-
         duplicate_artifact_ids, duplicate_map = self.get_duplicates(artifact_df,
                                                                     original_clusters_to_contents=original_clusters_to_contents,
                                                                     duplicate_type=duplicate_type)
+        dups_from_same_cluster = DuplicateDetector.identify_duplicates_from_same_cluster(duplicate_map,
+                                                                                         original_clusters_to_contents,
+                                                                                         artifact_df)
+        dups_from_same_cluster = DictUtil.flip(dups_from_same_cluster)
         done = set()
-        final_cluster_map = {}
+        final_cluster_map_from_dups = {}
         for i, (a_id, dups) in enumerate(duplicate_map.items()):
             artifact_ids = set()
             self._add_dups(a_id, artifact_ids, duplicate_map, done)
             if artifact_ids:
-                final_cluster_map[DuplicateDetector.rename_clusters(str(i), duplicate_type)] = Cluster.from_artifacts(
+                cluster_num = dups_from_same_cluster[a_id] if duplicate_type == DuplicateType.INTRA_CLUSTER else i
+                final_cluster_map_from_dups[DuplicateDetector.rename_clusters(cluster_num, duplicate_type)] = Cluster.from_artifacts(
                     list(artifact_ids), self.embeddings_manager)
 
-        return final_cluster_map
+        return final_cluster_map_from_dups if duplicate_type == DuplicateType.INTRA_CLUSTER else final_cluster_map
 
     def _add_dups(self, a_id, artifact_ids, duplicate_map, done):
         for d_id in duplicate_map[a_id]:
@@ -192,7 +197,7 @@ class DuplicateDetector:
         has_single_score = similarity_matrix.shape[0] <= 2 and similarity_matrix.shape[1] <= 2
         duplicate_similarity_threshold = self.duplicate_similarity_threshold
         if not has_single_score:  # do not use percentile is only single unique
-            _, outlier_threshold = NpUtil.get_similarity_matrix_outliers(similarity_matrix)
+            _, outlier_threshold = NpUtil.get_similarity_matrix_outliers(similarity_matrix, sigma=self.duplicate_sim_sigma)
             duplicate_similarity_threshold = max(duplicate_similarity_threshold, outlier_threshold)
         return duplicate_similarity_threshold
 

@@ -1,37 +1,24 @@
 <template>
-  <typography
-    el="div"
-    value="
-      During the import process,
-      a summary of each individual code file will be generated
-      along with an overall summary of the project.
-      You will receive an email when the import completes.
-    "
-  />
-  <typography
-    el="div"
-    secondary
-    value="This process may take up to 30 minutes depending on the size of your project."
-  />
+  <typography el="div" :value="ONBOARDING_SUMMARIZE_MESSAGE" />
+  <typography el="div" secondary :value="ONBOARDING_SUMMARIZE_DURATION" />
 
   <flex-box v-if="status === 'initial'" column align="center" t="4">
-    <typography el="div" value="Importing from GitHub:" />
-    <attribute-chip
-      :value="integrationsStore.gitHubFullProjectName"
-      icon="project-add"
-      color="primary"
-    />
-    <typography el="div" value="Generating Data:" class="q-mt-md" />
-    <attribute-chip
-      value="Project Summary"
-      icon="create-artifact"
-      color="primary"
-    />
-    <attribute-chip
-      value="File Summaries"
-      icon="create-artifact"
-      color="primary"
-    />
+    <list class="full-width">
+      <list-item
+        color="primary"
+        title="Importing From GitHub"
+        :subtitle="integrationsStore.gitHubFullProjectName"
+        icon="project-add"
+      />
+      <separator inset />
+      <list-item
+        color="primary"
+        title="Generating Data"
+        subtitle="Project Summary, File Summaries"
+        icon="create-artifact"
+      />
+    </list>
+
     <flex-box t="4">
       <text-button
         text
@@ -50,27 +37,11 @@
 
   <div v-if="status === 'success'" />
 
-  <q-banner v-if="status === 'error'" rounded class="bg-background q-mt-md">
-    <template #avatar>
-      <icon variant="error" color="secondary" size="md" class="q-mr-sm" />
-    </template>
-    <typography
-      value="
-          On no! It looks like there was an issue with importing from GitHub.
-          You can schedule a call with us below to ensure your data gets uploaded properly.
-        "
-    />
-    <template #action>
-      <text-button
-        text
-        color="secondary"
-        icon="calendar"
-        @click="onboardingStore.handleScheduleCall"
-      >
-        Schedule a Call
-      </text-button>
-    </template>
-  </q-banner>
+  <callout-sub-step
+    v-if="status === 'error'"
+    status="error"
+    :message="ONBOARDING_SUMMARIZE_ERROR"
+  />
 </template>
 
 <script lang="ts">
@@ -84,14 +55,21 @@ export default {
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
+import {
+  ONBOARDING_SUMMARIZE_DURATION,
+  ONBOARDING_SUMMARIZE_ERROR,
+  ONBOARDING_SUMMARIZE_MESSAGE,
+} from "@/util";
 import { integrationsStore, onboardingStore } from "@/hooks";
 import {
-  AttributeChip,
   FlexBox,
-  Icon,
+  List,
+  ListItem,
+  Separator,
   TextButton,
   Typography,
 } from "@/components/common";
+import CalloutSubStep from "./CalloutSubStep.vue";
 import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 
 const status = ref<"initial" | "loading" | "success" | "error">("initial");
@@ -108,12 +86,13 @@ function handleGenerate() {
  * Updates the status when the job changes.
  */
 function updateStatus(moveNext?: boolean) {
-  if (onboardingStore.uploadedJob?.status === "IN_PROGRESS") {
-    status.value = "loading";
-  }
-  if (onboardingStore.uploadedJob?.status === "FAILED") {
+  const jobStatus = onboardingStore.uploadedJob?.status;
+
+  if (jobStatus === "FAILED" || onboardingStore.error) {
     status.value = "error";
-  } else if (onboardingStore.uploadedJob?.status === "COMPLETED") {
+  } else if (jobStatus === "IN_PROGRESS") {
+    status.value = "loading";
+  } else if (jobStatus === "COMPLETED") {
     status.value = "success";
 
     if (!moveNext) return;
@@ -128,7 +107,7 @@ watch(
   () => onboardingStore.error,
   (error) => {
     if (!error) return;
-    status.value = "error";
+    updateStatus();
   }
 );
 

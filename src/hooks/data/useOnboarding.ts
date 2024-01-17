@@ -1,8 +1,17 @@
 import { defineStore } from "pinia";
 
 import { JobSchema, LocalStorageKeys } from "@/types";
-import { ARTIFACT_GENERATION_TYPES, ONBOARDING_STEPS } from "@/util";
 import {
+  ARTIFACT_GENERATION_ONBOARDING,
+  MAX_GENERATED_BASE_ARTIFACTS,
+  ONBOARDING_MEET_LINK,
+  ONBOARDING_STEPS,
+  ONBOARDING_SUPPORT_LINK,
+} from "@/util";
+import {
+  artifactGenerationApiStore,
+  artifactStore,
+  billingApiStore,
   createProjectApiStore,
   getVersionApiStore,
   gitHubApiStore,
@@ -10,10 +19,11 @@ import {
   jobApiStore,
   jobStore,
   logStore,
-  onboardingStore,
+  orgStore,
   projectApiStore,
   projectStore,
 } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
 import { pinia } from "@/plugins";
 
 /**
@@ -34,6 +44,10 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     loading: false,
     /**
+     * The ID of the project used in onboarding.
+     */
+    projectId: null as string | null,
+    /**
      * The current step of the onboarding workflow, starting at 1.
      */
     step: 1,
@@ -45,25 +59,39 @@ export const useOnboarding = defineStore("useOnboarding", {
       done: false,
     })),
     /**
-     * The types of artifacts that will be generated.
+     * The cost of generating the selected project data.
      */
-    generationTypes: [
-      ARTIFACT_GENERATION_TYPES.FUNCTIONAL_REQ,
-      ARTIFACT_GENERATION_TYPES.FEATURE,
-    ],
+    cost: null as number | null,
+    /**
+     * Whether payment has been confirmed.
+     */
+    paymentConfirmed: false,
+    /**
+     * Whether the generation step has been completed.
+     */
+    generationCompleted: false,
   }),
   getters: {
-    /**
-     * @return Whether the onboarding workflow is complete.
-     */
-    isComplete(): boolean {
-      return localStorage.getItem(LocalStorageKeys.onboarding) === "true";
-    },
     /**
      * @return The onboarding project's upload job, if the generation step is done.
      */
     uploadedJob(): JobSchema | undefined {
       return jobStore.jobs[0];
+    },
+    /**
+     * @return Whether the onboarding project's upload job is uploading artifacts.
+     */
+    isUploadJob(): boolean {
+      return (
+        this.uploadedJob?.steps.includes("Retrieving Github Repository") ||
+        false
+      );
+    },
+    /**
+     * @return Whether the onboarding project's upload job is generating artifacts.
+     */
+    isGenerationJob(): boolean {
+      return this.uploadedJob?.steps.includes("Generating Artifacts") || false;
     },
     /**
      * @return Whether the onboarding workflow should display the generated project overview.
@@ -75,91 +103,138 @@ export const useOnboarding = defineStore("useOnboarding", {
       );
     },
     /**
+     * @return Whether the onboarding workflow should display billing information.
+     */
+    displayBilling(): boolean {
+      return !orgStore.automaticBilling && !this.paymentConfirmed;
+    },
+    /**
      * @return A display string for the onboarding project's upload job.
      */
     uploadProgress(): string {
+      const { steps = [], currentStep = 0 } = this.uploadedJob || {};
       return this.uploadedJob
-        ? `Step ${this.uploadedJob.currentStep + 1} of ${
-            this.uploadedJob.steps.length
-          }: ${this.uploadedJob.steps[this.uploadedJob.currentStep]}`
+        ? `Step ${currentStep + 1} of ${steps.length}: ${steps[currentStep]}`
         : "";
+    },
+    /**
+     * @return Whether the onboarding workflow should block generation because of project size.
+     */
+    blockGeneration(): boolean {
+      return (
+        projectStore.isProjectDefined &&
+        artifactStore.allArtifacts.length > MAX_GENERATED_BASE_ARTIFACTS
+      );
     },
   },
   actions: {
     /**
      * Reloads the GitHub projects and jobs for the onboarding workflow.
+     * @param open - Whether to force open the onboarding workflow.
      */
     async handleReload(open?: boolean): Promise<void> {
+      // Open the onboarding workflow if it has not yet been completed, or is manually opened.
+      if (
+        open ||
+        localStorage.getItem(LocalStorageKeys.onboarding) !== "true"
+      ) {
+        this.open = true;
+      } else return;
+
+      // Skip reset if already loading.
+      if (this.loading) return;
+
       this.loading = true;
 
-      if (open) {
-        this.open = true;
-      } else if (onboardingStore.isComplete) {
-        return;
-      }
-
+      await gitHubApiStore.handleVerifyCredentials();
       await jobApiStore.handleReload();
 
-      if (integrationsStore.validGitHubCredentials) {
-        await gitHubApiStore.handleLoadProjects();
-      }
+      // Load the project ID and generation status based on stored state, job state, or local storage.
+      this.projectId =
+        this.projectId ||
+        (this.isUploadJob && this.uploadedJob?.completedEntityId) ||
+        localStorage.getItem(LocalStorageKeys.onboardingProject);
+      this.generationCompleted =
+        this.generationCompleted ||
+        (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED") ||
+        localStorage.getItem(LocalStorageKeys.onboardingGenerated) === "true";
 
-      // Move from Connect GitHub step if credentials are set.
       if (integrationsStore.validGitHubCredentials) {
-        onboardingStore.handleNextStep("connect");
+        // Skip to Code step if credentials are set.
+        await this.handleNextStep("connect");
       }
-      // Skip to the Summarize step if a job has been uploaded.
-      if (onboardingStore.uploadedJob) {
-        onboardingStore.handleNextStep("code");
+      if (this.isUploadJob || this.projectId) {
+        // Skip to the Summarize step if a job has been uploaded, or a project has been stored.
+        await this.handleNextStep("code");
       }
-      // Skip to the Generate step if a job has been completed.
-      if (onboardingStore.uploadedJob?.completedEntityId) {
-        onboardingStore.handleNextStep("summarize");
+      if (this.projectId) {
+        // Skip to the Generate step if a job has been completed.
+        await this.handleNextStep("summarize");
+      }
+      if (this.generationCompleted) {
+        // Skip to everything completed if the generation is complete.
+        await this.handleNextStep("generate");
       }
 
       this.loading = false;
     },
-    /**
-     * Close the popup and mark onboarding as complete.
-     */
+    /** Close the popup and mark onboarding as complete. */
     handleClose(): void {
       this.open = false;
       localStorage.setItem(LocalStorageKeys.onboarding, "true");
     },
     /**
      * Proceeds to the next step of the onboarding workflow.
-     * @param step - The step to proceed to. If not provided, proceeds to the next step.
+     * @param currentStep - The current step. If not provided, proceeds to the next step.
      */
-    handleNextStep(step?: keyof typeof ONBOARDING_STEPS): void {
-      const index = step ? ONBOARDING_STEPS[step].index : this.step - 1;
+    async handleNextStep(
+      currentStep?: keyof typeof ONBOARDING_STEPS
+    ): Promise<void> {
+      const index = currentStep
+        ? ONBOARDING_STEPS[currentStep].index
+        : this.step - 1;
+      const projectId = this.projectId || this.uploadedJob?.completedEntityId;
+
+      if (currentStep === "generate") {
+        this.generationCompleted = true;
+        localStorage.setItem(LocalStorageKeys.onboardingGenerated, "true");
+
+        return;
+      }
 
       this.steps[index].done = true;
+      this.steps[index + 1].done = true;
 
       if (this.step === index + 1) {
         this.step = index + 2;
       }
 
-      if (step === "connect") {
-        gitHubApiStore.handleLoadProjects();
+      if (currentStep === "connect") {
+        await gitHubApiStore.handleLoadProjects();
       }
 
-      if (step === "summarize" && this.uploadedJob?.completedEntityId) {
-        getVersionApiStore.handleLoad(
-          this.uploadedJob?.completedEntityId,
-          undefined,
-          false
-        );
+      if (currentStep === "summarize" && projectId) {
+        await getVersionApiStore.handleLoad(projectId, undefined, false, {
+          onSuccess: () => {
+            this.projectId = projectId;
+            localStorage.setItem(LocalStorageKeys.onboardingProject, projectId);
+            this.handleEstimateCost();
+          },
+          onError: () => {
+            this.projectId = "";
+            localStorage.setItem(LocalStorageKeys.onboardingProject, "");
+          },
+        });
       }
     },
     /**
      * Schedule a call with the SAFA team.
+     * @param error - Whether the call was scheduled because of an error.
      */
-    handleScheduleCall(): void {
-      // TODO
+    handleScheduleCall(error: boolean): void {
+      window.open(error ? ONBOARDING_SUPPORT_LINK : ONBOARDING_MEET_LINK);
     },
-    /**
-     * Import from GitHub and summarize project files.
-     */
+    /** Import from GitHub and summarize project files. */
     async handleImportProject(): Promise<void> {
       integrationsStore.gitHubConfig.summarize = true;
       await createProjectApiStore.handleGitHubImport({
@@ -168,32 +243,54 @@ export const useOnboarding = defineStore("useOnboarding", {
       });
     },
     /**
-     * Generate documentation for the selected project.
+     * Calculate the cost of generating the selected project data.
+     * Skipped if billing information is not displayed.
      */
-    async handleGenerateDocumentation(): Promise<void> {
-      // TODO
+    async handleEstimateCost(): Promise<void> {
+      if (!this.displayBilling) return;
+
+      await billingApiStore.handleEstimateCost(
+        {
+          artifacts: artifactStore.allArtifacts.map(({ id }) => id),
+          targetTypes: ARTIFACT_GENERATION_ONBOARDING,
+        },
+        {
+          onSuccess: (cost) => (this.cost = cost),
+          onError: () => (this.error = true),
+        }
+      );
     },
     /**
-     * Export the selected project as a CSV.
+     * Generate documentation for the selected project.
+     * @param paymentConfirmed - Whether the user has confirmed payment.
      */
+    async handleGenerateDocumentation(
+      paymentConfirmed?: boolean
+    ): Promise<void> {
+      const artifactIds = artifactStore.allArtifacts.map(({ id }) => id);
+      this.paymentConfirmed = paymentConfirmed || false;
+
+      if (this.displayBilling && !paymentConfirmed) {
+        await billingApiStore.handleCheckoutSession(artifactIds.length);
+      } else {
+        await artifactGenerationApiStore.handleGenerateArtifacts(
+          {
+            artifacts: artifactIds,
+            targetTypes: ARTIFACT_GENERATION_ONBOARDING,
+          },
+          { onError: () => (this.error = true) }
+        );
+      }
+    },
+    /** Export the selected project as a CSV. */
     async handleExportProject() {
-      if (!this.uploadedJob?.completedEntityId) return;
-
-      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
       await projectApiStore.handleDownload("csv");
-
       logStore.onSuccess("Your data is being exported.");
-
       this.handleClose();
     },
-    /**
-     * View the selected project in SAFA.
-     */
+    /** View the selected project in SAFA */
     async handleViewProject() {
-      if (!this.uploadedJob?.completedEntityId) return;
-
-      await getVersionApiStore.handleLoad(this.uploadedJob?.completedEntityId);
-
+      await navigateTo(Routes.ARTIFACT, { projectId: this.projectId });
       this.handleClose();
     },
   },

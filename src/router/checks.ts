@@ -1,5 +1,10 @@
 import { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
-import { getVersionApiStore, sessionApiStore } from "@/hooks/api";
+import { PaymentStatus } from "@/types";
+import {
+  billingApiStore,
+  getVersionApiStore,
+  sessionApiStore,
+} from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
 import {
   artifactStore,
@@ -69,6 +74,20 @@ export const routerBeforeChecks: RouteChecks = {
     if (to.path === Routes.ARTIFACT) return;
 
     appStore.closeSidePanels();
+  },
+  async acceptPayment(to) {
+    if (to.path !== Routes.PAYMENT) return;
+
+    const status = to.query[QueryParams.PAYMENT_STATUS];
+    const sessionId = String(to.query[QueryParams.PAYMENT_SESSION]);
+
+    if (status === PaymentStatus.success) {
+      await billingApiStore.handleAcceptPayment();
+    } else if (status === PaymentStatus.cancel) {
+      await billingApiStore.handleCancelPayment(sessionId);
+    }
+
+    return { path: Routes.HOME };
   },
 };
 

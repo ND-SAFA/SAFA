@@ -263,3 +263,10 @@ body.body--dark .q-layout__shadow:after {
 .rounded {
   border-radius: 4px !important;
 }
+
+// Onboarding
+
+.q-carousel__control {
+  background: linear-gradient(rgba(0, 0, 0, 0), $color-neutral 40%);
+  bottom: 0;
+}

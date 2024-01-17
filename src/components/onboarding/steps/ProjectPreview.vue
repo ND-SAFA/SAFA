@@ -1,35 +1,35 @@
 <template>
-  <div>
+  <div class="q-ma-md">
     <project-overview-display hide-overflow />
-    <q-carousel
-      v-model="artifactId"
-      transition-prev="slide-right"
-      transition-next="slide-left"
-      swipeable
-      animated
-      navigation
-      padding
-      arrows
-      height="auto"
-      navigation-position="top"
-    >
-      <q-carousel-slide
-        v-for="artifact in artifacts"
-        :key="artifact.id"
-        :name="artifact.id"
+    <panel-card>
+      <q-carousel
+        v-model="artifactId"
+        transition-prev="slide-right"
+        transition-next="slide-left"
+        swipeable
+        animated
+        arrows
+        navigation
+        height="400px"
+        control-color="grey"
       >
-        <div class="width-fit q-mx-auto">
-          <panel-card>
+        <q-carousel-slide
+          v-for="artifact in artifacts"
+          :key="artifact.id"
+          :name="artifact.id"
+        >
+          <div class="q-px-md full-width">
             <artifact-body-display
               display-title
               default-expanded
               display-divider
+              full-width
               :artifact="artifact"
             />
-          </panel-card>
-        </div>
-      </q-carousel-slide>
-    </q-carousel>
+          </div>
+        </q-carousel-slide>
+      </q-carousel>
+    </panel-card>
   </div>
 </template>
 

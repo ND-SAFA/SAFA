@@ -46,11 +46,13 @@ export interface GetVersionApiHook {
    * @param document - The document to start with viewing.
    * @param doNavigate - Whether to navigate to the artifact tree if not already on an artifact page.
    *        @default true
+   * @param callbacks - Callbacks for the action.
    */
   handleLoad(
     versionId: string,
     document?: DocumentSchema,
-    doNavigate?: boolean
+    doNavigate?: boolean,
+    callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**
    * Load the current version of the given project.

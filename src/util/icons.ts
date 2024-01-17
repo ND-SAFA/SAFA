@@ -214,6 +214,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-file-document-multiple";
     case "security":
       return "mdi-shield-lock";
+    case "payment":
+      return "mdi-credit-card-outline";
     default:
       return "";
   }

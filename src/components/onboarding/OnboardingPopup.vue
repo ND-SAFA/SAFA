@@ -7,8 +7,8 @@
     transition-show="slide-up"
     transition-hide="slide-down"
   >
-    <q-card>
-      <q-bar class="bg-neutral q-mt-md">
+    <q-card class="bg-background">
+      <q-bar class="bg-background q-mt-md">
         <q-space />
 
         <text-button text icon="cancel" @click="onboardingStore.handleClose">
@@ -91,7 +91,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, watch } from "vue";
 import { ENABLED_FEATURES } from "@/util";
 import { onboardingStore, permissionStore, sessionStore } from "@/hooks";
 import {
@@ -111,22 +111,13 @@ import {
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 
-// Preload GitHub projects if credentials are already set.
-onMounted(async () => {
-  await onboardingStore.handleReload();
-});
-
-// Open the popup when the user logs in, if they have not already completed it.
+// Check the onboarding workflow status when the user logs in, and open the popup if it's not complete.
 watch(
   () => userLoggedIn.value,
-  (userLoggedIn) => {
-    if (
-      userLoggedIn &&
-      !onboardingStore.isComplete &&
-      !permissionStore.isDemo
-    ) {
-      onboardingStore.open = true;
-    }
+  async (userLoggedIn) => {
+    if (!userLoggedIn || permissionStore.isDemo) return;
+
+    await onboardingStore.handleReload();
   }
 );
 </script>

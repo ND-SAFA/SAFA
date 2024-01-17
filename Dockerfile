@@ -39,5 +39,9 @@ RUN \
     cat "$RUN_SCRIPT"
 
 ENV PORT=80
-RUN mv /app/build/libs/edu.nd.crc.safa-0.1.0.jar $JAR_PATH
+RUN \
+    function getBuildVariable { \
+      awk -F= "/$1/"'{gsub(/^[ \t]*'\''?/,"",$2); gsub(/'\''?[ \t]*$/,"",$2); print $2}' /app/build.gradle; \
+    }; \
+    mv /app/build/libs/"$(getBuildVariable archivesBaseName)"-"$(getBuildVariable archiveVersion)".jar $JAR_PATH
 ENTRYPOINT /bin/bash $RUN_SCRIPT

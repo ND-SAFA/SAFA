@@ -2,8 +2,6 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-JAR_PATH="$SCRIPT_DIR/build/libs/edu.nd.crc.safa-0.1.0.jar"
-
 HELP_TEXT="
 Usage: builder.sh [options] <command>...
 
@@ -21,6 +19,7 @@ Options:
 Commands:
       build    Build the backend with Gradle
       run      Run the backend
+      clean    Run a gradle clean
 "
 
 function help {
@@ -59,10 +58,10 @@ function run {
   setGoogleCredentials
   if [ -n "$2" ]; then
     echo "Running with environment: $2"
-    source $2
+    source "$2"
   fi
 
-  java -jar -Dspring.profiles.active="$1" "$JAR_PATH"
+  java -jar -Dspring.profiles.active="$1" "$(getJarPath)"
   return $?
 }
 
@@ -70,6 +69,14 @@ function checkReturn {
   if [ "$1" -ne 0 ]; then
     exit "$1"
   fi
+}
+
+function getBuildVariable {
+  awk -F= "/$1/"'{gsub(/^[ \t]*'\''?/,"",$2); gsub(/'\''?[ \t]*$/,"",$2); print $2}' "${SCRIPT_DIR}"/build.gradle
+}
+
+function getJarPath {
+  echo "$SCRIPT_DIR/build/libs/$(getBuildVariable archivesBaseName)-$(getBuildVariable archiveVersion).jar"
 }
 
 # Parse arguments

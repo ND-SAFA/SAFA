@@ -23,17 +23,16 @@ bootJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+sourceCompatibility = '17'
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(sourceCompatibility.toString()))
     }
 }
 
 repositories {
     mavenCentral()
 }
-
-sourceCompatibility = '17'
 
 dependencies {
     implementation 'com.sun.xml.bind:jaxb-impl:4.0.3'

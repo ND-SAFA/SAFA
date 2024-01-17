@@ -1,16 +1,37 @@
-### Summary
----
+# Summary
+<!--- REPLACE LINK WITH LINK TO NOTION ISSUE, OR REMOVE IF NO ISSUE EXISTS -->
+[Notion Issue](LINK)
 
-[SUMMARY]
+<!--- ADD SUMMARY HERE -->
 
-* [ISSUE](LINK)
+## Updated/New Endpoints
+<!--- ADD UPDATED ENDPOINTS, OR REMOVE IF NONE WERE CHANGED -->
+<!--- USE BELOW AS A TEMPLATE -->
+### `GET /example/endpoint`
+Endpoint description
+#### Parameters
+- `param 1` - description
+- `param 2` - description
+#### Body
+```json
+{
+    "body_param" : "string"
+}
+```
+#### Response
+```json
+{
+    "response_param" : "string"
+}
+```
 
-### Change Set
----
+## Known Issues
+<!--- ADD ANY KNOWN ISSUES, OR REMOVE IF NONE -->
 
-- [CHANGE]
+# Change Set
+<!--- ADD LIST OF CHANGES -->
 
-### Test
----
+# Test
+<!--- ADD LIST OF TESTS PERFORMED -->
 
-- [UNITTEST]
+<!--- ADD ADDITIONAL SECTIONS IF NEEDED -->

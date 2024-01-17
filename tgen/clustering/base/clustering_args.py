@@ -48,6 +48,7 @@ class ClusteringArgs(PipelineArgs):
     seed_clustering_method: SupportedSeedClusteringMethods = DEFAULT_SEED_CLUSTERING_METHOD
     save_initial_clusters: bool = False
     metric_to_order_clusters: str = DEFAULT_SORT_METRIC
+    use_ids_as_content: bool = False
 
     def __post_init__(self) -> None:
         """

@@ -4,10 +4,9 @@ import numpy as np
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
-from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, DEFAULT_CLUSTER_MIN_VOTES, \
-    DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, DEFAULT_MIN_CLUSTER_SIZE, \
-    MIN_PAIRWISE_AVG_PERCENTILE, \
-    MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING, DEFAULT_SORT_METRIC, DEFAULT_ALLOW_OVERLAPPING_CLUSTERS
+from tgen.common.constants.clustering_constants import DEFAULT_ALLOW_OVERLAPPING_CLUSTERS, DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, \
+    DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, \
+    DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_SORT_METRIC, MIN_PAIRWISE_AVG_PERCENTILE, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -63,10 +62,8 @@ class ClusterCondenser:
         :return: None
         """
         clusters = self.cohesiveness_filter(clusters)
-        i = 0
         for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
             self.add(c)
-            i += 1
 
     def add(self, cluster: Cluster) -> Optional[ClusterType]:
         """
@@ -83,30 +80,13 @@ class ClusterCondenser:
             self.seen_artifacts.add(a)
         return cluster
 
-    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster) -> List[str]:
-        """
-        Adds the artifacts of the new cluster to the source. Source is updated after being modified.
-        :param source_cluster: The existing cluster to add new cluster to.
-        :param new_cluster: The cluster whose add to source.
-        :return: None. Updates are done in place.
-        """
-        artifacts_to_add = []
-        for a_id in new_cluster.artifact_id_set:
-            if a_id in source_cluster:
-                continue
-            similarity = source_cluster.similarity_to_neighbors(a_id)
-            if similarity >= 0.8:
-                artifacts_to_add.append(a_id)
-                self.seen_artifacts.add(a_id)
-        source_cluster.add_artifacts(artifacts_to_add)
-        return artifacts_to_add
-
     def should_add(self, cluster: Cluster) -> bool:
         """
         Processes cluster and determines if we should add it to the set.
         :param cluster: The candidate cluster to add.
         :return: Whether cluster should be added to map.
         """
+        cluster.remove_outliers()
         contains_cluster = self.contains_cluster(cluster, add_votes=True)
         if not self.allow_overlapping_clusters:
             overlapping_artifacts = [a for a in cluster if a in self.seen_artifacts]
@@ -134,6 +114,24 @@ class ClusterCondenser:
             added_artifacts = self.merge_clusters(most_similar_cluster, cluster)
             return len(added_artifacts) > 0
         return False
+
+    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster) -> List[str]:
+        """
+        Adds the artifacts of the new cluster to the source. Source is updated after being modified.
+        :param source_cluster: The existing cluster to add new cluster to.
+        :param new_cluster: The cluster whose add to source.
+        :return: None. Updates are done in place.
+        """
+        artifacts_to_add = []
+        for a_id in new_cluster.artifact_id_set:
+            if a_id in source_cluster:
+                continue
+            similarity = source_cluster.similarity_to_neighbors(a_id)
+            if similarity >= 0.8:
+                artifacts_to_add.append(a_id)
+                self.seen_artifacts.add(a_id)
+        source_cluster.add_artifacts(artifacts_to_add)
+        return artifacts_to_add
 
     def contains_cluster(self, other_cluster: ClusterType, add_votes: bool = False) -> bool:
         """

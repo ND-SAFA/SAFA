@@ -34,7 +34,8 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
 
         logger.info(f"{len(orphan_artifact_id_set)} artifacts were not clustered.")
 
-        self.cluster_orphans(args, state, cluster_map, orphan_artifact_id_set, args.min_orphan_similarity)
+        if len(orphan_artifact_id_set) > args.cluster_min_size:
+            self.cluster_orphans(args, state, cluster_map, orphan_artifact_id_set, args.min_orphan_similarity)
         self.place_orphans_in_homes(args, clusters, orphan_artifact_id_set)
 
         if args.allow_singleton_clusters:

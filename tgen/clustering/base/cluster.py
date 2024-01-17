@@ -1,13 +1,15 @@
 import os
 from copy import deepcopy
 from os.path import dirname
-from typing import Any, Dict, Iterable, List, Tuple, Union, Callable
+from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 
 import numpy as np
+import pandas as pd
 
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.util.embedding_util import EmbeddingUtil
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.np_util import NpUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -192,6 +194,20 @@ class Cluster:
         :return: List of all original clusters from which the current one came.
         """
         return self.__originating_clusters
+
+    def remove_outliers(self) -> None:
+        """
+        Removes any artifacts that are much different than the rest.
+        :return:
+        """
+        scores = [self.similarity_to_neighbors(a) for a in self.artifact_ids]
+        scores_std = pd.Series(scores).std()
+        if scores_std >= 0.05:
+            sorted_artifact_scores = ListUtil.zip_sort(self.artifact_ids, scores)
+            sorted_artifacts, sorted_scores = ListUtil.unzip(sorted_artifact_scores)
+            lower, upper = NpUtil.detect_outlier_scores(scores, sigma=1.5)
+            if sorted_scores[0] <= lower + 0.005:
+                self._remove_artifact(sorted_artifacts[0])
 
     def _commit_action(self, action: Callable, artifact_ids: Union[List[str], str], update_stats: bool) -> None:
         """

@@ -139,6 +139,11 @@ REFINEMENT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
                                                         f"{NEW_LINE}{PromptUtil.create_xml_closing('notes')}")
                                          ],
                       prompt_selector=lambda kwargs: int(kwargs.get("functionality") is not None)),
+    Prompt(
+        "Summarize the main goals and user needs addressed by the {source_type}s, "
+        "grouping similar functionalities / features together and generalizing technical specifics into overarching "
+        "statements that reflect key user functionalities / features.",
+        response_manager=PromptResponseManager(response_tag="reasoning")),
     *CLUSTERING_QUESTIONNAIRE.child_prompts[0:]
 ],
     enumeration_chars=["-"])

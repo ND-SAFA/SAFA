@@ -18,7 +18,7 @@ class RefineGenerationsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         if not args.run_refinement or not args.perform_clustering:
             return
 
-        duplicate_types = [DuplicateType.INTRA_CLUSTER, DuplicateType.ALL]
+        duplicate_types = [DuplicateType.ALL]  # [DuplicateType.INTRA_CLUSTER, DuplicateType.ALL]
         intra_refinement_state = state.get_path_to_state_checkpoint(state.export_dir, self.get_step_name(), run_num=0,
                                                                     step_num=len(state.completed_steps))
         if FileUtil.safely_check_path_exists(intra_refinement_state):

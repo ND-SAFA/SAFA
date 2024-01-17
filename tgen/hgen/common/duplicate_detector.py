@@ -8,7 +8,7 @@ from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.deliminator_constants import DASH
-from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_DUPLICATE_CLUSTER_COHESION_THRESHOLD
+from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_CLUSTER_COHESION_THRESHOLD, DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
@@ -85,8 +85,7 @@ class DuplicateDetector:
         cluster_args = ClusteringArgs(dataset=generated_artifact_dataset, export_dir=export_path,
                                       create_dataset=True, allow_duplicates_between_clusters=False,
                                       add_orphans_to_homes=False, allow_singleton_clusters=False,
-                                      embedding_manager=self.embeddings_manager,
-                                      use_ids_as_content=True)
+                                      embedding_manager=self.embeddings_manager)
 
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()

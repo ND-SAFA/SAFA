@@ -45,11 +45,14 @@ def run_check(new_files: List[Path]) -> set[str]:
 
 def check_new_file_versions(new_files: List[Path], latest_version: Version, errors_found: set[str]):
     for new_file in new_files:
+        if migration_folder not in new_file.parents:
+            continue
+
         version = get_version_number(new_file, errors_found, True)
 
         if not version > latest_version:
             add_error(new_file, errors_found, ignore_version_str,
-                      f'Found a new migration whose version is less than the current latest version: {new_file}\n'
+                      f'Found a new migration whose version is not greater than the current latest version: {new_file}\n'
                       f'This could lead to this migration not being run. '
                       f'Latest version: {latest_version}, This file\'s version: {version}')
 

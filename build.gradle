@@ -106,7 +106,7 @@ dependencies {
     implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
 
     // email
-    implementation 'com.infobip:infobip-api-java-client:4.0.0'
+    implementation 'com.infobip:infobip-api-java-client:4.1.0'
 
     // stripe
     implementation "com.stripe:stripe-java:24.8.0"

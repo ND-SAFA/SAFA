@@ -35,8 +35,10 @@ def run_check(new_files: List[Path]) -> set[str]:
     all_migrations = get_all_migrations()
     existing_migrations = list(set(all_migrations) - set(new_files))
 
-    print(f'Added files:\n  {[str(x) for x in new_files]}')
-    print(f'Old files:\n  {[str(x) for x in existing_migrations]}')
+    formatted_new_files = "\n".join([str(x) for x in new_files])
+    formatted_old_files = "\n".join([str(x) for x in existing_migrations])
+    print(f'::group::Added files:\n{formatted_new_files}\n::endgroup::')
+    print(f'::group::Old files:\n{formatted_old_files}\n::endgroup::')
 
     latest_version = get_latest_version(existing_migrations, errors_found)
     check_new_file_versions(new_files, latest_version, errors_found)
@@ -53,7 +55,7 @@ def check_new_file_versions(new_files: List[Path], latest_version: Version, erro
         if not version > latest_version:
             add_error(new_file, errors_found, ignore_version_str,
                       f'Found a new migration whose version is not greater than the current latest version: {new_file}\n'
-                      f'  This could lead to this migration not being run. '
+                      f'This could lead to this migration not being run. '
                       f'Latest version: {latest_version}, This file\'s version: {version}')
 
 
@@ -72,7 +74,7 @@ def get_version_number(migration: Path, errors_found: set[str], is_new: bool) ->
     if not match:
         add_error(migration, errors_found, ignore_filename_str,
                   f'Found migration with an invalid name: {migration}\n'
-                  f'  Must match pattern {migration_regex.pattern}')
+                  f'Must match pattern {migration_regex.pattern}')
 
         # if the file is new, we want a high version number, so it doesn't also get flagged as being a bad version
         # if the file is old, we want a low version number, so it doesn't cause other files to get flagged
@@ -89,9 +91,9 @@ def add_error(migration: Path, errors_found: set[str], ignore_str: str, message:
         contents = ""
 
     if ignore_str in contents:
-        print(f'WARNING: Found error in {migration}, but it is marked as ignored.')
+        print(f'Warning: Found error in {migration}, but it is marked as ignored.')
     else:
-        errors_found.add(f'ERROR: {message}\n  Include {ignore_str} in this file to ignore this message.')
+        errors_found.add(f'::group::Error: {message}\nInclude {ignore_str} in this file to ignore this message.\n::endgroup::')
 
 
 if __name__ == '__main__':

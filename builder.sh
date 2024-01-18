@@ -2,8 +2,6 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-JAR_PATH="$SCRIPT_DIR/build/libs/edu.nd.crc.safa-0.1.0.jar"
-
 HELP_TEXT="
 Usage: builder.sh [options] <command>...
 
@@ -19,8 +17,13 @@ Options:
       -f    Specifies an environment file to source before commands.
 
 Commands:
-      build    Build the backend with Gradle
-      run      Run the backend
+      build          Build the backend with Gradle
+      run            Run the backend
+      clean          Run a gradle clean
+      print_path     Print the path to where the jar will be built based on build.gradle.
+                     No other commands will be run even if they are supplied.
+      print_version  Print the version of the app based on the contents of build.gradle.
+                     No other commands will be run even if they are supplied.
 "
 
 function help {
@@ -59,10 +62,10 @@ function run {
   setGoogleCredentials
   if [ -n "$2" ]; then
     echo "Running with environment: $2"
-    source $2
+    source "$2"
   fi
 
-  java -jar -Dspring.profiles.active="$1" "$JAR_PATH"
+  java -jar -Dspring.profiles.active="$1" "$(getJarPath)"
   return $?
 }
 
@@ -70,6 +73,22 @@ function checkReturn {
   if [ "$1" -ne 0 ]; then
     exit "$1"
   fi
+}
+
+function getBuildVariable {
+  awk -F= "/$1/"'{gsub(/^[ \t]*'\''?/,"",$2); gsub(/'\''?[ \t]*$/,"",$2); print $2}' "${SCRIPT_DIR}"/build.gradle
+}
+
+function getVersion {
+  getBuildVariable archiveVersion
+}
+
+function getArchiveBaseName {
+  getBuildVariable archivesBaseName
+}
+
+function getJarPath {
+  echo "$SCRIPT_DIR/build/libs/$(getArchiveBaseName)-$(getVersion).jar"
 }
 
 # Parse arguments
@@ -98,6 +117,8 @@ while [ $OPTIND -le "$#" ]; do
       build) BUILD=true;;
       run) RUN=true;;
       clean) CLEAN=true;;
+      print_path) getJarPath; exit 0;;
+      print_version) getVersion; exit 0;;
       *) echo -e "Unknown command $command"; help 1;;
     esac
   fi

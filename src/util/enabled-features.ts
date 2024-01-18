@@ -10,4 +10,6 @@ export const ENABLED_FEATURES = {
   TRACE_MATRIX_TABLE: false,
 
   ONBOARDING_GENERATE: true,
+
+  DEMO_SIGNUP: false,
 };

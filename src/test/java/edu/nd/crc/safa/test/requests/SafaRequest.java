@@ -72,11 +72,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return new FlatFileRequest(this.path);
     }
 
-    public List<File> getWithFilesInZip() throws Exception {
+    public List<File> getWithFilesInZip() {
         return sendGet(ResponseParser::zipFileParser);
     }
 
-    public JSONArray getWithJsonArray() throws Exception {
+    public JSONArray getWithJsonArray() {
         return sendGet(ResponseParser::arrayCreator);
     }
 
@@ -105,14 +105,14 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             ResponseParser::jsonCreator);
     }
 
-    protected <T> T sendGet(Function<String, T> responseParser) throws Exception {
+    protected <T> T sendGet(Function<String, T> responseParser) {
         return sendAuthenticatedRequest(get(this.buildEndpoint()),
             status().isOk(),
             authorizationToken,
             responseParser);
     }
 
-    public JSONArray postWithJsonArray(Object body) throws Exception {
+    public JSONArray postWithJsonArray(Object body) {
         return postWithResponseParser(body, ResponseParser::arrayCreator);
     }
 
@@ -133,28 +133,36 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
     }
 
-    public <T> T postAndParseResponse(Object body, TypeReference<T> type) throws Exception {
+    public <T> T postAndParseResponse(Object body, TypeReference<T> type) {
         return postWithResponseParser(body, resp -> this.jacksonParse(resp, type));
     }
 
-    public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
+    public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) {
+        return putWithResponseParser(body, resultMatcher, ResponseParser::jsonCreator);
+    }
+
+    public JSONObject putWithJsonObject(Object body) {
+        return putWithJsonObject(body, status().is2xxSuccessful());
+    }
+
+    public <T> T putAndParseResponse(Object body, TypeReference<T> type) {
+        JSONObject result = putWithJsonObject(body);
+        return jacksonParse(result.toString(), type);
+    }
+
+    public <T> T putAndParseResponse(Object body, ResultMatcher resultMatcher, TypeReference<T> type) {
+        return putWithResponseParser(body, resultMatcher, resp -> jacksonParse(resp, type));
+    }
+
+    public <T> T putWithResponseParser(Object body, ResultMatcher resultMatcher, Function<String, T> responseParser) {
         return sendAuthenticatedRequest(
             put(this.buildEndpoint())
                 .content(stringify(body))
                 .contentType(MediaType.APPLICATION_JSON),
             resultMatcher,
             SafaRequest.authorizationToken,
-            ResponseParser::jsonCreator
+            responseParser
         );
-    }
-
-    public JSONObject putWithJsonObject(Object body) throws Exception {
-        return putWithJsonObject(body, status().is2xxSuccessful());
-    }
-
-    public <T> T putAndParseResponse(Object body, TypeReference<T> type) throws Exception {
-        JSONObject result = putWithJsonObject(body);
-        return jacksonParse(result.toString(), type);
     }
 
     public <T> T postWithResponseParser(Object body,
@@ -203,7 +211,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public <T> T getWithResponseParser(Function<String, T> responseParser,
-                                       ResultMatcher resultMatcher) throws Exception {
+                                       ResultMatcher resultMatcher) {
         return getWithResponseParser(
             responseParser,
             resultMatcher,
@@ -211,7 +219,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         );
     }
 
-    public <T> T getWithResponseParser(Function<String, T> responseParser) throws Exception {
+    public <T> T getWithResponseParser(Function<String, T> responseParser) {
         return getWithResponseParser(
             responseParser,
             status().is2xxSuccessful()
@@ -220,8 +228,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     private <T> T getWithResponseParser(Function<String, T> responseParser,
                                         ResultMatcher resultMatcher,
-                                        Cookie localAuthorizationToken
-    ) throws Exception {
+                                        Cookie localAuthorizationToken) {
         return sendAuthenticatedRequest(
             get(this.buildEndpoint()),
             resultMatcher,

@@ -331,6 +331,7 @@ public class AppRoutes {
     public static class Billing {
         public static final String ROOT = "/billing";
         public static final String CHECKOUT = ROOT + "/checkout";
+        public static final String CHANGE_TIER = ROOT + "/update-payment-tier";
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

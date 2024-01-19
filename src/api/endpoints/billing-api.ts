@@ -1,7 +1,6 @@
 import {
   CostEstimateSchema,
   GenerateArtifactSchema,
-  OrganizationSchema,
   OrgPaymentTier,
   PurchaseDetailsSchema,
   TransactionSchema,

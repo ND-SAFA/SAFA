@@ -38,6 +38,7 @@
         label="Organization"
         option-value="id"
         option-label="name"
+        class="q-mb-md"
       />
       <text-button
         block

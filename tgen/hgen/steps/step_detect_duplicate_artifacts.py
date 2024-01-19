@@ -3,13 +3,11 @@ from typing import Dict, List, Set
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dict_util import DictUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
-from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -25,6 +23,9 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The state of the
         :return: None
         """
+        if not args.perform_clustering:
+            state.selected_artifacts_dataset = state.all_artifacts_dataset
+            return
 
         embeddings_manager = state.embedding_manager
 

@@ -1,5 +1,7 @@
 from typing import Dict, List, Set, Tuple
 
+import numpy as np
+
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
@@ -8,7 +10,6 @@ from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.math_util import MathUtil
-from tgen.common.util.np_util import NpUtil
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
@@ -18,9 +19,9 @@ from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
+from tgen.tracing.ranking.selectors.selection_by_threshold_normalized_children import SelectByThresholdNormalizedChildren
 from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_across_all import SelectByThresholdScaledAcrossAll
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
-import numpy as np
 
 
 class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -46,7 +47,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
             trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
                                                                                       state.id_to_related_children)
-            selected_predictions = SelectByThresholdScaledAcrossAll.select(trace_predictions, args.link_selection_threshold)
+            selected_predictions = SelectByThresholdNormalizedChildren.select(trace_predictions, args.link_selection_threshold)
         state.selected_predictions = selected_predictions
         state.trace_predictions = trace_predictions
 

@@ -1,9 +1,19 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import { AdminApiHook, MembershipSchema } from "@/types";
+import {
+  AdminApiHook,
+  MembershipSchema,
+  OrganizationSchema,
+  OrgPaymentTier,
+} from "@/types";
 import { logStore, sessionStore } from "@/hooks";
-import { activateSuperuser, createSuperuser, deactivateSuperuser } from "@/api";
+import {
+  activateSuperuser,
+  createSuperuser,
+  deactivateSuperuser,
+  setOrgPaymentTier,
+} from "@/api";
 import { pinia } from "@/plugins";
 import useApi from "./useApi";
 
@@ -50,20 +60,33 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
       async (confirmed) => {
         if (!confirmed) return;
 
-        await adminApi.handleRequest(
-          async () => {
-            await createSuperuser(member.email);
-          },
-          {
-            success: `User is now a superuser: ${member.email}`,
-            error: `Unable to set as a superuser: ${member.email}`,
-          }
-        );
+        await adminApi.handleRequest(() => createSuperuser(member.email), {
+          success: `User is now a superuser: ${member.email}`,
+          error: `Unable to set as a superuser: ${member.email}`,
+        });
       }
     );
   }
 
-  return { activeSuperuser, enableSuperuser };
+  async function updatePaymentTier(
+    org: OrganizationSchema,
+    tier: OrgPaymentTier
+  ): Promise<void> {
+    logStore.confirm(
+      "Enable Superuser",
+      `Are you sure you want to set "${org.name}" as "${tier}"?`,
+      async (confirmed) => {
+        if (!confirmed) return;
+
+        await adminApi.handleRequest(() => setOrgPaymentTier(org.id, tier), {
+          success: `Org is now set to "${tier}": ${org.name}`,
+          error: `Unable to set org as "${tier}": ${org.name}`,
+        });
+      }
+    );
+  }
+
+  return { activeSuperuser, enableSuperuser, updatePaymentTier };
 });
 
 export default useAdminApi(pinia);

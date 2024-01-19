@@ -31,6 +31,23 @@
         @click="handleAdminSuperuser"
       />
     </expansion-item>
+    <expansion-item label="Enable Generation">
+      <select-input
+        v-model="orgStore.org"
+        :options="orgStore.allOrgs"
+        label="Organization"
+        option-value="id"
+        option-label="name"
+      />
+      <text-button
+        block
+        outlined
+        color="primary"
+        label="Enable Generation"
+        icon="invite"
+        @click="handleEnableGeneration"
+      />
+    </expansion-item>
   </panel-card>
 </template>
 
@@ -45,7 +62,12 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { adminApiStore, permissionStore, sessionApiStore } from "@/hooks";
+import {
+  adminApiStore,
+  orgStore,
+  permissionStore,
+  sessionApiStore,
+} from "@/hooks";
 import {
   PanelCard,
   TextButton,
@@ -53,6 +75,7 @@ import {
   ExpansionItem,
   TextInput,
 } from "@/components/common";
+import SelectInput from "@/components/common/input/SelectInput.vue";
 
 const adminCreateEmail = ref("");
 const adminCreatePassword = ref("");
@@ -70,6 +93,7 @@ function handleAdminCreate() {
     true
   );
 }
+
 /**
  * As an admin, sets an account as a superuser.
  */
@@ -77,5 +101,12 @@ function handleAdminSuperuser() {
   adminApiStore.enableSuperuser({
     email: adminSuperuserEmail.value,
   });
+}
+
+/**
+ * As an admin, sets an account to recurring billing to allow generation.
+ */
+function handleEnableGeneration() {
+  adminApiStore.updatePaymentTier(orgStore.org, "RECURRING");
 }
 </script>

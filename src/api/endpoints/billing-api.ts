@@ -1,8 +1,11 @@
 import {
   CostEstimateSchema,
   GenerateArtifactSchema,
+  OrganizationSchema,
+  OrgPaymentTier,
   PurchaseDetailsSchema,
   TransactionSchema,
+  UpdatePaymentTierSchema,
 } from "@/types";
 import { buildRequest } from "@/api";
 
@@ -44,4 +47,21 @@ export function deleteCheckoutSession(sessionId: string): Promise<void> {
   return buildRequest<void, "sessionId", void>("deleteCheckoutSession", {
     sessionId,
   }).post();
+}
+
+/**
+ * Updates the payment tier of an organization.
+ * @param organizationId - The organization to update.
+ * @param tier - The new payment tier.
+ */
+export function setOrgPaymentTier(
+  organizationId: string,
+  tier: OrgPaymentTier
+): Promise<void> {
+  return buildRequest<void, string, UpdatePaymentTierSchema>(
+    "setOrgPaymentTier"
+  ).put({
+    organizationId,
+    tier,
+  });
 }

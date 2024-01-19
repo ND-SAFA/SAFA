@@ -32,7 +32,8 @@ public class BillingService {
     private final OrganizationService organizationService;
 
     public BillingService(BillingInfoRepository billingInfoRepository, @Lazy TransactionService transactionService,
-                          IExternalBillingService externalBillingService, @Lazy OrganizationService organizationService) {
+                          IExternalBillingService externalBillingService,
+                          @Lazy OrganizationService organizationService) {
         this.billingInfoRepository = billingInfoRepository;
         this.transactionService = transactionService;
         this.externalBillingService = externalBillingService;

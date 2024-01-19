@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.billing.repositories.BillingInfoRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
+import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.context.annotation.Lazy;
@@ -28,12 +29,15 @@ public class BillingService {
     private final BillingInfoRepository billingInfoRepository;
     private final TransactionService transactionService;
     private final IExternalBillingService externalBillingService;
+    private final OrganizationService organizationService;
 
     public BillingService(BillingInfoRepository billingInfoRepository, @Lazy TransactionService transactionService,
-                          IExternalBillingService externalBillingService) {
+                          IExternalBillingService externalBillingService,
+                          @Lazy OrganizationService organizationService) {
         this.billingInfoRepository = billingInfoRepository;
         this.transactionService = transactionService;
         this.externalBillingService = externalBillingService;
+        this.organizationService = organizationService;
     }
 
     /**
@@ -212,5 +216,18 @@ public class BillingService {
 
     private boolean isDebit(int amount) {
         return amount < 0;
+    }
+
+    /**
+     * Update an organization's payment tier
+     *
+     * @param organization The organization to update
+     * @param paymentTier The new payment tier to give them
+     */
+    public void updatePaymentTier(Organization organization, PaymentTier paymentTier) {
+        // This obviously could be done outside of this function, but I'm putting it in the service
+        // in case we need to do more here later
+        organization.setPaymentTier(paymentTier);
+        organizationService.updateOrganization(organization);
     }
 }

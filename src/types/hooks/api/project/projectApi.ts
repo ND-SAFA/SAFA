@@ -1,5 +1,10 @@
 import { ComputedRef } from "vue";
-import { IOHandlerCallback, ProjectSchema, VersionSchema } from "@/types";
+import {
+  IOHandlerCallback,
+  ProjectSchema,
+  TransferProjectSchema,
+  VersionSchema,
+} from "@/types";
 
 /**
  * A hook for calling project API endpoints.
@@ -47,4 +52,14 @@ export interface ProjectApiHook {
     version: VersionSchema,
     callbacks: IOHandlerCallback
   ): void;
+  /**
+   * Moves the current project to a new owner.
+   *
+   * @param newOwner - The new owner of the project.
+   * @param callbacks - Callbacks for the action.
+   */
+  handleTransferProject(
+    newOwner: TransferProjectSchema,
+    callbacks?: IOHandlerCallback
+  ): Promise<void>;
 }

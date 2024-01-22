@@ -76,3 +76,27 @@ export interface CreateProjectByJsonSchema {
    */
   requests: GeneratedMatrixSchema[];
 }
+
+/**
+ * The types of project owners.
+ */
+export type ProjectOwnerType =
+  | "ORGANIZATION"
+  | "TEAM"
+  | "USER_ID"
+  | "USER_EMAIL";
+
+/**
+ * Represents a request to transfer ownership of a project.
+ */
+export interface TransferProjectSchema {
+  /**
+   * The new owner of the project, which will be either a UUID
+   * or an email specifically in the case of ownerType == USER_EMAIL
+   */
+  owner: string;
+  /**
+   * The type of owner, to transfer to.
+   */
+  ownerType: ProjectOwnerType;
+}

@@ -6,6 +6,7 @@
     <snackbar />
     <app-confirm-modal :message="confirmationMessage" />
     <save-project-modal />
+    <transfer-project-modal />
     <delete-project-modal />
     <onboarding-popup />
     <flex-box
@@ -38,7 +39,11 @@ import {
   sessionStore,
 } from "@/hooks";
 import { AppConfirmModal, FlexBox } from "@/components/common";
-import { SaveProjectModal, DeleteProjectModal } from "@/components/project";
+import {
+  SaveProjectModal,
+  DeleteProjectModal,
+  TransferProjectModal,
+} from "@/components/project";
 import { OnboardingPopup } from "@/components/onboarding";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";

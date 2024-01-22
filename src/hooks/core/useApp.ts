@@ -32,6 +32,7 @@ export const useApp = defineStore("app", {
       saveTeam: false,
       saveProject: false,
       editProject: false,
+      moveProject: false,
       deleteProject: false,
       saveArtifact: false,
       saveTrace: false,

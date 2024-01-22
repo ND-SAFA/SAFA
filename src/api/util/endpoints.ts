@@ -57,6 +57,10 @@ export enum Endpoint {
 
   project = "projects",
   updateProject = "projects/:projectId",
+  transferProject = "projects/:projectId/transfer",
+
+  // Project Members
+
   getProjectMembers = "projects/:projectId/members",
   updateProjectMember = "projects/:projectId/members",
   deleteProjectMember = "projects/members/:projectMemberId",

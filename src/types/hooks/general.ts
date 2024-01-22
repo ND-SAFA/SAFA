@@ -8,6 +8,7 @@ export type PopupType =
   | "saveTeam"
   | "saveProject"
   | "editProject"
+  | "moveProject"
   | "deleteProject"
   | "saveArtifact"
   | "saveTrace"
@@ -25,6 +26,7 @@ export interface PopupStateMap
   saveTeam: boolean;
   saveProject: boolean;
   editProject: boolean;
+  moveProject: boolean;
   deleteProject: boolean;
   saveArtifact: boolean;
   saveTrace: boolean;

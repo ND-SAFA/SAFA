@@ -53,7 +53,7 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
      */
     selectIdentifier(
       identifier: IdentifierSchema | undefined,
-      mode: "save" | "edit" | "delete"
+      mode: "save" | "edit" | "delete" | "transfer"
     ): void {
       this.baseIdentifier = identifier;
       this.resetIdentifier();
@@ -63,7 +63,8 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
           save: "saveProject",
           edit: "editProject",
           delete: "deleteProject",
-        } as Record<"save" | "edit" | "delete", PopupType>
+          transfer: "moveProject",
+        } as Record<"save" | "edit" | "delete" | "transfer", PopupType>
       )[mode];
 
       appStore.open(panelName);

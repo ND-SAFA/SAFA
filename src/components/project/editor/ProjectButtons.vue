@@ -26,6 +26,15 @@
     <text-button
       v-if="displayDeleting"
       text
+      label="Transfer"
+      icon="forward"
+      data-cy="button-settings-transfer"
+      @click="handleTransfer"
+    />
+    <separator v-if="displayDeleting" vertical />
+    <text-button
+      v-if="displayDeleting"
+      text
       label="Delete"
       icon="delete"
       data-cy="button-settings-delete"
@@ -72,6 +81,13 @@ function handleEdit(): void {
  */
 function handleDelete(): void {
   identifierSaveStore.selectIdentifier(projectStore.project, "delete");
+}
+
+/**
+ * Opens the transfer modal.
+ */
+function handleTransfer(): void {
+  identifierSaveStore.selectIdentifier(projectStore.project, "transfer");
 }
 
 /**

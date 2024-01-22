@@ -6,6 +6,7 @@ import {
   IOHandlerCallback,
   ProjectApiHook,
   ProjectSchema,
+  TransferProjectSchema,
   VersionSchema,
 } from "@/types";
 import { versionToString } from "@/util";
@@ -22,6 +23,7 @@ import {
   getProjectFiles,
   createProject,
   editProject,
+  setProjectOwner,
 } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -135,6 +137,31 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
     );
   }
 
+  async function handleTransferProject(
+    newOwner: TransferProjectSchema,
+    callbacks: IOHandlerCallback = {}
+  ): Promise<void> {
+    const project = identifierSaveStore.baseIdentifier;
+
+    if (!project) return;
+
+    await saveProjectApi.handleRequest(
+      async () => {
+        const updatedIdentifier = await setProjectOwner(
+          project.projectId,
+          newOwner
+        );
+
+        projectStore.updateProject(updatedIdentifier);
+      },
+      {
+        ...callbacks,
+        success: `Project has been transferred: ${project.name}`,
+        error: `Unable to transferred project: ${project.name}`,
+      }
+    );
+  }
+
   return {
     saveProjectLoading,
     deleteProjectLoading,
@@ -143,6 +170,7 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
     handleDownload,
     handleDeleteProject,
     handleDeleteVersion,
+    handleTransferProject,
   };
 });
 

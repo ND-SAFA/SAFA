@@ -33,8 +33,9 @@ export function useTableFilter(props: TableFilterProps): TableFilterHook {
         return false;
       }
 
-      for (const key of columnKeys.value) {
+      for (const key of [...columnKeys.value, "body", "summary"]) {
         if (
+          row[key] !== undefined &&
           String(row[key]).toLowerCase().includes(lowercaseSearchText.value)
         ) {
           return true;

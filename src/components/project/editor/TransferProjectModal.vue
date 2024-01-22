@@ -83,8 +83,7 @@ import { ref, computed } from "vue";
 import { ProjectOwnerType } from "@/types";
 import { ownerTypeOptions } from "@/util";
 import { projectApiStore, appStore, orgStore, teamStore } from "@/hooks";
-import { Modal, TextInput, TextButton } from "@/components/common";
-import SelectInput from "@/components/common/input/SelectInput.vue";
+import { Modal, TextInput, TextButton, SelectInput } from "@/components/common";
 
 const options = ownerTypeOptions();
 

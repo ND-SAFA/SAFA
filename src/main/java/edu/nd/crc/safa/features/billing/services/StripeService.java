@@ -35,8 +35,8 @@ public class StripeService implements IExternalBillingService {
     @Value("${stripe.cancel_url}")
     private String cancelUrl;
 
-    @Value("${stripe.credit_product_key}")
-    private String creditProductKey;
+    @Value("${stripe.credit_price_key}")
+    private String creditPriceKey;
 
     @Value("${stripe.webhook_key}")
     private String webhookSecret;
@@ -70,7 +70,7 @@ public class StripeService implements IExternalBillingService {
                 .addLineItem(
                     SessionCreateParams.LineItem.builder()
                         .setQuantity((long) transaction.getAmount())
-                        .setPrice(creditProductKey)
+                        .setPrice(creditPriceKey)
                         .build())
                 .setClientReferenceId(transaction.getId().toString())
                 .build();

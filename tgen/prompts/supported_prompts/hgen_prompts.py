@@ -68,21 +68,38 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     enumeration_chars=["-"])
 
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
+    Prompt("Your first task is to construct TWO well written paragraphs that will guide your work in the next task. "
+           "In the FIRST paragraph, identify what is the core goal or user need addressed by all or most of the {source_type}. "
+           "Think about what actions can be performed by a user and how their needs are met by these {source_type}. "
+           "Provide specific details from the {source_type} that highlight how these overarching "
+           "user needs / actions are facilitated. \n"
+           "In a SECOND paragraph, state how these core goals and user needs can be placed into {n_targets} distinct, cohesive groups "
+           "from the perspective of a {target_type}. IMPORTANTLY, the {n_targets} group should be distinct from one another, "
+           "and each one should be FOCUSED on a CLEAR, SPECIFIC goal that represents an important user need, action or feature. "
+           "Be as specific as possible, specifying details from each of the {source_type} surrounding the action taking place, "
+           "the system behavior and or how the user need is being met "
+           "for each of the {n_targets} groupings. \n"
+           "Importantly, do not make an information up or make assumptions. "
+           "Only use information directly from the {source_type}. "
+           "You answer should be given in TWO cohesive, well-written paragraphs.",
+           response_manager=PromptResponseManager("core-goals")),
     QuestionnairePrompt(
-        instructions="Your objective is produce a polished set of {n_targets} (or less) {target_type}s capturing the important "
-                     "functionality described by the {source_type}. When creating the {target_type} ensure that they are:",
+        instructions="Then use your groupings of the common functionality and features to create {n_targets} {target_type}s "
+                     "When creating the {target_type} ensure that they are:",
         question_prompts=[
             QuestionPrompt(
-                "Focused on the overlapping, cross-cutting functionality and features common among most of the {source_type}s"),
-            QuestionPrompt(
-                "Related or overlapping features and functionality are condensed into a single, cohesive {target_type}"),
+                "Focused on the core goals and user needs identified above. "),
             QuestionnairePrompt(
                 instructions="The {target_type} fits the following description:",
                 question_prompts=[QuestionPrompt("{description}")],
                 enumeration_chars=["*"]),
             QuestionPrompt(
-                "There is enough details to understand the functionality of the {target_type}, "
-                "but the {source_type} are not quoted verbatim. "),
+                "There is enough details to understand how the core user need / goal is being facilitated "
+                "and/or what behavior is occurring. The {target_type} should be as specific as possible. "
+                "Fill in exact details whenever possible, incorporating as many details from the core goals section as possible. "
+                "But do NOT make up information. "
+                "ALL information must be from the provided {source_type}. "
+                "Refer to the core goals section to make sure all important details are included."),
             QuestionnairePrompt(
                 instructions="The {target_type} uses this format as a guideline:",
                 question_prompts=[QuestionPrompt("{format}"),
@@ -90,9 +107,10 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
                 enumeration_chars=["*"]),
             QuestionPrompt("Importantly, EACH {target_type} should be unique from the others and focused on a clear single purpose "
                            "which is separate from all others so that "
-                           "EACH {target_type} focuses on its own specific feature or functionality. "),
+                           "EACH {target_type} should remain focused in its specific feature or "
+                           "functionality from the core goals section. "),
             ConditionalPrompt(
-                candidate_prompts=[Prompt("Create {n_targets} DISTINCT {target_type}")],
+                candidate_prompts=[Prompt("Create {n_targets} DISTINCT and DETAILED {target_type}.")],
                 prompt_selector=lambda kwargs: 1 - int(
                     kwargs.get("n_targets") is not None))
 
@@ -119,51 +137,51 @@ SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
 REFINE_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software system and your goal is to summarize "
                                 "a set of {target_type}s from a software project.")
 DUP_SUMMARY_TASKS = QuestionnairePrompt([
-    Prompt(
-        "Identify the unique features and functionality of the system. "
-        "Focus on condensing cross-cutting functionality between the {target_type}s. "
-        "Do not make up information. "
-        "Importantly, include only information that is contained in the {target_type}. "
-        f"Enclose your answer in {PromptUtil.create_xml('notes')} "),
-    Prompt(
-        "Produced a polished bulleted list from your notes, grouping overlapping functionality and features across "
-        "{target_type} together.")],
+    Prompt("Construct 1-2 well written paragraphs that summarize the core goal of the {target_type}. "
+           "Identify what is the core goal(s) or user need(s) addressed by all or most of the {target_type}. "
+           "Think about what actions can be performed by a user and how their needs are met by these {target_type}. "
+           "Provide specific details from ALL {target_type} that highlight how these overarching "
+           "user needs / actions are facilitated. Write your response in paragraph form to another engineer "
+           "who does not have access to the {target_type}. \n"
+           "Importantly, do not make an information up or make assumptions. "
+           "Only use information directly from the {target_type}. ")],
     response_manager=PromptResponseManager(response_tag="answer"))
 
 REFINEMENT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     ConditionalPrompt(candidate_prompts=[CLUSTERING_QUESTIONNAIRE.child_prompts[0],
-                                         QuestionPrompt("Here is the information that you should focus on when creating "
-                                                        "the {n_targets} {target_type}: "
-                                                        f"{NEW_LINE}{PromptUtil.create_xml_opening('notes')}{NEW_LINE}"
-                                                        "{functionality}"
-                                                        f"{NEW_LINE}{PromptUtil.create_xml_closing('notes')}")
+                                         QuestionnairePrompt(
+                                             question_prompts=[Prompt("Focus on these core goals / user needs when creating "
+                                                                      "the {n_targets} {target_type}: "
+                                                                      f"{NEW_LINE}"
+                                                                      "{functionality}"
+                                                                      f"{NEW_LINE}"),
+                                                               Prompt(
+                                                                   "Based on these core goals, "
+                                                                   "state how these core goals and user needs "
+                                                                   "can be placed into {n_targets} distinct, cohesive groups "
+                                                                   "from the perspective of a {target_type}. "
+                                                                   "IMPORTANTLY, groups should be distinct from one another, "
+                                                                   "and each one should be FOCUSED on a CLEAR, SPECIFIC goal "
+                                                                   "that represents an important user need, action or feature. "
+                                                                   "Be as specific as possible, "
+                                                                   "specifying details from each of the {source_type} "
+                                                                   "surrounding the action taking place, "
+                                                                   "the system behavior and or how the user need is being met "
+                                                                   "for each of the {n_targets} groupings. \n"
+                                                                   "Importantly, do not make an information up or make assumptions. "
+                                                                   "Only use information directly from the {source_type}. "
+                                                                   "You answer should be given in a cohesive, well-written paragraph.",
+                                                                   response_manager=PromptResponseManager("core-goals"))],
+                                             enumeration_chars=["i", "ii"])
                                          ],
                       prompt_selector=lambda kwargs: int(kwargs.get("functionality") is not None)),
-    Prompt(
-        "Summarize the main goals and user needs addressed by the {source_type}s, "
-        "grouping similar functionalities / features together and generalizing technical specifics into overarching "
-        "statements that reflect key user functionalities / features.",
-        response_manager=PromptResponseManager(response_tag="reasoning")),
-    *CLUSTERING_QUESTIONNAIRE.child_prompts[0:]
-],
-    enumeration_chars=["-"])
-REFINEMENT_QUESTIONNAIRE_INTER = QuestionnairePrompt(question_prompts=[
-    Prompt("First identify the important information (e.g. features, functionality, etc.) "
-           "from the {target_type}s. "
-           "Group related features/functionality together into a single bullet.",
-           response_manager=PromptResponseManager(response_tag="notes")),
-    QuestionnairePrompt(
-        question_prompts=[Prompt("Then group related features, functionality, etc. together "
-                                 "to produce a condensed set of {n_targets} {target_type}. "
-                                 "Do not add additional information. All information must be from the original {target_type}. "
-                                 "Include all important information from your notes. "
-                                 "Importantly, make sure that all {n_targets} contain separate information and do not overlap. "),
-                          QuestionnairePrompt(instructions="The {target_type} should use this format as a guideline:",
-                                              question_prompts=[QuestionPrompt("{format}"), QuestionPrompt("For example: {example}")],
-                                              enumeration_chars=["*"])],
-        enumeration_chars=["-"])])
-TITLE_PROMPT = Prompt("Create a title for the {target_type} below. "
-                      "Titles should be a short identifier containing keywords describing the functionality in the {target_type}. "
-                      "\nExample: User Profile Creation for Admins\n",
+    *CLUSTERING_QUESTIONNAIRE.child_prompts[1:]
+])
+TITLE_PROMPT = Prompt("Create a title for the {target_type} "
+                      "that is descriptive enough to give someone unfamiliar with it a good idea of the content. "
+                      "Titles should summarize the main goal of the {target_type} in the form of a concise identifier. "
+                      "Try to use as much language directly from the {target_type} as possible "
+                      "and keep the number of words to 5 or less PRINCIPAL words. "
+                      "\nExample: Category Filtering for Product Discovery \n",
                       PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS)
                       )

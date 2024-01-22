@@ -8,15 +8,17 @@ from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.deliminator_constants import DASH
-from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_CLUSTER_COHESION_THRESHOLD, DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
+from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_CLUSTER_MIN_SIM_THRESHOLD, DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
+from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.hgen_types import ArtifactPair, CountMap, MatrixIndex
+from tgen.hgen.hgen_state import HGenState
 
 
 class DuplicateType(Enum):
@@ -30,17 +32,17 @@ class DuplicateDetector:
 
     def __init__(self, embeddings_manager: EmbeddingsManager,
                  duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD,
-                 duplicate_cluster_cohesion_threshold: float = DEFAULT_DUPLICATE_CLUSTER_COHESION_THRESHOLD,
+                 duplicate_cluster_min_sim_threshold: float = DEFAULT_DUPLICATE_CLUSTER_MIN_SIM_THRESHOLD,
                  duplicate_sim_sigma: float = None):
         """
         Initializes detector with access to embeddings from manager.
         :param embeddings_manager: Contains the embeddings for the artifacts to be compared.
         :param duplicate_similarity_threshold: The similarity quantile for when two artifacts are too similar.
-        :param duplicate_cluster_cohesion_threshold: The cohesion threshold below which a cluster of duplicates will not be accepted.
+        :param duplicate_cluster_min_sim_threshold: The cohesion threshold below which a cluster of duplicates will not be accepted.
         """
         self.embeddings_manager = embeddings_manager
         self.duplicate_similarity_threshold = duplicate_similarity_threshold
-        self.duplicate_cluster_cohesion_threshold = duplicate_cluster_cohesion_threshold
+        self.duplicate_cluster_min_sim_threshold = duplicate_cluster_min_sim_threshold
         self.duplicate_sim_sigma = duplicate_sim_sigma
 
     def get_duplicates(self, artifact_df: ArtifactDataFrame,
@@ -70,6 +72,7 @@ class DuplicateDetector:
 
         return duplicate_artifact_ids, dup_map
 
+    @nested_pipeline(HGenState)
     def cluster_duplicates(self, artifact_df: ArtifactDataFrame, duplicate_type: DuplicateType = DuplicateType.ALL,
                            original_clusters_to_contents: Dict[str, List[str]] = None,
                            export_path: str = None) -> ClusterMapType:
@@ -82,7 +85,9 @@ class DuplicateDetector:
         :return: Dictionary mapping cluster id to the cluster containing duplicates.
         """
         generated_artifact_dataset = PromptDataset(artifact_df=artifact_df)
-        cluster_args = ClusteringArgs(dataset=generated_artifact_dataset, export_dir=export_path,
+        cluster_args = ClusteringArgs(dataset=generated_artifact_dataset,
+                                      export_dir=export_path,
+                                      cluster_max_size=5,
                                       create_dataset=True, allow_duplicates_between_clusters=False,
                                       add_orphans_to_homes=False, allow_singleton_clusters=False,
                                       embedding_manager=self.embeddings_manager)
@@ -90,6 +95,7 @@ class DuplicateDetector:
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
         clustering_state = clustering_pipeline.state
+        self.embeddings_manager.merge(clustering_state.embedding_manager)
 
         # ensure matches saved state
         artifacts_df = clustering_state.cluster_dataset.artifact_df.filter_by_row(
@@ -100,14 +106,23 @@ class DuplicateDetector:
 
         final_cluster_map: ClusterMapType = {}
         for c_id, cluster in clustering_state.final_cluster_map.items():
-            if duplicate_type == DuplicateType.ALL:
-                if self._should_add_duplicate_cluster(cluster):
-                    final_cluster_map[DuplicateDetector.rename_clusters(c_id, duplicate_type)] = cluster
-                continue
-
             duplicate_map = {a_id: cluster.artifact_id_set for a_id in cluster.artifact_id_set}
             dups_from_same_cluster = self.identify_duplicates_from_same_cluster(duplicate_map, original_clusters_to_contents,
                                                                                 artifact_df)
+            if duplicate_type == DuplicateType.ALL:
+                if self._should_add_duplicate_cluster(cluster):
+                    if dups_from_same_cluster:
+                        originating_clusters = [Cluster.from_artifacts(a_ids, self.embeddings_manager,
+                                                                       c_id=DuplicateType.INTRA_CLUSTER.name)
+                                                for a_ids in dups_from_same_cluster.values()]
+                        _, inter_cluster_artifacts = self._identify_dups_from_inter_clusters(cluster, dups_from_same_cluster)
+                        if inter_cluster_artifacts:
+                            originating_clusters.append(Cluster.from_artifacts(list(inter_cluster_artifacts), self.embeddings_manager,
+                                                                               c_id=DuplicateType.INTER_CLUSTER.name))
+                        cluster = Cluster.from_many_clusters(originating_clusters)
+                    final_cluster_map[DuplicateDetector.rename_clusters(c_id, duplicate_type)] = cluster
+                    continue
+
             if duplicate_type == DuplicateType.INTRA_CLUSTER:
                 self._add_intra_cluster_duplicates(cluster, dups_from_same_cluster, final_cluster_map)
             elif duplicate_type == DuplicateType.INTER_CLUSTER:
@@ -119,26 +134,9 @@ class DuplicateDetector:
         dups_from_same_cluster = DuplicateDetector.identify_duplicates_from_same_cluster(duplicate_map,
                                                                                          original_clusters_to_contents,
                                                                                          artifact_df)
-        dups_from_same_cluster = DictUtil.flip(dups_from_same_cluster)
-        done = set()
-        final_cluster_map_from_dups = {}
-        for i, (a_id, dups) in enumerate(duplicate_map.items()):
-            artifact_ids = set()
-            self._add_dups(a_id, artifact_ids, duplicate_map, done)
-            if artifact_ids:
-                cluster_num = dups_from_same_cluster[a_id] if duplicate_type == DuplicateType.INTRA_CLUSTER else i
-                final_cluster_map_from_dups[DuplicateDetector.rename_clusters(cluster_num, duplicate_type)] = Cluster.from_artifacts(
-                    list(artifact_ids), self.embeddings_manager)
+        final_cluster_map_from_dups = self.convert_dup_map_to_clusters(duplicate_map, duplicate_type, dups_from_same_cluster)
 
         return final_cluster_map_from_dups if duplicate_type == DuplicateType.INTRA_CLUSTER else final_cluster_map
-
-    def _add_dups(self, a_id, artifact_ids, duplicate_map, done):
-        for d_id in duplicate_map[a_id]:
-            if d_id in done:
-                continue
-            artifact_ids.add(d_id)
-            done.add(d_id)
-            self._add_dups(d_id, artifact_ids, duplicate_map, done)
 
     @staticmethod
     def identify_duplicates_from_same_cluster(duplicate_map: Dict[str, Set[str]], cluster_to_contents: Dict[str, List],
@@ -163,6 +161,39 @@ class DuplicateDetector:
                     DictUtil.set_or_append_item(same_cluster_duplicate_map, cluster, {dup_id, a_id}, set)
 
         return same_cluster_duplicate_map
+
+    def convert_dup_map_to_clusters(self, duplicate_map: Dict[str, Set[str]], duplicate_type: DuplicateType,
+                                    dups_from_same_cluster: Dict[str, Set[str]] = None) -> ClusterMapType:
+        """
+        Converts a duplicate map into clusters of duplicates.
+        :param duplicate_map: Maps artifact id to a set of duplicates to it.
+        :param duplicate_type: The type of duplicate to search for (between clusters, within clusters or all).
+        :param dups_from_same_cluster: Dictionary mapping cluster id to duplicates that came from that cluster.
+        :return: A cluster map containing groups of duplicates.
+        """
+
+        def find_connected_components(graph):
+            def dfs(node, visited, component):
+                visited.add(node)
+                component.add(node)
+                for neighbor in graph.get(node, []):
+                    if neighbor not in visited:
+                        dfs(neighbor, visited, component)
+
+            visited = set()
+            components = []
+
+            for node in graph:
+                if node not in visited:
+                    component = set()
+                    dfs(node, visited, component)
+                    components.append(component)
+
+            return components
+
+        duplicate_artifact_sets = find_connected_components(duplicate_map)
+        return {str(i): Cluster.from_artifacts(artifact_ids, self.embeddings_manager)
+                for i, artifact_ids in enumerate(duplicate_artifact_sets)}
 
     @staticmethod
     def rename_clusters(orig_cluster_id: str, duplicate_type: DuplicateType) -> str:
@@ -267,8 +298,7 @@ class DuplicateDetector:
         :param final_cluster_map: The cluster map to add acceptable clusters of inter-cluster duplicates.
         :return: None
         """
-        all_dups_from_same_cluster = {d for dups in dups_from_same_cluster.values() for d in dups}
-        inter_cluster_dups = cluster.artifact_id_set.difference(all_dups_from_same_cluster)
+        all_dups_from_same_cluster, inter_cluster_dups = self._identify_dups_from_inter_clusters(cluster, dups_from_same_cluster)
         if inter_cluster_dups:
             base_cluster = Cluster.from_artifacts(inter_cluster_dups, cluster.embedding_manager)
             selected_artifacts = base_cluster.artifact_ids
@@ -285,6 +315,18 @@ class DuplicateDetector:
         new_cluster = Cluster.from_artifacts(selected_artifacts, cluster.embedding_manager)
         if self._should_add_duplicate_cluster(new_cluster):
             final_cluster_map[self.rename_clusters(c_id, DuplicateType.INTER_CLUSTER)] = new_cluster
+
+    @staticmethod
+    def _identify_dups_from_inter_clusters(duplicate_cluster: Cluster, dups_from_same_cluster: Dict[str, Set[str]]) -> Tuple[Set, Set]:
+        """
+        Identifies any duplicates that came from different clusters.
+        :param duplicate_cluster: The cluster of duplciates.
+        :param dups_from_same_cluster: Dictionary mapping OG cluster to the duplicates that came form it.
+        :return: A set of dups from the same cluser and a set of dups from different clusters.
+        """
+        all_dups_from_same_cluster = {d for dups in dups_from_same_cluster.values() for d in dups}
+        inter_cluster_dups = duplicate_cluster.artifact_id_set.difference(all_dups_from_same_cluster)
+        return all_dups_from_same_cluster, inter_cluster_dups
 
     def _add_intra_cluster_duplicates(self, cluster: Cluster, dups_from_same_cluster: Dict,
                                       final_cluster_map: ClusterMapType) -> None:
@@ -309,7 +351,7 @@ class DuplicateDetector:
         :param cluster: The cluster to determine if it should be added.
         :return: True if the duplicate cluster is sufficiently cohesive, otherwise False.
         """
-        return cluster.avg_pairwise_sim and cluster.avg_pairwise_sim >= self.duplicate_cluster_cohesion_threshold
+        return cluster.min_sim and cluster.min_sim >= self.duplicate_cluster_min_sim_threshold
 
     @staticmethod
     def _remove_dups_not_of_duplicate_type(duplicate_artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]],
@@ -356,4 +398,24 @@ class DuplicateDetector:
             if len(duplicate_map[other_dup].difference(removed_duplicate_artifact_ids)) == 1:
                 # removing the dup_art will eliminate this whole group
                 return False
+        return True
+
+    def _add_dups_for_clusters(self, a_id: str, artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]], done: Set[str]) -> bool:
+        """
+        Adds duplicates to the artifact ids for a particular cluster of duplicates.
+        :param a_id: The starting duplicate id.
+        :param artifact_ids: List of current artifact ids for the duplicate cluster.
+        :param duplicate_map: Mapping of artifact id to its duplicates.
+        :param done: Set of duplicates already added to cluster.
+        :return: None (updates artifact id set).
+        """
+        if a_id not in duplicate_map:
+            return False
+        for d_id in duplicate_map[a_id]:
+            if d_id in done:
+                continue
+            added = self._add_dups_for_clusters(d_id, artifact_ids, duplicate_map, done)
+            if added:
+                artifact_ids.add(d_id)
+                done.add(d_id)
         return True

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS, \
     DEFAULT_PROJECT_SUMMARY_SECTIONS_DISPLAY_ORDER
 from tgen.common.util.dataclass_util import DataclassUtil
@@ -18,11 +18,11 @@ class SummarizerArgs(PipelineArgs):
     """
     LLM manager used for the individual artifact summaries
     """
-    llm_manager_for_artifact_summaries: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
+    llm_manager_for_artifact_summaries: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
     """
     LLM manager used for the full project summary
     """
-    llm_manager_for_project_summary: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
+    llm_manager_for_project_summary: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
     """
     The type of summary to use for the code artifacts
     """

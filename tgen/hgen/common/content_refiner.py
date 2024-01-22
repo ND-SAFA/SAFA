@@ -1,11 +1,12 @@
-import math
 from typing import Dict, List, Tuple, Set, Any, Optional
 
 import numpy as np
 
+from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.dict_util import DictUtil
@@ -17,7 +18,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.content_generator import ContentGenerator
 from tgen.hgen.common.duplicate_detector import DuplicateType, DuplicateDetector
-from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -41,32 +41,36 @@ class ContentRefiner:
         self.state = state
         self.duplicate_type = duplicate_type
 
-    def refine(self) -> Optional[Tuple[Dict, Dict, Dict]]:
+    def refine(self, generated_artifacts_df: ArtifactDataFrame,
+               duplicate_cluster_map: ClusterMapType = None,
+               new_source_clusters: Dict[str, List[EnumDict]] = None) -> Optional[Tuple[Dict, Dict, Dict]]:
         """
         Refines the previous generations.
+        :param generated_artifacts_df: Contains the generated artifacts being refined.
+        :param duplicate_cluster_map: Map of clusters containing duplicates.
+        :param new_source_clusters: Maps duplicate cluster to the cluster of sources that produced them.
         :return: Updated variables for state.
         """
-        generated_artifacts_df, _ = HGenUtil.create_artifact_df_from_generated_artifacts(self.args,
-                                                                                         self.state.get_generations2sources(),
-                                                                                         self.args.target_type, generate_names=True,
-                                                                                         generation_id=self.duplicate_type.name.lower())
-        clustering_export_path = FileUtil.safely_join_paths(self.args.export_dir, CLUSTERING_SUBDIRECTORY,
-                                                            f"refine_clusters_{self.duplicate_type.name.lower()}")
-        duplicate_detector = DuplicateDetector(embeddings_manager=self.state.embedding_manager,
-                                               duplicate_cluster_cohesion_threshold=0.5,
-                                               duplicate_similarity_threshold=0.5,
-                                               duplicate_sim_sigma=None if self.duplicate_type == DuplicateType.INTRA_CLUSTER else 2)
-        duplicate_cluster_map = duplicate_detector.cluster_duplicates(artifact_df=generated_artifacts_df,
-                                                                      duplicate_type=self.duplicate_type,
-                                                                      original_clusters_to_contents=self.state.get_cluster2generation(),
-                                                                      export_path=clustering_export_path)
+        if not duplicate_cluster_map:
+            clustering_export_path = FileUtil.safely_join_paths(self.args.export_dir, CLUSTERING_SUBDIRECTORY,
+                                                                f"refine_clusters_{self.duplicate_type.name.lower()}")
+            duplicate_detector = DuplicateDetector(embeddings_manager=self.state.embedding_manager)
+            logger.info("Clustering generations to identify overlapping artifacts. ")
+            duplicate_cluster_map = duplicate_detector.cluster_duplicates(artifact_df=generated_artifacts_df,
+                                                                          duplicate_type=self.duplicate_type,
+                                                                          original_clusters_to_contents=self.state.get_cluster2generation(),
+                                                                          export_path=clustering_export_path)
         if len(duplicate_cluster_map) == 0:
             return
 
-        new_source_clusters, dups2remove = self._create_new_source_clusters(duplicate_cluster_map, generated_artifacts_df)
-        duplicate_cluster_artifacts = ArtifactDataFrame({ArtifactKeys.ID: duplicate_cluster_map.keys(),
-                                                         ArtifactKeys.CONTENT: [EMPTY_STRING for _ in duplicate_cluster_map],
-                                                         ArtifactKeys.LAYER_ID: ["duplicate_cluster" for _ in duplicate_cluster_map]})
+        if not new_source_clusters:
+            logger.info("Linking duplicates to their source artifacts. ")
+            new_source_clusters, dups2remove = self._create_new_source_clusters(duplicate_cluster_map, generated_artifacts_df)
+        else:
+            dups2remove = set()
+            for cluster in duplicate_cluster_map.values():
+                dups2remove.update(cluster.artifact_id_set)
+        duplicate_cluster_artifacts = self._convert_clusters_to_df(duplicate_cluster_map)
         format_variables = self._create_prompt_variables(duplicate_cluster_map, new_source_clusters, generated_artifacts_df,
                                                          duplicate_cluster_artifacts)
 
@@ -77,6 +81,18 @@ class ContentRefiner:
                                                       new_source_clusters, dups2remove)
         refined_cluster2artifacts = {c_id: [a[ArtifactKeys.ID] for a in c_arts] for c_id, c_arts in new_source_clusters.items()}
         return refined_generation2sources, refined_cluster2generations, refined_cluster2artifacts
+
+    @staticmethod
+    def _convert_clusters_to_df(duplicate_cluster_map: ClusterMapType) -> ArtifactDataFrame:
+        """
+        Converts a map of duplicates into a dataframe.
+        :param duplicate_cluster_map: Maps of duplicate clusters.
+        :return: A dataframe containing references to the clusters.
+        """
+        duplicate_cluster_artifacts = ArtifactDataFrame({ArtifactKeys.ID: duplicate_cluster_map.keys(),
+                                                         ArtifactKeys.CONTENT: [EMPTY_STRING for _ in duplicate_cluster_map],
+                                                         ArtifactKeys.LAYER_ID: ["duplicate_cluster" for _ in duplicate_cluster_map]})
+        return duplicate_cluster_artifacts
 
     def _create_new_source_clusters(self, duplicate_cluster_map: ClusterMapType,
                                     generated_artifacts_df: ArtifactDataFrame) -> Tuple[Dict[str, List[EnumDict]], Set]:
@@ -136,7 +152,7 @@ class ContentRefiner:
         all_trace_preds: List[Trace] = [RankingUtil.create_entry(p_id, child, score) for p_id, (children, scores) in
                                         parent2ranking.items() for child, score in zip(children, scores)]
         RankingUtil.normalized_scores_based_on_parent(all_trace_preds)
-        link_threshold = 1 - 2 * np.std([trace[TraceKeys.SCORE] for trace in all_trace_preds])
+        link_threshold = 1 - 2 * np.std([trace[TraceKeys.SCORE] for trace in all_trace_preds])  # TODO standardize this somewhere
         parent_selected = RankingUtil.select_predictions_by_thresholds([p for p in all_trace_preds
                                                                         if p[TraceKeys.parent_label()] == p_id],
                                                                        primary_threshold=link_threshold)
@@ -177,7 +193,6 @@ class ContentRefiner:
         :return: Dictionary mapping format variable name to its value.
         """
         format_variables = {"n_targets": self._calculate_n_targets(duplicate_cluster_map, new_source_clusters)}
-        format_variables["n_bullets"] = [2 * n for n in format_variables["n_targets"]]
         if self.duplicate_type != DuplicateType.INTRA_CLUSTER:
             format_variables["functionality"] = self._summarize_duplicates(duplicate_cluster_map,
                                                                            generated_artifacts_df,
@@ -199,16 +214,30 @@ class ContentRefiner:
             n_generated = [len(c) for c in cluster2generations]
             n_targets = []
             for i, c_id in enumerate(duplicate_cluster_map.keys()):
-                originating_clusters = duplicate_cluster_map[c_id].get_originating_clusters()
-                if not originating_clusters:
-                    originating_clusters = [duplicate_cluster_map[c_id]]
-                reduced_duplicate_n = sum([round(len(cluster) * (1 - cluster.avg_pairwise_sim))
-                                           for cluster in originating_clusters])
+                reduced_duplicate_n = self._calculate_n_targets_for_duplicate_cluster(duplicate_cluster_map[c_id])
                 new_n = n_generated[i] - len(duplicate_cluster_map[c_id].artifact_id_set) + reduced_duplicate_n
                 n_target = max(new_n, 2 if n_generated[i] > 3 or len(new_source_clusters[c_id]) > 3 else 1)
                 n_targets.append(n_target)
         else:
-            n_targets = [max(math.ceil(len(duplicates) / 2), 1) for cluster_id, duplicates in duplicate_cluster_map.items()]
+            n_targets = [self._calculate_n_targets_for_duplicate_cluster(duplicates) for duplicates in duplicate_cluster_map.values()]
+        return n_targets
+
+    @staticmethod
+    def _calculate_n_targets_for_duplicate_cluster(duplicates: Cluster) -> int:
+        """
+        Calculates the number of targets per duplicate cluster.
+        :param duplicates: The cluster of duplicates.
+        :return: The number of targets.
+        """
+        originating_clusters = duplicates.get_originating_clusters()
+        if not originating_clusters:
+            originating_clusters = [duplicates]
+        n_targets = 0
+        for cluster in originating_clusters:
+            if cluster.id == DuplicateType.INTRA_CLUSTER.name:
+                n_targets += 1
+            else:
+                n_targets += len(cluster)
         return n_targets
 
     def _summarize_duplicates(self, duplicate_cluster_map: ClusterMapType, generated_artifacts_df: ArtifactDataFrame,
@@ -220,6 +249,7 @@ class ContentRefiner:
         :param duplicate_cluster_artifact_df: Contains the clusters of the duplicates.
         :return: List of the summarized duplicate clusters.
         """
+        logger.info("Summarizing duplicate core goals. ")
         cluster2duplicates = ClusteringUtil.convert_cluster_map_to_artifact_format(duplicate_cluster_map,
                                                                                    generated_artifacts_df)
         content_generator = ContentGenerator(self.args, self.state, PromptDataset(artifact_df=duplicate_cluster_artifact_df))
@@ -242,6 +272,7 @@ class ContentRefiner:
         :param format_variables: The variables to format each prompt with.
         :return:  A mapping of the generated artifact to a list of the predicted links to it and mapping of og cluster to generation.
         """
+        logger.info("Regenerating content for overlapping artifacts. ")
         content_generator = ContentGenerator(self.args, self.state, PromptDataset(artifact_df=duplicate_cluster_artifacts))
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,
                                                                  SupportedPrompts.HGEN_REFINEMENT_QUESTIONNAIRE,

@@ -1,4 +1,5 @@
 import os
+import uuid
 from copy import deepcopy
 from os.path import dirname
 from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
@@ -20,15 +21,17 @@ class Cluster:
     Manages a cluster in a dataset.
     """
 
-    def __init__(self, embeddings_manager: EmbeddingsManager):
+    def __init__(self, embeddings_manager: EmbeddingsManager, c_id: str = None):
         """
         Constructs empty cluster referencing embeddings in manager.
         :param embeddings_manager: The container for all embeddings relating to cluster.
+        :param c_id: The cluster id.
         """
         self.embedding_manager = embeddings_manager
         self.artifact_ids = []
         self.artifact_id_set = set()
         self.votes = 1
+        self.id = str(uuid.uuid4()) if not c_id else c_id
         self.__originating_clusters = []
         self.__init_stats()
 
@@ -43,14 +46,15 @@ class Cluster:
         return f"{method.name}{index}"
 
     @staticmethod
-    def from_artifacts(artifact_ids: List[str], embeddings_manager: EmbeddingsManager) -> "Cluster":
+    def from_artifacts(artifact_ids: List[str], embeddings_manager: EmbeddingsManager, c_id: str = None) -> "Cluster":
         """
         Creates cluster containing given artifact ids.
         :param artifact_ids: The artifacts to include in the cluster.
         :param embeddings_manager: The embeddings manager used to update the stats of the cluster.
+        :param c_id: The cluster id.
         :return: The cluster.
         """
-        cluster = Cluster(embeddings_manager)
+        cluster = Cluster(embeddings_manager, c_id=c_id)
         cluster.add_artifacts(artifact_ids)
         return cluster
 
@@ -188,6 +192,21 @@ class Cluster:
         self.add_artifacts(other_cluster.artifact_ids, update_stats=True)
         self.__originating_clusters.append(other_cluster)
 
+    @staticmethod
+    def from_many_clusters(originating_clusters: List["Cluster"]) -> "Cluster":
+        """
+        Creates a cluster from many smaller ones.
+        :param originating_clusters: The clusters to combine to create a new cluster.
+        :return: A cluster that results from the combination of all the smalelr ones.
+        """
+        cluster = originating_clusters[0]
+        if len(originating_clusters) > 1:
+            for c in originating_clusters[1:]:
+                cluster.combine_with_cluster(c)
+        else:
+            cluster.__originating_clusters = originating_clusters
+        return cluster
+
     def get_originating_clusters(self) -> List["Cluster"]:
         """
         If the cluster originated from the combination of multiple clusters, then returns a list of all original clusters.
@@ -195,10 +214,10 @@ class Cluster:
         """
         return self.__originating_clusters
 
-    def remove_outliers(self) -> None:
+    def remove_outliers(self) -> bool:
         """
         Removes any artifacts that are much different than the rest.
-        :return:
+        :return: True if removed an outlier else False.
         """
         scores = [self.similarity_to_neighbors(a) for a in self.artifact_ids]
         scores_std = pd.Series(scores).std()
@@ -206,8 +225,11 @@ class Cluster:
             sorted_artifact_scores = ListUtil.zip_sort(self.artifact_ids, scores)
             sorted_artifacts, sorted_scores = ListUtil.unzip(sorted_artifact_scores)
             lower, upper = NpUtil.detect_outlier_scores(scores, sigma=1.5)
-            if sorted_scores[0] <= lower + 0.005:
+            outliers = [a for a, score in sorted_artifact_scores if score < lower + 0.005]
+            if outliers:
                 self._remove_artifact(sorted_artifacts[0])
+                return True
+        return False
 
     def _commit_action(self, action: Callable, artifact_ids: Union[List[str], str], update_stats: bool) -> None:
         """
@@ -269,6 +291,7 @@ class Cluster:
         self.max_sim = None
         self.avg_pairwise_sim = None
         self.size_weighted_sim = None
+        self.importance = None
 
     def __calculate_avg_pairwise_distance(self) -> float:
         """
@@ -287,10 +310,21 @@ class Cluster:
         Calculates the average pairwise distance between all points of a matrix, weighted with the size of the cluster.
         :param avg_pairwise_sim: The average pairwise distance.
         :param size: The size of the cluster.
-        :param size_weight: The amount by which the log of the size should be weighted with the avg. pairwise sim
+        :param size_weight: The amount by which the log of the size should be weighted with the avg. pairwise sim.
         :return: Calculates the pairwise distances and returns its average, weighted with the size of the cluster.
         """
         return (size_weight * np.log(size)) + avg_pairwise_sim
+
+    def calculate_importance(self, primary_metric: str):
+        """
+        Calculates how important the cluster is compared to other candidates.
+        :param primary_metric: The primary metric to consider.
+        :return: The importance of the cluster.
+        """
+        primary_metric = getattr(self, primary_metric)
+        if not primary_metric:
+            return 0
+        return primary_metric * self.votes
 
     def __calculate_average_similarity(self) -> float:
         """
@@ -321,6 +355,14 @@ class Cluster:
         max_sim = np.max(similarities)
         med_sim = np.median(similarities)
         return min_sim, max_sim, med_sim
+
+    def __calculate_importance(self) -> float:
+        """
+        Calculates the importance of the cluster compared to other candidates.
+        :return: The importance score.
+        """
+        if self.size_weighted_sim:
+            return self.size_weighted_sim * self.votes
 
     def __len__(self) -> int:
         """

@@ -69,6 +69,7 @@ class MultiLayerHGenJob(AbstractJob):
             project_summary.combine_summaries(current_state.all_artifacts_dataset.project_summary)
         export_dir = os.path.dirname(current_state.export_dir)
         new_params = DataclassUtil.convert_to_dict(current_args,
+                                                   allow_orphans=False,
                                                    source_layer_ids=current_args.target_type,
                                                    export_dir=export_dir,
                                                    source_type=current_args.target_type,

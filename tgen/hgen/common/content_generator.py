@@ -122,6 +122,7 @@ class ContentGenerator:
         file_lengths = [len(content.splitlines()) for content in source_dataset.artifact_df[ArtifactKeys.CONTENT]]
         avg_file_size = sum(file_lengths) / len(file_lengths)
         cluster2artifacts = cluster2artifacts
+        cluster2cohesion = {c_id: cohesion if cohesion else 1 for c_id, cohesion in cluster2cohesion.items()}
         max_cohesion = max(cluster2cohesion.values())
         cluster2retention_percentage = {cluster_id: ContentGenerator.convert_cohesion_to_reduction_percentage(cohesion, max_cohesion)
                                         for cluster_id, cohesion in cluster2cohesion.items()}
@@ -148,13 +149,14 @@ class ContentGenerator:
         :param retention_percentage: Determines the proportion of source artifacts to use for # of generations
         :return: The number of artifacts equal to a proportion of the total
         """
+        debugging = [a[ArtifactKeys.ID] for a in artifacts]
         length_of_artifacts = sum([len(artifact[ArtifactKeys.CONTENT].splitlines()) for artifact in artifacts])
         # adjust for amount of content
-        n_artifacts = length_of_artifacts / avg_file_size
+        n_artifacts = (length_of_artifacts / avg_file_size)
         n_artifacts = min(max(n_artifacts, math.ceil(len(artifacts) / 2)), len(artifacts) + 1)
 
         # adjust for cohesion
-        min_acceptable = max(math.floor(len(artifacts) / 2), 1)
+        min_acceptable = max(math.ceil(len(artifacts) / 2), 1)
         n_targets = max(round(n_artifacts * retention_percentage), min_acceptable)
         return min(round(n_targets), len(artifacts))
 

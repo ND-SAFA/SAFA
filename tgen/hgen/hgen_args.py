@@ -3,8 +3,8 @@ from enum import Enum, auto
 from typing import Dict, List, Union
 
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
-    DEFAULT_ORPHAN_THRESHOLD, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS
-from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+    DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS
+from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.base_object import BaseObject
@@ -43,13 +43,17 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     source_type: str = None
     """
-    The LLM manager to use to generate the new artifact content and other more complex tasks
+    The LLM manager to use to generate the new artifact content and other more complex, longer tasks
     """
-    hgen_llm_manager_best: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
+    hgen_llm_manager_best_long_context: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
     """
-    The LLM manager to use to generate the artifact names and less complex tasks
+    The LLM manager to use to generate the artifact less complex tasks
     """
     hgen_llm_manager_efficient: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
+    """
+    The LLM manager to use to generate the artifact for short context windows
+    """
+    hgen_llm_manager_best_short_context: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
     """
     The LLM manager to use to generate the inputs during step 2
     """
@@ -126,6 +130,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     The sections of the project summary to include in content generation.
     """
     content_generation_project_summary_sections: List[str] = field(default_factory=lambda: [PS_ENTITIES_TITLE])
+    """
+    If False, all orphans will be added to the best fitting cluster.
+    """
+    allow_orphans: bool = True
 
     def __post_init__(self) -> None:
         """
@@ -147,7 +155,9 @@ class HGenArgs(PipelineArgs, BaseObject):
         Sets the llm manager map and the max tokens for each hgen step.
         :return: None
         """
-        self.llm_managers = {e.value: self.hgen_llm_manager_best for e in PredictionStep}
+        self.llm_managers = {e.value: (self.hgen_llm_manager_best_long_context
+                                       if e != PredictionStep.NAME else self.hgen_llm_manager_best_short_context
+                                       ) for e in PredictionStep}
         self.llm_managers[PredictionStep.FORMAT.value] = self.inputs_llm_manager
         for e in PredictionStep:
             if e.value not in self.max_tokens:
@@ -184,7 +194,7 @@ class HGenArgs(PipelineArgs, BaseObject):
             self.source_layer_ids.remove(USE_ALL_LAYERS)
             self.source_layer_ids.extend(self.dataset.artifact_df.get_artifact_types())
 
-    def get_seed_id(self, raise_exception: bool=True) -> str:
+    def get_seed_id(self, raise_exception: bool = True) -> str:
         """
         Gets the id of the seed layer.
         :param raise_exception: If True, raises an exception if no seed args are set.

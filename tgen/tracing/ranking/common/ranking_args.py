@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EMBEDDING_MODEL, \
     DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
@@ -54,7 +54,7 @@ class RankingArgs(PipelineArgs):
     """
     - ranking_llm_model: The model used to rank
     """
-    ranking_llm_model_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
+    ranking_llm_model_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
     """
     - explanation_llm_model: The model used to create explanations
     """

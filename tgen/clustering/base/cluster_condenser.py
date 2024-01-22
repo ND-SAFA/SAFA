@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import List, Optional, Set
 
 import numpy as np
@@ -88,13 +89,13 @@ class ClusterCondenser:
         """
         cluster.remove_outliers()
         contains_cluster = self.contains_cluster(cluster, add_votes=True)
+        did_merge = self.try_merge(cluster)
         if not self.allow_overlapping_clusters:
             overlapping_artifacts = [a for a in cluster if a in self.seen_artifacts]
             if len(cluster) - len(overlapping_artifacts) < self.min_cluster_size:
                 return False
             cluster.remove_artifacts(overlapping_artifacts, update_stats=True)
         contains_new_artifacts = self.contains_new_artifacts(cluster)
-        did_merge = self.try_merge(cluster)
         if len(cluster) == 1 and not contains_new_artifacts:
             return False
         return (contains_new_artifacts or not contains_cluster) and not did_merge
@@ -111,8 +112,13 @@ class ClusterCondenser:
                                                        reverse=True, key=lambda c: cluster.similarity_to(c))
         most_similar_cluster = clusters_to_merge_into[0] if len(clusters_to_merge_into) > 0 else None
         if most_similar_cluster:
-            added_artifacts = self.merge_clusters(most_similar_cluster, cluster)
-            return len(added_artifacts) > 0
+            removed_artifacts = most_similar_cluster.artifact_id_set.difference(cluster.artifact_id_set)
+            added_artifacts = cluster.artifact_id_set.difference(most_similar_cluster.artifact_id_set)
+            if not (len(removed_artifacts) and len(added_artifacts)):
+                return True  # cluster already exists
+            if len(removed_artifacts) == 0:
+                added_artifacts = self.merge_clusters(most_similar_cluster, cluster)
+                return len(added_artifacts) > 0
         return False
 
     def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster) -> List[str]:
@@ -146,8 +152,6 @@ class ClusterCondenser:
             similarity_to_cluster = self.calculate_intersection(source_cluster.artifact_id_set, other_cluster.artifact_id_set)
             if similarity_to_cluster >= self.threshold:
                 is_hit = True
-                if add_votes:
-                    source_cluster.add_vote()
             cluster_similarities[source_cluster] = similarity_to_cluster
         return is_hit
 
@@ -192,12 +196,22 @@ class ClusterCondenser:
         """
         filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
         min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
+        artifacts_list = [tuple(sorted(cluster.artifact_id_set)) for cluster in clusters]
+
+        artifacts2cluster = {}
+        for cluster_index, artifacts in enumerate(artifacts_list):
+            DictUtil.set_or_append_item(artifacts2cluster, artifacts, cluster_index)
+        cluster_votes = Counter(artifacts_list)
+        for artifacts, votes in cluster_votes.items():
+            for cluster_index in artifacts2cluster[artifacts]:
+                clusters[cluster_index].votes = votes
+
         if min_pairwise_avg is not None:
             if self.filter_cohesiveness:
-                filtered_clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
+                filtered_clusters: List[Cluster] = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
 
             clusters = list(sorted(filtered_clusters,
-                                   key=lambda v: getattr(v, self.sort_metric) if getattr(v, self.sort_metric) else 0, reverse=True))
+                                   key=lambda c: c.calculate_importance(self.sort_metric), reverse=True))
         debugging = [cluster.get_content_of_artifacts_in_cluster() for cluster in clusters]
         return clusters
 

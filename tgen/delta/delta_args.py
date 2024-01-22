@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Dict, Union
 
-from tgen.common.constants.model_constants import get_best_default_llm_manager
+from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.json_util import JsonUtil
@@ -20,7 +20,7 @@ class DeltaArgs(PipelineArgs):
     """
     :param llm_manager: The LLM Manager to use for generations
     """
-    llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
+    llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
     """
     :param export_path: Path to save checkpoints to
     """
@@ -40,4 +40,3 @@ class DeltaArgs(PipelineArgs):
         if isinstance(self.change_type_to_diffs, str):
             self.change_type_to_diffs = JsonUtil.read_json_file(self.change_type_to_diffs)
         self.change_type_to_diffs = EnumDict(self.change_type_to_diffs)
-

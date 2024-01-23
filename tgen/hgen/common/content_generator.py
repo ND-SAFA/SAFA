@@ -1,8 +1,8 @@
 import math
 import uuid
-from typing import Union, Dict, List, Optional, Tuple, Set, Any
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
@@ -126,7 +126,7 @@ class ContentGenerator:
         max_cohesion = max(cluster2cohesion.values())
         cluster2retention_percentage = {cluster_id: ContentGenerator.convert_cohesion_to_reduction_percentage(cohesion, max_cohesion)
                                         for cluster_id, cohesion in cluster2cohesion.items()}
-        retention_percentage_delta = max(1 - max(cluster2retention_percentage.values()), 0)
+        retention_percentage_delta = max(0.75 - max(cluster2retention_percentage.values()), 0)
         cluster2retention_percentage = {cluster_id: rp + retention_percentage_delta
                                         for cluster_id, rp in cluster2retention_percentage.items()}
         n_targets = [ContentGenerator._calculate_n_targets_for_cluster(artifacts=cluster2artifacts[i],
@@ -157,8 +157,9 @@ class ContentGenerator:
 
         # adjust for cohesion
         min_acceptable = max(math.ceil(len(artifacts) / 2), 1)
+        max_acceptable = max(len(artifacts) - 1, 1)
         n_targets = max(round(n_artifacts * retention_percentage), min_acceptable)
-        return min(round(n_targets), len(artifacts))
+        return min(round(n_targets), max_acceptable)
 
     def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt, cluster2artifacts: Dict[str, List] = None,
                                         additional_response_instructions: str = EMPTY_STRING) -> QuestionnairePrompt:

@@ -4,19 +4,21 @@ from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 
 CODE_SECTION_ID = "# Code to Summarize"
-CODE_SECTION_HEADER = f"\n\n\n{CODE_SECTION_ID}\n"
-CODE_SUMMARY = [Prompt("\n\n# Task\n"
-                       "First, provide a list of answers about the following questions about the code in the section "
-                       f"`{CODE_SECTION_ID}`:\n"
-                       "\n- What are the inputs/outputs of this code?"
-                       "\n- What is the code achieving?"
-                       "\n Enclose your answer in <notes></notes>."
-                       f"\n\nThen, write a polished summary in one cohesive, detailed paragraph. "
+CODE_SECTION_HEADER = f"{CODE_SECTION_ID}\n"
+CODE_SUMMARY = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADER),
+                Prompt("\n\n# Task\n"
+                       "First, answer this question with as much detail and accuracy as possible."
+                       "\n- What can a user achieve through this code?"
+                       "\n Do NOT reference specific class or function names, but instead describe them in detail. "
+                       "\n Your answer should be in the form of a long, detailed paragraph. Do not speculate or make up information, "
+                       "use only information directly from the code. "
+                       "Enclose your answer in <draft></draft>."
+                       f"\n\nThen, create a cohesive, detailed paragraph, encapsulating all the details from your draft. "
+                       "Focus on describing the behavior provided to the user while interweaving the details of how it provides such behavior."
                        "Write in an active voice and assume your audience is familiar with software system this code belongs to. "
-                       "There should be NO specific class or function names, but otherwise include key details about the code."
-                       "\n\n",
-                       PromptResponseManager(response_tag="summary")),
-                ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADER)]
+                       "Do not make conclusions about the code and only provide information.",
+                       PromptResponseManager(response_tag="summary"))
+                ]
 
 NL_SUMMARY = [
     Prompt("# Task\n"

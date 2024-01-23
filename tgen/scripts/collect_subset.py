@@ -9,7 +9,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.keys.structure_keys import LayerKeys, TraceKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_state import HGenState
@@ -88,7 +88,7 @@ def collect_subset(full_dataset_path: str, subset_dataset_path: str, export_dir:
 
 if __name__ == "__main__":
     PROJECT = "dronology"
-    METHOD = "baseline"
+    METHOD = "clustering"
     FINAL_TYPE = {"dronology": "Functional Requirement", "safa": "Feature"}[PROJECT]
     FIRST_TYPE = {"safa": "Functional Requirement", "dronology": "Design Requirement"}[PROJECT]
 
@@ -110,4 +110,4 @@ if __name__ == "__main__":
             shutil.rmtree(export_path)
 
     os.makedirs(export_path, exist_ok=True)
-    collect_subset(full_path, subset_path, export_path)
+    collect_subset(full_path, subset_path, export_path, state_path)

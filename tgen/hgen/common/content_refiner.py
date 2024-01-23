@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, Set, Any, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
@@ -17,7 +17,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.content_generator import ContentGenerator
-from tgen.hgen.common.duplicate_detector import DuplicateType, DuplicateDetector
+from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt

@@ -242,6 +242,8 @@ class DuplicateDetector:
         most_to_least_overlapping_dups = [d[0] for d in sorted(dup_counter.items(), key=lambda x: x[1], reverse=True)]
         duplicate_artifact_ids: Set[str] = set()
         for dup_art in most_to_least_overlapping_dups:
+            if dup_art not in dup_map:
+                continue
             if len(dup_map[dup_art].difference(duplicate_artifact_ids)) == 0:
                 continue
             can_remove = DuplicateDetector._can_be_removed(dup_art, duplicate_artifact_ids, dup_map)

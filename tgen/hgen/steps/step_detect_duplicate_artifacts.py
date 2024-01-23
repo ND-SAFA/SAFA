@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import Dict, List, Set, Tuple
 
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
@@ -41,15 +42,18 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             state.new_artifact_dataset.artifact_df, original_clusters_to_contents=state.get_cluster2generation(),
             duplicate_type=DuplicateType.INTER_CLUSTER)
 
+        strong_duplicates, _ = self._allow_tracing_between_dups(state, duplicate_map)
+        duplicate_artifact_ids = {a for a in duplicate_artifact_ids if a in strong_duplicates}
         selected_artifacts_df = ArtifactDataFrame(state.all_artifacts_dataset.artifact_df.to_dict("list", index=True))
+        selected_artifacts_df.remove_rows(duplicate_artifact_ids)
         state.selected_artifacts_dataset = PromptDataset(artifact_df=selected_artifacts_df,
                                                          project_summary=state.all_artifacts_dataset.project_summary)
-
-        self._allow_tracing_between_dups(state, duplicate_map)
+        state.selected_predictions = [pred for pred in state.selected_predictions
+                                      if pred[TraceKeys.parent_label()] not in duplicate_artifact_ids]
 
     @staticmethod
-    def _allow_tracing_between_dups(state: HGenState,
-                                    duplicate_map: Dict[str, Set[str]]) -> Tuple[Dict[str, Set], Dict[str, List[Trace]]]:
+    def _allow_tracing_between_dups(state: HGenState, duplicate_map: Dict[str, Set[str]]) -> Tuple[
+        Dict[str, Set], Dict[str, List[Trace]]]:
         """
         Re traces the children of a duplicate being removed to its potential dups
         :param state: The current state of HGEN
@@ -76,7 +80,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
             dup_selections = []
             for child, traces in child2traces.items():
-                selections = SelectByThreshold.select(traces, baseline[child] - 0.1)
+                selections = SelectByThreshold.select(traces, baseline[child] - 0.15)
                 dup_selections.extend(selections)
             dup2selected = RankingUtil.group_trace_predictions(dup_selections, TraceKeys.parent_label())
             confirmed_dups = set()
@@ -87,7 +91,9 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                 state.selected_predictions.extend(selected)
             if len(confirmed_dups):
                 strong_duplicates[dup_id] = confirmed_dups
-        return strong_duplicates, dup2links
+        dup_counter = Counter([d for dups in strong_duplicates.values() for d in dups])
+        selected_duplicates = DuplicateDetector.find_most_duplicated_artifacts(dup_counter, strong_duplicates)
+        return selected_duplicates, dup2links
 
     @staticmethod
     def _re_trace_duplicates(state: HGenState, duplicate_artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]]) -> None:

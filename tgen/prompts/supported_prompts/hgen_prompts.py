@@ -71,12 +71,14 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     QuestionnairePrompt(
         question_prompts=[
             Prompt("Your first task is to construct 1-2 well written paragraphs that will guide your work in the next task. "
-                   "In the paragraph, identify what is the core goal or user need addressed by all or most of the {source_type}. "
-                   "What action or system behavior is provided to the user by the {source_code}? "
-                   "Generalize technical specifics into overarching statement that reflect this key user actions and needs. "
-                   "Then provide specific details that highlight how the {source_type} provide the user the ability to perform "
-                   "the actions, focusing on the high-level system behavior and details that are most important "
-                   "for the scope and purposes of a {target_type}. "),
+                   "In the paragraph, identify what is the core goal or user need addressed by all or most of the {source_type}  "
+                   "as well as the action, system behavior, or information that is provided to the user "
+                   "by the {source_type} to support this core goal. "
+                   "Discuss how these actions relate to one another. "
+                   "Provide specific details that highlight how the {source_type} "
+                   "provide the user the ability to perform each of these actions, focusing on the "
+                   "details that are most important for the scope and purposes of a {target_type}. "
+                   "Be as specific as possible."),
             Prompt("Importantly, do not make an information up or make assumptions. "
                    "Only use information directly from the {source_type}. "
                    "You answer should be given in 1-2 cohesive, well-written paragraphs.")
@@ -84,21 +86,22 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
         enumeration_chars=["\t"],
         response_manager=PromptResponseManager(response_tag="core-goals")),
     QuestionnairePrompt(
-        instructions="Then use your common goals and actions to create {n_targets} {target_type}s "
-                     "When creating the higher-level {target_type} ensure that they are:",
+        instructions="Then use the actions you identified to create {n_targets} {target_type}s "
+                     "When creating the {target_type} ensure that they are:",
         question_prompts=[
             QuestionPrompt(
                 "Focused on the core goals and user needs identified above. "),
+            QuestionPrompt(
+                "Grouping related or overlapping actions across {source_type} together. "),
             QuestionnairePrompt(
                 instructions="The {target_type} fits the following description:",
                 question_prompts=[QuestionPrompt("{description}")],
                 enumeration_chars=["*"]),
             QuestionPrompt(
-                "Incorporate appropriate details from the {source_type}, "
-                "but stay focused on the high-level goals and system-behavior. "
+                "Incorporate appropriate details from the {source_type} to ensure that the {target_type} are clear and unambiguous. "
                 "Refer to the core goals section to identify details necessary to understand "
                 "how the core user need / goal is being facilitated and/or what behavior is occurring. "
-                "Do not use ambiguous language, but remain focused on the central goal of the {target_type}. "
+                "All details MUST be focused on the main goal of the {target_type}. "
                 "Do NOT make up information. "
                 "ALL information must be from the provided {source_type}. "),
             QuestionnairePrompt(

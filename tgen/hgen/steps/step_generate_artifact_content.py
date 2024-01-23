@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Set, Tuple
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, TAB
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
 from tgen.common.logging.logger_manager import logger
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.content_generator import ContentGenerator
@@ -34,7 +34,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             n_targets = ContentGenerator.calculate_number_of_targets_per_cluster(dataset.artifact_df.index,
                                                                                  state.get_cluster2artifacts(),
                                                                                  state.cluster2cohesion,
-                                                                                 state.source_dataset)
+                                                                                 state.source_dataset,
+                                                                                 first_layer=args.source_type == "code")
             format_variables.update({"n_targets": n_targets})
 
         content_generator = ContentGenerator(args, state, dataset)

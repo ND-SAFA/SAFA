@@ -92,7 +92,6 @@ class LLMTrainer(AbstractTrainer):
         else:
             assert len(datasets) == 1, "If prompts are provided, only one dataset may be used"
             prompt_df = datasets[0].get_prompt_dataframe()
-
         reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
         missing_generations = isinstance(reloaded, List) or reloaded is None
 

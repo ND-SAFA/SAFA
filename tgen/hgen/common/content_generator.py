@@ -110,7 +110,8 @@ class ContentGenerator:
 
     @staticmethod
     def calculate_number_of_targets_per_cluster(artifact_ids: List, cluster2artifacts: Dict[str, List[EnumDict]],
-                                                cluster2cohesion: Dict[str, float], source_dataset: PromptDataset) -> List[int]:
+                                                cluster2cohesion: Dict[str, float], source_dataset: PromptDataset,
+                                                first_layer: bool = True) -> List[int]:
         """
         Calculates the expected number of targets for each cluster based on the number of artifacts in each cluster
         :param artifact_ids: The ids of the artifact representing each cluster
@@ -126,13 +127,13 @@ class ContentGenerator:
         max_cohesion = max(cluster2cohesion.values())
         cluster2retention_percentage = {cluster_id: ContentGenerator.convert_cohesion_to_reduction_percentage(cohesion, max_cohesion)
                                         for cluster_id, cohesion in cluster2cohesion.items()}
-        retention_percentage_delta = max(0.75 - max(cluster2retention_percentage.values()), 0)
+        retention_percentage_delta = max(1 - max(cluster2retention_percentage.values()), 0)
         cluster2retention_percentage = {cluster_id: rp + retention_percentage_delta
                                         for cluster_id, rp in cluster2retention_percentage.items()}
         n_targets = [ContentGenerator._calculate_n_targets_for_cluster(artifacts=cluster2artifacts[i],
                                                                        avg_file_size=avg_file_size,
                                                                        retention_percentage=cluster2retention_percentage[i])
-                     for i in artifact_ids]
+                     for i in artifact_ids] if first_layer else [1 for _ in artifact_ids]
         return n_targets
 
     @staticmethod

@@ -92,7 +92,7 @@ if __name__ == "__main__":
     subset_path = os.path.join(DATASET_PATH, SUBSET_PROJECT)
     export_path = os.path.join(DATASET_PATH, EXPORT_PROJECT)
 
-    existing_files = os.listdir(export_path)
+    existing_files = os.listdir(export_path) if os.path.isdir(export_path) else []
     if len(existing_files) > 0:
         if "y" in input(f"{export_path} contains {len(existing_files)} files. Delete them?").lower():
             shutil.rmtree(export_path)

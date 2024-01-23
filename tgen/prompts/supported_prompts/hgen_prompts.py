@@ -67,85 +67,24 @@ GENERATATION_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("Ensure that all features and functionality are included in the {target_type}s.")],
     enumeration_chars=["-"])
 
-CLUSTERING_QUESTIONNAIRE1 = QuestionnairePrompt(question_prompts=[
-    QuestionnairePrompt(
-        question_prompts=[
-            Prompt(
-                "Your first task is to construct several well written paragraphs that will guide your work in the next task. "
-                "Identify {n_targets} cohesive groups for the user needs and actions that maximize the "
-                "separation of responsibility between groups. "
-                "Detail how each of the {source_type} fit into your groupings, indicating where EACH {source_type} belongs. "
-                "Details should highlight how the {source_type} within a group provide the user the ability to perform "
-                "the actions, focusing on the high-level system behavior. "
-                "IMPORTANTLY, the {n_targets} groups should be distinct from one another, "
-                "and each one should be FOCUSED on a CLEAR, SPECIFIC goal that represents an important user need, action or goal. \n"),
-            Prompt("Importantly, do not make an information up or make assumptions. "
-                   "Only use information directly from the {source_type}. "
-                   "You answer should be given in TWO cohesive, well-written paragraphs."),
-            ConditionalPrompt(candidate_prompts=[Prompt("Consider how ALL {source_type} "
-                                                        "might fit into the ONE group.")],
-                              prompt_selector=lambda kwargs: 1 - int(kwargs.get("n_targets") == 1))
-        ],
-        enumeration_chars=["\t"],
-        response_manager=PromptResponseManager(response_tag="core-goals")),
-    QuestionnairePrompt(
-        instructions="Then use your groupings of the common goals and actions to create {n_targets} {target_type}s "
-                     "When creating the {target_type} ensure that they are:",
-        question_prompts=[
-            QuestionPrompt(
-                "Focused on the core goals and user needs identified above. "),
-            QuestionnairePrompt(
-                instructions="The {target_type} fits the following description:",
-                question_prompts=[QuestionPrompt("{description}")],
-                enumeration_chars=["*"]),
-            QuestionPrompt(
-                "Incorporate appropriate details from the {source_type} belonging to the specific group for a {target_type}. "
-                "Refer to the core goals section to identify details necessary to understand "
-                "how the core user need / goal is being facilitated and/or what behavior is occurring. "
-                "Do not use ambiguous language, include specific information where possible, but remain focused on the central goal. "
-                "Do NOT make up information. "
-                "ALL information must be from the provided {source_type}. "),
-            QuestionnairePrompt(
-                instructions="The {target_type} uses this format as a guideline:",
-                question_prompts=[QuestionPrompt("{format}"),
-                                  QuestionPrompt("For example: {example}")],
-                enumeration_chars=["*"]),
-            QuestionPrompt("Importantly, EACH {target_type} should be unique from the others and focused on a clear single purpose "
-                           "which is separate from all others so that "
-                           "EACH {target_type} should remain focused in its specific goal. "),
-            ConditionalPrompt(
-                candidate_prompts=[Prompt("Create {n_targets} DISTINCT and DETAILED {target_type} using the groups "
-                                          "identified in core goals.")],
-                prompt_selector=lambda kwargs: 1 - int(
-                    kwargs.get("n_targets") is not None))
-
-        ], enumeration_chars=["-"]
-    )])
-
 CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     QuestionnairePrompt(
         question_prompts=[
-            Prompt(
-                "Your first task is to construct several well written paragraphs that will guide your work in the next task. "
-                "Identify {n_targets} cohesive groups for the user needs and actions that maximize the "
-                "separation of responsibility between groups. "
-                "Detail how each of the {source_type} fit into your groupings, indicating where EACH {source_type} belongs. "
-                "Details should highlight how the {source_type} within a group provide the user the ability to perform "
-                "the actions, focusing on the high-level system behavior. "
-                "IMPORTANTLY, the {n_targets} groups should be distinct from one another, "
-                "and each one should be FOCUSED on a CLEAR, SPECIFIC goal that represents an important user need, action or goal. \n"),
+            Prompt("Your first task is to construct 1-2 well written paragraphs that will guide your work in the next task. "
+                   "In the paragraph, identify what is the core goal or user need addressed by all or most of the {source_type}. "
+                   "What action or system behavior is provided to the user by the {source_code}? "
+                   "Generalize technical specifics into overarching statement that reflect this key user actions and needs. "
+                   "Then provide specific details that highlight how the {source_type} provide the user the ability to perform "
+                   "the actions, focusing on the high-level system behavior and details that are most important "
+                   "for the scope and purposes of a {target_type}. "),
             Prompt("Importantly, do not make an information up or make assumptions. "
                    "Only use information directly from the {source_type}. "
-                   "You answer should be given in TWO cohesive, well-written paragraphs."),
-            ConditionalPrompt(candidate_prompts=[Prompt("Consider how ALL {source_type} "
-                                                        "might fit into the ONE group.")],
-                              prompt_selector=lambda kwargs: 1 - int(kwargs.get("n_targets") == 1))
+                   "You answer should be given in 1-2 cohesive, well-written paragraphs.")
         ],
         enumeration_chars=["\t"],
         response_manager=PromptResponseManager(response_tag="core-goals")),
     QuestionnairePrompt(
-        instructions="Then use your groupings of the common goals and actions to create {n_targets} {target_type}s "
-                     "at a higher level of abstraction than the given {source_type}."
+        instructions="Then use your common goals and actions to create {n_targets} {target_type}s "
                      "When creating the higher-level {target_type} ensure that they are:",
         question_prompts=[
             QuestionPrompt(
@@ -155,10 +94,11 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
                 question_prompts=[QuestionPrompt("{description}")],
                 enumeration_chars=["*"]),
             QuestionPrompt(
-                "Incorporate appropriate details from the {source_type} belonging to the specific group for a {target_type}. "
+                "Incorporate appropriate details from the {source_type}, "
+                "but stay focused on the high-level goals and system-behavior. "
                 "Refer to the core goals section to identify details necessary to understand "
                 "how the core user need / goal is being facilitated and/or what behavior is occurring. "
-                "Do not use ambiguous language, include specific information where possible, but remain focused on the central goal. "
+                "Do not use ambiguous language, but remain focused on the central goal of the {target_type}. "
                 "Do NOT make up information. "
                 "ALL information must be from the provided {source_type}. "),
             QuestionnairePrompt(
@@ -170,8 +110,7 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
                            "which is separate from all others so that "
                            "EACH {target_type} should remain focused in its specific goal. "),
             ConditionalPrompt(
-                candidate_prompts=[Prompt("Create {n_targets} DISTINCT and DETAILED {target_type} using the groups "
-                                          "identified in core goals.")],
+                candidate_prompts=[Prompt("Create {n_targets} DISTINCT {target_type}")],
                 prompt_selector=lambda kwargs: 1 - int(
                     kwargs.get("n_targets") is not None))
 
@@ -212,28 +151,13 @@ DUP_SUMMARY_TASKS = QuestionnairePrompt([
 REFINEMENT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     ConditionalPrompt(candidate_prompts=[CLUSTERING_QUESTIONNAIRE.child_prompts[0],
                                          QuestionnairePrompt(
-                                             question_prompts=[Prompt("Focus on these core goals / user needs when creating "
-                                                                      "the {n_targets} {target_type}: "
+                                             question_prompts=[Prompt("Focus on the core goals / user needs below when creating "
+                                                                      "the {n_targets} {target_type}. "
+                                                                      f"{NEW_LINE} CORE GOALS: "
                                                                       f"{NEW_LINE}"
                                                                       "{functionality}"
-                                                                      f"{NEW_LINE}"),
-                                                               Prompt(
-                                                                   "Based on these core goals, "
-                                                                   "Identify {n_targets} cohesive groups for the user needs "
-                                                                   "and actions that maximize the "
-                                                                   "separation of responsibility between groups. "
-                                                                   "Include details necessary to understand "
-                                                                   "how the core user need / goal of each group is being facilitated. "
-                                                                   "IMPORTANTLY, the {n_targets} groups should be distinct "
-                                                                   "from one another, "
-                                                                   "and each one should be FOCUSED on a CLEAR, SPECIFIC goal "
-                                                                   "that represents an important user need, action or goal. \n"
-                                                                   "Do not make an information up or make assumptions. "
-                                                                   "Only use information directly from the {source_type} "
-                                                                   "and core goals above. "
-                                                                   "You answer should be given in a cohesive, well-written paragraph.",
-                                                                   response_manager=PromptResponseManager("core-goals"))],
-                                             enumeration_chars=["i", "ii"])
+                                                                      f"{NEW_LINE}")],
+                                             enumeration_chars=["!"])
                                          ],
                       prompt_selector=lambda kwargs: int(kwargs.get("functionality") is not None)),
     *CLUSTERING_QUESTIONNAIRE.child_prompts[1:]

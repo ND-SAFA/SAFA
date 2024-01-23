@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlTreeObjectsResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
@@ -369,6 +370,17 @@ public class GithubProjectCreationJob extends CommitJob {
         this.getServiceProvider().getGithubProjectRepository().save(githubProject);
 
         logger.log("Retrieved %d artifacts from project.", commit.getArtifacts().getSize());
+    }
+
+    @IJobStep(value = "Generate Summaries", position = 6)
+    public void generateSummaries(JobLogger logger) {
+        if (!importSettings.isSummarize()) {
+            return;
+        }
+
+        List<ArtifactAppEntity> newArtifacts = getProjectCommitDefinition().getArtifactList(ModificationType.ADDED);
+        SummaryService summaryService = getServiceProvider().getSummaryService();
+        summaryService.addSummariesToCode(newArtifacts, null, logger);
     }
 
     /**

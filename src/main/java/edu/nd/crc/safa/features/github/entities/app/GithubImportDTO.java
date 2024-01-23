@@ -14,4 +14,6 @@ public class GithubImportDTO {
 
     private UUID orgId;
     private UUID teamId;
+
+    private boolean summarize;
 }

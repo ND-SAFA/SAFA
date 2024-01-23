@@ -1,4 +1,5 @@
 import os.path
+import shutil
 from typing import Dict, List
 
 import numpy as np
@@ -77,7 +78,7 @@ def collect_subset(full_dataset_path: str, subset_dataset_path: str, export_dir:
 
 if __name__ == "__main__":
     PROJECT = "dronology"
-    METHOD = "clustering"
+    METHOD = "baseline"
     FINAL_TYPE = {"dronology": "Functional Requirement", "safa": "Feature"}[PROJECT]
 
     FULL_PROJECT = f"papers/hgen/code/{PROJECT}/full/{FINAL_TYPE}"  # dataset in output path
@@ -90,6 +91,11 @@ if __name__ == "__main__":
     full_path = os.path.join(HGEN_OUTPUT_PATH, METHOD, FULL_PROJECT, "final_generated_dataset/safa")
     subset_path = os.path.join(DATASET_PATH, SUBSET_PROJECT)
     export_path = os.path.join(DATASET_PATH, EXPORT_PROJECT)
-    os.makedirs(export_path, exist_ok=True)
 
+    existing_files = os.listdir(export_path)
+    if len(existing_files) > 0:
+        if "y" in input(f"{export_path} contains {len(existing_files)} files. Delete them?").lower():
+            shutil.rmtree(export_path)
+
+    os.makedirs(export_path, exist_ok=True)
     collect_subset(full_path, subset_path, export_path)

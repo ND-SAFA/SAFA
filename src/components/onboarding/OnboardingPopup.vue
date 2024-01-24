@@ -24,7 +24,7 @@
         <flex-box align="center">
           <text-button
             text
-            color="secondary"
+            color="primary"
             icon="calendar"
             label="Contact Us"
             style="position: absolute; bottom: 0; right: 0"

@@ -230,4 +230,13 @@ public class BillingService {
         organization.setPaymentTier(paymentTier);
         organizationService.updateOrganization(organization);
     }
+
+    /**
+     * Get the price of a credit
+     *
+     * @return The price of a credit, in cents
+     */
+    public long getCreditPrice() {
+        return externalBillingService.getCreditPrice();
+    }
 }

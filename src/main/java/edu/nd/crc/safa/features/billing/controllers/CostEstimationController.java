@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.billing.services.CostEstimationService;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -22,11 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class CostEstimationController extends BaseController {
 
     private final CostEstimationService costEstimationService;
+    private final BillingService billingService;
 
     public CostEstimationController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
-                                    CostEstimationService costEstimationService) {
+                                    CostEstimationService costEstimationService,
+                                    BillingService billingService) {
         super(resourceBuilder, serviceProvider);
         this.costEstimationService = costEstimationService;
+        this.billingService = billingService;
     }
 
     /**
@@ -39,14 +43,17 @@ public class CostEstimationController extends BaseController {
     @PostMapping(AppRoutes.HGen.ESTIMATE)
     public CostEstimationDTO estimateGenerateHierarchy(@PathVariable UUID versionId,
                                                        @RequestBody @Valid HGenRequest request) throws Exception {
-        int cost = costEstimationService.estimateHgen(request.getArtifacts().size(), request.getTargetTypes().size());
-        return new CostEstimationDTO(cost);
+        int credits = costEstimationService.estimateHgen(request.getArtifacts().size(),
+            request.getTargetTypes().size());
+        long pricePerCredit = billingService.getCreditPrice();
+        return new CostEstimationDTO(credits, credits * pricePerCredit);
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CostEstimationDTO {
-        private int cost;
+        private int credits;
+        private long price;
     }
 }

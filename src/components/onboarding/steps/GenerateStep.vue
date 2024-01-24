@@ -130,7 +130,7 @@ import JobLoadingSubStep from "./JobLoadingSubStep.vue";
 const status = ref<"initial" | "loading" | "success" | "error">("initial");
 
 const fileCount = computed(() => artifactStore.allArtifacts.length);
-const totalArtifactCount = computed(() => onboardingStore.cost || 0);
+const totalArtifactCount = computed(() => onboardingStore.cost?.credits || 0);
 const documentCount = computed(
   () => totalArtifactCount.value - fileCount.value
 );
@@ -139,8 +139,15 @@ const codeFiles = computed(
   () =>
     `${fileCount.value} Files | ${documentCount.value} Generated Documents (Estimate)`
 );
+
+const dollars = computed(() =>
+  onboardingStore.cost ? Math.floor(onboardingStore.cost.price / 100) : 0
+);
+const cents = computed(() =>
+  onboardingStore.cost ? Math.floor(onboardingStore.cost.price % 100) : 0
+);
 const generateCost = computed(() =>
-  onboardingStore.cost ? `$${Math.floor(onboardingStore.cost)}.00` : ""
+  onboardingStore.cost ? `$${dollars.value}.${cents.value}` : ""
 );
 
 const generateLabel = computed(() =>

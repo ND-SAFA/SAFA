@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { JobSchema, LocalStorageKeys } from "@/types";
+import { CostEstimateSchema, JobSchema, LocalStorageKeys } from "@/types";
 import {
   ARTIFACT_GENERATION_ONBOARDING,
   MAX_GENERATED_BASE_ARTIFACTS,
@@ -61,7 +61,7 @@ export const useOnboarding = defineStore("useOnboarding", {
     /**
      * The cost of generating the selected project data.
      */
-    cost: null as number | null,
+    cost: null as CostEstimateSchema | null,
     /**
      * Whether payment has been confirmed.
      */

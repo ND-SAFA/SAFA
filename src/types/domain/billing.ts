@@ -3,9 +3,13 @@
  */
 export interface CostEstimateSchema {
   /**
-   * The estimated cost of generating, in dollars.
+   * The number of credits that will be used.
    */
-  cost: number;
+  credits: number;
+  /**
+   * The price in cents of the credits
+   */
+  price: number;
 }
 
 /**

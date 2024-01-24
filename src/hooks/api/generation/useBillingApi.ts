@@ -1,6 +1,10 @@
 import { defineStore } from "pinia";
 
-import { GenerateArtifactSchema, IOHandlerCallback } from "@/types";
+import {
+  CostEstimateSchema,
+  GenerateArtifactSchema,
+  IOHandlerCallback,
+} from "@/types";
 import { onboardingStore, orgStore, projectStore, useApi } from "@/hooks";
 import {
   createCheckoutSession,
@@ -24,11 +28,11 @@ export const useBillingApi = defineStore("billingApi", () => {
    */
   async function handleEstimateCost(
     configuration: GenerateArtifactSchema,
-    callbacks: IOHandlerCallback<number>
+    callbacks: IOHandlerCallback<CostEstimateSchema>
   ): Promise<void> {
     await billingApi.handleRequest(
       async () =>
-        (await createCostEstimate(configuration, projectStore.versionId)).cost,
+        await createCostEstimate(configuration, projectStore.versionId),
       callbacks
     );
   }

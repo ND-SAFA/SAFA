@@ -9,11 +9,35 @@
   >
     <q-card class="bg-background">
       <q-bar class="bg-background q-mt-md">
+        <flex-box align="center">
+          <icon variant="safa" class="q-mr-md" />
+          <typography
+            el="h1"
+            variant="subtitle"
+            secondary
+            value="Early Access"
+          />
+        </flex-box>
+
         <q-space />
 
-        <text-button text icon="cancel" @click="onboardingStore.handleClose">
-          Skip Onboarding
-        </text-button>
+        <flex-box align="center">
+          <text-button
+            text
+            color="primary"
+            icon="calendar"
+            label="Contact Us"
+            style="position: absolute; bottom: 0; right: 0"
+            class="q-ma-md"
+            @click="onboardingStore.handleScheduleCall(false)"
+          />
+          <text-button
+            text
+            icon="cancel"
+            label="Skip Onboarding"
+            @click="onboardingStore.handleClose"
+          />
+        </flex-box>
       </q-bar>
 
       <flex-box
@@ -108,6 +132,7 @@ import {
   GenerateStep,
   ProjectPreview,
 } from "@/components/onboarding/steps";
+import Icon from "@/components/common/display/icon/Icon.vue";
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
 

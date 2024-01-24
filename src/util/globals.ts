@@ -33,8 +33,8 @@ export const LARGE_NODE_LAYOUT_COUNT = 50;
  * The demo user's account.
  */
 export const DEMO_ACCOUNT = {
-  email: "view@safa.ai",
-  password: "safa!",
+  email: process.env.VUE_APP_DEMO_EMAIL || "",
+  password: process.env.VUE_APP_DEMO_PW || "",
 };
 
-export const DEMO_VERSION_ID = "72f40221-565f-4c90-9ab1-f5d4bf665390"; // Autoware
+export const DEMO_VERSION_ID = process.env.VUE_APP_DEMO_PROJECT || "";

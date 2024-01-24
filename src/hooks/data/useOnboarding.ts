@@ -136,7 +136,8 @@ export const useOnboarding = defineStore("useOnboarding", {
       // Open the onboarding workflow if it has not yet been completed, or is manually opened.
       if (
         open ||
-        localStorage.getItem(LocalStorageKeys.onboarding) !== "true"
+        (localStorage.getItem(LocalStorageKeys.onboarding) !== "true" &&
+          projectStore.allProjects.length <= 1)
       ) {
         this.open = true;
       } else return;

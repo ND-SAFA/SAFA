@@ -65,3 +65,17 @@ export interface OrganizationSchema {
    */
   permissions: PermissionType[];
 }
+
+/**
+ * The schema for updating the payment tier of an organization.
+ */
+export interface UpdatePaymentTierSchema {
+  /**
+   * The id of the organization to update.
+   */
+  organizationId: string;
+  /**
+   * The new payment tier.
+   */
+  tier: OrgPaymentTier;
+}

@@ -197,6 +197,7 @@ export enum Endpoint {
 
   createCostEstimate = "hgen/:versionId/estimate",
   createCheckoutSession = "billing/checkout",
+  setOrgPaymentTier = "billing/update-payment-tier",
   deleteCheckoutSession = "stripe/cancel/:sessionId",
 }
 

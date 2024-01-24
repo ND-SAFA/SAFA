@@ -51,7 +51,9 @@ const props = defineProps<ArtifactNameDisplayProps>();
 const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
 
 const splitLines = computed(
-  () => props.artifact.isCode || props.artifact.name.includes("/")
+  () =>
+    props.artifact.isCode ||
+    (props.artifact.name.includes("/") && !props.artifact.name.includes(" "))
 );
 
 const codePath = computed(() =>

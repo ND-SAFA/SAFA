@@ -7,6 +7,7 @@ import {
   MemberRole,
   MembershipType,
   OrganizationTabTypes,
+  ProjectOwnerType,
   ProjectTableTab,
   SearchSelectOption,
   SelectOption,
@@ -158,6 +159,18 @@ export function uploadPanelOptions(): SelectOption<UploadPanelType>[] {
     createOption("bulk", "Bulk File Upload"),
     createOption("github", "GitHub Upload"),
     createOption("jira", "Jira Upload"),
+  ];
+}
+
+/**
+ * @return display names for project owner types.
+ */
+export function ownerTypeOptions(): SelectOption<ProjectOwnerType>[] {
+  return [
+    createOption("ORGANIZATION", "Organization"),
+    createOption("TEAM", "Organization Team"),
+    createOption("USER_ID", "Organization Member"),
+    createOption("USER_EMAIL", "User Email"),
   ];
 }
 

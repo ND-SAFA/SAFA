@@ -4,6 +4,7 @@ import {
   JobSchema,
   ProjectSchema,
   ProjectUploadFormData,
+  TransferProjectSchema,
   VersionUploadFormData,
 } from "@/types";
 import { buildRequest } from "@/api";
@@ -119,4 +120,23 @@ export async function deleteProject(projectId: string): Promise<void> {
   return buildRequest<void, "projectId">("updateProject", {
     projectId,
   }).delete();
+}
+
+/**
+ * Transfers the ownership of a project.
+ *
+ * @param projectId - The project ID to transfer.
+ * @param newOwner - The new owner of the project.
+ * @return The updated project identifier.
+ */
+export async function setProjectOwner(
+  projectId: string,
+  newOwner: TransferProjectSchema
+): Promise<IdentifierSchema> {
+  return buildRequest<IdentifierSchema, "projectId", TransferProjectSchema>(
+    "transferProject",
+    {
+      projectId,
+    }
+  ).put(newOwner);
 }

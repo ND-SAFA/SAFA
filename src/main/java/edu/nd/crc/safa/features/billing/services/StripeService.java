@@ -121,7 +121,6 @@ public class StripeService implements IExternalBillingService {
      * @return The price of a credit according to stripe
      */
     private long retrieveCreditPriceFromStripe() {
-        System.out.println("GOING TO STRIPE");
         try {
             return Price.retrieve(creditPriceKey).getUnitAmount();
         } catch (StripeException e) {

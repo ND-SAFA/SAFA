@@ -45,6 +45,10 @@ public class CostEstimationController extends BaseController {
                                                        @RequestBody @Valid HGenRequest request) throws Exception {
         int credits = costEstimationService.estimateHgen(request.getArtifacts().size(),
             request.getTargetTypes().size());
+        return createCostEstimation(credits);
+    }
+
+    private CostEstimationDTO createCostEstimation(int credits) {
         long pricePerCredit = billingService.getCreditPrice();
         return new CostEstimationDTO(credits, credits * pricePerCredit);
     }

@@ -35,4 +35,11 @@ public interface IExternalBillingService {
      * @param transaction The transaction that is being canceled
      */
     void cancelTransaction(Transaction transaction);
+
+    /**
+     * Get the price of a single credit, in cents
+     *
+     * @return The price of a credit, in cents
+     */
+    long getCreditPrice();
 }

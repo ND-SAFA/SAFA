@@ -4,11 +4,13 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.billing.entities.db.Transaction;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.utilities.CachedValue;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.Price;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -43,6 +45,8 @@ public class StripeService implements IExternalBillingService {
 
     private final BillingService billingService;
 
+    private final CachedValue<Long> priceOfCredit;
+
     public StripeService(@Value("${stripe.api_key}") String apiKey, @Lazy BillingService billingService) {
         this.billingService = billingService;
 
@@ -52,6 +56,8 @@ public class StripeService implements IExternalBillingService {
             logger.warn("No Stripe API key provided. Billing services will be unavailable. "
                 + "Set the environment variable STRIPE_API_KEY to fix this issue.");
         }
+
+        priceOfCredit = new CachedValue<>(this::retrieveCreditPriceFromStripe);
     }
 
     @Override
@@ -99,6 +105,27 @@ public class StripeService implements IExternalBillingService {
             expireSession(session);
         }
         logger.info("Canceled transaction with reference ID {}", transaction.getId());
+    }
+
+    // This will get the price of a credit with caching so that many requests to the BE do not
+    // spam Stripe with requests
+    @Override
+    public long getCreditPrice() {
+        return priceOfCredit.getValue();
+    }
+
+    /**
+     * As opposed to {@link #getCreditPrice()}, this actually goes to Stripe to retrieve the
+     * price, without any caching
+     *
+     * @return The price of a credit according to stripe
+     */
+    private long retrieveCreditPriceFromStripe() {
+        try {
+            return Price.retrieve(creditPriceKey).getUnitAmount();
+        } catch (StripeException e) {
+            throw new SafaError("Failed to retrieve credit price from Stripe", e);
+        }
     }
 
     /**

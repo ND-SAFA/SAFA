@@ -115,6 +115,8 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
 
   async function handleLogin(user: UserPasswordSchema): Promise<void> {
     await sessionApi.handleRequest(async () => {
+      permissionStore.isDemo = false;
+
       const session = await createLoginSession(user);
       const goToPath = getParam(QueryParams.LOGIN_PATH);
       const query = { ...getParams() };

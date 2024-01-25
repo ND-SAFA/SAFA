@@ -78,8 +78,9 @@ export interface SessionApiHook {
    * Attempts to log a user in.
    *
    * @param user - The user to log in.
+   * @param demo - Whether to set permissions to demo restrictions.
    */
-  handleLogin(user: UserPasswordSchema): Promise<void>;
+  handleLogin(user: UserPasswordSchema, demo?: boolean): Promise<void>;
   /**
    * Logs in to the demo account and opens the demo project.
    */

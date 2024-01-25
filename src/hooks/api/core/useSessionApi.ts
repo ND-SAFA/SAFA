@@ -113,9 +113,12 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     });
   }
 
-  async function handleLogin(user: UserPasswordSchema): Promise<void> {
+  async function handleLogin(
+    user: UserPasswordSchema,
+    demo?: boolean
+  ): Promise<void> {
     await sessionApi.handleRequest(async () => {
-      permissionStore.isDemo = false;
+      permissionStore.isDemo = demo || false;
 
       const session = await createLoginSession(user);
       const goToPath = getParam(QueryParams.LOGIN_PATH);
@@ -143,9 +146,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   }
 
   async function handleDemoLogin(): Promise<void> {
-    permissionStore.isDemo = true;
-
-    await handleLogin(DEMO_ACCOUNT).then(() =>
+    await handleLogin(DEMO_ACCOUNT, true).then(() =>
       getVersionApiStore.handleLoad(DEMO_VERSION_ID)
     );
   }

@@ -8,8 +8,4 @@ export const ENABLED_FEATURES = {
   ACTIVE_USERS: false,
 
   TRACE_MATRIX_TABLE: false,
-
-  ONBOARDING_GENERATE: true,
-
-  DEMO_SIGNUP: false,
 };

@@ -86,14 +86,7 @@
               <summarize-step />
             </template>
             <template #4>
-              <generate-step v-if="ENABLED_FEATURES.ONBOARDING_GENERATE" />
-              <typography
-                v-else
-                value="
-                  Now that your data has been imported, our team will run SAFA's document generation ASAP!
-                  Check back soon to see your generated documentation.
-                "
-              />
+              <generate-step />
             </template>
           </stepper>
         </flex-item>
@@ -116,7 +109,6 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { ENABLED_FEATURES } from "@/util";
 import { onboardingStore, permissionStore, sessionStore } from "@/hooks";
 import {
   TextButton,

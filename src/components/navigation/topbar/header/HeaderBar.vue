@@ -7,7 +7,7 @@
       <q-space />
       <project-searchbar v-if="graphVisible" />
       <text-button
-        v-if="permissionStore.isDemo && ENABLED_FEATURES.DEMO_SIGNUP"
+        v-if="permissionStore.isDemo"
         text
         color="gradient"
         class="q-ml-md bd-gradient"
@@ -32,7 +32,6 @@ export default {
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
-import { ENABLED_FEATURES } from "@/util";
 import { permissionStore, sessionApiStore } from "@/hooks";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";

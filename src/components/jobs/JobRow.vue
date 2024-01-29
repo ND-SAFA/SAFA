@@ -16,6 +16,13 @@
       />
     </q-td>
     <q-td align="end">
+      <typography
+        secondary
+        :value="jobStatus(props.job).duration()"
+        data-cy="job-duration"
+      />
+    </q-td>
+    <q-td align="end">
       <chip outlined :color="jobStatus(props.job).color()" data-cy="job-status">
         <q-circular-progress
           v-if="jobStatus(props.job).isInProgress()"

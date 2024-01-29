@@ -95,6 +95,12 @@ export const jobColumns: TableColumn<JobSchema>[] = [
     field: (job) => job.currentProgress,
   },
   {
+    name: "duration",
+    label: "Duration",
+    align: "right",
+    field: () => "",
+  },
+  {
     name: "status",
     label: "Status",
     align: "right",

@@ -73,45 +73,33 @@ export const useOnboarding = defineStore("useOnboarding", {
     generationCompleted: false,
   }),
   getters: {
-    /**
-     * @return The onboarding project's upload job, if the generation step is done.
-     */
+    /** @return The onboarding project's upload job, if the generation step is done. */
     uploadedJob(): JobSchema | undefined {
       return jobStore.jobs[0];
     },
-    /**
-     * @return Whether the onboarding project's upload job is uploading artifacts.
-     */
+    /** @return Whether the onboarding project's upload job is uploading artifacts. */
     isUploadJob(): boolean {
       return (
         this.uploadedJob?.steps.includes("Retrieving Github Repository") ||
         false
       );
     },
-    /**
-     * @return Whether the onboarding project's upload job is generating artifacts.
-     */
+    /** @return Whether the onboarding project's upload job is generating artifacts. */
     isGenerationJob(): boolean {
       return this.uploadedJob?.steps.includes("Generating Artifacts") || false;
     },
-    /**
-     * @return Whether the onboarding workflow should display the generated project overview.
-     */
+    /** @return Whether the onboarding workflow should display the generated project overview. */
     displayProject(): boolean {
       return (
         this.step >= ONBOARDING_STEPS.summarize.number &&
         projectStore.isProjectDefined
       );
     },
-    /**
-     * @return Whether the onboarding workflow should display billing information.
-     */
+    /** @return Whether the onboarding workflow should display billing information. */
     displayBilling(): boolean {
       return !orgStore.automaticBilling && !this.paymentConfirmed;
     },
-    /**
-     * @return A display string for the onboarding project's upload job.
-     */
+    /** @return A display string for the onboarding project's upload job. */
     uploadProgress(): string {
       const { steps = [], currentStep = 0 } = this.uploadedJob || {};
       return this.uploadedJob
@@ -120,9 +108,7 @@ export const useOnboarding = defineStore("useOnboarding", {
           } (${jobStatus(this.uploadedJob).duration()})`
         : "";
     },
-    /**
-     * @return Whether the onboarding workflow should block generation because of project size.
-     */
+    /** @return Whether the onboarding workflow should block generation because of project size. */
     blockGeneration(): boolean {
       return (
         projectStore.isProjectDefined &&

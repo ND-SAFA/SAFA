@@ -27,7 +27,7 @@
     >
       <q-timeline data-cy="text-job-log">
         <q-virtual-scroll
-          v-slot="{ item, index }: { item: JobLogStepSchema }"
+          v-slot="{ item, index }: { item: JobLogStepSchema; index: number }"
           :items="jobApiStore.jobLog"
           separator
           style="max-height: 70vh"
@@ -57,6 +57,7 @@
       </q-timeline>
       <template #actions>
         <text-button
+          text
           icon="download"
           label="Download Logs"
           @click="jobApiStore.handleDownloadLogs"

@@ -12,8 +12,8 @@
         v-bind="buttonProps(type)"
         dense
         :tooltip-delay="0"
-        :icon-id="type.icon"
-        :color="type.color"
+        :icon-id="timStore.getTypeIcon(type.name)"
+        :color="timStore.getTypeColor(type.name, true)"
         data-cy="button-filter-type"
         @click="emit('click', type, artifactTypes)"
       />

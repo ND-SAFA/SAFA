@@ -162,9 +162,28 @@ export const darkPalette = {
 };
 
 /**
+ * Normalizes either a theme color or safa color id to a theme color name.
+ * @param colorName - The color name to normalize.
+ * @return The color as a theme color name.
+ */
+export function normalizeColorName(
+  colorName: keyof typeof ThemeGradient | string
+): keyof typeof ThemeGradient {
+  return (ThemeGradient as Record<string, string>)[colorName]
+    ? (colorName as keyof typeof ThemeGradient)
+    : (({
+        gradient_0: "nodeGradient9",
+        gradient_1: "nodeGradient5",
+        gradient_2: "nodeGradient1",
+        gradient_3: "nodeGradient3",
+        gradient_4: "nodeGradient7",
+      }[colorName] || "nodeDefault") as keyof typeof ThemeGradient);
+}
+
+/**
  * Returns the color code based on a type color name.
  * @param colorName - The color name to get the color for.
- * @return The color.
+ * @return The color as a hex code.
  */
 export function convertTypeToColor(
   colorName: keyof typeof ThemeGradient | string

@@ -237,8 +237,6 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Skipped if billing information is not displayed.
      */
     async handleEstimateCost(): Promise<void> {
-      if (!this.displayBilling) return;
-
       await billingApiStore.handleEstimateCost(
         {
           artifacts: artifactStore.allArtifacts.map(({ id }) => id),
@@ -257,15 +255,23 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleGenerateDocumentation(
       paymentConfirmed?: boolean
     ): Promise<void> {
-      const artifactIds = artifactStore.allArtifacts.map(({ id }) => id);
-      this.paymentConfirmed = paymentConfirmed || false;
+      const credits = this.cost?.credits;
+
+      if (!credits) {
+        this.error = true;
+        return;
+      }
+
+      this.paymentConfirmed =
+        paymentConfirmed ||
+        orgStore.org.billing.monthlyRemainingCredits >= credits;
 
       if (this.displayBilling && !paymentConfirmed) {
-        await billingApiStore.handleCheckoutSession(artifactIds.length);
+        await billingApiStore.handleCheckoutSession(this.cost?.credits || 0);
       } else {
         await artifactGenerationApiStore.handleGenerateArtifacts(
           {
-            artifacts: artifactIds,
+            artifacts: artifactStore.allArtifacts.map(({ id }) => id),
             targetTypes: ARTIFACT_GENERATION_ONBOARDING,
           },
           { onError: () => (this.error = true) }

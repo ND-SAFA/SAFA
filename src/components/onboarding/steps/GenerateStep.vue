@@ -171,6 +171,7 @@ function updateStatus() {
     (correctJobType && jobStatus === "COMPLETED") ||
     onboardingStore.generationCompleted
   ) {
+    console.log({ jobStatus, correctJobType });
     status.value = "success";
 
     onboardingStore.handleNextStep("generate");

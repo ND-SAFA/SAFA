@@ -3,6 +3,37 @@ import { IdentifierSchema, MembershipSchema, PermissionType } from "@/types";
 export type OrgPaymentTier = "UNLIMITED" | "RECURRING" | "AS_NEEDED";
 
 /**
+ * Represents the billing information for an organization.
+ */
+export interface OrganizationBillingSchema {
+  /**
+   * The payment tier of this organization.
+   */
+  paymentTier: OrgPaymentTier;
+  /**
+   * The remaining credits for the current month.
+   * For pay-as-you-go organizations, this will roll over to the next month.
+   */
+  monthlyRemainingCredits: number;
+  /**
+   * The total credits for the current month.
+   */
+  monthlyUsedCredits: number;
+  /**
+   * The total successfully used credits for the current month.
+   */
+  monthlySuccessfulCredits: number;
+  /**
+   * The total used credits for the organization.
+   */
+  totalUsedCredits: number;
+  /**
+   * The total successfully used credits for the organization.
+   */
+  totalSuccessfulCredits: number;
+}
+
+/**
  * Represents a team with members and projects.
  */
 export interface TeamSchema {
@@ -49,10 +80,6 @@ export interface OrganizationSchema {
    */
   personalOrg: boolean;
   /**
-   * The payment tier of this organization.
-   */
-  paymentTier: OrgPaymentTier;
-  /**
    * List of members and their roles in the organization.
    */
   members: MembershipSchema[];
@@ -64,6 +91,10 @@ export interface OrganizationSchema {
    * The permissions of the current user on this organization.
    */
   permissions: PermissionType[];
+  /**
+   * The billing information for this organization.
+   */
+  billing: OrganizationBillingSchema;
 }
 
 /**

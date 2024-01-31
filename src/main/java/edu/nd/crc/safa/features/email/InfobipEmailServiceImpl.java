@@ -82,22 +82,24 @@ public class InfobipEmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmailVerification(String recipient, String token) {
-        EmailSendResponse response = wrapSendEmail(() -> {
-            String url = String.format(fendBase + verifyEmailUrl, token);
+        String url = String.format(fendBase + verifyEmailUrl, token);
+        sendTemplatedEmail(recipient, verifyEmailTemplateId, Map.of("accountlink", url));
+    }
 
-            JSONObject placeholdersObject = new JSONObject(
-                Map.of("accountlink", url)
-            );
+    private void sendTemplatedEmail(String recipient, Long templateId, Map<String, String> replacements) {
+        EmailSendResponse response = wrapSendEmail(() -> {
+
+            JSONObject placeholdersObject = new JSONObject(replacements);
 
             return emailApi
                 .sendEmail(List.of(recipient))
                 .from(senderEmailAddress)
-                .templateId(verifyEmailTemplateId)
+                .templateId(templateId)
                 .defaultPlaceholders(placeholdersObject.toString())
                 .execute();
         });
 
-        log.info("Verification email sent to " + recipient + ": " + response);
+        log.info("Email sent to " + recipient + ": " + response);
     }
 
     /**

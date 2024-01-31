@@ -8,7 +8,7 @@
           clickable
           :title="parent.name"
           :icon-id="timStore.getTypeIcon(parent.name)"
-          :color="parent.color"
+          :color="timStore.getTypeColor(parent.color)"
           :action-cols="1"
           data-cy="list-selected-parent-item"
           @click="selectionStore.selectArtifactLevel(parent.name)"

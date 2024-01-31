@@ -71,4 +71,9 @@ public abstract class GenerationJob extends CommitJob {
         this.projectSummary = summarizedEntities.getValue0();
         this.projectAppEntity.setArtifacts(summarizedEntities.getValue1());
     }
+
+    @Override
+    protected void afterJob(boolean success) throws Exception {
+        getServiceProvider().getEmailService().sendGenerationCompleted(getUser().getEmail());
+    }
 }

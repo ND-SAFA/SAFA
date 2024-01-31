@@ -85,5 +85,9 @@ public class FlatFileProjectCreationJob extends CommitJob {
         Project project = this.store.getProjectVersion().getProject();
         String projectPath = ProjectPaths.Storage.projectPath(project, true);
         FileUtilities.deletePath(projectPath);
+
+        if (this.store.isSummarizeArtifacts() || this.store.getFlatFileParser().getTGenRequestAppEntity().size() > 0) {
+            getServiceProvider().getEmailService().sendGenerationCompleted(getUser().getEmail());
+        }
     }
 }

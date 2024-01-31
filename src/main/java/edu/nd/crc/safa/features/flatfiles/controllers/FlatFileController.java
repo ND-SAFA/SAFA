@@ -56,8 +56,10 @@ public class FlatFileController extends BaseController {
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
         @RequestParam("files") Optional<List<MultipartFile>> files,
-        @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet)
+        @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet,
+        @RequestParam(required = false, defaultValue = "false") boolean summarizeArtifacts)
         throws SafaError, IOException {
+
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
             .withPermission(ProjectPermission.EDIT, user).get();
@@ -66,7 +68,6 @@ public class FlatFileController extends BaseController {
             throw new SafaError("Could not create project because no files were received.");
         }
 
-        boolean summarizeArtifacts = false;
         FlatFileBuilderStore args = new FlatFileBuilderStore(
             user,
             files.orElseGet(JobUtil::defaultFileListSupplier),
@@ -75,6 +76,11 @@ public class FlatFileController extends BaseController {
             summarizeArtifacts,
             true);
         FlatFileProjectBuilder.build(args, getServiceProvider());
+
+        if (summarizeArtifacts) {
+            getServiceProvider().getEmailService().sendGenerationCompleted(user.getEmail());
+        }
+
         return getServiceProvider().getProjectRetrievalService().getProjectAppEntity(projectVersion);
     }
 

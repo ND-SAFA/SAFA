@@ -80,6 +80,11 @@ public class InfobipEmailServiceImpl implements EmailService {
         sendTemplatedEmail(recipient, InfobipProperties.EmailType.VERIFY_EMAIL_ADDRESS, Map.of("accountlink", url));
     }
 
+    @Override
+    public void sendGenerationCompleted(String recipient) {
+        sendTemplatedEmail(recipient, InfobipProperties.EmailType.GENERATION_COMPLETED, Map.of());
+    }
+
     private void sendTemplatedEmail(String recipient, InfobipProperties.EmailType emailType, Map<String, String> replacements) {
         EmailSendResponse response = wrapSendEmail(() -> {
 

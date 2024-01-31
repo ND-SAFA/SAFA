@@ -14,7 +14,8 @@ public class InfobipProperties {
     private final Map<EmailType, EmailTypeSettings> emails;
 
     public enum EmailType {
-        VERIFY_EMAIL_ADDRESS
+        VERIFY_EMAIL_ADDRESS,
+        GENERATION_COMPLETED
     }
 
     public record EmailTypeSettings(Long templateId) {}

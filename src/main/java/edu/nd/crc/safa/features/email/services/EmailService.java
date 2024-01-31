@@ -20,4 +20,11 @@ public interface EmailService {
      * @param token The email verification token
      */
     void sendEmailVerification(String recipient, String token);
+
+    /**
+     * Send an email indicating that a generation job completed.
+     *
+     * @param recipient The email of the recipient
+     */
+    void sendGenerationCompleted(String recipient);
 }

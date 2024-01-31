@@ -381,6 +381,8 @@ public class GithubProjectCreationJob extends CommitJob {
         List<ArtifactAppEntity> newArtifacts = getProjectCommitDefinition().getArtifactList(ModificationType.ADDED);
         SummaryService summaryService = getServiceProvider().getSummaryService();
         summaryService.addSummariesToCode(newArtifacts, null, logger);
+
+        getServiceProvider().getEmailService().sendGenerationCompleted(getUser().getEmail());
     }
 
     /**

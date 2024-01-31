@@ -46,13 +46,21 @@ export function sortArtifactTypes(
 
 function traverseTypeTree(
   root: ArtifactTypeTree,
-  project: ProjectSchema
+  project: ProjectSchema,
+  visitedNodes: string[] = []
 ): ArtifactTypeTree {
   if (typeof root !== "string") {
     project.traceMatrices.forEach(({ sourceType, targetType }) => {
-      if (targetType === root.type && sourceType !== targetType) {
+      if (
+        targetType === root.type &&
+        sourceType !== targetType &&
+        !visitedNodes.includes(sourceType)
+      ) {
         root.next.push(
-          traverseTypeTree({ type: sourceType, next: [] }, project)
+          traverseTypeTree({ type: sourceType, next: [] }, project, [
+            ...visitedNodes,
+            root.type,
+          ])
         );
       }
     });

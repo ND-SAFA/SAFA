@@ -3,6 +3,7 @@ package edu.nd.crc.safa;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 @SpringBootApplication(exclude = FlywayAutoConfiguration.class)
 @EnableWebSocket
 @EnableWebSocketMessageBroker
+@ConfigurationPropertiesScan
 public class MainApplication {
     private static AnnotationConfigApplicationContext applicationContext;
 

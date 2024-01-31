@@ -4,7 +4,7 @@ import java.util.Date;
 
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.config.SecurityConstants;
-import edu.nd.crc.safa.features.email.EmailService;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.EmailVerificationToken;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;

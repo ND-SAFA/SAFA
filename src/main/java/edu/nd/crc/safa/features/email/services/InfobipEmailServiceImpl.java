@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.email;
+package edu.nd.crc.safa.features.email.services;
 
 import java.io.IOException;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.annotation.PostConstruct;
 
+import edu.nd.crc.safa.features.email.entities.InfobipProperties;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -14,9 +15,11 @@ import com.infobip.ApiKey;
 import com.infobip.BaseUrl;
 import com.infobip.api.EmailApi;
 import com.infobip.model.EmailSendResponse;
+import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -30,18 +33,12 @@ import org.springframework.stereotype.Service;
     havingValue = "infobip",
     matchIfMissing = true
 )
+@RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class InfobipEmailServiceImpl implements EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(InfobipEmailServiceImpl.class.getName());
 
-    @Value("${email.infobip.endpoint}")
-    private String infobipEndpoint;
-
-    @Value("${email.infobip.key}")
-    private String infobipKey;
-
-    @Value("${email.infobip.sender-address}")
-    private String senderEmailAddress;
+    private final InfobipProperties infobipProperties;
 
     @Value("${fend.base}")
     private String fendBase;
@@ -52,15 +49,12 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Value("${fend.verify-email-path}")
     private String verifyEmailUrl;
 
-    @Value("${email.infobip.verify-email-template-id}")
-    private Long verifyEmailTemplateId;
-
     private EmailApi emailApi;
 
     @PostConstruct
     public void init() {
-        ApiClient client = ApiClient.forApiKey(ApiKey.from(infobipKey))
-            .withBaseUrl(BaseUrl.from(infobipEndpoint))
+        ApiClient client = ApiClient.forApiKey(ApiKey.from(infobipProperties.getApiKey()))
+            .withBaseUrl(BaseUrl.from(infobipProperties.getEndpoint()))
             .build();
 
         this.emailApi = new EmailApi(client);
@@ -71,7 +65,7 @@ public class InfobipEmailServiceImpl implements EmailService {
         EmailSendResponse response = wrapSendEmail(() ->
             emailApi
                 .sendEmail(List.of(recipient))
-                .from(senderEmailAddress)
+                .from(infobipProperties.getSenderAddress())
                 .subject("Requested password reset token")
                 .text(String.format(fendBase + resetPasswordUrl, token))
                 .execute()
@@ -83,23 +77,24 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Override
     public void sendEmailVerification(String recipient, String token) {
         String url = String.format(fendBase + verifyEmailUrl, token);
-        sendTemplatedEmail(recipient, verifyEmailTemplateId, Map.of("accountlink", url));
+        sendTemplatedEmail(recipient, InfobipProperties.EmailType.VERIFY_EMAIL_ADDRESS, Map.of("accountlink", url));
     }
 
-    private void sendTemplatedEmail(String recipient, Long templateId, Map<String, String> replacements) {
+    private void sendTemplatedEmail(String recipient, InfobipProperties.EmailType emailType, Map<String, String> replacements) {
         EmailSendResponse response = wrapSendEmail(() -> {
 
             JSONObject placeholdersObject = new JSONObject(replacements);
+            Long templateId = infobipProperties.getEmails().get(emailType).templateId();
 
             return emailApi
                 .sendEmail(List.of(recipient))
-                .from(senderEmailAddress)
+                .from(infobipProperties.getSenderAddress())
                 .templateId(templateId)
                 .defaultPlaceholders(placeholdersObject.toString())
                 .execute();
         });
 
-        log.info("Email sent to " + recipient + ": " + response);
+        log.info(emailType + " email sent to " + recipient + ": " + response);
     }
 
     /**

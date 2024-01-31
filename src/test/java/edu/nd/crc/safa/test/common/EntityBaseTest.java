@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvid
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.email.EmailService;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.services.JobService;

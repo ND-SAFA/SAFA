@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.email;
+package edu.nd.crc.safa.features.email.services;
 
 /**
  * Interface defining the send-email operation.

@@ -97,7 +97,21 @@ export const useOnboarding = defineStore("useOnboarding", {
     },
     /** @return Whether the onboarding workflow should display billing information. */
     displayBilling(): boolean {
-      return !orgStore.automaticBilling && !this.paymentConfirmed;
+      const credits = this.cost?.credits;
+
+      console.log({
+        automaticBilling: orgStore.automaticBilling,
+        paymentConfirmed: this.paymentConfirmed,
+        credits: credits,
+        monthlyRemainingCredits: orgStore.org.billing.monthlyRemainingCredits,
+      });
+
+      return (
+        !orgStore.automaticBilling &&
+        !this.paymentConfirmed &&
+        !!credits &&
+        orgStore.org.billing.monthlyRemainingCredits < credits
+      );
     },
     /** @return A display string for the onboarding project's upload job. */
     uploadProgress(): string {
@@ -146,8 +160,7 @@ export const useOnboarding = defineStore("useOnboarding", {
         localStorage.getItem(LocalStorageKeys.onboardingProject);
       this.generationCompleted =
         this.generationCompleted ||
-        (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED") ||
-        localStorage.getItem(LocalStorageKeys.onboardingGenerated) === "true";
+        (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED");
 
       if (integrationsStore.validGitHubCredentials) {
         // Skip to Code step if credentials are set.
@@ -160,10 +173,6 @@ export const useOnboarding = defineStore("useOnboarding", {
       if (this.projectId) {
         // Skip to the Generate step if a job has been completed.
         await this.handleNextStep("summarize");
-      }
-      if (this.generationCompleted) {
-        // Skip to everything completed if the generation is complete.
-        await this.handleNextStep("generate");
       }
 
       this.loading = false;
@@ -184,13 +193,6 @@ export const useOnboarding = defineStore("useOnboarding", {
         ? ONBOARDING_STEPS[currentStep].index
         : this.step - 1;
       const projectId = this.projectId || this.uploadedJob?.completedEntityId;
-
-      if (currentStep === "generate") {
-        this.generationCompleted = true;
-        localStorage.setItem(LocalStorageKeys.onboardingGenerated, "true");
-
-        return;
-      }
 
       this.steps[index].done = true;
       this.steps[index + 1].done = true;
@@ -256,17 +258,14 @@ export const useOnboarding = defineStore("useOnboarding", {
       paymentConfirmed?: boolean
     ): Promise<void> {
       const credits = this.cost?.credits;
+      this.paymentConfirmed = paymentConfirmed || false;
 
       if (!credits) {
         this.error = true;
         return;
       }
 
-      this.paymentConfirmed =
-        paymentConfirmed ||
-        orgStore.org.billing.monthlyRemainingCredits >= credits;
-
-      if (this.displayBilling && !paymentConfirmed) {
+      if (this.displayBilling) {
         await billingApiStore.handleCheckoutSession(this.cost?.credits || 0);
       } else {
         await artifactGenerationApiStore.handleGenerateArtifacts(

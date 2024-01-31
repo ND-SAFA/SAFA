@@ -31,9 +31,9 @@
         :subtitle="ARTIFACT_GENERATION_ONBOARDING.join(', ')"
         icon="create-artifact"
       />
-      <separator v-if="onboardingStore.cost" inset />
+      <separator v-if="onboardingStore.displayBilling" inset />
       <list-item
-        v-if="onboardingStore.cost"
+        v-if="onboardingStore.displayBilling"
         color="primary"
         title="Generation Cost"
         :subtitle="generateCost"
@@ -171,10 +171,8 @@ function updateStatus() {
     (correctJobType && jobStatus === "COMPLETED") ||
     onboardingStore.generationCompleted
   ) {
-    console.log({ jobStatus, correctJobType });
     status.value = "success";
-
-    onboardingStore.handleNextStep("generate");
+    onboardingStore.generationCompleted = true;
   }
 }
 

@@ -6,6 +6,7 @@ import java.util.Set;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
@@ -74,6 +75,12 @@ public abstract class GenerationJob extends CommitJob {
 
     @Override
     protected void afterJob(boolean success) throws Exception {
-        getServiceProvider().getEmailService().sendGenerationCompleted(getUser().getEmail());
+        EmailService emailService = getServiceProvider().getEmailService();
+
+        if (success) {
+            emailService.sendGenerationCompleted(getUser().getEmail(), getProjectVersion());
+        } else {
+            emailService.sendGenerationFailed(getUser().getEmail(), getProjectVersion());
+        }
     }
 }

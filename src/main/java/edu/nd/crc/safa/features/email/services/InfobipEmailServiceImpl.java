@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.email.services;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -8,7 +7,7 @@ import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.email.entities.InfobipProperties;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.infobip.ApiClient;
 import com.infobip.ApiKey;
@@ -77,29 +76,52 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Override
     public void sendEmailVerification(String recipient, String token) {
         String url = String.format(fendBase + verifyEmailUrl, token);
-        sendTemplatedEmail(recipient, InfobipProperties.EmailType.VERIFY_EMAIL_ADDRESS, Map.of("accountlink", url));
+        sendTemplatedEmail(List.of(recipient), InfobipProperties.EmailType.VERIFY_EMAIL_ADDRESS,
+            Map.of(
+                "accountlink", url
+            )
+        );
     }
 
     @Override
-    public void sendGenerationCompleted(String recipient) {
-        sendTemplatedEmail(recipient, InfobipProperties.EmailType.GENERATION_COMPLETED, Map.of());
+    public void sendGenerationCompleted(String recipient, ProjectVersion projectVersion) {
+        sendTemplatedEmail(List.of(recipient), InfobipProperties.EmailType.GENERATION_COMPLETED,
+            Map.of(
+                "jobName", projectVersion.getProject().getName(),
+                "projectLink", makeProjectVersionLink(projectVersion)
+            )
+        );
     }
 
-    private void sendTemplatedEmail(String recipient, InfobipProperties.EmailType emailType, Map<String, String> replacements) {
+    @Override
+    public void sendGenerationFailed(String recipient, ProjectVersion projectVersion) {
+        sendTemplatedEmail(List.of(recipient), InfobipProperties.EmailType.GENERATION_FAILED,
+            Map.of(
+                "jobName", projectVersion.getProject().getName()
+            )
+        );
+    }
+
+    private String makeProjectVersionLink(ProjectVersion projectVersion) {
+        return fendBase + "/project?version=" + projectVersion.getId();
+    }
+
+    private void sendTemplatedEmail(List<String> recipients, InfobipProperties.EmailType emailType,
+                                    Map<String, String> replacements) {
         EmailSendResponse response = wrapSendEmail(() -> {
 
             JSONObject placeholdersObject = new JSONObject(replacements);
             Long templateId = infobipProperties.getEmails().get(emailType).templateId();
 
             return emailApi
-                .sendEmail(List.of(recipient))
+                .sendEmail(recipients)
                 .from(infobipProperties.getSenderAddress())
                 .templateId(templateId)
                 .defaultPlaceholders(placeholdersObject.toString())
                 .execute();
         });
 
-        log.info(emailType + " email sent to " + recipient + ": " + response);
+        log.info(emailType + " email sent to " + recipients + ": " + response);
     }
 
     /**
@@ -114,22 +136,6 @@ public class InfobipEmailServiceImpl implements EmailService {
             return emailSendFunction.call();
         } catch (Exception e) {
             throw new SafaError("Failed to send email", e);
-        }
-    }
-
-    /**
-     * Get a template email for email verification. This wraps the call to
-     * load the template from the classpath so that if there are any errors,
-     * a default value is used and the email will still get sent.
-     *
-     * @return The text of the email template
-     */
-    private String getVerificationEmailTemplate() {
-        try {
-            return FileUtilities.readClasspathFile("verification-email-template.html");
-        } catch (IOException e) {
-            log.warn("Failed to get verification email template", e);
-            return "Please use this link to verify your email: %s";
         }
     }
 }

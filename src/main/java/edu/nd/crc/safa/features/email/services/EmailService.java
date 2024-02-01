@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.email.services;
 
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
 /**
  * Interface defining the send-email operation.
  */
@@ -25,6 +27,15 @@ public interface EmailService {
      * Send an email indicating that a generation job completed.
      *
      * @param recipient The email of the recipient
+     * @param projectVersion The project version the job was running on
      */
-    void sendGenerationCompleted(String recipient);
+    void sendGenerationCompleted(String recipient, ProjectVersion projectVersion);
+
+    /**
+     * Send an email indicating that a generation job failed.
+     *
+     * @param recipient The email of the recipient
+     * @param projectVersion The project version the job was running on
+     */
+    void sendGenerationFailed(String recipient, ProjectVersion projectVersion);
 }

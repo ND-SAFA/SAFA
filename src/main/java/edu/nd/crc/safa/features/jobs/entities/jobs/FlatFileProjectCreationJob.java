@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.GenerateTraceLinksStep;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.ParseArtifactStep;
@@ -87,7 +88,13 @@ public class FlatFileProjectCreationJob extends CommitJob {
         FileUtilities.deletePath(projectPath);
 
         if (this.store.isSummarizeArtifacts() || this.store.getFlatFileParser().getTGenRequestAppEntity().size() > 0) {
-            getServiceProvider().getEmailService().sendGenerationCompleted(getUser().getEmail());
+
+            EmailService emailService = getServiceProvider().getEmailService();
+            if (success) {
+                emailService.sendGenerationCompleted(getUser().getEmail(), getProjectVersion());
+            } else {
+                emailService.sendGenerationFailed(getUser().getEmail(), getProjectVersion());
+            }
         }
     }
 }

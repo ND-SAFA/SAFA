@@ -78,7 +78,7 @@ public class FlatFileController extends BaseController {
         FlatFileProjectBuilder.build(args, getServiceProvider());
 
         if (summarizeArtifacts) {
-            getServiceProvider().getEmailService().sendGenerationCompleted(user.getEmail());
+            getServiceProvider().getEmailService().sendGenerationCompleted(user.getEmail(), projectVersion);
         }
 
         return getServiceProvider().getProjectRetrievalService().getProjectAppEntity(projectVersion);

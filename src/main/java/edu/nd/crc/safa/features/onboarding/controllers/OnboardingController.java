@@ -34,7 +34,7 @@ public class OnboardingController extends BaseController {
     @GetMapping(AppRoutes.Onboarding.ROOT)
     public OnboardingStateAppEntity getUserOnboardingState() {
         SafaUser user = getCurrentUser();
-        return new OnboardingStateAppEntity(onboardingService.getUserState(user));
+        return new OnboardingStateAppEntity(onboardingService.getState(user));
     }
 
     /**
@@ -46,6 +46,6 @@ public class OnboardingController extends BaseController {
     @PutMapping(AppRoutes.Onboarding.ROOT)
     public OnboardingStateAppEntity updateUserOnboardingState(@RequestBody OnboardingStateAppEntity updatedState) {
         SafaUser user = getCurrentUser();
-        return new OnboardingStateAppEntity(onboardingService.updateUserStateFromAppEntity(user, updatedState));
+        return new OnboardingStateAppEntity(onboardingService.updateStateFromAppEntity(user, updatedState));
     }
 }

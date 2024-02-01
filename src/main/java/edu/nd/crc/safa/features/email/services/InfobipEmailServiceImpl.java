@@ -6,7 +6,10 @@ import java.util.concurrent.Callable;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.email.entities.InfobipProperties;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.infobip.ApiClient;
@@ -61,16 +64,10 @@ public class InfobipEmailServiceImpl implements EmailService {
 
     @Override
     public void sendPasswordReset(String recipient, String token) {
-        EmailSendResponse response = wrapSendEmail(() ->
-            emailApi
-                .sendEmail(List.of(recipient))
-                .from(infobipProperties.getSenderAddress())
-                .subject("Requested password reset token")
-                .text(String.format(fendBase + resetPasswordUrl, token))
-                .execute()
-        );
+        sendSimpleEmail(recipient, "Requested password reset token",
+            String.format(fendBase + resetPasswordUrl, token));
 
-        log.info("Password reset email sent to " + recipient + ": " + response);
+
     }
 
     @Override
@@ -100,10 +97,21 @@ public class InfobipEmailServiceImpl implements EmailService {
                 "jobName", projectVersion.getProject().getName()
             )
         );
+        sendSimpleEmail("generate@safa.ai", "Customer generation failed",
+            makeFailedGenerationText(projectVersion));
     }
 
-    private String makeProjectVersionLink(ProjectVersion projectVersion) {
-        return fendBase + "/project?version=" + projectVersion.getId();
+    private void sendSimpleEmail(String recipient, String subject, String text) {
+        EmailSendResponse response = wrapSendEmail(() ->
+            emailApi
+                .sendEmail(List.of(recipient))
+                .from(infobipProperties.getSenderAddress())
+                .subject(subject)
+                .text(text)
+                .execute()
+        );
+
+        log.info("Email sent to " + recipient + " - subject \"" + subject + "\": " + response);
     }
 
     private void sendTemplatedEmail(List<String> recipients, InfobipProperties.EmailType emailType,
@@ -137,5 +145,22 @@ public class InfobipEmailServiceImpl implements EmailService {
         } catch (Exception e) {
             throw new SafaError("Failed to send email", e);
         }
+    }
+
+    private String makeProjectVersionLink(ProjectVersion projectVersion) {
+        return fendBase + "/project?version=" + projectVersion.getId();
+    }
+
+    private String makeFailedGenerationText(ProjectVersion projectVersion) {
+        Team team = projectVersion.getProject().getOwningTeam();
+        Organization organization = team.getOrganization();
+        Project project = projectVersion.getProject();
+
+        return "Generation job failed\n"
+            + "Organization: name=" + organization.getName() + ", id=" + organization.getId()
+                + ", paymentTier=" + organization.getPaymentTier() + "\n"
+            + "Team: name=" + team.getName() + ", id=" + team.getId() + "\n"
+            + "Project: name=" + project.getName() + ", id=" + project.getId() + "\n"
+            + "Project version: number=" + projectVersion + ", id=" + projectVersion.getId();
     }
 }

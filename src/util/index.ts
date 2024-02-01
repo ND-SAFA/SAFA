@@ -19,5 +19,6 @@ export * from "./notification-helper";
 export * from "./generation-config";
 export * from "./step-helper";
 export * from "./onboarding-text";
+export * from "./type-helper";
 
 export * from "./enabled-features";

@@ -36,8 +36,8 @@ export const useOrg = defineStore("org", {
      */
     automaticBilling(): boolean {
       return (
-        this.org.paymentTier === "UNLIMITED" ||
-        this.org.paymentTier === "RECURRING"
+        this.org.billing.paymentTier === "UNLIMITED" ||
+        this.org.billing.paymentTier === "RECURRING"
       );
     },
   },

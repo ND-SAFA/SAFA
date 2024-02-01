@@ -16,6 +16,13 @@
       />
     </q-td>
     <q-td align="end">
+      <typography
+        secondary
+        :value="jobStatus(props.job).duration()"
+        data-cy="job-duration"
+      />
+    </q-td>
+    <q-td align="end">
       <chip outlined :color="jobStatus(props.job).color()" data-cy="job-status">
         <q-circular-progress
           v-if="jobStatus(props.job).isInProgress()"
@@ -45,6 +52,7 @@
       />
       <flex-box full-width justify="end" b="2">
         <text-button
+          v-if="displayLogs"
           outlined
           label="View Logs"
           r="1"
@@ -91,6 +99,7 @@ import {
   jobApiStore,
   jobStore,
   logStore,
+  permissionStore,
   useVModel,
 } from "@/hooks";
 import {
@@ -121,6 +130,10 @@ const steps = computed<StepperStep[]>(
       title,
       done: idx < currentStep.value,
     })) || []
+);
+
+const displayLogs = computed(
+  () => permissionStore.isSuperuser || process.env.NODE_ENV !== "production"
 );
 
 /**

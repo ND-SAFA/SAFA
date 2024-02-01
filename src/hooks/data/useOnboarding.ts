@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { CostEstimateSchema, JobSchema, LocalStorageKeys } from "@/types";
 import {
   ARTIFACT_GENERATION_ONBOARDING,
+  jobStatus,
   MAX_GENERATED_BASE_ARTIFACTS,
   ONBOARDING_MEET_LINK,
   ONBOARDING_STEPS,
@@ -72,54 +73,56 @@ export const useOnboarding = defineStore("useOnboarding", {
     generationCompleted: false,
   }),
   getters: {
-    /**
-     * @return The onboarding project's upload job, if the generation step is done.
-     */
+    /** @return The onboarding project's upload job, if the generation step is done. */
     uploadedJob(): JobSchema | undefined {
       return jobStore.jobs[0];
     },
-    /**
-     * @return Whether the onboarding project's upload job is uploading artifacts.
-     */
+    /** @return Whether the onboarding project's upload job is uploading artifacts. */
     isUploadJob(): boolean {
       return (
         this.uploadedJob?.steps.includes("Retrieving Github Repository") ||
         false
       );
     },
-    /**
-     * @return Whether the onboarding project's upload job is generating artifacts.
-     */
+    /** @return Whether the onboarding project's upload job is generating artifacts. */
     isGenerationJob(): boolean {
       return this.uploadedJob?.steps.includes("Generating Artifacts") || false;
     },
-    /**
-     * @return Whether the onboarding workflow should display the generated project overview.
-     */
+    /** @return Whether the onboarding workflow should display the generated project overview. */
     displayProject(): boolean {
       return (
         this.step >= ONBOARDING_STEPS.summarize.number &&
         projectStore.isProjectDefined
       );
     },
-    /**
-     * @return Whether the onboarding workflow should display billing information.
-     */
+    /** @return Whether the onboarding workflow should display billing information. */
     displayBilling(): boolean {
-      return !orgStore.automaticBilling && !this.paymentConfirmed;
+      const credits = this.cost?.credits;
+
+      console.log({
+        automaticBilling: orgStore.automaticBilling,
+        paymentConfirmed: this.paymentConfirmed,
+        credits: credits,
+        monthlyRemainingCredits: orgStore.org.billing.monthlyRemainingCredits,
+      });
+
+      return (
+        !orgStore.automaticBilling &&
+        !this.paymentConfirmed &&
+        !!credits &&
+        orgStore.org.billing.monthlyRemainingCredits < credits
+      );
     },
-    /**
-     * @return A display string for the onboarding project's upload job.
-     */
+    /** @return A display string for the onboarding project's upload job. */
     uploadProgress(): string {
       const { steps = [], currentStep = 0 } = this.uploadedJob || {};
       return this.uploadedJob
-        ? `Step ${currentStep + 1} of ${steps.length}: ${steps[currentStep]}`
+        ? `Step ${currentStep + 1} of ${steps.length}: ${
+            steps[currentStep]
+          } (${jobStatus(this.uploadedJob).duration()})`
         : "";
     },
-    /**
-     * @return Whether the onboarding workflow should block generation because of project size.
-     */
+    /** @return Whether the onboarding workflow should block generation because of project size. */
     blockGeneration(): boolean {
       return (
         projectStore.isProjectDefined &&
@@ -157,8 +160,7 @@ export const useOnboarding = defineStore("useOnboarding", {
         localStorage.getItem(LocalStorageKeys.onboardingProject);
       this.generationCompleted =
         this.generationCompleted ||
-        (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED") ||
-        localStorage.getItem(LocalStorageKeys.onboardingGenerated) === "true";
+        (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED");
 
       if (integrationsStore.validGitHubCredentials) {
         // Skip to Code step if credentials are set.
@@ -171,10 +173,6 @@ export const useOnboarding = defineStore("useOnboarding", {
       if (this.projectId) {
         // Skip to the Generate step if a job has been completed.
         await this.handleNextStep("summarize");
-      }
-      if (this.generationCompleted) {
-        // Skip to everything completed if the generation is complete.
-        await this.handleNextStep("generate");
       }
 
       this.loading = false;
@@ -195,13 +193,6 @@ export const useOnboarding = defineStore("useOnboarding", {
         ? ONBOARDING_STEPS[currentStep].index
         : this.step - 1;
       const projectId = this.projectId || this.uploadedJob?.completedEntityId;
-
-      if (currentStep === "generate") {
-        this.generationCompleted = true;
-        localStorage.setItem(LocalStorageKeys.onboardingGenerated, "true");
-
-        return;
-      }
 
       this.steps[index].done = true;
       this.steps[index + 1].done = true;
@@ -248,8 +239,6 @@ export const useOnboarding = defineStore("useOnboarding", {
      * Skipped if billing information is not displayed.
      */
     async handleEstimateCost(): Promise<void> {
-      if (!this.displayBilling) return;
-
       await billingApiStore.handleEstimateCost(
         {
           artifacts: artifactStore.allArtifacts.map(({ id }) => id),
@@ -268,15 +257,20 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleGenerateDocumentation(
       paymentConfirmed?: boolean
     ): Promise<void> {
-      const artifactIds = artifactStore.allArtifacts.map(({ id }) => id);
+      const credits = this.cost?.credits;
       this.paymentConfirmed = paymentConfirmed || false;
 
-      if (this.displayBilling && !paymentConfirmed) {
-        await billingApiStore.handleCheckoutSession(artifactIds.length);
+      if (!credits) {
+        this.error = true;
+        return;
+      }
+
+      if (this.displayBilling) {
+        await billingApiStore.handleCheckoutSession(this.cost?.credits || 0);
       } else {
         await artifactGenerationApiStore.handleGenerateArtifacts(
           {
-            artifacts: artifactIds,
+            artifacts: artifactStore.allArtifacts.map(({ id }) => id),
             targetTypes: ARTIFACT_GENERATION_ONBOARDING,
           },
           { onError: () => (this.error = true) }

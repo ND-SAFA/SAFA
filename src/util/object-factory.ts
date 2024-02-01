@@ -241,10 +241,17 @@ export function buildOrg(
     name: org.name || "",
     description: org.description || "",
     personalOrg: org.personalOrg || false,
-    paymentTier: org.paymentTier || "AS_NEEDED",
     members: org.members || [],
     teams: org.teams || [],
     permissions: org?.permissions || [],
+    billing: {
+      paymentTier: org?.billing?.paymentTier || "AS_NEEDED",
+      totalUsedCredits: org?.billing?.totalUsedCredits || 0,
+      totalSuccessfulCredits: org?.billing?.totalSuccessfulCredits || 0,
+      monthlyUsedCredits: org?.billing?.monthlyUsedCredits || 0,
+      monthlySuccessfulCredits: org?.billing?.monthlySuccessfulCredits || 0,
+      monthlyRemainingCredits: org?.billing?.monthlyRemainingCredits || 0,
+    },
   };
 }
 

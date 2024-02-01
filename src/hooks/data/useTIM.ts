@@ -11,8 +11,10 @@ import {
   convertTypeToColor,
   DefaultTypeIcon,
   isLinkAllowedByType,
+  normalizeColorName,
   removeMatches,
   sanitizeNodeId,
+  sortArtifactTypes,
 } from "@/util";
 import { projectStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -47,7 +49,7 @@ export const useTIM = defineStore("tim", {
      * @param project - The project to load.
      */
     initializeProject(project: ProjectSchema): void {
-      this.artifactTypes = project.artifactTypes;
+      this.artifactTypes = sortArtifactTypes(project);
       this.traceMatrices = project.traceMatrices;
     },
     /**
@@ -188,10 +190,9 @@ export const useTIM = defineStore("tim", {
      */
     getTypeColor(name: string, dontConvert?: boolean): string {
       const artifactType = this.getType(name);
+      const themeColor = normalizeColorName(artifactType?.color || "primary");
 
-      return dontConvert
-        ? artifactType?.color || "primary"
-        : convertTypeToColor(artifactType?.color || "");
+      return dontConvert ? themeColor : convertTypeToColor(themeColor);
     },
     /**
      * Returns the icon id for a given artifact type.

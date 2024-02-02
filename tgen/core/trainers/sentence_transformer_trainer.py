@@ -103,6 +103,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         self.total_loss = 0
         self.loss_function = None
         self.params = None
+        self.loss_function = self._create_loss_function()
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -119,7 +120,6 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         train_dataloader = DataLoader(train_examples,
                                       batch_sampler=BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size))
 
-        self.loss_function = self._create_loss_function()
         n_steps = min(len(train_dataloader) + 1, self.min_eval_steps)
 
         evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
@@ -155,7 +155,9 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         input_examples = self.to_input_examples(dataset)
         scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
-        prediction_metrics["loss"] = self._calculate_loss(Tensor(scores), Tensor(labels)).item()
+        if self.loss_function:
+            dataset_features = self.model.smart_batching_collate(input_examples)
+            prediction_metrics["loss"] = self.loss_function(*dataset_features).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def _create_loss_function(self):

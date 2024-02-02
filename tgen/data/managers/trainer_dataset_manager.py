@@ -195,6 +195,7 @@ class TrainerDatasetManager(BaseObject):
         """
         dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
         self._datasets.update(dataset_splits_map)
+        train_dataset = dataset_splits_map[DatasetRole.TRAIN]
         if isinstance(train_dataset, TraceDataset):
             train_dataset.prepare_for_training(data_augmenter)
         return train_dataset

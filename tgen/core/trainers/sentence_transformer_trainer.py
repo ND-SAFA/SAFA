@@ -3,7 +3,6 @@ from typing import List, Tuple
 import numpy as np
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
-from torch import Tensor, nn
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
@@ -155,9 +154,9 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         input_examples = self.to_input_examples(dataset)
         scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
-        if self.loss_function:
-            dataset_features = self.model.smart_batching_collate(input_examples)
-            prediction_metrics["loss"] = self.loss_function(*dataset_features).item()
+        features, labels = self.model.smart_batching_collate(input_examples)
+        labels.to(self.model._target_device)
+        prediction_metrics["loss"] = self.loss_function(features, labels).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def _create_loss_function(self):
@@ -167,7 +166,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         """
         loss_function_name = self.trainer_args.st_loss_function
         loss_function_kwargs = {}
-        possible_params = {"loss_fct": self._calculate_loss, "size_average": False, "margin": 0.1}
+        possible_params = {"size_average": False, "margin": 0.1}
         loss_function_class = SupportedLossFunctions.get_value(loss_function_name)
         for param, param_value in possible_params.items():
             if ReflectionUtil.has_constructor_param(loss_function_class, param):
@@ -176,20 +175,6 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         loss_function = loss_function_class(self.model, **loss_function_kwargs)
         logger.info(f"Created loss function {loss_function_name}.")
         return loss_function
-
-    def _calculate_loss(self, output: Tensor, labels: Tensor):
-        """
-        Calculates the loss between batch of predictions and their labels.
-        :param output: Batch prediction output containing similarity scores between pairs.
-        :param labels: The labels associated with the pairs.
-        :return: The loss between the predictions and actual labels.
-        """
-        default_loss = nn.MSELoss()
-        loss = default_loss(output, labels)
-        loss_value = loss.item()
-        self.total_loss += loss_value
-        self.losses.append(loss_value)
-        return loss
 
     @staticmethod
     def to_input_examples(dataset: Dataset, use_scores: bool = False, model: SentenceTransformer = None) -> List[InputExample]:

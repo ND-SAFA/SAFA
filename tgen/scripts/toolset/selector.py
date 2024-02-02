@@ -1,10 +1,8 @@
 import sys
-from typing import Any, List, Type, Callable
+from typing import Any, Callable, List, Type
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH, NEW_LINE
 from tgen.common.logging.logger_manager import logger
-
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, F_SLASH
-
 from tgen.scripts.constants import BACK_COMMAND, DEFAULT_ALLOW_BACK, EXIT_COMMAND, EXIT_MESSAGE, \
     REQUIRED_FIELD_ERROR
 

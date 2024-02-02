@@ -1,6 +1,6 @@
 from typing import Union
 
-from sentence_transformers.losses import CosineSimilarityLoss, MultipleNegativesRankingLoss, OnlineContrastiveLoss
+from sentence_transformers.losses import ContrastiveLoss, CosineSimilarityLoss, MultipleNegativesRankingLoss
 
 from tgen.common.util.supported_enum import SupportedEnum
 
@@ -10,7 +10,7 @@ class SupportedLossFunctions(SupportedEnum):
     Enumerates the different loss functions available for sentence embedding models.
     """
     COSINE = CosineSimilarityLoss
-    CONTRASTIVE = OnlineContrastiveLoss
+    CONTRASTIVE = ContrastiveLoss
     MNRL = MultipleNegativesRankingLoss
 
     def is_name(self, n: Union[str, "SupportedLossFunctions"]):

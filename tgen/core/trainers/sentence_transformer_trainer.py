@@ -165,9 +165,12 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         """
         loss_function_name = self.trainer_args.st_loss_function
         loss_function_kwargs = {}
+        possible_params = {"loss_fct": self._calculate_loss, "size_average": False, "margin": 0.1}
         loss_function_class = SupportedLossFunctions.get_value(loss_function_name)
-        if ReflectionUtil.has_constructor_param(loss_function_class, "loss_fct"):
-            loss_function_kwargs["loss_fct"] = self._calculate_loss
+        for param, param_value in possible_params.items():
+            if ReflectionUtil.has_constructor_param(loss_function_class, param):
+                loss_function_kwargs[param] = param_value
+
         loss_function = loss_function_class(self.model, **loss_function_kwargs)
         logger.info(f"Created loss function {loss_function_name}.")
         return loss_function

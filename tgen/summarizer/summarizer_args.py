@@ -42,7 +42,7 @@ class SummarizerArgs(PipelineArgs):
     """
     Whether to summarize the artifacts after creating the project summary.
     """
-    do_resummarize_artifacts: bool = True
+    do_resummarize_artifacts: bool = False
     """
     If True, a project summary will not be created
     """

@@ -19,7 +19,8 @@ class TimProjectDefinition(AbstractProjectDefinition):
         JSON: {
             StructuredKeys.ARTIFACTS: {
                 "name": StructuredKeys.Artifact.ID.value,
-                "body": StructuredKeys.Artifact.CONTENT.value
+                "body": StructuredKeys.Artifact.CONTENT.value,
+                "summary": StructuredKeys.Artifact.SUMMARY.value
             },
             StructuredKeys.TRACES: {
                 "sourceName": StructuredKeys.Trace.SOURCE.value,

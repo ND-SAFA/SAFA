@@ -155,6 +155,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         features, labels = self.model.smart_batching_collate(input_examples)
+        for label, tensor in features.items():
+            tensor.to(self.model._target_device)
         labels.to(self.model._target_device)
         prediction_metrics["loss"] = self.loss_function(features, labels).item()
         return PredictionOutput(scores, labels, prediction_metrics)

@@ -1,14 +1,17 @@
 from typing import Dict, List, Tuple
 
 import numpy as np
+import torch
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
 from torch import Tensor
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL, NEG_LINK
+from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
@@ -157,17 +160,35 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         features, labels = self.model.smart_batching_collate(input_examples)
         features, labels = self.move_to_device(self.loss_function.model._target_device, features, labels)
-        prediction_metrics["loss"] = self.loss_function(features, labels).item()
+        prediction_metrics["loss"] = self.compute_internal_loss(input_examples)
         return PredictionOutput(scores, labels, prediction_metrics)
+
+    def compute_internal_loss(self, input_examples: List[InputExample]):
+        model_device = self.loss_function.model._target_device
+        batches = ListUtil.batch(input_examples, self.args.eval_batch_size)
+        total_loss = torch.tensor(0.0, device=model_device)
+
+        for batch in tqdm(batches, desc="Computing loss function...", ncols=TQDM_NCOLS):
+            features, labels = self.model.smart_batching_collate(batch)
+            features, labels = self.move_to_device(model_device, features, labels)
+            total_loss += self.loss_function(features, labels).detach()
+
+        return total_loss.item()
 
     @staticmethod
     def move_to_device(device: str, features: List[Dict[str, Tensor]], labels: Tensor):
         for feature in features:
             for k, v in feature.items():
-                feature[k] = v.to(device)
-
-        labels = labels.to(device)  # Move labels to the device
+                feature[k] = SentenceTransformerTrainer.move_tensor_to_device(v, device)
+        labels = SentenceTransformerTrainer.move_tensor_to_device(labels, device)
         return features, labels
+
+    @staticmethod
+    def move_tensor_to_device(tensor, model_device):
+        # Move tensor to model_device if it's not already there
+        if tensor.device != model_device:
+            tensor = tensor.to(model_device)
+        return tensor
 
     def _create_loss_function(self):
         """

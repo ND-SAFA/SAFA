@@ -38,4 +38,19 @@ public interface EmailService {
      * @param projectVersion The project version the job was running on
      */
     void sendGenerationFailed(String recipient, ProjectVersion projectVersion);
+
+    /**
+     * Send an email indicating that a generation job finished.
+     *
+     * @param recipient The email of the recipient
+     * @param projectVersion The project version the job was running on
+     * @param success Whether the generation finished successfully
+     */
+    default void sendGenerationFinished(String recipient, ProjectVersion projectVersion, boolean success) {
+        if (success) {
+            sendGenerationCompleted(recipient, projectVersion);
+        } else {
+            sendGenerationFailed(recipient, projectVersion);
+        }
+    }
 }

@@ -388,11 +388,7 @@ public class GithubProjectCreationJob extends CommitJob {
     protected void afterJob(boolean success) throws Exception {
         if (importSettings.isSummarize()) {
             EmailService emailService = getServiceProvider().getEmailService();
-            if (success) {
-                emailService.sendGenerationCompleted(getUser().getEmail(), getProjectVersion());
-            } else {
-                emailService.sendGenerationFailed(getUser().getEmail(), getProjectVersion());
-            }
+            emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);
         }
     }
 

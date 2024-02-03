@@ -88,13 +88,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
         FileUtilities.deletePath(projectPath);
 
         if (this.store.isSummarizeArtifacts() || this.store.getFlatFileParser().getTGenRequestAppEntity().size() > 0) {
-
             EmailService emailService = getServiceProvider().getEmailService();
-            if (success) {
-                emailService.sendGenerationCompleted(getUser().getEmail(), getProjectVersion());
-            } else {
-                emailService.sendGenerationFailed(getUser().getEmail(), getProjectVersion());
-            }
+            emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);
         }
     }
 }

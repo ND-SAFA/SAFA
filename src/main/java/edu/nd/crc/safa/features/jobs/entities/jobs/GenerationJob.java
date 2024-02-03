@@ -76,11 +76,6 @@ public abstract class GenerationJob extends CommitJob {
     @Override
     protected void afterJob(boolean success) throws Exception {
         EmailService emailService = getServiceProvider().getEmailService();
-
-        if (success) {
-            emailService.sendGenerationCompleted(getUser().getEmail(), getProjectVersion());
-        } else {
-            emailService.sendGenerationFailed(getUser().getEmail(), getProjectVersion());
-        }
+        emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);
     }
 }

@@ -1,8 +1,9 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
+from torch import Tensor
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
@@ -155,14 +156,19 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         features, labels = self.model.smart_batching_collate(input_examples)
-        for feature in features:
-            for label, tensor in feature.items():
-                tensor.to(self.loss_function.model._target_device)
-        labels.to(self.loss_function.model._target_device)
-
-        logger.info(f"Model Device: {self.loss_function.model._target_device}")
+        features, labels = self.move_to_device(self.loss_function.model._target_device, features, labels)
         prediction_metrics["loss"] = self.loss_function(features, labels).item()
         return PredictionOutput(scores, labels, prediction_metrics)
+
+    @staticmethod
+    def move_to_device(device: str, features: List[Dict[str, Tensor]], labels: Tensor):
+        for feature in features:
+            feature['input_ids'] = feature['input_ids'].to(device)
+            feature['token_type_ids'] = feature['token_type_ids'].to(device)
+            feature['attention_mask'] = feature['attention_mask'].to(device)
+
+        labels = labels.to(device)  # Move labels to the device
+        return features, labels
 
     def _create_loss_function(self):
         """

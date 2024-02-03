@@ -163,9 +163,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
     @staticmethod
     def move_to_device(device: str, features: List[Dict[str, Tensor]], labels: Tensor):
         for feature in features:
-            feature['input_ids'] = feature['input_ids'].to(device)
-            feature['token_type_ids'] = feature['token_type_ids'].to(device)
-            feature['attention_mask'] = feature['attention_mask'].to(device)
+            for k, v in feature.items():
+                feature[k] = v.to(device)
 
         labels = labels.to(device)  # Move labels to the device
         return features, labels

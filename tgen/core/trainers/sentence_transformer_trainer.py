@@ -157,8 +157,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         features, labels = self.model.smart_batching_collate(input_examples)
         for feature in features:
             for label, tensor in feature.items():
-                tensor.to(self.model._target_device)
-        labels.to(self.model._target_device)
+                tensor.to(self.loss_function.model._target_device)
+        labels.to(self.loss_function.model._target_device)
         prediction_metrics["loss"] = self.loss_function(features, labels).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 

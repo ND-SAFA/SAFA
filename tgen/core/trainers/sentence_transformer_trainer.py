@@ -165,7 +165,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
 
     def compute_internal_loss(self, input_examples: List[InputExample]):
         model_device = self.loss_function.model._target_device
-        batches = ListUtil.batch(input_examples, self.args.eval_batch_size)
+        batches = ListUtil.batch(input_examples, self.args.train_batch_size)
         total_loss = torch.tensor(0.0, device=model_device)
 
         for batch in tqdm(batches, desc="Computing loss function...", ncols=TQDM_NCOLS):

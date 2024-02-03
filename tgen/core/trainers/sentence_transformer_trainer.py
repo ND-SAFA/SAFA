@@ -159,6 +159,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
             for label, tensor in feature.items():
                 tensor.to(self.loss_function.model._target_device)
         labels.to(self.loss_function.model._target_device)
+
+        logger.info(f"Model Device: {self.loss_function.model._target_device}")
         prediction_metrics["loss"] = self.loss_function(features, labels).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 

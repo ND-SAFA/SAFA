@@ -48,6 +48,7 @@ public class FlatFileController extends BaseController {
      * @param versionId     The id of the version that will be modified by given files.
      * @param files         The flat files containing tim.json, artifact files, and trace link files.
      * @param asCompleteSet Whether entities in flat files are complete set of entities in version.
+     * @param summarizeArtifacts Whether to run a summarization job in addition to doing the import
      * @return ServerResponse whose body contains all entities in project created.
      * @throws SafaError Throws errors if no files are given.
      */

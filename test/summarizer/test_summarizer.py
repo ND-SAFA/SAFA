@@ -4,7 +4,7 @@ from string import ascii_lowercase
 from bs4 import BeautifulSoup
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE, MULTI_LINE_ITEMS, SPECIAL_TAGS_ITEMS
+from tgen.common.constants.project_summary_constants import SPECIAL_TAGS_ITEMS
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -109,14 +109,15 @@ class TestSummarizer(BaseTest):
             return matches
 
         def project_summary_response(prompt, **kwargs):
-            artifact_ids = [tag.text for tag in BeautifulSoup(prompt).findAll("id")]
+            artifact_ids = [tag.text for tag in BeautifulSoup(prompt, features="lxml").findAll("id")]
             if not artifact_ids:
                 artifact_ids = set(find_ids(prompt))
             artifact_ids = EMPTY_STRING.join([f"[{id_}]" for id_ in artifact_ids])
             pattern = re.compile(r'<[^>]+>')
-            tag = pattern.findall(prompt)[-1]
+            tags = [t for t in pattern.findall(prompt) if not any([x in t for x in {"id", "body", "artifact", "versions"}])]
+            tag = tags[3]
             tag = StrUtil.remove_substrings(tag, ["</", ">"])
-            section_title = SECTION_TAG_TO_TILE.get(tag, PS_SUBSYSTEM_TITLE)
+            section_title = SECTION_TAG_TO_TILE.get(tag)
             body_prefix = artifact_ids if section_title not in SPECIAL_TAGS_ITEMS else None
             return create(title=section_title, body_prefix=body_prefix)
 

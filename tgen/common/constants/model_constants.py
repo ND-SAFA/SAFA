@@ -22,7 +22,15 @@ def get_efficient_default_llm_manager() -> AbstractLLMManager:
 
 def get_best_default_llm_manager_long_context() -> AbstractLLMManager:
     """
-    Gets the default llm manager to use
+    Gets the default llm manager to use with long contexts
     :return: The default llm manager
     """
     return DefaultLLMManager.BEST_LONG()
+
+
+def get_best_default_llm_manager_short_context() -> AbstractLLMManager:
+    """
+    Gets the default llm manager to use with short contexts
+    :return: The default llm manager
+    """
+    return DefaultLLMManager.BEST_SHORT()

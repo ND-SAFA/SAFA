@@ -16,28 +16,31 @@ MOCK_PS_RES_MAP = {
     PS_DATA_FLOW_TITLE: "project_data_flow"
 }
 
-
 SECTION_TAG_TO_TILE = {
     v: k for k, v in PROJECT_SUMMARY_TAGS.items()
 }
-
 
 TEST_PROJECT_SUMMARY = Summary({title: EnumDict({"chunks": ["summary of project"], "title": title})
                                 for title in MOCK_PS_RES_MAP.keys()})
 
 
-def create(title: str, body_prefix: str = None, tag: str = None):
+def create(title: str, body_prefix: str = None, tag: str = None, body: str = None, n_items: int = 0):
     if body_prefix is None:
         body_prefix = ""
     tag = PROJECT_SUMMARY_TAGS[title] if not tag else tag
-    body = MOCK_PS_RES_MAP.get(title, f"project_{title.lower()}")
-    if title in SPECIAL_TAGS_ITEMS:
-        body_prefix = PromptUtil.create_xml("name", body_prefix if body_prefix else "name")
-        body = PromptUtil.create_xml("descr", body)
-    r = ""
-    r += PromptUtil.create_xml(PS_NOTES_TAG, "notes")
-    r += PromptUtil.create_xml(tag, f"{body_prefix}{body}")
-    return r
+    body = MOCK_PS_RES_MAP.get(title, f"project_{title.lower()}") if not body else body
+    if title in SPECIAL_TAGS_ITEMS and n_items == 0:
+        r = ""
+        for i in range(1, 4):
+            item_body_prefix = PromptUtil.create_xml("name", body_prefix if body_prefix else f"name{i}")
+            item_body = PromptUtil.create_xml(f"descr", body + str(i))
+            r += create(title, item_body_prefix, tag, item_body, n_items=i)
+        return r
+    else:
+        r = ""
+        r += PromptUtil.create_xml(PS_NOTES_TAG, "notes")
+        r += PromptUtil.create_xml(tag, f"{body_prefix}{body}")
+        return r
 
 
 class MockResponses:

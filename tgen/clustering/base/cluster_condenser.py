@@ -62,17 +62,20 @@ class ClusterCondenser:
         :param clusters: List of clusters to add.
         :return: None
         """
-        clusters = self.cohesiveness_filter(clusters)
+        filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
+        min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
+        clusters = self.cohesiveness_filter(filtered_clusters, min_pairwise_avg)
         for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
-            self.add(c)
+            self.add(c, min_pairwise_avg)
 
-    def add(self, cluster: Cluster) -> Optional[ClusterType]:
+    def add(self, cluster: Cluster, min_pairwise_avg: float = None) -> Optional[ClusterType]:
         """
         Adds single cluster to the map.
         :param cluster: The cluster to add.
+        :param min_pairwise_avg: Minimal acceptable pairwise average for clusters.
         :return: Cluster if added, None if cluster is duplicate.
         """
-        should_add = self.should_add(cluster)
+        should_add = self.should_add(cluster, min_pairwise_avg)
         if not should_add:
             return
         cluster_id = self.__get_next_cluster_id()
@@ -81,10 +84,11 @@ class ClusterCondenser:
             self.seen_artifacts.add(a)
         return cluster
 
-    def should_add(self, cluster: Cluster) -> bool:
+    def should_add(self, cluster: Cluster, min_pairwise_avg: float = None) -> bool:
         """
         Processes cluster and determines if we should add it to the set.
         :param cluster: The candidate cluster to add.
+        :param min_pairwise_avg: Minimal acceptable pairwise average for clusters.
         :return: Whether cluster should be added to map.
         """
         cluster.remove_outliers()
@@ -95,6 +99,8 @@ class ClusterCondenser:
             if len(cluster) - len(overlapping_artifacts) < self.min_cluster_size:
                 return False
             cluster.remove_artifacts(overlapping_artifacts, update_stats=True)
+            if not min_pairwise_avg or cluster.avg_pairwise_sim < min_pairwise_avg:
+                return False
         contains_new_artifacts = self.contains_new_artifacts(cluster)
         if len(cluster) == 1 and not contains_new_artifacts:
             return False
@@ -188,14 +194,13 @@ class ClusterCondenser:
             self.seen_artifacts.add(a)
         new_cluster.votes += old_cluster.votes
 
-    def cohesiveness_filter(self, clusters: List[Cluster]):
+    def cohesiveness_filter(self, clusters: List[Cluster], min_pairwise_avg: float = None):
         """
         Filters clusters by their cohesiveness relative to the average cohesiveness of all clusters.
         :param clusters: The clusters to filter.
+        :param min_pairwise_avg: The minimum acceptable pairwise average for clusters.
         :return: List of filtered clusters.
         """
-        filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
-        min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
         artifacts_list = [tuple(sorted(cluster.artifact_id_set)) for cluster in clusters]
 
         artifacts2cluster = {}
@@ -208,9 +213,9 @@ class ClusterCondenser:
 
         if min_pairwise_avg is not None:
             if self.filter_cohesiveness:
-                filtered_clusters: List[Cluster] = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
+                clusters: List[Cluster] = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, clusters))
 
-            clusters = list(sorted(filtered_clusters,
+            clusters = list(sorted(clusters,
                                    key=lambda c: c.calculate_importance(self.sort_metric), reverse=True))
         debugging = [cluster.get_content_of_artifacts_in_cluster() for cluster in clusters]
         return clusters

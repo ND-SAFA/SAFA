@@ -79,7 +79,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
                 predictions = self.calculate_predictions(sentence_pairs)
 
                 # Calculate loss
-                loss = self.compute_loss(scores=predictions, labels=labels)
+                loss = self.compute_loss(scores=predictions, labels=labels, input_examples=batch_examples)
 
                 loss.backward()  # Back-propagate and update weights
                 optimizer.step()
@@ -111,7 +111,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
         input_examples = to_input_examples(dataset)
         scores, labels = self.calculate_similarities(input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
-        prediction_metrics["loss"] = self.compute_loss(scores, labels, input_examples).item()
+        prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels, input_examples=input_examples).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def calculate_similarities(self, input_examples: List[InputExample]):

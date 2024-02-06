@@ -6,8 +6,8 @@ import numpy as np
 
 from tgen.common.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.sentence_transformer_trainer import SentenceTransformerTrainer
 from tgen.core.trainers.st.st_loss_functions import SupportedLossFunctions
+from tgen.core.trainers.st_trainer_siamese import SentenceTransformerTrainer
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager

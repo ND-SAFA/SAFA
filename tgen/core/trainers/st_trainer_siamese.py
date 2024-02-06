@@ -1,17 +1,15 @@
-from typing import List, Tuple
+from typing import List
 
 import torch
-from datasets import Dataset
-from sentence_transformers import InputExample, SentenceTransformer
+from sentence_transformers import InputExample
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL, NEG_LINK
+from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -23,16 +21,15 @@ from tgen.core.trainers.st.sentence_transformer_evaluator import SentenceTransfo
 from tgen.core.trainers.st.st_loss_functions import SupportedLossFunctions
 from tgen.core.trainers.st.st_metrics import STMetrics
 from tgen.core.trainers.st.st_training_manager import STTrainingParams
+from tgen.core.trainers.st.st_utilities import calculate_similarities, to_input_examples
 from tgen.core.trainers.st.tensor_utilities import move_to_device
-from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
 
 
-class SentenceTransformerTrainer(HuggingFaceTrainer):
+class SentenceTransformerTrainerSiamese(HuggingFaceTrainer):
     """
     Trains sentence transformer models. They have a slightly modified API for training the models and loading the data.
     """
@@ -106,8 +103,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         """
         self._current_eval_role = dataset_role
         dataset = self._get_dataset(dataset_role)
-        input_examples = self.to_input_examples(dataset)
-        scores, labels = self.calculate_similarities(self.model, input_examples)
+        input_examples = to_input_examples(dataset)
+        scores, labels = calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         prediction_metrics["loss"] = self.compute_internal_loss(scores, labels, input_examples)
         return PredictionOutput(scores, labels, prediction_metrics)
@@ -140,78 +137,3 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         loss_function = loss_function_class(self.model, **loss_function_kwargs)
         logger.info(f"Created loss function {loss_function_name}.")
         return loss_function
-
-    @staticmethod
-    def to_input_examples(dataset: Dataset, use_scores: bool = False, model: SentenceTransformer = None) -> List[InputExample]:
-        """
-        Converts a huggingface dataset into a list of sentence transformer input examples.
-        :param dataset: The huggingface dataset.
-        :param use_scores: Whether to use score over label for negative links.
-        :param model: If use_scores, the model used to embed artifacts.
-        :return: List of input examples.
-        """
-        input_examples = []
-        for i in dataset:
-            source_text = i[CSVKeys.SOURCE]
-            target_text = i[CSVKeys.TARGET]
-            label = float(i[CSVKeys.LABEL])
-            score = i.get(CSVKeys.SCORE, None)
-            if use_scores and score:
-                label = float(score)
-            input_examples.append(InputExample(texts=[source_text, target_text], label=label))
-
-        if use_scores and all([i.label is None for i in input_examples]):
-            assert model, f"Model is required to be defined if use_scores is True. Received {model}."
-            SentenceTransformerTrainer.replace_labels_with_scores(model, input_examples)
-        return input_examples
-
-    @staticmethod
-    def replace_labels_with_scores(model: SentenceTransformer, input_examples: List[InputExample], label: int = NEG_LINK):
-        """
-        Replaces the matching labels with model similarity score.
-        :param model: The model to create embeddings for artifacts for.
-        :param input_examples: The input examples to modify.
-        :param label: The label to replace with scores.
-        :return: None. Modified in place.
-        """
-        examples_with_label = [input_example for input_example in input_examples if input_example.label == label]
-        content = ListUtil.flatten([input_example.texts for input_example in examples_with_label])
-
-        embeddings_manager = EmbeddingsManager.create_from_content(content, model=model, show_progress_bar=False)
-
-        for input_example in examples_with_label:
-            input_example.label = SentenceTransformerTrainer.get_input_example_score(embeddings_manager, input_example)
-
-        logger.info(f"Adding scores to {len(examples_with_label)} input examples.")
-
-    @staticmethod
-    def calculate_similarities(model: SentenceTransformer, input_examples: List[InputExample]) -> Tuple[List[float], List[float]]:
-        """
-        Calculates the cosine similarity between the texts in each input example. TODO: Replace with embedding util.
-        :param model: The model used to embed the test dataset.
-        :param input_examples: The list of input examples to calculate similarities for.
-        :return: Prediction output containing scores as predictions and labels as label ids.
-        """
-        unique_content = list(set(ListUtil.flatten([e.texts for e in input_examples])))
-        embeddings_manager = EmbeddingsManager.create_from_content(unique_content, model=model, show_progress_bar=False)
-        scores = []
-        labels = []
-        for example in input_examples:
-            score = SentenceTransformerTrainer.get_input_example_score(embeddings_manager, example)
-            scores.append(score)
-            labels.append(example.label)
-        return scores, labels
-
-    @staticmethod
-    def get_input_example_score(embeddings_manager: EmbeddingsManager, input_example: InputExample) -> float:
-        """
-        Calculates the similarity score between the two texts in the input example.
-        :param embeddings_manager: The embeddings manager containing embedding to text.
-        :param input_example: The input example containing texts to compare.
-        :return: The similarity score between texts.
-        """
-        s_text, t_text = input_example.texts
-        s_embedding = embeddings_manager.get_embedding(s_text)
-        t_embedding = embeddings_manager.get_embedding(t_text)
-        score = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
-        return score

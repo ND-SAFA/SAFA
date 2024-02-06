@@ -11,7 +11,8 @@ def overrides(interface_class):
         :param method: The method to check existence for.
         :return: Method.
         """
-        assert (method.__name__ in dir(interface_class))
+        method_name = method.__name__
+        assert (method_name in dir(interface_class)), f"{interface_class} does not have method: {method_name}"
         return method
 
     return overrider

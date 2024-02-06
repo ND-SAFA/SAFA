@@ -1,7 +1,5 @@
 import numpy as np
 
-from tgen.common.logging.logger_manager import logger
-
 
 class BalancedBatchSampler:
     def __init__(self, dataset, batch_size: int):
@@ -31,7 +29,6 @@ class BalancedBatchSampler:
     @staticmethod
     def select_indices(indices, n_items, create_indices_method):
         if n_items > len(indices):
-            logger.info("Resetting indices...")
             indices = create_indices_method()  # Recreate indices using the provided method
 
         selected = list(np.random.choice(indices, n_items, replace=False))

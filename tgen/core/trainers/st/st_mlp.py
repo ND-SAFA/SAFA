@@ -26,7 +26,7 @@ class MLP(nn.Module):
     @staticmethod
     def build(model: SentenceTransformer, hidden_sizes: List[int], activations: List[nn.Module]):
         if not isinstance(activations, list):
-            activations = [activations] * (len(hidden_sizes) + 1)
+            activations = [activations] * (len(hidden_sizes))
         input_size = 2 * model.get_sentence_embedding_dimension()
         mlp_model = MLP(input_size=input_size, hidden_sizes=hidden_sizes, activations=activations)
         return mlp_model

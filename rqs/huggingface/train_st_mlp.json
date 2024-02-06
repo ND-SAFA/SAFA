@@ -14,13 +14,11 @@
             "model_path": "[BASE_MODEL]"
           },
           "trainer_args": {
-            "st_loss_function": "[LOSS_FUNCTION]",
-            "use_scores": "[USE_SCORES_BOOL]",
             "output_dir": "[OUTPUT_PATH]",
             "best_model_path": "[MODEL_PATH]/[BEST_MODEL_NAME]",
             "num_train_epochs": "[EPOCHS_INT]",
-            "train_batch_size": "[BATCH_SIZE_INT]",
-            "learning_rate": 5e-6,
+            "train_batch_size": "[TRAIN_BATCH_SIZE_INT]",
+            "per_device_eval_batch_size": "[EVAL_BATCH_SIZE_INT]",
             "skip_save": false,
             "load_best_model_at_end": true,
             "save_strategy": "epoch",

@@ -1,10 +1,8 @@
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
-import numpy as np
 import torch
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
-from torch import Tensor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
@@ -19,66 +17,19 @@ from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
 from tgen.core.trainers.st.custom_sentence_transformer import CustomSentenceTransformer
 from tgen.core.trainers.st.sentence_transformer_evaluator import SentenceTransformerEvaluator
 from tgen.core.trainers.st.st_loss_functions import SupportedLossFunctions
 from tgen.core.trainers.st.st_metrics import STMetrics
 from tgen.core.trainers.st.st_training_manager import STTrainingParams
+from tgen.core.trainers.st.tensor_utilities import move_to_device
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
-
-
-class BalancedBatchSampler:
-    def __init__(self, dataset, batch_size: int):
-        self.indices = list(np.arange(len(dataset)))
-        self.num_samples = len(dataset)
-        self.labels = np.array([example.label for example in dataset])
-        self.n_positive = len([s for s in self.labels if s != 0])
-        self.batch_size = batch_size
-        self.negative_indices = self.create_negative_indices()
-        self.other_indices = self.create_other_indices()
-        self.n_batches = int(min(len(self.other_indices), len(self.negative_indices)) // (self.batch_size / 2))
-
-    def create_negative_indices(self):
-        return [i for i in self.indices if self.labels[i] == 0]
-
-    def create_other_indices(self):
-        return [i for i in self.indices if self.labels[i] != 0]
-
-    def select_negative(self, n_items: int):
-        selected, self.negative_indices = self.select_indices(self.negative_indices, n_items, self.create_negative_indices)
-        return selected
-
-    def select_other(self, n_items: int):
-        selected, self.other_indices = self.select_indices(self.other_indices, n_items, self.create_other_indices)
-        return selected
-
-    @staticmethod
-    def select_indices(indices, n_items, create_indices_method):
-        if n_items > len(indices):
-            logger.info("Resetting indices...")
-            indices = create_indices_method()  # Recreate indices using the provided method
-
-        selected = list(np.random.choice(indices, n_items, replace=False))
-        indices = [index for index in indices if index not in selected]  # Efficient way to remove selected items
-        return selected, indices  # Return both selected items and the updated indices list
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        n_negative = self.batch_size // 2
-        n_pos = self.batch_size - n_negative
-        batch_indices = self.select_negative(n_negative) + self.select_other(n_pos)
-        np.random.shuffle(batch_indices)
-        return batch_indices
-
-    def __len__(self):
-        return self.n_batches
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -105,7 +56,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         self.losses = []
         self.total_loss = 0
         self.loss_function = None
-        self.params = None
+        self.params = None  # make global step
         self.loss_function = self._create_loss_function()
 
     @overrides(HuggingFaceTrainer)
@@ -158,37 +109,20 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         input_examples = self.to_input_examples(dataset)
         scores, labels = self.calculate_similarities(self.model, input_examples)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
-        features, labels = self.model.smart_batching_collate(input_examples)
-        features, labels = self.move_to_device(self.loss_function.model._target_device, features, labels)
-        prediction_metrics["loss"] = self.compute_internal_loss(input_examples)
+        prediction_metrics["loss"] = self.compute_internal_loss(scores, labels, input_examples)
         return PredictionOutput(scores, labels, prediction_metrics)
 
-    def compute_internal_loss(self, input_examples: List[InputExample]):
+    def compute_internal_loss(self, scores, labels, input_examples: List[InputExample]):
         model_device = self.loss_function.model._target_device
         batches = ListUtil.batch(input_examples, self.args.train_batch_size)
         total_loss = torch.tensor(0.0, device=model_device)
 
         for batch in tqdm(batches, desc="Computing loss function...", ncols=TQDM_NCOLS):
             features, labels = self.model.smart_batching_collate(batch)
-            features, labels = self.move_to_device(model_device, features, labels)
+            features, labels = move_to_device(model_device, features, labels)
             total_loss += self.loss_function(features, labels).detach()
 
         return total_loss.item()
-
-    @staticmethod
-    def move_to_device(device: str, features: List[Dict[str, Tensor]], labels: Tensor):
-        for feature in features:
-            for k, v in feature.items():
-                feature[k] = SentenceTransformerTrainer.move_tensor_to_device(v, device)
-        labels = SentenceTransformerTrainer.move_tensor_to_device(labels, device)
-        return features, labels
-
-    @staticmethod
-    def move_tensor_to_device(tensor, model_device):
-        # Move tensor to model_device if it's not already there
-        if tensor.device != model_device:
-            tensor = tensor.to(model_device)
-        return tensor
 
     def _create_loss_function(self):
         """

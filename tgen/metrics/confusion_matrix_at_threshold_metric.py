@@ -41,7 +41,7 @@ class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
         return self.calculate_confusion_matrix(references, predicted_labels)
 
     @staticmethod
-    def calculate_confusion_matrix(y_true: List[float], y_pred: List[float]):
+    def calculate_confusion_matrix(y_true: List[float], predictions: List[float]):
         """
         Computes confusion matrix between actual and predicted labels.
         :param y_true: List of true labels.
@@ -54,7 +54,7 @@ class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
             "fp": 0,
             "fn": 0
         }
-        for label, pred in zip(y_true, y_pred):
+        for label, pred in zip(y_true, predictions):
             if label == pred:
                 if label == 1:
                     errors["tp"] += 1

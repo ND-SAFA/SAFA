@@ -29,7 +29,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         :param train_objectives: List of objectives each containing data and a model.
         :param training_params: The training parameters to run loop on.
         """
-
+        self.mlp_model = None
         training_manager = STTrainingManager(training_objectives=train_objectives, params=training_params)
         steps_per_epoch = training_manager.get_epoch_steps()
 
@@ -70,10 +70,11 @@ class CustomSentenceTransformer(SentenceTransformer):
             labels = labels.to(self._target_device)
             features = list(map(lambda batch: batch_to_device(batch, self._target_device), features))
 
-            loss_value = loss_function(features, labels)
-            WBManager.log(metrics={"training_loss": loss_value.item()}, step=training_manager.params.global_step)
-            loss_value /= training_manager.params.accumulation_steps
-            loss_value.backward()
+            step_loss = loss_function(features, labels)
+            loss_value = step_loss.item()
+            WBManager.log(metrics={"training_loss": loss_value})
+            step_loss /= training_manager.params.accumulation_steps
+            step_loss.backward()
 
             if training_step % training_manager.params.accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(loss_function.parameters(), training_manager.params.max_grad_norm)
@@ -155,6 +156,12 @@ class CustomSentenceTransformer(SentenceTransformer):
             loss_model.to(self._target_device)
         for dataloader in training_manager.data_loaders:  # Use smart batching
             dataloader.collate_fn = self.smart_batching_collate
+
+        # if self.mlp_model == 1:
+        #     input_size = 2 * self.get_sentence_embedding_dimension()  # Two sentences concatenated
+        #     hidden_sizes = [512, 256]  # Sizes of hidden layers
+        #     activations = [nn.ReLU, nn.ReLU]  # Activation functions for each hidden layer
+        #     self.mlp_model = MLP(input_size=input_size, hidden_sizes=hidden_sizes, activations=activations)
 
     def on_post_training(self, training_manager: STTrainingManager) -> None:
         """

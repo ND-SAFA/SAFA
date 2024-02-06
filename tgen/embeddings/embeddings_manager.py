@@ -10,7 +10,7 @@ from sentence_transformers import SentenceTransformer
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.embedding_util import EmbeddingUtil, EmbeddingType, IdType
+from tgen.common.util.embedding_util import EmbeddingType, EmbeddingUtil, IdType
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -48,17 +48,20 @@ class EmbeddingsManager:
         self.__state_changed_since_last_save = False
 
     @staticmethod
-    def create_from_content(content_list: List[str], **kwargs) -> "EmbeddingsManager":
+    def create_from_content(content_list: List[str], embedding_kwargs: Dict = None, **kwargs) -> "EmbeddingsManager":
         """
         Creates embeddings manager mapping content in list to its embeddings.
         :param content_list: The content list to create embeddings for.
+        :param embedding_kwargs: Dictionary representing keyword arguments to function creating embeddings.
         :param kwargs: Keyword arguments passed to embeddings manager.
         :return: EmbeddingsManager.
         """
+        if embedding_kwargs is None:
+            embedding_kwargs = {}
         content_list = list(set(content_list))
         content_map = {c: c for c in content_list}
         embeddings_manager = EmbeddingsManager(content_map, **kwargs)
-        embeddings_manager.create_artifact_embeddings()
+        embeddings_manager.create_artifact_embeddings(**embedding_kwargs)
         return embeddings_manager
 
     def create_artifact_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:
@@ -366,7 +369,7 @@ class EmbeddingsManager:
         if not show_progress_bar:
             logger.log_without_spam(msg="Calculating embeddings for artifacts...", level=logging.INFO)
         embeddings = self.get_model().encode(artifact_contents, batch_size=DEFAULT_ENCODING_BATCH_SIZE,
-                                             show_progress_bar=show_progress_bar)
+                                             show_progress_bar=show_progress_bar, **kwargs)
         return embeddings if return_as_list else embeddings[0]
 
     def __set_embedding_order(self, ordered_ids: List[Any] = None) -> None:

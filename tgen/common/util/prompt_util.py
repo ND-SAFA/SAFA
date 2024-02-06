@@ -94,6 +94,7 @@ class PromptUtil:
         """
         Formats the string as indented in markdown
         :param original_string: The string to format
+        :param level: The indentation level.
         :return: The string indented as markdown
         """
         markdown_tab = "    "

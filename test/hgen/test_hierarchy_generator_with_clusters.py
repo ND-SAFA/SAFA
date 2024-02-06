@@ -1,5 +1,6 @@
 import math
 import random
+from copy import deepcopy
 from unittest.mock import MagicMock
 
 import mock
@@ -10,21 +11,19 @@ from bs4.element import Tag
 from test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, get_name_responses, \
     get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
-from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.embedding_util import EmbeddingUtil
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.content_generator import ContentGenerator
 from tgen.hgen.hgen_args import HGenArgs
-from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_detect_duplicate_artifacts import DetectDuplicateArtifactsStep
-from tgen.hgen.steps.step_find_homes_for_orphans import FindHomesForOrphansStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_explanations_for_links import GenerateExplanationsForLinksStep
 from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
@@ -33,7 +32,6 @@ from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
@@ -53,12 +51,43 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         NameArtifactsStep().run(args, state)
         self.assert_generate_trace_links_step(expected_names, n_artifacts_per_cluster,
                                               args, state, anthropic_ai_manager)
-        DetectDuplicateArtifactsStep().run(args, state)
-        self.assert_generate_explanations_step(args, state)
+        self.assert_detect_duplicates_step(args, state)
+        self.assert_generate_explanations_step(args, state, anthropic_ai_manager)
         CreateHGenDatasetStep().run(args, state)
         hgen = HierarchyGenerator(self.HGEN_ARGS)
         hgen.state = state
         hgen._log_costs()
+
+    def assert_detect_duplicates_step(self, args, state):
+        DUP_SOURCE_ARTIFACT = "dup_link"
+        content = list(state.get_generations2sources().keys())
+        dup_artifact_id = "dup1"
+        dup_content = NEW_LINE.join([content[0], "new"])
+        expected_parent = list(state.new_artifact_dataset.artifact_df.index)[0]
+        n_generations = len(state.new_artifact_dataset.artifact_df)
+
+        state.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
+        state.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
+
+        state.all_artifacts_dataset.artifact_df.add_artifact(DUP_SOURCE_ARTIFACT, content[0],
+                                                             self.HGEN_ARGS.source_layer_ids[0])
+        state.source_dataset.artifact_df.add_artifact(DUP_SOURCE_ARTIFACT, content[0],
+                                                      self.HGEN_ARGS.source_layer_ids[0])
+
+        state.embedding_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content[0])
+        state.get_cluster2generation()['2'].append(dup_content)
+
+        original_link = EnumDict({TraceKeys.child_label(): DUP_SOURCE_ARTIFACT,
+                                  TraceKeys.parent_label(): dup_artifact_id,
+                                  TraceKeys.SCORE: 0.6,
+                                  TraceKeys.EXPLANATION: "Explanation"})
+        state.selected_predictions.append(deepcopy(original_link))
+        DetectDuplicateArtifactsStep().run(args, state)
+        self.assertNotIn(dup_artifact_id, state.selected_artifacts_dataset.artifact_df)
+        self.assertNotIn(original_link, state.selected_predictions)
+        new_link = [trace for trace in state.selected_predictions if trace[TraceKeys.child_label()] == DUP_SOURCE_ARTIFACT]
+        self.assertSize(1, new_link)
+        self.assertEqual(new_link[0][TraceKeys.TARGET], expected_parent)
 
     def assert_generate_artifact_content_step(self, args, state,
                                               anthropic_ai_manager: TestAIManager):
@@ -75,9 +104,6 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                                          calculate_sim: MagicMock = None):
         embedding_similarities = self._create_fake_embedding_scores(args, calculate_sim, n_artifacts_per_cluster)
 
-        mock_explanations = [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
-                             for sim in embedding_similarities] * len(expected_names)
-        anthropic_ai_manager.add_responses(mock_explanations)
         anthropic_ai_manager.mock_summarization()
         GenerateTraceLinksStep().run(args, state)
         for cluster_id, cluster_artifacts in state.cluster2artifacts.items():
@@ -107,11 +133,15 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         avg_file_size = sum([len(a[ArtifactKeys.CONTENT].splitlines())
                              for a in source_artifacts]) / len(source_artifacts)
         expected_value = ContentGenerator._calculate_n_targets_for_cluster(artifacts,
-                                                                           avg_file_size=avg_file_size)
+                                                                           avg_file_size=avg_file_size,
+                                                                           retention_percentage=1)
         self.assertIn(str(expected_value), prompt)
         return return_value
 
-    def assert_generate_explanations_step(self, args, state):
+    def assert_generate_explanations_step(self, args, state, anthropic_ai_manager):
+        mock_explanations = [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)
+                             for _ in state.selected_predictions]
+        anthropic_ai_manager.add_responses(mock_explanations)
         GenerateExplanationsForLinksStep().run(args, state)
         missing_explanation = [trace for trace in state.selected_predictions if not trace.get(TraceKeys.EXPLANATION)]
         self.assertEqual(len(missing_explanation), 0)
@@ -159,7 +189,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         added_artifacts_to_last_cluster = n_artifacts_last_cluster - n_artifacts_per_cluster
         last_cluster_artifacts = state.cluster2artifacts[str(len(state.cluster2artifacts) - 1)]
         state.cluster2artifacts[str(len(state.cluster2artifacts) - 1)] = last_cluster_artifacts[
-                                                                      :-added_artifacts_to_last_cluster]
+                                                                         :-added_artifacts_to_last_cluster]
 
     def _setup_state_post_clustering_step(self, state):
         # makes it easier to test tracing + generation
@@ -178,5 +208,5 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         manual_clusters = {str(i): [a_id for a_id in artifact_ids] for i, artifact_ids in state.cluster2artifacts.items()}
         cluster_dataset = ClusterDatasetCreator(state.source_dataset, manual_clusters).create()
         state.cluster_dataset = PromptDataset(artifact_df=cluster_dataset.artifact_df)
-        state.cluster2cohesion = {i: random.randint(5, 10) / 10 for i in manual_clusters.keys()}
+        state.cluster2cohesion = {i: 0.5 for i in manual_clusters.keys()}
         return artifacts, n, n_artifacts_last_cluster,

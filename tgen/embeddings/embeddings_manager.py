@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.embedding_util import EmbeddingType, EmbeddingUtil, IdType
@@ -377,7 +376,7 @@ class EmbeddingsManager:
             return_as_list = False
         artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
         if include_ids:
-            artifact_contents = [f"{FileUtil.convert_path_to_human_readable(a_id)}{NEW_LINE}{content}"
+            artifact_contents = [f"{FileUtil.convert_path_to_human_readable(a_id)} {content}"
                                  # converts code file paths to NL
                                  for a_id, content in zip(subset_ids, artifact_contents)]
         show_progress_bar = self.show_progress_bar and math.ceil(len(artifact_contents) / DEFAULT_ENCODING_BATCH_SIZE) > 1

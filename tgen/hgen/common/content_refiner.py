@@ -241,12 +241,13 @@ class ContentRefiner:
         return n_targets
 
     def _summarize_duplicates(self, duplicate_cluster_map: ClusterMapType, generated_artifacts_df: ArtifactDataFrame,
-                              duplicate_cluster_artifact_df: ArtifactDataFrame, format_variables) -> List[str]:
+                              duplicate_cluster_artifact_df: ArtifactDataFrame, format_variables: Dict[str, List]) -> List[str]:
         """
         Summarizes the features of each duplicate cluster.
         :param duplicate_cluster_map: Dictionary mapping cluster id to a cluster containing duplicates.
         :param generated_artifacts_df: Contains the generated artifacts.
         :param duplicate_cluster_artifact_df: Contains the clusters of the duplicates.
+        :param format_variables: Dictionary mapping variable name to list of values to use when creating prompt.
         :return: List of the summarized duplicate clusters.
         """
         logger.info("Summarizing duplicate core goals. ")

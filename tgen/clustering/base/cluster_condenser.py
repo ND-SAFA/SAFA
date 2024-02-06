@@ -64,25 +64,9 @@ class ClusterCondenser:
         """
         filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
         min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
-        clusters = self.cohesiveness_filter(filtered_clusters, min_pairwise_avg)
+        clusters = self.filter_and_prioritize_clusters(filtered_clusters, min_pairwise_avg)
         for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
-            self.add(c, min_pairwise_avg)
-
-    def add(self, cluster: Cluster, min_pairwise_avg: float = None) -> Optional[ClusterType]:
-        """
-        Adds single cluster to the map.
-        :param cluster: The cluster to add.
-        :param min_pairwise_avg: Minimal acceptable pairwise average for clusters.
-        :return: Cluster if added, None if cluster is duplicate.
-        """
-        should_add = self.should_add(cluster, min_pairwise_avg)
-        if not should_add:
-            return
-        cluster_id = self.__get_next_cluster_id()
-        self.cluster_map[cluster_id] = cluster
-        for a in cluster.artifact_ids:
-            self.seen_artifacts.add(a)
-        return cluster
+            self._add_cluster(c, min_pairwise_avg)
 
     def should_add(self, cluster: Cluster, min_pairwise_avg: float = None) -> bool:
         """
@@ -194,7 +178,7 @@ class ClusterCondenser:
             self.seen_artifacts.add(a)
         new_cluster.votes += old_cluster.votes
 
-    def cohesiveness_filter(self, clusters: List[Cluster], min_pairwise_avg: float = None):
+    def filter_and_prioritize_clusters(self, clusters: List[Cluster], min_pairwise_avg: float = None):
         """
         Filters clusters by their cohesiveness relative to the average cohesiveness of all clusters.
         :param clusters: The clusters to filter.
@@ -236,6 +220,22 @@ class ClusterCondenser:
             sorted_cluster_ids = ListUtil.unzip(sorted(cluster_relationship, key=lambda item: item[1]), 0)
             for cluster_id in sorted_cluster_ids[1:]:  # remove from all but the top cluster
                 self.cluster_map[cluster_id].remove_artifacts([a_id])
+
+    def _add_cluster(self, cluster: Cluster, min_pairwise_avg: float = None) -> Optional[ClusterType]:
+        """
+        Adds single cluster to the map.
+        :param cluster: The cluster to add.
+        :param min_pairwise_avg: Minimal acceptable pairwise average for clusters.
+        :return: Cluster if added, None if cluster is duplicate.
+        """
+        should_add = self.should_add(cluster, min_pairwise_avg)
+        if not should_add:
+            return
+        cluster_id = self.__get_next_cluster_id()
+        self.cluster_map[cluster_id] = cluster
+        for a in cluster.artifact_ids:
+            self.seen_artifacts.add(a)
+        return cluster
 
     @staticmethod
     def calculate_intersection(source: Set, target: Set) -> float:

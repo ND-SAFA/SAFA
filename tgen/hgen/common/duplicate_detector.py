@@ -39,6 +39,7 @@ class DuplicateDetector:
         :param embeddings_manager: Contains the embeddings for the artifacts to be compared.
         :param duplicate_similarity_threshold: The similarity quantile for when two artifacts are too similar.
         :param duplicate_cluster_min_sim_threshold: The cohesion threshold below which a cluster of duplicates will not be accepted.
+        :param duplicate_sim_sigma: The number of standard deviations from the mean to flag overly similar artifacts as dups.
         """
         self.embeddings_manager = embeddings_manager
         self.duplicate_similarity_threshold = duplicate_similarity_threshold
@@ -65,7 +66,7 @@ class DuplicateDetector:
         similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, duplicate_similarity_threshold)
         dup_counter, dup_pairs = DuplicateDetector.count_duplicates(artifact_ids, similar_indices, similarity_matrix)
         dup_map = self.create_duplicate_map(dup_pairs)
-        duplicate_artifact_ids = self.find_most_duplicated_artifacts(dup_counter, dup_map)
+        duplicate_artifact_ids = set(dup_map.keys())  # self.find_most_duplicated_artifacts(dup_counter, dup_map)
         if duplicate_type != DuplicateType.ALL:
             dup_map, duplicate_artifact_ids = self._remove_dups_not_of_duplicate_type(duplicate_artifact_ids, dup_map, duplicate_type,
                                                                                       artifact_df, original_clusters_to_contents)
@@ -127,16 +128,7 @@ class DuplicateDetector:
                 self._add_intra_cluster_duplicates(cluster, dups_from_same_cluster, final_cluster_map)
             elif duplicate_type == DuplicateType.INTER_CLUSTER:
                 self._add_inter_cluster_duplicates(c_id, cluster, dups_from_same_cluster, final_cluster_map)
-
-        duplicate_artifact_ids, duplicate_map = self.get_duplicates(artifact_df,
-                                                                    original_clusters_to_contents=original_clusters_to_contents,
-                                                                    duplicate_type=duplicate_type)
-        dups_from_same_cluster = DuplicateDetector.identify_duplicates_from_same_cluster(duplicate_map,
-                                                                                         original_clusters_to_contents,
-                                                                                         artifact_df)
-        final_cluster_map_from_dups = self.convert_dup_map_to_clusters(duplicate_map, duplicate_type, dups_from_same_cluster)
-
-        return final_cluster_map_from_dups if duplicate_type == DuplicateType.INTRA_CLUSTER else final_cluster_map
+        return final_cluster_map
 
     @staticmethod
     def identify_duplicates_from_same_cluster(duplicate_map: Dict[str, Set[str]], cluster_to_contents: Dict[str, List],
@@ -161,39 +153,6 @@ class DuplicateDetector:
                     DictUtil.set_or_append_item(same_cluster_duplicate_map, cluster, {dup_id, a_id}, set)
 
         return same_cluster_duplicate_map
-
-    def convert_dup_map_to_clusters(self, duplicate_map: Dict[str, Set[str]], duplicate_type: DuplicateType,
-                                    dups_from_same_cluster: Dict[str, Set[str]] = None) -> ClusterMapType:
-        """
-        Converts a duplicate map into clusters of duplicates.
-        :param duplicate_map: Maps artifact id to a set of duplicates to it.
-        :param duplicate_type: The type of duplicate to search for (between clusters, within clusters or all).
-        :param dups_from_same_cluster: Dictionary mapping cluster id to duplicates that came from that cluster.
-        :return: A cluster map containing groups of duplicates.
-        """
-
-        def find_connected_components(graph):
-            def dfs(node, visited, component):
-                visited.add(node)
-                component.add(node)
-                for neighbor in graph.get(node, []):
-                    if neighbor not in visited:
-                        dfs(neighbor, visited, component)
-
-            visited = set()
-            components = []
-
-            for node in graph:
-                if node not in visited:
-                    component = set()
-                    dfs(node, visited, component)
-                    components.append(component)
-
-            return components
-
-        duplicate_artifact_sets = find_connected_components(duplicate_map)
-        return {str(i): Cluster.from_artifacts(artifact_ids, self.embeddings_manager)
-                for i, artifact_ids in enumerate(duplicate_artifact_sets)}
 
     @staticmethod
     def rename_clusters(orig_cluster_id: str, duplicate_type: DuplicateType) -> str:

@@ -122,12 +122,13 @@ class ArtifactPrompt(Prompt):
         :param header_level: The header level used to print each artifact ID.
         :return: The formatted prompt
         """
-        if include_id:
-            if artifact_id and relation:
-                artifact_id = f"{artifact_id} ({relation})"
-            elif relation and include_id:
+        if relation:
+            if not include_id or not artifact_id:
                 artifact_id = relation
-
+                include_id = True
+            elif artifact_id:
+                artifact_id = f"{artifact_id} ({relation})"
+        if include_id:
             header = f"{PromptUtil.as_markdown_header(original_string=artifact_id, level=header_level)}{NEW_LINE}"
         else:
             header = EMPTY_STRING

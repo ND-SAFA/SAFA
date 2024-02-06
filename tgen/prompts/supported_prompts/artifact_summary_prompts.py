@@ -20,6 +20,21 @@ CODE_SUMMARY = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADE
                        PromptResponseManager(response_tag="summary"))
                 ]
 
+CODE_SUMMARY_AS_NL = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADER),
+                      Prompt("\n\n# Task\n"
+                             "First, answer this question with as much detail and accuracy as possible."
+                             "\n- What can a user achieve through this code?"
+                             "\n Do NOT reference specific class or function names, but instead describe them in detail. "
+                             "\n Your answer should be in the form of a long, "
+                             "detailed paragraph. Do not speculate or make up information, "
+                             "use only information directly from the code. "
+                             "Enclose your answer in <notes></notes>."
+                             "\n\nThen, using your notes, create a {target_type} artifact for this code that describes the behavior "
+                             "provided to the user. You should use the following format when creating the {target_type}\n"
+                             "{format} ",
+                             PromptResponseManager(response_tag="summary"))
+                      ]
+
 NL_SUMMARY = [
     Prompt("# Task\n"
            "1. Provide a list of answers to the following questions about the software artifact:"

@@ -21,19 +21,19 @@ id_to_related_children: null
 new_artifact_dataset: null
 original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
-    ordered_steps: []
-    steps: []
+    ordered_steps: [ ]
+    steps: [ ]
   data_export_path: null
   ensure_code_is_summarized: false
   project_file_id: null
   project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
-    overrides: {}
+    overrides: { }
     project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
     structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
-      conversions: {}
+      conversions: { }
       definition_reader: null
-      overrides: {}
+      overrides: { }
       project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
       summarizer: null
     summarizer: null
@@ -45,34 +45,34 @@ project_summary: !!python/object/apply:tgen.summarizer.summary.Summary
     overview: !!python/object/apply:tgen.common.util.enum_util.EnumDict
       dictitems:
         chunks:
-        - Here is a summary of the key technical details and design aspects of the
-          system based on the provided code
+          - Here is a summary of the key technical details and design aspects of the
+            system based on the provided code
         title: overview
 questions:
-- What are the main classes/functions in the code?
-- What are the inputs and outputs of the main functions?
-- Is there any user interface code and what does it do?
-refined_cluster2artifacts: null
-refined_cluster2generation: null
-refined_generations2sources: null
+  - What are the main classes/functions in the code?
+  - What are the inputs and outputs of the main functions?
+  - Is there any user interface code and what does it do?
+refined_cluster2artifacts: { }
+refined_cluster2generation: { }
+refined_generations2sources: { }
 seed2artifact_ids: null
 selected_artifacts_dataset: null
 selected_predictions: null
 source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
-    ordered_steps: []
-    steps: []
+    ordered_steps: [ ]
+    steps: [ ]
   data_export_path: null
   ensure_code_is_summarized: false
   project_file_id: null
   project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
-    overrides: {}
+    overrides: { }
     project_path: '[ROOT_PATH]/tgen/testres/data/state/source_dataset'
     structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
-      conversions: {}
+      conversions: { }
       definition_reader: null
-      overrides: {}
+      overrides: { }
       project_path: '[ROOT_PATH]/tgen/testres/data/state/source_dataset'
       summarizer: null
     summarizer: null

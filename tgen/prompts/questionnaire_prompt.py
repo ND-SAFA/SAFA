@@ -1,5 +1,4 @@
 from string import ascii_uppercase
-from string import ascii_uppercase
 from typing import Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
@@ -54,7 +53,7 @@ class QuestionnairePrompt(MultiPrompt):
         A) Question 1
         B) ...
         C) Question n
-        :param child: If True, adds additional indents
+        :param child_num: Corresponds to the number of idents for nested questionnaires.
         :return: The formatted prompt
         """
         if self.use_bullets_for_enumeration:

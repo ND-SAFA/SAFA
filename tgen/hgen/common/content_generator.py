@@ -118,6 +118,7 @@ class ContentGenerator:
         :param cluster2artifacts: Dictionary mapping cluster id to the artifacts in that cluster.
         :param cluster2cohesion: Dictionary mapping cluster id to the cohesion of the cluster.
         :param source_dataset: Contains all source artifacts.
+        :param first_layer: If True, calculates the number of targets based on the cluster characteristics, else 1 per cluster.
         :return: A list of the expected number of target artifacts for each cluster
         """
         file_lengths = [len(content.splitlines()) for content in source_dataset.artifact_df[ArtifactKeys.CONTENT]]
@@ -138,6 +139,12 @@ class ContentGenerator:
 
     @staticmethod
     def convert_cohesion_to_reduction_percentage(cohesion: float, max_cohesion: float) -> float:
+        """
+        Converts the cluster cohesion to a reduction percentage for calculating # of higher level artifacts to generate.
+        :param cohesion: The cohesion of the cluster.
+        :param max_cohesion: Highest cohesion possible.
+        :return: The reduction percentage for calculating # of higher level artifacts to generate.
+        """
         return 1 - math.log(cohesion + 1) / math.log(max_cohesion + 1)
 
     @staticmethod

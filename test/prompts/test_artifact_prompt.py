@@ -36,24 +36,23 @@ class TestArtifactPrompt(BaseTest):
 
         markdown_id = ArtifactPrompt(self.PROMPT, build_method=ArtifactPrompt.BuildMethod.MARKDOWN, include_id=True)
         prompt = markdown_id._build(self.ARTIFACT)
-        expected_artifact_format = f"# {id_}\n    {content}"
+        expected_artifact_format = f"# {id_}\n        {content}"
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
         markdown_id_and_relation = ArtifactPrompt(self.PROMPT, build_method=ArtifactPrompt.BuildMethod.MARKDOWN, include_id=True)
         source_artifact = deepcopy(self.ARTIFACT)
         source_artifact[TraceKeys.SOURCE] = True
         prompt = markdown_id_and_relation._build(source_artifact)
-        expected_artifact_format = f"# {id_} (Child)\n    {content}"
+        expected_artifact_format = f"# {id_} (Child)\n        {content}"
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
         markdown = ArtifactPrompt(self.PROMPT, build_method=ArtifactPrompt.BuildMethod.MARKDOWN, include_id=False)
         prompt = markdown._build(source_artifact)
-        expected_artifact_format = f"# Child\n    {content}"
+        expected_artifact_format = f"# Child\n        {content}"
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
 
         target_artifact = deepcopy(self.ARTIFACT)
         target_artifact[TraceKeys.TARGET] = True
         prompt = markdown._build(target_artifact)
-        expected_artifact_format = f"# Parent\n    {content}"
+        expected_artifact_format = f"# Parent\n        {content}"
         ArtifactPromptTestUtil.assert_expected_format(self, prompt, self.PROMPT, expected_artifact_format)
-

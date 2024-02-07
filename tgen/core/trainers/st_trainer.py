@@ -58,7 +58,7 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
 
         evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
-        optimizer = optim.Adam(self.get_parameters(), lr=0.001)
+        optimizer = optim.Adam(self.get_trainable_parameters(), lr=0.001)
         epochs = int(self.args.num_train_epochs)
         logger.info(f"Epochs: {epochs}")
 
@@ -89,11 +89,17 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
                 self.after_step()
 
             logger.info(f"Training Loss: {epoch_loss}")
-            self.evaluation_step(evaluator)
+            self.evaluate_if_save(evaluator)
 
         return TrainOutput(metrics={}, training_loss=self.state.total_flos, global_step=self.state.global_step)
 
-    def evaluation_step(self, evaluator: SentenceTransformerEvaluator, **kwargs):
+    def evaluate_if_save(self, evaluator: SentenceTransformerEvaluator, **kwargs) -> None:
+        """
+        Evaluates the model and saves if its the best version of the model so far.
+        :param evaluator: The evaluator called to get score.
+        :param kwargs: Keyword arguments to evaluator.
+        :return: None, model is saved.
+        """
         epoch_score = evaluator(**kwargs)
         if self.max_score is None or epoch_score > self.max_score:
             self.max_score = epoch_score
@@ -109,40 +115,31 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
         self._current_eval_role = dataset_role
         dataset = self._get_dataset(dataset_role)
         input_examples = to_input_examples(dataset)
-        scores, labels = self.calculate_similarities(input_examples)
+        scores = self.predict_similarity_scores(input_examples)
+        labels = [e.label for e in input_examples]
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels, input_examples=input_examples).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
-    def calculate_similarities(self, input_examples: List[InputExample]):
+    def predict_similarity_scores(self, input_examples: List[InputExample]):
+        """
+        Predicts a similarity score for each input examples.
+        :param input_examples: The examples to predict.
+        :return: List of similarity scores.
+        """
         predictions = []
-        labels = []
 
         texts = [t for example in input_examples for t in example.texts]
-        embeddings_manager = self.create_embedding_manager(texts)
+        embeddings_manager = EmbeddingsManager.create_from_content(texts, model=self.model, as_tensors=True)
 
         batches = ListUtil.batch(input_examples, self.args.eval_batch_size)
         for batch in tqdm(batches, desc="Computing predictions..."):
             batch_sentence_pairs = [i.texts for i in batch]
-            batch_labels = [i.label for i in batch]
             batch_prediction = self.calculate_predictions(batch_sentence_pairs, embeddings_manager).tolist()
             predictions.extend(batch_prediction)
-            labels.extend(batch_labels)
 
         predictions = torch.tensor(predictions)
-        labels = torch.tensor(labels)
-        return predictions, labels
-
-    def create_embedding_manager(self, texts: List[str]) -> EmbeddingsManager:
-        """
-        Creates embedding manager for given texts.
-        :param texts: The texts to create embeddings for.
-        :return: The embeddings manager.
-        """
-        texts = set(texts)
-        embeddings_manager = EmbeddingsManager.create_from_content(texts, model=self.model,
-                                                                   embedding_kwargs={"convert_to_tensor": True})
-        return embeddings_manager
+        return predictions
 
     def calculate_predictions(self, sentence_pairs: List[List[str]], embedding_model_manager: EmbeddingsManager = None):
         """
@@ -173,16 +170,16 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor):
         """
         Calculates the similarity scores between source and target embeddings.
-        :param source_embeddings: The source embeddings.
-        :param target_embeddings: The target embeddings.
-        :return: Tensor containing similarity scores.
+        :param source_embeddings: The source embeddings of size (batch_size, features..).
+        :param target_embeddings: The target embeddings (batch_size, features..).
+        :return: Tensor containing similarity scores of size (batch_size,)
         """
         pass
 
     @abstractmethod
-    def get_parameters(self) -> Iterable[Parameter]:
+    def get_trainable_parameters(self) -> Iterable[Parameter]:
         """
-        :return: Returns parameters to optimize.
+        :return: Returns parameters to include in optimizer calculation.
         """
 
     @abstractmethod
@@ -197,18 +194,9 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
         pass
 
     @abstractmethod
-    def save(self):
+    def save(self) -> None:
         """
         Saves the current model
         :param self:
         :return:
         """
-
-    def on_setup(self):
-        pass
-
-    def before_step(self):
-        pass
-
-    def after_step(self):
-        pass

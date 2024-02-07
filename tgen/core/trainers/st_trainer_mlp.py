@@ -44,19 +44,41 @@ class SentenceTransformerTrainerMLP(SentenceTransformerTrainer):
         freeze(self.model)
 
     @overrides(SentenceTransformerTrainer)
-    def get_parameters(self) -> Iterable[Parameter]:
-        return self.mlp.parameters()
-
-    @overrides(SentenceTransformerTrainer)
-    def save(self):
-        torch.save(self.mlp, self.model_output_path)
-
-    @overrides(SentenceTransformerTrainer)
-    def compute_loss(self, scores, labels, *args, **kwargs):
-        loss = self.loss_function(scores, labels)
-        return loss
-
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor):
+        """
+        Calculates the similarity scores between the source and target embeddings.
+        :param source_embeddings: Tensor of source embeddings of size (batch_size, features...)
+        :param target_embeddings: Tensor of target embeddings of size (batch_size, features...)
+        :return: Tensor of size (batch_size, )
+        """
         combined_embeddings = torch.cat((source_embeddings, target_embeddings), dim=1)
         prediction = self.mlp(combined_embeddings)  # Add batch dimension
         return torch.sigmoid(prediction).squeeze()  # Keep as tensor
+
+    @overrides(SentenceTransformerTrainer)
+    def get_trainable_parameters(self) -> Iterable[Parameter]:
+        """
+        :return: Returns the parameters of the MLP.
+        """
+        return self.mlp.parameters()
+
+    @overrides(SentenceTransformerTrainer)
+    def compute_loss(self, scores, labels, *args, **kwargs) -> torch.Tensor:
+        """
+        Computes the loss between the scores and labels.
+        :param scores: The scores predicted by the MLP.
+        :param labels: The labels associated with each score.
+        :param args: Additional positional arguments.
+        :param kwargs: Additional keyword-arguments.
+        :return: The loss tensor.
+        """
+        loss = self.loss_function(scores, labels)
+        return loss
+
+    @overrides(SentenceTransformerTrainer)
+    def save(self):
+        """
+        Saves MLP at model_output_path.
+        :return:
+        """
+        torch.save(self.mlp, self.model_output_path)

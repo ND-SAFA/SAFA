@@ -48,20 +48,18 @@ class EmbeddingsManager:
         self.__state_changed_since_last_save = False
 
     @staticmethod
-    def create_from_content(content_list: List[str], embedding_kwargs: Dict = None, **kwargs) -> "EmbeddingsManager":
+    def create_from_content(content_list: List[str], as_tensors: bool = False, **kwargs) -> "EmbeddingsManager":
         """
         Creates embeddings manager mapping content in list to its embeddings.
         :param content_list: The content list to create embeddings for.
-        :param embedding_kwargs: Dictionary representing keyword arguments to function creating embeddings.
+        :param as_tensors: Whether to return the embeddings as tensors.
         :param kwargs: Keyword arguments passed to embeddings manager.
         :return: EmbeddingsManager.
         """
-        if embedding_kwargs is None:
-            embedding_kwargs = {}
         content_list = list(set(content_list))
         content_map = {c: c for c in content_list}
         embeddings_manager = EmbeddingsManager(content_map, **kwargs)
-        embeddings_manager.create_artifact_embeddings(**embedding_kwargs)
+        embeddings_manager.create_artifact_embeddings(convert_to_tensor=as_tensors)
         return embeddings_manager
 
     def create_artifact_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:

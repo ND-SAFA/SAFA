@@ -13,11 +13,13 @@ import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
 import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -165,8 +167,17 @@ public class GithubGraphQlService {
                                                                 Class<T> responseClass, String... variables) {
 
         String authorization = getAuthorization(user);
-        return graphQlService.makeGraphQlRequest(githubGraphqlUrl, queryLocation,
-            authorization, responseClass, variables);
+
+        try {
+            return graphQlService.makeGraphQlRequest(githubGraphqlUrl, queryLocation,
+                authorization, responseClass, variables);
+        } catch (ExternalAPIException ex) {
+            if (ex.getStatus() == HttpStatusCode.valueOf(401)) {
+                githubConnectionService.deleteGithubCredentials(user);
+                throw new SafaError("GitHub credentials expired. Please re-authorize.");
+            }
+            throw ex;
+        }
     }
 
     /**

@@ -1,24 +1,26 @@
 package edu.nd.crc.safa.utilities.exception;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 
+@Getter
+@JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
 public class ExternalAPIException extends RuntimeException {
 
-    @Getter
-    private HttpStatusCode status;
+    private final HttpStatusCode responseCode;
 
-    private String message;
+    private final String response;
 
-    public ExternalAPIException(HttpStatusCode status, String message) {
+    public ExternalAPIException(HttpStatusCode responseCode, String message) {
         super(message);
-        this.status = status;
-        this.message = message;
+        this.responseCode = responseCode;
+        this.response = "";
     }
 
-    public ExternalAPIException(String message, HttpStatusCode status, String message1) {
+    public ExternalAPIException(String message, HttpStatusCode responseCode, String response) {
         super(message);
-        this.status = status;
-        this.message = message1;
+        this.responseCode = responseCode;
+        this.response = response;
     }
 }

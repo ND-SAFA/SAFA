@@ -172,7 +172,7 @@ public class GithubGraphQlService {
             return graphQlService.makeGraphQlRequest(githubGraphqlUrl, queryLocation,
                 authorization, responseClass, variables);
         } catch (ExternalAPIException ex) {
-            if (ex.getStatus() == HttpStatusCode.valueOf(401)) {
+            if (ex.getResponseCode() == HttpStatusCode.valueOf(401)) {
                 githubConnectionService.deleteGithubCredentials(user);
                 throw new SafaError("GitHub credentials expired. Please re-authorize.");
             }

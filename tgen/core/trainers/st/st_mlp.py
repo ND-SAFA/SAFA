@@ -1,11 +1,12 @@
 from typing import List, Type, Union
 
+import torch
 import torch.nn as nn
 from sentence_transformers import SentenceTransformer
 
 
 class MLP(nn.Module):
-    def __init__(self, input_size: int, hidden_sizes: List[int], output_size=1,
+    def __init__(self, input_size: int, hidden_sizes: List[int], output_size=2,
                  activations: Union[Type[nn.Module], List[Type[nn.Module]]] = None):
         """
         Initializes an MLP with an layer of input size, a series of hidden layer, and an output layer.
@@ -32,4 +33,7 @@ class MLP(nn.Module):
         return mlp_model
 
     def forward(self, x):
-        return self.layers(x)
+        output = self.layers(x)
+        probabilities = torch.softmax(output, dim=1)  # Apply softmax, same shape: (N, 2)
+        class_1_probabilities = probabilities[:, 1]  # Extract probabilities of class=1, shape: (N,)
+        return class_1_probabilities

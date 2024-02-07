@@ -13,7 +13,6 @@ from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
     GENERATION_FILENAME = "artifact_gen_response"
-    FUNCTIONALITY_FILENAME = "gen_functionality_response"
 
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
@@ -35,7 +34,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                                  state.get_cluster2artifacts(),
                                                                                  state.cluster2cohesion,
                                                                                  state.source_dataset,
-                                                                                 first_layer=args.source_type == "code")
+                                                                                 is_first_layer=args.is_first_layer)
             format_variables.update({"n_targets": n_targets})
 
         content_generator = ContentGenerator(args, state, dataset)
@@ -67,23 +66,6 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                          for c_id in dataset.artifact_df.index]
         prompt_builder.add_prompt(SupportedPrompts.HGEN_SEED_PROMPT.value, -2)
         prompt_builder.format_variables.update({"seed_content": seed_contents})
-
-    def _identify_functionality(self, args: HGenArgs, state: HGenState) -> List[str]:
-        """
-        Identifies the functionality in each cluster.
-        :param args: The arguments to Hierarchy Generator
-        :param state: The current state for the generator
-        :return: List of the functionalities in each cluster.
-        """
-        content_generator = ContentGenerator(args, state, state.cluster_dataset)
-        prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,
-                                                                 SupportedPrompts.HGEN_CLUSTERING_QUESTIONNAIRE,
-                                                                 args.source_type, state.get_cluster2artifacts(),
-                                                                 include_summary=False)
-        functionality_from_clusters = content_generator.generate_content(prompt_builder,
-                                                                         generations_filename=self.FUNCTIONALITY_FILENAME,
-                                                                         return_first=True)
-        return functionality_from_clusters
 
     @staticmethod
     def _map_generations_to_predicted_sources(generations: List, source_tag_id: str, target_tag_id: str,

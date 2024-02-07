@@ -111,14 +111,14 @@ class ContentGenerator:
     @staticmethod
     def calculate_number_of_targets_per_cluster(artifact_ids: List, cluster2artifacts: Dict[str, List[EnumDict]],
                                                 cluster2cohesion: Dict[str, float], source_dataset: PromptDataset,
-                                                first_layer: bool = True) -> List[int]:
+                                                is_first_layer: bool = True) -> List[int]:
         """
         Calculates the expected number of targets for each cluster based on the number of artifacts in each cluster
         :param artifact_ids: The ids of the artifact representing each cluster
         :param cluster2artifacts: Dictionary mapping cluster id to the artifacts in that cluster.
         :param cluster2cohesion: Dictionary mapping cluster id to the cohesion of the cluster.
         :param source_dataset: Contains all source artifacts.
-        :param first_layer: If True, calculates the number of targets based on the cluster characteristics, else 1 per cluster.
+        :param is_first_layer: If True, calculates the number of targets based on the cluster characteristics, else 1 per cluster.
         :return: A list of the expected number of target artifacts for each cluster
         """
         file_lengths = [len(content.splitlines()) for content in source_dataset.artifact_df[ArtifactKeys.CONTENT]]
@@ -134,7 +134,7 @@ class ContentGenerator:
         n_targets = [ContentGenerator._calculate_n_targets_for_cluster(artifacts=cluster2artifacts[i],
                                                                        avg_file_size=avg_file_size,
                                                                        retention_percentage=cluster2retention_percentage[i])
-                     for i in artifact_ids] if first_layer else [1 for _ in artifact_ids]
+                     for i in artifact_ids] if is_first_layer else [1 for _ in artifact_ids]
         return n_targets
 
     @staticmethod

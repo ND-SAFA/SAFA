@@ -19,13 +19,31 @@ class DictUtil:
         :param dict_: Original dictionary.
         :return: Dictionary with keys and values flipped.
         """
+
         flipped_dict = {}
+
+        def _add(key, val):
+            """
+            Adds the value to the flipped dict with key.
+            :param key: The key to add to.
+            :param val: The value to add.
+            :return: None.
+            """
+            if key in flipped_dict:
+                if isinstance(flipped_dict[key], list):
+                    val = flipped_dict[key].append(val)
+                else:
+                    val = [flipped_dict[key], val]
+            flipped_dict[key] = val
+
         for k, v in dict_.items():
             if isinstance(v, set) or isinstance(v, list):
                 for child_val in v:
-                    flipped_dict[child_val] = k
+                    _add(child_val, k)
             else:
-                flipped_dict[v] = k
+                _add(v, k)
+        if any(isinstance(v, list) for v in flipped_dict.values()):  # ensure all value are same type
+            flipped_dict = {k: (v if isinstance(v, list) else [v]) for k, v in flipped_dict.items()}
         return flipped_dict
 
     @staticmethod
@@ -183,7 +201,7 @@ class DictUtil:
             mapping[item_key] += increment_value
 
     @staticmethod
-    def set_or_append_item(mapping: Dict, item_key: str, item_value: Any, iterable_type: Type[Iterable] = list) -> None:
+    def set_or_append_item(mapping: Dict, item_key: Any, item_value: Any, iterable_type: Type[Iterable] = list) -> None:
         """
         Initializes a list/set to mapping if it does not exists, and appends item either way.
         :param mapping: The map to add item to.

@@ -14,7 +14,7 @@ from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
-class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
+class AddOrphansToClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
     def _run(self, args: ClusteringArgs, state: ClusteringState) -> None:
         """
         Attempts to link orphans to their best fit cluster, if minimum score is not reached then

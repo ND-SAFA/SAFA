@@ -214,22 +214,47 @@ class Cluster:
         """
         return self.__originating_clusters
 
-    def remove_outliers(self) -> bool:
+    def remove_outliers(self, sim_sigma: float = 1.5, min_std: float = 0.05, eps: float = 0.005) -> bool:
         """
         Removes any artifacts that are much different than the rest.
+        :param sim_sigma: The number of stds from the mean to consider an outlier.
+        :param min_std: If a cluster has less std between artifacts than the min, no outliers will be removed.
+        :param eps: Slight offset from the outlier threshold.
         :return: True if removed an outlier else False.
         """
         scores = [self.similarity_to_neighbors(a) for a in self.artifact_ids]
         scores_std = pd.Series(scores).std()
-        if scores_std >= 0.05:
+        if scores_std >= min_std:
             sorted_artifact_scores = ListUtil.zip_sort(self.artifact_ids, scores)
             sorted_artifacts, sorted_scores = ListUtil.unzip(sorted_artifact_scores)
-            lower, upper = NpUtil.detect_outlier_scores(scores, sigma=1.5)
-            outliers = [a for a, score in sorted_artifact_scores if score < lower + 0.005]
+            lower, upper = NpUtil.detect_outlier_scores(scores, sigma=sim_sigma)
+            outliers = [a for a, score in sorted_artifact_scores if score < lower + eps]
             if outliers:
                 self._remove_artifact(sorted_artifacts[0])
                 return True
         return False
+
+    @staticmethod
+    def weight_average_pairwise_sim_with_size(avg_pairwise_sim: float, size: int, size_weight: float = 0.15) -> float:
+        """
+        Calculates the average pairwise distance between all points of a matrix, weighted with the size of the cluster.
+        :param avg_pairwise_sim: The average pairwise distance.
+        :param size: The size of the cluster.
+        :param size_weight: The amount by which the log of the size should be weighted with the avg. pairwise sim.
+        :return: Calculates the pairwise distances and returns its average, weighted with the size of the cluster.
+        """
+        return (size_weight * np.log(size)) + avg_pairwise_sim
+
+    def calculate_importance(self, primary_metric: str):
+        """
+        Calculates how important the cluster is compared to other candidates.
+        :param primary_metric: The primary metric to consider.
+        :return: The importance of the cluster.
+        """
+        primary_metric = getattr(self, primary_metric)
+        if not primary_metric:
+            return 0
+        return primary_metric * self.votes
 
     def _commit_action(self, action: Callable, artifact_ids: Union[List[str], str], update_stats: bool) -> None:
         """
@@ -303,28 +328,6 @@ class Cluster:
         unique_scores = NpUtil.get_values(self.similarity_matrix, indices)
         unique_scores.append(min(unique_scores))  # increase weight of min
         return sum(unique_scores) / len(unique_scores)
-
-    @staticmethod
-    def weight_average_pairwise_sim_with_size(avg_pairwise_sim: float, size: int, size_weight: float = 0.15) -> float:
-        """
-        Calculates the average pairwise distance between all points of a matrix, weighted with the size of the cluster.
-        :param avg_pairwise_sim: The average pairwise distance.
-        :param size: The size of the cluster.
-        :param size_weight: The amount by which the log of the size should be weighted with the avg. pairwise sim.
-        :return: Calculates the pairwise distances and returns its average, weighted with the size of the cluster.
-        """
-        return (size_weight * np.log(size)) + avg_pairwise_sim
-
-    def calculate_importance(self, primary_metric: str):
-        """
-        Calculates how important the cluster is compared to other candidates.
-        :param primary_metric: The primary metric to consider.
-        :return: The importance of the cluster.
-        """
-        primary_metric = getattr(self, primary_metric)
-        if not primary_metric:
-            return 0
-        return primary_metric * self.votes
 
     def __calculate_average_similarity(self) -> float:
         """
@@ -420,10 +423,9 @@ class Cluster:
         """
         return isinstance(other, Cluster) and other.artifact_id_set.__eq__(self.artifact_id_set)
 
-    def __hash__(self) -> List[Any]:
+    def __hash__(self) -> int:
         """
         Makes this object hashable.
-        # TODO: Replace this with the hash for a set.
         :return: The hash for each artifact id.
         """
-        return hash("-".join(sorted(list(self.artifact_ids))))
+        return hash("-".join(sorted(list(self.artifact_id_set))))

@@ -2,7 +2,6 @@ from string import ascii_uppercase
 from typing import Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
-from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
@@ -89,17 +88,3 @@ class QuestionnairePrompt(MultiPrompt):
         if self.value:
             instructions.append(self.value)
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
-
-    def _update_response_manager_for_questions(self, response_manager: PromptResponseManager) -> PromptResponseManager:
-        """
-        Updates the response manager to be able to parse each child question.
-        :param response_manager: The original response manager for questionnaire.
-        :return: The updated response manager.
-        """
-        if response_manager and not isinstance(response_manager.response_tag, dict):
-            all_tags = self.get_all_response_tags()
-            if len(all_tags) > 0 and response_manager.response_tag != all_tags:
-                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags}
-                if response_manager.response_tag else all_tags)
-                response_manager = PromptResponseManager(**params)
-        return response_manager

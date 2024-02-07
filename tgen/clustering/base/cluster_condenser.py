@@ -7,7 +7,8 @@ from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.common.constants.clustering_constants import DEFAULT_ALLOW_OVERLAPPING_CLUSTERS, DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, \
     DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, \
-    DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_SORT_METRIC, MIN_PAIRWISE_AVG_PERCENTILE, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
+    DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_SORT_METRIC, MIN_PAIRWISE_AVG_PERCENTILE, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING, \
+    MIN_CLUSTER_SIM_TO_MERGE, MIN_ARTIFACT_SIM_TO_MERGE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -76,21 +77,21 @@ class ClusterCondenser:
         :return: Whether cluster should be added to map.
         """
         cluster.remove_outliers()
-        contains_cluster = self.contains_cluster(cluster, add_votes=True)
+        contains_cluster = self.contains_cluster(cluster)
         did_merge = self.try_merge(cluster)
         if not self.allow_overlapping_clusters:
             overlapping_artifacts = [a for a in cluster if a in self.seen_artifacts]
             if len(cluster) - len(overlapping_artifacts) < self.min_cluster_size:
                 return False
             cluster.remove_artifacts(overlapping_artifacts, update_stats=True)
-            if not min_pairwise_avg or cluster.avg_pairwise_sim < min_pairwise_avg:
+            if min_pairwise_avg and cluster.avg_pairwise_sim < min_pairwise_avg:
                 return False
         contains_new_artifacts = self.contains_new_artifacts(cluster)
         if len(cluster) == 1 and not contains_new_artifacts:
             return False
         return (contains_new_artifacts or not contains_cluster) and not did_merge
 
-    def try_merge(self, cluster: Cluster, min_similarity_score: float = 0.7):
+    def try_merge(self, cluster: Cluster, min_similarity_score: float = MIN_CLUSTER_SIM_TO_MERGE):
         """
         Tries to merge cluster into those similar enough to it.
         :param cluster: The cluster to try to merge.
@@ -98,24 +99,25 @@ class ClusterCondenser:
         :return: Whether the cluster was merged into any others.
         """
         clusters = list(self.cluster_map.values())
-        clusters_to_merge_into: List[Cluster] = sorted([c for c in clusters if cluster.similarity_to(c) >= min_similarity_score],
-                                                       reverse=True, key=lambda c: cluster.similarity_to(c))
+        clusters_to_merge_into: List[Cluster] = sorted(clusters, reverse=True, key=lambda c: cluster.similarity_to(c))
         most_similar_cluster = clusters_to_merge_into[0] if len(clusters_to_merge_into) > 0 else None
-        if most_similar_cluster:
+        if most_similar_cluster and cluster.similarity_to(most_similar_cluster) > min_similarity_score:
             removed_artifacts = most_similar_cluster.artifact_id_set.difference(cluster.artifact_id_set)
             added_artifacts = cluster.artifact_id_set.difference(most_similar_cluster.artifact_id_set)
             if not (len(removed_artifacts) and len(added_artifacts)):
                 return True  # cluster already exists
-            if len(removed_artifacts) == 0:
+            if not removed_artifacts:
                 added_artifacts = self.merge_clusters(most_similar_cluster, cluster)
                 return len(added_artifacts) > 0
         return False
 
-    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster) -> List[str]:
+    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster,
+                       min_similarity_score: float = MIN_ARTIFACT_SIM_TO_MERGE) -> List[str]:
         """
         Adds the artifacts of the new cluster to the source. Source is updated after being modified.
         :param source_cluster: The existing cluster to add new cluster to.
         :param new_cluster: The cluster whose add to source.
+        :param min_similarity_score: The minimum score for a cluster to be deemed similar enough to another to merge them.
         :return: None. Updates are done in place.
         """
         artifacts_to_add = []
@@ -123,17 +125,16 @@ class ClusterCondenser:
             if a_id in source_cluster:
                 continue
             similarity = source_cluster.similarity_to_neighbors(a_id)
-            if similarity >= 0.8:
+            if similarity >= min_similarity_score:
                 artifacts_to_add.append(a_id)
                 self.seen_artifacts.add(a_id)
         source_cluster.add_artifacts(artifacts_to_add)
         return artifacts_to_add
 
-    def contains_cluster(self, other_cluster: ClusterType, add_votes: bool = False) -> bool:
+    def contains_cluster(self, other_cluster: ClusterType) -> bool:
         """
         Calculated whether given cluster is contained within current map.
         :param other_cluster: The cluster to evaluate if contained.
-        :param add_votes: Whether to add votes to the clusters where collision is seen.
         :return: True if cluster in map, false otherwise.
         """
         is_hit = False
@@ -185,22 +186,14 @@ class ClusterCondenser:
         :param min_pairwise_avg: The minimum acceptable pairwise average for clusters.
         :return: List of filtered clusters.
         """
-        artifacts_list = [tuple(sorted(cluster.artifact_id_set)) for cluster in clusters]
-
-        artifacts2cluster = {}
-        for cluster_index, artifacts in enumerate(artifacts_list):
-            DictUtil.set_or_append_item(artifacts2cluster, artifacts, cluster_index)
-        cluster_votes = Counter(artifacts_list)
-        for artifacts, votes in cluster_votes.items():
-            for cluster_index in artifacts2cluster[artifacts]:
-                clusters[cluster_index].votes = votes
+        self.vote_for_clusters(clusters)
 
         if min_pairwise_avg is not None:
             if self.filter_cohesiveness:
                 clusters: List[Cluster] = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, clusters))
 
-            clusters = list(sorted(clusters,
-                                   key=lambda c: c.calculate_importance(self.sort_metric), reverse=True))
+        clusters = list(sorted(clusters,
+                               key=lambda c: c.calculate_importance(self.sort_metric), reverse=True))
         debugging = [cluster.get_content_of_artifacts_in_cluster() for cluster in clusters]
         return clusters
 
@@ -236,6 +229,22 @@ class ClusterCondenser:
         for a in cluster.artifact_ids:
             self.seen_artifacts.add(a)
         return cluster
+
+    @staticmethod
+    def vote_for_clusters(clusters: List[Cluster]):
+        """
+        Votes for clusters for each time a cluster consists of the same artifact set.
+        :param clusters: All possible clusters.
+        :return: None.
+        """
+        artifacts_list = [tuple(sorted(cluster.artifact_id_set)) for cluster in clusters]
+        artifacts2cluster = {}
+        for cluster_index, artifacts in enumerate(artifacts_list):
+            DictUtil.set_or_append_item(artifacts2cluster, artifacts, cluster_index)
+        cluster_votes = Counter(artifacts_list)
+        for artifacts, votes in cluster_votes.items():
+            for cluster_index in artifacts2cluster[artifacts]:
+                clusters[cluster_index].votes = votes
 
     @staticmethod
     def calculate_intersection(source: Set, target: Set) -> float:

@@ -1,7 +1,7 @@
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.clustering.steps.link_orphans import LinkOrphans
+from tgen.clustering.steps.add_orphans_to_clusters import AddOrphansToClusters
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
@@ -44,7 +44,7 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
                                                                       embeddings_manager=state.embedding_manager)
                                    for cluster_id, cluster_artifacts in cluster2artifacts.items()},
                 embedding_manager=state.embedding_manager)
-            LinkOrphans().run(clustering_args, clustering_state)
+            AddOrphansToClusters().run(clustering_args, clustering_state)
 
             new_clusters = {c_id for c_id, c_artifacts in clustering_state.final_cluster_map.items()
                             if c_id not in cluster2artifacts}

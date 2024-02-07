@@ -1,9 +1,7 @@
 from typing import Dict, List, Set, Tuple
 
-import numpy as np
-
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
-from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD, RELATED_CHILDREN_SCORE, \
+from tgen.common.constants.hgen_constants import RELATED_CHILDREN_SCORE, \
     WEIGHT_OF_PRED_RELATED_CHILDREN
 from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
@@ -60,15 +58,9 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         children_ids = list(state.all_artifacts_dataset.artifact_df.get_artifacts_by_type(args.source_layer_ids).index)
         parent_ids = list(state.all_artifacts_dataset.artifact_df.get_artifacts_by_type(args.target_type).index)
-        run_name = RankingArgs.get_run_name(args.source_type, children_ids, args.target_type, parent_ids)
-        pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids,
-                                    children_ids=children_ids,
-                                    dataset=state.all_artifacts_dataset,
-                                    types_to_trace=(args.source_type, args.target_type),
-                                    export_dir=HGenUtil.get_ranking_dir(state.export_dir),
-                                    generate_explanations=args.generate_explanations,
-                                    link_threshold=FIRST_PASS_LINK_THRESHOLD)
-        selected_entries = self._run_embedding_pipeline(pipeline_args)
+
+        selected_entries = self._run_embedding_pipeline(args, state, parent_ids=parent_ids, children_ids=children_ids,
+                                                        export_dir=HGenUtil.get_ranking_dir(state.export_dir))
         trace_predictions: List[EnumDict] = selected_entries
         return trace_predictions
 
@@ -79,56 +71,79 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The current state of HGen
         :return: The trace predictions for the clusters
         """
-        new_artifact_map = state.new_artifact_dataset.artifact_df.to_map()
         trace_predictions, trace_selections = [], []
-        generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
-        state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         new_artifact_map = state.all_artifacts_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
+
+        state.all_artifacts_dataset.project_summary = args.dataset.project_summary
         state.embedding_manager.update_or_add_contents(new_artifact_map)
+
+        generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
         subset_ids = list({a_id for a_ids in state.get_cluster2artifacts(ids_only=True).values() for a_id in a_ids})
         subset_ids += list(state.new_artifact_dataset.artifact_df.index)
         state.embedding_manager.create_artifact_embeddings(artifact_ids=subset_ids)
-        pipeline_kwargs = dict(dataset=state.all_artifacts_dataset, selection_method=None,
-                               types_to_trace=(args.source_type, args.target_type), generate_explanations=False,
-                               embeddings_manager=state.embedding_manager)
-
-        orphans = state.original_dataset.trace_dataset.trace_df.get_orphans() if state.original_dataset.trace_dataset else set()
         for cluster_id, generations in state.get_cluster2generation().items():
             parent_ids = [generation2id[generation] for generation in generations if
                           generation in generation2id]  # ignores if dup deleted already
             if len(parent_ids) == 0:
                 continue
-            children_ids = [a_id for a_id in state.get_cluster2artifacts(ids_only=True)[cluster_id]
-                            if a_id in state.source_dataset.artifact_df
-                            or a_id in orphans]
-            cluster_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), str(cluster_id))
-            run_name = f"Cluster{cluster_id}: " + RankingArgs.get_run_name(args.source_type, children_ids,
-                                                                           args.target_type, parent_ids)
-            pipeline_args = RankingArgs(run_name=run_name, parent_ids=parent_ids, children_ids=children_ids,
-                                        export_dir=cluster_dir,
-                                        **pipeline_kwargs)
-            cluster_predictions = self._run_embedding_pipeline(pipeline_args)
-            link_selection_threshold = 1 - 2 * np.std([trace[TraceKeys.SCORE] for trace in cluster_predictions])
-            cluster_selections = SelectByThresholdScaledAcrossAll.select(cluster_predictions, link_selection_threshold)
-            parent2selections = RankingUtil.group_trace_predictions(cluster_selections, TraceKeys.parent_label())
-            parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
-            for parent, parent_preds in parent2predictions.items():
-                parent_selected_traces = parent2selections.get(parent, [])
-                if len(parent_selected_traces) == 0:
-                    best_trace = sorted(parent_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[0]
-                    lower_threshold = args.link_selection_threshold - 0.1
-                    if best_trace[TraceKeys.SCORE] >= lower_threshold:
-                        # grab all at lower threshold
-                        parent_selected_traces = SelectByThreshold.select(parent_preds, args.link_selection_threshold - 0.1)
-                    else:
-                        parent_selected_traces = [best_trace]  # just grab the best one
-                trace_selections.extend(parent_selected_traces)
-            trace_predictions.extend(cluster_predictions)
-        self._trace_orphans(state, trace_predictions, trace_selections)
+            self._add_cluster_predictions(args, state, cluster_id, parent_ids, trace_predictions, trace_selections)
+        self._trace_orphan_children(state, trace_predictions, trace_selections)
         return trace_predictions, trace_selections
 
+    def _add_cluster_predictions(self, args: HGenArgs, state: HGenState, cluster_id: str, parent_ids: List[str],
+                                 trace_predictions: List[Trace], trace_selections: List[Trace]) -> None:
+        """
+        Adds trace predictions a given cluster.
+        :param args: The arguments to HGEN.
+        :param state: The current state of HGEN.
+        :param cluster_id: The id of the cluster.
+        :param parent_ids: List of parents in the cluster.
+        :param trace_predictions: All predictions across all clusters.
+        :param trace_selections: Selected predictions across all clusters.
+        :return: None (adds directly to trace predictions/selections).
+        """
+        children_ids = [a_id for a_id in state.get_cluster2artifacts(ids_only=True)[cluster_id]
+                        if a_id in state.source_dataset.artifact_df]
+
+        cluster_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), str(cluster_id))
+        run_name = f"Cluster{cluster_id}: " + RankingArgs.get_run_name(args.source_type, children_ids,
+                                                                       args.target_type, parent_ids)
+        cluster_predictions = self._run_embedding_pipeline(args, state, run_name=run_name,
+                                                           parent_ids=parent_ids, children_ids=children_ids,
+                                                           export_dir=cluster_dir,
+                                                           selection_method=None)
+
+        link_selection_threshold = RankingUtil.calculate_threshold_from_std(cluster_predictions)
+        cluster_selections = SelectByThresholdScaledAcrossAll.select(cluster_predictions, link_selection_threshold)
+
+        parent2selections = RankingUtil.group_trace_predictions(cluster_selections, TraceKeys.parent_label())
+        parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
+        for parent, parent_preds in parent2predictions.items():
+            parent_selected_traces = parent2selections.get(parent, [])
+            if len(parent_selected_traces) == 0:
+                parent_selected_traces = self._trace_barren_parents(args, parent_preds)
+            trace_selections.extend(parent_selected_traces)
+        trace_predictions.extend(cluster_predictions)
+
     @staticmethod
-    def _trace_orphans(state: HGenState, trace_predictions: List[Trace], trace_selections: List[Trace]) -> None:
+    def _trace_barren_parents(args: HGenArgs, parent_preds: List[Trace]) -> List[Trace]:
+        """
+        Adds traces for any parents without children.
+        :param args: The arguments to HGEN.
+        :param parent_preds: All traces for the parent.
+        :return: Trace selections for parents.
+        """
+        best_trace = sorted(parent_preds, key=lambda t: t[TraceKeys.SCORE], reverse=True)[0]
+        lower_threshold = args.link_selection_threshold - 0.1
+        if best_trace[TraceKeys.SCORE] >= lower_threshold:
+            # grab all at lower threshold
+            parent_selected_traces = SelectByThreshold.select(parent_preds, lower_threshold)
+        else:
+            parent_selected_traces = [best_trace]  # just grab the best one
+        return parent_selected_traces
+
+    @staticmethod
+    def _trace_orphan_children(state: HGenState, trace_predictions: List[Trace], trace_selections: List[Trace]) -> None:
         """
         Traces any orphans to their top parent.
         :param state: The current state of HGen.
@@ -143,12 +158,27 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         trace_selections.extend(selected_traces)
 
     @staticmethod
-    def _run_embedding_pipeline(ranking_args: RankingArgs) -> List[Trace]:
+    def _run_embedding_pipeline(args: HGenArgs, state: HGenState,
+                                parent_ids: List, children_ids: List,
+                                export_dir: str = None, **pipeline_args) -> List[Trace]:
         """
         Runs the embedding pipeline to obtain trace predictions
-        :param ranking_args: The arguments to the ranking pipeline
-        :return: The selected predictions from the pipeline
+        :param args: The arguments to HGEN.
+        :param state: The state of HGEN.
+        :param parent_ids: The list of parent ids to trace.
+        :param children_ids: The list of children ids to trace.
+        :param export_dir: Directory to export to.
+        :param pipeline_args: Additional arguments to the tracing pipeline.
+        :return: The selected predictions from the pipeline.
         """
+        ranking_args = RankingArgs(parent_ids=parent_ids,
+                                   children_ids=children_ids,
+                                   dataset=state.all_artifacts_dataset,
+                                   types_to_trace=(args.source_type, args.target_type),
+                                   export_dir=export_dir,
+                                   generate_explanations=False,
+                                   embeddings_manager=state.embedding_manager,
+                                   **pipeline_args)
         ranking_state = RankingState()
         sort_children_step = SortChildrenStep()
         sort_children_step.run(ranking_args, ranking_state, verbose=False)

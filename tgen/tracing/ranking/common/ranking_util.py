@@ -1,11 +1,13 @@
 import json
 from typing import Dict, List, Optional, Tuple, Set, Union
 
+import numpy as np
+
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -313,3 +315,13 @@ class RankingUtil:
         min_score, max_score = min(scores), max(scores)
         for entry in candidate_entries:
             entry[TraceKeys.SCORE] = MathUtil.convert_to_new_range(entry[TraceKeys.SCORE], (0, max_score), (0, 1))
+
+    @staticmethod
+    def calculate_threshold_from_std(trace_entries: List[Trace], sigma: float = 2) -> float:
+        """
+        Calculates a trace link threshold based on the variability in the data.
+        :param trace_entries: List of all trace entries.
+        :param sigma: Number of standard deviations.
+        :return: A trace threshold.
+        """
+        return 1 - sigma * np.std([trace[TraceKeys.SCORE] for trace in trace_entries])

@@ -3,7 +3,7 @@ from enum import Enum, auto
 from typing import Dict, List, Union
 
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
-    DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS
+    DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS, DEFAULT_CLUSTER_MAX_SIZE
 from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
@@ -30,6 +30,7 @@ DEFAULT_MAX_TOKENS_SMALL = 2000
 
 @dataclass
 class HGenArgs(PipelineArgs, BaseObject):
+    # ================ REQUIRED PARAMS ================
     """
     The layer of the source artifacts for which higher-level artifacts will be generated
     """
@@ -38,46 +39,20 @@ class HGenArgs(PipelineArgs, BaseObject):
     The type of higher-level artifact that will be generated
     """
     target_type: str = required_field(field_name="target_type")
+
+    # ================ OPTIONAL PARAMS (ALPHABETIZED) ================
     """
-    The type of source artifacts for which higher-level artifacts will be generated
+    Adds clusters as artifacts
     """
-    source_type: str = None
+    add_linked_artifacts_to_cluster: bool = False
     """
-    The LLM manager to use to generate the new artifact content and other more complex, longer tasks
+    If True, allows orphans in the clustering process
     """
-    hgen_llm_manager_best_long_context: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
+    allow_orphans: bool = True
     """
-    The LLM manager to use to generate the artifact less complex tasks
+    The maximum size of a cluster
     """
-    hgen_llm_manager_efficient: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
-    """
-    The LLM manager to use to generate the artifact for short context windows
-    """
-    hgen_llm_manager_best_short_context: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
-    """
-    The LLM manager to use to generate the inputs during step 2
-    """
-    inputs_llm_manager: AbstractLLMManager = field(default_factory=lambda: OpenAIManager(OpenAIArgs(model=OPEN_AI_MODEL_DEFAULT)))
-    """
-    Max tokens to use for predictions.
-    """
-    max_tokens: Dict[int, int] = field(default_factory=dict)
-    """
-    If True, re-summarizes artifacts with a summary of the project 
-    """
-    create_new_code_summaries: bool = False
-    """
-    If True, re-runs hgen multiple times to get the best results across runs
-    """
-    run_refinement: bool = True
-    """
-    If True, automatically generates trace links between the new hgen layers and the source
-    """
-    generate_trace_links: bool = True
-    """
-    If True, automatically generates trace links explanations
-    """
-    generate_explanations: bool = True
+    cluster_max_size: int = DEFAULT_CLUSTER_MAX_SIZE
     """
     If True, creates clusters of related artifacts to create higher levels of docs for 
     """
@@ -85,55 +60,91 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     If True, adds already linked artifacts to the cluster that their parent is in
     """
-    add_linked_artifacts_to_cluster: bool = False
-    """
-    The llm manager to use for each prediction step
-    """
-    llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)
-    """
-    The threshold below which trace links will get filtered out
-    """
-    link_selection_threshold: float = DEFAULT_LINK_THRESHOLD
-    """
-    Threshold for which all orphan links have to exceed or equal.
-    """
-    min_orphan_score_threshold: float = None
-    """
-    Threshold for which generated artifacts are deemed duplicates.
-    """
-    duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
-    """
-    Percent of the number of children artifacts that will be the number generated.
-    """
-    reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
-    """
-    The section of the project summary to use as seeds for clustering.
-    """
-    seed_project_summary_section: str = None
-    """
-    The layer_id of the artifacts to use as seeds
-    """
-    seed_layer_id: str = None
-    """
-    Adds clusters as artifacts
-    """
     add_seeds_as_artifacts: bool = False
-    """
-    If True, seed will be provided to model when generating.
-    """
-    include_seed_in_prompt: bool = False
-    """
-    Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
-    """
-    export_hgen_artifacts_only: bool = False
     """
     The sections of the project summary to include in content generation.
     """
     content_generation_project_summary_sections: List[str] = field(default_factory=lambda: [PS_ENTITIES_TITLE])
     """
-    If False, all orphans will be added to the best fitting cluster.
+    If True, re-summarizes artifacts with a summary of the project 
     """
-    allow_orphans: bool = True
+    create_new_code_summaries: bool = False
+    """
+    Threshold for which generated artifacts are deemed duplicates.
+    """
+    duplicate_similarity_threshold: float = DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
+    """
+    Whether to only export the content produced by HGEN, otherwise, original dataset is exported too.
+    """
+    export_hgen_artifacts_only: bool = False
+    """
+    If True, automatically generates trace links explanations
+    """
+    generate_explanations: bool = True
+    """
+    If True, automatically generates trace links between the new hgen layers and the source
+    """
+    generate_trace_links: bool = True
+    """
+    The LLM manager to use to generate the new artifact content and other more complex, longer tasks
+    """
+    hgen_llm_manager_best_long_context: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
+    """
+    The LLM manager to use to generate the artifact for short context windows
+    """
+    hgen_llm_manager_best_short_context: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
+    """
+    The LLM manager to use to generate the artifact less complex tasks
+    """
+    hgen_llm_manager_efficient: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
+    """
+    If True, seed will be provided to model when generating.
+    """
+    include_seed_in_prompt: bool = False
+    """
+    The LLM manager to use to generate the inputs during step 2
+    """
+    inputs_llm_manager: AbstractLLMManager = field(default_factory=lambda: OpenAIManager(OpenAIArgs(model=OPEN_AI_MODEL_DEFAULT)))
+    """
+    True if lowest layer (generally code).
+    """
+    is_first_layer: bool = True
+    """
+    The threshold below which trace links will get filtered out
+    """
+    link_selection_threshold: float = DEFAULT_LINK_THRESHOLD
+    """
+    The llm manager to use for each prediction step
+    """
+    llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)
+    """
+    Max tokens to use for predictions.
+    """
+    max_tokens: Dict[int, int] = field(default_factory=dict)
+    """
+    Threshold for which all orphan links have to exceed or equal.
+    """
+    min_orphan_score_threshold: float = None
+    """
+    Percent of the number of children artifacts that will be the number generated.
+    """
+    reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
+    """
+    If True, re-runs hgen multiple times to get the best results across runs
+    """
+    run_refinement: bool = True
+    """
+    The layer_id of the artifacts to use as seeds
+    """
+    seed_layer_id: str = None
+    """
+    The section of the project summary to use as seeds for clustering.
+    """
+    seed_project_summary_section: str = None
+    """
+    The type of source artifacts for which higher-level artifacts will be generated
+    """
+    source_type: str = None
 
     def __post_init__(self) -> None:
         """

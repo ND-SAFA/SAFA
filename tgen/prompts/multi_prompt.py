@@ -1,13 +1,10 @@
 from copy import deepcopy
-from string import ascii_uppercase
 from typing import Any, Dict, List, Union
 
-from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
@@ -118,6 +115,20 @@ class MultiPrompt(Prompt):
             parsed_res = prompt.response_manager.parse_response(response)
             parsed.update(parsed_res)
         return parsed
+
+    def _update_response_manager_for_questions(self, response_manager: PromptResponseManager) -> PromptResponseManager:
+        """
+        Updates the response manager to be able to parse each child question.
+        :param response_manager: The original response manager for questionnaire.
+        :return: The updated response manager.
+        """
+        if response_manager and not isinstance(response_manager.response_tag, dict):
+            all_tags = self.get_all_response_tags()
+            if len(all_tags) > 0 and response_manager.response_tag != all_tags:
+                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags}
+                if response_manager.response_tag else all_tags)
+                response_manager = PromptResponseManager(**params)
+        return response_manager
 
     def __repr__(self) -> str:
         """

@@ -1,7 +1,6 @@
 from typing import Callable, List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.override import overrides
 from tgen.prompts.multi_prompt import MultiPrompt
 from tgen.prompts.prompt import Prompt
 
@@ -24,8 +23,7 @@ class ConditionalPrompt(MultiPrompt):
         :param kwargs: Any additional arguments for the prompt
         :return: The formatted prompt
         """
-        selected_prompt_index = self.prompt_selector(kwargs)
+        selected_prompt_index = int(self.prompt_selector(kwargs))
         if 0 <= selected_prompt_index < len(self.child_prompts):
             return self.child_prompts[selected_prompt_index].build(**kwargs)
         return EMPTY_STRING
-

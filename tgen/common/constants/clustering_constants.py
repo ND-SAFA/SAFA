@@ -1,3 +1,4 @@
+from tgen.clustering.base.supported_cluster_sort_metrics import SupportedClusterSortMetrics
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.clustering.methods.supported_seed_clustering_methods import SupportedSeedClusteringMethods
 
@@ -15,8 +16,10 @@ DEFAULT_ADD_CLUSTERS_TO_DATASET = False
 DEFAULT_CLUSTER_MIN_VOTES = 1
 DEFAULT_MAX_CLUSTER_SIZE = 10
 DEFAULT_FILTER_BY_COHESIVENESS = True
+MIN_CLUSTER_SIM_TO_MERGE = 0.7
+MIN_ARTIFACT_SIM_TO_MERGE = 0.8
 DEFAULT_MIN_CLUSTER_SIZE = 2
-DEFAULT_SORT_METRIC = "size_weighted_sim"
+DEFAULT_SORT_METRIC = SupportedClusterSortMetrics.SIZE_WEIGHTED_SIM.value
 DEFAULT_ALLOW_OVERLAPPING_CLUSTERS = True
 NO_CLUSTER_LABEL = -1
 MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING = 0.30

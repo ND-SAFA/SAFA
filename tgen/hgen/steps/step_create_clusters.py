@@ -69,7 +69,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
     @staticmethod
     def create_clustering_args(args: HGenArgs, state: HGenState) -> ClusteringArgs:
         """
-        Creates the configuration of the clustering pipeline basedon the args of the hgen pipeline.
+        Creates the configuration of the clustering pipeline based on the args of the hgen pipeline.
         :param args: The configuration of the hgen pipeline.
         :param state: State of HGEN pipeline.
         :return: The arguments to clustering pipeline.
@@ -78,7 +78,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         seed_kwargs = CreateClustersStep.create_clustering_kwargs(args, state) if uses_seeds else {}
         clustering_export_path = FileUtil.safely_join_paths(args.export_dir, CLUSTERING_SUBDIRECTORY)
         cluster_args = ClusteringArgs(dataset=state.source_dataset, create_dataset=True,
-                                      cluster_max_size=5,
+                                      cluster_max_size=args.cluster_max_size,
                                       allow_duplicates_between_clusters=False,
                                       export_dir=clustering_export_path,
                                       add_orphans_to_best_home=not args.allow_orphans, **seed_kwargs)

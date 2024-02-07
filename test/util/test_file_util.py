@@ -175,3 +175,6 @@ class TestFileUtil(BaseTest):
         for file in code_files:
             self.assertTrue(FileUtil.is_code(file))
         self.assertFalse(FileUtil.is_code("not_code.txt"))
+
+    def test_convert_path_to_human_readable(self):
+        self.assertEqual(FileUtil.convert_path_to_human_readable("/path/to/somewhere.txt"), " path to somewhere")

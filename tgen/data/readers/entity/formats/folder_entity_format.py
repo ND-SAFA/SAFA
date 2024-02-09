@@ -3,10 +3,10 @@ from typing import List, Tuple
 
 import pandas as pd
 
+from tgen.common.constants.dataset_constants import EXCLUDED_FILES
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
-from tgen.common.constants.dataset_constants import EXCLUDED_FILES
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
@@ -73,7 +73,7 @@ class FolderEntityFormat(AbstractEntityFormat):
             contents.append(FileUtil.read_file(file_path))
 
         artifact_names, contents = FolderEntityFormat._remove_empty_contents(artifact_names, contents)
-        summaries = summarizer.summarize_bulk(bodies=contents, filenames=artifact_names) \
+        summaries = summarizer.summarize_bulk(bodies=contents, ids=artifact_names) \
             if summarizer is not None else None
         entries = EnumDict({
             ArtifactKeys.ID: artifact_names,

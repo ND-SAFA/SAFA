@@ -63,6 +63,10 @@ class SummarizerArgs(PipelineArgs):
     List of directories to include when summarizing
     """
     include_subset_by_dir: List[str] = field(default_factory=list)
+    """
+    Includes context (dependent methods) when summarizing code.
+    """
+    use_context_in_code_summaries: bool = False
 
     def __post_init__(self) -> None:
         """

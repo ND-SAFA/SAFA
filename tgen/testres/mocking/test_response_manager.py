@@ -280,7 +280,7 @@ class TestAIManager:
             artifact_body = EMPTY_STRING
             split_prompt = p.split("# Code")
             if len(split_prompt) > 1:
-                artifact_body = [v for v in split_prompt[1].split("\n") if v]
+                artifact_body = [[v for v in split_prompt[1].split("\n") if v][1]]
         if len(artifact_body) == 0:
             body_start = p.find(start_body_tag)
             body_end = p.find(end_body_tag)

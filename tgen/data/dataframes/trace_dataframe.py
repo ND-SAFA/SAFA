@@ -173,7 +173,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param artifact_role: The role of the artifact as either a parent (target) or child (source)
         :return: Ids of all orphans that are of the given role (parent or child)
         """
-        all_artifact_ids = {trace[artifact_role] for trace in self.get_links(true_only=False)}
+        all_artifact_ids = self.get_artifact_ids(artifact_role=artifact_role, linked_only=False)
         orphans = self.find_orphans(self.get_links(true_only=True), all_artifact_ids, artifact_role)
         return orphans
 
@@ -200,3 +200,18 @@ class TraceDataFrame(AbstractProjectDataFrame):
         query_df = self[(self[TraceKeys.child_label()] == artifact_id) & (~self[TraceKeys.SCORE.value].isna())]
         parent_ids = list(query_df[TraceKeys.TARGET.value])
         return parent_ids
+
+    def get_artifact_ids(self, artifact_role: TraceKeys = None, linked_only: bool = False) -> Set[str]:
+        """
+        Returns the artifact ids in the trace df.
+        :param artifact_role: Will just get the sources or targets if appropriate key is provided, else all.
+        :param linked_only: If True, will only get artifacts that are linked.
+        :return: The artifact ids in the trace df.
+        """
+        artifact_ids = set()
+        for trace in self.get_links(true_only=linked_only):
+            for key in [TraceKeys.SOURCE, TraceKeys.TARGET]:
+                if artifact_role and key != artifact_role:
+                    continue
+                artifact_ids.add(trace[key])
+        return artifact_ids

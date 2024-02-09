@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union, Any
 
 import pandas as pd
 
@@ -8,15 +8,18 @@ from tgen.common.constants.model_constants import get_efficient_default_llm_mana
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.unique_id_manager import DeterministicUniqueIDManager
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, ArtifactKeys
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.tokens.token_calculator import TokenCalculator
+from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, \
@@ -35,6 +38,8 @@ class ArtifactsSummarizer(BaseObject):
     def __init__(self, llm_manager_for_artifact_summaries: AbstractLLMManager = None,
                  summarize_code_only: bool = True,
                  project_summary: Summary = None,
+                 summary_order: Dict[str, int] = None,
+                 context_mapping: Dict[str, List[EnumDict]] = None,
                  code_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.CODE_BASE,
                  nl_summary_type: ArtifactSummaryTypes = ArtifactSummaryTypes.NL_BASE,
                  export_dir: str = None,
@@ -44,6 +49,8 @@ class ArtifactsSummarizer(BaseObject):
         :param llm_manager_for_artifact_summaries: LLM manager used for the individual artifact summaries.
         :param summarize_code_only: If True, only summarizes code content
         :param project_summary: Default project summary to use.
+        :param summary_order: If provided, will summarize the artifacts in the provided order (artifact id -> order #).
+        :param context_mapping: Maps an artifact to the necessary artifacts to include as context.
         :param code_summary_type: The default prompt to use for summarization of code.
         :param nl_summary_type: The default prompt to use for summarization of natural language.
         :param export_dir: If provided, will save the responses there.
@@ -54,58 +61,65 @@ class ArtifactsSummarizer(BaseObject):
             else get_efficient_default_llm_manager()
         self.args_for_summarizer_model = self.llm_manager.llm_args
         self.code_or_above_limit_only = summarize_code_only
+        self.summary_order = summary_order
+        self.context_mapping = context_mapping
 
         # Setup prompts
         self.prompt_args = self.llm_manager.prompt_args
         self.project_summary = project_summary
         self.code_prompt_builder, self.nl_prompt_builder = self._create_prompt_builders(code_summary_type,
                                                                                         nl_summary_type,
-                                                                                        self.project_summary)
+                                                                                        self.project_summary,
+                                                                                        self.context_mapping)
 
         self.uuid_manager = DeterministicUniqueIDManager(summarizer_id)
 
-    def summarize_bulk(self, bodies: List[str], filenames: List[str] = None, use_content_if_unsummarized: bool = True) -> List[str]:
+    def summarize_bulk(self, bodies: List[str], ids: List[str] = None, use_content_if_unsummarized: bool = True) -> List[str]:
         """
         Summarizes a file or body of text  to create shorter, more succinct input for model
         :param bodies: List of content to summarize
-        :param filenames: The list of filenames to use to determine if the bodies are code or not
+        :param ids: The list of filenames to use to determine if the bodies are code or not
         :param use_content_if_unsummarized: If True, uses the artifacts orig content instead of a summary if it is not being summarized
         :return: The summarization
         """
         logger.info(f"Received {len(bodies)} artifacts to summarize.")
-        filenames = [EMPTY_STRING for _ in bodies] if not filenames else filenames
-        assert len(bodies) == len(filenames), "length of bodies, summary types and ids must all match"
-        summary_prompts = []
+        summary_order = self.summary_order if self.summary_order else {}
+        ids = [EMPTY_STRING for _ in bodies] if not ids else ids
+        assert len(bodies) == len(ids), "length of bodies, summary types and ids must all match"
+        order2indices = {}
         indices2summarize = set()
-        for i, artifact_info in enumerate(zip(bodies, filenames)):
-            content, filename = artifact_info
-            prompt = self._create_prompt(content, filename, self.code_or_above_limit_only)
-            if prompt:
-                if FileUtil.is_code(filename):
-                    prompt = PromptBuilder.remove_format_for_model_from_prompt(prompt, self.llm_manager.prompt_args)
-                    prompt = TokenCalculator.truncate_to_fit_tokens(prompt, self.llm_manager.llm_args.model,
-                                                                    self.llm_manager.llm_args.get_max_tokens(),
-                                                                    is_code=True)
-                    prompt = PromptBuilder.format_prompt_for_model(prompt, self.llm_manager.prompt_args)
-                summary_prompts.append(prompt)
+        for i, artifact_info in enumerate(zip(bodies, ids)):
+            content, a_id = artifact_info
+            if self.should_summarize(a_id=a_id):
+                order = summary_order.get(a_id, 0)
+                DictUtil.set_or_append_item(order2indices, order, i)
                 indices2summarize.add(i)
-        logger.info(f"Selected {len(indices2summarize)} artifacts to summarize.")
-        summarized_content = self._summarize_selective(contents=bodies,
-                                                       indices2summarize=indices2summarize,
-                                                       prompts_for_summaries=summary_prompts,
-                                                       use_content_if_unsummarized=use_content_if_unsummarized)
+        logger.info(f"Selected {len(indices2summarize)} artifacts to summarize in {len(order2indices)} batch(es).")
+
+        summarized_content = bodies
+        for order, indices in dict(sorted(order2indices.items())).items():
+            logger.info(f"Summarizing {len(indices)} artifacts in batch {order}.")
+            summary_prompts = [self._create_prompt(bodies[i], ids[i]) for i in indices]
+            summarized_content = self._summarize_selective(contents=summarized_content,
+                                                           indices2summarize=indices,
+                                                           prompts_for_summaries=summary_prompts,
+                                                           use_content_if_unsummarized=True)
+            self._update_context_mapping_with_summaries(summarized_content, ids)
+        if not use_content_if_unsummarized:
+            summarized_content = [(summary if i in indices2summarize else None) for i, summary in enumerate(summarized_content)]
         return summarized_content
 
-    def summarize_single(self, content: str, filename: str = EMPTY_STRING) -> str:
+    def summarize_single(self, content: str, a_id: str = EMPTY_STRING) -> str:
         """
         Summarizes a file or body of text  to create shorter, more succinct input for model
         :param content: Content to summarize
-        :param filename: The filename to use to determine if content is code or not
+        :param a_id: The filename to use to determine if content is code or not
         :return: The summarization
         """
-        prompt = self._create_prompt(content, filename, code_or_above_limit_only=self.code_or_above_limit_only)
-        if not prompt:
+
+        if not self.should_summarize(a_id):
             return content
+        prompt = self._create_prompt(content, a_id)
         summary = self._summarize(self.llm_manager, prompt)
         assert len(summary) == 1, f"Expected single summary but received {len(summary)}."
         return summary.pop()
@@ -131,6 +145,32 @@ class ArtifactsSummarizer(BaseObject):
 
         summaries = self.summarize_bulk(list(df[col2summarize]), filenames, use_content_if_unsummarized=False)
         return summaries
+
+    def should_summarize(self, a_id: str) -> bool:
+        """
+        True if the artifact should be summarized else False.
+        :param a_id: The artifact id.
+        :return: True if the artifact should be summarized else False.
+        """
+        if self.code_or_above_limit_only and not FileUtil.is_code(a_id):
+            return False  # skip summarizing content below token limit unless code
+        else:
+            return True
+
+    def _update_context_mapping_with_summaries(self, summarized_content: List[str], ids: List[str]) -> None:
+        """
+        Updates the context mapping to use the new summaries.
+        :param summarized_content: The recently summarized content.
+        :param ids: Ids corresponding to summaries.
+        :return: None (updates reference).
+        """
+        if not self.context_mapping:
+            return
+        id2summary = {a_id: summary for a_id, summary in zip(ids, summarized_content)}
+        for a_id, related_artifacts in self.context_mapping.items():
+            for artifact in related_artifacts:
+                summary = id2summary.get(artifact[ArtifactKeys.ID], EMPTY_STRING)
+                artifact[ArtifactKeys.SUMMARY] = summary
 
     def _summarize(self, llm_manager: AbstractLLMManager, prompts: Union[List[str], str]) -> List[str]:
         """
@@ -188,22 +228,24 @@ class ArtifactsSummarizer(BaseObject):
         summary = summary if summary else response
         return summary.strip()
 
-    def _create_prompt(self, content: str, filename: str = EMPTY_STRING, code_or_above_limit_only: bool = None) -> Optional[str]:
+    def _create_prompt(self, content: str, a_id: str = EMPTY_STRING) -> Optional[str]:
         """
         Prepares for summarization by creating the necessary prompts for the artifact
         :param content: Content to summarize
-        :param filename: The name of the file to determine if the content is code or not
-        :param code_or_above_limit_only: Needed only if different from self.code_or_above_limit_only
+        :param a_id: The id of the artifact to determine if the content is code or not
         :return: The list of prompts to use for summarization
         """
-        code_or_above_limit_only = self.code_or_above_limit_only if code_or_above_limit_only is None else code_or_above_limit_only
-        assert content is not None, "No content to summarize."
-        if code_or_above_limit_only and not FileUtil.is_code(filename):
-            return  # skip summarizing content below token limit unless code
-        prompt_builder = self.code_prompt_builder if FileUtil.is_code(filename) else self.nl_prompt_builder
-        return prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
-                                    artifact={StructuredKeys.Artifact.CONTENT: content,
-                                              StructuredKeys.Artifact.ID: filename})[PromptKeys.PROMPT.value]
+        prompt_builder = self.code_prompt_builder if FileUtil.is_code(a_id) else self.nl_prompt_builder
+        prompt = prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
+                                      artifact={StructuredKeys.Artifact.CONTENT: content,
+                                                StructuredKeys.Artifact.ID: a_id})[PromptKeys.PROMPT.value]
+        if FileUtil.is_code(a_id):
+            prompt = PromptBuilder.remove_format_for_model_from_prompt(prompt, self.llm_manager.prompt_args)
+            prompt = TokenCalculator.truncate_to_fit_tokens(prompt, self.llm_manager.llm_args.model,
+                                                            self.llm_manager.llm_args.get_max_tokens(),
+                                                            is_code=True)
+            prompt = PromptBuilder.format_prompt_for_model(prompt, self.llm_manager.prompt_args)
+        return prompt
 
     def _summarize_selective(self, contents: List[str], indices2summarize: Set[int], prompts_for_summaries: List[str],
                              use_content_if_unsummarized: bool) -> List[str]:
@@ -236,22 +278,27 @@ class ArtifactsSummarizer(BaseObject):
 
     @staticmethod
     def _create_prompt_builders(code_summary_type: ArtifactSummaryTypes, nl_summary_type: ArtifactSummaryTypes,
-                                project_summary: Summary) -> Tuple[PromptBuilder, PromptBuilder]:
+                                project_summary: Summary,
+                                context_mapping: Dict[Any, List[EnumDict]]) -> Tuple[PromptBuilder, PromptBuilder]:
         """
         Creates the prompt builders for both code and nl summarizing.
         :param code_summary_type: Specifies the prompt to use for the code summary.
         :param nl_summary_type: Specifies the prompt to use for the NL summary.
         :param project_summary: If provided, the project summary will be added to the prompt.
+        :param context_mapping: Maps an artifact to the necessary artifacts to include as context.
         :return: The code and nl prompt builder.
         """
-        code_prompts = code_summary_type.value
-        nl_prompts = nl_summary_type.value
-        if project_summary:
-            project_summary = project_summary.to_string([PS_ENTITIES_TITLE])
+        summary_prefixes = [CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX]
+        project_summary_string = project_summary.to_string([PS_ENTITIES_TITLE]) if project_summary else EMPTY_STRING
+        prompt_builders = []
 
-            nl_prompts.insert(0, NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            nl_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
-
-            code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
-            code_prompts.insert(1, Prompt(project_summary, allow_formatting=False))
-        return PromptBuilder(prompts=code_prompts), PromptBuilder(prompts=nl_prompts)
+        for i, a_type in enumerate([code_summary_type, nl_summary_type]):
+            prompts = a_type.value
+            if context_mapping:
+                context_prompt = ContextPrompt(context_mapping)
+                prompts.insert(0, context_prompt)
+            if project_summary_string:
+                prompts.insert(0, summary_prefixes[i])
+                prompts.insert(1, Prompt(project_summary_string, allow_formatting=False))
+            prompt_builders.append(PromptBuilder(prompts=prompts))
+        return prompt_builders[0], prompt_builders[1]

@@ -29,6 +29,7 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 
 class TraceDataset(iDataset):
@@ -233,6 +234,16 @@ class TraceDataset(iDataset):
         :return: The list of link ids that have the given label
         """
         return list(self.trace_df.filter_by_row(lambda row: row[TraceKeys.LABEL.value] == label).index)
+
+    def create_dependency_mapping(self) -> Dict[str, List[EnumDict]]:
+        """
+        Creates a mapping of artifact id to the list of artifacts its dependent on (traced to).
+        :return: Mapping of artifact id to the list of artifacts its dependent on (traced to).
+        """
+        dependencies = {p_id: [link[TraceKeys.child_label()] for link in links]
+                        for p_id, links in RankingUtil.group_trace_predictions(self.trace_df.get_links(true_only=True),
+                                                                               key_id=TraceKeys.parent_label()).items()}
+        return {p_id: [self.artifact_df.get_artifact(a_id) for a_id in children] for p_id, children in dependencies.items()}
 
     def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
                             is_true_link: bool) -> int:

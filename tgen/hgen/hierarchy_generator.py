@@ -1,6 +1,5 @@
 from typing import Dict, Type
 
-from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -19,9 +18,9 @@ from tgen.hgen.steps.step_generate_trace_links import GenerateTraceLinksStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.summarizer.summarizer_args import SummarizerArgs
 
 
@@ -30,7 +29,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     Responsible for generating higher-level artifacts from low-level artifacts
     """
     HGEN_SECTION_TITLE = "Hgen"
-    PROJECT_SUMMARY_SECTIONS = [PS_ENTITIES_TITLE]
+    PROJECT_SUMMARY_SECTIONS = []
     steps = [InitializeDatasetStep,
              GenerateInputsStep,
              CreateClustersStep,
@@ -49,10 +48,10 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         :param args: The arguments required for the hierarchy generation
         """
         summarizer_args = SummarizerArgs(
-                                         summarize_code_only=True,
-                                         do_resummarize_artifacts=False,
-                                         project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
-                                         )
+            summarize_code_only=True,
+            do_resummarize_artifacts=False,
+            project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
+        )
         super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
 

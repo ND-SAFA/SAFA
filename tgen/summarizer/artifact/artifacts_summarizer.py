@@ -295,7 +295,7 @@ class ArtifactsSummarizer(BaseObject):
         for i, a_type in enumerate([code_summary_type, nl_summary_type]):
             prompts = a_type.value
             if context_mapping:
-                context_prompt = ContextPrompt(context_mapping)
+                context_prompt = ContextPrompt(prompt_start="# Related Artifacts", id_to_context_artifacts=context_mapping)
                 prompts.insert(0, context_prompt)
             if project_summary_string:
                 prompts.insert(0, summary_prefixes[i])

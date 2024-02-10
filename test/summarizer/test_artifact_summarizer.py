@@ -116,9 +116,8 @@ class TestSummarizer(BaseTest):
         content = ["content" + id_ for id_ in artifact_ids]
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_ids, ArtifactKeys.CONTENT: content,
                                          ArtifactKeys.LAYER_ID: ["layer" for _ in artifact_ids]})
-        context_mapping = StepSummarizeArtifacts.get_context_mapping(TraceDataset(artifact_df=artifact_df,
-                                                                                  trace_df=trace_df,
-                                                                                  layer_df=LayerDataFrame()))
+        context_mapping = TraceDataset(artifact_df=artifact_df, trace_df=trace_df,
+                                       layer_df=LayerDataFrame()).create_dependency_mapping()
         for s, t in links:
             self.assertIn(s, [art[ArtifactKeys.ID] for art in context_mapping[t]])
 

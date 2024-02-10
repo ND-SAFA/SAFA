@@ -11,6 +11,7 @@ from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.hgen.common.special_doc_types import ONE_TARGET_PER_SOURCE_DOC_TYPES
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.pipeline.pipeline_args import PipelineArgs
@@ -130,6 +131,10 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     reduction_percentage: float = DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
     """
+    If True, detects and potentially removes overlapping artifacts.
+    """
+    detect_duplicates: bool = True
+    """
     If True, re-runs hgen multiple times to get the best results across runs
     """
     run_refinement: bool = True
@@ -160,6 +165,11 @@ class HGenArgs(PipelineArgs, BaseObject):
 
         if isinstance(self.source_layer_ids, str):
             self.source_layer_ids = [self.source_layer_ids]
+
+        if self.target_type in ONE_TARGET_PER_SOURCE_DOC_TYPES:
+            self.generate_explanations = False
+            self.detect_duplicates = False
+            self.run_refinement = False
 
     def _set_llm_variables(self) -> None:
         """

@@ -2,6 +2,7 @@ from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_NOTES_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.conditional_prompt import ConditionalPrompt
+from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -119,6 +120,11 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
         ], enumeration_chars=["-"]
     )])
+
+API_DATAFLOW_QUESTIONNAIRE = QuestionnairePrompt(
+    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Functions from the {source_type}"),
+                      Prompt("# TASK \n TODO ")], enumeration_chars=[NEW_LINE]
+)
 
 SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "
                      "When creating the {target_type}(s) from {source_type}, "

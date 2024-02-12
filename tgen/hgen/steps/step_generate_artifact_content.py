@@ -4,7 +4,7 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, 
 from tgen.common.logging.logger_manager import logger
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.content_generator import ContentGenerator
-from tgen.hgen.common.special_doc_types import USE_CONTEXT_DOC_TYPES
+from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -40,8 +40,9 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             format_variables.update({"n_targets": n_targets})
 
         content_generator = ContentGenerator(args, state, dataset)
-        context_mapping = {} if state.original_dataset.trace_dataset is None or args.target_type.upper() not in USE_CONTEXT_DOC_TYPES \
-            else state.original_dataset.create_dependency_mapping()
+        context_mapping = state.original_dataset.create_dependency_mapping() if state.original_dataset.trace_dataset \
+                                                                                and args.check_target_type_constraints(
+            DocTypeConstraints.USE_SOURCE_CONTEXT) else {}
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,
                                                                  base_task_prompt,
                                                                  args.source_type, state.get_cluster2artifacts(),

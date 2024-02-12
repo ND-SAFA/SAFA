@@ -17,7 +17,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.hgen.common.special_doc_types import ONE_TARGET_PER_SOURCE_DOC_TYPES
+from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -33,7 +33,7 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: Current state of the hgen pipeline.
         :return: None
         """
-        if args.target_type.upper() in ONE_TARGET_PER_SOURCE_DOC_TYPES:
+        if args.check_target_type_constraints(DocTypeConstraints.ONE_TARGET_PER_SOURCE):
             self._create_one_artifact_clusters(state)
             return
 

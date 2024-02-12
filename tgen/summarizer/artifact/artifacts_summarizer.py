@@ -116,7 +116,6 @@ class ArtifactsSummarizer(BaseObject):
         :param a_id: The filename to use to determine if content is code or not
         :return: The summarization
         """
-
         if not self.should_summarize(a_id):
             return content
         prompt = self._create_prompt(content, a_id)
@@ -295,7 +294,9 @@ class ArtifactsSummarizer(BaseObject):
         for i, a_type in enumerate([code_summary_type, nl_summary_type]):
             prompts = a_type.value
             if context_mapping:
-                context_prompt = ContextPrompt(prompt_start="# Related Artifacts", id_to_context_artifacts=context_mapping)
+                keywords = ["Functions", "Code"] if i == 0 else ["Artifacts", "Artifact to Summarize"]
+                context_prompt = ContextPrompt(prompt_start="# Related {} to Improve Understanding of {}".format(*keywords),
+                                               id_to_context_artifacts=context_mapping)
                 prompts.insert(0, context_prompt)
             if project_summary_string:
                 prompts.insert(0, summary_prefixes[i])

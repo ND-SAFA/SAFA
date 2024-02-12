@@ -1,3 +1,5 @@
+from enum import auto
+
 from tgen.common.util.supported_enum import SupportedEnum
 
 
@@ -5,5 +7,10 @@ class SpecialDocTypes(SupportedEnum):
     API_DATAFLOW = "API DATAFLOW"
 
 
-ONE_TARGET_PER_SOURCE_DOC_TYPES = {SpecialDocTypes.API_DATAFLOW.value}
-USE_CONTEXT_DOC_TYPES = {SpecialDocTypes.API_DATAFLOW.value}
+class DocTypeConstraints(SupportedEnum):
+    ONE_TARGET_PER_SOURCE = auto()
+    USE_SOURCE_CONTEXT = auto()
+
+
+DOC_TYPE2CONSTRAINTS = {SpecialDocTypes.API_DATAFLOW.value: {DocTypeConstraints.ONE_TARGET_PER_SOURCE,
+                                                             DocTypeConstraints.USE_SOURCE_CONTEXT}}

@@ -1,3 +1,5 @@
+from tgen.common.logging.logger_manager import logger
+from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_dataset_exporter import HGenDatasetBuilder
 from tgen.hgen.hgen_args import HGenArgs
@@ -15,5 +17,12 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         trace_dataset = HGenDatasetBuilder.build(args, state)
+        targets_without_children = trace_dataset.trace_df.find_orphans(
+            trace_dataset.trace_df.get_links(true_link_threshold=args.link_selection_threshold),
+            all_artifact_ids=set(state.new_artifact_dataset.artifact_df.index),
+            artifact_role=TraceKeys.parent_label())
+        if targets_without_children:
+            logger.warning(f"REMOVING {len(targets_without_children)} {args.target_type.upper()} BECAUSE THEY HAD NO CHILDREN. ")
+            trace_dataset.artifact_df.remove_rows(targets_without_children)
         dataset = PromptDataset(trace_dataset=trace_dataset, project_summary=args.dataset.project_summary)
         state.final_dataset = dataset

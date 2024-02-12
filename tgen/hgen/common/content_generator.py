@@ -11,7 +11,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import HGenUtil
-from tgen.hgen.common.special_doc_types import USE_CONTEXT_DOC_TYPES
+from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.prompts.context_prompt import ContextPrompt
@@ -84,7 +84,8 @@ class ContentGenerator:
                                                            context_mapping=context_mapping,
                                                            additional_response_instructions=additional_task_response_instructions)
         artifact_prompt = self.create_source_artifact_prompt(source_type, cluster2artifacts,
-                                                             use_summary=self.args.target_type.upper() not in USE_CONTEXT_DOC_TYPES,
+                                                             use_summary=not self.args.check_target_type_constraints(
+                                                                 DocTypeConstraints.USE_SOURCE_CONTEXT),
                                                              build_method=artifact_prompt_build_method) \
             if artifact_prompt_build_method else None
 

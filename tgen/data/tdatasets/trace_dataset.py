@@ -243,7 +243,8 @@ class TraceDataset(iDataset):
         dependencies = {p_id: [link[TraceKeys.child_label()] for link in links]
                         for p_id, links in RankingUtil.group_trace_predictions(self.trace_df.get_links(true_only=True),
                                                                                key_id=TraceKeys.parent_label()).items()}
-        return {p_id: [self.artifact_df.get_artifact(a_id) for a_id in children] for p_id, children in dependencies.items()}
+        return {p_id: [self.artifact_df.get_artifact(a_id) for a_id in children if a_id in self.artifact_df]
+                for p_id, children in dependencies.items()}
 
     def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
                             is_true_link: bool) -> int:

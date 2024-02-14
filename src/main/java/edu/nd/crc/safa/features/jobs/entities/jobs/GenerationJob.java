@@ -13,9 +13,9 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,10 +41,10 @@ public abstract class GenerationJob extends CommitJob {
     @IJobStep(value = "Retrieving Project", position = 1)
     public void retrieveProject() {
         PermissionService permissionService = getServiceProvider().getPermissionService();
-        Project project = getProjectVersion().getProject();
+        ProjectVersion projectVersion = getProjectVersion();
         permissionService.requirePermissions(
             Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE),
-            project,
+            projectVersion,
             getUser()
         );
         // TODO making summarization free for the moment

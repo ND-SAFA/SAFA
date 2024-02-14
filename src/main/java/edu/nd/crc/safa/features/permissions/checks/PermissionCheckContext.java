@@ -44,8 +44,11 @@ public class PermissionCheckContext {
      * @return The statistics for this version
      */
     private ProjectStatistics retrieveProjectStatistics() {
-        if (projectVersion == null || serviceProvider == null) {
-            return null;
+        if (projectVersion == null) {
+            throw new AssertionError("Cannot access project statistics because project version is null");
+        }
+        if (serviceProvider == null) {
+            throw new AssertionError("Cannot access project statistics because service provider is null");
         }
 
         int artifacts = serviceProvider.getArtifactVersionRepository().getCountInProjectVersion(projectVersion);

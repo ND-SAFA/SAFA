@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.hgen;
 
+import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -42,8 +43,7 @@ public class HGenController extends BaseController {
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
             .asUser(currentUser)
-            .withPermission(ProjectPermission.EDIT_DATA)
-            .withPermission(ProjectPermission.GENERATE)
+            .withPermissions(Set.of(ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE))
             .withAdditionalCheck(new CanAffordHgenCheck(request))
             .get();
         HGenJobBuilder jobBuilder = new HGenJobBuilder(getServiceProvider(), projectVersion, request, currentUser);

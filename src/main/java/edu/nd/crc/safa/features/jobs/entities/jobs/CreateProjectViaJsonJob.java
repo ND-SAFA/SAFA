@@ -62,8 +62,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
         Project project = getProjectVersion().getProject();
 
         permissionService.requirePermission(ProjectPermission.GENERATE, project, getUser());
-        permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
-            PricePermission.GENERATE_TRACES.getName(), project, getUser());
+        permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(), project, getUser());
 
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(getProjectCommitDefinition());
 

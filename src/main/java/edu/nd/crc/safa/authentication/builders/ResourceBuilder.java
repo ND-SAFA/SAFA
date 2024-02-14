@@ -338,7 +338,7 @@ public class ResourceBuilder {
          */
         public T get() {
             if (!allowed) {
-                throw new MissingPermissionException(missingPermissions, true);
+                throw new MissingPermissionException(missingPermissions, true, failedAdditionalChecks);
             }
             return value;
         }

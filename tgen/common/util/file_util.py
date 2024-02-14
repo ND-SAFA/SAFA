@@ -584,6 +584,8 @@ class FileUtil:
         """
         if not isinstance(path_or_ext, str):
             path_or_ext = str(path_or_ext)
+        if FUNCTION_SYMBOL in path_or_ext:
+            path_or_ext = path_or_ext.split(FUNCTION_SYMBOL)[0]
         ext_from_path = os.path.splitext(path_or_ext)[-1]
         ext = ext_from_path if ext_from_path else path_or_ext
         ext = ext.replace(os.extsep, EMPTY_STRING)

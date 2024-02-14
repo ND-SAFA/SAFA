@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.permissions.checks.utility.ComparisonCheck;
  *
  * @param <T> The type of the configuration value
  */
-public class ConfigurationComparisonCheck<T extends Comparable<T>> extends ComparisonCheck<T> {
+public abstract class ConfigurationComparisonCheck<T extends Comparable<T>> extends ComparisonCheck<T> {
     /**
      * Constructor
      *

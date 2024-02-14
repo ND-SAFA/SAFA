@@ -33,4 +33,9 @@ public class PaymentTierCheck implements AdditionalPermissionCheck {
 
         return supportedTiers.contains(org.getPaymentTier());
     }
+
+    @Override
+    public String getMessage() {
+        return "Payment tier must be among the following: " + supportedTiers;
+    }
 }

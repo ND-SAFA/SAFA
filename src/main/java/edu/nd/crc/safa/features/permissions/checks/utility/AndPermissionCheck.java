@@ -16,4 +16,10 @@ public class AndPermissionCheck implements AdditionalPermissionCheck {
     public boolean doCheck(PermissionCheckContext context) {
         return children.stream().allMatch(c -> c.doCheck(context));
     }
+
+    @Override
+    public String getMessage() {
+        return "All of the following:\n  "
+            + String.join("  \n", children.stream().map(AdditionalPermissionCheck::getMessage).toList());
+    }
 }

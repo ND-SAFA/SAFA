@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.authentication.builders;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -15,7 +17,6 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
-import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
@@ -187,6 +188,7 @@ public class ResourceBuilder {
         private final T value;
 
         private final Set<Permission> missingPermissions = new HashSet<>();
+        private final List<String> failedAdditionalChecks = new ArrayList<>();
         private boolean allowed = true;
         private final CheckPermissionFunction<T> hasPermissionFunction;
         private final CheckPermissionFunction<T> hasAnyPermissionFunction;
@@ -305,16 +307,14 @@ public class ResourceBuilder {
          * Check the check object passes for the given user
          *
          * @param check The thing to check
-         * @param checkName The name of the check, so we can display what permission is missing
          * @param user The user to check for
          * @return This
          * @throws SafaError If the user doesn't have the permissions
          */
-        public ObjectHolder<T> withAdditionalCheck(AdditionalPermissionCheck check,
-                                                   String checkName, SafaUser user) throws SafaError {
+        public ObjectHolder<T> withAdditionalCheck(AdditionalPermissionCheck check, SafaUser user) throws SafaError {
             if (!hasAdditionalCheckFunction.apply(check, user, getValue())) {
                 allowed = false;
-                missingPermissions.add((SimplePermission)() -> checkName);
+                failedAdditionalChecks.add(check.getMessage());
             }
             return this;
         }
@@ -323,13 +323,12 @@ public class ResourceBuilder {
          * Check the check object passes for the given user. Requires that {@link #asUser(SafaUser)} was called first
          *
          * @param check The thing to check
-         * @param checkName The name of the check, so we can display what permission is missing
          * @return This
          * @throws SafaError If the user doesn't have the permissions
          */
-        public ObjectHolder<T> withAdditionalCheck(AdditionalPermissionCheck check, String checkName) throws SafaError {
+        public ObjectHolder<T> withAdditionalCheck(AdditionalPermissionCheck check) throws SafaError {
             assert checkUser != null : "asUser must be called before this function";
-            return withAdditionalCheck(check, checkName, checkUser);
+            return withAdditionalCheck(check, checkUser);
         }
 
         /**

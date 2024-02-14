@@ -8,4 +8,9 @@ public class MaxProjectSizeCheck extends IntConfigurationComparisonCheck {
         super(context -> context.getProjectStatistics().getArtifactsTotal(),
             "limits.max_project_size", ComparisonType.LESS_OR_EQUAL);
     }
+
+    @Override
+    public String getMessage() {
+        return "Project must have at most " + getCachedCompareValue() + " artifacts";
+    }
 }

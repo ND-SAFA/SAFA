@@ -7,7 +7,7 @@ import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 /**
  * Specialization of {@link ConfigurationComparisonCheck} for integers
  */
-public class IntConfigurationComparisonCheck extends ConfigurationComparisonCheck<Integer> {
+public abstract class IntConfigurationComparisonCheck extends ConfigurationComparisonCheck<Integer> {
     public IntConfigurationComparisonCheck(Function<PermissionCheckContext, Integer> valueSupplier, String configKey,
                                            ComparisonType comparisonType) {
         super(valueSupplier, configKey, Integer.class, comparisonType);

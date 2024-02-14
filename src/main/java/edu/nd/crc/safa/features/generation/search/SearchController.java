@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.search;
 
+import java.util.Set;
 import java.util.UUID;
 import javax.management.InvalidAttributeValueException;
 
@@ -8,7 +9,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
-import edu.nd.crc.safa.features.permissions.entities.PricePermission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -43,9 +43,8 @@ public class SearchController extends BaseController {
             getResourceBuilder()
                 .fetchVersion(versionId)
                 .asUser(user)
-                .withPermission(ProjectPermission.VIEW)
-                .withPermission(ProjectPermission.GENERATE)
-                .withAdditionalCheck(new HasUnlimitedCreditsCheck(), PricePermission.SEARCH.getName())
+                .withPermissions(Set.of(ProjectPermission.VIEW, ProjectPermission.GENERATE))
+                .withAdditionalCheck(new HasUnlimitedCreditsCheck())
                 .get();
         ProjectAppEntity projectAppEntity = getServiceProvider()
             .getProjectRetrievalService()

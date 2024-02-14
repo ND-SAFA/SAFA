@@ -5,16 +5,25 @@ import java.util.function.Function;
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
 import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 /**
  * An additional permission check which compares two values
  *
  * @param <T> The type of object being compared
  */
-public class ComparisonCheck<T extends Comparable<T>> implements AdditionalPermissionCheck {
+public abstract class ComparisonCheck<T extends Comparable<T>> implements AdditionalPermissionCheck {
 
     private final Function<PermissionCheckContext, T> valueSupplier;
     private final Function<PermissionCheckContext, T> compareValueSupplier;
     private final ComparisonType comparisonType;
+
+    // These exist so that derived types can access the values that were used in the comparison
+    @Getter(AccessLevel.PROTECTED)
+    private T cachedValue;
+    @Getter(AccessLevel.PROTECTED)
+    private T cachedCompareValue;
 
     /**
      * Compare two values by suppliers
@@ -48,9 +57,9 @@ public class ComparisonCheck<T extends Comparable<T>> implements AdditionalPermi
 
     @Override
     public boolean doCheck(PermissionCheckContext context) {
-        T value = valueSupplier.apply(context);
-        T comparisonValue = compareValueSupplier.apply(context);
-        int comparison = value.compareTo(comparisonValue);
+        cachedValue = valueSupplier.apply(context);
+        cachedCompareValue = compareValueSupplier.apply(context);
+        int comparison = cachedValue.compareTo(cachedCompareValue);
 
         return switch (comparisonType) {
             case LESS -> comparison < 0;

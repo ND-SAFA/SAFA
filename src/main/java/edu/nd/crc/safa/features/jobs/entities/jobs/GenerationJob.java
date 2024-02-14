@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.permissions.checks.config.SummarizationMaxProjectSizeCheck;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -40,17 +41,6 @@ public abstract class GenerationJob extends CommitJob {
      */
     @IJobStep(value = "Retrieving Project", position = 1)
     public void retrieveProject() {
-        PermissionService permissionService = getServiceProvider().getPermissionService();
-        ProjectVersion projectVersion = getProjectVersion();
-        permissionService.requirePermissions(
-            Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE),
-            projectVersion,
-            getUser()
-        );
-        // TODO making summarization free for the moment
-        /*permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
-            PricePermission.SUMMARIZE_ARTIFACTS.getName(), project, getUser());*/
-
         ProjectRetrievalService projectRetrievalService = this.getServiceProvider().getProjectRetrievalService();
         this.projectAppEntity = projectRetrievalService.getProjectAppEntity(
             this.getJobDbEntity().getUser(),
@@ -62,6 +52,18 @@ public abstract class GenerationJob extends CommitJob {
      */
     @IJobStep(value = "Summarizing Project Entities", position = 2)
     public void summarizeProjectEntities() {
+        PermissionService permissionService = getServiceProvider().getPermissionService();
+        ProjectVersion projectVersion = getProjectVersion();
+        permissionService.requirePermissions(
+            Set.of(ProjectPermission.VIEW, ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE),
+            projectVersion,
+            getUser()
+        );
+        permissionService.requireAdditionalCheck(new SummarizationMaxProjectSizeCheck(), projectVersion, getUser());
+        // TODO making summarization free for the moment
+        /*permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
+            PricePermission.SUMMARIZE_ARTIFACTS.getName(), project, getUser());*/
+
         ProjectSummaryService service = this.getServiceProvider().getProjectSummaryService();
         Pair<String, List<ArtifactAppEntity>> summarizedEntities =
             service.summarizeProjectEntities(this.getUser(),

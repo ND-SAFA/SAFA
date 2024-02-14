@@ -12,7 +12,9 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.jobs.builders.ProjectSummaryJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
 import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
+import edu.nd.crc.safa.features.permissions.checks.config.SummarizationMaxProjectSizeCheck;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -43,12 +45,7 @@ public class SummarizeController extends BaseController {
     public List<String> summarizeArtifacts(@PathVariable UUID versionId,
                                            @RequestBody @Valid SummarizeArtifactRequestDTO request) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder()
-            .fetchVersion(versionId)
-            .asUser(user)
-            .withPermissions(Set.of(ProjectPermission.GENERATE, ProjectPermission.EDIT_DATA))
-            .withAdditionalCheck(new HasUnlimitedCreditsCheck())
-            .get();
+        ProjectVersion projectVersion = getProjectVersion(versionId, user, request);
         request.setProjectVersion(projectVersion);
         request.setProjectSummary(projectVersion.getProject().getSpecification());
         List<GenerationArtifact> summarizedArtifacts =
@@ -59,12 +56,24 @@ public class SummarizeController extends BaseController {
     @PostMapping(AppRoutes.Summarize.SUMMARIZE_PROJECT)
     public JobAppEntity summarizeProject(@PathVariable UUID versionId) throws Exception {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = getResourceBuilder()
-            .fetchVersion(versionId)
-            .asUser(user)
-            .withPermissions(Set.of(ProjectPermission.GENERATE, ProjectPermission.EDIT_DATA))
-            .withAdditionalCheck(new HasUnlimitedCreditsCheck())
-            .get();
+        ProjectVersion projectVersion = getProjectVersion(versionId, user, null);
         return new ProjectSummaryJobBuilder(user, this.getServiceProvider(), projectVersion).perform();
+    }
+
+    private ProjectVersion getProjectVersion(UUID versionId, SafaUser user, SummarizeArtifactRequestDTO request) {
+        AdditionalPermissionCheck maxSizeCheck;
+        if (request != null) {
+            maxSizeCheck = new SummarizationMaxProjectSizeCheck(request);
+        } else {
+            maxSizeCheck = new SummarizationMaxProjectSizeCheck();
+        }
+
+        return getResourceBuilder()
+           .fetchVersion(versionId)
+           .asUser(user)
+           .withPermissions(Set.of(ProjectPermission.GENERATE, ProjectPermission.EDIT_DATA))
+           .withAdditionalCheck(new HasUnlimitedCreditsCheck())
+           .withAdditionalCheck(maxSizeCheck)
+           .get();
     }
 }

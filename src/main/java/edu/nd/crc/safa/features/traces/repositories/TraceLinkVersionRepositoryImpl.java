@@ -189,6 +189,11 @@ public class TraceLinkVersionRepositoryImpl
         }
     }
 
+    @Override
+    public int getCountInProjectVersion(ProjectVersion projectVersion) {
+        return traceLinkVersionRepository.countByProjectVersion(projectVersion);
+    }
+
     private void notifyTraceMatrixUpdate(TraceMatrixEntry entry, SafaUser user) {
         ProjectChangeBuilder builder = EntityChangeBuilder
             .create(user, entry.getProjectVersion().getProject())

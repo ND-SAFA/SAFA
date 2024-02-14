@@ -7,7 +7,9 @@ import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.CachedValue;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 
 /**
@@ -25,8 +27,43 @@ public class PermissionCheckContext {
     private SafaUser user;
     private ServiceProvider serviceProvider;
 
+    @Getter(AccessLevel.NONE)
+    private final CachedValue<ProjectStatistics> projectStatistics;
+
     public static PermissionCheckContextBuilder builder() {
         return new PermissionCheckContextBuilder();
+    }
+
+    private PermissionCheckContext() {
+        projectStatistics = new CachedValue<>(this::retrieveProjectStatistics);
+    }
+
+    /**
+     * Creates a {@link ProjectStatistics} object based on the supplied project version
+     *
+     * @return The statistics for this version
+     */
+    private ProjectStatistics retrieveProjectStatistics() {
+        if (projectVersion == null || serviceProvider == null) {
+            return null;
+        }
+
+        int artifacts = serviceProvider.getArtifactVersionRepository().getCountInProjectVersion(projectVersion);
+        int traces = serviceProvider.getTraceLinkVersionRepository().getCountInProjectVersion(projectVersion);
+
+        ProjectStatistics projectStatisticsValue = new ProjectStatistics();
+        projectStatisticsValue.setArtifactsTotal(artifacts);
+        projectStatisticsValue.setLinksTotal(traces);
+        return projectStatisticsValue;
+    }
+
+    /**
+     * Get the project statistics for the project version stored in this context object
+     *
+     * @return Statistics about the project
+     */
+    public ProjectStatistics getProjectStatistics() {
+        return projectStatistics.getValue();
     }
 
     /**

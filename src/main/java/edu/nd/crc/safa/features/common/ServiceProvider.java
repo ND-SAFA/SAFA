@@ -76,6 +76,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -181,17 +182,19 @@ public class ServiceProvider {
     private final JobDbRepository jobRepository;
     // Jobs
     private JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
-    private JobLoggingService jobLoggingService;
+    private final JobLoggingService jobLoggingService;
     // Search
-    private SearchService searchService;
+    private final SearchService searchService;
     // Summarize
-    private SummaryService summaryService;
+    private final SummaryService summaryService;
     // HGen
-    private HGenService hGenService;
+    private final HGenService hGenService;
     // Billing
-    private BillingService billingService;
-    private TransactionService transactionService;
-    private CostEstimationService costEstimationService;
+    private final BillingService billingService;
+    private final TransactionService transactionService;
+    private final CostEstimationService costEstimationService;
+    // Config
+    private final Environment environment;
 
     @PostConstruct
     public void postInit() {

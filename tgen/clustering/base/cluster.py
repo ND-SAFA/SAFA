@@ -186,7 +186,7 @@ class Cluster:
         :return: A cluster that is a combination of the original and other cluster.
         """
         if not self.__originating_clusters:
-            current_cluster = Cluster.from_artifacts(self.artifact_ids, self.embedding_manager)
+            current_cluster = Cluster.from_artifacts(self.artifact_ids, self.embedding_manager, c_id=self.id)
             self.__originating_clusters.append(current_cluster)
         self.embedding_manager.merge(other_cluster.embedding_manager)
         self.add_artifacts(other_cluster.artifact_ids, update_stats=True)

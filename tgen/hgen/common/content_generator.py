@@ -83,10 +83,10 @@ class ContentGenerator:
         task_prompt = self._create_generations_task_prompt(base_task_prompt.value, cluster2artifacts,
                                                            context_mapping=context_mapping,
                                                            additional_response_instructions=additional_task_response_instructions)
-        artifact_prompt = self.create_source_artifact_prompt(source_type, cluster2artifacts,
-                                                             use_summary=not self.args.check_target_type_constraints(
-                                                                 DocTypeConstraints.USE_SOURCE_CONTEXT),
-                                                             build_method=artifact_prompt_build_method) \
+        artifact_prompt = self._create_source_artifact_prompt(source_type, cluster2artifacts,
+                                                              use_summary=not self.args.check_target_type_constraints(
+                                                                  DocTypeConstraints.USE_SOURCE_CONTEXT),
+                                                              build_method=artifact_prompt_build_method) \
             if artifact_prompt_build_method else None
 
         prompts = [base_intro_prompt.value, artifact_prompt]
@@ -134,7 +134,6 @@ class ContentGenerator:
         """
         file_lengths = [len(content.splitlines()) for content in source_dataset.artifact_df[ArtifactKeys.CONTENT]]
         avg_file_size = sum(file_lengths) / len(file_lengths)
-        cluster2artifacts = cluster2artifacts
         cluster2cohesion = {c_id: cohesion if cohesion else 1 for c_id, cohesion in cluster2cohesion.items()}
         max_cohesion = max(cluster2cohesion.values())
         cluster2retention_percentage = {cluster_id: ContentGenerator.convert_cohesion_to_reduction_percentage(cohesion, max_cohesion)
@@ -249,9 +248,9 @@ class ContentGenerator:
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
 
     @staticmethod
-    def create_source_artifact_prompt(source_type: str, id_to_context_artifacts: Dict[str, List] = None,
-                                      build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.MARKDOWN,
-                                      **multi_artifact_params) -> MultiArtifactPrompt:
+    def _create_source_artifact_prompt(source_type: str, id_to_context_artifacts: Dict[str, List] = None,
+                                       build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.MARKDOWN,
+                                       **multi_artifact_params) -> MultiArtifactPrompt:
         """
         Creates the prompt that will be used to supply the LLM with the source artifacts.
         :param source_type: The type of artifact that will be given to the LLM as sources.

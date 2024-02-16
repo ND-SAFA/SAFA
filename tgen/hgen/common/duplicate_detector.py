@@ -212,7 +212,7 @@ class DuplicateDetector:
 
     @classmethod
     def count_duplicates(cls, artifact_ids: List[str], duplicate_indices: List[MatrixIndex],
-                         similarity_matrix) -> Tuple[CountMap, Set[ArtifactPair]]:
+                         similarity_matrix: np.ndarray) -> Tuple[CountMap, Set[ArtifactPair]]:
         """
         Counts the duplicate artifacts and stores the duplicate artifact id pairs.
         :param artifact_ids: The artifact ids referenced by indices.

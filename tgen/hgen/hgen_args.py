@@ -83,10 +83,6 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     generate_explanations: bool = True
     """
-    If True, automatically generates trace links between the new hgen layers and the source
-    """
-    generate_trace_links: bool = True
-    """
     The LLM manager to use to generate the new artifact content and other more complex, longer tasks
     """
     hgen_llm_manager_best_long_context: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)

@@ -1,7 +1,5 @@
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-import numpy as np
-
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY
@@ -152,7 +150,7 @@ class ContentRefiner:
         all_trace_preds: List[Trace] = [RankingUtil.create_entry(p_id, child, score) for p_id, (children, scores) in
                                         parent2ranking.items() for child, score in zip(children, scores)]
         RankingUtil.normalized_scores_based_on_parent(all_trace_preds)
-        link_threshold = 1 - 2 * np.std([trace[TraceKeys.SCORE] for trace in all_trace_preds])  # TODO standardize this somewhere
+        link_threshold = RankingUtil.calculate_threshold_from_std(all_trace_preds)
         parent_selected = RankingUtil.select_predictions_by_thresholds([p for p in all_trace_preds
                                                                         if p[TraceKeys.parent_label()] == p_id],
                                                                        primary_threshold=link_threshold)

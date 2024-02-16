@@ -32,12 +32,6 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param args: The arguments and current state of HGEN.
         :return: None
         """
-
-        if not args.generate_trace_links:
-            state.trace_predictions = self._create_traces_from_references(state.id_to_related_children)
-            state.selected_predictions = state.trace_predictions
-            return
-
         logger.info(f"Predicting links between {args.target_type} and {args.source_layer_ids}\n")
 
         if args.perform_clustering:

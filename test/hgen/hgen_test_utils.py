@@ -67,7 +67,8 @@ def get_name_responses(generated_artifact_content=None, target_type="User Story"
         generated_artifact_content = HGenTestConstants.user_stories
     if isinstance(generated_artifact_content, dict):
         generated_artifact_content = generated_artifact_content.keys()
-    names = [f"{i}" for i, _ in enumerate(generated_artifact_content)]
+    n_generated = sum([max(a.count(HGenUtil.convert_spaces_to_dashes(target_type)), 2) for a in generated_artifact_content]) / 2
+    names = [f"{i}" for i in range(int(n_generated))]
     expected_names = [HGenUtil.format_names(name, target_type, i) for i, name in enumerate(names)]
     return names, expected_names, [PromptUtil.create_xml("title", name) for name in names]
 
@@ -88,10 +89,11 @@ def get_all_responses(content=None, target_type="User Story", sources=None, sour
     return step4[1], step2 + step3 + step4[-1]
 
 
-def get_test_hgen_args(test_refinement: bool = False):
+def get_test_hgen_args(test_refinement: bool = False, test_clustering: bool = False):
     return lambda: HGenArgs(source_layer_ids=["C++ Code"],
                             target_type="Test User Story",
                             run_refinement=test_refinement,
+                            perform_clustering=test_clustering,
                             dataset_creator=PromptDatasetCreator(
                                 trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))
 

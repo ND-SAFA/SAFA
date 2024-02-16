@@ -49,7 +49,7 @@ class TestHierarchyGenerator(BaseTest):
         anthropic_ai_manager.require_used_all_responses = False  # TODO: Investigate why too many link explanations responses.
         anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
-        self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
+        self.HGEN_ARGS = get_test_hgen_args()()
         self.HGEN_ARGS.perform_clustering = False
         self.HGEN_ARGS.duplicate_similarity_threshold = 0.65
         hgen = HierarchyGenerator(self.HGEN_ARGS)
@@ -59,7 +59,7 @@ class TestHierarchyGenerator(BaseTest):
         self.assert_generate_input_step()
         CreateClustersStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assert_generate_artifact_content_step(anthropic_ai_manager=anthropic_ai_manager)
-        self.assert_refined_artifact_content_step(anthropic_ai_manager=anthropic_ai_manager)
+        RefineGenerationsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assert_name_artifacts_step(anthropic_ai_manager=anthropic_ai_manager)
         self.assert_generate_trace_links_step(anthropic_ai_manager=anthropic_ai_manager)
         DetectDuplicateArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
@@ -128,27 +128,6 @@ class TestHierarchyGenerator(BaseTest):
         for i, us in enumerate(self.HGEN_STATE.generations2sources.keys()):
             self.assertEqual(us, HGenTestConstants.user_stories[i])
             self.assertEqual(set(self.HGEN_STATE.generations2sources[us]), set(HGenTestConstants.code_files[i]))
-
-    def assert_refined_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
-        # TODO
-        # refined_user_stories1 = ["#1" + us for us in HGenTestConstants.user_stories]
-        # refined_user_stories2 = ["#2" + us for us in HGenTestConstants.user_stories]
-        # refine_response1 = [PromptUtil.create_xml("selected-artifacts", "1,5,6")]  # orig content no. 1 and refined us #1 no. 2,3
-        # refine_response2 = [PromptUtil.create_xml("selected-artifacts", "1,2,6")]  # orig content no. 1, refined no. 2 (#1) and 3 (#2)
-        # anthropic_ai_manager.add_responses(get_generated_artifacts_response(contents=refined_user_stories1)
-        #                                    + refine_response1
-        #                                    + get_generated_artifacts_response(contents=refined_user_stories2)
-        #                                    + refine_response2
-        #                                    )
-        # self.HGEN_ARGS.perform_clustering = False
-        self.HGEN_ARGS.run_refinement = False
-        RefineGenerationsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
-        # us1 = HGenTestConstants.user_stories[0]
-        # us2 = refined_user_stories1[1]
-        # us3 = refined_user_stories2[2]
-        # for i, us in enumerate([us1, us2, us3]):
-        #     self.assertIn(us, self.HGEN_STATE.refined_content)
-        #     self.assertEqual(set(self.HGEN_STATE.refined_content[us]), set(HGenTestConstants.code_files[i]))
 
     def assert_name_artifacts_step(self, anthropic_ai_manager: TestAIManager):
         names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.get_generations2sources())

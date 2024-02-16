@@ -248,23 +248,25 @@ class DictUtil:
         return len(missing_keys) == 0
 
     @staticmethod
-    def get_first_key(dict_: Dict) -> Any:
+    def get_key_by_index(dict_: Dict, index: int = 0) -> Any:
         """
         Gets the first key from the dictionary.
         :param dict_: The dictionary to get first key of.
+        :param index: The index of the key to get.
         :return: The first key from the dictionary.
         """
         if len(dict_) == 0:
             return
-        return list(dict_.keys())[0]
+        return list(dict_.keys())[index]
 
     @staticmethod
-    def get_first_value(dict_: Dict) -> Any:
+    def get_value_by_index(dict_: Dict, index: int = 0) -> Any:
         """
         Gets the first value from the dictionary.
         :param dict_: The dictionary to get first value of.
+        :param index: The index of the value to get.
         :return: The first value from the dictionary.
         """
-        key = DictUtil.get_first_key(dict_)
+        key = DictUtil.get_key_by_index(dict_, index)
         if key:
             return dict_[key]

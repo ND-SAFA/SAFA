@@ -123,13 +123,18 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
 API_DATAFLOW_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Related Code Snippets"),
-                      Prompt("# TASK \n Starting with the input, create a detailed summary of each steps that the endpoint "
+                      Prompt("# TASK \n Starting with the input, create a detailed summary of each step that the endpoint "
                              "performs to produce the final output. "
                              "Your focus should be on detailing how data flows in the ENDPOINT execution. "
-                             "Include as much detail as would be necessary to recreate the endpoint, including details from "
+                             "Include as much detail as would be necessary to fully understand the endpoint, including details from "
                              "the descriptions of the functions under # Related Code Snippets which are called in the endpoint. "
                              "Use the following format to structure "
                              "your output\n {format}")], enumeration_chars=[NEW_LINE]
+)
+
+DB_ENTITY_SPEC_QUESTIONNAIRE = QuestionnairePrompt(
+    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Related Code Snippets"),
+                      Prompt("# TASK \n TODO")], enumeration_chars=[NEW_LINE]
 )
 
 SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "

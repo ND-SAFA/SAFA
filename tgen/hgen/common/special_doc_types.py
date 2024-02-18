@@ -5,6 +5,7 @@ from tgen.common.util.supported_enum import SupportedEnum
 
 class SpecialDocTypes(SupportedEnum):
     API_DATAFLOW = "API DATAFLOW"
+    DB_ENTITY_SPEC = "DB ENTITY SPEC"
 
 
 class DocTypeConstraints(SupportedEnum):
@@ -13,4 +14,7 @@ class DocTypeConstraints(SupportedEnum):
 
 
 DOC_TYPE2CONSTRAINTS = {SpecialDocTypes.API_DATAFLOW.value: {DocTypeConstraints.ONE_TARGET_PER_SOURCE,
-                                                             DocTypeConstraints.USE_SOURCE_CONTEXT}}
+                                                             DocTypeConstraints.USE_SOURCE_CONTEXT},
+                        SpecialDocTypes.DB_ENTITY_SPEC.value: {DocTypeConstraints.ONE_TARGET_PER_SOURCE,
+                                                               DocTypeConstraints.USE_SOURCE_CONTEXT}
+                        }

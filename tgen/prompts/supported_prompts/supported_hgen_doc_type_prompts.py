@@ -5,12 +5,14 @@ from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.supported_prompts.hgen_prompts import CLUSTERING_QUESTIONNAIRE, API_DATAFLOW_QUESTIONNAIRE
+from tgen.prompts.supported_prompts.hgen_prompts import CLUSTERING_QUESTIONNAIRE, API_DATAFLOW_QUESTIONNAIRE, \
+    DB_ENTITY_SPEC_QUESTIONNAIRE
 
 
 class SupportedHGenDocPrompts(SupportedEnum):
     BASE = CLUSTERING_QUESTIONNAIRE
     API_DATAFLOW = API_DATAFLOW_QUESTIONNAIRE
+    DB_ENTITY_SPEC = DB_ENTITY_SPEC_QUESTIONNAIRE
 
     @classmethod
     def get_prompt_by_type(cls, doc_type: str) -> "SupportedHGenDocPrompts":

@@ -9,7 +9,6 @@
               "export_dir": "[OUTPUT_PATH]/hgen/clustering/[CURRENT_PROJECT]",
               "source_layer_ids": "[SOURCE_LAYER_IDS_LIST]",
               "target_type": "[TARGET_TYPE]",
-              "generate_trace_links": true,
               "interactive_mode": "[IS_INTERACTIVE_BOOL]",
               "generate_explanations": "[GENERATE_EXPLANATIONS_BOOL_OPTIONAL]",
               "seed_project_summary_section": "[PS_SECTION_OPTIONAL]",

@@ -16,7 +16,6 @@ import lombok.Getter;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.function.ThrowingConsumer;
 import org.springframework.util.function.ThrowingFunction;
@@ -93,10 +92,9 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(ExternalAPIException.class)
-    public ResponseEntity<SafaError> handleExternalApiException(ExternalAPIException ex) {
-        return ResponseEntity
-            .status(ex.getStatus())
-            .body(new SafaError(ex.getMessage()));
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ExternalAPIException handleExternalApiException(ExternalAPIException ex) {
+        return ex;
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

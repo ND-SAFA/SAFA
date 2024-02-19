@@ -340,4 +340,9 @@ public class AppRoutes {
         public static final String WEBHOOK = ROOT + "/webhook";
         public static final String CANCEL = ROOT + "/cancel/{sessionId}";
     }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Onboarding {
+        public static final String ROOT = "/onboarding";
+    }
 }

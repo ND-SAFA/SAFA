@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.onboarding.services.OnboardingService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
@@ -62,6 +63,9 @@ public class ProjectService {
     @Setter(onMethod = @__({@Autowired}))
     private NotificationService notificationService;
 
+    @Setter(onMethod = @__({@Autowired}))
+    private OnboardingService onboardingService;
+
     /**
      * Deletes given project and all related entities through cascade property.
      *
@@ -93,7 +97,9 @@ public class ProjectService {
      */
     public Project createProject(String name, String description, Team owner) {
         Project project = new Project(name, description, owner);
-        return this.projectRepository.save(project);
+        project = this.projectRepository.save(project);
+        onboardingService.updateStateProject(owner.getOrganization().getOwner(), project);
+        return project;
     }
 
     /**

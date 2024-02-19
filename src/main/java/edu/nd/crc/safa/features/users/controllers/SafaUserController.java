@@ -9,7 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.email.EmailService;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;

@@ -172,12 +172,15 @@ export const useOnboarding = defineStore("useOnboarding", {
 
       this.loading = false;
     },
-    /** Close the popup and mark onboarding as complete. */
-    async handleClose(): Promise<void> {
+    /**
+     * Close the popup and mark onboarding as complete.
+     * @param resetProject - Whether to reset the project ID.
+     * */
+    async handleClose(resetProject?: boolean): Promise<void> {
       this.open = false;
       await billingApiStore.handleUpdateOnboardingStatus({
         completed: true,
-        projectId: this.projectId || "",
+        projectId: resetProject ? "" : this.projectId || "",
       });
     },
     /**
@@ -204,15 +207,18 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (currentStep === "summarize" && projectId) {
-        await getVersionApiStore.handleLoad(projectId, undefined, false, {
-          onSuccess: () => {
-            this.projectId = projectId;
-            this.handleEstimateCost();
-          },
-          onError: () => {
-            this.projectId = "";
-          },
-        });
+        await getVersionApiStore.handleLoadCurrent(
+          { projectId },
+          {
+            onSuccess: () => {
+              this.projectId = projectId;
+              this.handleEstimateCost();
+            },
+            onError: () => {
+              this.projectId = "";
+            },
+          }
+        );
       }
     },
     /**
@@ -277,12 +283,12 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleExportProject() {
       await projectApiStore.handleDownload("csv");
       logStore.onSuccess("Your data is being exported.");
-      await this.handleClose();
+      await this.handleClose(true);
     },
     /** View the selected project in SAFA */
     async handleViewProject() {
       await navigateTo(Routes.ARTIFACT, { projectId: this.projectId });
-      await this.handleClose();
+      await this.handleClose(true);
     },
   },
 });

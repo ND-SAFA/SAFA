@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { CostEstimateSchema, JobSchema, LocalStorageKeys } from "@/types";
+import { CostEstimateSchema, JobSchema } from "@/types";
 import {
   ARTIFACT_GENERATION_ONBOARDING,
   jobStatus,
@@ -137,16 +137,15 @@ export const useOnboarding = defineStore("useOnboarding", {
      */
     async handleReload(open?: boolean): Promise<void> {
       // Open the onboarding workflow if it has not yet been completed, or is manually opened.
-      if (
-        open ||
-        (localStorage.getItem(LocalStorageKeys.onboarding) !== "true" &&
-          projectStore.allProjects.length <= 1)
-      ) {
-        this.open = true;
-      } else return;
+      await billingApiStore.handleGetOnboardingStatus({
+        onSuccess: (status) => {
+          this.projectId = status.projectId || null;
+          this.open = open || !status.completed;
+        },
+      });
 
-      // Skip reset if already loading.
-      if (this.loading) return;
+      // Skip reset if already loading or completed.
+      if (!this.open || this.loading) return;
 
       this.loading = true;
 
@@ -154,10 +153,6 @@ export const useOnboarding = defineStore("useOnboarding", {
       await jobApiStore.handleReload();
 
       // Load the project ID and generation status based on stored state, job state, or local storage.
-      this.projectId =
-        this.projectId ||
-        (this.isUploadJob && this.uploadedJob?.completedEntityId) ||
-        localStorage.getItem(LocalStorageKeys.onboardingProject);
       this.generationCompleted =
         this.generationCompleted ||
         (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED");
@@ -178,9 +173,12 @@ export const useOnboarding = defineStore("useOnboarding", {
       this.loading = false;
     },
     /** Close the popup and mark onboarding as complete. */
-    handleClose(): void {
+    async handleClose(): Promise<void> {
       this.open = false;
-      localStorage.setItem(LocalStorageKeys.onboarding, "true");
+      await billingApiStore.handleUpdateOnboardingStatus({
+        completed: true,
+        projectId: this.projectId || "",
+      });
     },
     /**
      * Proceeds to the next step of the onboarding workflow.
@@ -209,12 +207,10 @@ export const useOnboarding = defineStore("useOnboarding", {
         await getVersionApiStore.handleLoad(projectId, undefined, false, {
           onSuccess: () => {
             this.projectId = projectId;
-            localStorage.setItem(LocalStorageKeys.onboardingProject, projectId);
             this.handleEstimateCost();
           },
           onError: () => {
             this.projectId = "";
-            localStorage.setItem(LocalStorageKeys.onboardingProject, "");
           },
         });
       }
@@ -281,12 +277,12 @@ export const useOnboarding = defineStore("useOnboarding", {
     async handleExportProject() {
       await projectApiStore.handleDownload("csv");
       logStore.onSuccess("Your data is being exported.");
-      this.handleClose();
+      await this.handleClose();
     },
     /** View the selected project in SAFA */
     async handleViewProject() {
       await navigateTo(Routes.ARTIFACT, { projectId: this.projectId });
-      this.handleClose();
+      await this.handleClose();
     },
   },
 });

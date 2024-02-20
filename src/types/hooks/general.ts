@@ -89,7 +89,4 @@ export type EmptyLambda = () => void;
 
 export enum LocalStorageKeys {
   darkMode = "dark",
-  onboarding = "ob",
-  onboardingProject = "obp",
-  onboardingGenerated = "obg",
 }

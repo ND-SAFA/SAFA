@@ -512,10 +512,11 @@ class FileUtil:
         :param output_file_path: The path to save the file to.
         :param dumper: The object responsible for translating into yaml.
         """
+        FileUtil.create_dir_safely(output_file_path)
         dumper = Dumper if dumper is None else dumper
         FileUtil.create_dir_safely(output_file_path)
         output_file_path = os.path.expanduser(output_file_path)
-        with open(output_file_path, 'w') as file:
+        with open(output_file_path, 'w+') as file:
             yaml.dump(content, file, Dumper=dumper)
 
     @staticmethod

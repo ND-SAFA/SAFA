@@ -1,7 +1,6 @@
 import re
 import string
 import uuid
-
 from typing import List, Union, Set, Dict
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD, SPACE, DASH
@@ -39,7 +38,7 @@ class StrUtil:
         updated_args = [arg for arg in args]
         updated_kwargs = {}
         for i, field in enumerate(formatting_fields):
-            replacement = '{%s}' % field
+            replacement = StrUtil.get_format_symbol(field)
             if field:
                 if field in kwargs:
                     updated_kwargs[field] = kwargs[field]
@@ -52,6 +51,26 @@ class StrUtil:
         except Exception:
             logger.exception(f"Unable to format {string} with args={updated_args} and kwargs={updated_kwargs}")
         return string
+
+    @staticmethod
+    def fill_with_format_variable_name(string_: str, variable_name: str, count: int = -1) -> str:
+        """
+        Updates the format symbol in the string to include the variable name for use with the format map.
+        :param string_: The string to update.
+        :param variable_name: The name of the format variable.
+        :param count: Number of replacements to make (-1 is all).
+        :return: The string with the format symbol and variable name for use with the format map.
+        """
+        return string_.replace(StrUtil.get_format_symbol(), StrUtil.get_format_symbol(variable_name), count)
+
+    @staticmethod
+    def get_format_symbol(var_name: str = EMPTY_STRING) -> str:
+        """
+        Gets the symbol for formatting strings '{}'.
+        :param var_name: If provided, places the variable name in the brackets for use with the format map.
+        :return: The symbol for formatting strings.
+        """
+        return '{%s}' % var_name
 
     @staticmethod
     def is_uuid(input_string: str) -> bool:

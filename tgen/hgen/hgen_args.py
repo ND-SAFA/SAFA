@@ -4,7 +4,8 @@ from typing import Dict, List, Union
 
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
     DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS, DEFAULT_CLUSTER_MAX_SIZE
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
+from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager, \
+    get_best_default_llm_manager_short_context
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.base_object import BaseObject
@@ -89,7 +90,7 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The LLM manager to use to generate the artifact for short context windows
     """
-    hgen_llm_manager_best_short_context: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)
+    hgen_llm_manager_best_short_context: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_short_context)
     """
     The LLM manager to use to generate the artifact less complex tasks
     """

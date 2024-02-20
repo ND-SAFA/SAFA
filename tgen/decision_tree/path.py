@@ -1,0 +1,48 @@
+from dataclasses import dataclass, field
+from typing import List
+
+from tgen.common.util.list_util import ListUtil
+from tgen.decision_tree.abstract_node import AbstractNode
+
+
+@dataclass
+class Path:
+    starting_node: AbstractNode
+    __choices: List[str] = field(default_factory=list, init=False)
+    __path_taken: List[AbstractNode] = field(default_factory=list, init=False)
+
+    def __post_init__(self) -> None:
+        """
+        Performs post initialization tasks on the Path.
+        :return: None
+        """
+        self.__path_taken.append(self.starting_node)
+
+    def get_choice(self, chosen_node_index: int = -1) -> str:
+        """
+        Gets a choice for the chosen node at the given index.
+        :param chosen_node_index: The index of the node that resulted from the desired choice.
+        :return: The
+        """
+        chosen_node_index = chosen_node_index - 1 if chosen_node_index != -1 else chosen_node_index
+        return ListUtil.safely_get_item(chosen_node_index, self.__choices)
+
+    def get_node(self, node_index: int = -1) -> AbstractNode:
+        """
+        Gets a node in the tree (by default is the last).
+        :param node_index: The index of the node.
+        :return: The node that was decided upon at the given index.
+        """
+        return ListUtil.safely_get_item(node_index, self.__path_taken)
+
+    def add_decision(self, choice: str) -> AbstractNode:
+        """
+        Adds a new decision on which branch of the tree to explore next.
+        :param choice: The reason that branch was chosen.
+        :return: The node chosen to explore next.
+        """
+        current_node = self.get_node()
+        next_selected_node = current_node.select_branch(choice)
+        self.__path_taken.append(next_selected_node)
+        self.__choices.append(choice)
+        return next_selected_node

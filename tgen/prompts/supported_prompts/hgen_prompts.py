@@ -133,8 +133,14 @@ API_DATAFLOW_QUESTIONNAIRE = QuestionnairePrompt(
 )
 
 DB_ENTITY_SPEC_QUESTIONNAIRE = QuestionnairePrompt(
-    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Related Code Snippets"),
-                      Prompt("# TASK \n TODO")], enumeration_chars=[NEW_LINE]
+    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Usages of the DB entity"),
+                      Prompt("# TASK \n "
+                             "You are given the code for a DB entity and summaries of each code module that uses the DB entity. "
+                             "Extract the DB schema from the given DB entity's attributes using the following format: \n{format}.\n"
+                             "Please make sure that all attributes are included. "
+                             "Use the usages to make sure that you understand the attributes of "
+                             "the entity in the context of the system. ")],
+    enumeration_chars=[NEW_LINE]
 )
 
 SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "

@@ -1,4 +1,3 @@
-import os
 from typing import Any, Dict
 
 from tgen.common.util.dataclass_util import DataclassUtil
@@ -46,7 +45,7 @@ class SummarizeJob(AbstractJob):
         dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
         dataset_dir = self.dataset_creator.get_project_path() if self.dataset_creator else None
 
-        self.args.no_project_summary = self.is_subset and not dataset.project_summary
+        self.args.no_project_summary = (self.is_subset and not dataset.project_summary) or self.args.no_project_summary
 
         summarizer = Summarizer(self.args, dataset=dataset)
         dataset = summarizer.summarize()

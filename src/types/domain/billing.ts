@@ -1,4 +1,18 @@
 /**
+ * The onboarding status for the current user.
+ */
+export interface OnboardingStatusSchema {
+  /**
+   * Whether the onboarding workflow is completed.
+   */
+  completed: boolean;
+  /**
+   * The ID of the project used in onboarding.
+   */
+  projectId: string;
+}
+
+/**
  * Represents an estimation of the cost of generating data.
  */
 export interface CostEstimateSchema {

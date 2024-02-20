@@ -61,6 +61,12 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     }
 
     @Override
+    public void deleteGithubCredentials(SafaUser user) {
+        Optional<GithubAccessCredentials> credentials = accessCredentialsRepository.findByUser(user);
+        credentials.ifPresent(accessCredentialsRepository::delete);
+    }
+
+    @Override
     public GithubSelfResponseDTO getSelf(GithubAccessCredentials credentials) {
         return WebApiUtils.blockOptional(
             this.webClient

@@ -65,6 +65,33 @@
               "isBinary": false
             },
             "path": "src/RGBN.cpp"
+          },
+          {
+            "name": "filename_with_a_comma,",
+            "type": "blob",
+            "object": {
+              "text": "",
+              "isBinary": false
+            },
+            "path": "src/filename_with_a_comma,"
+          },
+          {
+            "name": "filename_with_a_brace{",
+            "type": "blob",
+            "object": {
+              "text": "",
+              "isBinary": false
+            },
+            "path": "src/filename_with_a_brace{"
+          },
+          {
+            "name": "another_filename_with_a_comma,",
+            "type": "blob",
+            "object": {
+              "text": "",
+              "isBinary": false
+            },
+            "path": "src/another_filename_with_a_comma,"
           }
         ]
       }

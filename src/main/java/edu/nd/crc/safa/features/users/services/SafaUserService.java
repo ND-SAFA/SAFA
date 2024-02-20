@@ -44,7 +44,7 @@ public class SafaUserService {
     private final OrganizationService organizationService;
     private final PermissionService permissionService;
     private final Predicate<String> httpThreadPredicate = Pattern
-        .compile("https(?:-jsse)?-nio-\\S{1,20}-exec-\\d+")
+        .compile("http(?:s-jsse)?-nio-\\S{1,20}-exec-\\d+")
         .asMatchPredicate();
 
     /**
@@ -153,6 +153,10 @@ public class SafaUserService {
     public void addSuperUser(SafaUser updatedUser) {
         updatedUser.setSuperuser(true);
         safaUserRepository.save(updatedUser);
+
+        Organization personalOrg = organizationService.getPersonalOrganization(updatedUser);
+        personalOrg.setPaymentTier(PaymentTier.UNLIMITED);
+        organizationService.updateOrganization(personalOrg);
     }
 
     /**

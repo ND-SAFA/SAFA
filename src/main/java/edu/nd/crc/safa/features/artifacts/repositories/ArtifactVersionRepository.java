@@ -21,6 +21,8 @@ public interface ArtifactVersionRepository extends CrudRepository<ArtifactVersio
 
     List<ArtifactVersion> findByProjectVersion(ProjectVersion projectVersion);
 
+    int countByProjectVersion(ProjectVersion projectVersion);
+
     Optional<ArtifactVersion> findByProjectVersionAndArtifact(ProjectVersion projectVersion, Artifact artifact);
 
     Optional<ArtifactVersion> findByProjectVersionAndArtifactName(ProjectVersion projectVersion, String name);

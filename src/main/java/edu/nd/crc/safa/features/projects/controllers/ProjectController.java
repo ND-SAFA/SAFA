@@ -19,15 +19,19 @@ import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.entities.TeamPermission;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import jakarta.validation.Valid;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,15 +52,22 @@ public class ProjectController extends BaseController {
     private final ProjectMembershipService projectMembershipService;
     private final OrganizationService organizationService;
     private final TeamService teamService;
+    private final SafaUserService safaUserService;
+    private final PermissionService permissionService;
+    private final ProjectService projectService;
 
     @Autowired
     public ProjectController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
                              ProjectMembershipService projectMembershipService, OrganizationService organizationService,
-                             TeamService teamService) {
+                             TeamService teamService, SafaUserService safaUserService,
+                             PermissionService permissionService, ProjectService projectService) {
         super(resourceBuilder, serviceProvider);
         this.projectMembershipService = projectMembershipService;
         this.organizationService = organizationService;
         this.teamService = teamService;
+        this.safaUserService = safaUserService;
+        this.permissionService = permissionService;
+        this.projectService = projectService;
     }
 
     /**
@@ -126,7 +137,6 @@ public class ProjectController extends BaseController {
      * @return A newly created project object
      */
     private Project createProjectFromAppEntity(ProjectAppEntity projectAppEntity) {
-        ProjectService projectService = getServiceProvider().getProjectService();
         SafaUser user = getCurrentUser();
 
         if (projectAppEntity.getTeamId() != null) {
@@ -147,7 +157,7 @@ public class ProjectController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_USER_PROJECTS)
     public List<ProjectIdAppEntity> getUserProjects() {
-        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        SafaUser user = getCurrentUser();
         return projectMembershipService.getProjectIdAppEntitiesForUser(user);
     }
 
@@ -160,11 +170,84 @@ public class ProjectController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.DELETE_PROJECT_BY_ID)
     @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable UUID projectId) throws SafaError, IOException {
-        SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
+        SafaUser user = getCurrentUser();
         Project project = getResourceBuilder()
             .fetchProject(projectId)
             .withAnyPermission(Set.of(ProjectPermission.DELETE, TeamPermission.DELETE_PROJECTS), user)
             .get();
-        getServiceProvider().getProjectService().deleteProject(user, project);
+        projectService.deleteProject(user, project);
+    }
+
+    /**
+     * Transfer a project to a new owner
+     *
+     * @param projectId The ID of the project to transfer
+     * @param body Details of the transfer
+     * @return Updated project metadata
+     */
+    @PutMapping(AppRoutes.Projects.TRANSFER_OWNERSHIP)
+    public ProjectIdAppEntity transferProjectOwnership(@PathVariable UUID projectId,
+                                                       @RequestBody TransferOwnershipDTO body) {
+
+        SafaUser user = getCurrentUser();
+        Project project = getResourceBuilder()
+            .fetchProject(projectId)
+            .asUser(user)
+            .withPermissions(Set.of(ProjectPermission.VIEW, ProjectPermission.MOVE))
+            .get();
+
+        Team newOwningTeam = getTeam(body);
+        permissionService.requirePermission(TeamPermission.CREATE_PROJECTS, newOwningTeam, user);
+
+        Project updatedProject = projectService.transferProjectOwnership(project, newOwningTeam);
+        return projectService.getIdAppEntity(updatedProject, user);
+    }
+
+    /**
+     * Details about a project ownership transfer request
+     */
+    @Data
+    @NoArgsConstructor
+    public static class TransferOwnershipDTO {
+        private String owner;
+        private OwnerType ownerType;
+    }
+
+    /**
+     * The type of owner referenced in a given {@link TransferOwnershipDTO}.
+     * This is used to look up the team associated with that entity, since
+     * projects are ultimately owned by teams.
+     */
+    public enum OwnerType {
+        ORGANIZATION,
+        TEAM,
+        USER_ID,
+        USER_EMAIL
+    }
+
+    /**
+     * Returns the team associated with the transfer request
+     *
+     * @param transferDetails The details of the project transfer request
+     * @return The team the request is referencing
+     */
+    private Team getTeam(TransferOwnershipDTO transferDetails) {
+        String owner = transferDetails.getOwner();
+
+        return switch (transferDetails.getOwnerType()) {
+            case TEAM -> teamService.getTeamById(UUID.fromString(owner));
+            case USER_ID -> {
+                SafaUser otherUser = safaUserService.getUserById(UUID.fromString(owner));
+                yield teamService.getPersonalTeam(otherUser);
+            }
+            case USER_EMAIL -> {
+                SafaUser otherUser = safaUserService.getUserByEmail(owner);
+                yield teamService.getPersonalTeam(otherUser);
+            }
+            case ORGANIZATION -> {
+                Organization organization = organizationService.getOrganizationById(UUID.fromString(owner));
+                yield teamService.getFullOrganizationTeam(organization);
+            }
+        };
     }
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.nd.crc.safa.config.ProjectPaths;
@@ -15,6 +14,7 @@ import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.onboarding.services.OnboardingService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
@@ -63,6 +63,9 @@ public class ProjectService {
     @Setter(onMethod = @__({@Autowired}))
     private NotificationService notificationService;
 
+    @Setter(onMethod = @__({@Autowired}))
+    private OnboardingService onboardingService;
+
     /**
      * Deletes given project and all related entities through cascade property.
      *
@@ -94,7 +97,9 @@ public class ProjectService {
      */
     public Project createProject(String name, String description, Team owner) {
         Project project = new Project(name, description, owner);
-        return this.projectRepository.save(project);
+        project = this.projectRepository.save(project);
+        onboardingService.updateStateProject(owner.getOrganization().getOwner(), project);
+        return project;
     }
 
     /**
@@ -260,13 +265,13 @@ public class ProjectService {
             projectMemberships
                 .stream()
                 .map(MembershipAppEntity::new)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         List<String> permissions = getUserPermissions(project, currentUser)
             .stream()
             .filter(permission -> permission instanceof ProjectPermission)
             .map(Permission::getName)
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
 
         return new ProjectIdAppEntity(project, membershipAppEntities, permissions);
     }
@@ -283,7 +288,7 @@ public class ProjectService {
             .filter(project -> permissionService.hasAnyPermission(
                 Set.of(TeamPermission.VIEW_PROJECTS, ProjectPermission.VIEW), project, currentUser
             )).map(project -> getIdAppEntity(project, currentUser))
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     }
 
     /**
@@ -304,7 +309,7 @@ public class ProjectService {
         Stream<Permission> teamPermissions =
             teamService.getUserPermissions(project.getOwningTeam(), currentUser).stream();
 
-        return Stream.concat(permissions, teamPermissions).collect(Collectors.toUnmodifiableList());
+        return Stream.concat(permissions, teamPermissions).toList();
     }
 
     /**
@@ -326,5 +331,19 @@ public class ProjectService {
      */
     public Optional<Project> getProjectOptionalById(UUID id) {
         return projectRepository.findById(id);
+    }
+
+    /**
+     * Transfer ownership of a project to a new team
+     * @param project The project to transfer
+     * @param newTeam The team to transfer to
+     * @return The updated project object
+     */
+    public Project transferProjectOwnership(Project project, Team newTeam) {
+        assert project.getId() != null : "Cannot transfer ownership of a project which has not been saved.";
+        assert newTeam.getId() != null : "Cannot transfer ownership of a project to a team which has not been saved";
+
+        project.setOwningTeam(newTeam);
+        return projectRepository.save(project);
     }
 }

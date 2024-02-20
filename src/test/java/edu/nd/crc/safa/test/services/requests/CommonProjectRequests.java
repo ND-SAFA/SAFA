@@ -10,6 +10,8 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.projects.controllers.ProjectController;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -18,6 +20,7 @@ import edu.nd.crc.safa.test.services.builders.AndBuilder;
 import edu.nd.crc.safa.test.services.builders.BuilderState;
 import edu.nd.crc.safa.test.services.builders.CustomAttributeBuilder;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -65,6 +68,21 @@ public class CommonProjectRequests {
             .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
             .withEntityId(project.getProjectId())
             .postWithJsonObject(request, resultMatcher);
+    }
+
+    public static ProjectIdAppEntity transferProjectOwnership(Project project,
+                                                              ProjectController.TransferOwnershipDTO transferDetails) {
+        return SafaRequest.withRoute(AppRoutes.Projects.TRANSFER_OWNERSHIP)
+            .withProject(project)
+            .putAndParseResponse(transferDetails, new TypeReference<>(){});
+    }
+
+    public static JSONObject transferProjectOwnership(Project project,
+                                                      ProjectController.TransferOwnershipDTO transferDetails,
+                                                      ResultMatcher resultMatcher) {
+        return SafaRequest.withRoute(AppRoutes.Projects.TRANSFER_OWNERSHIP)
+            .withProject(project)
+            .putWithJsonObject(transferDetails, resultMatcher);
     }
 
     public AndBuilder<CommonProjectRequests, CustomAttributeAppEntity> createCustomAttribute(String projectParam,

@@ -7,12 +7,16 @@ import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
+import edu.nd.crc.safa.features.billing.services.BillingService;
+import edu.nd.crc.safa.features.billing.services.CostEstimationService;
+import edu.nd.crc.safa.features.billing.services.TransactionService;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
 import edu.nd.crc.safa.features.documents.services.DocumentService;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.CheckArtifactNameService;
 import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
@@ -185,6 +189,12 @@ public class ServiceProvider {
     private SummaryService summaryService;
     // HGen
     private HGenService hGenService;
+    // Billing
+    private BillingService billingService;
+    private TransactionService transactionService;
+    private CostEstimationService costEstimationService;
+    // Email
+    private EmailService emailService;
 
     @PostConstruct
     public void postInit() {

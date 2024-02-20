@@ -13,6 +13,7 @@ import lombok.Data;
 public class JiraProjectPermissionDTO {
 
     public static final String ADMINISTER_PROJECTS_PERMISSION = "ADMINISTER_PROJECTS";
+    public static final String BROWSE_PROJECTS_PERMISSION = "BROWSE_PROJECTS";
 
     private HashMap<String, Permission> permissions = new HashMap<>();
 

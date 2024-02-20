@@ -41,12 +41,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                                     FilterChain chain) throws IOException, ServletException {
         try {
             if (request.getCookies() == null) {
-                log.info("Request contained no cookies.");
+                log.debug("Request contained no cookies.");
                 return;
             }
 
             if (AuthenticationConfig.OPEN_ENDPOINTS.contains(request.getRequestURI())) {
-                log.info("Skipping authorization filter for open endpoints.");
+                log.debug("Skipping authorization filter for open endpoints.");
                 return;
             }
 
@@ -56,7 +56,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 .map(Cookie::getValue);
 
             if (token.isEmpty()) {
-                log.info("Authorization token was empty.");
+                log.debug("Authorization token was empty.");
                 return;
             }
 
@@ -70,7 +70,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             log.info("Authorization token referenced deleted account.");
         } catch (ExpiredJwtException ignored) {
             // If your JWT expired, just move on and force the user to log in again
-            log.info("Authorization token has expired.");
+            log.debug("Authorization token has expired.");
         } catch (SafaError e) {
             e.printStackTrace();
         } finally {

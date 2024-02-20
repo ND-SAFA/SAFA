@@ -19,6 +19,8 @@ import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.email.services.EmailService;
+import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlTreeObjectsResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
@@ -68,6 +70,9 @@ public class GithubProjectCreationJob extends CommitJob {
         "prod",
         "production"
     };
+
+    private static final String GLOB_SEPARATOR = "\0";
+
     /**
      * Internal project identifier
      */
@@ -134,7 +139,7 @@ public class GithubProjectCreationJob extends CommitJob {
      * @return Predicate that returns true if the file path matches any of the glob patterns
      */
     private Predicate<String> globListToPredicate(String globs) {
-        List<String> globList = List.of(globs.split(","));
+        List<String> globList = List.of(globs.split(GLOB_SEPARATOR));
         return globList.stream()                            // For each glob pattern from the front end:
             .map(pattern -> "glob:" + pattern)              //   Prepend "glob:" (needed for path matcher)
             .map(FileSystems.getDefault()::getPathMatcher)  //   Create a path matcher
@@ -261,11 +266,11 @@ public class GithubProjectCreationJob extends CommitJob {
         ghProject.setArtifactType(getArtifactTypeMapping(project));
 
         if (importSettings.getInclude() != null) {
-            ghProject.setInclude(String.join(",", importSettings.getInclude()));
+            ghProject.setInclude(String.join(GLOB_SEPARATOR, importSettings.getInclude()));
         }
 
         if (importSettings.getExclude() != null) {
-            ghProject.setExclude(String.join(",", importSettings.getExclude()));
+            ghProject.setExclude(String.join(GLOB_SEPARATOR, importSettings.getExclude()));
         }
 
         if (importSettings.getBranch() != null) {
@@ -366,6 +371,25 @@ public class GithubProjectCreationJob extends CommitJob {
         this.getServiceProvider().getGithubProjectRepository().save(githubProject);
 
         logger.log("Retrieved %d artifacts from project.", commit.getArtifacts().getSize());
+    }
+
+    @IJobStep(value = "Generate Summaries", position = 6)
+    public void generateSummaries(JobLogger logger) {
+        if (!importSettings.isSummarize()) {
+            return;
+        }
+
+        List<ArtifactAppEntity> newArtifacts = getProjectCommitDefinition().getArtifactList(ModificationType.ADDED);
+        SummaryService summaryService = getServiceProvider().getSummaryService();
+        summaryService.addSummariesToCode(newArtifacts, null, logger);
+    }
+
+    @Override
+    protected void afterJob(boolean success) throws Exception {
+        if (importSettings.isSummarize()) {
+            EmailService emailService = getServiceProvider().getEmailService();
+            emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);
+        }
     }
 
     /**

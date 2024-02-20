@@ -36,7 +36,7 @@ public class Transaction {
         PENDING,
         SUCCESSFUL,
         FAILED,
-        REFUNDED
+        CANCELED
     }
 
     @JdbcTypeCode(SqlTypes.BINARY)
@@ -64,12 +64,21 @@ public class Transaction {
     @OneToOne(fetch = FetchType.LAZY)
     private Organization organization;
 
+    @Column
+    private String externalReferenceId;
+
     public Transaction(int amount, String description, Organization organization) {
         this.amount = amount;
         this.description = description;
         this.status = Status.PENDING;
         this.timestamp = LocalDateTime.now();
         this.organization = organization;
+        this.externalReferenceId = null;
+    }
+
+    public Transaction(int amount, String description, Organization organization, String externalReferenceId) {
+        this(amount, description, organization);
+        this.externalReferenceId = externalReferenceId;
     }
 
 }

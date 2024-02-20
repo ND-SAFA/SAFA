@@ -6,6 +6,7 @@ import java.util.Set;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
@@ -47,6 +48,9 @@ public abstract class GenerationJob extends CommitJob {
             project,
             getUser()
         );
+        // TODO making summarization free for the moment
+        /*permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
+            PricePermission.SUMMARIZE_ARTIFACTS.getName(), project, getUser());*/
 
         ProjectRetrievalService projectRetrievalService = this.getServiceProvider().getProjectRetrievalService();
         this.projectAppEntity = projectRetrievalService.getProjectAppEntity(
@@ -67,5 +71,11 @@ public abstract class GenerationJob extends CommitJob {
                 this.getDbLogger());
         this.projectSummary = summarizedEntities.getValue0();
         this.projectAppEntity.setArtifacts(summarizedEntities.getValue1());
+    }
+
+    @Override
+    protected void afterJob(boolean success) throws Exception {
+        EmailService emailService = getServiceProvider().getEmailService();
+        emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);
     }
 }

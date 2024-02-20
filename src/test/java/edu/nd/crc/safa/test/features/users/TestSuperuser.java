@@ -5,6 +5,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
+import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.users.controllers.SafaUserController;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
@@ -14,9 +17,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 public class TestSuperuser extends ApplicationBaseTest {
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Test
     public void testRegularUserCannotPerformSuperuserAction() throws JsonProcessingException {
@@ -64,6 +71,20 @@ public class TestSuperuser extends ApplicationBaseTest {
         rootBuilder.getAuthorizationTestService().loginUser(newUserEmail, newUserPassword, this);
         rootBuilder.getCommonRequestService().user().activateSuperuser();
         performSuperuserAction(true);
+    }
+
+    @Test
+    public void testAddingAdminUpdatesPaymentTier() {
+        Organization organization = organizationService.getPersonalOrganization(getCurrentUser());
+        organization.setPaymentTier(PaymentTier.AS_NEEDED);
+        organizationService.updateOrganization(organization);
+
+        rootBuilder.getCommonRequestService().user()
+            .makeUserSuperuser(getCurrentUser())
+            .activateSuperuser();
+
+        assertThat(organizationService.getPersonalOrganization(getCurrentUser()).getPaymentTier())
+            .isEqualTo(PaymentTier.UNLIMITED);
     }
 
     private void performSuperuserAction(boolean shouldSucceed) throws JsonProcessingException {

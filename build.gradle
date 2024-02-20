@@ -19,21 +19,20 @@ plugins {
 
 bootJar {
     archivesBaseName = 'edu.nd.crc.safa'
-    archiveVersion = '0.1.0'
+    archiveVersion = '2.2.0'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+sourceCompatibility = '17'
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(sourceCompatibility.toString()))
     }
 }
 
 repositories {
     mavenCentral()
 }
-
-sourceCompatibility = '17'
 
 dependencies {
     implementation 'com.sun.xml.bind:jaxb-impl:4.0.3'
@@ -107,7 +106,10 @@ dependencies {
     implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
 
     // email
-    implementation 'com.infobip:infobip-api-java-client:4.0.0'
+    implementation 'com.infobip:infobip-api-java-client:4.1.0'
+
+    // stripe
+    implementation "com.stripe:stripe-java:24.8.0"
 
     // testing
     implementation 'org.springframework.boot:spring-boot-starter-test'

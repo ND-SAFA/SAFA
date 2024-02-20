@@ -21,6 +21,13 @@ public interface GithubConnectionService {
     Optional<GithubAccessCredentials> getGithubCredentials(SafaUser user);
 
     /**
+     * Deletes stored credentials for a given user
+     *
+     * @param user The user
+     */
+    void deleteGithubCredentials(SafaUser user);
+
+    /**
      * @param credentials User credentials
      * @return GitHub handler from the credentials
      */

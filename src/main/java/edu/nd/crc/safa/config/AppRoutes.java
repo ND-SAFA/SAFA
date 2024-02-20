@@ -100,6 +100,7 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class HGen {
         public static final String GENERATE = "/hgen/{versionId}";
+        public static final String ESTIMATE = GENERATE + "/estimate";
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
@@ -168,6 +169,7 @@ public class AppRoutes {
         public static final String GET_PROJECTS = ROOT;
         public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
+        public static final String TRANSFER_OWNERSHIP = BY_ID + "/transfer";
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {
@@ -323,5 +325,24 @@ public class AppRoutes {
         public static final String ROOT = "/members";
         public static final String BY_ENTITY_ID = ROOT + "/{entityId}";
         public static final String BY_ENTITY_ID_AND_MEMBERSHIP_ID = BY_ENTITY_ID + "/{membershipId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Billing {
+        public static final String ROOT = "/billing";
+        public static final String CHECKOUT = ROOT + "/checkout";
+        public static final String CHANGE_TIER = ROOT + "/update-payment-tier";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Stripe {
+        public static final String ROOT = "/stripe";
+        public static final String WEBHOOK = ROOT + "/webhook";
+        public static final String CANCEL = ROOT + "/cancel/{sessionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Onboarding {
+        public static final String ROOT = "/onboarding";
     }
 }

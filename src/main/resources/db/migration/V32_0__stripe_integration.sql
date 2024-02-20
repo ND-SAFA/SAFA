@@ -1,0 +1,1 @@
+ALTER TABLE transaction ADD COLUMN external_reference_id VARCHAR(255) NULL;

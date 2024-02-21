@@ -42,7 +42,7 @@ example:
 format:
   - "\nEntity Name: [Entity Name]
   \nDescription: [Entity Description]
-  \nAttributes:
+  \n- Attributes:
   \n\t- Field: [Attribute Name]
   \n\t\t * Type: [Data Type]
   \n\t\t * Description: [Description of the attribute.] "

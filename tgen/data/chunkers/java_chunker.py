@@ -55,7 +55,7 @@ class JavaChunker(AbstractCodeChunker):
             return ChunkedNode(lineno=-1, end_lineno=-1, type=UnknownNode.__name__)
 
     @staticmethod
-    def _create_chunked_node_without_children(java_node: javatree.AbstractNode, lines: List[str]) -> ChunkedNode:
+    def _create_chunked_node_without_children(java_node: javatree.Node, lines: List[str]) -> ChunkedNode:
         """
         Creates a single node without children from the parsed syntax tree
         :param java_node: The java node object that has no children
@@ -67,7 +67,7 @@ class JavaChunker(AbstractCodeChunker):
         return ChunkedNode(lineno=position, end_lineno=end_lineno, type=ChunkedNode.get_type_name(java_node))
 
     @staticmethod
-    def _create_node_with_children(parent_java_node: javatree.AbstractNode, lines: List[str], children: List) -> ChunkedNode:
+    def _create_node_with_children(parent_java_node: javatree.Node, lines: List[str], children: List) -> ChunkedNode:
         """
         Creates a node that has children (body) from the parsed syntax tree
         :param parent_java_node: The parent java node object for classes, methods, and other nodes with children
@@ -83,7 +83,7 @@ class JavaChunker(AbstractCodeChunker):
         return ChunkedNode(lineno=start, end_lineno=end, body=children_nodes, type=ChunkedNode.get_type_name(parent_java_node))
 
     @staticmethod
-    def _get_children(parent_java_node: javatree.AbstractNode) -> List[javatree.AbstractNode]:
+    def _get_children(parent_java_node: javatree.Node) -> List[javatree.Node]:
         """
         Gets all relevant children that belong to the parent
         :param parent_java_node: The parent node
@@ -101,8 +101,8 @@ class JavaChunker(AbstractCodeChunker):
             return []
 
     @staticmethod
-    def _filter_irrelevant_children(parent_java_node: javatree.AbstractNode, all_children: List[javatree.AbstractNode]) -> List[
-        javatree.AbstractNode]:
+    def _filter_irrelevant_children(parent_java_node: javatree.Node, all_children: List[javatree.Node]) -> List[
+        javatree.Node]:
         """
         Removes all the children that don't represent chunked nodes that are included in the javalang parser for unknown reasons
         :param parent_java_node: The parent node
@@ -136,7 +136,7 @@ class JavaChunker(AbstractCodeChunker):
         return start
 
     @staticmethod
-    def _get_parent_node_end_lineno(parent_java_node: javatree.AbstractNode, children_end_linenos: List[int], lines: List[str]) -> int:
+    def _get_parent_node_end_lineno(parent_java_node: javatree.Node, children_end_linenos: List[int], lines: List[str]) -> int:
         """
         Gets the end lineno of the java_node with children
         :param parent_java_node: The parent node to get end line number for
@@ -179,7 +179,7 @@ class JavaChunker(AbstractCodeChunker):
         return lineno
 
     @staticmethod
-    def _has_position(java_node: javatree.AbstractNode) -> bool:
+    def _has_position(java_node: javatree.Node) -> bool:
         """
         Returns True if the given node has a position, else False
         :param java_node: The node

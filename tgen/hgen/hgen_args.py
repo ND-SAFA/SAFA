@@ -174,7 +174,7 @@ class HGenArgs(PipelineArgs, BaseObject):
         :return: None
         """
         self.llm_managers = {e.value: (self.hgen_llm_manager_best_long_context
-                                       if e != PredictionStep.NAME else self.hgen_llm_manager_best_short_context
+                                       if e != PredictionStep.NAME else self.hgen_llm_manager_best_long_context
                                        ) for e in PredictionStep}
         self.llm_managers[PredictionStep.FORMAT.value] = self.inputs_llm_manager
         for e in PredictionStep:

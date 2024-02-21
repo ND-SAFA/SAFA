@@ -46,3 +46,11 @@ class Path:
         self.__path_taken.append(next_selected_node)
         self.__choices.append(choice)
         return next_selected_node
+
+    def get_final_decision(self) -> str:
+        """
+        Gets the description of the final node at the end of the path.
+        :return: The description of the final node at the end of the path.
+        """
+        last_node = self.get_node(-1)
+        return last_node.description

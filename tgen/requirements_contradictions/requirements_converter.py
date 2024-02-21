@@ -29,6 +29,11 @@ class RequirementsConverter:
         self.export_path = export_path
 
     def convert_artifacts(self, artifacts: List[Artifact]) -> List[Requirement]:
+        """
+        Converts a list of artifacts to a list using the requirements format.
+        :param artifacts: A list of artifacts.
+        :return: The artifacts converted to the requirements format.
+        """
         dataset = PromptDataset(artifact_df=ArtifactDataFrame(artifacts))
         task_prompt = SupportedPrompts.REQUIREMENT_EXTRACT_CONSTITUENTS.value
         prompt_builder = PromptBuilder([ArtifactPrompt(prompt_start=f"{PromptUtil.as_markdown_header('REQUIREMENT')}\n",

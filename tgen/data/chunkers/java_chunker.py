@@ -39,7 +39,7 @@ class JavaChunker(AbstractCodeChunker):
                            body=top_level_classes, type=ChunkedNode.get_type_name(tree))
 
     @staticmethod
-    def _create_chunked_node(java_node: javatree.AbstractNode, lines: List[str]) -> ChunkedNode:
+    def _create_chunked_node(java_node: javatree.Node, lines: List[str]) -> ChunkedNode:
         """
         Creates a node from the parsed syntax java
         :param java_node: The java_node object for classes, methods, statements, ect.

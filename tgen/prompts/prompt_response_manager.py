@@ -61,7 +61,7 @@ class PromptResponseManager:
     """
     If True, will convert the response to one of the expected responses if it is sufficiently close.
     """
-    loose_response_validation: bool = True
+    loose_response_validation: bool = False
     """
     Create reverse lookup for tags to their ids after init
     """

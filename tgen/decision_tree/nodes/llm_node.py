@@ -27,7 +27,8 @@ class LLMNode(AbstractNode):
                                       question=self.description,
                                       instructions="Answer with one of the following responses: ",
                                       response_format="Enclose your answer in {}",
-                                      response_tag="answer")
+                                      response_tag="answer",
+                                      loose_response_validation=True)
         prompt.format_value(**input_variables)
         builder = PromptBuilder([prompt])
         return builder

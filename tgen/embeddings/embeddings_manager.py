@@ -256,7 +256,6 @@ class EmbeddingsManager:
         :param dir_path: The path to directory to save to
         :return: None
         """
-
         base_path = os.path.join(dir_path, str(uuid.uuid4()))
         FileUtil.create_dir_safely(base_path)
         self._base_path = FileUtil.collapse_paths(base_path)
@@ -321,7 +320,7 @@ class EmbeddingsManager:
         :return: True if the embeddings need re-saved
         """
         need_save = not self._base_path or self.__state_changed_since_last_save
-        return need_save
+        return need_save and len(self._embedding_map) > 0
 
     def compare_embeddings(self, id1: str, id2: str) -> float:
         """

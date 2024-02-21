@@ -14,6 +14,7 @@ from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -235,14 +236,22 @@ class TraceDataset(iDataset):
         """
         return list(self.trace_df.filter_by_row(lambda row: row[TraceKeys.LABEL.value] == label).index)
 
-    def create_dependency_mapping(self) -> Dict[str, List[EnumDict]]:
+    def create_dependency_mapping(self, include_parents: bool = False) -> Dict[str, List[EnumDict]]:
         """
         Creates a mapping of artifact id to the list of artifacts its dependent on (traced to).
+        :param include_parents: If True, also includes the parents of the artifact.
         :return: Mapping of artifact id to the list of artifacts its dependent on (traced to).
         """
+        all_links = self.trace_df.get_links(true_only=True)
         dependencies = {p_id: [link[TraceKeys.child_label()] for link in links]
-                        for p_id, links in RankingUtil.group_trace_predictions(self.trace_df.get_links(true_only=True),
+                        for p_id, links in RankingUtil.group_trace_predictions(all_links,
                                                                                key_id=TraceKeys.parent_label()).items()}
+        if include_parents:
+            for c_id, links in RankingUtil.group_trace_predictions(all_links, key_id=TraceKeys.child_label()).items():
+                parents = [link[TraceKeys.parent_label()] for link in links]
+                if parents:
+                    DictUtil.set_or_append_item(dependencies, c_id, parents)
+
         return {p_id: [self.artifact_df.get_artifact(a_id) for a_id in children if a_id in self.artifact_df]
                 for p_id, children in dependencies.items()}
 

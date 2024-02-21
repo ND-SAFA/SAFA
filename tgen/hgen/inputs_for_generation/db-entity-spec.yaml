@@ -1,13 +1,13 @@
 description:
-- A DB Entity Spec, or Database Entity Specification, in a software development project
-  is a detailed description of the data entities that are part of a database system.
-  It outlines the attributes, relationships, and constraints of each entity. This
-  artifact is different from others as it specifically focuses on the data layer of
-  the software, providing a clear understanding of how data is structured, stored,
-  and related. It serves as a blueprint for database design and implementation, and
-  is crucial for ensuring data integrity and consistency.
+  - A DB Entity Spec, or Database Entity Specification, in a software development project
+    is a detailed description of the data entities that are part of a database system.
+    It outlines the attributes, relationships, and constraints of each entity. This
+    artifact is different from others as it specifically focuses on the data layer of
+    the software, providing a clear understanding of how data is structured, stored,
+    and related. It serves as a blueprint for database design and implementation, and
+    is crucial for ensuring data integrity and consistency.
 example:
-- '
+  - '
 
   Entity Name: Customer
 
@@ -40,34 +40,24 @@ example:
 
   '
 format:
-- 'Entity Name: [Entity Name]
-
-
-  Attributes:
-
-  - [Attribute Name]: [Description of the attribute including data type and constraints]
-
-
-  Relationships:
-
-  - [Description of the relationship with other entities]
-
-
-  Constraints:
-
-  - [Description of any additional constraints or rules that apply to the entity]'
+  - "\nEntity Name: [Entity Name]
+  \nDescription: [Entity Description]
+  \n- Attributes:
+  \n\t- Field: [Attribute Name]
+  \n\t\t * Type: [Data Type]
+  \n\t\t * Description: [Description of the attribute.] "
 questions:
-- - What are the main classes or data structures representing entities in the code?
-  - What are the properties or fields of those classes that would map to attributes
-    in a database table?
-  - What are the primary keys that uniquely identify each instance of those classes?
-  - What are the relationships between the different classes based on references,
-    foreign keys, etc?
-  - Are there any inheritance hierarchies between classes that would inform a database
-    schema?
-  - What are the data types of each property or field in the classes?
-  - Are there any validation rules, constraints, or restrictions on the values of
-    certain properties?
-  - Are there any indexes defined on certain properties for performance reasons?
-  - Are there any timestamps or metadata properties like created/updated dates?
-  - Are there any properties that contain large amounts of text or binary data?
+  - - What are the main classes or data structures representing entities in the code?
+    - What are the properties or fields of those classes that would map to attributes
+      in a database table?
+    - What are the primary keys that uniquely identify each instance of those classes?
+    - What are the relationships between the different classes based on references,
+      foreign keys, etc?
+    - Are there any inheritance hierarchies between classes that would inform a database
+      schema?
+    - What are the data types of each property or field in the classes?
+    - Are there any validation rules, constraints, or restrictions on the values of
+      certain properties?
+    - Are there any indexes defined on certain properties for performance reasons?
+    - Are there any timestamps or metadata properties like created/updated dates?
+    - Are there any properties that contain large amounts of text or binary data?

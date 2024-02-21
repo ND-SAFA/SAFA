@@ -40,8 +40,8 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             format_variables.update({"n_targets": n_targets})
 
         content_generator = ContentGenerator(args, state, dataset)
-        context_mapping = state.original_dataset.create_dependency_mapping() if state.original_dataset.trace_dataset \
-                                                                                and args.check_target_type_constraints(
+        context_mapping = state.original_dataset.create_dependency_mapping(include_parents=True) \
+            if state.original_dataset.trace_dataset and args.check_target_type_constraints(
             DocTypeConstraints.USE_SOURCE_CONTEXT) else {}
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,
                                                                  base_task_prompt,

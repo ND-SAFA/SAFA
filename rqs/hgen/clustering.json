@@ -15,6 +15,7 @@
               "seed_layer_id": "[SEED_LAYER_ID_OPTIONAL]",
               "add_seeds_as_artifacts": "[ADD_SEEDS_AS_ARTIFACTS_BOOL_OPTIONAL]",
               "reduction_percentage": "[REDUCTION_PERCENTAGE_OPTIONAL_FLOAT]",
+              "source_type": "[SOURCE_TYPE]",
               "dataset_creator": {
                 "object_type": "PROMPT",
                 "trace_dataset_creator": {

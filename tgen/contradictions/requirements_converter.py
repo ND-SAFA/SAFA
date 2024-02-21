@@ -2,7 +2,9 @@ from typing import List, Dict, Any
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
 from tgen.common.objects.artifact import Artifact
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.contradictions.requirement import Requirement, RequirementConstituent
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -15,7 +17,6 @@ from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.requirements_contradiction_prompts import CONSTITUENT2TAG
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.requirements_contradictions.requirement import Requirement, RequirementConstituent
 
 
 class RequirementsConverter:
@@ -44,7 +45,8 @@ class RequirementsConverter:
                                             {DatasetRole.EVAL: dataset}),
                                         llm_manager=self.llm_manager)
         trainer = LLMTrainer(trainer_state)
-        res = trainer.perform_prediction(save_and_load_path=self.export_path)
+        res = trainer.perform_prediction(save_and_load_path=FileUtil.safely_join_paths(self.export_path,
+                                                                                       "artifact2requirement_response.yaml"))
         requirements = [self._create_requirement(r[task_prompt.id], art[ArtifactKeys.ID]) for art, r in
                         zip(artifacts, res.predictions)]
         return requirements

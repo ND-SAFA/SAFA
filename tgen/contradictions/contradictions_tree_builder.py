@@ -1,13 +1,13 @@
 from typing import List, Optional, Dict
 
 from tgen.common.util.str_util import StrUtil
-from tgen.decision_tree.abstract_node import AbstractNode
-from tgen.decision_tree.conditional_node import ConditionalNode
-from tgen.decision_tree.llm_node import LLMNode
+from tgen.contradictions.common_choices import CommonChoices
+from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
+from tgen.contradictions.requirement import RequirementConstituent, Requirement
+from tgen.decision_tree.nodes.abstract_node import AbstractNode
+from tgen.decision_tree.nodes.conditional_node import ConditionalNode
+from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.tree import Tree
-from tgen.requirements_contradictions.common_choices import CommonChoices
-from tgen.requirements_contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
-from tgen.requirements_contradictions.requirement import RequirementConstituent, Requirement
 
 
 class ContradictionsTreeBuilder:
@@ -17,7 +17,7 @@ class ContradictionsTreeBuilder:
         """
         Builds the decision tree for requirements contradiction detection.
         """
-        self.nodes: List[Optional[AbstractNode]] = [None for None in range(self.N_QUESTIONS)]
+        self.nodes: List[Optional[AbstractNode]] = [None for _ in range(self.N_QUESTIONS)]
 
     def build_tree(self) -> Tree:
         """
@@ -32,9 +32,10 @@ class ContradictionsTreeBuilder:
         :param question_num: The number of the question to get.
         :return: The node for that question.
         """
-        if self.nodes[question_num - 1] is None:
-            self.nodes[question_num - 1] = getattr(self, f"construct_q{question_num}")()
-        return self.nodes[question_num]
+        question_index = question_num - 1
+        if self.nodes[question_index] is None:
+            self.nodes[question_index] = getattr(self, f"_construct_q{question_num}")()
+        return self.nodes[question_index]
 
     @staticmethod
     def convert_input_to_prompt_vars(requirements: List[Requirement], variable_base_name: str, **kwargs) -> Dict[str, str]:
@@ -56,7 +57,7 @@ class ContradictionsTreeBuilder:
         q2 = self.get_question_node(2)
         q1 = ContradictionsTreeBuilder._construct_llm_question_node(
             question="Are the words \"{variable1}\" similar to words \"{}\"?",
-            choices={CommonChoices.YES: q2, CommonChoices.NO: SupportedContradictionDecisionNodes.NONE.value},
+            branches={CommonChoices.YES: q2, CommonChoices.NO: SupportedContradictionDecisionNodes.NONE.value},
             constituent_addressed=RequirementConstituent.VARIABLE,
             constituent=RequirementConstituent.EFFECT)
         return q1
@@ -70,12 +71,12 @@ class ContradictionsTreeBuilder:
         q5 = self.get_question_node(5)
         q2 = ContradictionsTreeBuilder._construct_llm_question_node(
             question="Are the following sentences similar to each other?:\n- {}\n- {}?",
-            choices={CommonChoices.YES: q5, CommonChoices.NO: q3},
+            branches={CommonChoices.YES: q5, CommonChoices.NO: q3},
             constituent_addressed=RequirementConstituent.ACTION,
             constituent=RequirementConstituent.EFFECT)
         return q2
 
-    def construct_q3(self) -> LLMNode:
+    def _construct_q3(self) -> LLMNode:
         """
         Constructs question 3.
         :return: Question 3.
@@ -84,7 +85,7 @@ class ContradictionsTreeBuilder:
         q5 = self.get_question_node(5)
         q3 = ContradictionsTreeBuilder._construct_llm_question_node(
             question="Are the following sentences similar to each other?:\n- {}\n- {}?",
-            choices={CommonChoices.YES: q5, CommonChoices.NO: q4},
+            branches={CommonChoices.YES: q5, CommonChoices.NO: q4},
             constituent_addressed=RequirementConstituent.ACTION,
             constituent=RequirementConstituent.EFFECT)
         return q3
@@ -98,7 +99,7 @@ class ContradictionsTreeBuilder:
         q4 = ContradictionsTreeBuilder._construct_llm_question_node(
             question="Could the following statements potentially contradict each other?\n- \""
                      "it must {}\"\n- \"it must {}\"",
-            choices={CommonChoices.YES: q5, CommonChoices.NO: SupportedContradictionDecisionNodes.NONE.value},
+            branches={CommonChoices.YES: q5, CommonChoices.NO: SupportedContradictionDecisionNodes.NONE.value},
             constituent_addressed=RequirementConstituent.ACTION, constituent=RequirementConstituent.EFFECT)
         return q4
 
@@ -109,8 +110,8 @@ class ContradictionsTreeBuilder:
         """
         q6 = self.get_question_node(6)
         q5 = ConditionalNode(description="Does the following sentence contain a condition: {condition}.",
-                             choices={CommonChoices.YES: q6,
-                                      CommonChoices.NO: SupportedContradictionDecisionNodes.SIMPLEX_CONTRADICTION.value},
+                             branches={CommonChoices.YES: q6,
+                                       CommonChoices.NO: SupportedContradictionDecisionNodes.SIMPLEX_CONTRADICTION.value},
                              conditional_statement=lambda requirements: CommonChoices.NO
                              if any([not r.get_condition() for r in requirements]) else CommonChoices.YES)
         return q5
@@ -123,8 +124,8 @@ class ContradictionsTreeBuilder:
         q7 = self.get_question_node(7)
         q6 = ContradictionsTreeBuilder._construct_llm_question_node(
             question="Is the condition \"{}\" equivalent to the condition \"{}\"?",
-            choices={CommonChoices.YES: q7,
-                     CommonChoices.NO: SupportedContradictionDecisionNodes.IDEM_CONTRADICTION.value},
+            branches={CommonChoices.YES: q7,
+                      CommonChoices.NO: SupportedContradictionDecisionNodes.IDEM_CONTRADICTION.value},
             constituent_addressed=RequirementConstituent.CONDITION)
         return q6
 
@@ -135,18 +136,18 @@ class ContradictionsTreeBuilder:
         """
         q7 = ContradictionsTreeBuilder._construct_llm_question_node(
             question="Can the following states occur at the same time? \n1. {} \n2. {}",
-            choices={CommonChoices.YES: SupportedContradictionDecisionNodes.ALIUS_CONTRADICTION.value,
-                     CommonChoices.NO: SupportedContradictionDecisionNodes.NONE.value},
+            branches={CommonChoices.YES: SupportedContradictionDecisionNodes.ALIUS_CONTRADICTION.value,
+                      CommonChoices.NO: SupportedContradictionDecisionNodes.NONE.value},
             constituent_addressed=RequirementConstituent.CONDITION)
         return q7
 
     @staticmethod
-    def _construct_llm_question_node(question: str, choices: Dict[str, AbstractNode],
+    def _construct_llm_question_node(question: str, branches: Dict[str, AbstractNode],
                                      constituent_addressed: RequirementConstituent, **converter_kwargs) -> LLMNode:
         """
         Constructs a node for a question to be answered using the LLM.
         :param question: The question being asked.
-        :param choices: Maps potential answers to the question to the next node to visit if that answer is chosen.
+        :param branches: Maps potential answers to the question to the next node to visit if that answer is chosen.
         :param constituent_addressed: The part of the requirement being examined (e.g. condition, action...).
         :param converter_kwargs: Additional arguments used when converting the input to prompt variables.
         :return: A node for a question to be answered using the LLM.
@@ -157,7 +158,7 @@ class ContradictionsTreeBuilder:
             format_variable_name = ContradictionsTreeBuilder._create_format_variable_name(constituent_addressed, i)
             question = StrUtil.fill_with_format_variable_name(question, format_variable_name, count=1)
         question = LLMNode(description=question,
-                           choices=choices,
+                           branches=branches,
                            input_variable_converter=lambda input_:
                            ContradictionsTreeBuilder.convert_input_to_prompt_vars(input_, variable_base_name=constituent_addressed,
                                                                                   **converter_kwargs))

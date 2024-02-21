@@ -71,6 +71,8 @@ class FileUtil:
         :param additional_path_parts: Additional path parts to include in output path.
         :return: the output path
         """
+        if not output_path:
+            return
         if additional_path_parts:
             output_path = os.path.join(output_path, *additional_path_parts)
         output_path = FileUtil.get_directory_path(output_path)  # ensure is a directory

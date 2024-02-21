@@ -6,7 +6,6 @@ from typing import Dict, Any
 @dataclass
 class AbstractNode(abc.ABC):
     description: str
-    choices: Dict[str, "AbstractNode"] = field(default_factory=dict)
     branches: Dict[str, "AbstractNode"] = field(default_factory=dict)
 
     def select_branch(self, choice: str) -> "AbstractNode":
@@ -22,7 +21,7 @@ class AbstractNode(abc.ABC):
         Returns whether the given node is a leaf node.
         :return: True if the given node is a leaf node else False.
         """
-        return len(self.branches) > 0
+        return len(self.branches) == 0 or self.branches is None
 
     @abc.abstractmethod
     def choose_branch(self, input_: Any) -> str:

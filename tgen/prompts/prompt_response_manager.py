@@ -59,6 +59,10 @@ class PromptResponseManager:
     """
     entry_formatter: Callable[[str, Dict], Any] = None
     """
+    If True, will convert the response to one of the expected responses if it is sufficiently close.
+    """
+    loose_response_validation: bool = True
+    """
     Create reverse lookup for tags to their ids after init
     """
     _tag2id: Dict[str, str] = field(init=False, default_factory=dict)
@@ -235,8 +239,13 @@ class PromptResponseManager:
             elif v in self.expected_responses[tag]:
                 success = True
             if not success:
-                val = self._format_on_failure(tag, v, AssertionError(f"Unexpected value for {tag}"),
-                                              no_exception=is_list, return_none_on_fail=is_list)
+                closest_val = [r for r in self.expected_responses[tag] if r in v] if self.loose_response_validation else []
+                if len(closest_val) == 1:
+                    success = True
+                    val = closest_val[0]
+                else:
+                    val = self._format_on_failure(tag, v, AssertionError(f"Unexpected value for {tag}"),
+                                                  no_exception=is_list, return_none_on_fail=is_list)
             if val is not None:
                 checked_values.append(val)
         return checked_values

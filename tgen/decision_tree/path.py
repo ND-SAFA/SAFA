@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from tgen.common.util.list_util import ListUtil
-from tgen.decision_tree.abstract_node import AbstractNode
+from tgen.decision_tree.nodes.abstract_node import AbstractNode
 
 
 @dataclass

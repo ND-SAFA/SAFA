@@ -1,5 +1,6 @@
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.jobs.clustering_job.clustering_job import ClusteringJob
+from tgen.jobs.contradictions_jobs.contradiction_job import ContradictionJob
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.data_jobs.create_source_splits_job import CreateSourceSplitsJob
 from tgen.jobs.data_jobs.download_repository_job import DownloadRepositoryJob
@@ -36,3 +37,4 @@ class SupportedJobType(SupportedEnum):
     DOWNLOAD_REPO = DownloadRepositoryJob
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob
     CLUSTERING = ClusteringJob
+    CONTRADICTIONS = ContradictionJob

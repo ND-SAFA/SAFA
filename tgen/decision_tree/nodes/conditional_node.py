@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from tgen.common.util.dataclass_util import required_field
-from tgen.decision_tree.abstract_node import AbstractNode
+from tgen.decision_tree.nodes.abstract_node import AbstractNode
 
 
 @dataclass

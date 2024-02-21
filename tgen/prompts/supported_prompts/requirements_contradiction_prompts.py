@@ -1,8 +1,8 @@
 from tgen.common.constants.deliminator_constants import COMMA
+from tgen.contradictions.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.requirements_contradictions.requirement import RequirementConstituent
 
 CONSTITUENT2TAG = {RequirementConstituent.CONDITION: RequirementConstituent.CONDITION.value,
                    RequirementConstituent.EFFECT: RequirementConstituent.EFFECT.value,

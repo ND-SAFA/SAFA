@@ -1,7 +1,7 @@
 import abc
 from typing import Any
 
-from tgen.decision_tree.abstract_node import AbstractNode
+from tgen.decision_tree.nodes.abstract_node import AbstractNode
 from tgen.decision_tree.path import Path
 
 
@@ -21,7 +21,7 @@ class Tree(abc.ABC):
         """
         path_taken = Path(self.starting_node)
         node = self.starting_node
-        while node.branches is not None:
+        while not node.is_leaf():
             choice = node.choose_branch(input_)
             node = path_taken.add_decision(choice)
         return path_taken

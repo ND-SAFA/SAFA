@@ -15,6 +15,7 @@ class ContradictionJob(AbstractJob):
         """
         Initializes the job to detect contradictions in requirements.
         :param dataset_creator: Creates the dataset containing the requirements.
+        :param export_dir: Where to export responses to.
         :param job_args: The arguments need for the job.
         """
         self.trace_dataset_creator = dataset_creator

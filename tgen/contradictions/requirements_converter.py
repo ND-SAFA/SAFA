@@ -25,6 +25,7 @@ class RequirementsConverter:
         """
         Responsible for converting an artifact to the expected format for requirements.
         :param llm_manager: The LLM to use for the constituent extraction from the artifact.
+        :param export_path: Where to export responses to.
         """
         self.llm_manager = llm_manager if llm_manager else get_best_default_llm_manager_short_context()
         self.export_path = export_path
@@ -56,6 +57,7 @@ class RequirementsConverter:
         """
         Creates a requirement from the LLM response.
         :param res_dict: Contains the tags mapped to their response.
+        :param req_id: The id of the requirement.
         :return:  A requirement created from the LLM response.
         """
         params = {"id": req_id}

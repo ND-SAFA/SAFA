@@ -25,6 +25,8 @@ class ContradictionsDetector:
         """
         Handles detecting contradictions in requirements.
         :param trace_dataset: Contains the requirements.
+        :param export_path: Where to export responses to.
+        :param llm_manager: The LLM manager to use to make decisions.
         """
         self.trace_dataset = trace_dataset
         self.export_path = export_path

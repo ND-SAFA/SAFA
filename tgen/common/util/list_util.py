@@ -163,3 +163,15 @@ class ListUtil:
         """
         required_length = item_index + 1 if item_index >= 0 else abs(item_index)
         return list_[item_index] if len(list_) >= required_length else default
+
+    @staticmethod
+    def are_all_items_the_same(list_: List) -> bool:
+        """
+        Checks if all items in the list are the same.
+        :param list_: The list to check.
+        :return: True if all items in the list are the same else False.
+        """
+        try:
+            return len(set(list_)) == 1
+        except TypeError:  # not hashable
+            return all([item1 == item2 for item1 in list_ for item2 in list_])

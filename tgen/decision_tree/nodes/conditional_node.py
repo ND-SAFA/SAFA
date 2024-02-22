@@ -16,4 +16,4 @@ class ConditionalNode(AbstractNode):
         :return: The choice of the next branch.
         """
         choice = self.conditional_statement(input_)
-        return choice
+        return choice 

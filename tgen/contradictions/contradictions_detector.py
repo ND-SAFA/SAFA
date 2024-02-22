@@ -28,8 +28,9 @@ class ContradictionsDetector:
         id2requirement = {req.id: req for req in requirements}
         decision_tree = ContradictionsTreeBuilder().build_tree()
         contradictions = {contradiction.value.description: [] for contradiction in SupportedContradictionDecisionNodes
-                          if contradiction.name != SupportedContradictionDecisionNodes.NONE}
-        for link in self.trace_dataset.trace_df.get_links():
+                          if contradiction != SupportedContradictionDecisionNodes.NONE}
+        links = self.trace_dataset.trace_df.get_links()
+        for link in links:
             r_id1, r_id2 = link[TraceKeys.child_label()], link[TraceKeys.parent_label()]
             req1, req2 = id2requirement[r_id1], id2requirement[r_id2]
             try:

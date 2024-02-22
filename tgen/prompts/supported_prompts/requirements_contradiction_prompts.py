@@ -20,7 +20,8 @@ CONSTITUENT2TAG = {RequirementConstituent.CONDITION: RequirementConstituent.COND
 
 CONDITIONS_PROMPT = Prompt("Conditions are sub-statements that are crucial for the occurrence of something else and "
                            "typically occur in subordinate clauses. "
-                           "For example, a condition might be 'If the threshold is reached...' "
+                           "For example, for the requirement 'If the threshold is reached, then the speed must be decreased',"
+                           "the condition would be *'If the threshold is reached'. "
                            "Identify if the requirement above has a condition. ",
                            response_manager=PromptResponseManager(
                                response_tag="condition",
@@ -28,8 +29,7 @@ CONDITIONS_PROMPT = Prompt("Conditions are sub-statements that are crucial for t
                                                             "Otherwise, proceed to the next question."))
 
 EFFECT_PROMPT = Prompt("Effects are the results of a condition being met. "
-                       "For example, if the condition were that some threshold must be reached and then the speed must be decreased. "
-                       "*The speed decreasing would be the effect* "
+                       "For example, for the previous requirement example, 'the speed must be  decreased' would be the effect."
                        "It also is possible for there to be an effect "
                        "even when a condition is not explicitly included in the requirement. "
                        "For example, 'The speed must be decreased' would still be an effect even if there was no condition provided. "
@@ -39,7 +39,7 @@ EFFECT_PROMPT = Prompt("Effects are the results of a condition being met. "
                            response_instructions_format="If it has a effect, output the effect enclosed in {}. "
                                                         "Otherwise, proceed to the next question."))
 
-VARIABLE_PROMPT = Prompt("Variables are the subjects of the condition and effect. "
+VARIABLE_PROMPT = Prompt("Variables are the *subjects* of the condition and effect. "
                          "For example, the variables of 'If the threshold is reached, "
                          "the speed of the car must be decreased' would be "
                          "'threshold' and 'speed of the car'. There is generally one variable in the condition (if it exists) "

@@ -3,12 +3,15 @@ import string
 import uuid
 from typing import List, Union, Set, Dict
 
+from nltk.corpus import stopwords
+
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD, SPACE, DASH
 from tgen.common.logging.logger_manager import logger
 
 
 class StrUtil:
     FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
+    STOP_WORDS = set(stopwords.words('english'))
 
     @staticmethod
     def get_letter_from_number(number: int, lower_case: bool = False) -> str:
@@ -210,3 +213,12 @@ class StrUtil:
         for d in deliminators:
             processed_string = SPACE.join(processed_string.split(d))
         return processed_string
+
+    @staticmethod
+    def remove_stop_words(input_string: str) -> str:
+        """
+        Removes the stop words in the string.
+        :param input_string: The string to remove stopwords from.
+        :return: The string without stop words.
+        """
+        return SPACE.join([word for word in input_string.split() if word not in StrUtil.STOP_WORDS])

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from tgen.common.util.list_util import ListUtil
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
@@ -47,10 +47,11 @@ class Path:
         self.__choices.append(choice)
         return next_selected_node
 
-    def get_final_decision(self) -> str:
+    def get_final_decision(self) -> Optional[str]:
         """
         Gets the description of the final node at the end of the path.
         :return: The description of the final node at the end of the path.
         """
         last_node = self.get_node(-1)
-        return last_node.description
+        if last_node.is_leaf():
+            return last_node.description

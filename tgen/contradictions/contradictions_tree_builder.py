@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict, Callable
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.contradictions.common_choices import CommonChoices
@@ -52,8 +53,10 @@ class ContradictionsTreeBuilder:
         :param kwargs: Any additional arguments for getting the variable value from the requirement.
         :return: Format variables for the prompt in a dictionary mapping variable name to its value.
         """
-        return {ContradictionsTreeBuilder._create_format_variable_name(variable_base_name, i):
-                    getattr(requirements[i], f"get_{variable_base_name}")(**kwargs) for i in range(len(requirements))}
+        prompt_vars = {ContradictionsTreeBuilder._create_format_variable_name(variable_base_name, i):
+                           getattr(requirements[i], f"get_{variable_base_name}")(**kwargs) for i in range(len(requirements))}
+        prompt_vars = {k: (v if v else EMPTY_STRING) for k, v in prompt_vars.items()}
+        return prompt_vars
 
     def _compare_vars(self, question_num: int) -> LLMNode:
         """

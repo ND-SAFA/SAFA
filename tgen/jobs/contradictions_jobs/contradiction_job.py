@@ -29,7 +29,7 @@ class ContradictionJob(AbstractJob):
         """
         dataset = self.trace_dataset_creator.create()
         detector = ContradictionsDetector(dataset, export_path=self.export_dir)
-        contradictions = detector.detect()
+        contradictions = detector.detect_all()
         predicted_contradictions = {link_id for c, link_ids in contradictions.items() for link_id in link_ids}
         predictions = [DictUtil.update_kwarg_values(dataset.trace_df.get_link(link_id), score=int(link_id in predicted_contradictions))
                        for link_id in dataset.trace_df.index]

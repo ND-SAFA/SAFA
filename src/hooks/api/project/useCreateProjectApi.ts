@@ -126,6 +126,8 @@ export const useCreateProjectApi = defineStore(
       const repositoryName = integrationsStore.gitHubProject?.name;
       const owner = integrationsStore.gitHubProject?.owner;
 
+      console.log({ repositoryName, owner });
+
       if (!repositoryName || !owner) return;
 
       await createProjectApi.handleRequest(

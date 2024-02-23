@@ -7,20 +7,46 @@
       label="GitHub Organization"
       :options="gitHubApiStore.organizationList"
       :loading="gitHubApiStore.loading"
-      hint="Required"
+      hint="Required. You can also type in a public organization and click 'Enter'."
       class="full-width q-mb-sm"
       option-label="name"
       data-cy="input-github-organization"
+      use-input
+      clearable
+      new-value-mode="add-unique"
+      @new-value="
+        (val) =>
+          (integrationsStore.gitHubOrganization = {
+            name: val || '',
+            id: val || '',
+          })
+      "
     />
     <select-input
       v-if="!!integrationsStore.gitHubOrganization"
       v-model="integrationsStore.gitHubProject"
       label="GitHub Repository"
       :options="projects"
-      hint="Required"
+      hint="Required. You can also type in a public repository and click 'Enter'."
       class="full-width q-mb-sm"
       option-label="name"
       data-cy="input-github-project"
+      use-input
+      clearable
+      new-value-mode="add-unique"
+      @new-value="
+        (val) =>
+          (integrationsStore.gitHubProject = {
+            name: val || '',
+            id: val || '',
+            description: '',
+            size: 0,
+            owner: integrationsStore.gitHubOrganization?.name || '',
+            branches: [],
+            defaultBranch: '',
+            creationDate: '',
+          })
+      "
     />
 
     <flex-box v-if="!!projectName" column t="1">
@@ -30,6 +56,9 @@
         :options="branches"
         class="full-width q-mb-sm"
         hint="The branch to import files from, using the default branch if not specified."
+        use-input
+        clearable
+        new-value-mode="add-unique"
       />
       <multiselect-input
         v-model="filePaths"

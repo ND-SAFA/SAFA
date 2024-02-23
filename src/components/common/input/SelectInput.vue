@@ -10,6 +10,7 @@
     :option-label="props.optionLabel"
     :map-options="props.optionToValue"
     :emit-value="props.optionToValue"
+    @new-value="emit('new-value', $event)"
   >
     <template #prepend>
       <slot name="prepend" />
@@ -29,11 +30,13 @@ export default {
 <script setup lang="ts">
 import { SelectInputProps } from "@/types";
 import { useVModel } from "@/hooks";
+import { SelectInput } from "@/components";
 
 const props = defineProps<SelectInputProps>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "update:modelValue", value: string | null): void;
+  (e: "new-value", value: string | null): void;
 }>();
 
 const model = useVModel(props, "modelValue");

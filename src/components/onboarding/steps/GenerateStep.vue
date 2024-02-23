@@ -147,7 +147,9 @@ const cents = computed(() =>
   onboardingStore.cost ? Math.floor(onboardingStore.cost.price % 100) : 0
 );
 const generateCost = computed(() =>
-  onboardingStore.cost ? `$${dollars.value}.${cents.value}` : ""
+  onboardingStore.cost
+    ? `$${dollars.value}.${cents.value} (80% Early Access Discount)`
+    : ""
 );
 
 const generateLabel = computed(() =>

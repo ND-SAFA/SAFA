@@ -30,7 +30,6 @@ export default {
 <script setup lang="ts">
 import { SelectInputProps } from "@/types";
 import { useVModel } from "@/hooks";
-import { SelectInput } from "@/components";
 
 const props = defineProps<SelectInputProps>();
 

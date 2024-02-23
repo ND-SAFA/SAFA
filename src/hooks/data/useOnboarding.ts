@@ -158,7 +158,11 @@ export const useOnboarding = defineStore("useOnboarding", {
         // Skip to the Summarize step if a job has been uploaded, or a project has been stored.
         await this.handleNextStep("code");
       }
-      if (this.projectId) {
+      if (
+        this.projectId &&
+        ((this.isUploadJob && this.uploadedJob?.status === "COMPLETED") ||
+          this.isGenerationJob)
+      ) {
         // Skip to the Generate step if a job has been completed.
         await this.handleNextStep("summarize");
       }

@@ -144,7 +144,9 @@ const dollars = computed(() =>
   onboardingStore.cost ? Math.floor(onboardingStore.cost.price / 100) : 0
 );
 const cents = computed(() =>
-  onboardingStore.cost ? Math.floor(onboardingStore.cost.price % 100) : 0
+  onboardingStore.cost
+    ? String(Math.floor(onboardingStore.cost.price % 100)).padStart(2, "0")
+    : "00"
 );
 const generateCost = computed(() =>
   onboardingStore.cost

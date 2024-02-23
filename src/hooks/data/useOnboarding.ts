@@ -99,13 +99,6 @@ export const useOnboarding = defineStore("useOnboarding", {
     displayBilling(): boolean {
       const credits = this.cost?.credits;
 
-      console.log({
-        automaticBilling: orgStore.automaticBilling,
-        paymentConfirmed: this.paymentConfirmed,
-        credits: credits,
-        monthlyRemainingCredits: orgStore.org.billing.monthlyRemainingCredits,
-      });
-
       return (
         !orgStore.automaticBilling &&
         !this.paymentConfirmed &&

@@ -58,6 +58,12 @@
       <template #actions>
         <text-button
           text
+          icon="graph-refresh"
+          label="Reload Logs"
+          @click="jobApiStore.handleViewLogs(jobStore.selectedJob!)"
+        />
+        <text-button
+          text
           icon="download"
           label="Download Logs"
           @click="jobApiStore.handleDownloadLogs"

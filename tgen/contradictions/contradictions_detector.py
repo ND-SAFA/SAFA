@@ -11,7 +11,7 @@ from tgen.contradictions.requirement import Requirement
 from tgen.contradictions.requirements_converter import RequirementsConverter
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
-from tgen.data.keys.structure_keys import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
@@ -78,20 +78,20 @@ class ContradictionsDetector:
         return contradictions
 
     @staticmethod
-    def detect_single_pair(artifact1: Artifact, artifact2: Artifact) -> str:
+    def detect_single_pair(artifact1: Artifact, artifact2: Artifact) -> Path:
         """
         Runs the detection for a single pair of artifacts..
         :param artifact1: The first artifact.
         :param artifact2: The second artifact.
-        :return: The decision on whether there is a contradiction between the artifacts.
+        :return: The path taken when traversing the tree.
         """
         id2requirement = ContradictionsDetector.create_requirements([artifact1, artifact2])
         if DictUtil.get_value_by_index(id2requirement) is None:
             raise Exception("Failed to convert artifact to requirement - bad response.")
-        link = Trace(source=artifact1, target=artifact2)
+        link = Trace(source=artifact1[ArtifactKeys.ID], target=artifact2[ArtifactKeys.ID])
         input_ = ContradictionsDetector._create_input_for_tree(link, id2requirement)
         path = ContradictionsDetector.TREE.traverse(input_)
-        return path.get_final_decision()
+        return path
 
     @staticmethod
     def create_requirements(artifacts: List[Artifact], export_path: str = None) -> Dict[int, Requirement]:

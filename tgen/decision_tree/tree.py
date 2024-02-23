@@ -58,5 +58,6 @@ class Tree(abc.ABC):
         :return: The next node to take.
         """
         choice = current_node.choose_branch(input_)
-        current_node = path_taken.add_decision(choice)
+        if choice:
+            current_node = path_taken.add_decision(choice)
         return current_node

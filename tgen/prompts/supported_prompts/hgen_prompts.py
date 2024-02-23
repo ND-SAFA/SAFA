@@ -4,7 +4,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.conditional_prompt import ConditionalPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
+from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
@@ -16,14 +16,14 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} f
                                      "to create the {target_type}. Output the minimal set of questions in a new-line "
                                      "delimited list containing at most 10 items. ",
                                      PromptResponseManager(response_tag="questions",
-                                                           required_tag_ids=REQUIRE_ALL_TAGS,
+                                                           required_tag_ids=USE_ALL_TAGS,
                                                            ))
 
 DEFINITION_PROMPT = QuestionPrompt(
     "First, write a brief description of what a {target_type} is in a software development project. "
     "Focus on what differentiates this artifact from other similar software artifacts. ",
     response_manager=PromptResponseManager(response_tag="description",
-                                           required_tag_ids=REQUIRE_ALL_TAGS,
+                                           required_tag_ids=USE_ALL_TAGS,
                                            value_formatter=lambda tag, val:
                                            PromptUtil.strip_new_lines_and_extra_space(val)))
 EXAMPLE_PROMPT = QuestionPrompt(
@@ -37,7 +37,7 @@ FORMAT_PROMPT = QuestionPrompt(
     "The template should be generalizable so it can apply to any software project and should exclude any numbering system. "
     "Include only the format. ",
     response_manager=PromptResponseManager(response_tag="format",
-                                           required_tag_ids=REQUIRE_ALL_TAGS,
+                                           required_tag_ids=USE_ALL_TAGS,
                                            value_formatter=lambda tag, val:
                                            PromptUtil.strip_new_lines_and_extra_space(val)))
 
@@ -194,5 +194,5 @@ TITLE_PROMPT = Prompt("Create a title for the {target_type} "
                       "Try to use as much language directly from the {target_type} as possible "
                       "and keep the number of words to 5 or less PRINCIPAL words. "
                       "\nExample: Category Filtering for Product Discovery \n",
-                      PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS)
+                      PromptResponseManager(response_tag="title", required_tag_ids=USE_ALL_TAGS)
                       )

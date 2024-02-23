@@ -33,7 +33,7 @@ class LLMNode(AbstractNode):
                                       instructions="Answer with one of the following responses: ",
                                       response_format="Enclose your answer in {}",
                                       response_tag=RESPONSE_TAG,
-                                      loose_response_validation=True, )
+                                      loose_response_validation=True)
         prompt.id = PROMPT_ID
         prompt.format_value(**input_variables)
         builder = PromptBuilder([prompt])
@@ -60,4 +60,4 @@ class LLMNode(AbstractNode):
         :return: The model's choice from the parsed response.
         """
         res = parsed_res[PROMPT_ID][RESPONSE_TAG]
-        return res[0] if len(res) > 0 else "no"  # TODO handle this case better
+        return res[0] if len(res) > 0 else None

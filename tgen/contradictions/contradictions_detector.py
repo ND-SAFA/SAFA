@@ -1,8 +1,9 @@
-from typing import Dict, List, Tuple, Set
+from typing import Dict, List, Tuple, Set, Optional
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
 from tgen.contradictions.contradictions_tree_builder import ContradictionsTreeBuilder
@@ -53,11 +54,16 @@ class ContradictionsDetector:
                 link_id = link[TraceKeys.LINK_ID]
                 if link_id in links_with_decisions:
                     continue
+
                 current_path = link2path.get(link_id)
                 last_choice = next(choices, None)
                 if last_choice:
                     current_path.add_decision(last_choice)
                 input_ = self._create_input_for_tree(link, id2requirement)
+                if not input_:
+                    links_with_decisions.add(link_id)
+                    continue
+
                 prompt_builder, path = self.TREE.next_step(input_, current_path)
                 link2path[link_id] = path
 
@@ -80,6 +86,8 @@ class ContradictionsDetector:
         :return: The decision on whether there is a contradiction between the artifacts.
         """
         id2requirement = ContradictionsDetector.create_requirements([artifact1, artifact2])
+        if DictUtil.get_value_by_index(id2requirement) is None:
+            raise Exception("Failed to convert artifact to requirement - bad response.")
         link = Trace(source=artifact1, target=artifact2)
         input_ = ContradictionsDetector._create_input_for_tree(link, id2requirement)
         path = ContradictionsDetector.TREE.traverse(input_)
@@ -98,7 +106,7 @@ class ContradictionsDetector:
         return id2requirement
 
     @staticmethod
-    def _create_input_for_tree(link: EnumDict, id2requirement: Dict[int, Requirement]) -> Tuple[Requirement, Requirement]:
+    def _create_input_for_tree(link: EnumDict, id2requirement: Dict[int, Requirement]) -> Optional[Tuple[Requirement, Requirement]]:
         """
         Creates the input for the decision tree.
         :param link: The current link to be examined.
@@ -107,6 +115,8 @@ class ContradictionsDetector:
         """
         r_id1, r_id2 = link[TraceKeys.child_label()], link[TraceKeys.parent_label()]
         req1, req2 = id2requirement[r_id1], id2requirement[r_id2]
+        if req1.is_empty() or req2.is_empty():
+            return
         input_ = (req1, req2)
         return input_
 

@@ -1,6 +1,7 @@
 from typing import List, Dict, Any
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -68,7 +69,10 @@ class RequirementsConverter:
                                              for sub_constituent, t in tag.items()}
             else:
                 params[constituent.value] = RequirementsConverter._get_res_value(res_dict, tag)
-        return Requirement(**params)
+        requirement = Requirement(**params)
+        if requirement.is_empty():
+            logger.error(f"!!Failed to convert artifact to requirement {req_id} - bad response!!")
+        return requirement
 
     @staticmethod
     def _get_res_value(res_dict: Dict, value_tag: str) -> Any:

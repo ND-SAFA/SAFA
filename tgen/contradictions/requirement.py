@@ -33,7 +33,7 @@ class Requirement:
         """
         return self.effect
 
-    def get_variable(self, constituent: RequirementConstituent, return_first: bool = True) -> Union[str, List]:
+    def get_variable(self, constituent: RequirementConstituent = None, return_first: bool = True) -> Union[str, List]:
         """
         Gets the variable of the constituent in the requirement.
         :param constituent: The constituent in the requirement to get the variable from.
@@ -42,7 +42,7 @@ class Requirement:
         """
         return self._get_component_of_constituent(self.variable, constituent, return_first)
 
-    def get_action(self, constituent: RequirementConstituent, return_first: bool = True) -> Union[str, List]:
+    def get_action(self, constituent: RequirementConstituent = None, return_first: bool = True) -> Union[str, List]:
         """
         Gets the action of the constituent in the requirement.
         :param constituent: The constituent in the requirement to get the action from.
@@ -51,8 +51,16 @@ class Requirement:
         """
         return self._get_component_of_constituent(self.action, constituent, return_first)
 
+    def is_empty(self) -> bool:
+        """
+        Returns True if the requirement does not contain a condition or an effect.
+        :return: True if the requirement does not contain a condition or an effect.
+        """
+        return not self.get_condition() and not self.get_effect()
+
     @staticmethod
-    def _get_component_of_constituent(component_dict: Dict[RequirementConstituent, List], constituent: RequirementConstituent,
+    def _get_component_of_constituent(component_dict: Dict[RequirementConstituent, List],
+                                      constituent: RequirementConstituent = None,
                                       return_first: bool = True) -> Union[str, List[str], None]:
         """
         Gets the component of the constituent in the requirement.
@@ -61,6 +69,10 @@ class Requirement:
         :param return_first: If True, returns the first action if there is multiple for a given constituent.
         :return: The component of the constituent in the requirement.
         """
+        if not constituent:
+            components = [Requirement._get_component_of_constituent(component_dict, RequirementConstituent.CONDITION),
+                          Requirement._get_component_of_constituent(component_dict, RequirementConstituent.EFFECT)]
+            return [c for c in components if c is not None]
         component = component_dict.get(constituent)
         if not component:
             return

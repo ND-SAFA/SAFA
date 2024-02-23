@@ -1,7 +1,7 @@
 from tgen.common.constants.deliminator_constants import COMMA
 from tgen.contradictions.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
 CONSTITUENT2TAG = {RequirementConstituent.CONDITION: RequirementConstituent.CONDITION.value,
@@ -24,7 +24,8 @@ CONDITIONS_PROMPT = Prompt("Conditions are sub-statements that are crucial for t
                            "the condition would be *'If the threshold is reached'. "
                            "Identify if the requirement above has a condition. ",
                            response_manager=PromptResponseManager(
-                               response_tag="condition",
+                               response_tag=CONSTITUENT2TAG[RequirementConstituent.CONDITION],
+                               optional_tag_ids=USE_ALL_TAGS,
                                response_instructions_format="If it has a condition, output the condition enclosed in {}. "
                                                             "Otherwise, proceed to the next question."))
 
@@ -35,7 +36,8 @@ EFFECT_PROMPT = Prompt("Effects are the results of a condition being met. "
                        "For example, 'The speed must be decreased' would still be an effect even if there was no condition provided. "
                        "Identify if the requirement above has a effect.",
                        response_manager=PromptResponseManager(
-                           response_tag="effect",
+                           response_tag=CONSTITUENT2TAG[RequirementConstituent.EFFECT],
+                           optional_tag_ids=USE_ALL_TAGS,
                            response_instructions_format="If it has a effect, output the effect enclosed in {}. "
                                                         "Otherwise, proceed to the next question."))
 
@@ -47,7 +49,9 @@ VARIABLE_PROMPT = Prompt("Variables are the *subjects* of the condition and effe
                          "Identify any variables in the requirement. ",
                          response_manager=PromptResponseManager(
                              value_formatter=lambda tag, val: val.split(COMMA),
-                             response_tag=["condition-variable", "effect-variable"],
+                             response_tag=[CONSTITUENT2TAG[RequirementConstituent.VARIABLE][RequirementConstituent.CONDITION],
+                                           CONSTITUENT2TAG[RequirementConstituent.VARIABLE][RequirementConstituent.EFFECT]],
+                             optional_tag_ids=USE_ALL_TAGS,
                              response_instructions_format="If there is a condition with a variable, enclose it in {}. "
                                                           "If there is an effect with a variable, enclose it in {}. "))
 
@@ -56,7 +60,9 @@ ACTION_PROMPT = Prompt("Actions are what happens to the variables.  "
                        "'is reached' and 'must be decreased'"
                        "Identify any actions in the requirement.",
                        response_manager=PromptResponseManager(
-                           response_tag=["condition-action", "effect-action"],
+                           response_tag=[CONSTITUENT2TAG[RequirementConstituent.ACTION][RequirementConstituent.CONDITION],
+                                         CONSTITUENT2TAG[RequirementConstituent.ACTION][RequirementConstituent.EFFECT]],
+                           optional_tag_ids=USE_ALL_TAGS,
                            value_formatter=lambda tag, val: val.split(COMMA),
                            response_instructions_format="If there is a condition with an action, enclose it in {}. "
                                                         "If there is an effect with an action, enclose it in {}. "))

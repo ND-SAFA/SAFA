@@ -125,8 +125,10 @@ class MultiPrompt(Prompt):
         if response_manager and not isinstance(response_manager.response_tag, dict):
             all_tags = self.get_all_response_tags()
             if len(all_tags) > 0 and response_manager.response_tag != all_tags:
+                required_tag_ids = {req_tag for prompt in self.child_prompts for req_tag in prompt.response_manager.required_tag_ids}
+                optional_tag_ids = {opt_tag for prompt in self.child_prompts for opt_tag in prompt.response_manager.optional_tag_ids}
                 params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags}
-                if response_manager.response_tag else all_tags)
+                if response_manager.response_tag else all_tags, required_tag_ids=required_tag_ids, optional_tag_ids=optional_tag_ids)
                 response_manager = PromptResponseManager(**params)
         return response_manager
 

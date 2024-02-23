@@ -203,6 +203,7 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (currentStep === "connect") {
+        integrationsStore.validGitHubCredentials = true;
         await gitHubApiStore.handleLoadProjects();
       }
 

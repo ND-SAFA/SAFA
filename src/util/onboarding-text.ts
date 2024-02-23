@@ -18,7 +18,7 @@ export const ONBOARDING_GITHUB_SECURITY = `
 
 export const ONBOARDING_REPO_SELECT = `
   Select which repository you want to import below.
-  Include the main branch and file path to your code
+  After selecting, include the main branch and file path to your code
   to ensure that SAFA is applied to the correct data.
 `;
 

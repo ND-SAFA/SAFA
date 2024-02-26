@@ -41,7 +41,6 @@ export default {
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
-import { ONBOARDING_MEET_LINK } from "@/util";
 import { onboardingStore, permissionStore, sessionApiStore } from "@/hooks";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";

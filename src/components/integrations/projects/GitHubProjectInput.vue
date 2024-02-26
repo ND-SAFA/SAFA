@@ -71,11 +71,12 @@
     </flex-box>
 
     <expansion-item
-      v-if="!!integrationsStore.gitHubProject && !props.minimal"
+      v-if="!!integrationsStore.gitHubProject"
       label="Advanced Configuration"
     >
       <flex-box v-if="!!projectName" column t="1">
         <text-input
+          v-if="!props.minimal"
           v-model="artifactType"
           label="Artifact Type"
           class="full-width q-mb-sm"

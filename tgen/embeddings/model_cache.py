@@ -17,10 +17,11 @@ class ModelCache:
         :return: The model.
         """
         if model_name in ModelCache.MODEL_MAP:
+            logger.info(f"Loading cached model: {model_name}")
             return ModelCache.MODEL_MAP[model_name]
         else:
             cache_dir = ModelCache.get_cache_dir()
-            logger.info(f"Loading model {model_name} from {cache_dir}")
+            logger.info(f"Creating model {model_name} in cache.")
             model = SentenceTransformer(model_name, cache_folder=cache_dir)
             ModelCache.MODEL_MAP[model_name] = model
             return model
@@ -41,4 +42,5 @@ class ModelCache:
         Creates the current model map.
         :return: None
         """
+        logger.info("Clearing model cache.")
         ModelCache.MODEL_MAP = {}

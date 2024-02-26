@@ -224,7 +224,10 @@ export const useOnboarding = defineStore("useOnboarding", {
      * @param error - Whether the call was scheduled because of an error.
      */
     handleScheduleCall(error: boolean): void {
-      window.open(error ? ONBOARDING_SUPPORT_LINK : ONBOARDING_MEET_LINK);
+      window.open(
+        error ? ONBOARDING_SUPPORT_LINK : ONBOARDING_MEET_LINK,
+        "_blank"
+      );
     },
     /** Import from GitHub and summarize project files. */
     async handleImportProject(): Promise<void> {

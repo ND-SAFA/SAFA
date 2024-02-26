@@ -27,7 +27,7 @@ class TestRankingUtil(BaseTest):
         Be able to select the top predictions for each child
         """
         predictions = EntryCreator.create_trace_predictions(3, 1, [0.75, 0.8, 0.95])
-        selected_predictions = RankingUtil.select_predictions(predictions, 0.9, 0.7, 0.4)
+        selected_predictions = RankingUtil.select_predictions_by_thresholds(predictions, 0.9, 0.7, 0.4)
         self.assertEqual(1, len(selected_predictions))
         prediction = selected_predictions[0]
         self.assertEqual("p2", prediction[TraceKeys.TARGET.value])

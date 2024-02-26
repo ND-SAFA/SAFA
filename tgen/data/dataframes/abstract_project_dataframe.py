@@ -100,10 +100,11 @@ class AbstractProjectDataFrame(pd.DataFrame):
                 self.loc[index] = [row_as_dict.get(col, None) for col in self.get_all_column_names() if col in self.columns]
         return self.get_row(index)
 
-    def get_row(self, index: Any) -> EnumDict:
+    def get_row(self, index: Any, throw_exception: bool = False) -> EnumDict:
         """
         Gets the row of the dataframe with the given index
         :param index: The index of the row to get
+        :param throw_exception: If True, throws exception if item is missing.
         :return: The row as a dictionary if index is found else None
         """
         try:
@@ -112,6 +113,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
             if self.index_name():
                 row_as_dict[self.index_name()] = index
         except KeyError as e:  # index not in dataframe
+            if throw_exception:
+                raise KeyError(f"{index} not found in {self.__class__.__name__}")
             row_as_dict = None
         return row_as_dict
 
@@ -271,6 +274,15 @@ class AbstractProjectDataFrame(pd.DataFrame):
          """
         for id_, val in zip(ids2update, new_values):
             self.update_value(column2update, id_, val)
+
+    def update_index(self, new_ids: List[Any]) -> "AbstractProjectDataFrame":
+        """
+        Updates the indices of the data frame to the new values.
+        :param new_ids: The new ids to set on the index.
+        :return: DataFrame of base class.
+        """
+        new_df = self.reindex(new_ids)
+        return self.__class__(new_df)
 
     def drop_nan_indices(self) -> pd.DataFrame:
         """

@@ -90,13 +90,15 @@ class PromptUtil:
         return f"{TAB * level}{bullets[level % 3]} {original_string}"
 
     @staticmethod
-    def indent_for_markdown(original_string: str) -> str:
+    def indent_for_markdown(original_string: str, level: int = 1) -> str:
         """
         Formats the string as indented in markdown
         :param original_string: The string to format
+        :param level: The indentation level.
         :return: The string indented as markdown
         """
-        return f"    {original_string}"
+        markdown_tab = "    "
+        return f"{level * markdown_tab}{original_string}"
 
     @staticmethod
     def markdown_divider() -> str:

@@ -22,7 +22,7 @@ class GenerateExplanationsForLinksStep(AbstractPipelineStep[HGenArgs, HGenState]
         :return: None
         """
 
-        if not args.generate_trace_links or not args.generate_explanations:
+        if not args.generate_explanations:
             return
 
         export_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), "explanations")

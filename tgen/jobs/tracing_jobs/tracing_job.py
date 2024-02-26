@@ -85,7 +85,7 @@ class TracingJob(AbstractJob):
                                                                               original_entries=target_entries)
             predicted_entries.extend(target_predicted_entries)
         if self.select_top_predictions:
-            predicted_entries = RankingUtil.select_predictions(predicted_entries)
+            predicted_entries = RankingUtil.select_predictions_by_thresholds(predicted_entries)
         RankingUtil.evaluate_trace_predictions(dataset.trace_df, predicted_entries)
 
         return TracePredictionOutput(prediction_entries=predicted_entries)

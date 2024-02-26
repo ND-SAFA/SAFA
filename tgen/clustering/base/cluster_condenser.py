@@ -1,13 +1,15 @@
+from collections import Counter
 from typing import List, Optional, Set
 
 import numpy as np
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
-from tgen.common.constants.clustering_constants import DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, DEFAULT_CLUSTER_MIN_VOTES, \
-    DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, DEFAULT_MIN_CLUSTER_SIZE, \
-    MIN_PAIRWISE_AVG_PERCENTILE, \
-    MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
+from tgen.common.constants.clustering_constants import DEFAULT_ALLOW_OVERLAPPING_CLUSTERS, DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, \
+    DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, \
+    DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_SORT_METRIC, MIN_PAIRWISE_AVG_PERCENTILE, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING, \
+    MIN_CLUSTER_SIM_TO_MERGE, MIN_ARTIFACT_SIM_TO_MERGE
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 
@@ -21,7 +23,9 @@ class ClusterCondenser:
                  threshold=DEFAULT_CLUSTER_SIMILARITY_THRESHOLD,
                  min_cluster_size: int = DEFAULT_MIN_CLUSTER_SIZE,
                  max_cluster_size: int = DEFAULT_MAX_CLUSTER_SIZE,
-                 filter_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS):
+                 filter_cohesiveness: bool = DEFAULT_FILTER_BY_COHESIVENESS,
+                 sort_metric: str = DEFAULT_SORT_METRIC,
+                 allow_overlapping_clusters: bool = DEFAULT_ALLOW_OVERLAPPING_CLUSTERS):
         """
         Creates map with similarity threshold.
         :param embeddings_manager: Manages embeddings used to calculate distances between artifacts and clusters.
@@ -29,6 +33,8 @@ class ClusterCondenser:
         :param min_cluster_size: The minimum size of a cluster.
         :param max_cluster_size: The maximum size of a cluster.
         :param filter_cohesiveness: If True, first filters the clusters by their cohesiveness.
+        :param sort_metric: The metric to prioritize clusters by.
+        :param allow_overlapping_clusters: If True, artifacts may exist in multiple clusters.
         """
         self.embeddings_manager = embeddings_manager
         self.cluster_map = {}
@@ -37,6 +43,8 @@ class ClusterCondenser:
         self.min_cluster_size = min_cluster_size
         self.max_cluster_size = max_cluster_size
         self.filter_cohesiveness = filter_cohesiveness
+        self.sort_metric = sort_metric
+        self.allow_overlapping_clusters = allow_overlapping_clusters
 
     def get_clusters(self, min_votes: int = DEFAULT_CLUSTER_MIN_VOTES) -> ClusterMapType:
         """
@@ -55,56 +63,35 @@ class ClusterCondenser:
         :param clusters: List of clusters to add.
         :return: None
         """
-        clusters = self.cohesiveness_filter(clusters)
+        filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
+        min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
+        clusters = self.filter_and_prioritize_clusters(filtered_clusters, min_pairwise_avg)
         for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
-            self.add(c)
+            self._add_cluster(c, min_pairwise_avg)
 
-    def add(self, cluster: Cluster) -> Optional[ClusterType]:
-        """
-        Adds single cluster to the map.
-        :param cluster: The cluster to add.
-        :return: Cluster if added, None if cluster is duplicate.
-        """
-        should_add = self.should_add(cluster)
-        if not should_add:
-            return
-        cluster_id = self.__get_next_cluster_id()
-        self.cluster_map[cluster_id] = cluster
-        for a in cluster.artifact_ids:
-            self.seen_artifacts.add(a)
-        return cluster
-
-    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster):
-        """
-        Adds the artifacts of the new cluster to the source. Source is updated after being modified.
-        :param source_cluster: The existing cluster to add new cluster to.
-        :param new_cluster: The cluster whose add to source.
-        :return: None. Updates are done in place.
-        """
-        artifacts_to_add = []
-        for a_id in new_cluster.artifact_id_set:
-            if a_id in source_cluster:
-                continue
-            similarity = source_cluster.similarity_to_neighbors(a_id)
-            if similarity >= 0.8:
-                artifacts_to_add.append(a_id)
-                self.seen_artifacts.add(a_id)
-        source_cluster.add_artifacts(artifacts_to_add)
-
-    def should_add(self, cluster: Cluster) -> bool:
+    def should_add(self, cluster: Cluster, min_pairwise_avg: float = None) -> bool:
         """
         Processes cluster and determines if we should add it to the set.
         :param cluster: The candidate cluster to add.
+        :param min_pairwise_avg: Minimal acceptable pairwise average for clusters.
         :return: Whether cluster should be added to map.
         """
-        contains_new_artifacts = self.contains_new_artifacts(cluster)
-        contains_cluster = self.contains_cluster(cluster, add_votes=True)
+        cluster.remove_outliers()
+        contains_cluster = self.contains_cluster(cluster)
         did_merge = self.try_merge(cluster)
+        if not self.allow_overlapping_clusters:
+            overlapping_artifacts = [a for a in cluster if a in self.seen_artifacts]
+            if len(cluster) - len(overlapping_artifacts) < self.min_cluster_size:
+                return False
+            cluster.remove_artifacts(overlapping_artifacts, update_stats=True)
+            if min_pairwise_avg and cluster.avg_pairwise_sim < min_pairwise_avg:
+                return False
+        contains_new_artifacts = self.contains_new_artifacts(cluster)
         if len(cluster) == 1 and not contains_new_artifacts:
             return False
         return (contains_new_artifacts or not contains_cluster) and not did_merge
 
-    def try_merge(self, cluster: Cluster, min_similarity_score: float = 0.85):
+    def try_merge(self, cluster: Cluster, min_similarity_score: float = MIN_CLUSTER_SIM_TO_MERGE):
         """
         Tries to merge cluster into those similar enough to it.
         :param cluster: The cluster to try to merge.
@@ -112,16 +99,42 @@ class ClusterCondenser:
         :return: Whether the cluster was merged into any others.
         """
         clusters = list(self.cluster_map.values())
-        clusters_to_merge_into: List[Cluster] = [c for c in clusters if cluster.similarity_to(c) >= min_similarity_score]
-        for source_cluster in clusters_to_merge_into:
-            self.merge_clusters(source_cluster, cluster)
-        return len(clusters_to_merge_into) > 0
+        clusters_to_merge_into: List[Cluster] = sorted(clusters, reverse=True, key=lambda c: cluster.similarity_to(c))
+        most_similar_cluster = clusters_to_merge_into[0] if len(clusters_to_merge_into) > 0 else None
+        if most_similar_cluster and cluster.similarity_to(most_similar_cluster) > min_similarity_score:
+            removed_artifacts = most_similar_cluster.artifact_id_set.difference(cluster.artifact_id_set)
+            added_artifacts = cluster.artifact_id_set.difference(most_similar_cluster.artifact_id_set)
+            if not (len(removed_artifacts) and len(added_artifacts)):
+                return True  # cluster already exists
+            if not removed_artifacts:
+                added_artifacts = self.merge_clusters(most_similar_cluster, cluster)
+                return len(added_artifacts) > 0
+        return False
 
-    def contains_cluster(self, other_cluster: ClusterType, add_votes: bool = False) -> bool:
+    def merge_clusters(self, source_cluster: Cluster, new_cluster: Cluster,
+                       min_similarity_score: float = MIN_ARTIFACT_SIM_TO_MERGE) -> List[str]:
+        """
+        Adds the artifacts of the new cluster to the source. Source is updated after being modified.
+        :param source_cluster: The existing cluster to add new cluster to.
+        :param new_cluster: The cluster whose add to source.
+        :param min_similarity_score: The minimum score for a cluster to be deemed similar enough to another to merge them.
+        :return: None. Updates are done in place.
+        """
+        artifacts_to_add = []
+        for a_id in new_cluster.artifact_id_set:
+            if a_id in source_cluster:
+                continue
+            similarity = source_cluster.similarity_to_neighbors(a_id)
+            if similarity >= min_similarity_score:
+                artifacts_to_add.append(a_id)
+                self.seen_artifacts.add(a_id)
+        source_cluster.add_artifacts(artifacts_to_add)
+        return artifacts_to_add
+
+    def contains_cluster(self, other_cluster: ClusterType) -> bool:
         """
         Calculated whether given cluster is contained within current map.
         :param other_cluster: The cluster to evaluate if contained.
-        :param add_votes: Whether to add votes to the clusters where collision is seen.
         :return: True if cluster in map, false otherwise.
         """
         is_hit = False
@@ -130,8 +143,6 @@ class ClusterCondenser:
             similarity_to_cluster = self.calculate_intersection(source_cluster.artifact_id_set, other_cluster.artifact_id_set)
             if similarity_to_cluster >= self.threshold:
                 is_hit = True
-                if add_votes:
-                    source_cluster.add_vote()
             cluster_similarities[source_cluster] = similarity_to_cluster
         return is_hit
 
@@ -168,26 +179,72 @@ class ClusterCondenser:
             self.seen_artifacts.add(a)
         new_cluster.votes += old_cluster.votes
 
-    def cohesiveness_filter(self, clusters: List[Cluster]):
+    def filter_and_prioritize_clusters(self, clusters: List[Cluster], min_pairwise_avg: float = None):
         """
         Filters clusters by their cohesiveness relative to the average cohesiveness of all clusters.
         :param clusters: The clusters to filter.
+        :param min_pairwise_avg: The minimum acceptable pairwise average for clusters.
         :return: List of filtered clusters.
         """
-        filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
-        min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
+        self.vote_for_clusters(clusters)
+
         if min_pairwise_avg is not None:
             if self.filter_cohesiveness:
-                filtered_clusters = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, filtered_clusters))
-            clusters = list(sorted(filtered_clusters, key=lambda v: v.size_weighted_sim if v.size_weighted_sim else 0, reverse=True))
+                clusters: List[Cluster] = list(filter(lambda c: c.avg_pairwise_sim >= min_pairwise_avg, clusters))
+
+        clusters = list(sorted(clusters,
+                               key=lambda c: c.calculate_importance(self.sort_metric), reverse=True))
+        debugging = [cluster.get_content_of_artifacts_in_cluster() for cluster in clusters]
         return clusters
 
-    def __get_next_cluster_id(self) -> int:
+    def remove_duplicate_artifacts(self) -> None:
         """
-        Gets the id of the next new cluster.
-        :return: Next available index.
+        Ensures that there are no duplicated artifacts between clusters.
+        :return: None
         """
-        return len(self.cluster_map)
+        artifact2cluster = {}
+        for cluster_id, cluster in self.cluster_map.items():
+            for a_id in cluster.artifact_id_set:
+                art_cluster_relationship = (cluster_id, cluster.calculate_avg_pairwise_sim_for_artifact(a_id))
+                DictUtil.set_or_append_item(artifact2cluster, a_id, art_cluster_relationship)
+        for a_id, cluster_relationship in artifact2cluster.items():
+            if len(cluster_relationship) == 1:
+                continue
+            sorted_cluster_ids = ListUtil.unzip(sorted(cluster_relationship, key=lambda item: item[1]), 0)
+            for cluster_id in sorted_cluster_ids[1:]:  # remove from all but the top cluster
+                self.cluster_map[cluster_id].remove_artifacts([a_id])
+
+    def _add_cluster(self, cluster: Cluster, min_pairwise_avg: float = None) -> Optional[ClusterType]:
+        """
+        Adds single cluster to the map.
+        :param cluster: The cluster to add.
+        :param min_pairwise_avg: Minimal acceptable pairwise average for clusters.
+        :return: Cluster if added, None if cluster is duplicate.
+        """
+        should_add = self.should_add(cluster, min_pairwise_avg)
+        if not should_add:
+            return
+        cluster_id = self.__get_next_cluster_id()
+        self.cluster_map[cluster_id] = cluster
+        for a in cluster.artifact_ids:
+            self.seen_artifacts.add(a)
+        return cluster
+
+    @staticmethod
+    def vote_for_clusters(clusters: List[Cluster]):
+        """
+        Votes for clusters for each time a cluster consists of the same artifact set.
+        :param clusters: All possible clusters.
+        :return: None.
+        """
+        artifacts_list = [tuple(sorted(cluster.artifact_id_set)) for cluster in clusters]
+        artifacts2cluster = {}
+        for cluster_index, artifacts in enumerate(artifacts_list):
+            DictUtil.set_or_append_item(artifacts2cluster, artifacts, cluster_index)
+        cluster_votes = Counter(artifacts_list)
+        for artifacts, votes in cluster_votes.items():
+            for cluster_index in artifacts2cluster[artifacts]:
+                clusters[cluster_index].votes = votes
 
     @staticmethod
     def calculate_intersection(source: Set, target: Set) -> float:
@@ -230,3 +287,10 @@ class ClusterCondenser:
         percentile_score = np.quantile(cluster_scores, MIN_PAIRWISE_AVG_PERCENTILE)
         final_score = min(percentile_score, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING)
         return final_score
+
+    def __get_next_cluster_id(self) -> int:
+        """
+        Gets the id of the next new cluster.
+        :return: Next available index.
+        """
+        return len(self.cluster_map)

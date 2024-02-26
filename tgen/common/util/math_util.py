@@ -52,3 +52,12 @@ class MathUtil:
         differences = set(set1).difference(set2)
         differences.update(set(set2).difference(set1))
         return differences
+
+    @staticmethod
+    def is_odd(num: int) -> bool:
+        """
+        Returns True if the number is odd, else False.
+        :param num: The number to determine if it is odd.
+        :return: True if the number is odd, else False.
+        """
+        return num % 2 == 1

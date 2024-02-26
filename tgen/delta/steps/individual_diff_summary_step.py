@@ -44,7 +44,7 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
             questionnaire: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value
             if change_type in self.CHANGE_TYPE_TO_QUESTION_PROMPT:
                 questionnaire.question_prompts = [self.CHANGE_TYPE_TO_QUESTION_PROMPT[change_type].value] \
-                                                 + questionnaire.question_prompts[-2:]
+                                                 + questionnaire.child_prompts[-2:]
             output = get_prediction_output(args, artifact_df, state, prompts=[SupportedPrompts.DIFF_SUMMARY_STARTER.value,
                                                                               ArtifactPrompt(include_id=False),
                                                                               questionnaire])
@@ -100,7 +100,7 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                 if not category_res.lower().startswith(no_res):
                     results[filename][category.value] = category_res
             for i in range(1, 3):
-                tag = questionnaire.get_response_tags_for_question(-i)
+                tag = questionnaire.get_response_tags_for_prompt(-i)
                 results[filename][tag] = res[tag]
         return results
 

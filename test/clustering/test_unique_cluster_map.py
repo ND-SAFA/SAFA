@@ -13,13 +13,11 @@ class TestUniqueClusterMap(TestCase):
         embeddings_manager = ClusteringTestUtil.create_embeddings_manager()
         unique_set_map = ClusterCondenser(embeddings_manager)
 
-        source_cluster = Cluster.from_artifacts(["A", "B", "C", "D"], embeddings_manager)
-        unique_set_map.add(source_cluster)
-
+        source_cluster = Cluster.from_artifacts(["A", "B"], embeddings_manager)
         collision_cluster = Cluster.from_artifacts(["A", "B"], embeddings_manager)
+        unique_set_map.add_all([source_cluster, collision_cluster])
 
         self.assertTrue(unique_set_map.contains_cluster(collision_cluster))
-        unique_set_map.add(collision_cluster)
         self.assertEqual(2, source_cluster.votes)
 
     def test_intersection_calculation(self):

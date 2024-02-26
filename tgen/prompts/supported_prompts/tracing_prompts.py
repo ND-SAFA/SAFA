@@ -67,7 +67,7 @@ SCORE_INSTRUCTIONS = SelectQuestionPrompt(
                  f"Note, generally if a relationship is truly unclear, no trace-link exists. ",
     response_tag=RANKING_SCORE_TAG,
     response_format="Enclose the score in {}",
-    value_formatter=lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(StrUtil.remove_chars(val, [L_CARROT, R_CARROT])),
+    value_formatter=lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(StrUtil.remove_substrings(val, [L_CARROT, R_CARROT])),
     default_factory=lambda tag, val: DEFAULT_SCORE)
 
 QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps used to determine "

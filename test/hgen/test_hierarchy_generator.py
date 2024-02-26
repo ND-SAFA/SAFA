@@ -1,5 +1,4 @@
 import os
-from copy import deepcopy
 from unittest.mock import MagicMock
 
 import mock
@@ -8,14 +7,11 @@ import pandas as pd
 
 from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.embedding_util import EmbeddingUtil
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import PipelineUtil
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.exporters.safa_exporter import SafaExporter
@@ -43,8 +39,6 @@ from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 
-DUP_SOURCE_ARTIFACT = "dup_link"
-
 
 class TestHierarchyGenerator(BaseTest):
     HGEN_ARGS = None
@@ -55,8 +49,9 @@ class TestHierarchyGenerator(BaseTest):
         anthropic_ai_manager.require_used_all_responses = False  # TODO: Investigate why too many link explanations responses.
         anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses([MockResponses.project_title_to_response[PS_ENTITIES_TITLE]])
-        self.HGEN_ARGS = get_test_hgen_args(test_refinement=True)()
+        self.HGEN_ARGS = get_test_hgen_args()()
         self.HGEN_ARGS.perform_clustering = False
+        self.HGEN_ARGS.duplicate_similarity_threshold = 0.65
         hgen = HierarchyGenerator(self.HGEN_ARGS)
         hgen.run_setup_for_pipeline()
         self.HGEN_STATE = hgen.state
@@ -64,13 +59,12 @@ class TestHierarchyGenerator(BaseTest):
         self.assert_generate_input_step()
         CreateClustersStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assert_generate_artifact_content_step(anthropic_ai_manager=anthropic_ai_manager)
-        self.assert_refined_artifact_content_step(anthropic_ai_manager=anthropic_ai_manager)
+        RefineGenerationsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assert_name_artifacts_step(anthropic_ai_manager=anthropic_ai_manager)
         self.assert_generate_trace_links_step(anthropic_ai_manager=anthropic_ai_manager)
-        self.assert_detect_duplicates_step()
+        DetectDuplicateArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assert_find_homes_for_orphans_step()
         self.assert_generate_explanations_for_links_step(anthropic_ai_manager=anthropic_ai_manager)
-
         self.assert_create_dataset_step()
         self.assert_save_dataset_checkpoint()
         hgen._log_costs()
@@ -85,11 +79,7 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df), msg=msg)
 
         export_path = TEST_OUTPUT_DIR
-        trace_df = self.HGEN_STATE.final_dataset.trace_dataset.trace_df
-        ids2remove = [i for i, trace in trace_df.itertuples() if trace[TraceKeys.child_label()] == DUP_SOURCE_ARTIFACT]
-        trace_df.remove_rows(ids2remove)
         artifact_df = self.HGEN_STATE.final_dataset.trace_dataset.artifact_df
-        artifact_df.remove_row(DUP_SOURCE_ARTIFACT)
         self.HGEN_STATE.final_dataset.update_artifact_df(artifact_df)
         safa_save_path = PipelineUtil.save_dataset_checkpoint(self.HGEN_STATE.final_dataset, export_path, filename="dir",
                                                               exporter_class=SafaExporter)
@@ -139,27 +129,8 @@ class TestHierarchyGenerator(BaseTest):
             self.assertEqual(us, HGenTestConstants.user_stories[i])
             self.assertEqual(set(self.HGEN_STATE.generations2sources[us]), set(HGenTestConstants.code_files[i]))
 
-    def assert_refined_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
-        refined_user_stories1 = ["#1" + us for us in HGenTestConstants.user_stories]
-        refined_user_stories2 = ["#2" + us for us in HGenTestConstants.user_stories]
-        refine_response1 = [PromptUtil.create_xml("selected-artifacts", "1,5,6")]  # orig content no. 1 and refined us #1 no. 2,3
-        refine_response2 = [PromptUtil.create_xml("selected-artifacts", "1,2,6")]  # orig content no. 1, refined no. 2 (#1) and 3 (#2)
-        anthropic_ai_manager.add_responses(get_generated_artifacts_response(contents=refined_user_stories1)
-                                           + refine_response1
-                                           + get_generated_artifacts_response(contents=refined_user_stories2)
-                                           + refine_response2
-                                           )
-        self.HGEN_ARGS.perform_clustering = False
-        RefineGenerationsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
-        us1 = HGenTestConstants.user_stories[0]
-        us2 = refined_user_stories1[1]
-        us3 = refined_user_stories2[2]
-        for i, us in enumerate([us1, us2, us3]):
-            self.assertIn(us, self.HGEN_STATE.refined_content)
-            self.assertEqual(set(self.HGEN_STATE.refined_content[us]), set(HGenTestConstants.code_files[i]))
-
     def assert_name_artifacts_step(self, anthropic_ai_manager: TestAIManager):
-        names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.generations2sources)
+        names, expected_names, name_responses = get_name_responses(self.HGEN_STATE.get_generations2sources())
         anthropic_ai_manager.add_responses(name_responses)
         NameArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         for name in expected_names:
@@ -186,34 +157,6 @@ class TestHierarchyGenerator(BaseTest):
             if child in us2code[parent]:
                 self.assertGreater(new_pred[TraceKeys.SCORE], 0.8)  # these should be weighted higher than original prediction
 
-    def assert_detect_duplicates_step(self):
-        content = list(self.HGEN_STATE.generations2sources.keys())
-        dup_artifact_id = "dup1"
-        dup_indices = [0, 1]
-        dup_content = NEW_LINE.join([content[dup_indices[0]], content[dup_indices[1]]])
-        expected_parent = list(self.HGEN_STATE.new_artifact_dataset.artifact_df.index)[dup_indices[0]]
-        n_generations = len(self.HGEN_STATE.new_artifact_dataset.artifact_df)
-        all_indices = [i for i in range(n_generations)]
-
-        self.HGEN_STATE.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.all_artifacts_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)
-        self.HGEN_STATE.source_dataset.artifact_df.add_artifact(DUP_SOURCE_ARTIFACT, content[0],
-                                                                self.HGEN_ARGS.source_layer_ids[0])
-
-        self.HGEN_STATE.embedding_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content[0])
-
-        original_link = EnumDict({TraceKeys.child_label(): DUP_SOURCE_ARTIFACT,
-                                  TraceKeys.parent_label(): dup_artifact_id,
-                                  TraceKeys.SCORE: 0.6,
-                                  TraceKeys.EXPLANATION: "Explanation"})
-        self.HGEN_STATE.trace_predictions.append(deepcopy(original_link))
-        DetectDuplicateArtifactsStep().run(self.HGEN_ARGS, self.HGEN_STATE)
-        self.assertNotIn(dup_artifact_id, self.HGEN_STATE.selected_artifacts_dataset.artifact_df)
-        self.assertNotIn(original_link, self.HGEN_STATE.selected_predictions)
-        new_link = [trace for trace in self.HGEN_STATE.trace_predictions if trace[TraceKeys.child_label()] == DUP_SOURCE_ARTIFACT]
-        self.assertSize(1, new_link)
-        self.assertEqual(new_link[0][TraceKeys.TARGET], expected_parent)
-
     def assert_generate_explanations_for_links_step(self, anthropic_ai_manager):
         GenerateExplanationsForLinksStep().run(self.HGEN_ARGS, self.HGEN_STATE)
         missing_explanation = [trace for trace in self.HGEN_STATE.selected_predictions if not trace.get(TraceKeys.EXPLANATION)]
@@ -226,9 +169,13 @@ class TestHierarchyGenerator(BaseTest):
             found_link = self.HGEN_STATE.final_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
                                                                          target_id=link[TraceKeys.TARGET])
             self.assertIsNotNone(found_link)
-        for content in self.HGEN_STATE.refined_content.keys():
-            name = self.HGEN_STATE.final_dataset.artifact_df.filter_by_row(lambda row:
-                                                                           row[ArtifactKeys.CONTENT.value] == content).index[0]
+        for content in self.HGEN_STATE.get_generations2sources().keys():
+            found_artifact = self.HGEN_STATE.final_dataset.artifact_df.filter_by_row(lambda row:
+                                                                                     row[ArtifactKeys.CONTENT.value] == content
+                                                                                     and row[
+                                                                                         ArtifactKeys.LAYER_ID.value] == self.HGEN_ARGS.target_type)
+            self.assertEqual(len(found_artifact), 1)
+            name = found_artifact.index[0]
             new_artifact = self.HGEN_STATE.final_dataset.artifact_df.get_artifact(name)
             self.assertEqual(new_artifact[ArtifactKeys.LAYER_ID], self.HGEN_ARGS.target_type)
             for orig_id, orig_artifact in self.HGEN_STATE.original_dataset.artifact_df.itertuples():

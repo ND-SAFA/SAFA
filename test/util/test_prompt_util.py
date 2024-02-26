@@ -28,3 +28,6 @@ class TestPromptUtil(BaseTest):
         lowest_level = PromptUtil.as_bullet_point("lowest-level", level=4)
         self.assertIn(bullets[0], lowest_level)
         self.assertEqual(3, lowest_level.count("\t"))
+
+    def test_indent_for_markdown(self):
+        self.assertEqual(PromptUtil.indent_for_markdown("test", 2), "        test")

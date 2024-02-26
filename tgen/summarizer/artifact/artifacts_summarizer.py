@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict, List, Optional, Set, Union, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import pandas as pd
 
@@ -157,7 +157,7 @@ class ArtifactsSummarizer(BaseObject):
             res = reloaded
 
         batch_responses = self._parse_responses(res)
-        debugging = list(zip(prompts, batch_responses))
+        debugging = [p + r for p, r in zip(prompts, res.batch_responses)]
 
         self.uuid_manager.generate_new_id()
         return batch_responses

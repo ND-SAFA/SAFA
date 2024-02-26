@@ -173,10 +173,22 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param artifact_role: The role of the artifact as either a parent (target) or child (source)
         :return: Ids of all orphans that are of the given role (parent or child)
         """
-        linked_artifacts = {trace[artifact_role] for i, trace in self.itertuples()
-                            if trace[TraceKeys.LABEL] == 1}
-        orphans = {trace[artifact_role] for i, trace in self.itertuples()
-                   if trace[artifact_role] not in linked_artifacts}
+        all_artifact_ids = {trace[artifact_role] for trace in self.get_links(true_only=False)}
+        orphans = self.find_orphans(self.get_links(true_only=True), all_artifact_ids, artifact_role)
+        return orphans
+
+    @staticmethod
+    def find_orphans(true_traces: List[EnumDict], all_artifact_ids: Set[str],
+                     artifact_role: TraceKeys = TraceKeys.child_label()) -> Set[Any]:
+        """
+        Returns all orphans in the given traces that are of the given role (parent or child)
+        :param true_traces: The traces to look for orphans in.
+        :param all_artifact_ids: A set of all artifact ids that could have traces.
+        :param artifact_role: The role of the artifact as either a parent (target) or child (source)
+        :return: Ids of all orphans that are of the given role (parent or child)
+        """
+        linked_artifacts = {trace[artifact_role] for trace in true_traces}
+        orphans = all_artifact_ids.difference(linked_artifacts)
         return orphans
 
     def get_parents(self, artifact_id: str) -> List[str]:

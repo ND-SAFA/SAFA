@@ -1,3 +1,5 @@
+import math
+import string
 from unittest import TestCase
 
 from tgen.common.util.dict_util import DictUtil
@@ -29,7 +31,7 @@ class TestDictUtil(TestCase):
         parent = {"A": {"1": "hello", "2": "what's"},
                   "B": {"3": "world", "4": "up"},
                   "C": {"5": "don't combine"}}
-        keys2combine =  {"A", "B"}
+        keys2combine = {"A", "B"}
         combined = DictUtil.combine_child_dicts(parent, keys2combine)
         for key, val in parent.items():
             if key in keys2combine:
@@ -41,20 +43,20 @@ class TestDictUtil(TestCase):
 
     def test_filter_dict_keys(self):
         dict_ = {"A": {"1": "hello", "2": "what's"},
-                  "B": {"3": "world", "4": "up"},
-                  "C": {"5": "filter me"}}
+                 "B": {"3": "world", "4": "up"},
+                 "C": {"5": "filter me"}}
         keys2keep = {"A", "B"}
         filtered1 = DictUtil.filter_dict_keys(dict_, keys2keep=keys2keep)
         filtered2 = DictUtil.filter_dict_keys(dict_, keys2filter={"C"})
         for filtered in [filtered1, filtered2]:
-            for k,v in filtered.items():
+            for k, v in filtered.items():
                 if k in keys2keep:
                     self.assertIn(k, filtered)
                 else:
                     self.assertNotIn(k, filtered)
 
     def test_joining(self):
-        dict_ = [{"1": "hello ", "2": "what's "},  {"1": "world", "2": "up"}]
+        dict_ = [{"1": "hello ", "2": "what's "}, {"1": "world", "2": "up"}]
         joined = DictUtil.joining(dict_)
         self.assertIn("1", joined)
         self.assertEqual(joined["1"], "hello world")
@@ -80,3 +82,33 @@ class TestDictUtil(TestCase):
         self.assertNotEqual(kwargs["four"], "cuatro")
         self.assertIn("five", kwargs)
 
+    def test_flip(self):
+
+        # basic case
+        orig = {k: i for i, k in enumerate(string.ascii_lowercase[:3])}
+        expected = {i: k for i, k in enumerate(string.ascii_lowercase[:3])}
+        flipped = DictUtil.flip(orig)
+        self.assertDictEqual(flipped, expected)
+
+        # values are lists
+        orig = {i: list(string.ascii_lowercase[i * 3:i * 3 + 3]) for i in range(3)}
+        expected = {k: math.floor(i / 3) for i, k in enumerate(string.ascii_lowercase[:9])}
+        flipped = DictUtil.flip(orig)
+        self.assertDictEqual(flipped, expected)
+
+        # value maps to multiple keys
+        orig = {i: list(string.ascii_lowercase[i * 3:i * 3 + 4]) for i in range(3)}
+        expected_values = [min(math.floor(i / 3), 2) for i in range(10)]
+        expected = {k: ([v - 1, v] if i % 3 == 0 and 0 < i < 9 else [v])
+                    for i, (k, v) in enumerate(zip(string.ascii_lowercase[:10], expected_values))}
+        flipped = DictUtil.flip(orig)
+        self.assertDictEqual(flipped, expected)
+
+    def test_set_or_append_item(self):
+        dict_ = {"a": [1, 2]}
+        DictUtil.set_or_append_item(dict_, "a", 3)
+        DictUtil.set_or_append_item(dict_, "b", 4)
+        DictUtil.set_or_append_item(dict_, "b", [5, 6])
+        self.assertListEqual(dict_["a"], [1, 2, 3])
+        self.assertIn("b", dict_)
+        self.assertListEqual(dict_["b"], [4, 5, 6])

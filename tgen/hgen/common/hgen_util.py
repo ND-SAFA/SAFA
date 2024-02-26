@@ -6,10 +6,11 @@ import pandas as pd
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -20,12 +21,11 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.artifact_prompt import ArtifactPrompt
-from tgen.prompts.context_prompt import ContextPrompt
-from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
-from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from string import ascii_uppercase
+
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
@@ -79,80 +79,23 @@ class HGenUtil:
         return predictions
 
     @staticmethod
-    def get_prompt_builder_for_generation(hgen_args: HGenArgs,
-                                          task_prompt: Union[QuestionnairePrompt, Prompt],
-                                          base_prompt: Union[SupportedPrompts, str] = SupportedPrompts.HGEN_GENERATION,
-                                          summary_prompt: Prompt = None, artifact_type: str = None,
-                                          combine_summary_and_task_prompts: bool = False,
-                                          build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
-                                          id_to_context_artifacts: Dict[str, List[EnumDict]] = None,
-                                          **multi_artifact_params
-                                          ) -> PromptBuilder:
-        """
-        Gets the prompt builder used for the generations
-        :param hgen_args: The arguments for the hierarchy generator
-        :param task_prompt: The questionnaire prompt given to the model to produce the generations
-        :param base_prompt: The main prompt that starts the prompt
-        :param summary_prompt: Instructions for the model to create a summary of the system first
-        :param artifact_type: The type of artifact being presented in the prompt
-        :param combine_summary_and_task_prompts: If True combines the summary and task prompts into a single Questionnaire prompt
-        :param build_method: The method to use to build the artifacts into the prompt
-        :param id_to_context_artifacts: An optional mapping of artifact id to a list of the related artifacts for context
-        :return: The prompt builder used for the generations
-        """
-        if isinstance(base_prompt, SupportedPrompts):
-            base_prompt = base_prompt.value
-
-        generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
-                                                                                                           QuestionnairePrompt) \
-            else task_prompt.response_manager
-        if generation_step_response_manager.value_formatter is None:
-            generation_step_response_manager.value_formatter = lambda tag, val: val.strip().strip(NEW_LINE)
-
-        artifact_type = hgen_args.source_type if not artifact_type else artifact_type
-        artifact_prompt_kwargs = dict(prompt_prefix=PromptUtil.as_markdown_header(f"{artifact_type.upper()}S:"),
-                                      build_method=build_method,
-                                      include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
-                                      data_type=MultiArtifactPrompt.DataType.ARTIFACT,
-                                      xml_tags={
-                                          HGenUtil.convert_spaces_to_dashes(artifact_type.lower()): ["id",
-                                                                                                     "description"]},
-                                      **multi_artifact_params)
-        artifact_prompt = ContextPrompt(id_to_context_artifacts=id_to_context_artifacts, **artifact_prompt_kwargs) \
-            if id_to_context_artifacts else MultiArtifactPrompt(**artifact_prompt_kwargs)
-        prompts = [base_prompt, artifact_prompt]
-
-        task_preface = f"{NEW_LINE}{PromptUtil.as_markdown_header('TASKS:')}{NEW_LINE}"
-        if summary_prompt:
-            if combine_summary_and_task_prompts:
-                task_prompt = QuestionnairePrompt(question_prompts=[summary_prompt, task_prompt],
-                                                  prompt_id=task_prompt.id,
-                                                  use_multi_step_task_instructions=True)
-            else:
-                summary_prompt.value = task_preface + summary_prompt.value
-                prompts.append(summary_prompt)
-        else:
-            task_prompt.value = task_preface + task_prompt.value
-
-        prompts.append(task_prompt)
-        prompt_builder = PromptBuilder(prompts)
-        prompt_builder.format_prompts_with_var(source_type=hgen_args.source_type, target_type=hgen_args.target_type)
-        return prompt_builder
-
-    @staticmethod
     def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs,
                                                     generations2sources: Dict[str, Set],
                                                     target_layer_id: str,
-                                                    generate_names: bool = True) -> Tuple[ArtifactDataFrame, Dict[str, Set]]:
+                                                    generate_names: bool = True,
+                                                    generation_id: Union[int, str] = 0) -> Tuple[ArtifactDataFrame, Dict[str, Set]]:
         """
         Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
         :param hgen_args: The arguments for the hierarchy generation
         :param generations2sources: A dictionary mapping generated artifact content to the predicted links
         :param target_layer_id: The id for the layer with the new generated artifacts
         :param generate_names: If True, generates names for the new artifacts
+        :param generation_id: How many times has the name generation currently run.
         :return: The dataframe of generated artifacts and a dictionary mapping the new name to the list of predicted related artifacts
         """
-        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(generations2sources))],
+        filename = f"artifact_names_{generation_id}.yaml"
+        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [f"{StrUtil.get_letter_from_number(i)}{i}"
+                                                               for i in range(len(generations2sources))],
                                              ArtifactKeys.CONTENT: list(generations2sources.keys()),
                                              ArtifactKeys.LAYER_ID: [target_layer_id for _ in generations2sources]})
         if generate_names:
@@ -165,14 +108,12 @@ class HGenUtil:
                     names = list(use_content_as_names.values())
                 else:
                     logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
-                    name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
-                                         f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
-                                         PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS)
-                                         )
-                    artifact_prompt = ArtifactPrompt(include_id=False)
+                    name_prompt: Prompt = SupportedPrompts.HGEN_TITLE_PROMPT.value
+                    name_prompt.format_value(target_type=hgen_args.target_type)
+                    artifact_prompt = ArtifactPrompt(include_id=False, build_method=ArtifactPrompt.BuildMethod.XML)
                     prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
                     dataset = PromptDataset(artifact_df=new_artifact_df)
-                    predictions_path = FileUtil.safely_join_paths(hgen_args.export_dir, "artifact_names.json")
+                    predictions_path = FileUtil.safely_join_paths(hgen_args.export_dir, filename)
                     names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
                                                      prediction_step=PredictionStep.NAME,
                                                      dataset=dataset, response_prompt_ids=name_prompt.id,
@@ -232,7 +173,7 @@ class HGenUtil:
         if len(words) <= 1:
             return input_string
         first_letters = [word[0] for word in words]
-        return ''.join(first_letters).upper()
+        return EMPTY_STRING.join(first_letters).upper()
 
     @staticmethod
     def get_ranking_dir(directory: str) -> str:

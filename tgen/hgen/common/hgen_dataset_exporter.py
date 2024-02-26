@@ -37,9 +37,9 @@ class HGenDatasetBuilder:
         :param state: State of HGEN pipeline to export.
         :return: Trace dataset containing artifacts, traces, and traced layers.
         """
-        exporter = HGenDatasetBuilder(args, state)
-        exporter.add_content()
-        trace_dataset = exporter.get_trace_dataset()
+        builder = HGenDatasetBuilder(args, state)
+        builder.add_content()
+        trace_dataset = builder.get_trace_dataset()
         trace_dataset.trace_df = TraceDatasetCreator.generate_negative_links(layer_df=trace_dataset.layer_df,
                                                                              trace_df=trace_dataset.trace_df,
                                                                              artifact_df=trace_dataset.artifact_df)

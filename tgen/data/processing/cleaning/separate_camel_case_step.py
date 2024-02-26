@@ -2,6 +2,7 @@ import re
 from typing import List
 
 from tgen.common.constants.deliminator_constants import SPACE
+from tgen.common.util.str_util import StrUtil
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
@@ -17,14 +18,6 @@ class SeparateCamelCaseStep(AbstractDataProcessingStep):
         :param kwargs: Ignored.
         :return: Processed data entries.
         """
-        return [SeparateCamelCaseStep.separate_camel_case(s) for s in data_entries]
+        return [StrUtil.separate_camel_case(s) for s in data_entries]
 
-    @staticmethod
-    def separate_camel_case(doc: str):
-        """
-        Finds words written in camel casing and separates them into individual words.
-        :param doc: The document to split camel case words.
-        :return: Processed document.
-        """
-        split_doc = re.sub("([A-Z][a-z]+)", r" \1", re.sub("([A-Z]+)", r" \1", doc)).split()
-        return SPACE.join(split_doc)
+

@@ -8,7 +8,6 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
@@ -20,10 +19,9 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
@@ -94,7 +92,6 @@ class LLMTrainer(AbstractTrainer):
         else:
             assert len(datasets) == 1, "If prompts are provided, only one dataset may be used"
             prompt_df = datasets[0].get_prompt_dataframe()
-
         reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
         missing_generations = isinstance(reloaded, List) or reloaded is None
 
@@ -188,17 +185,6 @@ class LLMTrainer(AbstractTrainer):
         :return: None
         """
         pass
-
-    @staticmethod
-    def convert_dataset_to_prompt_dataset(dataset: Union[PromptDataset, TraceDataset]) -> PromptDataset:
-        """
-        If the dataset is not a prompt dataset, it is converted to one
-        :param dataset: The original dataset
-        :return: The dataset a a prompt dataset
-        """
-        if not isinstance(dataset, PromptDataset):
-            dataset = PromptDataset(trace_dataset=dataset)
-        return dataset
 
     @staticmethod
     def _create_generation_output(responses: List[str], prompt_builder_map: Dict[str, PromptBuilder],

@@ -81,13 +81,14 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                        ArtifactKeys.SUMMARY: summary if summary else self._SUMMARY_DEFAULT}
         return self.add_or_update_row(row_as_dict)
 
-    def get_artifact(self, artifact_id: Any) -> EnumDict:
+    def get_artifact(self, artifact_id: Any, throw_exception: bool = False) -> EnumDict:
         """
         Gets the row of the dataframe with the associated artifact_id
         :param artifact_id: The id of the artifact to get
+        :param throw_exception: If True, throws exception if artifact is missing.
         :return: The artifact if one is found with the specified params, else None
         """
-        return self.get_row(artifact_id)
+        return self.get_row(artifact_id, throw_exception)
 
     def get_artifacts_from_trace(self, trace: EnumDict) -> Tuple[EnumDict, EnumDict]:
         """

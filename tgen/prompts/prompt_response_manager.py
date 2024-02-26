@@ -79,7 +79,7 @@ class PromptResponseManager:
         self.expected_response_type = self._convert2dict(self.expected_response_type)
         self.expected_responses = self._convert2dict(self.expected_responses)
         if self.required_tag_ids == REQUIRE_ALL_TAGS:
-            self.required_tag_ids = set(self._all_tag_ids)
+            self.required_tag_ids = set(self.get_all_tag_ids())
         elif not isinstance(self.required_tag_ids, set):
             self.required_tag_ids = {self.required_tag_ids}
 
@@ -90,7 +90,7 @@ class PromptResponseManager:
         :return: A dictionary mapping tag id to a value
         """
         if not isinstance(initial_val, dict):
-            return {id_: initial_val for id_ in self._all_tag_ids}
+            return {id_: initial_val for id_ in self.get_all_tag_ids()}
         return initial_val
 
     def _init_tag_attrs(self) -> None:
@@ -107,10 +107,12 @@ class PromptResponseManager:
             for tag, children in self.response_tag.items():
                 all_tags.append(tag)
                 all_tags.extend(children)
-        if not self.id2tag:
-            self.id2tag = {tag: tag for tag in all_tags}
+        ids = set(self.id2tag.values())
+        for tag in all_tags:
+            if tag not in ids:
+                self.id2tag[tag] = tag
         self._tag2id = {tag: id_ for id_, tag in self.id2tag.items()}
-        self._all_tag_ids = [self._tag2id[tag] for tag in all_tags]
+        self._all_tag_ids = [self._tag2id.get(tag, tag) for tag in all_tags]
 
     def get_all_tag_ids(self) -> List[str]:
         """

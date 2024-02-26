@@ -121,12 +121,10 @@ class TestProjectSummarizer(BaseTest):
                                                                      self.PROJECT_SUMMARY_SECTIONS + list(self.NEW_SECTIONS.keys()))
         self.assertListEqual(section_order, self.SECTION_ORDER + [PS_DATA_FLOW_TITLE])
 
-
     def _get_dataset(self):
         creator = PromptDatasetCreator(trace_dataset_creator=TraceDatasetCreator(SafaTestProject.get_project_reader()))
         dataset = creator.create()
         return dataset
-
 
     def get_project_summarizer(self, project_summary=None):
         dataset = self._get_dataset()

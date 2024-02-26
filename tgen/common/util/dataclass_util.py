@@ -98,7 +98,7 @@ class DataclassUtil:
         """
         param_specs = ParamSpecs.create_from_method(dataclass.__init__)
         matching_attrs = [getattr(dataclass, name) for name, type_ in param_specs.param_types.items() if
-                           ReflectionUtil.is_instance_or_subclass(type_, attr_type)]
+                          ReflectionUtil.is_instance_or_subclass(type_, attr_type)]
         for attr in matching_attrs:
             for name, val in vals2update.items():
                 setattr(attr, name, val)

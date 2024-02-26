@@ -164,7 +164,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 25_000_000
 CELERY_ACCEPT_CONTENT = ['NpEncoder']
 CELERY_TASK_SERIALIZER = 'NpEncoder'
 CELERY_RESULT_SERIALIZER = 'NpEncoder'
-S3_BASE_PATH = "/test"
+
 if 'BACKEND_ACCESS_ID' in os.environ:  # collect static will be running this without env file
     base_path = f"/{ENV_NAME}"
     CELERY_S3_BACKEND_SETTINGS = {
@@ -175,8 +175,6 @@ if 'BACKEND_ACCESS_ID' in os.environ:  # collect static will be running this wit
         'base_path': bytes(base_path, "utf-8")  # See `Rabbit Hole Fix`
 
     }
-    for k, v in CELERY_S3_BACKEND_SETTINGS.items():
-        print(k, ":", type(v), "=", v)
 """"
 FootNotes:
 

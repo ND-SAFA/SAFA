@@ -149,6 +149,7 @@ register('NpEncoder',
 
 # Celery Configuration Options
 # https://docs.celeryq.dev/en/stable/index.html
+# TODO: broker_connection_retry_on_startup needs to be set
 CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'  # 'api.celery.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
@@ -165,12 +166,22 @@ CELERY_TASK_SERIALIZER = 'NpEncoder'
 CELERY_RESULT_SERIALIZER = 'NpEncoder'
 S3_BASE_PATH = "/test"
 if 'BACKEND_ACCESS_ID' in os.environ:  # collect static will be running this without env file
+    base_path = f"/{ENV_NAME}"
     CELERY_S3_BACKEND_SETTINGS = {
         'aws_access_key_id': f'{os.environ["BACKEND_ACCESS_ID"]}',
         'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
         'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}',
         'reduced_redundancy': True,
-        'base_path': bytes('/test', "utf-8")
+        'base_path': bytes(base_path, "utf-8")  # See `Rabbit Hole Fix`
+
     }
     for k, v in CELERY_S3_BACKEND_SETTINGS.items():
         print(k, ":", type(v), "=", v)
+""""
+FootNotes:
+
+# Rabbit Hole Fix
+S3 Backend uses os.path.join on the bucket name, however, bucket name is in bytes resulting in a type mismatch error.
+Therefore, to not have to re-write the s3 backend we are converting to bytes here since it is directly used without modification
+in their code.
+"""

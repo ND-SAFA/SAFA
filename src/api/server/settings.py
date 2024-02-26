@@ -13,6 +13,7 @@ import json
 import os.path
 import sys
 
+from celery_s3.backends import S3Backend
 from kombu.serialization import register
 
 from tgen.common.logging.logger_manager import logger
@@ -90,12 +91,7 @@ WSGI_APPLICATION = 'api.server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
-}
+DATABASES = {}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -119,15 +115,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -136,7 +130,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOWED_ORIGINS = [
@@ -144,50 +137,40 @@ CORS_ALLOWED_ORIGINS = [
     "https://bend.safa.ai",
     "https://dev.bend.safa.ai"
 ]
-
 ENV_NAME = os.environ.get("ENV_MODE", "development")
 logger.info(f"Environment: {ENV_NAME}")
-"""
-Celery Configuration Options
-"""
-CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
+
+# Request Encoder/Decoer
+register('NpEncoder',
+         encoder=lambda obj: json.dumps(obj, cls=NpEncoder),
+         decoder=lambda obj: json.loads(obj),
+         content_type='application/x-myjson',
+         content_encoding='utf-8')
+
+# Celery Configuration Options
+# https://docs.celeryq.dev/en/stable/index.html
+CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'  # 'api.celery.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
 CELERYD_HIJACK_ROOT_LOGGER = False
-
-run_as_eager = ENV_NAME.lower() == "local"
-CELERY_TASK_ALWAYS_EAGER = run_as_eager
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = run_as_eager
-if run_as_eager:
+CELERY_TASK_ALWAYS_EAGER = ENV_NAME.lower() == "test"
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
+if CELERY_TASK_ALWAYS_EAGER:
     logger.info("Running in EAGER mode.")
-
-DEBUG = run_as_eager
+DEBUG = CELERY_TASK_ALWAYS_EAGER
 DATA_UPLOAD_MAX_MEMORY_SIZE = 25_000_000
-
-
-# Encoder function
-def np_encoder_dumps(obj):
-    return json.dumps(obj, cls=NpEncoder)
-
-
-# Decoder function
-def np_encoder_loads(obj):
-    return json.loads(obj)
-
-
-register('NpEncoder', np_encoder_dumps, np_encoder_loads,
-         content_type='application/x-myjson',
-         content_encoding='utf-8')
-
-# Tell celery to use your new serializer:
 CELERY_ACCEPT_CONTENT = ['NpEncoder']
 CELERY_TASK_SERIALIZER = 'NpEncoder'
 CELERY_RESULT_SERIALIZER = 'NpEncoder'
-
-if os.environ.get("BACKEND_ACCESS_ID", None):
+S3_BASE_PATH = "/test"
+if 'BACKEND_ACCESS_ID' in os.environ:  # collect static will be running this without env file
     CELERY_S3_BACKEND_SETTINGS = {
         'aws_access_key_id': f'{os.environ["BACKEND_ACCESS_ID"]}',
         'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
-        'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}'
+        'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}',
+        'reduced_redundancy': True,
+        'base_path': bytes('/test', "utf-8")
     }
+    for k, v in CELERY_S3_BACKEND_SETTINGS.items():
+        print(k, ":", type(v), "=", v)

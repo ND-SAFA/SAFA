@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker-compose build 
+docker-compose build
 
 # Check if the build was successful
 if [ $? -eq 0 ]; then

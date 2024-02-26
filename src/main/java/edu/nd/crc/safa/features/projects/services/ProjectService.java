@@ -12,6 +12,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
+import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.onboarding.services.OnboardingService;
@@ -53,6 +54,9 @@ public class ProjectService {
 
     @Setter(onMethod = @__({@Autowired, @Lazy}))
     private ProjectMembershipService projectMembershipService;
+
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
+    private TeamMembershipService teamMembershipService;
 
     @Setter(onMethod = @__({@Autowired}))
     private JobService jobService;
@@ -261,10 +265,19 @@ public class ProjectService {
         List<IEntityMembership> projectMemberships =
             projectMembershipService.getMembershipsForEntity(project);
 
+        List<IEntityMembership> teamMemberships =
+            teamMembershipService.getMembershipsForEntity(project.getOwningTeam());
+
+        Stream<MembershipAppEntity> projectMembershipAppEntities =
+            projectMemberships.stream()
+                .map(MembershipAppEntity::new);
+
+        Stream<MembershipAppEntity> teamMembershipAppEntities =
+            teamMemberships.stream()
+                .map(MembershipAppEntity::new);
+
         List<MembershipAppEntity> membershipAppEntities =
-            projectMemberships
-                .stream()
-                .map(MembershipAppEntity::new)
+            Stream.concat(projectMembershipAppEntities, teamMembershipAppEntities)
                 .toList();
 
         List<String> permissions = getUserPermissions(project, currentUser)

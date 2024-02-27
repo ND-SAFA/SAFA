@@ -191,4 +191,6 @@ watch(
 );
 
 watch(() => onboardingStore.uploadedJob, updateStatus);
+
+// TODO: reset local state when onboarding is reset.
 </script>

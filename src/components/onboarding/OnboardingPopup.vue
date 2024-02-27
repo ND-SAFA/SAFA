@@ -33,6 +33,12 @@
           />
           <text-button
             text
+            icon="graph-refresh"
+            label="Restart"
+            @click="onboardingStore.handleReload(true, true)"
+          />
+          <text-button
+            text
             icon="cancel"
             label="Skip Onboarding"
             @click="onboardingStore.handleClose"

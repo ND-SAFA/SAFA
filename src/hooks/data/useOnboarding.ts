@@ -127,15 +127,29 @@ export const useOnboarding = defineStore("useOnboarding", {
     /**
      * Reloads the GitHub projects and jobs for the onboarding workflow.
      * @param open - Whether to force open the onboarding workflow.
+     * @param reset - Whether to reset the project ID.
      */
-    async handleReload(open?: boolean): Promise<void> {
-      // Open the onboarding workflow if it has not yet been completed, or is manually opened.
-      await billingApiStore.handleGetOnboardingStatus({
-        onSuccess: (status) => {
-          this.projectId = status.projectId || null;
-          this.open = open || !status.completed;
-        },
-      });
+    async handleReload(open?: boolean, reset?: boolean): Promise<void> {
+      if (reset) {
+        // Reset all onboarding state.
+        this.projectId = null;
+        this.open = true;
+        this.step = 1;
+        this.steps.forEach((step) => (step.done = false));
+        await billingApiStore.handleUpdateOnboardingStatus({
+          completed: false,
+          projectId: "",
+        });
+      } else {
+        // Load the current onboarding status.
+        await billingApiStore.handleGetOnboardingStatus({
+          onSuccess: (status) => {
+            // Open the onboarding workflow if it has not yet been completed, or is manually opened.
+            this.projectId = status.projectId || null;
+            this.open = open || !status.completed;
+          },
+        });
+      }
 
       // Skip reset if already loading or completed.
       if (!this.open || this.loading) return;
@@ -153,13 +167,14 @@ export const useOnboarding = defineStore("useOnboarding", {
         this.projectId &&
         ((this.isUploadJob && this.uploadedJob?.status === "COMPLETED") ||
           this.isGenerationJob);
+      const skipToUpload = !reset && (this.isUploadJob || skipToGenerate);
 
       if (integrationsStore.validGitHubCredentials) {
         // Skip to Code step if credentials are set.
         await this.handleNextStep("connect");
       }
-      if (this.isUploadJob || skipToGenerate) {
-        // Skip to the Summarize step if a job has been uploaded, or a project has been stored.
+      if (skipToUpload) {
+        // Skip to the Summarize step if a job has been started, or a project has already been uploaded.
         await this.handleNextStep("code");
       }
       if (skipToGenerate) {

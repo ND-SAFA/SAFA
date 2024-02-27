@@ -94,7 +94,7 @@ function updateStatus(moveNext?: boolean) {
     status.value = "error";
   } else if (jobStatus === "IN_PROGRESS") {
     status.value = "loading";
-  } else if (jobStatus === "COMPLETED") {
+  } else if (status.value === "loading" && jobStatus === "COMPLETED") {
     status.value = "success";
 
     if (!moveNext) return;
@@ -117,6 +117,4 @@ watch(
   () => onboardingStore.uploadedJob,
   () => updateStatus(true)
 );
-
-// TODO: reset local state when onboarding is reset.
 </script>

@@ -19,17 +19,17 @@ export enum Colors {
   greyDarkest = "#2B2B2B",
 
   green = "#55A630",
-  greenDark = "#488E27",
+  greenDark = "#488E27", // Primary
 
   blue = "#3055A6",
 
-  red = "#E24C15", // "#A63055",
-  redLight = "#E24C15", // "#D51552",
+  red = "#E24C15",
+  redLight = "#E24C15",
 
   orange = "#fb8500",
 
   brown = "#b6ad90",
-  brownDark = "#a68a64",
+  brownDark = "#a68a64", // Secondary
 
   gradient1 = "#81C644",
   gradient2 = "#61AD73",

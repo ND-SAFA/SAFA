@@ -14,6 +14,7 @@ import {
   appStore,
   artifactStore,
   cyStore,
+  projectStore,
   selectionStore,
   subtreeStore,
 } from "@/hooks";
@@ -102,7 +103,8 @@ export const useLayout = defineStore("layout", {
         if (
           this.mode === "tim" &&
           type !== "creator" &&
-          appStore.popups.detailsPanel !== "displayProject"
+          appStore.popups.detailsPanel !== "displayProject" &&
+          projectStore.isProjectDefined
         ) {
           // On the home page, load the project details panel.
           appStore.openDetailsPanel("displayProject");

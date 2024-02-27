@@ -1,12 +1,34 @@
 import {
   CostEstimateSchema,
   GenerateArtifactSchema,
+  OnboardingStatusSchema,
   OrgPaymentTier,
   PurchaseDetailsSchema,
   TransactionSchema,
   UpdatePaymentTierSchema,
 } from "@/types";
 import { buildRequest } from "@/api";
+
+/**
+ * Gets the onboarding status for the current user.
+ * @returns The onboarding status.
+ */
+export function getOnboardingStatus(): Promise<OnboardingStatusSchema> {
+  return buildRequest<OnboardingStatusSchema>("onboardingStatus").get();
+}
+
+/**
+ * Sets the onboarding status for the current user.
+ * @param status - The new onboarding status.
+ * @returns The updated onboarding status.
+ */
+export function setOnboardingStatus(
+  status: OnboardingStatusSchema
+): Promise<OnboardingStatusSchema> {
+  return buildRequest<OnboardingStatusSchema, string, OnboardingStatusSchema>(
+    "onboardingStatus"
+  ).put(status);
+}
 
 /**
  * Estimates the cost of generating parent artifacts from child artifacts.

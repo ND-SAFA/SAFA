@@ -5,7 +5,16 @@
       <nav-breadcrumbs />
       <members-bar />
       <q-space />
-      <project-searchbar v-if="graphVisible" />
+      <project-searchbar v-if="graphVisible && !permissionStore.isDemo" />
+      <text-button
+        v-if="permissionStore.isDemo"
+        text
+        color="primary"
+        class="q-ml-md"
+        icon="calendar"
+        label="Contact Us"
+        @click="onboardingStore.handleScheduleCall(false)"
+      />
       <text-button
         v-if="permissionStore.isDemo"
         text
@@ -32,7 +41,7 @@ export default {
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
-import { permissionStore, sessionApiStore } from "@/hooks";
+import { onboardingStore, permissionStore, sessionApiStore } from "@/hooks";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { ProjectSearchbar } from "@/components/search";

@@ -53,6 +53,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
 
   async function handleViewLogs(job: JobSchema): Promise<void> {
     viewedJob.value = job;
+    jobStore.selectedJob = job;
 
     await jobApi.handleRequest(async () => {
       const logs = await getJobLog(job.id);

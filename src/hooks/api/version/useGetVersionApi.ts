@@ -105,11 +105,12 @@ export const useGetVersionApi = defineStore(
     }
 
     async function handleLoadCurrent(
-      identifier: Pick<IdentifierSchema, "projectId">
+      identifier: Pick<IdentifierSchema, "projectId">,
+      callbacks?: IOHandlerCallback
     ): Promise<void> {
       const versions = await getProjectVersions(identifier.projectId);
 
-      await handleLoad(versions[0].versionId);
+      await handleLoad(versions[0].versionId, undefined, false, callbacks);
     }
 
     // Load the versions of the current project whenever the current project changes.

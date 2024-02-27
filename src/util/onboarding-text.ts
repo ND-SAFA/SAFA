@@ -18,7 +18,7 @@ export const ONBOARDING_GITHUB_SECURITY = `
 
 export const ONBOARDING_REPO_SELECT = `
   Select which repository you want to import below.
-  Include the main branch and file path to your code
+  After selecting, include the main branch and file path to your code
   to ensure that SAFA is applied to the correct data.
 `;
 
@@ -42,6 +42,7 @@ export const ONBOARDING_SUMMARIZE_ERROR = `
 
 export const ONBOARDING_SUMMARIZE_DURATION = `
   This process may take up to 30 minutes depending on the size of your project.
+  Your generation may be put in a queue if there are many imports ahead of you.
 `;
 
 export const ONBOARDING_GENERATE_MESSAGE = `
@@ -52,6 +53,7 @@ export const ONBOARDING_GENERATE_MESSAGE = `
 
 export const ONBOARDING_GENERATE_DURATION = `
   This process may take an additional 30 minutes depending on the size of your project.
+  Your generation may be put in a queue if there are many imports ahead of you.
 `;
 
 export const ONBOARDING_GENERATE_SUCCESS = `

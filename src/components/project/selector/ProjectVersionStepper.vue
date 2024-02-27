@@ -1,6 +1,7 @@
 <template>
   <panel-card :color="panelColor" :title="panelTitle">
     <stepper
+      v-if="!permissionStore.isDemo || !getVersionApiStore.loadLoading"
       v-model="currentStep"
       :steps="steps"
       :minimal="props.minimal"
@@ -24,6 +25,15 @@
         />
       </template>
     </stepper>
+    <flex-box v-else align="center" justify="center" full-width t="2">
+      <q-circular-progress
+        rounded
+        indeterminate
+        size="60px"
+        :thickness="0.2"
+        color="primary"
+      />
+    </flex-box>
   </panel-card>
 </template>
 
@@ -45,8 +55,9 @@ import {
   MinimalProps,
 } from "@/types";
 import { versionToString } from "@/util";
-import { getVersionApiStore, projectStore } from "@/hooks";
+import { getVersionApiStore, permissionStore, projectStore } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
+import FlexBox from "@/components/common/display/content/FlexBox.vue";
 import { ProjectSelectorTable, VersionSelectorTable } from "./table";
 
 const props = defineProps<MinimalProps>();

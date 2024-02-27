@@ -4,12 +4,15 @@ import {
   CostEstimateSchema,
   GenerateArtifactSchema,
   IOHandlerCallback,
+  OnboardingStatusSchema,
 } from "@/types";
 import { onboardingStore, orgStore, projectStore, useApi } from "@/hooks";
 import {
   createCheckoutSession,
   createCostEstimate,
   deleteCheckoutSession,
+  getOnboardingStatus,
+  setOnboardingStatus,
 } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -18,6 +21,26 @@ import { pinia } from "@/plugins";
  */
 export const useBillingApi = defineStore("billingApi", () => {
   const billingApi = useApi("billingApi");
+
+  /**
+   * Gets the onboarding status for the current user.
+   * @param callbacks - The callbacks for the action, with the onboarding status as the payload.
+   */
+  async function handleGetOnboardingStatus(
+    callbacks: IOHandlerCallback<OnboardingStatusSchema>
+  ): Promise<void> {
+    await billingApi.handleRequest(() => getOnboardingStatus(), callbacks);
+  }
+
+  /**
+   * Gets the onboarding status for the current user.
+   * @param status - The new onboarding status.
+   */
+  async function handleUpdateOnboardingStatus(
+    status: OnboardingStatusSchema
+  ): Promise<void> {
+    await billingApi.handleRequest(() => setOnboardingStatus(status));
+  }
 
   /**
    * Estimates the cost of generating artifacts.
@@ -72,6 +95,8 @@ export const useBillingApi = defineStore("billingApi", () => {
   }
 
   return {
+    handleGetOnboardingStatus,
+    handleUpdateOnboardingStatus,
     handleEstimateCost,
     handleCheckoutSession,
     handleAcceptPayment,

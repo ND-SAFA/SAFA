@@ -88,11 +88,13 @@ function handleGenerate() {
 function updateStatus(moveNext?: boolean) {
   const jobStatus = onboardingStore.uploadedJob?.status;
 
-  if (jobStatus === "FAILED" || onboardingStore.error) {
+  if (!jobStatus) {
+    status.value = "initial";
+  } else if (jobStatus === "FAILED" || onboardingStore.error) {
     status.value = "error";
   } else if (jobStatus === "IN_PROGRESS") {
     status.value = "loading";
-  } else if (jobStatus === "COMPLETED") {
+  } else if (status.value === "loading" && jobStatus === "COMPLETED") {
     status.value = "success";
 
     if (!moveNext) return;

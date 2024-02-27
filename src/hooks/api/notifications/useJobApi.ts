@@ -122,6 +122,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
         const userJobs = await getUserJobs();
 
         for (const job of userJobs) {
+          if (job.status !== "IN_PROGRESS") continue;
           await subscribeToJob(job.id);
         }
 

@@ -149,20 +149,20 @@ export const useOnboarding = defineStore("useOnboarding", {
       this.generationCompleted =
         this.generationCompleted ||
         (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED");
+      const skipToGenerate =
+        this.projectId &&
+        ((this.isUploadJob && this.uploadedJob?.status === "COMPLETED") ||
+          this.isGenerationJob);
 
       if (integrationsStore.validGitHubCredentials) {
         // Skip to Code step if credentials are set.
         await this.handleNextStep("connect");
       }
-      if (this.isUploadJob || this.projectId) {
+      if (this.isUploadJob || skipToGenerate) {
         // Skip to the Summarize step if a job has been uploaded, or a project has been stored.
         await this.handleNextStep("code");
       }
-      if (
-        this.projectId &&
-        ((this.isUploadJob && this.uploadedJob?.status === "COMPLETED") ||
-          this.isGenerationJob)
-      ) {
+      if (skipToGenerate) {
         // Skip to the Generate step if a job has been completed.
         await this.handleNextStep("summarize");
       }

@@ -10,6 +10,7 @@
       to=""
       title="Send Feedback"
       icon="feedback"
+      color="secondary"
       clickable
       @click="handleFeedback"
     />

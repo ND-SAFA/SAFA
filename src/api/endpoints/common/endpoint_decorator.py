@@ -28,6 +28,12 @@ def endpoint(serializer, is_async: bool = False):
 
 
 def create_task_decorator(serializer, func):
+    """
+    Decorates func to be a celery task.
+    :param serializer: The serializer used to parse the input data.
+    :param func: The executing function.
+    :return: Task endpoint handler.
+    """
     request_receiver = AsyncEndpointHandler.create_receiver(func, serializer)
     return class_decorator(serializer, request_receiver)
 

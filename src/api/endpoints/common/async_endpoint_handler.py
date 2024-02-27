@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Type
 from celery import shared_task
 from django.http import JsonResponse
 
+from api.endpoints.common.celery_utils import find_task_position
 from api.endpoints.common.ihandler import IHandler
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from tgen.common.logging.log_capture import LogCapture
@@ -43,7 +44,9 @@ class AsyncEndpointHandler(IHandler):
         :return: None
         """
         result = self.task.delay(data)
-        return JsonResponse({"task_id": result.id}, encoder=NpEncoder)
+        task_id = result.id
+        position = find_task_position(task_id)
+        return JsonResponse({"task_id": task_id, "position": position}, encoder=NpEncoder)
 
     def create_task(self):
         @shared_task(name=self.func.__name__)

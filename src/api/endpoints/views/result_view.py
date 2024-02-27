@@ -7,9 +7,9 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_MEDIUM
 from api.constants.celery_status import CeleryStatus
+from api.endpoints.common.celery_utils import find_task_position
 from api.endpoints.common.endpoint_decorator import endpoint
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
-from api.server.celery import celery
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
 
@@ -47,28 +47,6 @@ def get_task_status(result: AsyncResult.status) -> Tuple[CeleryStatus, str]:
         return CeleryStatus.FAILURE, "Task has failed."
     else:
         raise Exception(f"CeleryStatus is unknown:{result.status}")
-
-
-def find_task_position(task_id: str) -> int:
-    """
-    Returns the queue position of task.
-    :param task_id:
-    :return:
-    """
-    i = celery.control.inspect()
-    active_task_map = i.active()
-    reserved_task_map = i.reserved()
-    logger.info(f"active:{active_task_map}")
-    logger.info(f"reserved:{reserved_task_map}")
-
-    active_ids = [t["id"] for t in active_task_map.values()]
-    if task_id in active_ids:
-        return 0
-    reserved_tasks = reserved_task_map.values()
-    for pos, task in enumerate(reserved_tasks):
-        if task["id"] == task_id:
-            return pos + 1
-    return -1  # Indicates task not found in the queue
 
 
 def try_get_logs(async_result: AsyncResult):

@@ -35,10 +35,10 @@ class IHandler(ABC):
         :param request: The request to handle.
         :return: The response of the endpoint.
         """
+        data = ViewUtil.read_request(request, self.serializer)
         if self.skip_serialization:
-            data = json.loads(request.body)
-        else:
-            data = ViewUtil.read_request(request, self.serializer)
+            data = json.loads(request.body)  # will re-serialize but make sure serializer passes before starting job
+
         response = self._request_handler(data)
         if isinstance(response, JsonResponse):
             return response

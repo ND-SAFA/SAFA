@@ -28,7 +28,7 @@ datasets/**
 # Secrets
 application-credentials.json
 *.pem
-.env
+*.env
 wandb/**
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

@@ -18,7 +18,7 @@ class TestHGen(BaseTest):
         """
         Tests that user stories are able to be generated using clustering.
         """
-        n_links = 5
+        n_links = 4
         source_layer_id = CHILD_TYPE
         target_type = PARENT_TYPE
 
@@ -29,6 +29,9 @@ class TestHGen(BaseTest):
         generation_xml_map = {"functional-requirement": [a[ArtifactKeys.CONTENT] for a in target_artifacts]}
         title_xml_map = {"title": [a[ArtifactKeys.ID] for a in target_artifacts]}
 
+        test_manager.add_xml_response(generation_xml_map, as_single_res=True)
+        test_manager.add_xml_response(title_xml_map)
+        test_manager.add_xml_response({"answer": "COMMON FUNCTIONALITY BETWEEN ARTIFACTS"})
         test_manager.add_xml_response(generation_xml_map, as_single_res=True)
         test_manager.add_xml_response(title_xml_map)
 

@@ -3,34 +3,35 @@ name: Django Unit Tests
 on:
   pull_request:
     branches:
-      - development
-    types: [ opened, synchronize ]
+    - development
+    types: [opened, synchronize]
   issue_comment:
-    types: [ created ]
+    types: [created]
     body: /build
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-          ref: ${{ github.ref }}
-          token: ${{ secrets.TGEN_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+        ref: ${{ github.ref }}
+        token: ${{ secrets.TGEN_TOKEN }}
 
-      - uses: actions/setup-python@v3
-        with:
-          python-version: '3.9'
-          cache: 'pip'
+    - uses: actions/setup-python@v3
+      with:
+        python-version: '3.9'
+        cache: 'pip'
 
-      - name: Install Requirements
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install Requirements
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Run unit tests
-        run: |
-          python src/api/manage.py test src/tests
-        env:
-          DEPLOYMENT: test
+    - name: Run unit tests
+      run: |
+        python src/api/manage.py test src/tests
+      env:
+        DEPLOYMENT: test
+        DJANGO_SETTINGS_MODULE: api.server.settings

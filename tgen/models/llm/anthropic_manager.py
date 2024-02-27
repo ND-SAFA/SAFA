@@ -214,16 +214,3 @@ def get_client(refresh: bool = False):
             return client
         else:
             return AnthropicManager.Client
-
-
-def is_connection_alive(client: anthropic.Client) -> bool:
-    """
-    Checks to see if the current anthropic client is alive.
-    :param client: The anthropic client to check if connection is alive.
-    :return: Whether client is alive.
-    """
-    try:
-        client.completion(prompt="ping")
-        return True
-    except:
-        return False

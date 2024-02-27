@@ -32,44 +32,26 @@ import { pinia } from "@/plugins";
  */
 export const useOnboarding = defineStore("useOnboarding", {
   state: () => ({
-    /**
-     * Whether the onboarding workflow is open.
-     */
+    /** Whether the onboarding workflow is open. */
     open: false,
-    /**
-     * Whether the onboarding workflow ran into an error.
-     */
+    /** Whether the onboarding workflow ran into an error. */
     error: false,
-    /**
-     * Whether the onboarding workflow is loading.
-     */
+    /** Whether the onboarding workflow is loading. */
     loading: false,
-    /**
-     * The ID of the project used in onboarding.
-     */
+    /** The ID of the project used in onboarding.  */
     projectId: null as string | null,
-    /**
-     * The current step of the onboarding workflow, starting at 1.
-     */
+    /** The current step of the onboarding workflow, starting at 1. */
     step: 1,
-    /**
-     * The steps of the onboarding workflow, with their completion status.
-     */
+    /** The steps of the onboarding workflow, with their completion status.  */
     steps: Object.values(ONBOARDING_STEPS).map((step) => ({
       ...step,
       done: false,
     })),
-    /**
-     * The cost of generating the selected project data.
-     */
+    /** The cost of generating the selected project data. */
     cost: null as CostEstimateSchema | null,
-    /**
-     * Whether payment has been confirmed.
-     */
+    /** Whether payment has been confirmed. */
     paymentConfirmed: false,
-    /**
-     * Whether the generation step has been completed.
-     */
+    /** Whether the generation step has been completed. */
     generationCompleted: false,
   }),
   getters: {

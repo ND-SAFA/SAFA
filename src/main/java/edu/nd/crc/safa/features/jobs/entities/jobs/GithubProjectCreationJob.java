@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlTreeObjectsResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
@@ -381,6 +382,14 @@ public class GithubProjectCreationJob extends CommitJob {
         List<ArtifactAppEntity> newArtifacts = getProjectCommitDefinition().getArtifactList(ModificationType.ADDED);
         SummaryService summaryService = getServiceProvider().getSummaryService();
         summaryService.addSummariesToCode(newArtifacts, null, logger);
+    }
+
+    @Override
+    protected void afterJob(boolean success) throws Exception {
+        if (importSettings.isSummarize()) {
+            EmailService emailService = getServiceProvider().getEmailService();
+            emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);
+        }
     }
 
     /**

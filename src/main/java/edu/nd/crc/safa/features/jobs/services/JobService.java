@@ -176,8 +176,7 @@ public class JobService {
     public void completeJob(JobDbEntity jobDbEntity) {
         jobDbEntity.setStatus(JobStatus.COMPLETED);
         jobDbEntity.setCurrentProgress(100);
-        jobDbEntity.setCompletedAt(now());
-        this.jobDbRepository.save(jobDbEntity);
+        endJob(jobDbEntity);
     }
 
     /**
@@ -188,6 +187,11 @@ public class JobService {
     public void failJob(JobDbEntity jobDbEntity) {
         jobDbEntity.setStatus(JobStatus.FAILED);
         jobDbEntity.setCurrentProgress(-1);
+        endJob(jobDbEntity);
+    }
+
+    private void endJob(JobDbEntity jobDbEntity) {
+        jobDbEntity.setCompletedAt(now());
         this.jobDbRepository.save(jobDbEntity);
     }
 

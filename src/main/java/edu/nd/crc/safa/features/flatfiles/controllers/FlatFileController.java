@@ -48,6 +48,7 @@ public class FlatFileController extends BaseController {
      * @param versionId     The id of the version that will be modified by given files.
      * @param files         The flat files containing tim.json, artifact files, and trace link files.
      * @param asCompleteSet Whether entities in flat files are complete set of entities in version.
+     * @param summarizeArtifacts Whether to run a summarization job in addition to doing the import
      * @return ServerResponse whose body contains all entities in project created.
      * @throws SafaError Throws errors if no files are given.
      */
@@ -56,8 +57,10 @@ public class FlatFileController extends BaseController {
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
         @RequestParam("files") Optional<List<MultipartFile>> files,
-        @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet)
+        @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet,
+        @RequestParam(required = false, defaultValue = "false") boolean summarizeArtifacts)
         throws SafaError, IOException {
+
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
             .withPermission(ProjectPermission.EDIT, user).get();
@@ -66,7 +69,6 @@ public class FlatFileController extends BaseController {
             throw new SafaError("Could not create project because no files were received.");
         }
 
-        boolean summarizeArtifacts = false;
         FlatFileBuilderStore args = new FlatFileBuilderStore(
             user,
             files.orElseGet(JobUtil::defaultFileListSupplier),
@@ -75,6 +77,11 @@ public class FlatFileController extends BaseController {
             summarizeArtifacts,
             true);
         FlatFileProjectBuilder.build(args, getServiceProvider());
+
+        if (summarizeArtifacts) {
+            getServiceProvider().getEmailService().sendGenerationCompleted(user.getEmail(), projectVersion);
+        }
+
         return getServiceProvider().getProjectRetrievalService().getProjectAppEntity(projectVersion);
     }
 

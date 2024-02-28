@@ -53,4 +53,6 @@ public interface TraceLinkVersionRepository extends CrudRepository<TraceLinkVers
                                                                  ApprovalStatus approvalStatus);
 
     Optional<TraceLinkVersion> findByProjectVersionAndTraceLink(ProjectVersion projectVersion, TraceLink traceLink);
+
+    int countByProjectVersion(ProjectVersion projectVersion);
 }

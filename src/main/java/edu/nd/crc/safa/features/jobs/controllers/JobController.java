@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.jobs.controllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -21,7 +22,6 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
-import edu.nd.crc.safa.features.permissions.entities.PricePermission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -223,9 +223,8 @@ public class JobController extends BaseController {
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
             .asUser(user)
-            .withPermission(ProjectPermission.EDIT_DATA)
-            .withPermission(ProjectPermission.GENERATE)
-            .withAdditionalCheck(new HasUnlimitedCreditsCheck(), PricePermission.GENERATE_TRACES.getName())
+            .withPermissions(Set.of(ProjectPermission.GENERATE, ProjectPermission.EDIT_DATA))
+            .withAdditionalCheck(new HasUnlimitedCreditsCheck())
             .get();
         request.setProjectVersion(projectVersion);
 

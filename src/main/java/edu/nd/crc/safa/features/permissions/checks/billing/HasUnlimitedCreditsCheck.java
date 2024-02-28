@@ -12,4 +12,9 @@ public class HasUnlimitedCreditsCheck extends CompositeCheck {
     public HasUnlimitedCreditsCheck() {
         super(new PaymentTierCheck(Set.of(PaymentTier.RECURRING, PaymentTier.UNLIMITED)));
     }
+
+    @Override
+    public String getMessage() {
+        return "Payment tier must allow for unlimited credit usage";
+    }
 }

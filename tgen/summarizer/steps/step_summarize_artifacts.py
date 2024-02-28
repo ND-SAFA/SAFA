@@ -1,5 +1,5 @@
 from trace import Trace
-from typing import List, Dict, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from tgen.common.util.dict_util import DictUtil
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -60,7 +60,8 @@ class StepSummarizeArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerStat
         :return: Any leaves within the given artifacts and all links, excluding the leaves.
         """
         parents2links = RankingUtil.group_trace_predictions(links, key_id=TraceKeys.parent_label())
-        leaves = possible_artifacts.difference(set(parents2links.keys()))
+        parent_ids = set(parents2links.keys())
+        leaves = possible_artifacts.difference(parent_ids)
         remaining_links = [link for link in links if link[TraceKeys.SOURCE] not in leaves]
         possible_artifacts.difference_update(leaves)
         return leaves, remaining_links

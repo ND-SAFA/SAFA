@@ -25,7 +25,7 @@ from api.constants.config import get_current_version, get_home_page
 from api.endpoints.completion.completion_view import perform_completion
 from api.endpoints.views.hgen_view import perform_hgen
 from api.endpoints.views.project_summary_view import perform_project_summary
-from api.endpoints.views.result_view import cancel_job, get_result, get_status
+from api.endpoints.views.result_view import cancel_job, get_active_task_ids, get_pending_task_ids, get_result, get_status
 from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
 from api.endpoints.views.trace_view import perform_prediction, perform_search
 from api.endpoints.views.wait_view import perform_wait
@@ -67,5 +67,7 @@ urlpatterns = [
     path(AppEndpoints.STATUS.as_path(), get_status),
     path(AppEndpoints.CANCEL.as_path(), cancel_job),
     path(AppEndpoints.RESULTS.as_path(), get_result),
+    path(AppEndpoints.TASKS_ACTIVE.as_path(), get_active_task_ids()),
+    path(AppEndpoints.TASKS_PENDING.as_path(), get_pending_task_ids()),
     path(AppEndpoints.WAIT.as_path(), perform_wait)
 ]

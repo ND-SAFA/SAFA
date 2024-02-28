@@ -16,6 +16,8 @@ class AppEndpoints(Enum):
     CANCEL = "cancel"
     RESULTS = "results"
     WAIT = "wait"
+    TASKS_ACTIVE = "tasks/active"
+    TASKS_PENDING = "tasks/pending"
 
     def as_endpoint(self, suffix: str = None) -> str:
         """

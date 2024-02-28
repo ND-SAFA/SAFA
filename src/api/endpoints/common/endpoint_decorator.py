@@ -27,6 +27,19 @@ def endpoint(serializer, is_async: bool = False):
     return dec
 
 
+def endpoint_get(func):
+    """
+    Creates endpoint for GET request.
+    :param func: The function to call when get is called.
+    :return:
+    """
+
+    def dec(*args, **kwargs):
+        return class_decorator_get(func)
+
+    return dec
+
+
 def create_task_decorator(serializer, func):
     """
     Decorates func to be a celery task.
@@ -53,5 +66,24 @@ def class_decorator(serializer, func):
             :return: JSON response.
             """
             return func(request)
+
+    return APIDecorator.as_view()
+
+
+def class_decorator_get(func):
+    class APIDecorator(APIView):
+        """
+        Internal class supported the auto-generation of endpoint documentation.
+        """
+
+        @csrf_exempt
+        def get(self, request: HttpRequest):
+            """
+            The POST method handler logic.
+            :param request: The incoming request.
+            :return: JSON response.
+            """
+            # TODO: Currently ignoring request, can see this needed for params later.
+            return func()
 
     return APIDecorator.as_view()

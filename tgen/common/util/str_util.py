@@ -221,4 +221,4 @@ class StrUtil:
         :param input_string: The string to remove stopwords from.
         :return: The string without stop words.
         """
-        return SPACE.join([word for word in input_string.split() if word not in StrUtil.STOP_WORDS])
+        return SPACE.join([word for word in input_string.split() if word.lower() not in StrUtil.STOP_WORDS])

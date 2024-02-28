@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 
 from tgen.common.util.supported_enum import SupportedEnum
 
@@ -16,8 +16,17 @@ class Requirement:
     id: str
     condition: str
     effect: str
-    variable: Dict[RequirementConstituent, List[str]]
-    action: Dict[RequirementConstituent, List[str]]
+    variable: Dict[RequirementConstituent, str]
+    action: Dict[RequirementConstituent, str]
+
+    def get_constituent(self, constituent2get: RequirementConstituent, **kwargs) -> Any:
+        """
+        Gets the constituent of the requirement.
+        :param constituent2get: The constituent to get.
+        :param kwargs: Additional arguments to the getter.
+        :return: The constituent.
+        """
+        return getattr(self, f"get_{constituent2get.value}")(**kwargs)
 
     def get_condition(self) -> str:
         """
@@ -33,23 +42,24 @@ class Requirement:
         """
         return self.effect
 
-    def get_variable(self, constituent: RequirementConstituent = None, return_first: bool = True) -> Union[str, List]:
+    def get_variable(self, constituent: RequirementConstituent = None, default: Any = None) -> Union[str, List]:
         """
         Gets the variable of the constituent in the requirement.
         :param constituent: The constituent in the requirement to get the variable from.
-        :param return_first: If True, returns the first action if there is multiple for a given constituent.
+        :param default: Default value if does not exist.
         :return: The variable of the constituent in the requirement.
         """
-        return self._get_component_of_constituent(self.variable, constituent, return_first)
+        return self._get_component_of_constituent(self.variable, constituent, default)
 
-    def get_action(self, constituent: RequirementConstituent = None, return_first: bool = True) -> Union[str, List]:
+    def get_action(self, constituent: RequirementConstituent = None,
+                   default: Any = None) -> Union[str, List]:
         """
         Gets the action of the constituent in the requirement.
         :param constituent: The constituent in the requirement to get the action from.
-        :param return_first: If True, returns the first action if there is multiple for a given constituent.
+        :param default: Default value if does not exist.
         :return: The action of the constituent in the  requirement.
         """
-        return self._get_component_of_constituent(self.action, constituent, return_first)
+        return self._get_component_of_constituent(self.action, constituent, default)
 
     def is_empty(self) -> bool:
         """
@@ -61,12 +71,12 @@ class Requirement:
     @staticmethod
     def _get_component_of_constituent(component_dict: Dict[RequirementConstituent, List],
                                       constituent: RequirementConstituent = None,
-                                      return_first: bool = True) -> Union[str, List[str], None]:
+                                      default: Any = None) -> Union[str, List[str], None]:
         """
         Gets the component of the constituent in the requirement.
         :param component_dict: Contains the component for all constituents.
         :param constituent: he constituent in the requirement to get the component from.
-        :param return_first: If True, returns the first action if there is multiple for a given constituent.
+        :param default: Default value if does not exist.
         :return: The component of the constituent in the requirement.
         """
         if not constituent:
@@ -75,5 +85,5 @@ class Requirement:
             return [c for c in components if c is not None]
         component = component_dict.get(constituent)
         if not component:
-            return
-        return component[0] if return_first else component
+            return default
+        return component

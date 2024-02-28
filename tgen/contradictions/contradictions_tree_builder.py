@@ -109,7 +109,7 @@ class ContradictionsTreeBuilder:
         :param question_num: The current question number.
         :return: Question 5.
         """
-        q5 = ConditionalNode(description="Does the following sentence contain a condition:?",
+        q5 = ConditionalNode(description="Do the requirements contain a condition?",
                              branches={CommonChoices.YES: self.get_question_node(question_num + 1),
                                        CommonChoices.NO: SupportedContradictionDecisionNodes.SIMPLEX_CONTRADICTION.value},
                              conditional_statement=lambda requirements: CommonChoices.NO
@@ -168,7 +168,7 @@ class ContradictionsTreeBuilder:
                            ContradictionsTreeBuilder.convert_input_to_prompt_vars(input_, variable_base_name=constituent_addressed,
                                                                                   **converter_kwargs))
         if pre_check_constituent:
-            question = ConditionalNode(f"Pre-check the {constituent_addressed}",
+            question = ConditionalNode(f"Check if the {constituent_addressed} are exactly the same",
                                        branches={CommonChoices.YES: question.branches[CommonChoices.YES],
                                                  CommonChoices.NO: question},
                                        conditional_statement=lambda input_: CommonChoices.YES if ListUtil.are_all_items_the_same(

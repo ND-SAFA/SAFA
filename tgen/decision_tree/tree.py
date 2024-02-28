@@ -22,7 +22,7 @@ class Tree(abc.ABC):
         :param input_: The input to make the decision on.
         :return: The path taken to the final leaf node.
         """
-        path_taken = Path(self.starting_node)
+        path_taken = Path(self.starting_node, input_)
         node = self.starting_node
         while not node.is_leaf():
             node = self._take_step(input_, node, path_taken)
@@ -35,7 +35,7 @@ class Tree(abc.ABC):
         :param current_path_taken: The path up until the current point.
         :return: Prompt builder if LLM Node is reached and the updated path.
         """
-        current_path_taken = Path(self.starting_node) if not current_path_taken else current_path_taken
+        current_path_taken = Path(self.starting_node, input_) if not current_path_taken else current_path_taken
         current_node = current_path_taken.get_node(-1)
         if current_node.is_leaf():
             prompt_builder = None

@@ -3,7 +3,6 @@ from typing import Dict, List, Tuple, Set, Optional
 from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
-from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
 from tgen.contradictions.contradictions_tree_builder import ContradictionsTreeBuilder
@@ -86,7 +85,7 @@ class ContradictionsDetector:
         :return: The path taken when traversing the tree.
         """
         id2requirement = ContradictionsDetector.create_requirements([artifact1, artifact2])
-        if DictUtil.get_value_by_index(id2requirement) is None:
+        if any([req.is_empty() for req in id2requirement.values()]):
             raise Exception("Failed to convert artifact to requirement - bad response.")
         link = Trace(source=artifact1[ArtifactKeys.ID], target=artifact2[ArtifactKeys.ID])
         input_ = ContradictionsDetector._create_input_for_tree(link, id2requirement)

@@ -61,3 +61,15 @@ class LLMNode(AbstractNode):
         """
         res = parsed_res[PROMPT_ID][RESPONSE_TAG]
         return res[0] if len(res) > 0 else None
+
+    def get_formatted_question(self, input_: Any) -> str:
+        """
+        Formats the question using the given input.
+        :param input_: The input to the question.
+        :return: The question formatted using the given input.
+        """
+        question = self.description
+        if self.input_variable_converter:
+            format_vars = self.input_variable_converter(input_)
+            question = question.format(**format_vars)
+        return question

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from tgen.common.util.list_util import ListUtil
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
@@ -8,6 +8,7 @@ from tgen.decision_tree.nodes.abstract_node import AbstractNode
 @dataclass
 class Path:
     starting_node: AbstractNode
+    starting_input: Any
     __choices: List[str] = field(default_factory=list, init=False)
     __path_taken: List[AbstractNode] = field(default_factory=list, init=False)
 
@@ -35,6 +36,13 @@ class Path:
         """
         return ListUtil.safely_get_item(node_index, self.__path_taken)
 
+    def get_nodes(self) -> List[AbstractNode]:
+        """
+        Gets all nodes in the tree.
+        :return: All nodes in the tree.
+        """
+        return self.__path_taken
+
     def add_decision(self, choice: str) -> AbstractNode:
         """
         Adds a new decision on which branch of the tree to explore next.
@@ -55,3 +63,10 @@ class Path:
         last_node = self.get_node(-1)
         if last_node.is_leaf():
             return last_node.description
+
+    def __len__(self) -> int:
+        """
+        Returns the depth of the path.
+        :return: The depth of the path.
+        """
+        return len(self.__path_taken)

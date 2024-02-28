@@ -1,4 +1,3 @@
-from tgen.common.constants.deliminator_constants import COMMA
 from tgen.contradictions.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
@@ -43,12 +42,13 @@ EFFECT_PROMPT = Prompt("Effects are the results of a condition being met. "
 
 VARIABLE_PROMPT = Prompt("Variables are the *subjects* of the condition and effect. "
                          "For example, the variables of 'If the threshold is reached, "
-                         "the speed of the car must be decreased' would be "
-                         "'threshold' and 'speed of the car'. There is generally one variable in the condition (if it exists) "
-                         "and one in the effect (if it exists)."
-                         "Identify any variables in the requirement. ",
+                         "the dashboard must display the speed of the car' would be "
+                         "'threshold' (condition-variable) and 'dashboard' (effect-variable). "
+                         "The 'speed' would NOT be a variable since the primary action is occurring on the dashboard, not the speed."
+                         "There is generally exactly ONE variable in the condition (if it exists) "
+                         "and exactly ONE in the effect (if it exists)."
+                         "Identify the condition and effect variables in the requirement. ",
                          response_manager=PromptResponseManager(
-                             value_formatter=lambda tag, val: val.split(COMMA),
                              response_tag=[CONSTITUENT2TAG[RequirementConstituent.VARIABLE][RequirementConstituent.CONDITION],
                                            CONSTITUENT2TAG[RequirementConstituent.VARIABLE][RequirementConstituent.EFFECT]],
                              optional_tag_ids=USE_ALL_TAGS,
@@ -56,18 +56,21 @@ VARIABLE_PROMPT = Prompt("Variables are the *subjects* of the condition and effe
                                                           "If there is an effect with a variable, enclose it in {}. "))
 
 ACTION_PROMPT = Prompt("Actions are what happens to the variables.  "
-                       "For example, the actions of 'If the threshold is reached, the speed of the car must be decreased' would be "
-                       "'is reached' and 'must be decreased'"
-                       "Identify any actions in the requirement.",
+                       "For example, the actions of 'If the threshold is reached, "
+                       "the dashboard must display the speed of the car and the change in velocity calculated per BR-12.' would be "
+                       "'is reached' (condition-action) and 'must display' (effect-action"
+                       "'calculated' would NOT be an action since it is a further description of what would be displayed, "
+                       "where as 'display' WOULD BE the primary action occurring to the dashboard. "
+                       "There is generally exactly ONE action in the condition (if it exists) "
+                       "and exactly ONE in the effect (if it exists).",
                        response_manager=PromptResponseManager(
                            response_tag=[CONSTITUENT2TAG[RequirementConstituent.ACTION][RequirementConstituent.CONDITION],
                                          CONSTITUENT2TAG[RequirementConstituent.ACTION][RequirementConstituent.EFFECT]],
                            optional_tag_ids=USE_ALL_TAGS,
-                           value_formatter=lambda tag, val: val.split(COMMA),
                            response_instructions_format="If there is a condition with an action, enclose it in {}. "
                                                         "If there is an effect with an action, enclose it in {}. "))
 
-EXTRACT_CONSTITUENTS_PROMPT = QuestionnairePrompt(instructions="You must identify the condition(s), effect(s), "
+EXTRACT_CONSTITUENTS_PROMPT = QuestionnairePrompt(instructions="You must identify the condition, effect, "
                                                                "variable(s) and action(s) in the requirement if they exist.",
                                                   use_multi_step_task_instructions=True,
                                                   question_prompts=[CONDITIONS_PROMPT,

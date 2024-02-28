@@ -112,23 +112,24 @@ def get_result(task_identifier: TaskIdentifier) -> Union[Dict, JsonResponse]:
 
 
 @endpoint_get
-def get_active_task_ids() -> List[str]:
+def get_active_task_ids() -> Dict:
     """
     :return: List of active task IDs.
     """
     i = celery.control.inspect()
     active_task_map = i.active()
-    return get_task_ids(active_task_map)
+
+    return {"pending_task_ids": get_task_ids(active_task_map)}
 
 
 @endpoint_get
-def get_pending_task_ids() -> List[str]:
+def get_pending_task_ids() -> Dict:
     """
     :return: List of pending task IDs.
     """
     i = celery.control.inspect()
     active_task_map = i.reserved()
-    return get_task_ids(active_task_map)
+    return {"active_task_ids": get_task_ids(active_task_map)}
 
 
 def get_task_ids(queue2tasks: Dict) -> List[str]:

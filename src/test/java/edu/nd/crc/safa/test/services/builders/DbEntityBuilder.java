@@ -21,9 +21,18 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
+import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
+import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
+import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
+import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -71,6 +80,9 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final VersionService versionService;
     private final TeamService teamService;
     private final OrganizationService organizationService;
+    private final TeamMembershipService teamMembershipService;
+    private final OrganizationMembershipService organizationMembershipService;
+    private final ProjectMembershipService projectMembershipService;
 
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
@@ -102,6 +114,9 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.versionService = serviceProvider.getVersionService();
         this.teamService = serviceProvider.getTeamService();
         this.organizationService = serviceProvider.getOrganizationService();
+        this.teamMembershipService = serviceProvider.getTeamMembershipService();
+        this.organizationMembershipService = serviceProvider.getOrgMembershipService();
+        this.projectMembershipService = serviceProvider.getProjectMembershipService();
         DbEntityBuilder.instance = this;
         this.initializeData();
     }
@@ -148,22 +163,42 @@ public class DbEntityBuilder extends AbstractBuilder {
     }
 
     public Project newProjectWithReturn(String name) {
-        return this.newProject(name).getProject(name);
+        return newProjectWithReturn(name, currentUser);
+    }
+
+    public Project newProjectWithReturn(String name, SafaUser owner) {
+        Project project = this.projectService.createProject(name, "", owner);
+        createProjectTables(name, project);
+        return project;
+    }
+
+    public Project newProjectWithReturn(String name, Team owner) {
+        Project project = this.projectService.createProject(name, "", owner);
+        createProjectTables(name, project);
+        return project;
     }
 
     public DbEntityBuilder newProject(String name) {
-        return newProject(name, currentUser);
+        newProjectWithReturn(name);
+        return this;
     }
 
     public DbEntityBuilder newProject(String name, SafaUser owner) {
-        Project project = this.projectService.createProject(name, "", owner);
+        newProjectWithReturn(name, owner);
+        return this;
+    }
 
+    public DbEntityBuilder newProject(String name, Team owner) {
+        newProjectWithReturn(name, owner);
+        return this;
+    }
+
+    private void createProjectTables(String name, Project project) {
         this.projects.put(name, project);
         this.versions.put(name, new Hashtable<>());
         this.artifactTypes.put(name, new Hashtable<>());
         this.artifacts.put(name, new Hashtable<>());
         this.bodies.put(name, new Hashtable<>());
-        return this;
     }
 
     public DbEntityBuilder setProject(String key, Project project) {
@@ -446,6 +481,35 @@ public class DbEntityBuilder extends AbstractBuilder {
 
     private <T> void assertProjectExists(Map<String, T> table, String projectName) {
         assertEntityExists(table, projectName, "Project");
+    }
+
+    public IEntityMembership createMembershipWithReturn(IEntityWithMembership membershipEntity, SafaUser user, IRole role) {
+        if (role instanceof ProjectRole && membershipEntity instanceof Project) {
+            return projectMembershipService.addUserRole(user, membershipEntity, role);
+        } else if (role instanceof TeamRole && membershipEntity instanceof Team) {
+            return teamMembershipService.addUserRole(user, membershipEntity, role);
+        } else if (role instanceof OrganizationRole && membershipEntity instanceof Organization) {
+            return organizationMembershipService.addUserRole(user, membershipEntity, role);
+        } else {
+            throw new AssertionError("Role type does not match membership entity type");
+        }
+    }
+
+    public DbEntityBuilder createMembership(IEntityWithMembership membershipEntity, SafaUser user, IRole role) {
+        createMembershipWithReturn(membershipEntity, user, role);
+        return this;
+    }
+
+    public void deleteMembership(IEntityWithMembership membershipEntity, SafaUser user, IRole role) {
+        if (role instanceof ProjectRole && membershipEntity instanceof Project) {
+            projectMembershipService.removeUserRole(user, membershipEntity, role);
+        } else if (role instanceof TeamRole && membershipEntity instanceof Team) {
+            teamMembershipService.removeUserRole(user, membershipEntity, role);
+        } else if (role instanceof OrganizationRole && membershipEntity instanceof Organization) {
+            organizationMembershipService.removeUserRole(user, membershipEntity, role);
+        } else {
+            throw new AssertionError("Role type does not match membership entity type");
+        }
     }
 
     /**

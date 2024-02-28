@@ -15,4 +15,10 @@ public class OrPermissionCheck implements AdditionalPermissionCheck {
     public boolean doCheck(PermissionCheckContext context) {
         return children.stream().anyMatch(c -> c.doCheck(context));
     }
+
+    @Override
+    public String getMessage() {
+        return "Any of the following:\n  "
+            + String.join("  \n", children.stream().map(AdditionalPermissionCheck::getMessage).toList());
+    }
 }

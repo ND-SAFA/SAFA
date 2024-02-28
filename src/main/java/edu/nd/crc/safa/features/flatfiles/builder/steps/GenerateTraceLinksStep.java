@@ -8,12 +8,11 @@ import edu.nd.crc.safa.features.flatfiles.builder.FlatFileBuilderStore;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenRequestAppEntity;
 import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
-import edu.nd.crc.safa.features.permissions.entities.PricePermission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class GenerateTraceLinksStep implements IFlatFileBuilderStep {
     @Override
@@ -23,11 +22,10 @@ public class GenerateTraceLinksStep implements IFlatFileBuilderStep {
 
         if (tgenRequest.size() > 0) {
             PermissionService permissionService = serviceProvider.getPermissionService();
-            Project project = state.getProjectVersion().getProject();
+            ProjectVersion projectVersion = state.getProjectVersion();
 
-            permissionService.requirePermission(ProjectPermission.GENERATE, project, state.getUser());
-            permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(),
-                PricePermission.GENERATE_TRACES.getName(), project, state.getUser());
+            permissionService.requirePermission(ProjectPermission.GENERATE, projectVersion, state.getUser());
+            permissionService.requireAdditionalCheck(new HasUnlimitedCreditsCheck(), projectVersion, state.getUser());
         }
         ProjectAppEntity projectAppEntity = new ProjectAppEntity();
         ProjectCommitDefinition commit = state.getProjectCommitDefinition();

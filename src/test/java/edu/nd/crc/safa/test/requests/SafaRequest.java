@@ -137,6 +137,10 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return postWithResponseParser(body, resp -> this.jacksonParse(resp, type));
     }
 
+    public <T> T postAndParseResponse(Object body, TypeReference<T> type, ResultMatcher resultMatcher) {
+        return postWithResponseParser(body, resp -> this.jacksonParse(resp, type), resultMatcher);
+    }
+
     public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) {
         return putWithResponseParser(body, resultMatcher, ResponseParser::jsonCreator);
     }

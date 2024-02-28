@@ -193,6 +193,11 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
+    @Override
+    public int getCountInProjectVersion(ProjectVersion projectVersion) {
+        return artifactVersionRepository.countByProjectVersion(projectVersion);
+    }
+
     /**
      * Private helper methods
      */

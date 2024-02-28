@@ -1,9 +1,17 @@
 package edu.nd.crc.safa.features.permissions.checks;
 
 /**
- * Interface for additional checks that can be tied to permissions
+ * Interface for additional checks that can be tied to permissions. Broadly speaking,
+ * implementations of this interface will be called like this:<br/>
+ * <pre>
+ * {@code
+ *   AdditionalPermissionCheck check = ...;
+ *   if (!check.doCheck(context)) {
+ *     throw new RuntimeException(check.getMessage());
+ *   }
+ * }
+ * </pre>
  */
-@FunctionalInterface
 public interface AdditionalPermissionCheck {
     /**
      * Perform the check
@@ -12,4 +20,11 @@ public interface AdditionalPermissionCheck {
      * @return Whether the check passed
      */
     boolean doCheck(PermissionCheckContext context);
+
+    /**
+     * Get the message that should be displayed if the check fails
+     *
+     * @return The message
+     */
+    String getMessage();
 }

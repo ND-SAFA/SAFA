@@ -153,4 +153,12 @@ public interface IVersionRepository<
      * @return A map between entity ID and entity versions for all entities in the given project version.
      */
     Map<UUID, List<V>> createVersionEntityMap(ProjectVersion projectVersion, List<UUID> baseEntityIds);
+
+    /**
+     * Get the count of entities present in a particular project version
+     *
+     * @param projectVersion The version to check in
+     * @return The number of entities in this version
+     */
+    int getCountInProjectVersion(ProjectVersion projectVersion);
 }

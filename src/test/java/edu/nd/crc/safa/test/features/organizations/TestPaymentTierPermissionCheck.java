@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,10 @@ public class TestPaymentTierPermissionCheck extends ApplicationBaseTest {
             .postWithJsonObject(body, status().is4xxClientError());
 
         assertThat(response.getString("message")).isNotNull();
-        assertThat(response.getString("message").toLowerCase()).contains("missing permission");
+        assertThat(response.getString("message").toLowerCase()).contains("additional errors were encountered");
+
+        JSONArray additionalErrors = response.getJSONArray("additionalErrors");
+        assertThat(additionalErrors.length()).isEqualTo(1);
+        assertThat(additionalErrors.getString(0)).contains("credit balance must be at least");
     }
 }

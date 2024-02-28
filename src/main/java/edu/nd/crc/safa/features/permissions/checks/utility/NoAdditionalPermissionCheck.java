@@ -8,4 +8,10 @@ public class NoAdditionalPermissionCheck implements AdditionalPermissionCheck {
     public boolean doCheck(PermissionCheckContext context) {
         return true;
     }
+
+    @Override
+    public String getMessage() {
+        // Since we always return true above, there's no reason for anyone to see this message
+        return "If you are seeing this message, please report it to the devs";
+    }
 }

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.permissions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,13 +18,25 @@ public class MissingPermissionException extends SafaError {
     @JsonIgnore
     private final Set<Permission> missingPermissions;
 
-    public MissingPermissionException(Set<Permission> missingPermissions, boolean needAll) {
+    private final List<String> additionalErrors;
+
+    public MissingPermissionException(Set<Permission> missingPermissions, boolean needAll,
+                                      List<String> additionalErrors) {
         super(getPermissionMessage(missingPermissions, needAll));
         this.missingPermissions = missingPermissions;
+        this.additionalErrors = additionalErrors;
+    }
+
+    public MissingPermissionException(Set<Permission> missingPermissions, boolean needAll) {
+        this(missingPermissions, needAll, new ArrayList<>());
     }
 
     public MissingPermissionException(Permission missingPermission) {
         this(Set.of(missingPermission), true);
+    }
+
+    public MissingPermissionException(List<String> additionalErrors) {
+        this(Set.of(), true, additionalErrors);
     }
 
     public List<String> getPermissions() {
@@ -35,6 +48,10 @@ public class MissingPermissionException extends SafaError {
     }
 
     private static String getPermissionMessage(Set<Permission> missingPermissions, boolean needAll) {
+        if (missingPermissions.isEmpty()) {
+            return "All permissions met, but additional errors were encountered";
+        }
+
         return
             String.format(
                 "Missing permissions. User must have %s of these permissions: %s",

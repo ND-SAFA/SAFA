@@ -26,7 +26,6 @@ import edu.nd.crc.safa.features.permissions.checks.utility.AndPermissionCheck;
 import edu.nd.crc.safa.features.permissions.checks.utility.OrPermissionCheck;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.SafaApplicationPermission;
-import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -250,15 +249,12 @@ public class PermissionService {
      *
      * @param check The additional permission check to perform. These can be chained together using
      *              {@link AndPermissionCheck} and {@link OrPermissionCheck}
-     * @param checkName The name for the check, which will be used as the name of the missing permission
-     *                  in the exception
      * @param entity The entity we're considering
      * @param user The user in question
      */
-    public void requireAdditionalCheck(AdditionalPermissionCheck check, String checkName,
-                                       IEntityWithMembership entity, SafaUser user) {
+    public void requireAdditionalCheck(AdditionalPermissionCheck check, IEntityWithMembership entity, SafaUser user) {
         if (!hasAdditionalCheck(check, entity, user)) {
-            throw new MissingPermissionException((SimplePermission)(() -> checkName));
+            throw new MissingPermissionException(List.of(check.getMessage()));
         }
     }
 

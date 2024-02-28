@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.hgen;
 
+import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -9,7 +10,6 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.builders.HGenJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.permissions.checks.billing.CanAffordHgenCheck;
-import edu.nd.crc.safa.features.permissions.entities.PricePermission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -43,9 +43,8 @@ public class HGenController extends BaseController {
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
             .asUser(currentUser)
-            .withPermission(ProjectPermission.EDIT_DATA)
-            .withPermission(ProjectPermission.GENERATE)
-            .withAdditionalCheck(new CanAffordHgenCheck(request), PricePermission.HGEN.getName())
+            .withPermissions(Set.of(ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE))
+            .withAdditionalCheck(new CanAffordHgenCheck(request))
             .get();
         HGenJobBuilder jobBuilder = new HGenJobBuilder(getServiceProvider(), projectVersion, request, currentUser);
         return jobBuilder.perform();

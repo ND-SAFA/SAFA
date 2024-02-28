@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.permissions.checks.billing;
 
+import java.util.function.Function;
+
 import edu.nd.crc.safa.features.billing.entities.db.BillingInfo;
 import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
@@ -13,10 +15,15 @@ import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
  */
 public class MinimumBalanceCheck implements AdditionalPermissionCheck {
 
-    private final int minimumBalance;
+    private final Function<PermissionCheckContext, Integer> minimumBalanceSupplier;
+    private Integer cachedMinimumBalance;
 
     public MinimumBalanceCheck(int minimumBalance) {
-        this.minimumBalance = minimumBalance;
+        this(context -> minimumBalance);
+    }
+
+    public MinimumBalanceCheck(Function<PermissionCheckContext, Integer> minimumBalanceSupplier) {
+        this.minimumBalanceSupplier = minimumBalanceSupplier;
     }
 
     @Override
@@ -29,6 +36,22 @@ public class MinimumBalanceCheck implements AdditionalPermissionCheck {
 
         BillingService billingService = context.getServiceProvider().getBillingService();
         BillingInfo billingInfo = billingService.getBillingInfoForOrg(org);
-        return billingInfo.getBalance() > minimumBalance;
+        return billingInfo.getBalance() > getMinimumBalance(context);
+    }
+
+    @Override
+    public String getMessage() {
+        return "Organization credit balance must be at least: " + getMinimumBalance(null);
+    }
+
+    private int getMinimumBalance(PermissionCheckContext context) {
+        if (cachedMinimumBalance == null) {
+            if (context == null) {
+                cachedMinimumBalance = -1;
+            } else {
+                cachedMinimumBalance = minimumBalanceSupplier.apply(context);
+            }
+        }
+        return cachedMinimumBalance;
     }
 }

@@ -24,7 +24,8 @@ class RequestProxy:
         :return: The list of trace predictions.
         """
         data = {"dataset": dataset}
-        response = RequestProxy._request(AppEndpoints.TGEN.as_endpoint(sync=sync), data)
+        suffix = "sync" if sync else None
+        response = RequestProxy._request(AppEndpoints.TGEN.as_endpoint(suffix=suffix), data)
         return [Trace(**t) for t in response["predictions"]]
 
     @staticmethod

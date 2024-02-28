@@ -15,27 +15,30 @@ class AppEndpoints(Enum):
     STATUS = "status"
     CANCEL = "cancel"
     RESULTS = "results"
+    WAIT = "wait"
+    TASKS_ACTIVE = "tasks/active"
+    TASKS_PENDING = "tasks/pending"
 
-    def as_endpoint(self, sync=False) -> str:
+    def as_endpoint(self, suffix: str = None) -> str:
         """
         :return: Client endpoint location..
         """
-        return self.as_path(prefix=F_SLASH, sync=sync)
+        return self.as_path(prefix=F_SLASH, suffix=suffix)
 
-    def as_path(self, prefix: str = EMPTY_STRING, sync=False) -> str:
+    def as_path(self, prefix: str = EMPTY_STRING, suffix: str = None) -> str:
         """
         :return: Internal endpoint location.
         """
-        endpoint_value = self.get_name(sync=sync)
+        endpoint_value = self.get_name(suffix=suffix)
         return f"{prefix}{endpoint_value}/"
 
-    def get_name(self, sync: bool = False):
+    def get_name(self, suffix: str = None):
         """
         Returns the value of the endpoint.
-        :param sync: Whether to convert the endpoint to a syncronous one.
+        :param suffix: The suffix to add to endpoint.
         :return: The endpoint value.
         """
         internal_value = self.value
-        if sync:
-            internal_value = f"{internal_value}-sync"
+        if suffix:
+            internal_value = f"{internal_value}-{suffix}"
         return internal_value

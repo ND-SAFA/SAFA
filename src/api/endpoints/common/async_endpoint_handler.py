@@ -43,7 +43,8 @@ class AsyncEndpointHandler(IHandler):
         :return: None
         """
         result = self.task.delay(data)
-        return JsonResponse({"task_id": result.id}, encoder=NpEncoder)
+        task_id = result.id
+        return JsonResponse({"task_id": task_id}, encoder=NpEncoder)
 
     def create_task(self):
         @shared_task(name=self.func.__name__)

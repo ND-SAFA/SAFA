@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, TypedDict, Union
+from typing import Dict, List, Tuple, TypedDict, Union
 
 from celery import states
 from celery.result import AsyncResult
@@ -7,8 +7,9 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_MEDIUM
 from api.constants.celery_status import CeleryStatus
-from api.endpoints.common.endpoint_decorator import endpoint
+from api.endpoints.common.endpoint_decorator import endpoint, endpoint_get
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from api.server.celery import celery
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
 
@@ -108,3 +109,34 @@ def get_result(task_identifier: TaskIdentifier) -> Union[Dict, JsonResponse]:
     else:
         status, msg = get_status(task_identifier)
         return JsonResponse({"error": f"Job status: {msg}"}, status=400)
+
+
+@endpoint_get
+def get_active_task_ids() -> Dict:
+    """
+    :return: List of active task IDs.
+    """
+    i = celery.control.inspect()
+    active_task_map = i.active()
+
+    return {"pending_task_ids": get_task_ids(active_task_map)}
+
+
+@endpoint_get
+def get_pending_task_ids() -> Dict:
+    """
+    :return: List of pending task IDs.
+    """
+    i = celery.control.inspect()
+    active_task_map = i.reserved()
+    return {"active_task_ids": get_task_ids(active_task_map)}
+
+
+def get_task_ids(queue2tasks: Dict) -> List[str]:
+    """
+    Returns the set of task IDs in map.
+    :param queue2tasks: Map of queue to tasks in celery app.
+    :return: List of task ids.
+    """
+    task_ids = [task["id"] for queue, queue_tasks in queue2tasks.items() for task in queue_tasks]
+    return task_ids

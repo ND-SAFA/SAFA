@@ -9,16 +9,16 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.tf_util import move_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.st.st_loss_functions import SupportedLossFunctions
-from tgen.core.trainers.st.tensor_utilities import move_to_device
-from tgen.core.trainers.st_trainer import SentenceTransformerTrainer
+from tgen.core.trainers.st.st_loss_functions import SupportedSTLossFunctions
+from tgen.core.trainers.st_trainer import STTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
 
 
-class SentenceTransformerTrainerSiamese(SentenceTransformerTrainer):
+class STEmbeddingTrainer(STTrainer):
     """
     Trains sentence transformer models. They have a slightly modified API for training the models and loading the data.
     """
@@ -41,7 +41,7 @@ class SentenceTransformerTrainerSiamese(SentenceTransformerTrainer):
         self.loss_function = None
         self.loss_function = self._create_loss_function()
 
-    @overrides(SentenceTransformerTrainer)
+    @overrides(STTrainer)
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor) -> torch.Tensor:
         """
         Computes the similarity scores between source and target embeddings.
@@ -52,14 +52,14 @@ class SentenceTransformerTrainerSiamese(SentenceTransformerTrainer):
         similarity_scores = cosine_similarity(source_embeddings, target_embeddings)
         return similarity_scores
 
-    @overrides(SentenceTransformerTrainer)
+    @overrides(STTrainer)
     def get_trainable_parameters(self) -> Iterable[Parameter]:
         """
         :return: Returns the embedding model's parameters.
         """
         return self.model.parameters()
 
-    @overrides(SentenceTransformerTrainer)
+    @overrides(STTrainer)
     def compute_loss(self, scores: torch.Tensor, labels: torch.Tensor, input_examples: List[InputExample] = None) -> torch.Tensor:
         """
         Computes the loss between the input examples.
@@ -77,13 +77,13 @@ class SentenceTransformerTrainerSiamese(SentenceTransformerTrainer):
             loss += self.loss_function(features, labels)
         return loss
 
-    @overrides(SentenceTransformerTrainer)
+    @overrides(STTrainer)
     def save(self) -> None:
         """
         Saves the current embedding model.
         :return: None
         """
-        raise NotImplementedError()
+        self.model.save(self.args.output_dir)
 
     def _create_loss_function(self):
         """
@@ -93,7 +93,7 @@ class SentenceTransformerTrainerSiamese(SentenceTransformerTrainer):
         loss_function_name = self.trainer_args.st_loss_function
         loss_function_kwargs = {}
         possible_params = {"size_average": False, "margin": 0.1}
-        loss_function_class = SupportedLossFunctions.get_value(loss_function_name)
+        loss_function_class = SupportedSTLossFunctions.get_value(loss_function_name)
         for param, param_value in possible_params.items():
             if ReflectionUtil.has_constructor_param(loss_function_class, param):
                 loss_function_kwargs[param] = param_value

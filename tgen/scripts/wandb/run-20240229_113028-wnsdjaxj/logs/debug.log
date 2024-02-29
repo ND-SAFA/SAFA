@@ -1,0 +1,33 @@
+2024-02-29 11:30:28,938 INFO    MainThread:2072 [wandb_setup.py:_flush():68] Configure stats pid to 2072
+2024-02-29 11:30:28,938 INFO    MainThread:2072 [wandb_setup.py:_flush():68] Loading settings from /Users/albertorodriguez/.config/wandb/settings
+2024-02-29 11:30:28,938 INFO    MainThread:2072 [wandb_setup.py:_flush():68] Loading settings from /Users/albertorodriguez/projects/safa/tgen/tgen/scripts/wandb/settings
+2024-02-29 11:30:28,939 INFO    MainThread:2072 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'mode': 'online', '_require_service': 'True'}
+2024-02-29 11:30:28,939 INFO    MainThread:2072 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program_relpath': 'tgen/scripts/tool_runner.py', 'program': '/Users/albertorodriguez/projects/safa/tgen/tgen/scripts/tool_runner.py'}
+2024-02-29 11:30:28,939 INFO    MainThread:2072 [wandb_init.py:_log_setup():492] Logging user logs to /Users/albertorodriguez/projects/safa/tgen/tgen/scripts/wandb/run-20240229_113028-wnsdjaxj/logs/debug.log
+2024-02-29 11:30:28,939 INFO    MainThread:2072 [wandb_init.py:_log_setup():493] Logging internal logs to /Users/albertorodriguez/projects/safa/tgen/tgen/scripts/wandb/run-20240229_113028-wnsdjaxj/logs/debug-internal.log
+2024-02-29 11:30:28,940 INFO    MainThread:2072 [wandb_init.py:init():532] calling init triggers
+2024-02-29 11:30:28,940 INFO    MainThread:2072 [wandb_init.py:init():538] wandb.init called with sweep_config: {}
+config: {'train_project': 'clustering', 'val_project': 0.25, 'eval_project': '', 'model': 'sentence-transformers/all-MiniLM-L6-v2'}
+2024-02-29 11:30:28,941 INFO    MainThread:2072 [wandb_init.py:init():588] starting backend
+2024-02-29 11:30:28,941 INFO    MainThread:2072 [wandb_init.py:init():592] setting up manager
+2024-02-29 11:30:28,946 INFO    MainThread:2072 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2024-02-29 11:30:28,951 INFO    MainThread:2072 [wandb_init.py:init():599] backend started and connected
+2024-02-29 11:30:28,960 INFO    MainThread:2072 [wandb_init.py:init():687] updated telemetry
+2024-02-29 11:30:29,000 INFO    MainThread:2072 [wandb_init.py:init():727] communicating run to backend with 60.0 second timeout
+2024-02-29 11:30:29,554 INFO    MainThread:2072 [wandb_run.py:_on_init():2134] communicating current version
+2024-02-29 11:30:29,697 INFO    MainThread:2072 [wandb_run.py:_on_init():2143] got version response upgrade_message: "wandb version 0.16.3 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2024-02-29 11:30:29,703 INFO    MainThread:2072 [wandb_init.py:init():775] starting run threads in backend
+2024-02-29 11:30:29,808 INFO    MainThread:2072 [wandb_run.py:_console_start():2114] atexit reg
+2024-02-29 11:30:29,810 INFO    MainThread:2072 [wandb_run.py:_redirect():1969] redirect: SettingsConsole.WRAP_RAW
+2024-02-29 11:30:29,810 INFO    MainThread:2072 [wandb_run.py:_redirect():2034] Wrapping output streams.
+2024-02-29 11:30:29,810 INFO    MainThread:2072 [wandb_run.py:_redirect():2059] Redirects installed.
+2024-02-29 11:30:29,811 INFO    MainThread:2072 [wandb_init.py:init():817] run started, returning control to user process
+2024-02-29 11:30:29,818 INFO    MainThread:2072 [wandb_run.py:_config_callback():1250] config_cb None None {'num_train_epochs': 3, 'train_batch_size': 4, 'st_loss_function': 'cosine', 'metric_for_best_model': 'loss', 'gradient_accumulation_steps': 1, 'use_scores': False}
+2024-02-29 11:31:32,298 INFO    MainThread:2072 [wandb_run.py:_finish():1854] finishing run safa-nd/tgen-tgen_scripts/wnsdjaxj
+2024-02-29 11:31:32,299 INFO    MainThread:2072 [wandb_run.py:_atexit_cleanup():2083] got exitcode: 0
+2024-02-29 11:31:32,303 INFO    MainThread:2072 [wandb_run.py:_restore():2066] restore
+2024-02-29 11:31:32,304 INFO    MainThread:2072 [wandb_run.py:_restore():2072] restore done
+2024-02-29 11:31:39,529 INFO    MainThread:2072 [wandb_run.py:_footer_history_summary_info():3442] rendering history
+2024-02-29 11:31:39,533 INFO    MainThread:2072 [wandb_run.py:_footer_history_summary_info():3474] rendering summary
+2024-02-29 11:31:39,552 INFO    MainThread:2072 [wandb_run.py:_footer_sync_info():3398] logging synced files

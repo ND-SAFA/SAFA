@@ -5,7 +5,7 @@ import torch.nn as nn
 from sentence_transformers import SentenceTransformer
 
 
-class MLP(nn.Module):
+class STMLP(nn.Module):
     def __init__(self, input_size: int, hidden_sizes: List[int], output_size=2,
                  activations: Union[Type[nn.Module], List[Type[nn.Module]]] = None):
         """
@@ -15,7 +15,7 @@ class MLP(nn.Module):
         :param output_size: The size of the final output layer.
         :param activations:
         """
-        super(MLP, self).__init__()
+        super(STMLP, self).__init__()
         layers = []
         sizes = [input_size] + hidden_sizes + [output_size]
         for i in range(len(sizes) - 1):
@@ -29,7 +29,7 @@ class MLP(nn.Module):
         if not isinstance(activations, list):
             activations = [activations] * (len(hidden_sizes))
         input_size = 2 * model.get_sentence_embedding_dimension()
-        mlp_model = MLP(input_size=input_size, hidden_sizes=hidden_sizes, activations=activations)
+        mlp_model = STMLP(input_size=input_size, hidden_sizes=hidden_sizes, activations=activations)
         return mlp_model
 
     def forward(self, x):

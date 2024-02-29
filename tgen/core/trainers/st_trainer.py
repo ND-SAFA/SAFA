@@ -12,11 +12,11 @@ from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFOR
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
+from tgen.common.util.st_util import to_input_examples
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
-from tgen.core.trainers.st.sentence_transformer_evaluator import SentenceTransformerEvaluator
-from tgen.core.trainers.st.st_utilities import to_input_examples
+from tgen.core.trainers.st.st_evaluator import STEvaluator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -24,7 +24,7 @@ from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
 
 
-class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
+class STTrainer(HuggingFaceTrainer, ABC):
     """
     Trains sentence transformer models. They have a slightly modified API for training the models and loading the data.
     """
@@ -57,43 +57,36 @@ class SentenceTransformerTrainer(HuggingFaceTrainer, ABC):
         train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
 
-        evaluator = SentenceTransformerEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
+        evaluator = STEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
         optimizer = optim.Adam(self.get_trainable_parameters(), lr=0.001)
         epochs = int(self.args.num_train_epochs)
         logger.info(f"Epochs: {epochs}")
 
-        self.on_setup()
-
         for epoch in range(epochs):
             epoch_loss = 0
             for i in tqdm(range(len(train_batch_sampler)), desc="Training model...."):
-                self.before_step()
                 batch_indices = next(train_batch_sampler)
                 batch_examples = [train_examples[i] for i in batch_indices]
                 sentence_pairs: List[List[str]] = [b.texts for b in batch_examples]
                 labels = torch.tensor([float(b.label) for b in batch_examples])
 
                 optimizer.zero_grad()  # Clear gradients
-
-                # Process each sentence pair
-                predictions = self.calculate_predictions(sentence_pairs)
-
-                # Calculate loss
+                predictions = self.calculate_predictions(sentence_pairs)  # Process each sentence pair
                 loss = self.compute_loss(scores=predictions, labels=labels, input_examples=batch_examples)
-
                 loss.backward()  # Back-propagate and update weights
                 optimizer.step()
+
                 epoch_loss += loss.item()
                 self.state.total_flos += loss.item()
                 self.state.global_step += 1
-                self.after_step()
+                train_batch_sampler.reset()
 
             logger.info(f"Training Loss: {epoch_loss}")
             self.evaluate_if_save(evaluator)
 
         return TrainOutput(metrics={}, training_loss=self.state.total_flos, global_step=self.state.global_step)
 
-    def evaluate_if_save(self, evaluator: SentenceTransformerEvaluator, **kwargs) -> None:
+    def evaluate_if_save(self, evaluator: STEvaluator, **kwargs) -> None:
         """
         Evaluates the model and saves if its the best version of the model so far.
         :param evaluator: The evaluator called to get score.

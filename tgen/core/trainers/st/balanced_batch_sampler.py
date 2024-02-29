@@ -44,6 +44,13 @@ class BalancedBatchSampler:
         """
         return self.n_batches
 
+    def reset(self) -> None:
+        """
+        Resets the available samples.
+        :return: None.
+        """
+        self.non_negative_indices, self.negative_indices = self.create_indices(self.labels)
+
     def select_negative(self, n_items: int) -> List[int]:
         """
         Selects native indices for next batch. Updates negative indices with those unselected.

@@ -6,8 +6,8 @@ import numpy as np
 
 from tgen.common.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.st.st_loss_functions import SupportedLossFunctions
-from tgen.core.trainers.st_trainer_siamese import SentenceTransformerTrainer
+from tgen.core.trainers.st.st_loss_functions import SupportedSTLossFunctions
+from tgen.core.trainers.st_embedding_trainer import STTrainer
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager
@@ -39,7 +39,7 @@ class TestSentenceTransformerTrainer(TestCase):
         """
         Tests ability to define loss functions on sentence transformer trainer.
         """
-        for loss_function in SupportedLossFunctions:
+        for loss_function in SupportedSTLossFunctions:
             trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": 1, "st_loss_function": loss_function.name})
             training_metrics = trainer.perform_training().metrics["records"]
             self.assert_valid_metrics(self, training_metrics, 1)
@@ -66,7 +66,7 @@ class TestSentenceTransformerTrainer(TestCase):
     @staticmethod
     def create_trainer(model_manager_kwargs: Dict = None, trainer_dataset_manager_kwargs: Dict = None,
                        trainer_args_kwargs: Dict = None, trainer_kwargs: Dict = None,
-                       save_best_model: bool = False) -> SentenceTransformerTrainer:
+                       save_best_model: bool = False) -> STTrainer:
         """
         Creates trainer with given customizations.
         :param model_manager_kwargs: Keyword arguments passed to model manager.
@@ -91,7 +91,7 @@ class TestSentenceTransformerTrainer(TestCase):
         trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager(val_percentage=0.4,
                                                                                      **trainer_dataset_manager_kwargs)
         trainer_args_kwargs = HuggingFaceArgs(TEST_OUTPUT_DIR, **trainer_args_kwargs)
-        trainer = SentenceTransformerTrainer(trainer_args_kwargs, model_manager, trainer_dataset_manager, **trainer_kwargs)
+        trainer = STTrainer(trainer_args_kwargs, model_manager, trainer_dataset_manager, **trainer_kwargs)
         return trainer
 
     @staticmethod

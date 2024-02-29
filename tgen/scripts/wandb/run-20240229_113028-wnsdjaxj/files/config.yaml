@@ -1,0 +1,71 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.10
+    framework: huggingface
+    huggingface_version: 4.26.1
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.9.13
+    start_time: 1709227828.952195
+    t:
+      1:
+      - 1
+      - 5
+      - 11
+      - 49
+      - 51
+      - 53
+      - 55
+      - 75
+      2:
+      - 1
+      - 5
+      - 11
+      - 49
+      - 51
+      - 53
+      - 55
+      - 75
+      3:
+      - 2
+      - 13
+      - 16
+      - 23
+      4: 3.9.13
+      5: 0.13.10
+      6: 4.26.1
+      8:
+      - 5
+eval_project:
+  desc: null
+  value: ''
+gradient_accumulation_steps:
+  desc: null
+  value: 1
+metric_for_best_model:
+  desc: null
+  value: loss
+model:
+  desc: null
+  value: sentence-transformers/all-MiniLM-L6-v2
+num_train_epochs:
+  desc: null
+  value: 3
+st_loss_function:
+  desc: null
+  value: cosine
+train_batch_size:
+  desc: null
+  value: 4
+train_project:
+  desc: null
+  value: clustering
+use_scores:
+  desc: null
+  value: false
+val_project:
+  desc: null
+  value: 0.25

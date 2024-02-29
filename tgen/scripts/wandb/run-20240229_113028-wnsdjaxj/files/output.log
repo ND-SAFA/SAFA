@@ -1,0 +1,77 @@
+Configuration Update: {'num_train_epochs': 3, 'train_batch_size': 4, 'st_loss_function': 'cosine', 'metric_for_best_model': 'loss', 'gradient_accumulation_steps': 1, 'use_scores': False}
+/Users/albertorodriguez/desktop/safa/datasets/papers/hgen/official/dronology/clustering/dr.csv:25
+/Users/albertorodriguez/desktop/safa/datasets/papers/hgen/official/dronology/clustering/c.csv:27
+/Users/albertorodriguez/desktop/safa/datasets/papers/hgen/official/dronology/clustering/fr.csv:13
+/Users/albertorodriguez/desktop/safa/datasets/papers/hgen/official/dronology/clustering/c2dr.json:74
+/Users/albertorodriguez/desktop/safa/datasets/papers/hgen/official/dronology/clustering/dr2fr.json:70
+Artifacts: 65 Traces: 144 Queries: 2
+Adding negative links to trace data frame...
+Done.
+[Design Requirement: 25],[Code: 27],[Functional Requirement: 13]
+Trace dataset(+144, -(856) = 1000)
+Creating data slices: 100%|██████████████████████████████████████████████████████████| 500/500 [00:01<00:00, 299.85it/s]
+Creating data slices: 100%|██████████████████████████████████████████████████████████| 500/500 [00:01<00:00, 329.72it/s]
+Creating data slices:  26%|███████████████▌                                           | 66/250 [00:00<00:00, 322.60it/s]
+Creating data slices: 100%|██████████████████████████████████████████████████████████| 250/250 [00:00<00:00, 316.34it/s]
+Creating data slices: 100%|██████████████████████████████████████████████████████████| 250/250 [00:00<00:00, 333.37it/s]
+Trace links after processing: 500
+Converting trace data frame to hugging face dataset.
+Trace links after processing: 250
+Converting trace data frame to hugging face dataset.
+Trace links after processing: 250
+# Evaluating Model
+## Val Set
+Batches:  33%|███▎      | 1/3 [00:00<00:01,  1.24it/s]
+Batches: 100%|██████████| 3/3 [00:01<00:00,  2.71it/s]
+Computing predictions...: 100%|██████████| 32/32 [00:00<00:00, 9477.98it/s]
+
+
+
+
+
+
+
+Calculating loss..: 100%|██████████| 32/32 [00:14<00:00,  2.15it/s]
+# Val Metrics
+{'map': 0.8451796157059315, 'precision': 0.25, 'recall': 0.8888888888888888, 'lag': 2.9473684210526314, 'f2': 0.5882352941176471, 'avg_true_links': 0.9473684210526315, 'loss': 7.395611763000488}
+## Eval Set
+Batches:   0%|          | 0/3 [00:00<?, ?it/s]
+Batches: 100%|██████████| 3/3 [00:01<00:00,  2.62it/s]
+Computing predictions...: 100%|██████████| 32/32 [00:00<00:00, 9258.95it/s]
+
+
+
+
+
+
+
+
+
+
+
+Calculating loss..: 100%|██████████| 32/32 [00:22<00:00,  1.43it/s]
+# Eval Metrics
+{'map': 0.8444354256854257, 'precision': 0.2553191489361702, 'recall': 1.0, 'lag': 2.5454545454545454, 'f2': 0.631578947368421, 'avg_true_links': 0.9473684210526315, 'loss': 7.8644585609436035}
+Epochs: 3
+Job failed during run
+Traceback (most recent call last):
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/jobs/abstract_job.py", line 50, in run
+    run_result = self._run()
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/jobs/trainer_jobs/abstract_trainer_job.py", line 52, in _run
+    output = trainer.perform_training()
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/core/trainers/hugging_face_trainer.py", line 101, in perform_training
+    hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/core/trainers/st_trainer.py", line 65, in train
+    self.on_setup()
+AttributeError: 'SentenceTransformerTrainerSiamese' object has no attribute 'on_setup'
+Saving job output: /Users/albertorodriguez/desktop/safa/output/huggingface-train_st/experiment_0/step_0
+Traceback (most recent call last):
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/jobs/abstract_job.py", line 50, in run
+    run_result = self._run()
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/jobs/trainer_jobs/abstract_trainer_job.py", line 52, in _run
+    output = trainer.perform_training()
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/core/trainers/hugging_face_trainer.py", line 101, in perform_training
+    hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
+  File "/Users/albertorodriguez/projects/safa/tgen/tgen/core/trainers/st_trainer.py", line 65, in train
+    self.on_setup()
+AttributeError: 'SentenceTransformerTrainerSiamese' object has no attribute 'on_setup'

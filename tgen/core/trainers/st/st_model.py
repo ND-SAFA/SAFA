@@ -11,13 +11,14 @@ from tqdm import tqdm
 
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.core.trainers.st.constants import DEFAULT_BEST_SCORE, STARTING_STEP, TRAINING_SECTION_KEY
-from tgen.core.trainers.st.st_training_manager import STTrainingManager, STTrainingParams
+from tgen.core.trainers.st.st_training_params import STTrainingParams
+from tgen.core.trainers.st.st_training_state import STTrainingState
 from tgen.core.wb.wb_manager import WBManager
 
 logger = logging.getLogger(__name__)
 
 
-class CustomSentenceTransformer(SentenceTransformer):
+class STModel(SentenceTransformer):
     def fit(
             self,
             train_objectives: Iterable[Tuple[DataLoader, nn.Module]],
@@ -30,7 +31,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         :param training_params: The training parameters to run loop on.
         """
         self.mlp_model = None
-        training_manager = STTrainingManager(training_objectives=train_objectives, params=training_params)
+        training_manager = STTrainingState(training_objectives=train_objectives, params=training_params)
         steps_per_epoch = training_manager.get_epoch_steps()
 
         self.on_pre_training(training_manager)
@@ -48,7 +49,7 @@ class CustomSentenceTransformer(SentenceTransformer):
 
         self.on_post_training(training_manager)
 
-    def perform_training_step(self, training_manager: STTrainingManager, training_step: int) -> None:
+    def perform_training_step(self, training_manager: STTrainingState, training_step: int) -> None:
         """
         Performs a training step.
         :param training_manager: Manager containing models, objectives, and data.
@@ -85,7 +86,7 @@ class CustomSentenceTransformer(SentenceTransformer):
 
         training_manager.params.global_step += 1
 
-    def on_pre_step(self, epoch: int, training_step: int, training_data: STTrainingManager) -> None:
+    def on_pre_step(self, epoch: int, training_step: int, training_data: STTrainingState) -> None:
         """
         Handler called before each training step.
         :param epoch: The epoch of the training session.
@@ -94,7 +95,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         :return:  None
         """
 
-    def on_post_step(self, epoch: int, training_step: int, training_data: STTrainingManager) -> None:
+    def on_post_step(self, epoch: int, training_step: int, training_data: STTrainingState) -> None:
         """
         Called after each training step.
          :param epoch: The epoch of the training session.
@@ -117,7 +118,7 @@ class CustomSentenceTransformer(SentenceTransformer):
                                   training_data.params.checkpoint_save_total_limit,
                                   training_data.params.global_step)
 
-    def on_pre_epoch(self, training_data: STTrainingManager) -> None:
+    def on_pre_epoch(self, training_data: STTrainingState) -> None:
         """
         Called before each epoch.
         :param training_data: Data representing state of current training.
@@ -126,7 +127,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         self._init_loss_models(training_data.loss_functions)
         training_data.initialize_data_iterators()
 
-    def on_post_epoch(self, epoch: int, training_data: STTrainingManager) -> None:
+    def on_post_epoch(self, epoch: int, training_data: STTrainingState) -> None:
         """
         Called after each epoch.
         :param epoch: The epoch of the training loop.
@@ -141,7 +142,7 @@ class CustomSentenceTransformer(SentenceTransformer):
                                    -1,
                                    params.callback)
 
-    def on_pre_training(self, training_manager: STTrainingManager) -> None:
+    def on_pre_training(self, training_manager: STTrainingState) -> None:
         """
         Handler called before training begins.
         :param training_manager: The state of the training loop.
@@ -157,13 +158,7 @@ class CustomSentenceTransformer(SentenceTransformer):
         for dataloader in training_manager.data_loaders:  # Use smart batching
             dataloader.collate_fn = self.smart_batching_collate
 
-        # if self.mlp_model == 1:
-        #     input_size = 2 * self.get_sentence_embedding_dimension()  # Two sentences concatenated
-        #     hidden_sizes = [512, 256]  # Sizes of hidden layers
-        #     activations = [nn.ReLU, nn.ReLU]  # Activation functions for each hidden layer
-        #     self.mlp_model = MLP(input_size=input_size, hidden_sizes=hidden_sizes, activations=activations)
-
-    def on_post_training(self, training_manager: STTrainingManager) -> None:
+    def on_post_training(self, training_manager: STTrainingState) -> None:
         """
         Called after all training steps have been completed.
         :param training_manager: State of the training loop.

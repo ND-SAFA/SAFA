@@ -10,13 +10,11 @@ from tgen.core.wb.wb_manager import WBManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
 
-class SentenceTransformerEvaluator(SentenceEvaluator):
+class STEvaluator(SentenceEvaluator):
     def __init__(self, trainer: HuggingFaceTrainer, evaluation_roles: List[DatasetRole],
                  evaluator_metric: str = DEFAULT_EVAL_METRIC):
         """
         Evaluates dataset under role with given trainer.
-        TODO: Move pre,post training step methods into trainer.
-        TODO: Replace params with use in trainer args.
         :param trainer: The trainer used to predict on the dataset.
         :param evaluation_roles: The role the dataset to predict should be found under.
         :param evaluator_metric: The metric used to define which is the best run.

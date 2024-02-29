@@ -7,16 +7,16 @@ from torch.nn import Parameter
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
 from tgen.common.util.override import overrides
+from tgen.common.util.tf_util import freeze
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.st.st_mlp import MLP
-from tgen.core.trainers.st.tensor_utilities import freeze
-from tgen.core.trainers.st_trainer import SentenceTransformerTrainer
+from tgen.core.trainers.st.st_mlp import STMLP
+from tgen.core.trainers.st_trainer import STTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
 
 
-class SentenceTransformerTrainerMLP(SentenceTransformerTrainer):
+class STMLPTrainer(STTrainer):
     """
     Trains sentence transformer models. They have a slightly modified API for training the models and loading the data.
     """
@@ -38,12 +38,12 @@ class SentenceTransformerTrainerMLP(SentenceTransformerTrainer):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
         self.loss_function = nn.MSELoss()
-        self.mlp = MLP.build(self.model, [512, 256], nn.ReLU)
+        self.mlp = STMLP.build(self.model, [512, 256], nn.ReLU)
         self.max_score = None
         self.model_output_path = os.path.join(self.args.output_dir, "model.pt")
         freeze(self.model)
 
-    @overrides(SentenceTransformerTrainer)
+    @overrides(STTrainer)
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor):
         """
         Calculates the similarity scores between the source and target embeddings.
@@ -55,15 +55,15 @@ class SentenceTransformerTrainerMLP(SentenceTransformerTrainer):
         prediction = self.mlp(combined_embeddings)  # Add batch dimension
         return torch.sigmoid(prediction).squeeze()  # Keep as tensor
 
-    @overrides(SentenceTransformerTrainer)
+    @overrides(STTrainer)
     def get_trainable_parameters(self) -> Iterable[Parameter]:
         """
         :return: Returns the parameters of the MLP.
         """
         return self.mlp.parameters()
 
-    @overrides(SentenceTransformerTrainer)
-    def compute_loss(self, scores, labels, *args, **kwargs) -> torch.Tensor:
+    @overrides(STTrainer)
+    def compute_loss(self, scores: torch.Tensor, labels: torch.Tensor, *args, **kwargs) -> torch.Tensor:
         """
         Computes the loss between the scores and labels.
         :param scores: The scores predicted by the MLP.
@@ -72,10 +72,14 @@ class SentenceTransformerTrainerMLP(SentenceTransformerTrainer):
         :param kwargs: Additional keyword-arguments.
         :return: The loss tensor.
         """
+        if isinstance(scores, list):
+            scores = torch.Tensor(scores)
+        if isinstance(labels, list):
+            labels = torch.Tensor(labels)
         loss = self.loss_function(scores, labels)
         return loss
 
-    @overrides(SentenceTransformerTrainer)
+    @overrides(STTrainer)
     def save(self):
         """
         Saves MLP at model_output_path.

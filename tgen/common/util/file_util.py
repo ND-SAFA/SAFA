@@ -10,7 +10,7 @@ import yaml
 from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
-from tgen.common.constants.code_extensions import CODE_EXTENSIONS, CODE_FILENAMES, FUNCTION_SYMBOL
+from tgen.common.constants.code_extensions import CODE_EXTENSIONS, CODE_FILENAMES
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH, SPACE
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
@@ -587,13 +587,11 @@ class FileUtil:
         """
         if not isinstance(path_or_ext, str):
             path_or_ext = str(path_or_ext)
-        if FUNCTION_SYMBOL in path_or_ext:
-            path_or_ext = path_or_ext.split(FUNCTION_SYMBOL)[0]
         ext_from_path = os.path.splitext(path_or_ext)[-1]
         ext = ext_from_path if ext_from_path else path_or_ext
         ext = ext.replace(os.extsep, EMPTY_STRING)
         filename = os.path.split(path_or_ext)[-1]
-        if ext.upper() in CODE_EXTENSIONS or filename.upper() in CODE_FILENAMES or FUNCTION_SYMBOL in filename:
+        if ext.upper() in CODE_EXTENSIONS or filename.upper() in CODE_FILENAMES:
             return True
         return False
 

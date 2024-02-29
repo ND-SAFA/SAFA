@@ -106,7 +106,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
             local_response = get_client().completion(**prompt_params)
             return local_response
-        
+
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
                                                                          thread_work,
                                                                          retries=retries,
@@ -114,7 +114,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
                                                                          max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
                                                                          raise_exception=raise_exception,
-                                                                         start_delay=1)
+                                                                         thread_delay=1)
 
         self._handle_exceptions(global_state)
         global_responses = global_state.results
@@ -198,15 +198,19 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         return log_probs
 
 
-def get_client():
+def get_client(refresh: bool = False):
     """
+    Returns the current anthropic client.
+    :param refresh: Whether to re-create client regardless of whether a cached version exists.
     :return:  Returns the singleton anthropic client.
     """
-    if not environment_constants.IS_TEST:
+    if environment_constants.IS_TEST:
+        return MockAnthropicClient()
+    else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-        if AnthropicManager.Client is None:
-            return anthropic.Client(ANTHROPIC_KEY)
+        if AnthropicManager.Client is None or refresh:
+            client = anthropic.Client(ANTHROPIC_KEY)
+            AnthropicManager.Client = client
+            return client
         else:
             return AnthropicManager.Client
-    else:
-        return MockAnthropicClient()

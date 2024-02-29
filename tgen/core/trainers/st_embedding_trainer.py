@@ -9,7 +9,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.util.tf_util import move_to_device
+from tgen.common.util.tf_util import move_input_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_loss_functions import SupportedSTLossFunctions
 from tgen.core.trainers.st_trainer import STTrainer
@@ -70,16 +70,13 @@ class STEmbeddingTrainer(STTrainer):
         """
         model_device = self.loss_function.model._target_device
         batches = ListUtil.batch(input_examples, self.trainer_args.per_device_eval_batch_size)
+        loss_fnc = self.loss_function.to(model_device)
+
         loss = torch.tensor(0.0)
         for batch in ListUtil.selective_tqdm(batches, desc="Calculating loss.."):
             features, labels = self.model.smart_batching_collate(batch)
-            features, labels = move_to_device(model_device, features, labels)
-            logger.info(f"Model device: {model_device}")
-            for feature in features:
-                for k, v in feature.items():
-                    logger.info(f"{k}: {v.device}")
-            logger.info(f"Labels device: {labels.device}")
-            loss += self.loss_function(features, labels)
+            features, labels = move_input_to_device(model_device, features, labels)
+            loss += loss_fnc(features, labels)
         return loss
 
     @overrides(STTrainer)

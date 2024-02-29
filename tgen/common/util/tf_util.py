@@ -3,7 +3,7 @@ from typing import Dict, List
 from torch import Tensor, nn
 
 
-def move_to_device(device: str, features: List[Dict[str, Tensor]], labels: Tensor):
+def move_input_to_device(device: str, features: List[Dict[str, Tensor]], labels: Tensor):
     """
     Moves the features and labels to device.
     :param device: The device to place features in.

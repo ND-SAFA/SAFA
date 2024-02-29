@@ -16,6 +16,7 @@ import sys
 from celery_s3.backends import S3Backend
 from kombu.serialization import register
 
+from tgen.common.constants import anthropic_constants
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
 from .paths import load_paths
@@ -110,6 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# TGEN Configuration
+anthropic_constants.ANTHROPIC_MAX_THREADS = 2
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

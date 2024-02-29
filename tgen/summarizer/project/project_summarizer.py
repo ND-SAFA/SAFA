@@ -175,7 +175,7 @@ class ProjectSummarizer(BaseObject):
         :return: Whether the creation was successful.
         """
         try:
-            task_tag = section_prompt.get_response_tags_for_question(-1)
+            task_tag = section_prompt.get_response_tags_for_prompt(-1)
             task_tag = task_tag[0] if isinstance(task_tag, list) else task_tag
             section_body, section_title = self._parse_section(response=section_response,
                                                               task_tag=task_tag, multi_line_items=section_id in MULTI_LINE_ITEMS)
@@ -229,7 +229,7 @@ class ProjectSummarizer(BaseObject):
                                                if self.dataset else {"versions": ["id", "body"]},
                                                include_ids=self.dataset is not None)
         section_prompt.set_instructions(f"{PS_QUESTIONS_HEADER}{NEW_LINE}"
-                                        f"*Importantly, ONLY answer the {len(section_prompt.question_prompts)} questions below "
+                                        f"*Importantly, ONLY answer the {len(section_prompt.child_prompts)} questions below "
                                         f"and ensure the ALL tags {section_prompt.get_all_response_tags()} "
                                         f"are included in your answer*")
         prompt_builder = PromptBuilder(prompts=[content_prompt,

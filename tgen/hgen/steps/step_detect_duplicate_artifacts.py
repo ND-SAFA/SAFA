@@ -1,16 +1,20 @@
-from typing import Dict, List, Set
+from collections import Counter
+from typing import Dict, List, Set, Tuple
 
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD
-from tgen.common.logging.logger_manager import logger
+from tgen.common.objects.trace import Trace
+from tgen.common.util.dict_util import DictUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.hgen.common.duplicate_detector import DuplicateDetector
+from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingSorter
 
 
@@ -23,24 +27,73 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The state of the
         :return: None
         """
+        if not args.perform_clustering or not args.detect_duplicates:
+            state.selected_artifacts_dataset = state.all_artifacts_dataset
+            return
 
         embeddings_manager = state.embedding_manager
 
         new_artifact_map = state.new_artifact_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
-        new_artifact_embeddings_map = embeddings_manager.update_or_add_contents(new_artifact_map, create_embedding=True)
-        new_artifact_ids = list(new_artifact_embeddings_map.keys())
+        embeddings_manager.update_or_add_contents(new_artifact_map, create_embedding=True)
 
-        duplicate_detector = DuplicateDetector(embeddings_manager, duplicate_similarity_threshold=args.duplicate_similarity_threshold)
-        duplicate_artifact_ids, duplicate_map = duplicate_detector.get_duplicates(new_artifact_ids)
+        duplicate_detector = DuplicateDetector(embeddings_manager,
+                                               duplicate_similarity_threshold=args.duplicate_similarity_threshold)
+        duplicate_artifact_ids, duplicate_map = duplicate_detector.get_duplicates(
+            state.new_artifact_dataset.artifact_df, original_clusters_to_contents=state.get_cluster2generation(),
+            duplicate_type=DuplicateType.INTER_CLUSTER)
 
-        logger.info(f"Removing: {len(duplicate_artifact_ids)} duplicates.")
-
+        strong_duplicates, _ = self._allow_tracing_between_dups(state, duplicate_map)
+        duplicate_artifact_ids = {a for a in duplicate_artifact_ids if a in strong_duplicates}
         selected_artifacts_df = ArtifactDataFrame(state.all_artifacts_dataset.artifact_df.to_dict("list", index=True))
         selected_artifacts_df.remove_rows(duplicate_artifact_ids)
         state.selected_artifacts_dataset = PromptDataset(artifact_df=selected_artifacts_df,
                                                          project_summary=state.all_artifacts_dataset.project_summary)
+        state.selected_predictions = [pred for pred in state.selected_predictions
+                                      if pred[TraceKeys.parent_label()] not in duplicate_artifact_ids]
 
-        self._re_trace_duplicates(state, duplicate_artifact_ids, duplicate_map)
+    @staticmethod
+    def _allow_tracing_between_dups(state: HGenState, duplicate_map: Dict[str, Set[str]]) -> Tuple[
+        Dict[str, Set], Dict[str, List[Trace]]]:
+        """
+        Re traces the children of a duplicate being removed to its potential dups
+        :param state: The current state of HGEN
+        :param duplicate_map:  A dictionary mapping dup id to possible duplicates.
+        :return: A dictionary mapping dup id to its confirmed duplicates.
+        """
+        content_map = state.all_artifacts_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
+        state.embedding_manager.update_or_add_contents(content_map=content_map)
+        parent2selections = RankingUtil.group_trace_predictions(state.selected_predictions, TraceKeys.parent_label())
+        strong_duplicates = {}
+        dup2links = {}
+        for dup_id, related_dups in duplicate_map.items():
+            selected_traces = parent2selections[dup_id]
+            candidate_children = [trace[TraceKeys.child_label()] for trace in selected_traces]
+            parent_rankings = EmbeddingSorter.sort([dup_id, *related_dups], candidate_children,
+                                                   embedding_manager=state.embedding_manager,
+                                                   return_scores=True)
+            dup_scores = parent_rankings.pop(dup_id)
+            baseline = {child: score for child, score in zip(dup_scores[0], dup_scores[1])}
+
+            predictions = [RankingUtil.create_entry(p_id, c_id, score) for p_id, preds in parent_rankings.items()
+                           for c_id, score in zip(preds[0], preds[1])]
+            child2traces = RankingUtil.group_trace_predictions(predictions, TraceKeys.child_label())
+
+            dup_selections = []
+            for child, traces in child2traces.items():
+                selections = SelectByThreshold.select(traces, baseline[child] - 0.15)
+                dup_selections.extend(selections)
+            dup2selected = RankingUtil.group_trace_predictions(dup_selections, TraceKeys.parent_label())
+            confirmed_dups = set()
+            for dup, selected in dup2selected.items():
+                if len(selected) == len(selected_traces):
+                    confirmed_dups.add(dup)
+                    DictUtil.set_or_append_item(dup2links, dup_id, selected)
+                state.selected_predictions.extend(selected)
+            if len(confirmed_dups):
+                strong_duplicates[dup_id] = confirmed_dups
+        dup_counter = Counter([d for dups in strong_duplicates.values() for d in dups])
+        selected_duplicates = DuplicateDetector.find_most_duplicated_artifacts(dup_counter, strong_duplicates)
+        return selected_duplicates, dup2links
 
     @staticmethod
     def _re_trace_duplicates(state: HGenState, duplicate_artifact_ids: Set[str], duplicate_map: Dict[str, Set[str]]) -> None:
@@ -62,7 +115,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             parent = trace[parent_key]
             child = trace[TraceKeys.child_label()]
 
-            if parent in duplicate_artifact_ids:
+            if parent in duplicate_map:
                 potential_parents = duplicate_map[parent].difference(duplicate_artifact_ids)
                 if not potential_parents:
                     continue
@@ -98,6 +151,4 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                              embedding_manager=embeddings_manager,
                                                              return_scores=True)[artifact_id]
         top_parent, top_parent_score = sorted_parents[0], sorted_scores[0]
-        if top_parent_score < min_score:
-            return None
         return top_parent

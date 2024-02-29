@@ -31,10 +31,13 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
         for i, batch_ids in enumerate(batches):
             initial_cluster_map = self.create_clusters(args, state.embedding_manager, batch_ids)
             initial_clusters.update(initial_cluster_map)
+            debugging_cluster = {k: [args.dataset.artifact_df.get_artifact(a)["content"] for a in b] for k, b in
+                                 initial_cluster_map.items()}
             batch_cluster_map = self.process_clusters(args, state.embedding_manager, initial_cluster_map, prefix=str(i))
             if i < len(seeds):
                 cluster_id_to_seed.update({c_id: seeds[i] for c_id in batch_cluster_map.keys()})
             global_clusters.update(batch_cluster_map)
+
         state.cluster_id_2seeds = cluster_id_to_seed
         logger.info(f"Found {len(global_clusters)} clusters in the source artifacts.")
         state.final_cluster_map = global_clusters
@@ -109,9 +112,12 @@ class CreateClustersFromEmbeddings(AbstractPipelineStep):
                                               threshold=args.cluster_intersection_threshold,
                                               min_cluster_size=args.cluster_min_size,
                                               max_cluster_size=args.cluster_max_size,
-                                              filter_cohesiveness=args.filter_by_cohesiveness)
+                                              filter_cohesiveness=args.filter_by_cohesiveness,
+                                              sort_metric=args.metric_to_order_clusters,
+                                              allow_overlapping_clusters=args.allow_duplicates_between_clusters)
         clusters = list(cluster_map.values())
         unique_cluster_map.add_all(clusters)
+
         cluster_map = unique_cluster_map.get_clusters(args.cluster_min_votes)
         return cluster_map
 

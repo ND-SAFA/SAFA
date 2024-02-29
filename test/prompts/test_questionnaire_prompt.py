@@ -31,7 +31,7 @@ class TestQuestionnairePrompt(BaseTest):
     def test_get_prompt_by_primary_tag(self):
         questionnaire = self.get_questionnaire()
         prompt = questionnaire.get_prompt_by_primary_tag("question2")
-        self.assertEqual(questionnaire.question_prompts[1].id, prompt.id)
+        self.assertEqual(questionnaire.child_prompts[1].id, prompt.id)
 
         questionnaire = self.get_questionnaire()
         prompt = questionnaire.get_prompt_by_primary_tag("unknown")
@@ -58,5 +58,5 @@ class TestQuestionnairePrompt(BaseTest):
         self.assertTrue(res[2].startswith(f"ii) {self.STEPS[2].value}"))
         self.assertTrue(res[3].startswith(f"iii) {self.STEPS[3].value}"))
         self.assertTrue(res[4].startswith(f"iv) {self.STEPS[4].value.format(blank2='questions')}"))
-        self.assertTrue(res[5].startswith(PromptUtil.indent_for_markdown(f"- {self.STEPS[4].question_prompts[0]}")))
+        self.assertTrue(res[5].startswith(PromptUtil.indent_for_markdown(f"- {self.STEPS[4].child_prompts[0]}")))
 

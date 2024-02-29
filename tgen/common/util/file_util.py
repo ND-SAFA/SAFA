@@ -11,13 +11,14 @@ from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.code_extensions import CODE_EXTENSIONS, CODE_FILENAMES
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH, SPACE
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
     USER_SYM
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.str_util import StrUtil
 
 EXCLUDE_EXTENSIONS = [".png", ".jpg", ".reg"]
 ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM, MODEL_PARAM]
@@ -77,26 +78,39 @@ class FileUtil:
         return output_path
 
     @staticmethod
-    def read_file(file_path: str, raise_exception: bool = True, encoding: str = "utf-8") -> Optional[str]:
+    def read_file(file_path: str, raise_exception: bool = True, encoding: str = "utf-8", tries: int = 0) -> Optional[str]:
         """
         Reads file at given path if exists.
         :param file_path: Path of the file to read.
         :param raise_exception: If True, raises an exception if reading fails
         :param encoding: The encoding to use when reading the file
         :param encoding: The encoding the read the file in.
+        :param tries: The number of tries to read the file.
         :return: The content of the file.
         """
+
+        def handle_exception(e: Exception):
+            """
+            Handles file reading exceptions
+            :param e: The exception thrown
+            :return: None if no exception is raised.
+            """
+            logger.exception(f"Failed reading file: {file_path}")
+            if raise_exception:
+                raise e
+            return None
+
         try:
             with open(file_path, encoding=encoding) as file:
                 file_content = file.read()
                 return file_content
         except UnicodeDecodeError as e:
-            return FileUtil.read_file(file_path, raise_exception=raise_exception, encoding="windows-1252")
+            if tries < 1:
+                return FileUtil.read_file(file_path, raise_exception=raise_exception, encoding="windows-1252", tries=tries + 1)
+            else:
+                return handle_exception(e)
         except Exception as e:
-            logger.exception(f"Failed reading file: {file_path}")
-            if raise_exception:
-                raise e
-            return None
+            return handle_exception(e)
 
     @staticmethod
     def read_file_lines(file_path: str) -> List[str]:
@@ -665,3 +679,15 @@ class FileUtil:
         """
         path, ext = os.path.splitext(path)
         return FileUtil.add_ext(path + additional_filename_part, ext)
+
+    @staticmethod
+    def convert_path_to_human_readable(path: str) -> str:
+        """
+        Cleans a path to resemble a more human readable string (e.g. /path1/path2/filename.txt -> path1 path2 filename).
+        :param path: The original path.
+        :return: The path as a more human readable string.
+        """
+        path_parts = list(FileUtil.split_into_parts(path))
+        path_parts[-1] = FileUtil.get_file_base_name(path_parts[-1])
+        path_parts = [StrUtil.separate_joined_words(part) for part in path_parts]
+        return SPACE.join(path_parts)

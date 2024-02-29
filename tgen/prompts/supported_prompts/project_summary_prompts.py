@@ -62,9 +62,11 @@ def entities_formatter(t, v):
 
 
 ENTITIES_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
-    QuestionPrompt("List all the domain entities and vocabulary that are needed to understand the project.",
+    QuestionPrompt("Think about what domain entities and vocabulary that are needed to understand the project. "
+                   "Write a short PARAGRAPH describing each one.",
                    response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
-    QuestionPrompt("Using your notes, create a comprehensive list of all domain entities and key vocabularly used in the system. ",
+    QuestionPrompt("Using your notes, create a comprehensive list of all domain entities and key vocabularly used in the system "
+                   "and use xml format to output them. ",
                    response_manager=PromptResponseManager(response_tag={PS_ENTITIES_TAG: ["name", "descr"]},
                                                           response_instructions_format="Enclose each entity in {} "
                                                                                        "with the name of the entity inside of "
@@ -89,9 +91,9 @@ def subsection_formatter(t, v):
 
 
 SUBSYSTEM_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
-    QuestionnairePrompt(instructions="Create a set of sub-systems that group the similar features. "
+    QuestionnairePrompt(instructions="First you are to think about a set of sub-systems that group the similar features. "
                                      "Similar features will use related domain entities and work to accomplish shared goals. "
-                                     "For each sub-system describe: ",
+                                     "For each sub-system write a short paragraph that describes: ",
                         enumeration_chars=["-"],
                         question_prompts=[QuestionPrompt("The functionality the sub-system."),
                                           QuestionPrompt("The value of the sub-system to the overall system."),
@@ -99,7 +101,8 @@ SUBSYSTEM_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                                                          "of the sub-system"),
                                           QuestionPrompt("The differences to other similar sub-system in the system.")],
                         response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
-    QuestionPrompt("Using your notes, create a comprehensive description of each of the system's sub-systems.",
+    QuestionPrompt("Using your notes, create a comprehensive description of each of the system's sub-systems "
+                   "and output them in xml format.",
                    response_manager=PromptResponseManager(response_tag={PS_SUBSYSTEM_TAG: ["name", "descr"]},
                                                           response_instructions_format="Enclose each sub-system in {} "
                                                                                        "with the name of the subsystem inside of "

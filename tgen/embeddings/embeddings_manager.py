@@ -14,6 +14,7 @@ from tgen.common.util.embedding_util import EmbeddingType, EmbeddingUtil, IdType
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.str_util import StrUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.embeddings.model_cache import ModelCache
@@ -215,10 +216,12 @@ class EmbeddingsManager:
         if self._base_path:
             object_paths = self.get_object_paths()
             ordered_ids = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.ORDERED_IDS])
-            self.__set_embedding_order(ordered_ids)
+            self.__set_embedding_order(StrUtil.convert_all_items_to_string(ordered_ids))
             self._embedding_map = self.load_embeddings_from_file(file_path=object_paths[EmbeddingsManagerObjects.EMBEDDINGS],
                                                                  ordered_ids=self.__ordered_ids)
+            self._embedding_map = StrUtil.convert_all_items_to_string(self._embedding_map, keys_only=True)
             self._content_map = self.load_content_map_from_file(object_paths[EmbeddingsManagerObjects.CONTENT_MAP])
+            self._content_map = StrUtil.convert_all_items_to_string(self._content_map)
 
     @staticmethod
     def load_embeddings_from_file(file_path: str, ordered_ids: List[Any]) -> Dict[Any, EmbeddingType]:
@@ -254,7 +257,6 @@ class EmbeddingsManager:
         :param dir_path: The path to directory to save to
         :return: None
         """
-
         base_path = os.path.join(dir_path, str(uuid.uuid4()))
         FileUtil.create_dir_safely(base_path)
         self._base_path = FileUtil.collapse_paths(base_path)
@@ -288,6 +290,9 @@ class EmbeddingsManager:
         :return: None
         """
         df_kwargs = {}
+        if len(content) == 0:
+            return
+
         if isinstance(content, dict):
             entries = [EnumDict({ArtifactKeys.ID: content_id, ArtifactKeys.CONTENT: content}) for content_id, content in
                        content.items()]
@@ -316,7 +321,7 @@ class EmbeddingsManager:
         :return: True if the embeddings need re-saved
         """
         need_save = not self._base_path or self.__state_changed_since_last_save
-        return need_save
+        return need_save and len(self._embedding_map) > 0
 
     def compare_embeddings(self, id1: str, id2: str) -> float:
         """
@@ -340,6 +345,15 @@ class EmbeddingsManager:
         centroid = np.sum(embeddings, axis=0) / len(cluster)
         return centroid
 
+    def merge(self, other: "EmbeddingsManager") -> None:
+        """
+        Combines the embeddings and contents maps of the two embedding managers.
+        :param other: The embedding manager to merge with.
+        :return: None.
+        """
+        self.update_or_add_contents(other._content_map, create_embedding=False)
+        self._embedding_map.update(other._embedding_map)
+
     def _get_default_artifact_ids(self, artifact_ids: List[str] = None):
         """
         Returns the artifact ids if not None otherwise return list of all artifact ids.
@@ -362,7 +376,9 @@ class EmbeddingsManager:
             return_as_list = False
         artifact_contents = [self._content_map[a_id] for a_id in subset_ids]
         if include_ids:
-            artifact_contents = [f"{a_id}: {content}" for a_id, content in zip(subset_ids, artifact_contents)]
+            artifact_contents = [f"{FileUtil.convert_path_to_human_readable(a_id)} {content}"
+                                 # converts code file paths to NL
+                                 for a_id, content in zip(subset_ids, artifact_contents)]
         show_progress_bar = self.show_progress_bar and math.ceil(len(artifact_contents) / DEFAULT_ENCODING_BATCH_SIZE) > 1
         if not show_progress_bar:
             logger.log_without_spam(msg="Calculating embeddings for artifacts...", level=logging.INFO)

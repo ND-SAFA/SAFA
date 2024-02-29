@@ -1,6 +1,5 @@
-from typing import Any, Dict, List
-
 import math
+from typing import Any, Dict, List
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
@@ -38,7 +37,7 @@ class ClusteringAlgorithmManager:
         if subset_ids is not None and len(subset_ids) == 0:
             raise Exception("Expected at least one artifact defined in subset ids.")
         embedding_map = embedding_manager.create_embedding_map(subset_ids)
-        artifact_ids = list(embedding_map.keys())
+        artifact_ids = sorted(list(embedding_map.keys()))
         embeddings = [embedding_map[artifact_id] for artifact_id in artifact_ids]
         expected_avg_cluster_size = (max_cluster_size + min_cluster_size) / 2
         n_clusters = max(math.ceil(len(embeddings) / expected_avg_cluster_size), 1)

@@ -5,7 +5,8 @@ from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
-from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_SIMILARITY_DELTA, MIN_ORPHAN_HOME_SIMILARITY
+from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_CLUSTER_SIZE_DELTA, ALLOWED_ORPHAN_SIMILARITY_DELTA, \
+    MIN_ORPHAN_HOME_SIMILARITY
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.list_util import ListUtil
@@ -13,7 +14,7 @@ from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
-class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
+class AddOrphansToClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
     def _run(self, args: ClusteringArgs, state: ClusteringState) -> None:
         """
         Attempts to link orphans to their best fit cluster, if minimum score is not reached then
@@ -22,8 +23,10 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param state: The current state of the clustering pipeline.
         :return: None, modifications done in place.
         """
+        if not args.add_orphans_to_homes:
+            return
         cluster_map: ClusterMapType = state.final_cluster_map
-        clusters: List[Cluster] = list(cluster_map.values())
+        clusters: List[Cluster] = list(filter(lambda cluster: len(cluster) > 1, cluster_map.values()))
 
         seen_artifacts = self.collect_seen_artifacts(clusters)
         all_artifacts = set(args.get_artifact_ids())
@@ -31,11 +34,13 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
 
         logger.info(f"{len(orphan_artifact_id_set)} artifacts were not clustered.")
 
-        adopted_orphans = self.place_orphans_in_homes(args, clusters, orphan_artifact_id_set)
-        remaining_orphans = orphan_artifact_id_set.difference(adopted_orphans)
-        self.cluster_orphans(args, state, cluster_map, remaining_orphans, args.min_orphan_similarity)
-        for a in remaining_orphans:
-            self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
+        if len(orphan_artifact_id_set) > args.cluster_min_size and not args.add_orphans_to_best_home:
+            self.cluster_orphans(args, state, cluster_map, orphan_artifact_id_set, args.min_orphan_similarity)
+        self.place_orphans_in_homes(args, clusters, orphan_artifact_id_set)
+
+        if args.allow_singleton_clusters:
+            for a in orphan_artifact_id_set:
+                self.add_singleton_cluster(a, cluster_map, state.embedding_manager)
 
     @classmethod
     def cluster_orphans(cls, args: ClusteringArgs, state: ClusteringState, cluster_map: ClusterMapType,
@@ -81,7 +86,7 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         return seen_artifacts
 
     @staticmethod
-    def place_orphans_in_homes(args: ClusteringArgs, clusters: List[Cluster], orphan_artifacts: Set[str]) -> Set[str]:
+    def place_orphans_in_homes(args: ClusteringArgs, clusters: List[Cluster], orphan_artifacts: Set[str]) -> None:
         """
         Attempts to house orphans from best to worst houses for them.
         :param args: The arguments to the clustering pipeline.
@@ -101,15 +106,15 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         for i, (artifact, cluster, cluster_similarity) in enumerate(best_clusters):
             delta = cluster.min_sim - cluster_similarity if len(cluster) > 1 else 0
             within_similarity_threshold = delta < ALLOWED_ORPHAN_SIMILARITY_DELTA
-            within_cluster_size = len(cluster) <= args.cluster_max_size
+            within_cluster_size = len(cluster) < args.cluster_max_size + ALLOWED_ORPHAN_CLUSTER_SIZE_DELTA
             above_minimum_score = cluster_similarity >= MIN_ORPHAN_HOME_SIMILARITY
             not_seen = artifact not in adopted_orphans
-            if args.add_orphans_to_best_home or (within_similarity_threshold and not_seen and above_minimum_score):
-                if not within_cluster_size:
+            if args.add_orphans_to_best_home or (within_similarity_threshold and above_minimum_score):
+                if not (within_cluster_size and not_seen):
                     continue
                 cluster.add_artifacts(artifact)
                 adopted_orphans.add(artifact)
-        return adopted_orphans
+                orphan_artifacts.remove(artifact)
 
     @classmethod
     def add_singleton_cluster(cls, a_id: str, cluster_map: ClusterMapType, embeddings_manager: EmbeddingsManager) -> None:
@@ -132,4 +137,4 @@ class LinkOrphans(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :return: None. Map modified in place.
         """
         next_cluster_index = len(cluster_map)
-        cluster_map[next_cluster_index] = cluster
+        cluster_map[str(next_cluster_index)] = cluster

@@ -88,15 +88,17 @@ class TraceDataFrame(AbstractProjectDataFrame):
             self.link_as_dict(source_id=source, target_id=target, label=label, link_id=link_id, score=score,
                               explanation=explanation))
 
-    def get_links(self, true_only: bool = False) -> List[EnumDict]:
+    def get_links(self, true_only: bool = False, true_link_threshold: float = None) -> List[EnumDict]:
         """
         Returns the links in the data frame.
         :param true_only: If True, only returns links with positive id.
+        :param true_link_threshold: If selecting positive links only, considers scored links as true if above threshold.
         :return: Traces in data frame.
         """
+        true_only = true_only or true_link_threshold is not None
         links = []
         for link_id, link in self.itertuples():
-            if not true_only or link[TraceKeys.LABEL] == 1:
+            if not true_only or link[TraceKeys.LABEL] == 1 or (true_link_threshold and link[TraceKeys.SCORE] >= true_link_threshold):
                 links.append(link)
         return links
 
@@ -167,16 +169,30 @@ class TraceDataFrame(AbstractProjectDataFrame):
             t_map[i] = row
         return t_map
 
-    def get_orphans(self, artifact_role: TraceKeys = TraceKeys.child_label()) -> Set[Any]:
+    def get_orphans(self, artifact_role: TraceKeys = TraceKeys.child_label(), true_link_threshold: float = None) -> Set[Any]:
         """
         Returns all orphans that are of the given role (parent or child)
         :param artifact_role: The role of the artifact as either a parent (target) or child (source)
+        :param true_link_threshold: If selecting positive links only, considers scored links as true if above threshold.
         :return: Ids of all orphans that are of the given role (parent or child)
         """
-        linked_artifacts = {trace[artifact_role] for i, trace in self.itertuples()
-                            if trace[TraceKeys.LABEL] == 1}
-        orphans = {trace[artifact_role] for i, trace in self.itertuples()
-                   if trace[artifact_role] not in linked_artifacts}
+        all_artifact_ids = self.get_artifact_ids(artifact_role=artifact_role, linked_only=False)
+        orphans = self.find_orphans(self.get_links(true_only=True, true_link_threshold=true_link_threshold),
+                                    all_artifact_ids, artifact_role)
+        return orphans
+
+    @staticmethod
+    def find_orphans(true_traces: List[EnumDict], all_artifact_ids: Set[str],
+                     artifact_role: TraceKeys = TraceKeys.child_label()) -> Set[Any]:
+        """
+        Returns all orphans in the given traces that are of the given role (parent or child)
+        :param true_traces: The traces to look for orphans in.
+        :param all_artifact_ids: A set of all artifact ids that could have traces.
+        :param artifact_role: The role of the artifact as either a parent (target) or child (source)
+        :return: Ids of all orphans that are of the given role (parent or child)
+        """
+        linked_artifacts = {trace[artifact_role] for trace in true_traces}
+        orphans = all_artifact_ids.difference(linked_artifacts)
         return orphans
 
     def get_parents(self, artifact_id: str) -> List[str]:
@@ -188,3 +204,18 @@ class TraceDataFrame(AbstractProjectDataFrame):
         query_df = self[(self[TraceKeys.child_label()] == artifact_id) & (~self[TraceKeys.SCORE.value].isna())]
         parent_ids = list(query_df[TraceKeys.TARGET.value])
         return parent_ids
+
+    def get_artifact_ids(self, artifact_role: TraceKeys = None, linked_only: bool = False) -> Set[str]:
+        """
+        Returns the artifact ids in the trace df.
+        :param artifact_role: Will just get the sources or targets if appropriate key is provided, else all.
+        :param linked_only: If True, will only get artifacts that are linked.
+        :return: The artifact ids in the trace df.
+        """
+        artifact_ids = set()
+        for trace in self.get_links(true_only=linked_only):
+            for key in [TraceKeys.SOURCE, TraceKeys.TARGET]:
+                if artifact_role and key != artifact_role:
+                    continue
+                artifact_ids.add(trace[key])
+        return artifact_ids

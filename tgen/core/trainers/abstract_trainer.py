@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Type
+from typing import Type, Union
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
@@ -9,6 +9,8 @@ from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
 class AbstractTrainer(BaseObject):
@@ -44,6 +46,17 @@ class AbstractTrainer(BaseObject):
         performs any necessary cleanup at the end of the job
         :return: None
         """
+
+    @staticmethod
+    def convert_dataset_to_prompt_dataset(dataset: Union[PromptDataset, TraceDataset]) -> PromptDataset:
+        """
+        If the dataset is not a prompt dataset, it is converted to one
+        :param dataset: The original dataset
+        :return: The dataset a prompt dataset
+        """
+        if not isinstance(dataset, PromptDataset):
+            dataset = PromptDataset(trace_dataset=dataset)
+        return dataset
 
     @classmethod
     @overrides(BaseObject)

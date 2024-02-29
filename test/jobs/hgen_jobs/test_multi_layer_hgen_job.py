@@ -57,6 +57,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         self.ranking_calls = 0
         self.clustering_calls = 0
         args: HGenArgs = self.get_args()
+        args.run_refinement = False
         source_arts = args.dataset.artifact_df.filter_by_row(lambda row:
                                                              row[ArtifactKeys.LAYER_ID.value]
                                                              ==
@@ -140,6 +141,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
     def _get_job(self):
         args: HGenArgs = self.get_args(export_dir=EMPTY_STRING)
         args.generate_explanations = False
+        args.run_refinement = False
         starting_hgen_job = BaseHGenJob(args)
         return MultiLayerHGenJob(starting_hgen_job, self.higher_levels)
 
@@ -148,7 +150,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
         divisor = 3 - self.clustering_calls
         n = math.floor(len(artifacts) / divisor)
         state.final_cluster_map = {
-            i: Cluster.from_artifacts([a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]], state.embedding_manager) for i in
+            str(i): Cluster.from_artifacts([a[ArtifactKeys.ID.value] for a in artifacts[i * n:i * n + n]], state.embedding_manager) for i in
             range(divisor)}
         cluster_dataset = ClusterDatasetCreator(args.dataset, state.final_cluster_map).create()
         state.cluster_dataset = PromptDataset(trace_dataset=cluster_dataset.trace_dataset)

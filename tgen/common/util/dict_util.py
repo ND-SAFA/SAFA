@@ -13,6 +13,40 @@ class DictUtil:
     """
 
     @staticmethod
+    def flip(dict_: Dict) -> Dict:
+        """
+        Flips the keys and values in the dictionary.
+        :param dict_: Original dictionary.
+        :return: Dictionary with keys and values flipped.
+        """
+
+        flipped_dict = {}
+
+        def _add(key, val):
+            """
+            Adds the value to the flipped dict with key.
+            :param key: The key to add to.
+            :param val: The value to add.
+            :return: None.
+            """
+            if key in flipped_dict:
+                if isinstance(flipped_dict[key], list):
+                    val = flipped_dict[key].append(val)
+                else:
+                    val = [flipped_dict[key], val]
+            flipped_dict[key] = val
+
+        for k, v in dict_.items():
+            if isinstance(v, set) or isinstance(v, list):
+                for child_val in v:
+                    _add(child_val, k)
+            else:
+                _add(v, k)
+        if any(isinstance(v, list) for v in flipped_dict.values()):  # ensure all value are same type
+            flipped_dict = {k: (v if isinstance(v, list) else [v]) for k, v in flipped_dict.items()}
+        return flipped_dict
+
+    @staticmethod
     def assert_same_keys(links: List[Dict]) -> None:
         """
         Asserts that links are the same size and have the same keys.
@@ -167,7 +201,7 @@ class DictUtil:
             mapping[item_key] += increment_value
 
     @staticmethod
-    def set_or_append_item(mapping: Dict, item_key: str, item_value: Any, iterable_type: Type = list) -> None:
+    def set_or_append_item(mapping: Dict, item_key: Any, item_value: Any, iterable_type: Type[Iterable] = list) -> None:
         """
         Initializes a list/set to mapping if it does not exists, and appends item either way.
         :param mapping: The map to add item to.
@@ -178,6 +212,11 @@ class DictUtil:
         """
         if item_key not in mapping:
             mapping[item_key] = iterable_type()
+        if isinstance(item_value, iterable_type):
+            for item in item_value:
+                DictUtil.set_or_append_item(mapping, item_key, item, iterable_type)
+            return
+
         if isinstance(mapping[item_key], set):
             mapping[item_key].add(item_value)
         elif isinstance(mapping[item_key], dict):
@@ -186,6 +225,7 @@ class DictUtil:
         else:
             mapping[item_key].append(item_value)
 
+    @staticmethod
     def get_missing_keys(obj: Dict, keys: List[str]) -> List[str]:
         """
         Extracts keys missing in dict.
@@ -206,3 +246,27 @@ class DictUtil:
         """
         missing_keys = cls.get_missing_keys(obj, keys)
         return len(missing_keys) == 0
+
+    @staticmethod
+    def get_key_by_index(dict_: Dict, index: int = 0) -> Any:
+        """
+        Gets the first key from the dictionary.
+        :param dict_: The dictionary to get first key of.
+        :param index: The index of the key to get.
+        :return: The first key from the dictionary.
+        """
+        if len(dict_) == 0:
+            return
+        return list(dict_.keys())[index]
+
+    @staticmethod
+    def get_value_by_index(dict_: Dict, index: int = 0) -> Any:
+        """
+        Gets the first value from the dictionary.
+        :param dict_: The dictionary to get first value of.
+        :param index: The index of the value to get.
+        :return: The first value from the dictionary.
+        """
+        key = DictUtil.get_key_by_index(dict_, index)
+        if key:
+            return dict_[key]

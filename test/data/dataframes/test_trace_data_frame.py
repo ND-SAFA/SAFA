@@ -29,6 +29,13 @@ class TestTraceDataFrame(BaseTest):
         without_dups = df.to_dict(orient="index")
         self.assertSize(1, without_dups)
 
+    def test_get_orphans(self):
+        trace_dataset_frame = self.get_trace_data_frame()
+        child_orphans = trace_dataset_frame.get_orphans(artifact_role=TraceKeys.child_label())
+        self.assertSetEqual(child_orphans, {"s1"})
+        parent_orphans = trace_dataset_frame.get_orphans(artifact_role=TraceKeys.parent_label())
+        self.assertSetEqual(parent_orphans, {"t1"})
+
     def assert_link(self, link: EnumDict, source_id, target_id, label, link_id):
         self.assertEqual(link[TraceKeys.SOURCE], source_id)
         self.assertEqual(link[TraceKeys.TARGET], target_id)

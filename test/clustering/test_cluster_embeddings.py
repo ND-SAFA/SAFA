@@ -29,8 +29,8 @@ class TestClusterEmbeddings(TestCase):
         cluster_map = state.final_cluster_map
 
         ClusteringTestUtil.verify_clusters(self, cluster_map, {
-            "0:0": ["A3", "A4"],
-            "0:1": ["A1", "A2"]
+            "0:0": ["A1", "A4"],
+            "0:1": ["A2", "A3"]
         })
 
     def test_condense_clusters(self):

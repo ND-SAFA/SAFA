@@ -14,7 +14,7 @@ example:
   be collapsed into a "hamburger" icon, which, when tapped, expands to display the
   full menu vertically with collapsible submenus for each main menu item.'
 format:
-- 'Design Requirement: [Brief description of the feature or functionality]. [Detailed
+- '[Brief description of the feature or functionality]: [Detailed
   description of the design aspect, including user interface, architecture, or interaction
   between components]. [Additional specifications or constraints, if applicable].'
 questions:

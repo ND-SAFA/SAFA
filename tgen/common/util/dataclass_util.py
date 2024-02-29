@@ -38,16 +38,19 @@ class RequiredField:
 class DataclassUtil:
 
     @staticmethod
-    def convert_to_dict(dataclass_: dataclass, **val2replace) -> Dict:
+    def convert_to_dict(dataclass_: dataclass, include_init_vals_only: bool = False, **val2replace) -> Dict:
         """
         Converts the dataclass to a dictionary
         :param dataclass_: The dataclass to convert
+        :param include_init_vals_only: If True, only includes values that are in the constructor.
         :param val2replace: Dictionary mapping attr to the new value for it
         :return: the dataclass as a dictionary
         """
         args = {k: v for k, v in vars(dataclass_).items() if k not in val2replace.keys()
                 and not ReflectionUtil.is_function(v) and not k.startswith("__")}
         args.update(val2replace)
+        if include_init_vals_only:
+            args = ReflectionUtil.get_constructor_params(type(dataclass_), args)
         return args
 
     @staticmethod
@@ -95,7 +98,7 @@ class DataclassUtil:
         """
         param_specs = ParamSpecs.create_from_method(dataclass.__init__)
         matching_attrs = [getattr(dataclass, name) for name, type_ in param_specs.param_types.items() if
-                           ReflectionUtil.is_instance_or_subclass(type_, attr_type)]
+                          ReflectionUtil.is_instance_or_subclass(type_, attr_type)]
         for attr in matching_attrs:
             for name, val in vals2update.items():
                 setattr(attr, name, val)

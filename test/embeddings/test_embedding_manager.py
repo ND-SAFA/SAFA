@@ -58,7 +58,24 @@ class TestEmbeddingManager(BaseTest):
         for key, val in new_content_map.items():
             self.assertEqual(embedding_manager.get_content(key), val)
 
-    def create_test_embedding_manager(self, encode_mock = None):
+    def test_merge(self):
+        content_map1, embedding_manager1 = self.create_test_embedding_manager()
+        embedding_manager1.create_embedding_map()
+        content_map2 = {"new_artifact1": "a1",
+                        "new_artifact2": "a2"}
+        embedding_manager2 = EmbeddingsManager(content_map=content_map2,
+                                               model_name="sentence-transformers/all-MiniLM-L6-v2")
+        embedding_manager2.create_embedding_map(subset_ids=["new_artifact1"])
+        embedding_manager1.merge(embedding_manager2)
+        content_map1.update(content_map2)
+        for a_id in content_map1.keys():
+            if a_id == "new_artifact2":
+                self.assertNotIn(a_id, embedding_manager1.get_current_embeddings())
+            else:
+                self.assertIn(a_id, embedding_manager1.get_current_embeddings())
+            self.assertEqual(embedding_manager1.get_content(a_id), content_map1[a_id])
+
+    def create_test_embedding_manager(self, encode_mock=None):
         content_map = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
                        for artifact in SafaTestProject.get_artifact_entries()}
         embeddings = [[i for i in range(j, j + 3)] for j in range(len(content_map))]

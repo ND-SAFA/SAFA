@@ -22,7 +22,7 @@ class EmbeddingSorter(iSorter):
         """
         if len(child_ids) == 0:
             return {p: [] for p in parent_ids}
-        children_embeddings = embedding_manager.create_artifact_embeddings(artifact_ids=child_ids)
+        children_embeddings = embedding_manager.create_artifact_embeddings(artifact_ids=child_ids, include_ids=True)
 
         parent2rankings = {}
         iterable = ListUtil.selective_tqdm(parent_ids, desc="Performing Ranking Via Embeddings")

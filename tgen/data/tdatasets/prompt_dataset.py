@@ -50,7 +50,7 @@ class PromptDataset(iDataset):
         self.project_file_id = project_file_id
         self.data_export_path = data_export_path
         self.project_summary = project_summary
-        self.__state_has_changed = False
+        self.__state_has_changed = True
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """
@@ -146,6 +146,7 @@ class PromptDataset(iDataset):
             prompt_creator = PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=collapsed_path))
         else:
             raise NotImplementedError("Cannot get creator for prompt dataset without an artifact df or trace dataset")
+        self.__state_has_changed = False
         return prompt_creator
 
     def update_artifact_df(self, artifact_df: ArtifactDataFrame) -> None:

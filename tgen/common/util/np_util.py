@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
-from scipy.stats import hmean
+from numpy import mean
 
 from tgen.common.util.list_util import ListUtil
 
@@ -67,11 +67,11 @@ class NpUtil:
             sigma = 2.5 if len(scores) > 20 else 1.5
         scores = pd.Series(scores)
         scores[scores < 0] = epsilon
-        harmonic_mean = hmean(scores)
+        harmonic_mean = mean(scores)
         lower_limit = harmonic_mean - sigma * scores.std()
         upper_limit = harmonic_mean + sigma * scores.std()
 
-        return lower_limit, upper_limit
+        return lower_limit + epsilon, upper_limit - epsilon
 
     @staticmethod
     def get_unique_indices(n_rows: int, n_cols: int = None) -> List[Tuple[int, int]]:

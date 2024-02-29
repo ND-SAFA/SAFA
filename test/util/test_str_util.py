@@ -23,6 +23,10 @@ class TestStrUtil(BaseTest):
         formatted = StrUtil.format_selective(str2format, random="four")
         self.assertEqual(formatted, "Nothing should be formatted: {} and {this}")
 
+    def test_get_letter_from_number(self):
+        self.assertEqual(StrUtil.get_letter_from_number(10, lower_case=True), "k")
+        self.assertEqual(StrUtil.get_letter_from_number(10, lower_case=False), "K")
+
     def test_is_uuid(self):
         self.assertTrue(StrUtil.is_uuid(str(uuid.uuid4())))
         self.assertFalse(StrUtil.is_uuid("hello world"))
@@ -43,10 +47,10 @@ class TestStrUtil(BaseTest):
 
     def test_remove_chars(self):
         string = "<These ^ chars ? need to be removed />"
-        removed_chars_string = StrUtil.remove_chars(string, ["?", "^", "/>", "<"])
+        removed_chars_string = StrUtil.remove_substrings(string, ["?", "^", "/>", "<"])
         self.assertEqual("These  chars  need to be removed ", removed_chars_string)
 
-        removed_chars_string = StrUtil.remove_chars(string, "<")
+        removed_chars_string = StrUtil.remove_substrings(string, "<")
         self.assertEqual("These ^ chars ? need to be removed />", removed_chars_string)
 
     def test_remove_decimal_points_from_floats(self):
@@ -67,3 +71,12 @@ class TestStrUtil(BaseTest):
         remove_last = StrUtil.remove_substring(string, substring, only_if_endswith=True)
         self.assertFalse(remove_last.endswith(substring))
         self.assertIn(substring, remove_last)
+
+    def test_convert_all_items_to_string(self):
+        self.assertEqual(StrUtil.convert_all_items_to_string([1, 2, 3]), ['1', '2', '3'])
+        self.assertEqual(StrUtil.convert_all_items_to_string({1, 2, 3}), {'1', '2', '3'})
+        self.assertEqual(StrUtil.convert_all_items_to_string({1: False, 2: True, 3: False}), {'1': 'False', '2': 'True', '3': 'False'})
+
+    def test_separate_joined_word(self):
+        self.assertEqual(StrUtil.separate_joined_words("HelloWorld"), "Hello World")
+        self.assertEqual(StrUtil.separate_joined_words("hello_world"), "hello world")

@@ -26,7 +26,7 @@ class StepSummarizeArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerStat
             context_mapping = state.dataset.trace_dataset.create_dependency_mapping()
             summary_order = self.get_summary_order(trace_df=state.dataset.trace_dataset.trace_df)
             DictUtil.update_kwarg_values(params, context_mapping=context_mapping, summary_order=summary_order)
-        re_summarize = not SummarizerUtil.needs_project_summary(state.dataset.project_summary, args)
+        re_summarize = not SummarizerUtil.needs_project_summary(state.dataset.project_summary, args) and args.do_resummarize_artifacts
         project_summary = state.dataset.project_summary if re_summarize else None
         summarizer = ArtifactsSummarizer(**params, project_summary=project_summary, summarizer_id="First Summary")
         state.dataset.artifact_df.summarize_content(summarizer, re_summarize=re_summarize)

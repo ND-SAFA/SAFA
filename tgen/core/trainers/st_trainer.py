@@ -13,6 +13,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.st_util import to_input_examples
+from tgen.common.util.tf_util import move_tensor_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
@@ -108,10 +109,12 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self._current_eval_role = dataset_role
         dataset = self._get_dataset(dataset_role)
         input_examples = to_input_examples(dataset)
-        scores = self.predict_similarity_scores(input_examples)
         labels = [e.label for e in input_examples]
+        scores = self.predict_similarity_scores(input_examples)
+        device = self.model._target_device
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
-        prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels, input_examples=input_examples).item()
+        labels_tensor = self.get_labels_tensor(input_examples, device)
+        prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels_tensor, input_examples=input_examples).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def predict_similarity_scores(self, input_examples: List[InputExample]):
@@ -158,6 +161,18 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
         predictions = self.calculate_similarity_scores(source_embeddings, target_embeddings)
         return predictions
+
+    @staticmethod
+    def get_labels_tensor(input_examples: List[InputExample], device: str) -> torch.Tensor:
+        """
+        Creates tensor containing labels of examples.
+        :param input_examples:  The input examples to extract labels from.
+        :param device: The device to move labels to.
+        :return: The tensor on device.
+        """
+        labels = [e.label for e in input_examples]
+        labels_tensor = torch.Tensor(labels)
+        return move_tensor_to_device(labels_tensor, device)
 
     @abstractmethod
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor):

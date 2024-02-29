@@ -256,7 +256,8 @@ class PromptResponseManager:
             elif v in self.expected_responses[tag]:
                 success = True
             if not success:
-                closest_val = [r for r in self.expected_responses[tag] if r in v] if self.loose_response_validation else []
+                closest_val = [r for r in self.expected_responses[tag] if
+                               hasattr(r, '__contains__') and r in v] if self.loose_response_validation else []
                 if len(closest_val) == 1:
                     success = True
                     val = closest_val[0]

@@ -39,7 +39,7 @@ class LLMNode(AbstractNode):
         builder = PromptBuilder([prompt])
         return builder
 
-    def choose_branch(self, input_: Any) -> str:
+    def make_choice(self, input_: Any) -> str:
         """
         Decides which path to take from the current node.
         :param input_: The unique input to the node.

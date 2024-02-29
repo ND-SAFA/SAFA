@@ -15,7 +15,7 @@ class LeafNode(AbstractNode):
         if not self.is_leaf():
             raise Exception("Leaf node cannot have branches.")
 
-    def choose_branch(self, input_: Any) -> str:
+    def make_choice(self, input_: Any) -> str:
         """
         Here to maintain consistency with other nodes.
         :param input_: Input to the node.

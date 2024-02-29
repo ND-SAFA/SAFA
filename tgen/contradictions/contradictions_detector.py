@@ -47,8 +47,8 @@ class ContradictionsDetector:
         links_with_decisions: Set[int] = set()
         choices = []
         while len(links_with_decisions) != len(links):
-            prompt_builders = []
             choices = iter(choices)
+            prompt_builders = []
             for link in links:
                 link_id = link[TraceKeys.LINK_ID]
                 if link_id in links_with_decisions:

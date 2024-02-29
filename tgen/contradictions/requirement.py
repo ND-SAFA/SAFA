@@ -69,7 +69,7 @@ class Requirement:
         return not self.get_condition() and not self.get_effect()
 
     @staticmethod
-    def _get_component_of_constituent(component_dict: Dict[RequirementConstituent, List],
+    def _get_component_of_constituent(component_dict: Dict[RequirementConstituent, str],
                                       constituent: RequirementConstituent = None,
                                       default: Any = None) -> Union[str, List[str], None]:
         """
@@ -82,8 +82,5 @@ class Requirement:
         if not constituent:
             components = [Requirement._get_component_of_constituent(component_dict, RequirementConstituent.CONDITION),
                           Requirement._get_component_of_constituent(component_dict, RequirementConstituent.EFFECT)]
-            return [c for c in components if c is not None]
-        component = component_dict.get(constituent)
-        if not component:
-            return default
-        return component
+            return [c if c is not None else default for c in components]
+        return component_dict.get(constituent, default)

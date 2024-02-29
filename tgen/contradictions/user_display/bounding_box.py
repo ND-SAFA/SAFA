@@ -69,22 +69,8 @@ class BoundingBox:
         """
         return self.x0, self.y0, self.x1, self.y1
 
-    def _create_coordinates_from_initial_points(self) -> None:
-        """
-        Creates the coordinates for the corners of a bounding box.
-        :return: None
-        """
-        width = self.calculate_width_of_text(self.text, self.letter_width, self.max_width) if self.text else self.x_padding * 2
-        height = self._calculate_height_of_text(self.text, self.line_height) if self.text else self.y_padding * 2
-        x_offset = (width / 2) + self.x_padding
-        y_offset = height + self.y_padding
-        self.x0, self.x1 = self.x_mid - x_offset, self.x_mid + x_offset
-        if not self.y0:
-            self.y0 = self.y_mid - y_offset / 2
-        self.y1 = self.y0 + y_offset
-
     @staticmethod
-    def _calculate_height_of_text(text2display: str, line_height: float = None) -> float:
+    def calculate_height_of_text(text2display: str, line_height: float = None) -> float:
         """
         Calculates how much height to use for lines of the text.
         :param text2display: The text to use to judge y.
@@ -106,3 +92,17 @@ class BoundingBox:
         letter_width = BoundingBox.letter_width if not letter_width else letter_width
         len_text = max([len(text) for text in text2display.splitlines()])
         return min(len_text * letter_width, max_width)
+
+    def _create_coordinates_from_initial_points(self) -> None:
+        """
+        Creates the coordinates for the corners of a bounding box.
+        :return: None
+        """
+        width = self.calculate_width_of_text(self.text, self.letter_width, self.max_width) if self.text else self.x_padding * 2
+        height = self.calculate_height_of_text(self.text, self.line_height) if self.text else self.y_padding * 2
+        x_offset = (width / 2) + self.x_padding
+        y_offset = height + self.y_padding
+        self.x0, self.x1 = self.x_mid - x_offset, self.x_mid + x_offset
+        if not self.y0:
+            self.y0 = self.y_mid - y_offset / 2
+        self.y1 = self.y0 + y_offset

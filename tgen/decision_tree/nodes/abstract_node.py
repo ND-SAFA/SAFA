@@ -24,7 +24,7 @@ class AbstractNode(abc.ABC):
         return len(self.branches) == 0 or self.branches is None
 
     @abc.abstractmethod
-    def choose_branch(self, input_: Any) -> str:
+    def make_choice(self, input_: Any) -> str:
         """
         Decides which path to take from the current node.
         :param input_: The unique input to the node.

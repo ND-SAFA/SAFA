@@ -68,7 +68,8 @@ class STEmbeddingTrainer(STTrainer):
         :param input_examples: The input examples.
         :return: The loss for given predictions.
         """
-        model_device = self.loss_function.model._target_device
+        base_device = torch.device("cpu")
+        model_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         batches = ListUtil.batch(input_examples, self.trainer_args.per_device_eval_batch_size)
         loss_fnc = self.loss_function.to(model_device)
 
@@ -78,6 +79,7 @@ class STEmbeddingTrainer(STTrainer):
             features, labels = self.model.smart_batching_collate(batch)
             features, labels = move_input_to_device(model_device, features, labels)
             loss += loss_fnc(features, labels)
+            move_input_to_device(base_device, features, labels)
         return loss
 
     @overrides(STTrainer)

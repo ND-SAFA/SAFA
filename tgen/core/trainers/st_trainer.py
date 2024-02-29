@@ -65,6 +65,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
         for epoch in range(epochs):
             epoch_loss = 0
+            self.model.train()
             for i in tqdm(range(len(train_batch_sampler)), desc="Training model...."):
                 batch_indices = next(train_batch_sampler)
                 batch_examples = [train_examples[i] for i in batch_indices]
@@ -106,6 +107,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :param dataset_role: Role of dataset to predict on.
         :return: Prediction output containing similarity scores as predictions.
         """
+        self.model.eval()
         self._current_eval_role = dataset_role
         dataset = self._get_dataset(dataset_role)
         input_examples = to_input_examples(dataset)

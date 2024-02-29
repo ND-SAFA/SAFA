@@ -172,6 +172,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         """
         labels = [e.label for e in input_examples]
         labels_tensor = torch.Tensor(labels)
+        print(f"Moving labels to device:{device}")
         return move_tensor_to_device(labels_tensor, device)
 
     @abstractmethod

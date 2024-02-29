@@ -1,20 +1,27 @@
 import os
+import re
+from typing import Union
 
+from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE, TAB, EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE, TAB
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.prompts.prompt_args import PromptArgs
-from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
-from tgen.summarizer.summarizer_args import SummarizerArgs
-from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.prompts.prompt_args import PromptArgs
+from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
+from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.steps.step_summarize_artifacts import StepSummarizeArtifacts
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.paths import TEST_DATA_DIR
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_openai import mock_openai
 from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.paths.paths import TEST_DATA_DIR
 
 
 class TestSummarizer(BaseTest):
@@ -51,7 +58,7 @@ class TestSummarizer(BaseTest):
         ai_manager.set_responses([lambda prompt: self.get_response(prompt, ArtifactSummaryTypes.CODE_BASE, CODE_SUMMARY)])
         CODE_SUMMARY = "CODE_SUMMARY"
         summarizer = self.get_summarizer()
-        content_summary = summarizer.summarize_single(self.CODE_CONTENT, filename="file.py")
+        content_summary = summarizer.summarize_single(self.CODE_CONTENT, a_id="file.py")
         self.assertEqual(content_summary, CODE_SUMMARY)
 
     @mock_openai
@@ -74,7 +81,7 @@ class TestSummarizer(BaseTest):
                                         lambda prompt: self.get_response(prompt, ArtifactSummaryTypes.CODE_BASE, PL_SUMMARY)])
 
         summaries = summarizer.summarize_bulk(bodies=contents,
-                                              filenames=["natural language", "file.py"])
+                                              ids=["natural language", "file.py"])
         self.assertEqual(NL_SUMMARY, summaries[0])
         self.assertEqual(PL_SUMMARY, summaries[1])
 
@@ -93,10 +100,52 @@ class TestSummarizer(BaseTest):
         response_manager.set_responses([
             PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, SUMMARY_1)  # The re-summarization of the artifact.
         ])
-        summaries = summarizer.summarize_bulk(bodies=TEXTS, filenames=["file.py", "unknown"])
+        summaries = summarizer.summarize_bulk(bodies=TEXTS, ids=["file.py", "unknown"])
 
         self.assertEqual(summaries[0], SUMMARY_1)
         self.assertEqual(summaries[1], TEXT_2)  # shouldn't have summarized
+
+    @mock_anthropic
+    def test_context_summary(self, ai_manager: TestAIManager):
+        links = [(8, 7), (2, 3), (1, 3), (7, 3), (1, 4), (3, 6), (3, 5), (6, 9)]
+        links = [(self.convert_id_to_code_file(s), self.convert_id_to_code_file(t)) for s, t in links]
+        trace_df = TraceDataFrame({TraceKeys.SOURCE: [s for s, _ in links],
+                                   TraceKeys.TARGET: [t for _, t in links],
+                                   TraceKeys.LABEL: [1 for _ in links]})
+        artifact_ids = list(trace_df.get_artifact_ids())
+        content = ["content" + id_ for id_ in artifact_ids]
+        artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_ids, ArtifactKeys.CONTENT: content,
+                                         ArtifactKeys.LAYER_ID: ["layer" for _ in artifact_ids]})
+        context_mapping = TraceDataset(artifact_df=artifact_df, trace_df=trace_df,
+                                       layer_df=LayerDataFrame()).create_dependency_mapping()
+        for s, t in links:
+            self.assertIn(s, [art[ArtifactKeys.ID] for art in context_mapping[t]])
+
+        ai_manager.set_responses([lambda p: self.assert_context_prompt(p, context_mapping) for _ in artifact_ids])
+        order = StepSummarizeArtifacts.get_summary_order(trace_df)
+        expected_order = {0: [1, 2, 8],
+                          1: [4, 7],
+                          2: [3],
+                          3: [5, 6],
+                          4: [9]}
+        self.assertDictEqual(order, {self.convert_id_to_code_file(node): order
+                                     for order, nodes in expected_order.items() for node in nodes})
+        summarizer = ArtifactsSummarizer(context_mapping=context_mapping, summary_order=order)
+        artifact_df.summarize_content(summarizer)
+
+    def assert_context_prompt(self, p, context_mapping):
+        summary_response_format = "Summary of {}"
+        summary = TestAIManager.create_summarization_response(p)
+        content = summary.replace(summary_response_format.format(EMPTY_STRING), EMPTY_STRING)
+        id_num = re.findall(r'\d+', content)[0]
+        full_id = self.convert_id_to_code_file(id_num)
+        if full_id in context_mapping:
+            for related_artifact in context_mapping[full_id]:
+                self.assertIn(summary_response_format.format(related_artifact[ArtifactKeys.CONTENT]), p)
+        return summary
+
+    def convert_id_to_code_file(self, orig_id: Union[int, str]):
+        return f"{orig_id}.py"
 
     def get_summarizer(self, **kwargs):
         internal_kwargs = {"summarize_code_only": False}

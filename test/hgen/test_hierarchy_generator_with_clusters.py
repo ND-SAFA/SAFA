@@ -46,7 +46,9 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         CreateClustersStep().run(args, state)
         self.assert_generate_artifact_content_step(args, state, anthropic_ai_manager)
 
-        expected_names = self.assert_refine_artifact_content_step(args, state, anthropic_ai_manager)
+        self.assert_refine_artifact_content_step(args, state, anthropic_ai_manager)
+        names, expected_names, name_responses = get_name_responses(state.get_generations2sources().keys())
+        anthropic_ai_manager.add_responses(name_responses)
         NameArtifactsStep().run(args, state)
         self.assert_generate_trace_links_step(expected_names, args, state, anthropic_ai_manager)
         self.assert_detect_duplicates_step(args, state)
@@ -72,7 +74,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                                                       self.HGEN_ARGS.source_layer_ids[0])
 
         state.embedding_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content)
-        DictUtil.get_first_value(state.get_cluster2generation()).append(dup_content)
+        DictUtil.get_value_by_index(state.get_cluster2generation()).append(dup_content)
 
         original_link = EnumDict({TraceKeys.child_label(): DUP_SOURCE_ARTIFACT,
                                   TraceKeys.parent_label(): dup_artifact_id,
@@ -93,12 +95,13 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         def prompt_res_creator(r):
             return lambda prompt: self.assert_generation_prompts(prompt, return_value=r)
 
-        user_stories = [PromptUtil.create_xml("user-story",
-                                              HGenTestConstants.user_stories[i % len(HGenTestConstants.user_stories)] + str(i))
+        user_stories = [HGenTestConstants.user_stories[i % len(HGenTestConstants.user_stories)] + str(i)
                         for i in range(len(state.cluster2artifacts))]
-        user_stories[-1] += PromptUtil.create_xml("user-story", HGenTestConstants.user_stories[-1] + str(len(user_stories)))
-        responses = [prompt_res_creator(us) for i, us in enumerate(user_stories)]
-        names, expected_names, name_responses = get_name_responses(user_stories)
+        user_story_res = [PromptUtil.create_xml("user-story", us) for us in user_stories]
+        user_story_res[-1] += PromptUtil.create_xml("user-story", user_stories[-1] + str(len(user_story_res)))
+        user_stories.append(user_stories[-1] + str(len(user_story_res)))
+        responses = [prompt_res_creator(us) for i, us in enumerate(user_story_res)]
+        names, expected_names, name_responses = get_name_responses(user_story_res)
         responses.extend(name_responses)
         anthropic_ai_manager.add_responses(responses)
         anthropic_ai_manager.mock_summarization()
@@ -110,8 +113,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
             if i < len(state.get_generations2sources()) - 1:
                 for a in source_artifacts:
                     self.assertIn(a, us)
-            i = i - 1 if i == len(state.generations2sources) - 1 else i
-            expected_us = HGenTestConstants.user_stories[i % len(HGenTestConstants.user_stories)]
+            expected_us = user_stories[i]
             self.assertIn(expected_us, us)
 
     @mock.patch.object(ContentGenerator, "convert_cohesion_to_reduction_percentage", return_value=1)
@@ -122,18 +124,27 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                                            f"duplicate summary {i}")
                      for i, _ in enumerate(HGenTestConstants.user_stories)]
 
+        generations2expected_n_targets = {}
+        for us in HGenTestConstants.user_stories:
+            for gen in state.get_generations2sources():
+                if us in gen:
+                    if generations2expected_n_targets.get(us, 0) < args.cluster_max_size:
+                        DictUtil.set_or_increment_count(generations2expected_n_targets, us)
+        for us in HGenTestConstants.user_stories:
+            if us in DictUtil.get_value_by_index(state.cluster2generations, index=-1)[0]:
+                generations2expected_n_targets[us] -= 1  # intra cluster duplicate
+
+        artifact2n_targets = {a_id: generations2expected_n_targets[[us for us in HGenTestConstants.user_stories
+                                                                    if us in state.get_cluster2generation()[c_id][0]][0]]
+                              for a_id, c_id in DictUtil.flip(state.cluster2artifacts).items()}
+
         def prompt_res_creator(r):
-            return lambda prompt: self.assert_generation_prompts(prompt, return_value=r, refinement=True)
+            return lambda prompt: self.assert_generation_prompts(prompt, return_value=r, refinement=True,
+                                                                 artifact2n_targets=artifact2n_targets)
 
         user_stories = [PromptUtil.create_xml("user-story", us) for us in HGenTestConstants.user_stories]
         responses.extend([prompt_res_creator(us) for i, us in enumerate(user_stories)])
-        names, expected_names, name_responses = get_name_responses(user_stories)
-        responses.extend(name_responses)
         anthropic_ai_manager.add_responses(responses)
-        RefineGenerationsStep().run(args, state)
-        return expected_names
-
-    def assert_refine_content_step(self, args, state, anthropic_ai_manager: TestAIManager):
         RefineGenerationsStep().run(args, state)
 
     def assert_generate_trace_links_step(self, expected_names,
@@ -156,7 +167,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
                  and p[TraceKeys.parent_label()] == new_name]
         return found
 
-    def assert_generation_prompts(self, prompt: str, return_value: str, refinement: bool = False):
+    def assert_generation_prompts(self, prompt: str, return_value: str, refinement: bool = False, **kwargs):
         artifacts = BeautifulSoup(prompt, features="lxml").findAll(self.HGEN_ARGS.source_type)
         artifacts = [{ArtifactKeys.ID: child.text
                       for child in a if isinstance(child, Tag) and child.name == "id"}
@@ -166,9 +177,13 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         source_artifacts = self.HGEN_ARGS.dataset.artifact_df.get_artifacts_by_type(self.HGEN_ARGS.source_layer_ids[0]).to_artifacts()
         avg_file_size = sum([len(a[ArtifactKeys.CONTENT].splitlines())
                              for a in source_artifacts]) / len(source_artifacts)
-        expected_value = ContentGenerator._calculate_n_targets_for_cluster(artifacts,
-                                                                           avg_file_size=avg_file_size,
-                                                                           retention_percentage=1) if not refinement else 4
+        if refinement:
+            artifact2n_targets = DictUtil.get_kwarg_values(kwargs, artifact2n_targets=None)
+            expected_value = artifact2n_targets[artifacts[0][ArtifactKeys.ID]]
+        else:
+            expected_value = ContentGenerator._calculate_n_targets_for_cluster(artifacts,
+                                                                               avg_file_size=avg_file_size,
+                                                                               retention_percentage=1)
         self.assertIn("Create {} DISTINCT User Story".format(expected_value), prompt)
         if not refinement:
             end_tag_index = return_value.find(PromptUtil.create_xml_closing("user-story"))

@@ -27,7 +27,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The state of the
         :return: None
         """
-        if not args.perform_clustering:
+        if not args.perform_clustering or not args.detect_duplicates:
             state.selected_artifacts_dataset = state.all_artifacts_dataset
             return
 

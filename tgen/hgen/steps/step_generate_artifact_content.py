@@ -4,10 +4,12 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, 
 from tgen.common.logging.logger_manager import logger
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.content_generator import ContentGenerator
+from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.supported_prompts.supported_hgen_doc_type_prompts import SupportedHGenDocPrompts
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
@@ -24,7 +26,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         logger.info(f"Generating {args.target_type}s\n")
 
         base_task_prompt = SupportedPrompts.HGEN_GENERATION_QUESTIONNAIRE if not state.cluster2artifacts \
-            else SupportedPrompts.HGEN_CLUSTERING_QUESTIONNAIRE
+            else SupportedHGenDocPrompts.get_prompt_by_type(args.target_type)
 
         dataset = state.cluster_dataset if state.cluster_dataset is not None else state.source_dataset
 
@@ -38,9 +40,13 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
             format_variables.update({"n_targets": n_targets})
 
         content_generator = ContentGenerator(args, state, dataset)
+        context_mapping = state.original_dataset.create_dependency_mapping(include_parents=True) \
+            if state.original_dataset.trace_dataset and args.check_target_type_constraints(
+            DocTypeConstraints.USE_SOURCE_CONTEXT) else {}
         prompt_builder = content_generator.create_prompt_builder(SupportedPrompts.HGEN_GENERATION,
                                                                  base_task_prompt,
                                                                  args.source_type, state.get_cluster2artifacts(),
+                                                                 context_mapping=context_mapping,
                                                                  format_variables=format_variables, include_summary=False)
 
         if args.seed_layer_id and args.include_seed_in_prompt:

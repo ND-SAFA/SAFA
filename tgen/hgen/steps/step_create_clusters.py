@@ -6,13 +6,18 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.clustering_constants import CLUSTERING_SUBDIRECTORY
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.hgen_constants import CLUSTER_ARTIFACT_TYPE_PARAM, CLUSTER_SEEDS_PARAM
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -28,6 +33,10 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: Current state of the hgen pipeline.
         :return: None
         """
+        if args.check_target_type_constraints(DocTypeConstraints.ONE_TARGET_PER_SOURCE):
+            self._create_one_artifact_clusters(state)
+            return
+
         if not args.perform_clustering:
             state.embedding_manager = EmbeddingsManager(content_map={}, model_name=DEFAULT_EMBEDDING_MODEL)
             return
@@ -36,6 +45,24 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         clustering_pipeline = ClusteringPipeline(cluster_args)
         clustering_pipeline.run()
         self.update_hgen_state(args, state, clustering_pipeline.state, cluster_args.cluster_max_size)
+
+    @staticmethod
+    def _create_one_artifact_clusters(state: HGenState) -> None:
+        """
+        Creates a cluster for each artifact for a 1-1 relationship.
+        :param state: The current hgen state.
+        :return: None (updates state).
+        """
+        state.embedding_manager = EmbeddingsManager(content_map={}, model_name=DEFAULT_EMBEDDING_MODEL)
+        n_source_artifacts = len(state.source_dataset.artifact_df.index)
+        state.cluster2artifacts = {a_id: [a_id] for a_id in state.source_dataset.artifact_df.index}
+        cluster_artifacts = ArtifactDataFrame({ArtifactKeys.ID: [a_id for a_id in state.cluster2artifacts.keys()],
+                                               ArtifactKeys.CONTENT: [EMPTY_STRING for _ in range(n_source_artifacts)],
+                                               ArtifactKeys.LAYER_ID: [ClusteringArgs.cluster_artifact_type
+                                                                       for _ in range(n_source_artifacts)]
+                                               })
+        state.cluster_dataset = PromptDataset(artifact_df=cluster_artifacts)
+        state.cluster2cohesion = {c_id: 1 for c_id in state.cluster2artifacts.keys()}
 
     @staticmethod
     def update_hgen_state(args: HGenArgs, state: HGenState, cluster_state: ClusteringState, cluster_max_size: int) -> None:

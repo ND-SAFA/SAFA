@@ -10,6 +10,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.math_util import MathUtil
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
+from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -114,7 +115,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         parent2predictions = RankingUtil.group_trace_predictions(cluster_predictions, TraceKeys.parent_label())
         for parent, parent_preds in parent2predictions.items():
             parent_selected_traces = parent2selections.get(parent, [])
-            if len(parent_selected_traces) == 0:
+            if len(parent_selected_traces) == 0 and not args.check_target_type_constraints(DocTypeConstraints.ONE_TARGET_PER_SOURCE):
                 parent_selected_traces = self._trace_barren_parents(args, parent_preds)
             trace_selections.extend(parent_selected_traces)
         trace_predictions.extend(cluster_predictions)

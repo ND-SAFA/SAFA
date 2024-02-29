@@ -11,6 +11,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import HGenUtil
+from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
 from tgen.prompts.context_prompt import ContextPrompt
@@ -47,7 +48,7 @@ class ContentGenerator:
         :param return_first: If True, returns the first item from each list of parsed tags (often there is only one per tag)
         :return: The model's parsed generations.
         """
-        task_prompt = prompt_builder.get_prompt(-1)
+        task_prompt = prompt_builder.get_prompt_by_id(self.TASK_PROMPT_ID)
         prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
 
         export_path = FileUtil.safely_join_paths(self.state.export_dir, generations_filename)
@@ -59,11 +60,13 @@ class ContentGenerator:
         return generations
 
     def create_prompt_builder(self, base_intro_prompt: SupportedPrompts, base_task_prompt: SupportedPrompts,
-                              source_type: str, cluster2artifacts: Dict[str, List] = None,
+                              source_type: str,
+                              cluster2artifacts: Dict[str, List] = None,
                               format_variables: Dict[str, List] = None,
                               additional_task_response_instructions: str = EMPTY_STRING,
                               artifact_prompt_build_method: MultiArtifactPrompt.BuildMethod = MultiArtifactPrompt.BuildMethod.XML,
-                              include_summary: bool = True) -> PromptBuilder:
+                              include_summary: bool = True,
+                              context_mapping: Dict[str, List[EnumDict]] = None) -> PromptBuilder:
         """
         Creates the prompt builder for the generations using the provided prompts and variables.
         :param base_intro_prompt: Will be used to introduce the problem at the start of the prompt.
@@ -74,16 +77,24 @@ class ContentGenerator:
         :param additional_task_response_instructions: Any additional instructions to include on how the model should format its res.
         :param include_summary: If True, includes summary in prompt.
         :param artifact_prompt_build_method: How to construct the source artifacts in prompt.
+        :param context_mapping: Maps artifact id to related artifacts for use in certain types of docs requiring context.
         :return: The prompt builder for the generations using the provided prompts and variables.
         """
         task_prompt = self._create_generations_task_prompt(base_task_prompt.value, cluster2artifacts,
+                                                           context_mapping=context_mapping,
                                                            additional_response_instructions=additional_task_response_instructions)
         artifact_prompt = self._create_source_artifact_prompt(source_type, cluster2artifacts,
+                                                              use_summary=not self.args.check_target_type_constraints(
+                                                                  DocTypeConstraints.USE_SOURCE_CONTEXT),
                                                               build_method=artifact_prompt_build_method) \
             if artifact_prompt_build_method else None
 
-        prompt_builder = self._get_prompt_builder_for_generation(
-            task_prompt, base_intro_prompt.value, artifact_prompt, format_variables, include_summary)
+        prompts = [base_intro_prompt.value, artifact_prompt]
+        if context_mapping:
+            prompts.insert(1, task_prompt)
+        else:
+            prompts.append(task_prompt)
+        prompt_builder = self._get_prompt_builder_for_generation(prompts, format_variables, include_summary)
         return prompt_builder
 
     def map_generations_to_predicted_sources(self, generations: List,
@@ -169,15 +180,24 @@ class ContentGenerator:
         return min(round(n_targets), max_acceptable)
 
     def _create_generations_task_prompt(self, task_prompt: QuestionnairePrompt, cluster2artifacts: Dict[str, List] = None,
+                                        context_mapping: Dict[str, List[EnumDict]] = None,
                                         additional_response_instructions: str = EMPTY_STRING) -> QuestionnairePrompt:
         """
         Creates the prompt used for the primary creation task
         :param task_prompt: The main prompt being used to prompt the model to generate artifacts.
         :param cluster2artifacts: Maps cluster id to the list of artifacts in that cluster.
+        :param context_mapping: Maps artifact id to related artifacts for use in certain types of docs requiring context.
         :param additional_response_instructions: If provided, will be used to instruct the model how to format the response.
         :return: The prompt used for the primary creation task
         """
         task_prompt.id = self.TASK_PROMPT_ID
+        use_context = False
+        for c_prompt in task_prompt.child_prompts:
+            if isinstance(c_prompt, ContextPrompt):
+                c_prompt.id_to_context_artifacts = context_mapping
+                use_context = True
+        if isinstance(task_prompt, QuestionnairePrompt) and not use_context:
+            task_prompt.use_multi_step_task_instructions = True
         if not task_prompt.response_manager.response_tag:
             target_type_tag = HGenUtil.convert_spaces_to_dashes(self.args.target_type)
             response_instructions_format = f"Enclose each final {self.args.target_type} in " \
@@ -194,23 +214,17 @@ class ContentGenerator:
                                  example=self.state.example_artifact)
         return task_prompt
 
-    def _get_prompt_builder_for_generation(self, task_prompt: QuestionnairePrompt, base_prompt: Prompt,
-                                           artifact_prompt: MultiArtifactPrompt, format_variables: Dict = None,
+    def _get_prompt_builder_for_generation(self, prompts: List[Prompt],
+                                           format_variables: Dict = None,
                                            include_summary: bool = True) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations.
-        :param task_prompt: The questionnaire prompt given to the model to produce the generations.
-        :param base_prompt: The main prompt that starts the prompt.
-        :param artifact_prompt: The prompt that contains the source artifacts.
+        :param prompts: Contains the necessary prompts.
         :param format_variables: Any variables to give the prompt builder to dynamically format.
         :param include_summary: If True, includes summary in prompt.
         :return: The prompt builder used for the generations
         """
 
-        if isinstance(task_prompt, QuestionnairePrompt):
-            task_prompt.use_multi_step_task_instructions = True
-
-        prompts = [base_prompt, artifact_prompt, task_prompt]
         prompt_builder = PromptBuilder(prompts)
 
         if format_variables:

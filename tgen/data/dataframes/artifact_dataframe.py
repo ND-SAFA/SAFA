@@ -183,7 +183,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 self[ArtifactKeys.SUMMARY] = summaries
             else:
                 ids, content = self._find_missing_summaries()
-                summaries = summarizer.summarize_bulk(bodies=content, filenames=ids, use_content_if_unsummarized=False)
+                summaries = summarizer.summarize_bulk(bodies=content, ids=ids, use_content_if_unsummarized=False)
                 self.update_values(ArtifactKeys.SUMMARY, ids, summaries)
         return self[ArtifactKeys.SUMMARY]
 

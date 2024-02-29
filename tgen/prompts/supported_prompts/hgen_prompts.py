@@ -2,6 +2,7 @@ from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.project_summary_constants import PS_NOTES_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.conditional_prompt import ConditionalPrompt
+from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -119,6 +120,28 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
         ], enumeration_chars=["-"]
     )])
+
+API_DATAFLOW_QUESTIONNAIRE = QuestionnairePrompt(
+    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Related Code Snippets"),
+                      Prompt("# TASK \n "
+                             "Create a detailed summary describing what occurs during the execution of the endpoint."
+                             "\n\t- The summary should detail the input, what happens inside of each step, and the output."
+                             "\n\t- The functions called during the execution of the endpoint are included above. "
+                             "Embed their functionality into the summary steps. "
+                             "\n\nUse the following format to structure "
+                             "your output\n {format}")], enumeration_chars=[NEW_LINE]
+)
+
+DB_ENTITY_SPEC_QUESTIONNAIRE = QuestionnairePrompt(
+    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Usages of the entity"),
+                      Prompt("# TASK \n "
+                             "You are given the code for an entity and summaries of each code module that uses the entity. "
+                             "Extract the schema from the given entity's attributes using the following format: \n{format}.\n"
+                             "Please make sure that all attributes are included. "
+                             "Use the usages to make sure that you understand the attributes of "
+                             "the entity in the context of the system but create ONE spec ONLY for the {source_type} provided. ")],
+    enumeration_chars=[NEW_LINE]
+)
 
 SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "
                      "When creating the {target_type}(s) from {source_type}, "

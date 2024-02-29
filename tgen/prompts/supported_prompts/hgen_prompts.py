@@ -123,12 +123,12 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
 
 API_DATAFLOW_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Related Code Snippets"),
-                      Prompt("# TASK \n Starting with the input, create a detailed summary of each step that the endpoint "
-                             "performs to produce the final output. "
-                             "Your focus should be on detailing how data flows in the ENDPOINT execution. "
-                             "Include as much detail as would be necessary to fully understand the endpoint, including details from "
-                             "the descriptions of the functions under # Related Code Snippets which are called in the endpoint. "
-                             "Use the following format to structure "
+                      Prompt("# TASK \n "
+                             "Create a detailed summary describing what occurs during the execution of the endpoint."
+                             "\n\t- The summary should detail the input, what happens inside of each step, and the output."
+                             "\n\t- The functions called during the execution of the endpoint are included above. "
+                             "Embed their functionality into the summary steps. "
+                             "\n\nUse the following format to structure "
                              "your output\n {format}")], enumeration_chars=[NEW_LINE]
 )
 

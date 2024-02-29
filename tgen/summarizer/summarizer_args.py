@@ -42,7 +42,7 @@ class SummarizerArgs(PipelineArgs):
     """
     Whether to summarize the artifacts after creating the project summary.
     """
-    do_resummarize_artifacts: bool = True
+    do_resummarize_artifacts: bool = False
     """
     If True, a project summary will not be created
     """
@@ -66,7 +66,7 @@ class SummarizerArgs(PipelineArgs):
     """
     Includes context (dependent methods) when summarizing code.
     """
-    use_context_in_code_summaries: bool = False
+    use_context_in_code_summaries: bool = True
 
     def __post_init__(self) -> None:
         """

@@ -40,7 +40,7 @@ class TestContradictionsTreeBuilder(BaseTest):
         q3 = builder.get_question_node(3)
         self.assertEqual(q2.select_branch(choice_no), q3)
 
-        choice_yes = q2a.make_choice((R2, R3))  # should be yes bc actions are same
+        choice_yes = q2a.make_choice((R1, R3))  # should be yes bc actions are same
         q4 = builder.get_question_node(4)
         self.assertEqual(q2a.select_branch(choice_yes), q4)
         choice_yes = q2.make_choice((R1, R2))  # mocked response from LLM

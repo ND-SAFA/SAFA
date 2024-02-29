@@ -116,7 +116,8 @@ class STTrainer(HuggingFaceTrainer, ABC):
         device = self.model._target_device
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         labels_tensor = self.get_labels_tensor(input_examples, device)
-        prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels_tensor, input_examples=input_examples).item()
+        with torch.no_grad():
+            prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels_tensor, input_examples=input_examples).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def predict_similarity_scores(self, input_examples: List[InputExample]):

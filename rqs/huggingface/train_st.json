@@ -39,6 +39,7 @@
             "use_scores": "[USE_SCORES_BOOL]",
             "num_train_epochs": "[EPOCHS_INT]",
             "train_batch_size": "[BATCH_SIZE_INT]",
+            "per_device_eval_batch_size": "[BATCH_SIZE_INT]",
             "do_training_eval": "[DO_TRAINING_EVAL_BOOL]",
             "best_model_path": "[MODEL_PATH]/[BEST_MODEL_NAME]",
             "output_dir": "[OUTPUT_PATH]",

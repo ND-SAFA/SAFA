@@ -73,6 +73,7 @@ class STEmbeddingTrainer(STTrainer):
         loss_fnc = self.loss_function.to(model_device)
 
         loss = torch.tensor(0.0)
+        loss = loss.to(model_device)
         for batch in ListUtil.selective_tqdm(batches, desc="Calculating loss.."):
             features, labels = self.model.smart_batching_collate(batch)
             features, labels = move_input_to_device(model_device, features, labels)

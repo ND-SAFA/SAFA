@@ -52,8 +52,8 @@ class STMLPTrainer(STTrainer):
         :return: Tensor of size (batch_size, )
         """
         combined_embeddings = torch.cat((source_embeddings, target_embeddings), dim=1)
-        prediction = self.mlp(combined_embeddings)  # Add batch dimension
-        return torch.sigmoid(prediction).squeeze()  # Keep as tensor
+        scores = self.mlp(combined_embeddings)  # Add batch dimension
+        return scores
 
     @overrides(STTrainer)
     def get_trainable_parameters(self) -> Iterable[Parameter]:

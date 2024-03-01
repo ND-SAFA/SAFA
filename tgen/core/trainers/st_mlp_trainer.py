@@ -51,7 +51,7 @@ class STMLPTrainer(STTrainer):
         :param target_embeddings: Tensor of target embeddings of size (batch_size, features...)
         :return: Tensor of size (batch_size, )
         """
-        mlp = move_tensor_to_device(self.mlp)
+        self.mlp = move_tensor_to_device(self.mlp, self.device)
         combined_embeddings = torch.cat((source_embeddings, target_embeddings), dim=1)
         scores = self.mlp(combined_embeddings)  # Add batch dimension
         return scores

@@ -7,7 +7,7 @@ from torch.nn import Parameter
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
 from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import freeze, move_tensor_to_device
+from tgen.common.util.tf_util import move_tensor_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_mlp import STMLP
 from tgen.core.trainers.st_trainer import STTrainer
@@ -41,7 +41,6 @@ class STMLPTrainer(STTrainer):
         self.mlp = STMLP.build(self.model, [512, 256], nn.ReLU)
         self.max_score = None
         self.model_output_path = os.path.join(self.args.output_dir, "model.pt")
-        freeze(self.model)
 
     @overrides(STTrainer)
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor):

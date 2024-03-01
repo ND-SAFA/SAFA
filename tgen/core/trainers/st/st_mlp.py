@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 from sentence_transformers import SentenceTransformer
 
+from tgen.common.util.override import overrides
+
 
 class STMLP(nn.Module):
     def __init__(self, input_size: int, hidden_sizes: List[int], output_size=2,
@@ -23,6 +25,18 @@ class STMLP(nn.Module):
             if activations is not None and i < len(activations):
                 layers.append(activations[i]())
         self.layers = nn.Sequential(*layers)
+        self.device = next(self.parameters()).device
+
+    @overrides(nn.Module)
+    def to(self, device):
+        """
+        Overrides to method to allow setting of fake property `device`.
+        :param device: The device to move model to.
+        :return: The moved model.
+        """
+        self.device = device
+        moved_model = super().to(device)
+        return moved_model
 
     @staticmethod
     def build(model: SentenceTransformer, hidden_sizes: List[int], activations: List[nn.Module]):

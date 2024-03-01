@@ -49,6 +49,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.min_eval_steps = max_steps_before_eval
         self.max_score = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.setup_complete = False
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -57,7 +58,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        self.setup_training_device()  # moves model and any additional modules to training device.
+        self.complete_device_setup()
         train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
 
@@ -94,18 +95,6 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
         return TrainOutput(metrics={}, training_loss=self.state.total_flos, global_step=self.state.global_step)
 
-    def evaluate_if_save(self, evaluator: STEvaluator, **kwargs) -> None:
-        """
-        Evaluates the model and saves if its the best version of the model so far.
-        :param evaluator: The evaluator called to get score.
-        :param kwargs: Keyword arguments to evaluator.
-        :return: None, model is saved.
-        """
-        epoch_score = evaluator(**kwargs)
-        if self.max_score is None or epoch_score > self.max_score:
-            self.max_score = epoch_score
-            self.save()
-
     @overrides(HuggingFaceTrainer)
     def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:
         """
@@ -113,6 +102,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :param dataset_role: Role of dataset to predict on.
         :return: Prediction output containing similarity scores as predictions.
         """
+        self.complete_device_setup()
         self.model.eval()
         self._current_eval_role = dataset_role
         dataset = self._get_dataset(dataset_role)
@@ -171,6 +161,27 @@ class STTrainer(HuggingFaceTrainer, ABC):
         predictions = self.calculate_similarity_scores(source_embeddings, target_embeddings)
         return predictions
 
+    def evaluate_if_save(self, evaluator: STEvaluator, **kwargs) -> None:
+        """
+        Evaluates the model and saves if its the best version of the model so far.
+        :param evaluator: The evaluator called to get score.
+        :param kwargs: Keyword arguments to evaluator.
+        :return: None, model is saved.
+        """
+        epoch_score = evaluator(**kwargs)
+        if self.max_score is None or epoch_score > self.max_score:
+            self.max_score = epoch_score
+            self.save()
+
+    def complete_device_setup(self) -> None:
+        """
+        Lazily performs final setup on device.
+        :return: None
+        """
+        if not self.setup_complete:
+            self.setup_training_device()
+            self.setup_complete = True
+
     def setup_training_device(self) -> None:
         """
         Moves training modules to training device.
@@ -179,13 +190,6 @@ class STTrainer(HuggingFaceTrainer, ABC):
         logger.info(f"Moving modules to training device: {self.device}")
         self.model = self.model.to(self.device)
         self.move_training_modules(self.device)
-
-    @abstractmethod
-    def move_training_modules(self, device: torch.device) -> None:
-        """
-        :return: Moves any additional modules to device before training.
-        """
-        pass
 
     @staticmethod
     def get_labels_tensor(input_examples: List[InputExample], device: str) -> torch.Tensor:
@@ -198,6 +202,13 @@ class STTrainer(HuggingFaceTrainer, ABC):
         labels = [e.label for e in input_examples]
         labels_tensor = torch.Tensor(labels)
         return move_tensor_to_device(labels_tensor, device)
+
+    @abstractmethod
+    def move_training_modules(self, device: torch.device) -> None:
+        """
+        :return: Moves any additional modules to device before training.
+        """
+        pass
 
     @abstractmethod
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor):

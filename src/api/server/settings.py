@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # TGEN Configuration
-anthropic_constants.ANTHROPIC_MAX_THREADS = 2
+anthropic_constants.ANTHROPIC_MAX_THREADS = 10
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

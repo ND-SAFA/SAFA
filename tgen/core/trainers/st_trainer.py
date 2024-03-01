@@ -88,8 +88,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
                 self.state.total_flos += step_loss
                 self.state.global_step += 1
                 train_batch_sampler.reset()
-                WBManager.log({DatasetRole.TRAIN: {"loss": step_loss}}, step=self.state.global_step)
-
+            WBManager.log({DatasetRole.TRAIN: {"loss": epoch_loss, "epoch": epoch + 1}}, step=self.state.global_step)
             logger.info(f"Training Loss: {epoch_loss}")
             self.evaluate_if_save(evaluator)
 

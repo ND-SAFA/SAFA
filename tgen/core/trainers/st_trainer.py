@@ -13,7 +13,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.st_util import to_input_examples
-from tgen.common.util.tf_util import freeze, move_tensor_to_device
+from tgen.common.util.tf_util import move_tensor_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
@@ -61,16 +61,12 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.complete_device_setup()
         train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
-
         evaluator = STEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
-        parameters = self.get_trainable_parameters()
-        optimizer = optim.Adam(parameters, lr=self.trainer_args.learning_rate)
+
+        optimizer = self.setup_optimizer()
+
         epochs = int(self.args.num_train_epochs)
         logger.info(f"Total Epochs: {epochs}")
-
-        if self.trainer_args.freeze_base:
-            freeze(self.model)
-
         for epoch in range(epochs):
             logger.info(f"Starting Epoch {epoch + 1}")
             epoch_loss = 0
@@ -83,6 +79,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
                 optimizer.zero_grad()  # Clear gradients
                 predictions = self.calculate_predictions(sentence_pairs).to(self.device)  # Process each sentence pair
+                predictions.requires_grad = True
                 loss = self.compute_loss(scores=predictions, labels=labels, input_examples=batch_examples)
                 loss.backward()  # Back-propagate and update weights
                 optimizer.step()
@@ -97,6 +94,20 @@ class STTrainer(HuggingFaceTrainer, ABC):
             self.evaluate_if_save(evaluator)
 
         return TrainOutput(metrics={}, training_loss=self.state.total_flos, global_step=self.state.global_step)
+
+    def setup_optimizer(self):
+        """
+        Creates optimizer with training parameters.
+        :return:
+        """
+        model_parameters = list(self.model.parameters())
+        additional_parameters = list(self.get_additional_training_parameters())
+        # set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
+        parameters = model_parameters + additional_parameters
+        trainable_params = [p for p in parameters if p.requires_grad]
+        optimizer = optim.Adam(trainable_params, lr=self.trainer_args.learning_rate)
+        logger.info(f"Training {len(trainable_params)} parameters...")
+        return optimizer
 
     @overrides(HuggingFaceTrainer)
     def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:
@@ -199,6 +210,12 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.model = self.model.to(self.device)
         self.move_training_modules(self.device)
 
+    def get_additional_training_parameters(self) -> Iterable[Parameter]:
+        """
+        :return: Returns parameters to include in optimizer calculation.
+        """
+        return []
+
     @staticmethod
     def get_labels_tensor(input_examples: List[InputExample], device: torch.device) -> torch.Tensor:
         """
@@ -238,12 +255,6 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :return:
         """
         pass
-
-    @abstractmethod
-    def get_trainable_parameters(self) -> Iterable[Parameter]:
-        """
-        :return: Returns parameters to include in optimizer calculation.
-        """
 
     @abstractmethod
     def save(self) -> None:

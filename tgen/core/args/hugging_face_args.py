@@ -74,7 +74,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
 
     # Sentence-BERT
     use_scores: bool = False
-    st_loss_function = "cosine"
+    st_loss_function = None
     freeze_base: bool = False
 
     # Misc

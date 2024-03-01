@@ -1,7 +1,8 @@
-from typing import Dict, List, Type
+from typing import Dict, Iterable, List, Type
 
 import torch
-from torch import Tensor, nn
+from torch import Tensor
+from torch.nn.parameter import Parameter
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -35,29 +36,32 @@ def move_tensor_to_device(tensor: Tensor, model_device: torch.device):
     return tensor
 
 
-def freeze(*models: nn.Module) -> None:
+def set_gradients(parameters: Iterable[Parameter], requires_grad: bool) -> None:
     """
     Freezes the parameters of the models.
-    :param models: The models to freeze.
+    :param parameters: The parameters to train.
+    :param requires_grad: Whether the parameter should require gradients.
     :return:None
     """
-    for model in models:
-        for param in model.parameters():
-            param.requires_grad = False
+    for param in parameters:
+        param.requires_grad = requires_grad
 
 
-def create_loss_function(loss_function_enum: Type[SupportedEnum], loss_function_name: str, possible_params: Dict = None, *args,
-                         **kwargs):
+def create_loss_function(loss_function_enum: Type[SupportedEnum], loss_function_name: str, default: str, possible_params: Dict = None,
+                         *args, **kwargs):
     """
     Creates loss function.
     :param loss_function_enum: Enum mapping name to loss function class.
     :param loss_function_name: The name of the loss function to create.
+    :param default: The default loss function to use if name is None.
     :param possible_params: Map of param to values to construct loss function with.
     :param kwargs: Additional constructor parameters to loss function.
     :return:
     """
     if possible_params is None:
         possible_params = {}
+    if default and loss_function_name is None:
+        loss_function_name = default
 
     loss_function_class = loss_function_enum.get_value(loss_function_name)
     loss_function_kwargs = {param: param_value for param, param_value in possible_params.items()

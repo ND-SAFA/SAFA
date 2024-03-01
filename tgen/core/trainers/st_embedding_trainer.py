@@ -1,15 +1,13 @@
-from typing import Iterable, List
+from typing import List
 
 import torch
 from sentence_transformers import InputExample
 from torch import cosine_similarity
-from torch.nn import Parameter
 
-from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import create_loss_function, move_input_to_device
+from tgen.common.util.tf_util import create_loss_function
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.st.st_loss_functions import SupportedSTLossFunctions
+from tgen.core.trainers.st_loss_functions import SupportedMLPLosses
 from tgen.core.trainers.st_trainer import STTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.models.model_manager import ModelManager
@@ -59,14 +57,7 @@ class STEmbeddingTrainer(STTrainer):
         :param input_examples: The input examples.
         :return: The loss for given predictions.
         """
-        batches = ListUtil.batch(input_examples, self.trainer_args.per_device_eval_batch_size)
-
-        loss = torch.tensor(0.0)
-        loss = loss.to(self.device)
-        for batch in ListUtil.selective_tqdm(batches, desc="Calculating loss.."):
-            features, labels = self.model.smart_batching_collate(batch)
-            features, labels = move_input_to_device(self.device, features, labels)
-            loss += self.loss_function(features, labels)
+        loss = self.loss_function(scores, labels)
         return loss
 
     @overrides(STTrainer)
@@ -75,13 +66,6 @@ class STEmbeddingTrainer(STTrainer):
         :return: Returns list of modules to move to device before training.
         """
         self.loss_function = self.loss_function.to(device)
-
-    @overrides(STTrainer)
-    def get_trainable_parameters(self) -> Iterable[Parameter]:
-        """
-        :return: Returns the embedding model's parameters.
-        """
-        return self.model.parameters()
 
     @overrides(STTrainer)
     def save(self) -> None:
@@ -96,10 +80,4 @@ class STEmbeddingTrainer(STTrainer):
         Creates the loss function from its defined class.
         :return: The loss function.
         """
-        possible_params = {"size_average": False, "margin": 0.1}
-        return create_loss_function(
-            SupportedSTLossFunctions,
-            self.trainer_args.st_loss_function,
-            possible_params,
-            self.model
-        )
+        return create_loss_function(SupportedMLPLosses, self.trainer_args.st_loss_function, "mse")

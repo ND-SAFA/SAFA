@@ -24,18 +24,17 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": "[VAL_PERCENTAGE_FLOAT]"
+              "val_percentage": 0.25
             },
             "eval_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[EVAL_PROJECT]"
-              }
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.25
             }
           },
           "trainer_args": {
             "freeze_base": "[FREEZE_BASE_BOOL]",
+            "st_loss_function": "[ST_LOSS_FUNC]",
             "use_scores": "[USE_SCORES_BOOL]",
             "num_train_epochs": "[EPOCHS_INT]",
             "train_batch_size": "[BATCH_SIZE_INT]",

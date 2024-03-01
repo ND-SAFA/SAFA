@@ -75,7 +75,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
                 batch_indices = next(train_batch_sampler)
                 batch_examples = [train_examples[i] for i in batch_indices]
                 sentence_pairs: List[List[str]] = [b.texts for b in batch_examples]
-                labels = torch.tensor([float(b.label) for b in batch_examples])
+                labels = torch.tensor([float(b.label) for b in batch_examples]).to(self.device)
 
                 optimizer.zero_grad()  # Clear gradients
                 predictions = self.calculate_predictions(sentence_pairs)  # Process each sentence pair

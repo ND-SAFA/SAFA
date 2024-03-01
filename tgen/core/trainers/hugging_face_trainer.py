@@ -116,7 +116,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if not self.has_dataset(dataset_role):
             raise Exception(f"Trainer does not have dataset for {dataset_role}.")
         output = self.predict(dataset_role)
-        display_metrics = {k: output.metrics[k] for k in DISPLAY_METRICS if k in output.metrics}
+        display_metrics = {k: round(output.metrics[k], 4) for k in DISPLAY_METRICS if k in output.metrics}
         logger.log_with_title(f"{dataset_role.name.title()} Metrics", display_metrics)
         trace_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role]
         prediction_entries = trace_dataset.trace_df.get_links()

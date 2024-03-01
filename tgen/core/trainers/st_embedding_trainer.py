@@ -53,13 +53,6 @@ class STEmbeddingTrainer(STTrainer):
         return similarity_scores
 
     @overrides(STTrainer)
-    def get_trainable_parameters(self) -> Iterable[Parameter]:
-        """
-        :return: Returns the embedding model's parameters.
-        """
-        return self.model.parameters()
-
-    @overrides(STTrainer)
     def compute_loss(self, scores: torch.Tensor, labels: torch.Tensor, input_examples: List[InputExample] = None) -> torch.Tensor:
         """
         Computes the loss between the input examples.
@@ -81,6 +74,13 @@ class STEmbeddingTrainer(STTrainer):
             loss += loss_fnc(features, labels)
             move_input_to_device(base_device, features, labels)
         return loss
+
+    @overrides(STTrainer)
+    def get_trainable_parameters(self) -> Iterable[Parameter]:
+        """
+        :return: Returns the embedding model's parameters.
+        """
+        return self.model.parameters()
 
     @overrides(STTrainer)
     def save(self) -> None:

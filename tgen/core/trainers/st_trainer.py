@@ -48,6 +48,8 @@ class STTrainer(HuggingFaceTrainer, ABC):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
         self.max_score = None
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        logger.info(f"Training Device: {self.device}")
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -56,6 +58,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
+        self.move_model_to_device()
         train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
 
@@ -169,6 +172,9 @@ class STTrainer(HuggingFaceTrainer, ABC):
         predictions = self.calculate_similarity_scores(source_embeddings, target_embeddings)
         return predictions
 
+    def move_model_to_device(self):
+        self.model = self.model.to(self.device)
+
     @staticmethod
     def get_labels_tensor(input_examples: List[InputExample], device: str) -> torch.Tensor:
         """
@@ -192,12 +198,6 @@ class STTrainer(HuggingFaceTrainer, ABC):
         pass
 
     @abstractmethod
-    def get_trainable_parameters(self) -> Iterable[Parameter]:
-        """
-        :return: Returns parameters to include in optimizer calculation.
-        """
-
-    @abstractmethod
     def compute_loss(self, scores: torch.Tensor, labels: torch.Tensor, input_examples: List[InputExample] = None) -> torch.Tensor:
         """
         Computes the loss of given examples.
@@ -207,6 +207,12 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :return:
         """
         pass
+
+    @abstractmethod
+    def get_trainable_parameters(self) -> Iterable[Parameter]:
+        """
+        :return: Returns parameters to include in optimizer calculation.
+        """
 
     @abstractmethod
     def save(self) -> None:

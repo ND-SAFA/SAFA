@@ -50,26 +50,6 @@ class FMetric(AbstractTraceMetric):
                 max_f2 = f2
         return {self.F1_KEY: max_f1, self.F2_KEY: max_f2}
 
-    @staticmethod
-    def f1_score(precision, recall):
-        """
-        Returns the f1 score from precision and recall.
-        :param precision: The precision score.
-        :param recall: The recall score
-        :return: The harmonic mean between precision and recall.
-        """
-        return 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
-
-    @staticmethod
-    def f2_score(precision, recall):
-        """
-        Returns the F2 score from precision and recall.
-        :param precision: The precision score.
-        :param recall: The recall score
-        :return: The harmonic mean between precision and recall with greater weight to recall.
-        """
-        return 5 * precision * recall / (4 * precision + recall) if precision + recall > 0 else 0
-
     def _info(self) -> datasets.MetricInfo:
         """
         Information relating to the metric

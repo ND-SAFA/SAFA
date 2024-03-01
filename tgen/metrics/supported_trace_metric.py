@@ -7,7 +7,6 @@ from tgen.common.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.metrics.average_true_links_metrics import AverageTrueLinksMetric
 from tgen.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
-from tgen.metrics.f1_metric import FMetric
 from tgen.metrics.lag_metric import LagMetric
 from tgen.metrics.map_at_k_metric import MapAtKMetric
 from tgen.metrics.map_metric import MapMetric
@@ -32,7 +31,6 @@ class SupportedTraceMetric(SupportedEnum):
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
     AVERAGE_TRUE_LINKS = AverageTrueLinksMetric
     SPECIFICITY = SpecificityMetric
-    F = FMetric
 
     @staticmethod
     def get_query_metrics() -> List[str]:

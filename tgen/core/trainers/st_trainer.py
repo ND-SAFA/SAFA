@@ -59,11 +59,12 @@ class STTrainer(HuggingFaceTrainer, ABC):
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
 
         evaluator = STEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
-        optimizer = optim.Adam(self.get_trainable_parameters(), lr=0.001)
+        optimizer = optim.Adam(self.get_trainable_parameters(), lr=self.trainer_args.learning_rate)
         epochs = int(self.args.num_train_epochs)
-        logger.info(f"Epochs: {epochs}")
+        logger.info(f"Total Epochs: {epochs}")
 
         for epoch in range(epochs):
+            logger.info(f"Starting Epoch {epoch + 1}")
             epoch_loss = 0
             self.model.train()
             for i in tqdm(range(len(train_batch_sampler)), desc="Training model...."):

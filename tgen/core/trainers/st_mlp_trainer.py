@@ -63,11 +63,6 @@ class STMLPTrainer(STTrainer):
         :param kwargs: Additional keyword-arguments.
         :return: The loss tensor.
         """
-
-        if isinstance(scores, list):
-            scores = torch.Tensor(scores).to(self.device)
-        if isinstance(labels, list):
-            labels = torch.Tensor(labels).to(self.device)
         loss = self.loss_function(scores, labels)
         return loss
 
@@ -93,12 +88,3 @@ class STMLPTrainer(STTrainer):
         :return:
         """
         torch.save(self.mlp, self.model_output_path)
-
-    @overrides(STTrainer)
-    def setup_training_device(self) -> None:
-        """
-        Overrides loading model to device to add mlp.
-        :return: None
-        """
-        super().setup_training_device()
-        self.mlp = self.mlp.to(self.device)

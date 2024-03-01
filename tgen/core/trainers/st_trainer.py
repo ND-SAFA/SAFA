@@ -49,7 +49,6 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.min_eval_steps = max_steps_before_eval
         self.max_score = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        logger.info(f"Training Device: {self.device}")
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -58,7 +57,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :param kwargs: Currently ignored. TODO: add ability to start from checkpoint.
         :return: None
         """
-        self.move_model_to_device()
+        self.setup_training_device()  # moves model and any additional modules to training device.
         train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
 
@@ -172,8 +171,21 @@ class STTrainer(HuggingFaceTrainer, ABC):
         predictions = self.calculate_similarity_scores(source_embeddings, target_embeddings)
         return predictions
 
-    def move_model_to_device(self):
+    def setup_training_device(self) -> None:
+        """
+        Moves training modules to training device.
+        :return: None
+        """
+        logger.info(f"Moving modules to training device: {self.device}")
         self.model = self.model.to(self.device)
+        self.move_training_modules(self.device)
+
+    @abstractmethod
+    def move_training_modules(self, device: torch.device) -> None:
+        """
+        :return: Moves any additional modules to device before training.
+        """
+        pass
 
     @staticmethod
     def get_labels_tensor(input_examples: List[InputExample], device: str) -> torch.Tensor:

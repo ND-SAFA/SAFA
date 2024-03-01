@@ -28,26 +28,28 @@ class STMLP(nn.Module):
         self.device = next(self.parameters()).device
 
     @overrides(nn.Module)
-    def to(self, device):
+    def forward(self, x):
         """
-        Overrides to method to allow setting of fake property `device`.
-        :param device: The device to move model to.
-        :return: The moved model.
+        Passed concatenated embeddings through MLP and calculates class 1 propabilities.
+        :param x: The concatenated embeddings.
+        :return: Class 1 probabilities.
         """
-        self.device = device
-        moved_model = super().to(device)
-        return moved_model
+        output = self.layers(x)
+        probabilities = torch.softmax(output, dim=1)  # Apply softmax, same shape: (N, 2)
+        class_1_probabilities = probabilities[:, 1]  # Extract probabilities of class=1, shape: (N,)
+        return class_1_probabilities
 
     @staticmethod
     def build(model: SentenceTransformer, hidden_sizes: List[int], activations: List[nn.Module]):
+        """
+        Builds MLP on top of concatenated embeddings of given model.
+        :param model: The model producing the embeddings to classify.
+        :param hidden_sizes: List of sizes of each hidden layer.
+        :param activations:The action function to use. If single, then used for all layers.
+        :return: The constructed MLP.
+        """
         if not isinstance(activations, list):
             activations = [activations] * (len(hidden_sizes))
         input_size = 2 * model.get_sentence_embedding_dimension()
         mlp_model = STMLP(input_size=input_size, hidden_sizes=hidden_sizes, activations=activations)
         return mlp_model
-
-    def forward(self, x):
-        output = self.layers(x)
-        probabilities = torch.softmax(output, dim=1)  # Apply softmax, same shape: (N, 2)
-        class_1_probabilities = probabilities[:, 1]  # Extract probabilities of class=1, shape: (N,)
-        return class_1_probabilities

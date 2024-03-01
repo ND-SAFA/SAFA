@@ -76,6 +76,13 @@ class STEmbeddingTrainer(STTrainer):
         return loss
 
     @overrides(STTrainer)
+    def move_training_modules(self, device: torch.device) -> None:
+        """
+        :return: Returns list of modules to move to device before training.
+        """
+        self.loss_function = self.loss_function.to(device)
+
+    @overrides(STTrainer)
     def get_trainable_parameters(self) -> Iterable[Parameter]:
         """
         :return: Returns the embedding model's parameters.

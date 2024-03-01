@@ -7,7 +7,7 @@ from torch.nn import Parameter
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
 from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import freeze, move_tensor_to_device
+from tgen.common.util.tf_util import freeze
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_mlp import STMLP
 from tgen.core.trainers.st_trainer import STTrainer
@@ -51,7 +51,6 @@ class STMLPTrainer(STTrainer):
         :param target_embeddings: Tensor of target embeddings of size (batch_size, features...)
         :return: Tensor of size (batch_size, )
         """
-        self.mlp = move_tensor_to_device(self.mlp, self.device)
         combined_embeddings = torch.cat((source_embeddings, target_embeddings), dim=1)
         scores = self.mlp(combined_embeddings)  # Add batch dimension
         return scores
@@ -74,6 +73,14 @@ class STMLPTrainer(STTrainer):
         return loss
 
     @overrides(STTrainer)
+    def move_training_modules(self, device: torch.device) -> None:
+        """
+        :return: Returns list of modules to move to device before training.
+        """
+        self.loss_function = self.loss_function.to(device)
+        self.mlp = self.mlp.to(device)
+
+    @overrides(STTrainer)
     def get_trainable_parameters(self) -> Iterable[Parameter]:
         """
         :return: Returns the parameters of the MLP.
@@ -89,10 +96,10 @@ class STMLPTrainer(STTrainer):
         torch.save(self.mlp, self.model_output_path)
 
     @overrides(STTrainer)
-    def move_model_to_device(self) -> None:
+    def setup_training_device(self) -> None:
         """
         Overrides loading model to device to add mlp.
         :return: None
         """
-        super().move_model_to_device()
+        super().setup_training_device()
         self.mlp = self.mlp.to(self.device)

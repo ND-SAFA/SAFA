@@ -5,11 +5,9 @@ from sentence_transformers import InputExample
 from torch import cosine_similarity
 from torch.nn import Parameter
 
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
-from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.util.tf_util import move_input_to_device
+from tgen.common.util.tf_util import create_loss_function, move_input_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_loss_functions import SupportedSTLossFunctions
 from tgen.core.trainers.st_trainer import STTrainer
@@ -98,14 +96,10 @@ class STEmbeddingTrainer(STTrainer):
         Creates the loss function from its defined class.
         :return: The loss function.
         """
-        loss_function_name = self.trainer_args.st_loss_function
-        loss_function_kwargs = {}
         possible_params = {"size_average": False, "margin": 0.1}
-        loss_function_class = SupportedSTLossFunctions.get_value(loss_function_name)
-        for param, param_value in possible_params.items():
-            if ReflectionUtil.has_constructor_param(loss_function_class, param):
-                loss_function_kwargs[param] = param_value
-
-        loss_function = loss_function_class(self.model, **loss_function_kwargs)
-        logger.info(f"Created loss function {loss_function_name}.")
-        return loss_function
+        return create_loss_function(
+            SupportedSTLossFunctions,
+            self.trainer_args.st_loss_function,
+            possible_params,
+            self.model
+        )

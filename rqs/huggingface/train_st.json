@@ -36,7 +36,7 @@
           },
           "trainer_args": {
             "freeze_base": "[FREEZE_BASE_BOOL]",
-            "st_loss_function": "cosine",
+            "st_loss_function": "[ST_LOSS_FUNC]",
             "use_scores": "[USE_SCORES_BOOL]",
             "num_train_epochs": "[EPOCHS_INT]",
             "train_batch_size": "[BATCH_SIZE_INT]",

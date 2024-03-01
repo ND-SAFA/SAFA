@@ -77,9 +77,12 @@ class STMLPTrainer(STTrainer):
     @overrides(STTrainer)
     def get_trainable_parameters(self) -> Iterable[Parameter]:
         """
-        :return: Returns the parameters of the MLP.
+        :return: Returns the parameters of the MLP, if base frozen, or both MLP and embedding model parameters.
         """
-        return self.mlp.parameters()
+        if self.trainer_args.freeze_base:
+            return self.mlp.parameters()
+        else:
+            return self.model.parameters() + self.mlp.parameters()
 
     @overrides(STTrainer)
     def save(self):

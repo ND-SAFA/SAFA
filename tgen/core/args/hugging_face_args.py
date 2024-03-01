@@ -75,6 +75,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     # Sentence-BERT
     use_scores: bool = False
     st_loss_function = "cosine"
+    freeze_base: bool = False
 
     # Misc
     multi_gpu: bool = MULTI_GPU_DEFAULT

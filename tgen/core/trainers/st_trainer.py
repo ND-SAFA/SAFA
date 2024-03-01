@@ -78,7 +78,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
                 labels = torch.tensor([float(b.label) for b in batch_examples]).to(self.device)
 
                 optimizer.zero_grad()  # Clear gradients
-                predictions = self.calculate_predictions(sentence_pairs)  # Process each sentence pair
+                predictions = self.calculate_predictions(sentence_pairs).to(self.device)  # Process each sentence pair
                 loss = self.compute_loss(scores=predictions, labels=labels, input_examples=batch_examples)
                 loss.backward()  # Back-propagate and update weights
                 optimizer.step()
@@ -112,7 +112,9 @@ class STTrainer(HuggingFaceTrainer, ABC):
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         labels_tensor = self.get_labels_tensor(input_examples, self.device)
         with torch.no_grad():
-            prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels_tensor, input_examples=input_examples).item()
+            prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels_tensor,
+                                                           input_examples=input_examples).cpu().item()
+        scores = scores.cpu()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def predict_similarity_scores(self, input_examples: List[InputExample], device: torch.device = None):
@@ -123,14 +125,14 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :return: List of similarity scores.
         """
         predictions = []
-
         texts = [t for example in input_examples for t in example.texts]
         embeddings_manager = EmbeddingsManager.create_from_content(texts, model=self.model, as_tensors=True)
 
         batches = ListUtil.batch(input_examples, self.args.eval_batch_size)
         for batch in tqdm(batches, desc="Computing predictions..."):
             batch_sentence_pairs = [i.texts for i in batch]
-            batch_prediction = self.calculate_predictions(batch_sentence_pairs, embeddings_manager).tolist()
+            batch_prediction_tensor = self.calculate_predictions(batch_sentence_pairs, embeddings_manager)
+            batch_prediction = batch_prediction_tensor.tolist()
             predictions.extend(batch_prediction)
 
         predictions = torch.tensor(predictions)

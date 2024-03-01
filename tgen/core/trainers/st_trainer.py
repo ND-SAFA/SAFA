@@ -114,7 +114,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         with torch.no_grad():
             prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels_tensor,
                                                            input_examples=input_examples).cpu().item()
-        scores = scores.cpu()
+        scores = scores.cpu().tolist()
         return PredictionOutput(scores, labels, prediction_metrics)
 
     def predict_similarity_scores(self, input_examples: List[InputExample], device: torch.device = None):

@@ -108,17 +108,18 @@ class STTrainer(HuggingFaceTrainer, ABC):
         dataset = self._get_dataset(dataset_role)
         input_examples = to_input_examples(dataset)
         labels = [e.label for e in input_examples]
-        scores = self.predict_similarity_scores(input_examples)
+        scores = self.predict_similarity_scores(input_examples, device=self.device)
         prediction_metrics = self._compute_validation_metrics(EvalPrediction(scores, labels))
         labels_tensor = self.get_labels_tensor(input_examples, self.device)
         with torch.no_grad():
             prediction_metrics["loss"] = self.compute_loss(scores=scores, labels=labels_tensor, input_examples=input_examples).item()
         return PredictionOutput(scores, labels, prediction_metrics)
 
-    def predict_similarity_scores(self, input_examples: List[InputExample]):
+    def predict_similarity_scores(self, input_examples: List[InputExample], device: torch.device = None):
         """
         Predicts a similarity score for each input examples.
         :param input_examples: The examples to predict.
+        :param device: The device to store tensor on.
         :return: List of similarity scores.
         """
         predictions = []
@@ -133,6 +134,8 @@ class STTrainer(HuggingFaceTrainer, ABC):
             predictions.extend(batch_prediction)
 
         predictions = torch.tensor(predictions)
+        if device:
+            predictions = predictions.to(device)
         return predictions
 
     def calculate_predictions(self, sentence_pairs: List[List[str]], embedding_model_manager: EmbeddingsManager = None):
@@ -191,7 +194,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.move_training_modules(self.device)
 
     @staticmethod
-    def get_labels_tensor(input_examples: List[InputExample], device: str) -> torch.Tensor:
+    def get_labels_tensor(input_examples: List[InputExample], device: torch.device) -> torch.Tensor:
         """
         Creates tensor containing labels of examples.
         :param input_examples:  The input examples to extract labels from.

@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+import torch
 from torch import Tensor, nn
 
 
@@ -18,7 +19,7 @@ def move_input_to_device(device: str, features: List[Dict[str, Tensor]], labels:
     return features, labels
 
 
-def move_tensor_to_device(tensor: Tensor, model_device: str):
+def move_tensor_to_device(tensor: Tensor, model_device: torch.device):
     """
     Moves the tensor to device, if not already there.
     :param tensor: The tensor to move.

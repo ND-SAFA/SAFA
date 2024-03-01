@@ -13,7 +13,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.st_util import to_input_examples
-from tgen.common.util.tf_util import move_tensor_to_device
+from tgen.common.util.tf_util import freeze, move_tensor_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
@@ -63,9 +63,13 @@ class STTrainer(HuggingFaceTrainer, ABC):
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
 
         evaluator = STEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
-        optimizer = optim.Adam(self.get_trainable_parameters(), lr=self.trainer_args.learning_rate)
+        parameters = self.get_trainable_parameters()
+        optimizer = optim.Adam(parameters, lr=self.trainer_args.learning_rate)
         epochs = int(self.args.num_train_epochs)
         logger.info(f"Total Epochs: {epochs}")
+
+        if self.trainer_args.freeze_base:
+            freeze(self.model)
 
         for epoch in range(epochs):
             logger.info(f"Starting Epoch {epoch + 1}")

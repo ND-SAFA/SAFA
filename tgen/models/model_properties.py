@@ -3,8 +3,6 @@ from enum import Enum, IntEnum
 from sentence_transformers import SentenceTransformer
 from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSequenceClassification, BertModel
 
-from tgen.core.trainers.st.st_model import STModel
-
 model = BertModel
 
 
@@ -18,7 +16,7 @@ class AutoModelForSentenceTransformer:
         :param kwargs: Ignored. Allows ST to confirm to API.
         :return: Sentence transformer model.
         """
-        return STModel(model_path)
+        return SentenceTransformer(model_path)
 
 
 class ModelTask(Enum):

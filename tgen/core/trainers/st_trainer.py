@@ -18,6 +18,7 @@ from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
 from tgen.core.trainers.st.st_evaluator import STEvaluator
+from tgen.core.wb.wb_manager import WBManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
@@ -79,10 +80,12 @@ class STTrainer(HuggingFaceTrainer, ABC):
                 loss.backward()  # Back-propagate and update weights
                 optimizer.step()
 
-                epoch_loss += loss.item()
-                self.state.total_flos += loss.item()
+                step_loss = loss.item()
+                epoch_loss += step_loss
+                self.state.total_flos += step_loss
                 self.state.global_step += 1
                 train_batch_sampler.reset()
+                WBManager.log({DatasetRole.TRAIN: {"loss": step_loss}}, step=self.state.global_step)
 
             logger.info(f"Training Loss: {epoch_loss}")
             self.evaluate_if_save(evaluator)

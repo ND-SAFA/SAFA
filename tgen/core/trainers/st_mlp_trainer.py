@@ -7,7 +7,7 @@ from torch.nn import Parameter
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
 from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import freeze
+from tgen.common.util.tf_util import freeze, move_tensor_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_mlp import STMLP
 from tgen.core.trainers.st_trainer import STTrainer
@@ -65,10 +65,13 @@ class STMLPTrainer(STTrainer):
         :param kwargs: Additional keyword-arguments.
         :return: The loss tensor.
         """
+
         if isinstance(scores, list):
-            scores = torch.Tensor(scores)
+            scores = torch.Tensor(scores).to(self.device)
         if isinstance(labels, list):
-            labels = torch.Tensor(labels)
+            labels = torch.Tensor(labels).to(self.device)
+        scores = move_tensor_to_device(scores, self.device)
+        labels = move_tensor_to_device(labels, self.device)
         loss = self.loss_function(scores, labels)
         return loss
 

@@ -79,7 +79,6 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
                 optimizer.zero_grad()  # Clear gradients
                 predictions = self.calculate_predictions(sentence_pairs).to(self.device)  # Process each sentence pair
-                predictions.requires_grad = True
                 loss = self.compute_loss(scores=predictions, labels=labels, input_examples=batch_examples)
                 loss.backward()  # Back-propagate and update weights
                 optimizer.step()
@@ -172,8 +171,11 @@ class STTrainer(HuggingFaceTrainer, ABC):
             source_embeddings = torch.stack(source_embeddings)
             target_embeddings = torch.stack(target_embeddings)
         elif self.model:
-            source_embeddings = self.model.encode(source_sentences, convert_to_tensor=True)
-            target_embeddings = self.model.encode(target_sentences, convert_to_tensor=True)
+            source_features = self.model.tokenize(source_sentences)
+            target_features = self.model.tokenize(target_sentences)
+
+            source_embeddings = self.model(source_features)['sentence_embedding']
+            target_embeddings = self.model(target_features)['sentence_embedding']
         else:
             raise Exception("")
 

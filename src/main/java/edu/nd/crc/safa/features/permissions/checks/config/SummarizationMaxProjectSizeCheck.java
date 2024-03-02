@@ -25,4 +25,9 @@ public class SummarizationMaxProjectSizeCheck extends IntConfigurationComparison
     public String getMessage() {
         return "Project must have at most " + getCachedCompareValue() + " artifacts";
     }
+
+    @Override
+    public boolean superuserCanOverride() {
+        return true;
+    }
 }

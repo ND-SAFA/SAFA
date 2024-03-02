@@ -44,6 +44,11 @@ public class MinimumBalanceCheck implements AdditionalPermissionCheck {
         return "Organization credit balance must be at least: " + getMinimumBalance(null);
     }
 
+    @Override
+    public boolean superuserCanOverride() {
+        return true;
+    }
+
     private int getMinimumBalance(PermissionCheckContext context) {
         if (cachedMinimumBalance == null) {
             if (context == null) {

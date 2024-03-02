@@ -22,4 +22,9 @@ public class AndPermissionCheck implements AdditionalPermissionCheck {
         return "All of the following:\n  "
             + String.join("  \n", children.stream().map(AdditionalPermissionCheck::getMessage).toList());
     }
+
+    @Override
+    public boolean superuserCanOverride() {
+        return children.stream().map(AdditionalPermissionCheck::superuserCanOverride).reduce(true, (a,b) -> a && b);
+    }
 }

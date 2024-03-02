@@ -115,6 +115,10 @@ public class PermissionService {
      */
     public boolean hasAdditionalCheck(AdditionalPermissionCheck check, IEntityWithMembership entity, SafaUser user) {
         PermissionCheckContext context = createContext(entity, user);
+
+        if (check.superuserCanOverride() && isActiveSuperuser(user)) {
+            return true;
+        }
         return check.doCheck(context);
     }
 

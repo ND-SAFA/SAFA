@@ -22,7 +22,7 @@ public class MissingPermissionException extends SafaError {
 
     public MissingPermissionException(Set<Permission> missingPermissions, boolean needAll,
                                       List<String> additionalErrors) {
-        super(getPermissionMessage(missingPermissions, needAll));
+        super(getPermissionMessage(missingPermissions, needAll, additionalErrors));
         this.missingPermissions = missingPermissions;
         this.additionalErrors = additionalErrors;
     }
@@ -47,9 +47,11 @@ public class MissingPermissionException extends SafaError {
         return permissions.stream().map(Permission::getName).toList();
     }
 
-    private static String getPermissionMessage(Set<Permission> missingPermissions, boolean needAll) {
+    private static String getPermissionMessage(Set<Permission> missingPermissions, boolean needAll,
+                                               List<String> additionalErrors) {
         if (missingPermissions.isEmpty()) {
-            return "All permissions met, but additional errors were encountered";
+            return "All permissions met, but additional errors were encountered:\n"
+                + getAdditionalErrors(additionalErrors);
         }
 
         return
@@ -58,5 +60,9 @@ public class MissingPermissionException extends SafaError {
                 (needAll ? "all" : "any"),
                 getPermissionNames(missingPermissions)
             );
+    }
+
+    private static String getAdditionalErrors(List<String> additionalErrors) {
+        return String.join("\n", additionalErrors);
     }
 }

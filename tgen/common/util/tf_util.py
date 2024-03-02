@@ -29,6 +29,9 @@ def move_features_to_device(device: torch.device, features: List[Dict[str, Tenso
     :param features: The features to move.
     :return: None
     """
+    if not isinstance(features, list):
+        features = [features]
+
     for feature in features:
         for k, v in feature.items():
             feature[k] = move_tensor_to_device(v, device)

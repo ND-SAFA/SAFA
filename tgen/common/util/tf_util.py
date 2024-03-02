@@ -9,7 +9,7 @@ from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.supported_enum import SupportedEnum
 
 
-def move_input_to_device(device: str, features: List[Dict[str, Tensor]], labels: Tensor):
+def move_input_to_device(device: torch.device, features: List[Dict[str, Tensor]], labels: Tensor):
     """
     Moves the features and labels to device.
     :param device: The device to place features in.
@@ -17,11 +17,21 @@ def move_input_to_device(device: str, features: List[Dict[str, Tensor]], labels:
     :param labels: The associated labels of the features.
     :return: Features and labels on the device.
     """
+    move_features_to_device(device, features)
+    labels = move_tensor_to_device(labels, device)
+    return features, labels
+
+
+def move_features_to_device(device: torch.device, features: List[Dict[str, Tensor]]) -> None:
+    """
+    Moves features to device.
+    :param device: The device to place features on.
+    :param features: The features to move.
+    :return: None
+    """
     for feature in features:
         for k, v in feature.items():
             feature[k] = move_tensor_to_device(v, device)
-    labels = move_tensor_to_device(labels, device)
-    return features, labels
 
 
 def move_tensor_to_device(tensor: Tensor, model_device: torch.device):

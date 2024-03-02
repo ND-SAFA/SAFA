@@ -13,7 +13,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.st_util import to_input_examples
-from tgen.common.util.tf_util import move_tensor_to_device
+from tgen.common.util.tf_util import move_features_to_device, move_tensor_to_device
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
@@ -173,6 +173,9 @@ class STTrainer(HuggingFaceTrainer, ABC):
         elif self.model:
             source_features = self.model.tokenize(source_sentences)
             target_features = self.model.tokenize(target_sentences)
+
+            move_features_to_device(self.device, source_features)
+            move_features_to_device(self.device, target_features)
 
             source_embeddings = self.model(source_features)['sentence_embedding']
             target_embeddings = self.model(target_features)['sentence_embedding']

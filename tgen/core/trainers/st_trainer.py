@@ -100,33 +100,6 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
         return TrainOutput(metrics={}, training_loss=self.state.total_flos, global_step=self.state.global_step)
 
-    def setup_scheduler(self, optimizer: Optimizer):
-        """
-        Creates scheduler for optimizer.
-        :param optimizer: The optimizer.
-        :return: The scheduler.
-        """
-        lr_initial = self.args.learning_rate
-        lr_final = self.trainer_args.final_learning_rate
-        total_epochs = int(self.args.num_train_epochs)
-        gamma = (lr_final / lr_initial) ** (1 / total_epochs)
-        scheduler = ExponentialLR(optimizer, gamma=gamma)
-        return scheduler
-
-    def setup_optimizer(self) -> Optimizer:
-        """
-        Creates optimizer with training parameters.
-        :return:
-        """
-        model_parameters = list(self.model.parameters())
-        additional_parameters = list(self.get_additional_training_parameters())
-        set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
-        parameters = model_parameters + additional_parameters
-        trainable_params = [p for p in parameters if p.requires_grad]
-        optimizer = optim.Adam(trainable_params, lr=self.trainer_args.learning_rate)
-        logger.info(f"Training {len(trainable_params)} parameters...")
-        return optimizer
-
     @overrides(HuggingFaceTrainer)
     def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:
         """
@@ -203,6 +176,33 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
         predictions = self.calculate_similarity_scores(source_embeddings, target_embeddings)
         return predictions
+
+    def setup_scheduler(self, optimizer: Optimizer):
+        """
+        Creates scheduler for optimizer.
+        :param optimizer: The optimizer.
+        :return: The scheduler.
+        """
+        lr_initial = self.args.learning_rate
+        lr_final = self.trainer_args.final_learning_rate
+        total_epochs = int(self.args.num_train_epochs)
+        gamma = (lr_final / lr_initial) ** (1 / total_epochs)
+        scheduler = ExponentialLR(optimizer, gamma=gamma)
+        return scheduler
+
+    def setup_optimizer(self) -> Optimizer:
+        """
+        Creates optimizer with training parameters.
+        :return:
+        """
+        model_parameters = list(self.model.parameters())
+        additional_parameters = list(self.get_additional_training_parameters())
+        set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
+        parameters = model_parameters + additional_parameters
+        trainable_params = [p for p in parameters if p.requires_grad]
+        optimizer = optim.Adam(trainable_params, lr=self.trainer_args.learning_rate)
+        logger.info(f"Training {len(trainable_params)} parameters...")
+        return optimizer
 
     def evaluate_if_save(self, evaluator: STEvaluator, **kwargs) -> None:
         """

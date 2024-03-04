@@ -61,7 +61,8 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.complete_device_setup()
         train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
-        evaluator = STEvaluator(self, self.evaluation_roles) if self.has_dataset(DatasetRole.VAL) else None
+        evaluator = STEvaluator(self, self.evaluation_roles, self.trainer_args.metric_for_best_model) if self.has_dataset(
+            DatasetRole.VAL) else None
 
         optimizer = self.setup_optimizer()
 

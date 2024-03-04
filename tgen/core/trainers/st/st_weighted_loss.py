@@ -23,7 +23,7 @@ class WeightedMSE(torch.nn.Module):
                 return self.weight_positive
         else:
             if pred >= 0.5:
-                return self.weight_positive
+                return 0
             else:
                 return 0
 

@@ -43,6 +43,7 @@
             "do_training_eval": "[DO_TRAINING_EVAL_BOOL]",
             "best_model_path": "[MODEL_PATH]/[BEST_MODEL_NAME]",
             "output_dir": "[OUTPUT_PATH]",
+            "st_loss_function": "[LOSS_FUNCTION]",
             "learning_rate": "[LEARNING_RATE_FLOAT]",
             "skip_save": false,
             "load_best_model_at_end": true,

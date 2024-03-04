@@ -196,8 +196,11 @@ class STTrainer(HuggingFaceTrainer, ABC):
         if self.curr_score is None or \
                 (epoch_score > self.curr_score and self.trainer_args.greater_is_better) or \
                 (epoch_score < self.curr_score and not self.trainer_args.greater_is_better):
+            logger.info(f"New Best Model: {self.curr_score} -> {epoch_score}")
             self.curr_score = epoch_score
             self.save()
+        else:
+            logger.info(f"No change to best model ({self.curr_score})")
 
     def complete_device_setup(self) -> None:
         """

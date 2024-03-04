@@ -14,4 +14,9 @@ public class NoAdditionalPermissionCheck implements AdditionalPermissionCheck {
         // Since we always return true above, there's no reason for anyone to see this message
         return "If you are seeing this message, please report it to the devs";
     }
+
+    @Override
+    public boolean superuserCanOverride() {
+        return false;
+    }
 }

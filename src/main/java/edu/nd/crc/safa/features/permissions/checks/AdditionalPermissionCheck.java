@@ -27,4 +27,11 @@ public interface AdditionalPermissionCheck {
      * @return The message
      */
     String getMessage();
+
+    /**
+     * Specifies whether a superuser can override this check.
+     *
+     * @return True if this check can be overridden by an active superuser
+     */
+    boolean superuserCanOverride();
 }

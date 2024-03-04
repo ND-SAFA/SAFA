@@ -115,6 +115,34 @@ public class PermissionService {
      */
     public boolean hasAdditionalCheck(AdditionalPermissionCheck check, IEntityWithMembership entity, SafaUser user) {
         PermissionCheckContext context = createContext(entity, user);
+        return doAdditionalCheck(context, check, user);
+    }
+
+    /**
+     * Checks if an {@link AdditionalPermissionCheck} passes for the given user.
+     *
+     * @param check The additional permission check to perform. These can be chained together using
+     *              {@link AndPermissionCheck} and {@link OrPermissionCheck}
+     * @param user The user in question
+     * @return Whether the check passes for that user
+     */
+    public boolean hasAdditionalCheck(AdditionalPermissionCheck check, SafaUser user) {
+        PermissionCheckContext context = createContext(user);
+        return doAdditionalCheck(context, check, user);
+    }
+
+    /**
+     * Actually do a check
+     *
+     * @param context The check context
+     * @param check The check
+     * @param user The user trying to perform an action
+     * @return Whether the check passes for that user
+     */
+    private boolean doAdditionalCheck(PermissionCheckContext context, AdditionalPermissionCheck check, SafaUser user) {
+        if (check.superuserCanOverride() && isActiveSuperuser(user)) {
+            return true;
+        }
         return check.doCheck(context);
     }
 
@@ -129,6 +157,19 @@ public class PermissionService {
         return PermissionCheckContext.builder()
             .add(user)
             .add(entity)
+            .add(serviceProvider)
+            .get();
+    }
+
+    /**
+     * Create a permission check context object without an entity
+     *
+     * @param user The user to put in the context
+     * @return The constructed context
+     */
+    private PermissionCheckContext createContext(SafaUser user) {
+        return PermissionCheckContext.builder()
+            .add(user)
             .add(serviceProvider)
             .get();
     }

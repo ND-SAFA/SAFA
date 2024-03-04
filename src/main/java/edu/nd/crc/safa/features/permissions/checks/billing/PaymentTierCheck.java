@@ -38,4 +38,9 @@ public class PaymentTierCheck implements AdditionalPermissionCheck {
     public String getMessage() {
         return "Payment tier must be among the following: " + supportedTiers;
     }
+
+    @Override
+    public boolean superuserCanOverride() {
+        return true;
+    }
 }

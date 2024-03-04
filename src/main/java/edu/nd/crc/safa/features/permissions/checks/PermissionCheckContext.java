@@ -1,5 +1,9 @@
 package edu.nd.crc.safa.features.permissions.checks;
 
+import java.nio.file.Path;
+import java.util.List;
+
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
@@ -8,6 +12,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.CachedValue;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,12 +56,16 @@ public class PermissionCheckContext {
             throw new AssertionError("Cannot access project statistics because service provider is null");
         }
 
-        int artifacts = serviceProvider.getArtifactVersionRepository().getCountInProjectVersion(projectVersion);
+        List<ArtifactVersion> artifacts = serviceProvider.getArtifactVersionRepository().findByProjectVersion(projectVersion);
         int traces = serviceProvider.getTraceLinkVersionRepository().getCountInProjectVersion(projectVersion);
+        int unsummarized = (int) artifacts.stream()
+            .filter(a -> FileUtilities.isCodeFile(Path.of(a.getName())) && a.getSummary().isEmpty())
+            .count();
 
         ProjectStatistics projectStatisticsValue = new ProjectStatistics();
-        projectStatisticsValue.setArtifactsTotal(artifacts);
+        projectStatisticsValue.setArtifactsTotal(artifacts.size());
         projectStatisticsValue.setLinksTotal(traces);
+        projectStatisticsValue.setUnsummarizedCodeArtifactsTotal(unsummarized);
         return projectStatisticsValue;
     }
 

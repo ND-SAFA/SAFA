@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.permissions.checks.PermissionCheckContext;
  */
 public class SummarizationMaxProjectSizeCheck extends IntConfigurationComparisonCheck {
     public SummarizationMaxProjectSizeCheck() {
-        this(context -> context.getProjectStatistics().getArtifactsTotal());
+        this(context -> context.getProjectStatistics().getUnsummarizedCodeArtifactsTotal());
     }
 
     public SummarizationMaxProjectSizeCheck(SummarizeArtifactRequestDTO summarizationRequest) {
@@ -24,5 +24,10 @@ public class SummarizationMaxProjectSizeCheck extends IntConfigurationComparison
     @Override
     public String getMessage() {
         return "Project must have at most " + getCachedCompareValue() + " artifacts";
+    }
+
+    @Override
+    public boolean superuserCanOverride() {
+        return true;
     }
 }

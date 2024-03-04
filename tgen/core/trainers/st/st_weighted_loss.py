@@ -2,7 +2,7 @@ import torch
 
 
 class WeightedBCELoss(torch.nn.Module):
-    def __init__(self, weight_positive=1.2):
+    def __init__(self, weight_positive=1.1):
         super().__init__()
         self.weight_positive = weight_positive
 

@@ -5,6 +5,8 @@ import torch
 from sentence_transformers import InputExample
 from torch import optim
 from torch.nn import Parameter
+from torch.optim import Optimizer
+from torch.optim.lr_scheduler import ExponentialLR
 from tqdm import tqdm
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
@@ -65,6 +67,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
             DatasetRole.VAL) else None
 
         optimizer = self.setup_optimizer()
+        scheduler = self.setup_scheduler(optimizer)
 
         epochs = int(self.args.num_train_epochs)
         logger.info(f"Total Epochs: {epochs}")
@@ -89,13 +92,28 @@ class STTrainer(HuggingFaceTrainer, ABC):
                 self.state.total_flos += step_loss
                 self.state.global_step += 1
                 train_batch_sampler.reset()
+
+            scheduler.step()
             WBManager.log({DatasetRole.TRAIN: {"loss": epoch_loss, "epoch": epoch + 1}}, step=self.state.global_step)
             logger.info(f"Training Loss: {epoch_loss}")
             self.evaluate_if_save(evaluator)
 
         return TrainOutput(metrics={}, training_loss=self.state.total_flos, global_step=self.state.global_step)
 
-    def setup_optimizer(self):
+    def setup_scheduler(self, optimizer: Optimizer):
+        """
+        Creates scheduler for optimizer.
+        :param optimizer: The optimizer.
+        :return: The scheduler.
+        """
+        lr_initial = self.args.learning_rate
+        lr_final = self.trainer_args.final_learning_rate
+        total_epochs = int(self.args.num_train_epochs)
+        gamma = (lr_final / lr_initial) ** (1 / total_epochs)
+        scheduler = ExponentialLR(optimizer, gamma=gamma)
+        return scheduler
+
+    def setup_optimizer(self) -> Optimizer:
         """
         Creates optimizer with training parameters.
         :return:

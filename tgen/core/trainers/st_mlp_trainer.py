@@ -6,6 +6,7 @@ from torch import nn
 from torch.nn import Parameter
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.tf_util import create_loss_function
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
@@ -41,7 +42,6 @@ class STMLPTrainer(STTrainer):
         self.loss_function = create_loss_function(SupportedMLPLosses, self.trainer_args.st_loss_function, "mse")
         self.mlp = STMLP.build(self.model, [512, 256], nn.ReLU)
         self.max_score = None
-        self.model_output_path = os.path.join(self.args.output_dir, "model.pt")
 
     @overrides(STTrainer)
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor):
@@ -90,4 +90,8 @@ class STMLPTrainer(STTrainer):
         Saves MLP at model_output_path.
         :return:
         """
-        torch.save(self.mlp, self.model_output_path)
+        mlp_output_path = os.path.join(self.args.output_dir, "mlp.pt")
+        st_output_path = os.path.join(self.args.output_dir, "base.pt")
+        torch.save(self.mlp, mlp_output_path)
+        torch.save(self.model, st_output_path)
+        logger.info(f"Saved models at directory: {self.args.output_dir}")

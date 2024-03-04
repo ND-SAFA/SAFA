@@ -76,6 +76,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     use_scores: bool = False
     st_loss_function = None
     freeze_base: bool = False
+    final_learning_rate = 5e-6
 
     # Misc
     multi_gpu: bool = MULTI_GPU_DEFAULT

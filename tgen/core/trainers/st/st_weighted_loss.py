@@ -1,20 +1,30 @@
 import torch
 
 
-class WeightedBCELoss(torch.nn.Module):
-    def __init__(self, weight_positive=1.1):
+class WeightedMSE(torch.nn.Module):
+    def __init__(self, weight_positive=.1):
         super().__init__()
         self.weight_positive = weight_positive
 
     def forward(self, predictions, targets):
-        # Ensure the predictions are in a valid range
-        predictions = torch.clamp(predictions, min=1e-7, max=1 - 1e-7)
-
         # Calculate the weighted loss
-        loss = -1 * (self.weight_positive * targets * torch.log(predictions) +
-                     (1 - targets) * torch.log(1 - predictions))
+        losses = (predictions - targets) ** 2
+        weights = torch.Tensor([1 + self.calculate_extra_weight(p, l) for p, l in zip(predictions, targets)])
+        weighted_losses = weights * losses
+        loss = torch.mean(weighted_losses)
+        return loss
 
-        return torch.mean(loss)
+    def calculate_extra_weight(self, pred, label):
+        if label == 1:
+            if pred >= 0.5:
+                return 0
+            else:
+                return self.weight_positive
+        else:
+            if pred >= 0.5:
+                return self.weight_positive
+            else:
+                return 0
 
     def __repr__(self) -> str:
         return f"{str(self.__class__)}({self.weight_positive})"

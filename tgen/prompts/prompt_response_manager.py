@@ -12,7 +12,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 
 RESPONSE_FORMAT = "Enclose your answer inside of {}"
-REQUIRE_ALL_TAGS = str(uuid.uuid4())
+USE_ALL_TAGS = str(uuid.uuid4())
 
 
 @dataclass
@@ -55,9 +55,17 @@ class PromptResponseManager:
     """
     required_tag_ids: Union[Set, str] = field(default_factory=set)
     """
+    :param required_tag_ids: A set of the tag ids that will not even log when missing because it is expected
+    """
+    optional_tag_ids: Union[Set, str] = field(default_factory=set)
+    """
     Formats an entry given its tag and values.
     """
     entry_formatter: Callable[[str, Dict], Any] = None
+    """
+    If True, will convert the response to one of the expected responses if it is sufficiently close.
+    """
+    loose_response_validation: bool = False
     """
     Create reverse lookup for tags to their ids after init
     """
@@ -78,10 +86,20 @@ class PromptResponseManager:
             self._init_tag_attrs()
         self.expected_response_type = self._convert2dict(self.expected_response_type)
         self.expected_responses = self._convert2dict(self.expected_responses)
-        if self.required_tag_ids == REQUIRE_ALL_TAGS:
-            self.required_tag_ids = set(self.get_all_tag_ids())
-        elif not isinstance(self.required_tag_ids, set):
-            self.required_tag_ids = {self.required_tag_ids}
+        self.required_tag_ids = self._post_process_tag_id_sets(self.required_tag_ids)
+        self.optional_tag_ids = self._post_process_tag_id_sets(self.optional_tag_ids)
+
+    def _post_process_tag_id_sets(self, tag_ids: Union[Set, str]) -> Set[str]:
+        """
+        Performs necessary post-processing on required and optional tag ids set to ensure they are in correct format.
+        :param tag_ids: The required or optional tag ids set to post-process.
+        :return: Correctly formatted set of tag ids for required and optional tag ids set.
+        """
+        if tag_ids == USE_ALL_TAGS:
+            tag_ids = set(self.get_all_tag_ids())
+        elif not isinstance(tag_ids, set):
+            tag_ids = {tag_ids}
+        return tag_ids
 
     def _convert2dict(self, initial_val: Any) -> Dict:
         """
@@ -145,7 +163,8 @@ class PromptResponseManager:
         output = {}
         if isinstance(self.response_tag, dict):
             for parent, child_tags in self.response_tag.items():
-                values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
+                values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids,
+                                               is_optional=parent in self.optional_tag_ids)
                 tags = child_tags + [parent]
                 values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in tags if c_tag in val or c_tag != parent}
                           for val in values]
@@ -154,7 +173,8 @@ class PromptResponseManager:
             tags, _ = self._convert2list(self.response_tag)
             for tag in tags:
                 tag_id = self._tag2id[tag]
-                parsed = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=tag in self.required_tag_ids)
+                parsed = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=tag in self.required_tag_ids,
+                                               is_optional=tag in self.optional_tag_ids)
                 output[tag_id] = parsed if len(parsed) > 0 else [None]
         formatted_output = self._format_response(output)
         return formatted_output
@@ -183,7 +203,8 @@ class PromptResponseManager:
                     try:
                         formatted_val = self._format_value(tag, formatted_val)
                     except (TypeError, AssertionError, ValueError) as e:
-                        logger.log_without_spam(level=logging.ERROR, msg=str(e))
+                        if tag not in self.optional_tag_ids:
+                            logger.log_without_spam(level=logging.ERROR, msg=str(e))
                         formatted_val = self._format_on_failure(tag, formatted_val, e)
                     if formatted_val is not None:
                         formatted_values.append(formatted_val)
@@ -235,8 +256,14 @@ class PromptResponseManager:
             elif v in self.expected_responses[tag]:
                 success = True
             if not success:
-                val = self._format_on_failure(tag, v, AssertionError(f"Unexpected value for {tag}"),
-                                              no_exception=is_list, return_none_on_fail=is_list)
+                closest_val = [r for r in self.expected_responses[tag] if
+                               hasattr(r, '__contains__') and r in v] if self.loose_response_validation else []
+                if len(closest_val) == 1:
+                    success = True
+                    val = closest_val[0]
+                else:
+                    val = self._format_on_failure(tag, v, AssertionError(f"Unexpected value for {tag}"),
+                                                  no_exception=is_list, return_none_on_fail=is_list)
             if val is not None:
                 checked_values.append(val)
         return checked_values
@@ -271,7 +298,8 @@ class PromptResponseManager:
         :return: Default value
         """
         assert no_exception or tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
-        logger.log_without_spam(level=logging.WARNING, msg=f"Unexpected response for {tag_id}: {val} - {e}.")
+        if tag_id not in self.optional_tag_ids:
+            logger.log_without_spam(level=logging.WARNING, msg=f"Unexpected response for {tag_id}: {val} - {e}.")
         if self.default_factory:
             return self.default_factory(tag_id, val)
         return val if not return_none_on_fail else None

@@ -21,7 +21,7 @@ class LLMTrainerState(State):
     """
     :param trainer_dataset_manager: The dataset manager for training and prediction
     """
-    trainer_dataset_manager: TrainerDatasetManager = required_field(field_name="trainer_dataset_manager")
+    trainer_dataset_manager: TrainerDatasetManager = None
     """
     :param llm_manager: The manager incharge of the lLM being used
     """

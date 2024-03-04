@@ -80,3 +80,10 @@ class TestStrUtil(BaseTest):
     def test_separate_joined_word(self):
         self.assertEqual(StrUtil.separate_joined_words("HelloWorld"), "Hello World")
         self.assertEqual(StrUtil.separate_joined_words("hello_world"), "hello world")
+
+    def test_fill_with_format_variable_name(self):
+        self.assertEqual(StrUtil.fill_with_format_variable_name("The {} in the {}", "cat", count=1), "The {cat} in the {}")
+        self.assertEqual(StrUtil.fill_with_format_variable_name("The {} in the {}", "hat", count=-1), "The {hat} in the {hat}")
+
+    def test_remove_stop_words(self):
+        self.assertEqual(StrUtil.remove_stop_words("The cat in the hat"), "cat hat")

@@ -1,6 +1,6 @@
 import json
 from collections import OrderedDict
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional, Tuple
 
 from openai.api_resources.fine_tune import FineTune
 
@@ -81,17 +81,9 @@ class LLMTrainer(AbstractTrainer):
         """
         assert not save_and_load_path or save_and_load_path.endswith(FileUtil.YAML_EXT), "Response must be saved to yaml file."
 
-        datasets = self.trainer_dataset_manager[dataset_role] if not datasets else datasets
-        assert datasets is not None, "Must provide a dataset for predicting on."
-        datasets = [datasets] if not isinstance(datasets, list) else datasets
-        datasets: List[PromptDataset] = [self.convert_dataset_to_prompt_dataset(dataset) for dataset in datasets]
+        datasets = self._get_dataset(dataset_role, datasets)
+        prompt_df, prompts = self._get_prompts_for_predictions(datasets, prompts)
 
-        if not prompts:
-            prompt_df = self._get_prompts_for_prediction(datasets, self.prompt_builders)
-            prompts = list(prompt_df[PromptKeys.PROMPT])
-        else:
-            assert len(datasets) == 1, "If prompts are provided, only one dataset may be used"
-            prompt_df = datasets[0].get_prompt_dataframe()
         reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
         missing_generations = isinstance(reloaded, List) or reloaded is None
 
@@ -121,32 +113,6 @@ class LLMTrainer(AbstractTrainer):
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
-
-    def _get_prompts_for_prediction(self, datasets: Union[PromptDataset, List[PromptDataset]],
-                                    prompt_builders: Union[PromptBuilder, List[PromptBuilder]]) -> PromptDataFrame:
-        """
-        Gets the prompts used for the prediction
-        :param datasets: The dataset to use when creating the prompts
-        :param prompt_builders: The builder(s) to use to create the prompts
-        :return: The prompts and the prompt dataframe
-        """
-        datasets = [datasets] if not isinstance(datasets, list) else datasets
-        if len(datasets) > 1:
-            prompt_df = PromptDataFrame()
-            if len(prompt_builders) == 1:
-                for dataset in datasets:
-                    prompt_df = prompt_df.concat(self._get_prompts_for_prediction(dataset, prompt_builders))
-            else:
-                assert len(datasets) == len(prompt_builders), "Must supply a prompt builder per dataset " \
-                                                              "or one prompt builder for all datasets"
-                for dataset, prompt_builder in zip(datasets, prompt_builders):
-                    prompt_df = prompt_df.concat(prompt_df, self._get_prompts_for_prediction(dataset, prompt_builder),
-                                                 ignore_index=True)
-            prompt_df
-        else:
-            prompt_df = datasets[0].get_prompt_dataframe(prompt_builders=prompt_builders,
-                                                         prompt_args=self.llm_manager.prompt_args)
-        return prompt_df
 
     @staticmethod
     def predict_from_prompts(llm_manager: AbstractLLMManager,
@@ -232,7 +198,7 @@ class LLMTrainer(AbstractTrainer):
                 entry = LLMResponseUtil.extract_labels(r, {label: label for label in CURRENT_LABELS})
                 entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
 
-                score = self.extract_score(entry)
+                score = self._extract_score(entry)
                 trace_row = trace_df.iloc[i]
                 label = trace_row[TraceKeys.LABEL.value]
                 predicted_label = 1 if score >= 0.5 else 0
@@ -243,7 +209,7 @@ class LLMTrainer(AbstractTrainer):
                 entry[TraceKeys.TARGET.value] = trace_row[TraceKeys.TARGET.value]
                 entry[TraceKeys.LABEL.value] = trace_row[TraceKeys.LABEL.value]
 
-                self.update_classification_metrics(class2correct, correct_label, entry, label)
+                self._update_classification_metrics(class2correct, correct_label, entry, label)
                 scores.append(score)
                 classifications.append(entry["classification"])
                 prediction_entries.append(entry)
@@ -262,8 +228,74 @@ class LLMTrainer(AbstractTrainer):
         output = TracePredictionOutput(prediction_entries=prediction_entries, metrics=all_metrics, label_ids=all_label_ids)
         return output
 
+    def _get_prompts_for_predictions(self, datasets: Optional[List[PromptDataset]], prompts: List[str] = None) -> Tuple[
+        PromptDataFrame, List[str]]:
+        """
+        Gets the prompts to use for prediction.
+        :param datasets: Dataset to fill in artifacts and traces in the prompt.
+        :param prompts: List of existing prompts if applicable.
+        :return: The prompts dataframe and list of corresponding prompts.
+        """
+        if not prompts:
+            prompt_df = self._create_prompts_for_prediction(datasets, self.prompt_builders)
+            prompts = list(prompt_df[PromptKeys.PROMPT])
+        else:
+            if datasets:
+                assert len(datasets) == 1, "If prompts are provided, only one dataset may be used"
+                prompt_df = datasets[0].get_prompt_dataframe()
+            else:
+                prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts})
+        return prompt_df, prompts
+
+    def _create_prompts_for_prediction(self, datasets: Union[PromptDataset, List[PromptDataset]],
+                                       prompt_builders: Union[PromptBuilder, List[PromptBuilder]]) -> PromptDataFrame:
+        """
+        Gets the prompts used for the prediction
+        :param datasets: The dataset to use when creating the prompts
+        :param prompt_builders: The builder(s) to use to create the prompts
+        :return: The prompts and the prompt dataframe
+        """
+        if not datasets:
+            prompt_entries = []
+            for prompt_builder in prompt_builders:
+                prompt_dict = prompt_builder.build(self.state.llm_manager.prompt_args)
+                prompt_dict[PromptKeys.PROMPT_BUILDER_ID] = prompt_builder.id
+                prompt_entries.append(prompt_dict)
+            return PromptDataFrame(prompt_entries)
+        datasets = [datasets] if not isinstance(datasets, list) else datasets
+        if len(datasets) > 1:
+            prompt_df = PromptDataFrame()
+            if len(prompt_builders) == 1:
+                for dataset in datasets:
+                    prompt_df = prompt_df.concat(self._create_prompts_for_prediction(dataset, prompt_builders))
+            else:
+                assert len(datasets) == len(prompt_builders), "Must supply a prompt builder per dataset " \
+                                                              "or one prompt builder for all datasets"
+                for dataset, prompt_builder in zip(datasets, prompt_builders):
+                    prompt_df = prompt_df.concat(prompt_df, self._create_prompts_for_prediction(dataset, prompt_builder),
+                                                 ignore_index=True)
+        else:
+            prompt_df = datasets[0].get_prompt_dataframe(prompt_builders=prompt_builders,
+                                                         prompt_args=self.llm_manager.prompt_args)
+        return prompt_df
+
+    def _get_dataset(self, dataset_role: DatasetRole, datasets: Optional[Union[iDataset, List[iDataset]]]) -> Optional[List[iDataset]]:
+        """
+        Gets the dataset to use for a given role if applicable.
+        :param dataset_role: The dataset role to get the dataset for.
+        :param datasets: The datasets to use if not using the trainer dataset manager.
+        :return: The dataset to use for a given role if applicable.
+        """
+        if datasets or self.trainer_dataset_manager and self.trainer_dataset_manager[dataset_role]:
+            datasets = self.trainer_dataset_manager[dataset_role] if not datasets else datasets
+            datasets = [datasets] if not isinstance(datasets, list) else datasets
+            datasets: List[PromptDataset] = [self.convert_dataset_to_prompt_dataset(dataset) for dataset in datasets]
+        else:
+            assert self.state.completion_type != LLMCompletionType.CLASSIFICATION, "Need dataset for classification"
+        return datasets
+
     @staticmethod
-    def extract_score(entry):
+    def _extract_score(entry):
         """
         Extracts the score from the classification entry response.
         :param entry: Entry containing score or classification, to extract score from.
@@ -285,7 +317,7 @@ class LLMTrainer(AbstractTrainer):
         return score
 
     @staticmethod
-    def update_classification_metrics(class2correct, correct_label, entry, label) -> None:
+    def _update_classification_metrics(class2correct, correct_label, entry, label) -> None:
         """
         Updates the classification metrics on the categories of traces.
         :param class2correct: The current metrics on the classes.

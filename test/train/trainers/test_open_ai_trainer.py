@@ -15,7 +15,10 @@ from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_responses import GenerationResponse
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -23,9 +26,6 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_openai import mock_openai
 from tgen.testres.mocking.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
@@ -116,18 +116,19 @@ class TestOpenAiTrainer(BaseTest):
         prompt_builder2 = PromptBuilder([artifact_prompt, response_prompt2])
         dataset_creator = TestOpenAiTrainer.get_dataset_creator_with_artifact_df()
         trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_builder=[prompt_builder1, prompt_builder2])
-        prompts = trainer._get_prompts_for_prediction(dataset_creator.create(), [prompt_builder1, prompt_builder2])[PromptKeys.PROMPT]
+        prompts = trainer._create_prompts_for_prediction(dataset_creator.create(), [prompt_builder1, prompt_builder2])[
+            PromptKeys.PROMPT]
 
         n_prompts = len(dataset_creator.create().artifact_df)
         responses1 = [PromptUtil.create_xml("response1", "Here is my first response.") for _ in range(n_prompts)]
         responses2 = [PromptUtil.create_xml("response2", "Here is my second response.") for _ in range(n_prompts)]
-        test_ai_manager.set_responses(responses1+responses2)
+        test_ai_manager.set_responses(responses1 + responses2)
 
         res = trainer.perform_prediction()
         predictions = res.predictions
         for i in range(len(predictions)):
             response_num = math.floor(i / n_prompts)
-            tag = f"response{response_num+1}"
+            tag = f"response{response_num + 1}"
             prompt_response = predictions[i][prompt_ids[response_num]]
             self.assertIn(tag, prompts[i])
             self.assertIn(tag, prompt_response)

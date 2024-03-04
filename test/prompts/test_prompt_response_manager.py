@@ -2,7 +2,7 @@ from typing import Dict
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
+from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.testres.base_tests.base_test import BaseTest
 
 
@@ -53,6 +53,10 @@ class TestPromptResponseManager(BaseTest):
     def test_format_response(self):
         prm_multi = self.get_multi_tag_prm()
         formatted_response = prm_multi._format_response({"tag1": "one\n", "tag2": "2 "})
+        self.assertEqual(formatted_response, {"tag1": ["one"], "tag2": [2]})
+
+        prm_multi.loose_response_validation = True
+        formatted_response = prm_multi._format_response({"tag1": "onefour", "tag2": "2 "})
         self.assertEqual(formatted_response, {"tag1": ["one"], "tag2": [2]})
 
         # Not expected response
@@ -132,7 +136,7 @@ class TestPromptResponseManager(BaseTest):
         return PromptResponseManager(response_tag={"tag1": ["tag2", "tag3"]},
                                      response_instructions_format=response_format,
                                      id2tag={"parent": "tag1", "c1": "tag2", "c2": "tag3"},
-                                     required_tag_ids=REQUIRE_ALL_TAGS,
+                                     required_tag_ids=USE_ALL_TAGS,
                                      expected_response_type={"c1": int},
                                      expected_responses={"c2": ["hello", "world"]},
                                      default_factory=lambda tag, val: self.EXPECTED_FAIL_VAl,

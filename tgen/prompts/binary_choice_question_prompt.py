@@ -1,6 +1,6 @@
 from typing import Callable, List
 
-from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
+from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 
 
@@ -30,6 +30,6 @@ class BinaryChoiceQuestionPrompt(QuestionPrompt):
                                                  response_instructions_format=response_instructions,
                                                  expected_responses={response_tag: self.choices},
                                                  expected_response_type={response_tag: type(choices[0])},
-                                                 required_tag_ids=REQUIRE_ALL_TAGS if required else set(),
+                                                 required_tag_ids=USE_ALL_TAGS if required else set(),
                                                  default_factory=default_factory)
         super().__init__(value=question, response_manager=response_manager)

@@ -71,6 +71,8 @@ class FileUtil:
         :param additional_path_parts: Additional path parts to include in output path.
         :return: the output path
         """
+        if not output_path:
+            return
         if additional_path_parts:
             output_path = os.path.join(output_path, *additional_path_parts)
         output_path = FileUtil.get_directory_path(output_path)  # ensure is a directory
@@ -512,10 +514,11 @@ class FileUtil:
         :param output_file_path: The path to save the file to.
         :param dumper: The object responsible for translating into yaml.
         """
+        FileUtil.create_dir_safely(output_file_path)
         dumper = Dumper if dumper is None else dumper
         FileUtil.create_dir_safely(output_file_path)
         output_file_path = os.path.expanduser(output_file_path)
-        with open(output_file_path, 'w') as file:
+        with open(output_file_path, 'w+') as file:
             yaml.dump(content, file, Dumper=dumper)
 
     @staticmethod

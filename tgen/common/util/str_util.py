@@ -1,8 +1,9 @@
 import re
 import string
 import uuid
-
 from typing import List, Union, Set, Dict
+
+from nltk.corpus import stopwords
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD, SPACE, DASH
 from tgen.common.logging.logger_manager import logger
@@ -10,6 +11,7 @@ from tgen.common.logging.logger_manager import logger
 
 class StrUtil:
     FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
+    STOP_WORDS = set(stopwords.words('english'))
 
     @staticmethod
     def get_letter_from_number(number: int, lower_case: bool = False) -> str:
@@ -39,7 +41,7 @@ class StrUtil:
         updated_args = [arg for arg in args]
         updated_kwargs = {}
         for i, field in enumerate(formatting_fields):
-            replacement = '{%s}' % field
+            replacement = StrUtil.get_format_symbol(field)
             if field:
                 if field in kwargs:
                     updated_kwargs[field] = kwargs[field]
@@ -52,6 +54,26 @@ class StrUtil:
         except Exception:
             logger.exception(f"Unable to format {string} with args={updated_args} and kwargs={updated_kwargs}")
         return string
+
+    @staticmethod
+    def fill_with_format_variable_name(string_: str, variable_name: str, count: int = -1) -> str:
+        """
+        Updates the format symbol in the string to include the variable name for use with the format map.
+        :param string_: The string to update.
+        :param variable_name: The name of the format variable.
+        :param count: Number of replacements to make (-1 is all).
+        :return: The string with the format symbol and variable name for use with the format map.
+        """
+        return string_.replace(StrUtil.get_format_symbol(), StrUtil.get_format_symbol(variable_name), count)
+
+    @staticmethod
+    def get_format_symbol(var_name: str = EMPTY_STRING) -> str:
+        """
+        Gets the symbol for formatting strings '{}'.
+        :param var_name: If provided, places the variable name in the brackets for use with the format map.
+        :return: The symbol for formatting strings.
+        """
+        return '{%s}' % var_name
 
     @staticmethod
     def is_uuid(input_string: str) -> bool:
@@ -191,3 +213,12 @@ class StrUtil:
         for d in deliminators:
             processed_string = SPACE.join(processed_string.split(d))
         return processed_string
+
+    @staticmethod
+    def remove_stop_words(input_string: str) -> str:
+        """
+        Removes the stop words in the string.
+        :param input_string: The string to remove stopwords from.
+        :return: The string without stop words.
+        """
+        return SPACE.join([word for word in input_string.split() if word.lower() not in StrUtil.STOP_WORDS])

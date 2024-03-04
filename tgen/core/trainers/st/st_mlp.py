@@ -23,6 +23,7 @@ class STMLP(nn.Module):
             layers.append(nn.Linear(sizes[i], sizes[i + 1]))
             if activations is not None and i < len(activations):
                 layers.append(activations[i]())
+        layers.append(nn.Sigmoid())
         self.layers = nn.Sequential(*layers)
         self.device = next(self.parameters()).device
 
@@ -34,7 +35,8 @@ class STMLP(nn.Module):
         :return: Class 1 probabilities.
         """
         output = self.layers(x)
-        return output.squeeze()
+        scores = output.squeeze()
+        return scores
 
     @staticmethod
     def build(model: SentenceTransformer, hidden_sizes: List[int], activations: List[nn.Module]):

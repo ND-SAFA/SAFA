@@ -63,6 +63,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.complete_device_setup()
         train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
+        n_samples = len(train_batch_sampler)
         evaluator = STEvaluator(self, self.evaluation_roles, self.trainer_args.metric_for_best_model) if self.has_dataset(
             DatasetRole.VAL) else None
 
@@ -75,7 +76,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
             logger.info(f"Starting Epoch {epoch + 1}")
             epoch_loss = 0
             self.model.train()
-            for i in tqdm(range(len(train_batch_sampler)), desc="Training model...."):
+            for i in tqdm(range(n_samples), desc="Training model...."):
                 batch_indices = next(train_batch_sampler)
                 batch_examples = [train_examples[i] for i in batch_indices]
                 sentence_pairs: List[List[str]] = [b.texts for b in batch_examples]
@@ -94,6 +95,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
                 train_batch_sampler.reset()
 
             scheduler.step()
+            epoch_loss /= n_samples
             WBManager.log({DatasetRole.TRAIN: {"loss": epoch_loss, "epoch": epoch + 1}}, step=self.state.global_step)
             logger.info(f"Training Loss: {epoch_loss}")
             self.evaluate_if_save(evaluator)

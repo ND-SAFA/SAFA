@@ -13,7 +13,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.st_util import to_input_examples
-from tgen.common.util.tf_util import move_features_to_device, move_tensor_to_device
+from tgen.common.util.tf_util import move_features_to_device, move_tensor_to_device, set_gradients
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
@@ -101,7 +101,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         """
         model_parameters = list(self.model.parameters())
         additional_parameters = list(self.get_additional_training_parameters())
-        # set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
+        set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
         parameters = model_parameters + additional_parameters
         trainable_params = [p for p in parameters if p.requires_grad]
         optimizer = optim.Adam(trainable_params, lr=self.trainer_args.learning_rate)
@@ -180,7 +180,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
             source_embeddings = self.model(source_features)['sentence_embedding']
             target_embeddings = self.model(target_features)['sentence_embedding']
         else:
-            raise Exception("")
+            raise Exception("Expected embedding manager or model to be defined.")
 
         predictions = self.calculate_similarity_scores(source_embeddings, target_embeddings)
         return predictions

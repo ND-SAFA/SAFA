@@ -52,6 +52,8 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.curr_score = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.setup_complete = False
+        self.starting_learning_rate = None
+        self.ending_learning_rate = None
 
     @overrides(HuggingFaceTrainer)
     def train(self, **kwargs) -> TrainOutput:
@@ -179,32 +181,32 @@ class STTrainer(HuggingFaceTrainer, ABC):
         predictions = self.calculate_similarity_scores(source_embeddings, target_embeddings)
         return predictions
 
+    def setup_optimizer(self) -> Optimizer:
+        """
+        Creates optimizer with training parameters.
+        :return:
+        """
+        assert self.starting_learning_rate is not None
+        model_parameters = list(self.model.parameters())
+        additional_parameters = list(self.get_additional_training_parameters())
+        set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
+        parameters = model_parameters + additional_parameters
+        trainable_params = [p for p in parameters if p.requires_grad]
+        optimizer = optim.Adam(trainable_params, lr=self.starting_learning_rate)
+        logger.info(f"Training {len(trainable_params)} parameters...")
+        return optimizer
+
     def setup_scheduler(self, optimizer: Optimizer):
         """
         Creates scheduler for optimizer.
         :param optimizer: The optimizer.
         :return: The scheduler.
         """
-        lr_initial = self.args.learning_rate
-        lr_final = self.trainer_args.final_learning_rate
+        assert self.starting_learning_rate is not None and self.ending_learning_rate is not None
         total_epochs = int(self.args.num_train_epochs)
-        gamma = (lr_final / lr_initial) ** (1 / total_epochs)
+        gamma = (self.ending_learning_rate / self.starting_learning_rate) ** (1 / total_epochs)
         scheduler = ExponentialLR(optimizer, gamma=gamma)
         return scheduler
-
-    def setup_optimizer(self) -> Optimizer:
-        """
-        Creates optimizer with training parameters.
-        :return:
-        """
-        model_parameters = list(self.model.parameters())
-        additional_parameters = list(self.get_additional_training_parameters())
-        set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
-        parameters = model_parameters + additional_parameters
-        trainable_params = [p for p in parameters if p.requires_grad]
-        optimizer = optim.Adam(trainable_params, lr=self.trainer_args.learning_rate)
-        logger.info(f"Training {len(trainable_params)} parameters...")
-        return optimizer
 
     def evaluate_if_save(self, evaluator: STEvaluator, **kwargs) -> None:
         """

@@ -39,8 +39,11 @@ class STMLPTrainer(STTrainer):
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
-        self.loss_function = create_loss_function(SupportedMLPLosses, self.trainer_args.st_loss_function, "WEIGHTED_MSE")
+        self.loss_function = create_loss_function(SupportedMLPLosses, self.trainer_args.st_loss_function, "WEIGHTED_MSE",
+                                                  possible_params={"device": self.device})
         self.mlp = STMLP.build(self.model, [512, 256], nn.ReLU)
+        self.starting_learning_rate = 1e-3
+        self.ending_learning_rate = 5e-5
         self.max_score = None
 
     @overrides(STTrainer)

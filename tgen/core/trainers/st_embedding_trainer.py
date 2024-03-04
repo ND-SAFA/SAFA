@@ -36,6 +36,8 @@ class STEmbeddingTrainer(STTrainer):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.loss_function = None
         self.loss_function = self._create_loss_function()
+        self.starting_learning_rate = 5e-5
+        self.ending_learning_rate = 5e-9
 
     @overrides(STTrainer)
     def calculate_similarity_scores(self, source_embeddings: torch.Tensor, target_embeddings: torch.Tensor) -> torch.Tensor:

@@ -2,7 +2,7 @@ import torch
 
 
 class WeightedBCELoss(torch.nn.Module):
-    def __init__(self, weight_positive=1.5):
+    def __init__(self, weight_positive=1.2):
         super().__init__()
         self.weight_positive = weight_positive
 
@@ -15,3 +15,6 @@ class WeightedBCELoss(torch.nn.Module):
                      (1 - targets) * torch.log(1 - predictions))
 
         return torch.mean(loss)
+
+    def __repr__(self) -> str:
+        return f"{str(self.__class__)}({self.weight_positive})"

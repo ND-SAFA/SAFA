@@ -1,6 +1,5 @@
 from typing import List, Type, Union
 
-import torch
 import torch.nn as nn
 from sentence_transformers import SentenceTransformer
 
@@ -8,7 +7,7 @@ from tgen.common.util.override import overrides
 
 
 class STMLP(nn.Module):
-    def __init__(self, input_size: int, hidden_sizes: List[int], output_size=2,
+    def __init__(self, input_size: int, hidden_sizes: List[int], output_size=1,
                  activations: Union[Type[nn.Module], List[Type[nn.Module]]] = None):
         """
         Initializes an MLP with an layer of input size, a series of hidden layer, and an output layer.
@@ -35,9 +34,7 @@ class STMLP(nn.Module):
         :return: Class 1 probabilities.
         """
         output = self.layers(x)
-        probabilities = torch.softmax(output, dim=1)  # Apply softmax, same shape: (N, 2)
-        class_1_probabilities = probabilities[:, 1]  # Extract probabilities of class=1, shape: (N,)
-        return class_1_probabilities
+        return output.squeeze()
 
     @staticmethod
     def build(model: SentenceTransformer, hidden_sizes: List[int], activations: List[nn.Module]):

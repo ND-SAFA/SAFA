@@ -47,7 +47,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
-        self.max_score = None
+        self.curr_score = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.setup_complete = False
 
@@ -193,8 +193,10 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :return: None, model is saved.
         """
         epoch_score = evaluator(**kwargs)
-        if self.max_score is None or epoch_score > self.max_score:
-            self.max_score = epoch_score
+        if self.curr_score is None or \
+                (epoch_score > self.curr_score and self.trainer_args.greater_is_better) or \
+                (epoch_score < self.curr_score and not self.trainer_args.greater_is_better):
+            self.curr_score = epoch_score
             self.save()
 
     def complete_device_setup(self) -> None:

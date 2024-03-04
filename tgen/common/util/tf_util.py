@@ -56,8 +56,11 @@ def set_gradients(parameters: Iterable[Parameter], requires_grad: bool) -> None:
     :param requires_grad: Whether the parameter should require gradients.
     :return:None
     """
+    n_params = 0
     for param in parameters:
         param.requires_grad = requires_grad
+        n_params += 1
+    logger.info(f"{n_params} parameters was set to requires_grad={requires_grad}")
 
 
 def create_loss_function(loss_function_enum: Type[SupportedEnum], loss_function_name: str, default: str, possible_params: Dict = None,

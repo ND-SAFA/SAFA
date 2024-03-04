@@ -8,7 +8,12 @@ from tgen.common.logging.logger_manager import logger
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
 GROUP_EXCLUDE = ["random_seed"]
-ARGS_PARAMS = ["num_train_epochs", "train_batch_size", "st_loss_function", "metric_for_best_model", "gradient_accumulation_steps",
+ARGS_PARAMS = ["num_train_epochs",
+               "train_batch_size",
+               "metric_for_best_model",
+               "gradient_accumulation_steps",
+               "st_loss_function",
+               "freeze_base",
                "use_scores"]
 
 

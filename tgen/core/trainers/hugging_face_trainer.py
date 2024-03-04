@@ -97,7 +97,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         self.model = self.model_manager.get_model()
         if self.trainer_args.do_training_eval:
-            self._evaluate()
+            self._evaluate(step=0)
         hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
         train_output = TraceTrainOutput(train_output=hf_train_output)
         if self.trainer_args.do_training_eval:
@@ -173,7 +173,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         FileUtil.move_dir_contents(best_model_path, model_dir_path, delete_after_move=False)
         logger.info(f"Best model at: {model_dir_path}")
 
-    def _evaluate(self) -> Dict[DatasetRole, TracePredictionOutput]:
+    def _evaluate(self, **kwargs) -> Dict[DatasetRole, TracePredictionOutput]:
         """
         Performs an evaluation on the training output using the EVAL dataset if provided
         :return: Map of dataset role evaluated to its prediction output.
@@ -189,7 +189,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
                 logger.warning(f"No {dataset_role} dataset. Skipping evaluation.")
                 continue
 
-        WBManager.log({r: output.metrics for r, output in results.items()})
+        WBManager.log({r: output.metrics for r, output in results.items()}, **kwargs)
         return results
 
     @overrides(Trainer)

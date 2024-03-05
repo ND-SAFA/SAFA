@@ -12,7 +12,9 @@ from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOu
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
+from tgen.common.util.math_util import MathUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.st_util import to_input_examples
 from tgen.common.util.tf_util import move_features_to_device, move_tensor_to_device, set_gradients
@@ -119,13 +121,34 @@ class STTrainer(HuggingFaceTrainer, ABC):
         labels = [e.label for e in input_examples]
         device_scores = self.predict_similarity_scores(input_examples, device=self.device)
         host_scores = device_scores.cpu().tolist()
-        prediction_metrics = self._compute_validation_metrics(EvalPrediction(host_scores, labels))
+        scaled_scores = self.scale_scores(input_examples, host_scores)
+        prediction_metrics = self._compute_validation_metrics(EvalPrediction(scaled_scores, labels))
         labels_tensor = self.get_labels_tensor(input_examples, self.device)
         with torch.no_grad():
             prediction_metrics["loss"] = self.compute_loss(scores=device_scores, labels=labels_tensor,
                                                            input_examples=input_examples).cpu().item()
 
         return PredictionOutput(host_scores, labels, prediction_metrics)
+
+    def scale_scores(self, input_examples: List[InputExample], scores: List[float]):
+        items = zip(input_examples, scores)
+        parent2items = DictUtil.group_by(items, lambda i: i[0].texts[1])
+        parent2min = {}
+        for p, children in parent2items.items():
+            children_scores = [c[1] for c in children]
+            parent2min[p] = {
+                "min": min(children_scores),
+                "max": max(children_scores)
+            }
+        new_scores = []
+        for example, score in zip(input_examples, scores):
+            parent_id = example.texts[1]
+            parent_stats = parent2min[parent_id]
+            parent_min = parent_stats["min"]
+            parent_max = parent_stats["max"]
+            new_score = MathUtil.convert_to_new_range(score, (parent_min, parent_max), (0, 1))
+            new_scores.append(new_score)
+        return new_scores
 
     def predict_similarity_scores(self, input_examples: List[InputExample], device: torch.device = None):
         """

@@ -213,6 +213,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if n_labels == 0:
             logger.info("Could not evaluate predictions because no true labels are present.")
             return {}
+        
         metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                          link_ids=trace_dataset.get_ordered_link_ids(),
                                          trace_predictions=output.predictions)

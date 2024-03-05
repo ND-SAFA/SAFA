@@ -30,8 +30,8 @@ class SelectByThresholdNormalizedChildren(iSelector):
         :return: None
         """
         for parent, children in parent2children.items():
-            sorted_scores = sorted(parent2scores[parent])
-            min_score, max_score = sorted_scores[0], sorted_scores[-1]
+            children_scores = parent2scores[parent]
+            min_score, max_score = min(children_scores), max(children_scores)
             for entry in children:
                 entry[TraceKeys.SCORE] = MathUtil.convert_to_new_range(entry[TraceKeys.SCORE], (min_score, max_score), (0, 1))
 

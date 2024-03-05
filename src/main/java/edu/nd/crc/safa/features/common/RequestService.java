@@ -76,7 +76,7 @@ public class RequestService {
         if (responseBody == null) {
             logger.warn("Null body received in response to request to {}\nstatus code: {}",
                 endpoint, response.getStatusCode());
-            responseBody = "";
+            responseBody = String.format("%s %s", response.getStatusCode(), endpoint);
         }
 
         if (JsonFileUtilities.isValid(responseBody)) {

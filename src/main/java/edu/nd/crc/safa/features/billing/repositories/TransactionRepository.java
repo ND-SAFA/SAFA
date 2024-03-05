@@ -11,4 +11,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface TransactionRepository extends CrudRepository<Transaction, UUID> {
     List<Transaction> findByOrganizationAndTimestampIsAfter(Organization organization, LocalDateTime startTime);
+
+    List<Transaction> findByOrganization(Organization organization);
 }

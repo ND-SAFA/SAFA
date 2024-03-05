@@ -332,6 +332,14 @@ public class AppRoutes {
         public static final String ROOT = "/billing";
         public static final String CHECKOUT = ROOT + "/checkout";
         public static final String CHANGE_TIER = ROOT + "/update-payment-tier";
+
+        @NoArgsConstructor(access = AccessLevel.NONE)
+        public static class Transaction {
+            public static final String ROOT = Billing.ROOT + "/transactions";
+            public static final String BY_ORG = ROOT + "/{orgId}";
+            public static final String MONTHLY = ROOT + "/month";
+            public static final String BY_ORG_MONTHLY = BY_ORG + "/month";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

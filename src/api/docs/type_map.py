@@ -3,6 +3,8 @@ from drf_yasg import openapi
 from rest_framework.fields import *
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, PrimaryKeyRelatedField, SlugRelatedField
 
+from api.endpoints.serializers.artifact_serializer import CleanCharField
+
 """
 Maps Django fields to OpenAPI fields used for documentation generation.
 """
@@ -14,6 +16,7 @@ TYPE_MAP = {
     DateField: openapi.TYPE_STRING,
     TimeField: openapi.TYPE_STRING,
     DurationField: openapi.TYPE_STRING,
+    CleanCharField: openapi.TYPE_STRING,
     CharField: openapi.TYPE_STRING,
     EmailField: openapi.TYPE_STRING,
     URLField: openapi.TYPE_STRING,

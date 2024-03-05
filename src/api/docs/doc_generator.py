@@ -74,7 +74,7 @@ def get_schema_for_field(field: serializers.Field):
     else:
         schema_type = TYPE_MAP.get(field.__class__, None)
         if schema_type is None:
-            raise AssertionError(f"No schema type defined for {field.__class__}")
+            raise AssertionError(f"Type not mapped to open API type: {field.__class__}")
         return openapi.Schema(
             type=schema_type,
             description=field.help_text

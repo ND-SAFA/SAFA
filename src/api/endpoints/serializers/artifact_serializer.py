@@ -7,10 +7,27 @@ from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
 
+NULL_CHARACTER = "\x00"
+UNKNOWN_CHARACTER = "\uFFFD"
+
+
+class CleanCharField(serializers.CharField):
+    def to_internal_value(self, data):
+        """
+        Replaces NULL characters with `�`.
+        :param data:
+        :return:
+        """
+        data = super().to_internal_value(data)
+        if isinstance(data, bytes):
+            data = data.decode('utf-8', errors='replace')
+        data = data.replace(NULL_CHARACTER, UNKNOWN_CHARACTER)
+        return data
+
 
 class ArtifactSerializer(AbstractSerializer):
     id = serializers.CharField(help_text="The identifier of the artifact.", required=True)
-    content = serializers.CharField(help_text="The body of the artifact", max_length=None, required=True, allow_blank=True)
+    content = CleanCharField(help_text="The body of the artifact", max_length=None, required=True, allow_blank=True)
     layer_id = serializers.CharField(help_text="The layer this artifact is associated with.", max_length=TEXT_MEDIUM, required=True)
     name = serializers.CharField(help_text="The human readable name of the artifact.", required=False)
     summary = serializers.CharField(help_text="The summary of the artifact", max_length=TEXT_LONG, required=False, allow_null=True,

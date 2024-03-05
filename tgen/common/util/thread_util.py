@@ -39,7 +39,8 @@ class ThreadUtil:
             t1 = ChildThread(global_state, thread_work, start_delay=thread_delay)
             threads.append(t1)
             t1.start()
-            time.sleep(thread_delay)  # also delay start of threads
+            if thread_delay:
+                time.sleep(thread_delay)  # also delay start of threads
         for t in threads:
             t.join()
 

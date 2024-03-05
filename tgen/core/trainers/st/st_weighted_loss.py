@@ -15,7 +15,13 @@ class WeightedMSE(torch.nn.Module):
         loss = torch.mean(weighted_losses)
         return loss
 
-    def calculate_extra_weight(self, pred, label):
+    def calculate_extra_weight(self, pred: float, label: int):
+        """
+        Calculates the extra weight to add to the loss.
+        :param pred: The prediction for the label.
+        :param label: THe label of the datum.
+        :return:
+        """
         if label == 1:
             if pred >= 0.5:
                 return 0

@@ -16,6 +16,8 @@ COPY src/api/ /app/api/
 
 ### Step - Collect static files
 WORKDIR /app
+COPY download_static.py /app/download_static.py
+RUN python3 download_static.py
 RUN python3 api/manage.py collectstatic --noinput
 
 ### COPy

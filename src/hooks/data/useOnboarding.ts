@@ -205,15 +205,11 @@ export const useOnboarding = defineStore("useOnboarding", {
         await getVersionApiStore.handleLoadCurrent(
           { projectId },
           {
-            onSuccess: () => {
-              this.projectId = projectId;
-              this.handleEstimateCost();
-            },
-            onError: () => {
-              this.projectId = "";
-            },
+            onSuccess: () => (this.projectId = projectId),
+            onError: () => (this.projectId = ""),
           }
         );
+        await this.handleEstimateCost();
       }
     },
     /**

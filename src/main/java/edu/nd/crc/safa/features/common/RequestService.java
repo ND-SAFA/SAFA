@@ -18,6 +18,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -63,11 +64,21 @@ public class RequestService {
                              Class<T> responseClass,
                              HttpMethod method) {
         String requestLog = String.format("Starting request to %s", endpoint);
+        logger.debug(requestLog);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         HttpEntity<Object> headerEntity = new HttpEntity<>(payload, headers);
-        logger.debug(requestLog);
-        String responseBody = restTemplate.exchange(endpoint, method, headerEntity, String.class).getBody();
+
+        ResponseEntity<String> response = restTemplate.exchange(endpoint, method, headerEntity, String.class);
+        String responseBody = response.getBody();
+
+        if (responseBody == null) {
+            logger.warn("Null body received in response to request to {}\nstatus code: {}",
+                endpoint, response.getStatusCode());
+            responseBody = "";
+        }
+
         if (JsonFileUtilities.isValid(responseBody)) {
             return JsonFileUtilities.parse(responseBody, responseClass);
         } else {

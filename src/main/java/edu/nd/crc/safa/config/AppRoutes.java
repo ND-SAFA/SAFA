@@ -174,6 +174,7 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {
             public static final String GET_USER_PROJECTS = ROOT;
+            public static final String GET_TEAM_PROJECTS = ROOT + "/team/{teamId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.NONE)

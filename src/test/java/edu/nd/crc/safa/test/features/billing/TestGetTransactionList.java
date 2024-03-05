@@ -18,6 +18,7 @@ import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,6 +83,9 @@ public class TestGetTransactionList extends ApplicationBaseTest {
             SafaRequest.withRoute(AppRoutes.Billing.Transaction.BY_ORG)
                 .withOrgId(otherOrg.getId())
                 .getWithJsonObject(status().is4xxClientError());
+
+        assertThat(response.has("permissions")).isTrue();
+        assertThat(jsonArrayContains(response.getJSONArray("permissions"), "org.view_billing")).isTrue();
     }
 
     @Test
@@ -112,6 +116,18 @@ public class TestGetTransactionList extends ApplicationBaseTest {
             SafaRequest.withRoute(AppRoutes.Billing.Transaction.BY_ORG_MONTHLY)
                 .withOrgId(otherOrg.getId())
                 .getWithJsonObject(status().is4xxClientError());
+
+        assertThat(response.has("permissions")).isTrue();
+        assertThat(jsonArrayContains(response.getJSONArray("permissions"), "org.view_billing")).isTrue();
+    }
+
+    private boolean jsonArrayContains(JSONArray array, String value) {
+        for (int i = 0; i < array.length(); ++i) {
+            if (array.getString(i).equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void leaveOrg() {

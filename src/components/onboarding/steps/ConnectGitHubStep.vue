@@ -40,6 +40,16 @@
       </text-button>
     </template>
   </callout-sub-step>
+
+  <flex-box
+    v-if="integrationsStore.validGitHubCredentials"
+    t="4"
+    justify="center"
+  >
+    <text-button outlined @click="onboardingStore.handleNextStep('connect')">
+      Continue
+    </text-button>
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -58,7 +68,7 @@ import {
   ONBOARDING_GITHUB_SECURITY,
   SECURITY_LINK,
 } from "@/util";
-import { onboardingStore } from "@/hooks";
+import { integrationsStore, onboardingStore } from "@/hooks";
 import { GitHubAuthentication } from "@/components/integrations";
 import {
   TextButton,

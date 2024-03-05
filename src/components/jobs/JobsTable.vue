@@ -18,65 +18,6 @@
         />
       </template>
     </data-table>
-
-    <modal
-      :open="jobApiStore.jobLog.length > 0"
-      size="xl"
-      title="Logs"
-      @close="jobApiStore.handleCloseLogs"
-    >
-      <q-timeline data-cy="text-job-log">
-        <q-virtual-scroll
-          v-slot="{ item, index }: { item: JobLogStepSchema; index: number }"
-          :items="jobApiStore.jobLog"
-          separator
-          style="max-height: 70vh"
-        >
-          <q-timeline-entry
-            v-if="!!item.entry"
-            :key="index"
-            :color="item.error ? 'negative' : 'positive'"
-            :subtitle="item.timestamp"
-          >
-            <q-expansion-item
-              :label="item.stepName"
-              class="text-h5"
-              default-opened
-              switch-toggle-side
-            >
-              <typography
-                :collapse-length="0"
-                :value="item.entry"
-                default-expanded
-                l="3"
-                variant="expandable"
-              />
-            </q-expansion-item>
-          </q-timeline-entry>
-        </q-virtual-scroll>
-      </q-timeline>
-      <template #actions>
-        <text-button
-          text
-          icon="graph-refresh"
-          label="Reload Logs"
-          @click="jobApiStore.handleViewLogs(jobStore.selectedJob!)"
-        />
-        <text-button
-          text
-          icon="download"
-          label="Download Logs"
-          @click="jobApiStore.handleDownloadLogs"
-        />
-        <text-button
-          color="negative"
-          icon="logs"
-          label="Report a Bug"
-          text
-          @click="handleFeedback"
-        />
-      </template>
-    </modal>
   </panel-card>
 </template>
 
@@ -91,11 +32,10 @@ export default {
 
 <script lang="ts" setup>
 import { computed, onMounted } from "vue";
-import { JobLogStepSchema, JobSchema, JobTableProps } from "@/types";
-import { FEEDBACK_LINK, jobColumns } from "@/util";
+import { JobSchema, JobTableProps } from "@/types";
+import { jobColumns } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
-import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
-import TextButton from "@/components/common/button/TextButton.vue";
+import { DataTable, PanelCard } from "@/components/common";
 import JobRow from "./JobRow.vue";
 
 const props = defineProps<JobTableProps>();
@@ -110,13 +50,6 @@ const loading = computed(() => appStore.isLoading > 0);
 const expanded = computed(() =>
   jobStore.selectedJob ? [jobStore.selectedJob.id] : []
 );
-
-/**
- * Routes the user to the feedback page.
- */
-function handleFeedback(): void {
-  window.open(FEEDBACK_LINK);
-}
 
 onMounted(() => jobApiStore.handleReload());
 </script>

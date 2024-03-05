@@ -114,14 +114,15 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
-import { onboardingStore, permissionStore, sessionStore } from "@/hooks";
+import { computed } from "vue";
+import { onboardingStore, sessionStore } from "@/hooks";
 import {
   TextButton,
   Stepper,
   Typography,
   FlexBox,
   FlexItem,
+  Icon,
 } from "@/components/common";
 import {
   ConnectGitHubStep,
@@ -130,17 +131,6 @@ import {
   GenerateStep,
   ProjectPreview,
 } from "@/components/onboarding/steps";
-import Icon from "@/components/common/display/icon/Icon.vue";
 
 const userLoggedIn = computed(() => sessionStore.doesSessionExist);
-
-// Check the onboarding workflow status when the user logs in, and open the popup if it's not complete.
-watch(
-  () => userLoggedIn.value,
-  async (userLoggedIn) => {
-    if (!userLoggedIn || permissionStore.isDemo) return;
-
-    await onboardingStore.handleReload();
-  }
-);
 </script>

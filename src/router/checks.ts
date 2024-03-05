@@ -5,10 +5,11 @@ import {
   getVersionApiStore,
   sessionApiStore,
 } from "@/hooks/api";
-import { appStore, sessionStore } from "@/hooks/core";
+import { appStore, permissionStore, sessionStore } from "@/hooks/core";
 import {
   artifactStore,
   documentStore,
+  onboardingStore,
   projectStore,
   viewsStore,
 } from "@/hooks/data";
@@ -61,6 +62,7 @@ export const routerBeforeChecks: RouteChecks = {
     });
 
     if (!authenticated) {
+      // If not authenticated, redirect to login
       return {
         path: Routes.LOGIN_ACCOUNT,
         query: {
@@ -68,6 +70,10 @@ export const routerBeforeChecks: RouteChecks = {
           [QueryParams.LOGIN_PATH]: to.path,
         },
       };
+    } else if (to.path !== Routes.PAYMENT && !permissionStore.isDemo) {
+      // If logging in to a non-payment endpoint and not in demo mode, reload onboarding state.
+      // This ensures that reloading onboarding is not duplicated when navigating to the payment page.
+      await onboardingStore.handleReload();
     }
   },
   async closePanelsIfNotInGraph(to) {

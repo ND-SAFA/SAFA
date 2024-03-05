@@ -5,6 +5,7 @@
     <details-drawer v-if="displayNavigation" />
     <snackbar />
     <app-confirm-modal :message="confirmationMessage" />
+    <job-log-modal />
     <save-project-modal />
     <transfer-project-modal />
     <delete-project-modal />
@@ -45,6 +46,7 @@ import {
   TransferProjectModal,
 } from "@/components/project";
 import { OnboardingPopup } from "@/components/onboarding";
+import { JobLogModal } from "@/components/jobs";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";

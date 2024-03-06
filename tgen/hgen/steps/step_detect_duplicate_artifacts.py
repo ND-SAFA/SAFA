@@ -48,8 +48,19 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         selected_artifacts_df.remove_rows(duplicate_artifact_ids)
         state.selected_artifacts_dataset = PromptDataset(artifact_df=selected_artifacts_df,
                                                          project_summary=state.all_artifacts_dataset.project_summary)
-        state.selected_predictions = [pred for pred in state.selected_predictions
-                                      if pred[TraceKeys.parent_label()] not in duplicate_artifact_ids]
+        state.trace_predictions = self._remove_traces(state.trace_predictions, duplicate_artifact_ids)
+        state.selected_predictions = self._remove_traces(state.selected_predictions, duplicate_artifact_ids)
+
+    @staticmethod
+    def _remove_traces(predictions: List[Trace], duplicate_artifact_ids: Set[str]) -> List[Trace]:
+        """
+        Removes the traces that contain a duplicate artifact id.
+        :param predictions: List of the predictions to remove from.
+        :param duplicate_artifact_ids: The artifact ids to remove.
+        :return: The list of traces without any containing duplicate artifacts.
+        """
+        return [pred for pred in predictions
+                if pred[TraceKeys.parent_label()] not in duplicate_artifact_ids]
 
     @staticmethod
     def _allow_tracing_between_dups(state: HGenState, duplicate_map: Dict[str, Set[str]]) -> Tuple[

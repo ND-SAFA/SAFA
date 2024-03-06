@@ -1,13 +1,16 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.flatfiles.builder.steps.CommitStep;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -55,13 +58,22 @@ public abstract class CommitJob extends AbstractJob {
     }
 
     @IJobStep(value = "Committing Entities", position = -2)
-    public void commitArtifactsAndTraceLinks() throws SafaError {
+    public void commitArtifactsAndTraceLinks(JobLogger logger) throws SafaError {
         projectCommitDefinition.setUser(getUser());
-        CommitStep.performCommit(
+        List<CommitError> errors = CommitStep.performCommit(
             getServiceProvider(),
             projectCommitDefinition,
             this.asCompleteSet
         );
+
+        if (!errors.isEmpty()) {
+            logger.log("### **The following errors were encountered while "
+                + "attempting to commit the project changes**");
+
+            for (int i = 0; i < errors.size(); ++i) {
+                logger.log((i + 1) + ") " + errors.get(i).getDescription());
+            }
+        }
     }
 
     /**

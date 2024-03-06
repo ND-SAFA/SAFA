@@ -137,6 +137,7 @@ public class CommitService {
         );
         List<A> entitiesModified = modifiedResponse.getEntities();
         processedChange.getModified().addAll(entitiesModified);
+        commitErrors.addAll(modifiedResponse.getErrors());
 
         // Commit deleted entities
         EntityParsingResult<A, CommitError> removeResponse = commitActionOnAppEntities(
@@ -147,6 +148,7 @@ public class CommitService {
         );
         List<A> entitiesRemoved = removeResponse.getEntities();
         processedChange.getRemoved().addAll(entitiesRemoved);
+        commitErrors.addAll(removeResponse.getErrors());
         return new Pair<>(processedChange, commitErrors);
     }
 

@@ -30,7 +30,7 @@ class GenerateExplanationsForLinksStep(AbstractPipelineStep[HGenArgs, HGenState]
         export_dir = FileUtil.safely_join_paths(HGenUtil.get_ranking_dir(state.export_dir), "explanations")
         pipeline_args = RankingArgs(run_name="explanations", parent_ids=[], children_ids=[],
                                     weight_of_explanation_scores=0, export_dir=export_dir,
-                                    dataset=state.all_artifacts_dataset, selection_method=None,
+                                    dataset=state.selected_artifacts_dataset, selection_method=None,
                                     types_to_trace=(args.source_type, args.target_type), generate_explanations=True)
         pipeline_args.update_llm_managers_with_state(state)
 

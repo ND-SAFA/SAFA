@@ -31,11 +31,6 @@ class AsyncEndpointHandler(IHandler):
         self.result = {}
         self.task = self.create_task()
 
-    @staticmethod
-    def create_receiver(func, serializer):
-        handler = AsyncEndpointHandler(func, serializer)
-        return lambda r: handler.handle_request(r)
-
     def _request_handler(self, data: Dict) -> JsonResponse:
         """
         Processes data through a celery task.
@@ -119,6 +114,11 @@ class AsyncEndpointHandler(IHandler):
             raise self.exception
         logs = self.log_capture.get_logs()
         self.task.update_state(state="PROGRESS", meta={'logs': logs})
+
+    @staticmethod
+    def create_receiver(func, serializer):
+        handler = AsyncEndpointHandler(func, serializer)
+        return lambda r: handler.handle_request(r)
 
     @staticmethod
     def encode_object(response: Any):

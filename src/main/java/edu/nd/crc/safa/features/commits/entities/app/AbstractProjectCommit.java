@@ -16,7 +16,7 @@ import lombok.Data;
 @Data
 public class AbstractProjectCommit {
     private List<CommitError> errors = new ArrayList<>();
-    private boolean failOnError = true;
+    private boolean failOnError = false;
     private SafaUser user;
     private ProjectVersion commitVersion;
     private ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();

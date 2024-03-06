@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.flatfiles.builder.steps;
 
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -28,7 +29,8 @@ public class CommitStep implements IFlatFileBuilderStep {
         if (asCompleteSet) {
             projectChanger.setEntitiesAsCompleteSet(projectEntities, user);
         } else {
-            projectChanger.commit(user, projectCommitDefinition);
+            ProjectCommitAppEntity result = projectChanger.commit(user, projectCommitDefinition);
+            projectCommitDefinition.addErrors(result.getErrors());
         }
         serviceProvider.getCommitErrorRepository().saveAll(projectCommitDefinition.getErrors());
     }

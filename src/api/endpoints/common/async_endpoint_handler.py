@@ -11,7 +11,6 @@ from tgen.common.logging.log_capture import LogCapture
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
 from tgen.embeddings.model_cache import ModelCache
-from tgen.models.llm.anthropic_manager import get_client
 
 
 class AsyncEndpointHandler(IHandler):
@@ -71,7 +70,6 @@ class AsyncEndpointHandler(IHandler):
         """
         try:
             ModelCache.clear()
-            get_client(refresh=True)
             data = self.serialize_data(data)
             response = self.func(data)
             response_dict = self.encode_object(response)

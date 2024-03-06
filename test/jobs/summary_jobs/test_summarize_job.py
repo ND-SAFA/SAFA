@@ -1,7 +1,5 @@
 from typing import List
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
-from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -12,7 +10,7 @@ from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MOCK_PS_RES_MAP, MockResponses, create
+from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
 
@@ -73,7 +71,7 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertIn(self.NL_SUMMARY, artifact[ArtifactKeys.SUMMARY])
 
     def _get_job(self) -> AbstractJob:
-        return SummarizeJob(self.get_project().get_dataset(), summarize_code_only=False)
+        return SummarizeJob(self.get_project().get_dataset(), summarize_code_only=False, do_resummarize_artifacts=True)
 
     def get_project(self):
         return GenerationTestProject()

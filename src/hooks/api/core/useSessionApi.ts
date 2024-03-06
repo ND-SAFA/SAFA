@@ -146,9 +146,13 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   }
 
   async function handleDemoLogin(): Promise<void> {
-    await handleLogin(DEMO_ACCOUNT, true).then(() =>
-      getVersionApiStore.handleLoad(DEMO_VERSION_ID)
-    );
+    await handleLogin(DEMO_ACCOUNT, true).then(() => {
+      const versionId = String(
+        getParam(QueryParams.VERSION) || DEMO_VERSION_ID
+      );
+
+      getVersionApiStore.handleLoad(versionId);
+    });
   }
 
   async function handleLogout(

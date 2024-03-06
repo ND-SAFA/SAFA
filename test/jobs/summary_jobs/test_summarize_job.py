@@ -36,7 +36,7 @@ class TestSummarizeJob(BaseJobTest):
 
         ai_manager.set_responses(responses)
         job = SummarizeJob(self.get_project().get_dataset(),
-                           is_subset=True, summarize_code_only=False)
+                           is_subset=True, summarize_code_only=False, do_resummarize_artifacts=True)
         job.run()
         self.assert_output_on_success(job, job.result, resummarized=False)
 

@@ -161,21 +161,6 @@ public class SafaUserController extends BaseController {
     }
 
     /**
-     * Sends email to authorized user email enabling them to create a new password.
-     * This variant can only be used by admins, and it allows for sending the email
-     * to an address other than the one owning the account
-     *
-     * @param user The user to send the reset password email to.
-     */
-    @Transactional
-    @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD_NO_EMAIL)
-    public void forgotPasswordNoEmail(@Valid @RequestBody PasswordForgottenRequest user) {
-        SafaUser currentUser = getCurrentUser();
-        permissionService.requireActiveSuperuser(currentUser);
-        forgotPassword(user.getEmail(), currentUser.getEmail());
-    }
-
-    /**
      * Reset a password
      *
      * @param resetEmail The email of the account to reset
@@ -196,6 +181,21 @@ public class SafaUserController extends BaseController {
         this.passwordResetTokenRepository.flush();
 
         this.passwordResetTokenRepository.save(passwordResetToken);
+    }
+
+    /**
+     * Sends email to authorized user email enabling them to create a new password.
+     * This variant can only be used by admins, and it allows for sending the email
+     * to an address other than the one owning the account
+     *
+     * @param user The user to send the reset password email to.
+     */
+    @Transactional
+    @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD_NO_EMAIL)
+    public void forgotPasswordNoEmail(@Valid @RequestBody PasswordForgottenRequest user) {
+        SafaUser currentUser = getCurrentUser();
+        permissionService.requireActiveSuperuser(currentUser);
+        forgotPassword(user.getEmail(), currentUser.getEmail());
     }
 
     /**

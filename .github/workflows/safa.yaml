@@ -9,32 +9,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Check if comment contains /build.
-      if: contains(github.event.comment.body, '/build')
-      run: echo "Build trigger has been activated."
     - name: Checkout code.
       uses: actions/checkout@v3
+
     - uses: actions/setup-python@v4
       with:
         python-version: '3.9'
         cache: 'pip'
         cache-dependency-path: '**/*-requirements.txt'
 
-    - name: Run Dev-Ops Checks
+    - name: Upgrade Pip
+      run: python -m pip install --upgrade pip
+
+    - name: Install Packages
       run: |
         pip install -r requirements/devops-requirements.txt
-        python3 tgen/scripts/tools/find_missing_docs.py
+        pip install -r requirements.txt
+        pip install -r requirements.txt
+
+    - name: Run Dev-Ops Checks
+      run: python3 tgen/scripts/tools/find_missing_docs.py
       env:
         ROOT_PATH: /home/runner/work/tgen/tgen
 
-    - name: Install Dependencies.
-      run: |
-        pip install -r requirements.txt
-        python3 download_static.py
-
     - name: Run Unit Tests.
-      run: |
-        python -m unittest discover -s test
+      run: python -m unittest discover -s test
       env:
         DEPLOYMENT: test
         ROOT_PATH: /home/runner/work/tgen/tgen

@@ -11,7 +11,6 @@ from tgen.common.logging.log_capture import LogCapture
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
 from tgen.embeddings.model_cache import ModelCache
-from tgen.models.llm.anthropic_manager import get_client
 
 
 class AsyncEndpointHandler(IHandler):
@@ -30,11 +29,6 @@ class AsyncEndpointHandler(IHandler):
         self.task = None
         self.result = {}
         self.task = self.create_task()
-
-    @staticmethod
-    def create_receiver(func, serializer):
-        handler = AsyncEndpointHandler(func, serializer)
-        return lambda r: handler.handle_request(r)
 
     def _request_handler(self, data: Dict) -> JsonResponse:
         """
@@ -76,7 +70,6 @@ class AsyncEndpointHandler(IHandler):
         """
         try:
             ModelCache.clear()
-            get_client(refresh=True)
             data = self.serialize_data(data)
             response = self.func(data)
             response_dict = self.encode_object(response)
@@ -119,6 +112,11 @@ class AsyncEndpointHandler(IHandler):
             raise self.exception
         logs = self.log_capture.get_logs()
         self.task.update_state(state="PROGRESS", meta={'logs': logs})
+
+    @staticmethod
+    def create_receiver(func, serializer):
+        handler = AsyncEndpointHandler(func, serializer)
+        return lambda r: handler.handle_request(r)
 
     @staticmethod
     def encode_object(response: Any):

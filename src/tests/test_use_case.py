@@ -25,9 +25,8 @@ class TestUseCase(BaseTest):
         self.remove_summaries(source_artifacts)
 
         project_summary_json = TestData.read_summary(True)
-        ai_manager.mock_summarization(responses=fake_summaries)
-        ai_manager.mock_project_summary(project_summary_json)
         ai_manager.mock_summarization(responses=source_summaries)
+        ai_manager.mock_project_summary(project_summary_json)
 
         summary_response = RequestProxy.summarize(source_artifacts)
         project_summary = summary_response["summary"]

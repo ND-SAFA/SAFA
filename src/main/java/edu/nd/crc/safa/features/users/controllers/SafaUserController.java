@@ -189,7 +189,7 @@ public class SafaUserController extends BaseController {
         String token = tokenService.createTokenForUsername(resetEmail, expirationDate);
         PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser, token, expirationDate);
 
-        emailService.sendPasswordReset(tokenEmail, token);
+        emailService.sendPasswordReset(tokenEmail, resetEmail, token);
 
         // Just in case the user had a previous forget token they never clicked on
         this.passwordResetTokenRepository.deleteByUser(retrievedUser);

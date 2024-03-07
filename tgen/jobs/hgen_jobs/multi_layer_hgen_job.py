@@ -23,6 +23,7 @@ class MultiLayerHGenJob(AbstractJob):
         :param starting_hgen_job: The initial hgen job to run to get the first layer of artifacts
         :param target_types: The list of target types going up the hierarchy
         :param job_args: The arguments need for the job
+        :param save_on_failure_path: Whether to save the state of HGEN on failure.
         """
         if target_types is None:
             target_types = []

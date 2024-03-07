@@ -202,7 +202,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 def get_client():
     """
     Returns the current anthropic client.
-    :param refresh: Whether to re-create client regardless of whether a cached version exists.
     :return:  Returns the singleton anthropic client.
     """
     if environment_constants.IS_TEST:

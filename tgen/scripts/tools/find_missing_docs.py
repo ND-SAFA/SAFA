@@ -238,4 +238,4 @@ def print_complex_functions(threshold: int = DEFAULT_COMPLEXITY_THRESHOLD):
 
 
 if __name__ == "__main__":
-    print_missing_headers()
+    print_missing_headers(throw_error=True)

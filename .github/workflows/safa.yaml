@@ -24,16 +24,20 @@ jobs:
         python-version: '3.9'
         cache: 'pip'
 
-    - name: Install Requirements
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        python3 tgen/download_static.py
+    - name: Upgrade Pip
+      run: python -m pip install --upgrade pip
 
-    - name: Find Missing Docs.
-      run: python3 tgen/tgen/scripts/tools/find_missing_docs.py src/api
+    - name: Run Dev-Ops Checks
+      run: |
+        pip3 install -r tgen/requirements/devops-requirements.txt
+        python3 tgen/tgen/scripts/tools/find_missing_docs.py src/api
       env:
         ROOT_PATH: /home/runner/work/tgen
+
+    - name: Install TGEN Requirements
+      run: |
+        pip install -r requirements.txt
+        python3 tgen/download_static.py
 
     - name: Run unit tests
       run: |

@@ -20,7 +20,7 @@ jobs:
         cache: 'pip'
         cache-dependency-path: '**/*-requirements.txt'
 
-    - name: Find Missing Docs.
+    - name: Run Dev-Ops Checks
       run: |
         pip install -r requirements/devops-requirements.txt
         python3 tgen/scripts/tools/find_missing_docs.py

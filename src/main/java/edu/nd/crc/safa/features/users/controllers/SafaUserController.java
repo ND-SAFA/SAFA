@@ -157,14 +157,39 @@ public class SafaUserController extends BaseController {
     @Transactional
     @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD)
     public void forgotPassword(@Valid @RequestBody PasswordForgottenRequest user) {
-        String username = user.getEmail();
-        SafaUser retrievedUser = safaUserRepository.findByEmail(username)
-            .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + username));
+        forgotPassword(user.getEmail(), user.getEmail());
+    }
+
+    /**
+     * Sends email to authorized user email enabling them to create a new password.
+     * This variant can only be used by admins, and it allows for sending the email
+     * to an address other than the one owning the account
+     *
+     * @param user The user to send the reset password email to.
+     */
+    @Transactional
+    @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD_NO_EMAIL)
+    public void forgotPasswordNoEmail(@Valid @RequestBody PasswordForgottenRequest user) {
+        SafaUser currentUser = getCurrentUser();
+        permissionService.requireActiveSuperuser(currentUser);
+        forgotPassword(user.getEmail(), currentUser.getEmail());
+    }
+
+    /**
+     * Reset a password
+     *
+     * @param resetEmail The email of the account to reset
+     * @param tokenEmail The email to send the token to (usually the same as the one being
+     *                   reset unless an admin is doing it)
+     */
+    private void forgotPassword(String resetEmail, String tokenEmail) {
+        SafaUser retrievedUser = safaUserRepository.findByEmail(resetEmail)
+            .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + resetEmail));
         Date expirationDate = new Date(System.currentTimeMillis() + SecurityConstants.FORGOT_PASSWORD_EXPIRATION_TIME);
-        String token = tokenService.createTokenForUsername(username, expirationDate);
+        String token = tokenService.createTokenForUsername(resetEmail, expirationDate);
         PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser, token, expirationDate);
 
-        emailService.sendPasswordReset(user.getEmail(), token);
+        emailService.sendPasswordReset(tokenEmail, token);
 
         // Just in case the user had a previous forget token they never clicked on
         this.passwordResetTokenRepository.deleteByUser(retrievedUser);

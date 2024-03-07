@@ -11,9 +11,10 @@ public interface EmailService {
      * Send a password reset token email.
      *
      * @param recipient The email of the recipient
+     * @param resetAccount The email of the account we're resetting (usually but not always the same as recipient)
      * @param token The password reset token
      */
-    void sendPasswordReset(String recipient, String token);
+    void sendPasswordReset(String recipient, String resetAccount, String token);
 
     /**
      * Send an email verification email.

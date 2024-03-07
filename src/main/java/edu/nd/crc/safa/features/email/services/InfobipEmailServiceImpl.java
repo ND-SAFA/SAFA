@@ -67,11 +67,10 @@ public class InfobipEmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendPasswordReset(String recipient, String token) {
-        sendSimpleEmail(recipient, "Requested password reset token",
-            String.format(fendBase + resetPasswordUrl, token));
-
-
+    public void sendPasswordReset(String recipient, String resetAccount, String token) {
+        String body = "Here is the requested link to reset the password for the account belonging to " + resetAccount
+            + "\n\n" + String.format(fendBase + resetPasswordUrl, token);
+        sendSimpleEmail(recipient, "Requested password reset token", body);
     }
 
     @Override

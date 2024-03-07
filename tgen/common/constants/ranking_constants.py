@@ -1,3 +1,5 @@
+import os
+
 DEFAULT_PARENT_PRIMARY_THRESHOLD = 0.80  # The minimum percentile to consider a candidate as true
 DEFAULT_PARENT_SECONDARY_THRESHOLD = 0.60
 DEFAULT_PARENT_MIN_THRESHOLD = 0.4  # The minimum percentile allowed for a top parent prediction.
@@ -45,5 +47,5 @@ FUNCTIONALITY_TAG = "functionality"
 RANKING_ID_TAG = "id"
 RANKING_EXPLANATION_TAG = "explanation"
 RANKING_SCORE_TAG = "score"
-DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-roberta-large-v1"
+DEFAULT_EMBEDDING_MODEL = os.environ.get("DEFAULT_EMBEDDING_MODEL", "sentence-transformers/all-roberta-large-v1", )
 DEFAULT_SEARCH_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"

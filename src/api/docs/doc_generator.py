@@ -1,3 +1,5 @@
+from typing import Dict
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
@@ -13,13 +15,15 @@ def autodoc(serializer, *args, **kwargs):
     :param kwargs: Keyword args to swagger doc generator.
     :return: The method being implemented (e.g. POST).
     """
-    doc_info = get_serializer_swagger_info(serializer)
+    doc_info = create_serializer_swagger_info(serializer)
     return swagger_auto_schema(*args, **kwargs, **doc_info)
 
 
-def get_serializer_swagger_info(serializer_class):
+def create_serializer_swagger_info(serializer_class) -> Dict:
     """
-    Returns the Swagger/OpenAPI schema information for a given serializer class.
+    Creates swagger UI information for given serializer.
+    :param serializer_class: The serializer class to document.
+    :return: Returns the Swagger/OpenAPI schema information for a given serializer class.
     """
     fields = serializer_class().get_fields()
     properties = {}
@@ -57,7 +61,7 @@ def get_schema_for_field(field: serializers.Field):
     :return: The schema of the field.
     """
     if isinstance(field, serializers.Serializer):
-        return get_serializer_swagger_info(field.__class__)['request_body']
+        return create_serializer_swagger_info(field.__class__)['request_body']
 
     if field.help_text is None:
         parent_text = field.parent.help_text

@@ -9,6 +9,9 @@ from tgen.common.logging.logger_manager import logger
 
 
 class WaitPayload(TypedDict):
+    """
+    The input to a wait endpoint.
+    """
     seconds: int
 
 
@@ -16,6 +19,11 @@ class WaitPayloadSerializer(AbstractSerializer):
     seconds: serializers.IntegerField()
 
     def create(self, validated_data):
+        """
+        Creates dummy payload.
+        :param validated_data: The request input data.
+        :return: Wait endpoint input.
+        """
         return self.initial_data
 
 

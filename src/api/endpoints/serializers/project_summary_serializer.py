@@ -22,5 +22,10 @@ class ProjectSummarySerializer(AbstractSerializer):
                                    required=False, allow_empty=True, allow_null=False)
 
     def create(self, validated_data: Dict) -> ProjectSummaryRequest:
+        """
+        Serializes input data into a project summary request.
+        :param validated_data: The validated request data.
+        :return: Project Summary Request.
+        """
         kwargs = validated_data.get("kwargs", {})
         return ProjectSummaryRequest(artifacts=validated_data["artifacts"], kwargs=kwargs)

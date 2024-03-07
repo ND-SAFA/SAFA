@@ -34,6 +34,11 @@ class ArtifactSerializer(AbstractSerializer):
                                     allow_blank=True)
 
     def create(self, validated_data: Dict) -> Artifact:
+        """
+        Serializes artifact from input data.
+        :param validated_data: The JSON for an artifact.
+        :return: The artifact.
+        """
         summary = DataFrameUtil.get_optional_value_from_df(validated_data, "summary", allow_empty=False)
         return Artifact(id=validated_data["id"],
                         content=validated_data["content"],

@@ -21,12 +21,17 @@ class AppEndpoints(Enum):
 
     def as_endpoint(self, suffix: str = None) -> str:
         """
+        Return enumeration as endpoint path.
+        :param suffix: The suffix to attach to endpoint.
         :return: Client endpoint location..
         """
         return self.as_path(prefix=F_SLASH, suffix=suffix)
 
     def as_path(self, prefix: str = EMPTY_STRING, suffix: str = None) -> str:
         """
+        Return enum as path in django server.
+        :param prefix: The prefix to pre-pend to path.
+        :param suffix: The suffix to append to path.
         :return: Internal endpoint location.
         """
         endpoint_value = self.get_name(suffix=suffix)

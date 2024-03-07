@@ -3,8 +3,8 @@ import os
 
 import boto3
 
-from tgen.util.json_util import NpEncoder
-from tgen.util.logging.logger_manager import logger
+from tgen.common.logging.logger_manager import logger
+from tgen.common.util.json_util import NpEncoder
 
 
 class CloudUtility:
@@ -13,7 +13,13 @@ class CloudUtility:
     """
 
     @staticmethod
-    def save_json(content_dict: dict, file_path: str):
+    def save_json(content_dict: dict, file_path: str) -> None:
+        """
+        Saves JSON to file path.
+        :param content_dict: The JSON content.
+        :param file_path: Path in default bucket to save content to.
+        :return: None.
+        """
         AWS_ACCESS_KEY_ID = os.environ["BACKEND_ACCESS_ID"]
         AWS_SECRET_ACCESS_KEY = os.environ["BACKEND_SECRET_KEY"]
         BUCKET_NAME = os.environ["BACKEND_BUCKET_NAME"]

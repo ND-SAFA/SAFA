@@ -19,9 +19,9 @@ from kombu.serialization import register
 from tgen.common.constants import anthropic_constants
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
-from .paths import load_paths
+from .paths import load_source_code_paths
 
-load_paths()
+load_source_code_paths()
 
 from pathlib import Path
 

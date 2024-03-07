@@ -1,3 +1,5 @@
+from typing import Callable
+
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from dotenv import load_dotenv
@@ -20,28 +22,37 @@ def endpoint(serializer, is_async: bool = False):
     :return: The decorator that will take in the endpoint function.
     """
 
-    def dec(func):
+    def dec(func) -> Callable:
+        """
+        Decorates function with either sync or async endpoint decorator.
+        :param func: The function to decorate.
+        :return: Reference to decorated endpoint.
+        """
         if is_async and not environment_constants.IS_TEST:
-            return create_task_decorator(serializer, func)
-        return class_decorator(serializer, EndpointHandlerProxy(func, serializer, is_async=is_async))
+            return async_endpoint_decorator(serializer, func)
+        return sync_endpoint_decorator(serializer, EndpointHandlerProxy(func, serializer, is_async=is_async))
 
     return dec
 
 
-def endpoint_get(func):
+def endpoint_get(func) -> Callable:
     """
     Creates endpoint for GET request.
     :param func: The function to call when get is called.
-    :return:
+    :return: Reference to decorated function
     """
 
-    def dec(*args, **kwargs):
+    def dec():
+        """
+        Creates a GET class decorator for function.
+        :return: The class decorator
+        """
         return class_decorator_get(func)
 
     return dec
 
 
-def create_task_decorator(serializer, func):
+def async_endpoint_decorator(serializer, func):
     """
     Decorates func to be a celery task.
     :param serializer: The serializer used to parse the input data.
@@ -49,10 +60,17 @@ def create_task_decorator(serializer, func):
     :return: Task endpoint handler.
     """
     request_receiver = AsyncEndpointHandler.create_receiver(func, serializer)
-    return class_decorator(serializer, request_receiver)
+    return sync_endpoint_decorator(serializer, request_receiver)
 
 
-def class_decorator(serializer, func):
+def sync_endpoint_decorator(serializer, func) -> Callable:
+    """
+    Creates API endpoint for a syncronous endpoint using function to execute a task.
+    :param serializer: Serializes request data into func input data.
+    :param func: The function to execute a job.
+    :return: The endpoint callable.
+    """
+
     class APIDecorator(APIView):
         """
         Internal class supported the auto-generation of endpoint documentation.
@@ -72,6 +90,12 @@ def class_decorator(serializer, func):
 
 
 def class_decorator_get(func):
+    """
+    Decorates function so that it becomes an GET endpoint.
+    :param func: The function returning data.
+    :return: GET endpoint using function to retrieve data to send back.
+    """
+
     class APIDecorator(APIView):
         """
         Internal class supported the auto-generation of endpoint documentation.

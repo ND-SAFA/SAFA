@@ -3,9 +3,9 @@ import os
 from celery import Celery
 from dotenv import load_dotenv
 
-from .paths import load_paths
+from .paths import load_source_code_paths
 
-load_paths()
+load_source_code_paths()
 load_dotenv()
 
 celery = None

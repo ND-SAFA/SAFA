@@ -5,7 +5,7 @@ from api.utils.serializer_utility import SerializerUtility
 from tgen.common.objects.trace_layer import TraceLayer
 
 
-class TraceLayerSerializer(AbstractSerializer):
+class LayerSerializer(AbstractSerializer):
     parent = serializers.CharField(help_text="The parent type.", allow_blank=False, allow_null=False, required=True)
     child = serializers.CharField(help_text="The child type.", allow_blank=False, allow_null=False, required=True)
 
@@ -17,6 +17,11 @@ class TraceLayerSerializer(AbstractSerializer):
         """
         SerializerUtility.update_error()
 
-    def create(self, validated_data):
+    def create(self, validated_data) -> TraceLayer:
+        """
+        Serializes the input data for a layer to trace between.
+        :param validated_data: The validated request data.
+        :return: The trace layer instance.
+        """
         trace_layer = TraceLayer(parent=validated_data["parent"], child=validated_data["child"])
         return trace_layer

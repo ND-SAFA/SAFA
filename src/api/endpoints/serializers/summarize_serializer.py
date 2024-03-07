@@ -25,6 +25,11 @@ class SummarizeSerializer(AbstractSerializer):
                                            required=False, allow_null=True, allow_blank=True)
 
     def create(self, validated_data) -> SummarizeRequest:
+        """
+        Serializes input to summary job.
+        :param validated_data: The validated data.
+        :return: Summarize request.
+        """
         summary_serializer = ArtifactSerializer(many=True, data=validated_data["artifacts"])
         summary_serializer.is_valid(raise_exception=True)
         summary_artifacts = summary_serializer.save()

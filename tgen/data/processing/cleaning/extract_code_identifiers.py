@@ -1,6 +1,5 @@
 from typing import List, Tuple
 
-import javac_parser
 from comment_parser import comment_parser
 from comment_parser.comment_parser import UnsupportedError
 
@@ -29,6 +28,7 @@ class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):
         :return:
         """
         if self._java is None:
+            import javac_parser
             self._java = javac_parser.Java()
         return self._java
 

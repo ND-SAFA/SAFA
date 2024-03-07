@@ -2,7 +2,6 @@ import builtins
 import importlib
 import traceback
 import typing
-from copy import deepcopy
 from enum import Enum
 from typing import Any, Dict, List, Optional, Type
 
@@ -254,7 +253,9 @@ class ReflectionUtil:
         :param expected_type:
         :return: Returns true if expected type is a typed dictionary, false otherwise.
         """
-        return hasattr(expected_type, "__annotations__") and issubclass(expected_type, dict)
+        return hasattr(expected_type, "__annotations__") and \
+            len(getattr(expected_type, "__annotations__")) > 0 and \
+            issubclass(expected_type, dict)
 
     @staticmethod
     def get_cls_from_path(class_path: str) -> Optional[Type]:
@@ -311,7 +312,8 @@ class ReflectionUtil:
                 return True
 
             if ReflectionUtil.is_typed_dict(expected_type):
-                assert isinstance(val, dict)
+                if not isinstance(val, dict):
+                    raise Exception(f"Expected a dictionary but while parsing {expected_type} got: {val}")
                 for field_name, expected_field_type in expected_type.__annotations__.items():
                     check_type(f"{param_name}-{field_name}", val.get(field_name, None), expected_field_type)
                 return True

@@ -47,7 +47,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
     Defines AI interface for anthropic API.
     """
 
-    Client = None
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
     prompt_args = PromptArgs(prompt_prefix="\n\nHuman: ", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
                              completion_suffix="###")
@@ -61,7 +60,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             llm_args = AnthropicArgs()
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
-        self.client = get_client()
 
     def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:
         """
@@ -96,6 +94,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         if isinstance(prompts, str):
             prompts = [prompts]
 
+        anthropic_client = get_client()
+
         def thread_work(payload: Tuple[int, str]) -> Dict:
             """
             Performs completion on prompt and sets response to index.
@@ -104,7 +104,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             """
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
-            local_response = self.client.completion(**prompt_params)
+            local_response = anthropic_client.completion(**prompt_params)
             return local_response
 
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
@@ -115,6 +115,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
                                                                          raise_exception=raise_exception,
                                                                          thread_delay=1)
+        close_client(anthropic_client)
 
         self._handle_exceptions(global_state)
         global_responses = global_state.results
@@ -198,10 +199,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         return log_probs
 
 
-def get_client(refresh: bool = False):
+def get_client():
     """
     Returns the current anthropic client.
-    :param refresh: Whether to re-create client regardless of whether a cached version exists.
     :return:  Returns the singleton anthropic client.
     """
     if environment_constants.IS_TEST:
@@ -209,3 +209,14 @@ def get_client(refresh: bool = False):
     else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
         return anthropic.Client(ANTHROPIC_KEY)
+
+
+def close_client(anthropic_client: anthropic.Client) -> None:
+    """
+    If anthropic client is given, then protected session is closed.
+    :param anthropic_client: Mock client or anthropic client.
+    :return: None
+    """
+    if hasattr(anthropic_client, "_session"):
+        anthropic_client._session.close()
+        logger.info("Anthropic connection has been closed.")

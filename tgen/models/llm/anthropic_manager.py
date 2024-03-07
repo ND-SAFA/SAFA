@@ -116,7 +116,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          raise_exception=raise_exception,
                                                                          thread_delay=1)
         close_client(anthropic_client)
-        
+
         self._handle_exceptions(global_state)
         global_responses = global_state.results
         for i, res in enumerate(global_responses):
@@ -220,3 +220,4 @@ def close_client(anthropic_client: anthropic.Client) -> None:
     """
     if hasattr(anthropic_client, "_session"):
         anthropic_client._session.close()
+        logger.info("Anthropic connection has been closed.")

@@ -61,7 +61,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             llm_args = AnthropicArgs()
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
-        AnthropicManager.Client = get_client()
+        self.client = get_client()
 
     def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:
         """
@@ -104,7 +104,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             """
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
-            local_response = get_client().completion(**prompt_params)
+            local_response = self.client.completion(**prompt_params)
             return local_response
 
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
@@ -208,9 +208,4 @@ def get_client(refresh: bool = False):
         return MockAnthropicClient()
     else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-        if AnthropicManager.Client is None or refresh:
-            client = anthropic.Client(ANTHROPIC_KEY)
-            AnthropicManager.Client = client
-            return client
-        else:
-            return AnthropicManager.Client
+        return anthropic.Client(ANTHROPIC_KEY)

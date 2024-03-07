@@ -16,7 +16,8 @@ from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 
 class MultiLayerHGenJob(AbstractJob):
 
-    def __init__(self, starting_hgen_job: BaseHGenJob, target_types: List[str] = None, job_args: JobArgs = None):
+    def __init__(self, starting_hgen_job: BaseHGenJob, target_types: List[str] = None, job_args: JobArgs = None,
+                 save_on_failure_path: str = None):
         """
         Initializes the job with args needed for hierarchy generator
         :param starting_hgen_job: The initial hgen job to run to get the first layer of artifacts
@@ -30,6 +31,7 @@ class MultiLayerHGenJob(AbstractJob):
             # target types should not include start target type
             target_types.pop(0)
         self.target_types = target_types
+        self.save_on_failure_path = save_on_failure_path
         super().__init__(job_args)
 
     def _run(self) -> TraceDataset:
@@ -49,6 +51,8 @@ class MultiLayerHGenJob(AbstractJob):
                 current_hgen_job.hgen_args.add_seeds_as_artifacts = False
             res = current_hgen_job.run()
             if res.status != Status.SUCCESS:
+                if self.save_on_failure_path:
+                    current_hgen_job.hgen.state.save(res.status.name.lower())
                 raise Exception(res.body)
             current_hgen_job = self.get_next_hgen_job(current_hgen_job, next_target_type)
         return current_hgen_job.run().body

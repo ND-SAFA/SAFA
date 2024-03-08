@@ -23,7 +23,7 @@
       />
 
       <div class="q-ml-auto text-right">
-        <div>
+        <div v-if="ENABLED_FEATURES.SIGN_UP">
           <typography value="Dont have an account yet?" />
 
           <text-button
@@ -60,6 +60,7 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import { sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {

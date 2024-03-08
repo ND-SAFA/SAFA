@@ -91,7 +91,8 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
     await adminApi.handleRequest(
       async () => createAdminPasswordReset({ email }),
       {
-        success: "A password reset email has been sent to your admin account.",
+        success: `A password reset email has been sent to your admin account: ${email}`,
+        error: `Unable to send a password reset email: ${email}`,
       }
     );
   }

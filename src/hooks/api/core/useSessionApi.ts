@@ -19,7 +19,6 @@ import {
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
-  createAdminPasswordReset,
   createLoginSession,
   createPasswordReset,
   createUser,

@@ -27,7 +27,7 @@ class StepCreateArtifactBatches(AbstractPipelineStep[SummarizerArgs, SummarizerS
         """
         cluster_map = {0: list(state.dataset.artifact_df.index)}
         final_cluster_map = self.cluster_until_prompt_fits(cluster_map, state.dataset.artifact_df, args.export_dir)
-        state.batch_id_to_artifacts = {cluster_id: cluster.artifact_ids for cluster_id, cluster in final_cluster_map.items()}
+        state.batch_id_to_artifacts = final_cluster_map
 
     @staticmethod
     def cluster_until_prompt_fits(initial_cluster_map: ClusterIdType, artifact_df: ArtifactDataFrame, export_dir: str):
@@ -52,25 +52,6 @@ class StepCreateArtifactBatches(AbstractPipelineStep[SummarizerArgs, SummarizerS
         return cluster_map
 
     @staticmethod
-    def create_mini_clusters(cluster_map: ClusterIdType, export_dir: Optional[str]) -> ClusterIdType:
-        """
-        Creates mini-clusters for each cluster in map.
-        :param cluster_map: Map of cluster id to cluster to create mini-clusters for.
-        :param export_dir: Path to direction to store state.
-        :return: Map of mini-cluster id to artifacts in mini-cluster.
-        """
-        mini_batch_map = {}
-        for parent_cluster_id, (cluster_artifact_df, cluster_tokens) in cluster_map.items():
-            cluster_dataset = PromptDataset(artifact_df=cluster_artifact_df)
-            cluster_export_dir = os.path.join(export_dir, str(parent_cluster_id)) if export_dir else None
-            cluster_mini_batches = StepCreateArtifactBatches._run_clustering_pipeline(cluster_dataset, cluster_tokens,
-                                                                                      cluster_export_dir)
-            cluster_mini_batches = {f"{parent_cluster_id}:{c_id}": c_artifacts
-                                    for c_id, c_artifacts in cluster_mini_batches.items()}
-            mini_batch_map.update(cluster_mini_batches)
-        return mini_batch_map
-
-    @staticmethod
     def extract_large_clusters(cluster_map: ClusterIdType, artifact_df: ArtifactDataFrame, token_limit: int) -> ClusterIdType:
         """
         Extracts clusters in map exceeding
@@ -90,15 +71,36 @@ class StepCreateArtifactBatches(AbstractPipelineStep[SummarizerArgs, SummarizerS
                 large_clusters[cluster_id] = (cluster_artifact_df, n_tokens)
         return large_clusters
 
+    @staticmethod
+    def create_mini_clusters(cluster_map: ClusterIdType, export_dir: Optional[str]) -> ClusterIdType:
+        """
+        Creates mini-clusters for each cluster in map.
+        :param cluster_map: Map of cluster id to cluster to create mini-clusters for.
+        :param export_dir: Path to direction to store state.
+        :return: Map of mini-cluster id to artifacts in mini-cluster.
+        """
+        mini_batch_map = {}
+        for parent_cluster_id, (cluster_artifact_df, cluster_tokens) in cluster_map.items():
+            cluster_export_dir = os.path.join(export_dir, str(parent_cluster_id)) if export_dir else None
+            cluster_mini_batches = StepCreateArtifactBatches._run_clustering_pipeline(cluster_artifact_df,
+                                                                                      cluster_tokens,
+                                                                                      export_dir=cluster_export_dir)
+            cluster_mini_batches = {f"{parent_cluster_id}:{c_id}": c_artifacts
+                                    for c_id, c_artifacts in cluster_mini_batches.items()}
+            mini_batch_map.update(cluster_mini_batches)
+        return mini_batch_map
+
+    @staticmethod
     @nested_pipeline(SummarizerState)
-    def _run_clustering_pipeline(self, dataset: PromptDataset, n_tokens: int, export_dir: str) -> ClusterMapType:
+    def _run_clustering_pipeline(artifact_df: ArtifactDataFrame, n_tokens: int, export_dir: str = None) -> ClusterMapType:
         """
         Runs the clustering pipeline to break the project into clusters.
-        :param dataset: The dataset containing artifacts to cluster.
+        :param artifact_df: The artifacts to cluster.
         :param export_dir: Where to export state to.
         :param n_tokens: The number of tokens in the content of the project.
         :return: The cluster map from the pipeline.
         """
+        dataset = PromptDataset(artifact_df=artifact_df)
         n_artifacts = len(dataset.artifact_df)
         avg_file_size = n_tokens / n_artifacts
         max_cluster_size = round(MAX_TOKENS_FOR_PROJECT_SUMMARY / avg_file_size)

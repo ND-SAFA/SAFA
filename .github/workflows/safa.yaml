@@ -37,7 +37,7 @@ jobs:
     - name: Run Dev-Ops Checks
       run: python3 tgen/tgen/scripts/tools/find_missing_docs.py src/api
       env:
-        ROOT_PATH: /home/runner/work/tgen
+        ROOT_PATH: /home/runner/work/tgen-api/tgen-api/tgen
 
     - name: Run unit tests
       run: |

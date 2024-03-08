@@ -31,6 +31,11 @@ class HGenSerializer(serializers.Serializer):
                                     allow_blank=False)
 
     def create(self, validated_data) -> HGenRequest:
+        """
+        Serializes HGEN request.
+        :param validated_data: The JSON input data.
+        :return: HGEN Request.
+        """
         artifact_serializer = ArtifactSerializer(data=validated_data["artifacts"], many=True)
         artifact_serializer.is_valid(raise_exception=True)
         artifacts = artifact_serializer.save()

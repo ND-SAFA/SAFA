@@ -9,7 +9,11 @@ API_PATH = os.path.join(REPO_PATH, "src")
 TGEN_PATH = os.path.join(REPO_PATH, "tgen")
 
 
-def load_paths():
+def load_source_code_paths() -> None:
+    """
+    Loads both API and TGEN onto the path.
+    :return: None
+    """
     if TGEN_PATH not in sys.path:
         sys.path.append(TGEN_PATH)
     if API_PATH not in sys.path:

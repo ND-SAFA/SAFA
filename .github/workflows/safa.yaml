@@ -10,6 +10,7 @@ on:
     body: /build
 jobs:
   build:
+    name: TGEN API BUILD
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -21,14 +22,23 @@ jobs:
 
     - uses: actions/setup-python@v3
       with:
-        python-version: '3.9'
+        python-version: '3.10'
         cache: 'pip'
+        cache-dependency-path: '**/*-requirements.txt'
+
+    - name: Upgrade Pip
+      run: python -m pip install --upgrade pip
 
     - name: Install Requirements
       run: |
-        python -m pip install --upgrade pip
+        pip3 install -r tgen/requirements/devops-requirements.txt
         pip install -r requirements.txt
         python3 tgen/download_static.py
+
+    - name: Run Dev-Ops Checks
+      run: python3 tgen/tgen/scripts/tools/find_missing_docs.py src/api
+      env:
+        ROOT_PATH: /home/runner/work/tgen-api/tgen-api/tgen
 
     - name: Run unit tests
       run: |

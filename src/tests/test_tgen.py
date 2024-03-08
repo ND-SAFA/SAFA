@@ -9,9 +9,11 @@ from tgen.testres.mocking.test_response_manager import TestAIManager
 class TestTGen(BaseTest):
 
     @mock_anthropic
-    def test_use_case(self, ai_manager: TestAIManager):
+    def test_use_case(self, ai_manager: TestAIManager) -> None:
         """
         Traces between the source and target artifacts of test dataset.
+        :param ai_manager: The AI manages used to mock responses.
+        :return: None
         """
         for sync in [True, False]:
             dataset = TestData.get_dataset(TestSubset.FULL)

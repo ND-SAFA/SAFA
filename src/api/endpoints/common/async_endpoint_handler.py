@@ -1,9 +1,9 @@
 import json
 import threading
-from typing import Any, Callable, Dict, Type
 
 from celery import shared_task
 from django.http import JsonResponse
+from typing import Any, Callable, Dict, Type
 
 from api.endpoints.common.ihandler import IHandler
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
@@ -41,12 +41,23 @@ class AsyncEndpointHandler(IHandler):
         return JsonResponse({"task_id": task_id}, encoder=NpEncoder)
 
     def create_task(self):
+        """
+        :return: reference to celery task function.
+        """
+
         @shared_task(name=self.func.__name__)
         def task(data):
+            """
+            The Celery task responsible for starting job, polling / publishing logs, and saving job output.
+            :param data: The input data to the job.
+            :return:
+            """
             self.is_running = True
             self.pre_process()
             self.poll_job(data)
             self.post_process()
+            if self.exception:
+                raise self.exception
             return self.result["output"]
 
         return task
@@ -54,6 +65,7 @@ class AsyncEndpointHandler(IHandler):
     def poll_job(self, data) -> None:
         """
         Runs the job within a thread using the main thread to update the task logs.
+        :param data: The input data to the job.
         :return: None
         """
         thread = threading.Thread(target=self.run_job, args=[data])
@@ -63,10 +75,11 @@ class AsyncEndpointHandler(IHandler):
             threading.Event().wait(5)
         thread.join()
 
-    def run_job(self, data):
+    def run_job(self, data: Dict) -> None:
         """
-        Runs the
-        :return:
+        Executes job on data. Serializes input data, runs function on data, and stores output.
+        :param data: The input data to the job.
+        :return: None
         """
         try:
             ModelCache.clear()
@@ -81,17 +94,12 @@ class AsyncEndpointHandler(IHandler):
             self.exception = e
         self.is_running = False
 
-    def pre_process(self):
+    def pre_process(self) -> None:
         """
         Creates log capture.
         :return: None
         """
         self.log_capture = LogCapture()
-
-        def remove_handlers(logger):
-            for handler in logger.handlers[:]:
-                logger.removeHandler(handler)
-
         remove_handlers(logger)
         self.log_capture.clear()
 
@@ -115,11 +123,32 @@ class AsyncEndpointHandler(IHandler):
 
     @staticmethod
     def create_receiver(func, serializer):
+        """
+        Creates reference to request handler for a function to perform asyncronously.
+        :param func: The function to perform.
+        :param serializer: The serializer to preprocess input data with.
+        :return: Reference to request handler.
+        """
         handler = AsyncEndpointHandler(func, serializer)
         return lambda r: handler.handle_request(r)
 
     @staticmethod
-    def encode_object(response: Any):
+    def encode_object(response: Any) -> Dict:
+        """
+        Dumps JobOutput into JSON then reloads it so that final content is guranteed to be serializable.
+        :param response: The response to encode into JSON.
+        :return: Response dictionary.
+        """
         response_str = json.dumps(response, cls=NpEncoder)
         response_dict = json.loads(response_str)
         return response_dict
+
+
+def remove_handlers(logger) -> None:
+    """
+    Removes logger handlers.
+    :param logger: The logger to remove handlers from.
+    :return: None
+    """
+    for handler in logger.handlers:
+        logger.removeHandler(handler)

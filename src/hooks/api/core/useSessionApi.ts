@@ -19,6 +19,7 @@ import {
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
+  createAdminPasswordReset,
   createLoginSession,
   createPasswordReset,
   createUser,
@@ -97,6 +98,15 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
 
       passwordSubmitted.value = true;
     });
+  }
+
+  async function handleAdminPasswordReset(email: string): Promise<void> {
+    await sessionApi.handleRequest(
+      async () => createAdminPasswordReset({ email }),
+      {
+        success: "A password reset email has been sent to your admin account.",
+      }
+    );
   }
 
   async function handlePasswordUpdate(
@@ -229,6 +239,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     handleCreateAccount,
     handleVerifyAccount,
     handlePasswordReset,
+    handleAdminPasswordReset,
     handlePasswordUpdate,
     handleLogin,
     handleDemoLogin,

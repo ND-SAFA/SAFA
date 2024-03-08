@@ -68,6 +68,12 @@ export interface SessionApiHook {
    */
   handlePasswordReset(email: string): Promise<void>;
   /**
+   * As an admin, sends a password reset email, for the given account, to the admin's email.
+   *
+   * @param email - The email to reset the password of.
+   */
+  handleAdminPasswordReset(email: string): Promise<void>;
+  /**
    * Attempts to reset a user's password.
    *
    * @param newPassword - The password and token to reset with.

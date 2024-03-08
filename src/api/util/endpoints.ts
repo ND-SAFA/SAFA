@@ -27,6 +27,7 @@ export enum Endpoint {
   verifyAccount = "accounts/verify",
   logout = "logout",
   forgotPassword = "accounts/forgot",
+  forgotPasswordAdmin = "accounts/forgot/no-email",
   resetPassword = "accounts/reset",
   updatePassword = "accounts/change",
   deleteAccount = "accounts/delete",

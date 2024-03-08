@@ -10,6 +10,7 @@ on:
     body: /build
 jobs:
   build:
+    name: TGEN API BUILD
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code

@@ -1,8 +1,8 @@
 import json
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, Type, Union
 
 from django.http import HttpRequest, JsonResponse
+from typing import Callable, Dict, Type, Union
 
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from api.utils.view_util import ViewUtil
@@ -10,7 +10,7 @@ from tgen.common.util.json_util import NpEncoder
 
 
 class IHandler(ABC):
-    def __init__(self, func: Callable, serializer: Type[AbstractSerializer], skip_serialization: bool = False):
+    def __init__(self, func: Callable[[Dict], Dict], serializer: Type[AbstractSerializer], skip_serialization: bool = False):
         """
         Creates endpoint handler with given callable.
         :param func: The function handling incoming request.

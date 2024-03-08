@@ -1,9 +1,9 @@
 import json
 import threading
-from typing import Any, Callable, Dict, Type
 
 from celery import shared_task
 from django.http import JsonResponse
+from typing import Any, Callable, Dict, Type
 
 from api.endpoints.common.ihandler import IHandler
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
@@ -56,6 +56,8 @@ class AsyncEndpointHandler(IHandler):
             self.pre_process()
             self.poll_job(data)
             self.post_process()
+            if self.exception:
+                raise self.exception
             return self.result["output"]
 
         return task
@@ -98,16 +100,6 @@ class AsyncEndpointHandler(IHandler):
         :return: None
         """
         self.log_capture = LogCapture()
-
-        def remove_handlers(logger) -> None:
-            """
-            Removes logger handlers.
-            :param logger: The logger to remove handlers from.
-            :return: None
-            """
-            for handler in logger.handlers[:]:
-                logger.removeHandler(handler)
-
         remove_handlers(logger)
         self.log_capture.clear()
 
@@ -150,3 +142,13 @@ class AsyncEndpointHandler(IHandler):
         response_str = json.dumps(response, cls=NpEncoder)
         response_dict = json.loads(response_str)
         return response_dict
+
+
+def remove_handlers(logger) -> None:
+    """
+    Removes logger handlers.
+    :param logger: The logger to remove handlers from.
+    :return: None
+    """
+    for handler in logger.handlers:
+        logger.removeHandler(handler)

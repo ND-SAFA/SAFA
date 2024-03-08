@@ -38,17 +38,18 @@ class StepCreateArtifactBatches(AbstractPipelineStep[SummarizerArgs, SummarizerS
         :param export_dir: Optional export directory to save state in.
         :return: Final cluster map.
         """
-        is_done = False
         cluster_map = {**initial_cluster_map}
-        while not is_done:
+        while True:
             large_cluster_map = StepCreateArtifactBatches.extract_large_clusters(cluster_map,
                                                                                  artifact_df,
                                                                                  MAX_TOKENS_FOR_PROJECT_SUMMARY)
+            if len(large_cluster_map) == 0:
+                break
+
             for cluster_id, _ in large_cluster_map.items():
                 cluster_map.pop(cluster_id)
-            is_done = len(large_cluster_map) == 0
-            mini_batch_map = StepCreateArtifactBatches.create_mini_clusters(large_cluster_map, export_dir)
-            cluster_map.update(mini_batch_map)
+            large_cluster_mini_batches = StepCreateArtifactBatches.create_mini_clusters(large_cluster_map, export_dir)
+            cluster_map.update(large_cluster_mini_batches)
         return cluster_map
 
     @staticmethod

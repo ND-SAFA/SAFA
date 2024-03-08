@@ -5,7 +5,8 @@ from tgen.clustering.base.cluster_type import ClusterIdType, ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.project_summary_constants import MAX_TOKENS_FOR_PROJECT_SUMMARY
+from tgen.common.constants.project_summary_constants import MAX_ITERATIONS_ALLOWED, MAX_TOKENS_FOR_PROJECT_SUMMARY
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -39,6 +40,7 @@ class StepCreateArtifactBatches(AbstractPipelineStep[SummarizerArgs, SummarizerS
         :return: Final cluster map.
         """
         cluster_map = {**initial_cluster_map}
+        n_iterations = 0
         while True:
             large_cluster_map = StepCreateArtifactBatches.extract_large_clusters(cluster_map,
                                                                                  artifact_df,
@@ -50,6 +52,11 @@ class StepCreateArtifactBatches(AbstractPipelineStep[SummarizerArgs, SummarizerS
                 cluster_map.pop(cluster_id)
             large_cluster_mini_batches = StepCreateArtifactBatches.create_mini_clusters(large_cluster_map, export_dir)
             cluster_map.update(large_cluster_mini_batches)
+            n_iterations += 1
+
+            if n_iterations > MAX_ITERATIONS_ALLOWED:
+                logger.warning("Clustering for project summary has reached the maximum number of iterations")
+                break
         return cluster_map
 
     @staticmethod

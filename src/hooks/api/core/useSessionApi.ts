@@ -100,15 +100,6 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     });
   }
 
-  async function handleAdminPasswordReset(email: string): Promise<void> {
-    await sessionApi.handleRequest(
-      async () => createAdminPasswordReset({ email }),
-      {
-        success: "A password reset email has been sent to your admin account.",
-      }
-    );
-  }
-
   async function handlePasswordUpdate(
     newPassword: string,
     resetToken: string
@@ -239,7 +230,6 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     handleCreateAccount,
     handleVerifyAccount,
     handlePasswordReset,
-    handleAdminPasswordReset,
     handlePasswordUpdate,
     handleLogin,
     handleDemoLogin,

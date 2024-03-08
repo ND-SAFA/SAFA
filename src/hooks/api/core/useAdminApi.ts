@@ -10,6 +10,7 @@ import {
 import { logStore, sessionStore } from "@/hooks";
 import {
   activateSuperuser,
+  createAdminPasswordReset,
   createSuperuser,
   deactivateSuperuser,
   setOrgPaymentTier,
@@ -86,7 +87,21 @@ export const useAdminApi = defineStore("useAdmin", (): AdminApiHook => {
     );
   }
 
-  return { activeSuperuser, enableSuperuser, updatePaymentTier };
+  async function handleAdminPasswordReset(email: string): Promise<void> {
+    await adminApi.handleRequest(
+      async () => createAdminPasswordReset({ email }),
+      {
+        success: "A password reset email has been sent to your admin account.",
+      }
+    );
+  }
+
+  return {
+    activeSuperuser,
+    enableSuperuser,
+    updatePaymentTier,
+    handleAdminPasswordReset,
+  };
 });
 
 export default useAdminApi(pinia);

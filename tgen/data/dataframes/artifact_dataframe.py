@@ -1,6 +1,7 @@
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
@@ -31,7 +32,9 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         if not self.empty and StructuredKeys.Artifact.SUMMARY.value not in self.columns:
             self[StructuredKeys.Artifact.SUMMARY.value] = [self._SUMMARY_DEFAULT for _ in self.index]
         large_file_ids = self.identify_large_files(self)
-        self.drop(index=large_file_ids, inplace=True)
+        if len(large_file_ids) > 0:
+            self.drop(index=large_file_ids, inplace=True)
+            logger.info(f"Files are too large for generations: {large_file_ids}")
 
     @classmethod
     def index_name(cls) -> str:

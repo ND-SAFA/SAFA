@@ -1,5 +1,6 @@
 from typing import Any, Dict, Set
 
+from tgen.common.constants.project_summary_constants import MAX_NL_SIZE_BEFORE_SUMMARIZATION
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.models.tokens.token_calculator import TokenCalculator
@@ -47,4 +48,4 @@ class SummarizerUtil:
         :return: Whether content is above limit.
         """
         n_tokens = TokenCalculator.estimate_num_tokens(content)
-        return n_tokens > 60_000
+        return n_tokens > MAX_NL_SIZE_BEFORE_SUMMARIZATION

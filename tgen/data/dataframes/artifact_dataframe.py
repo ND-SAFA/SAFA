@@ -1,5 +1,6 @@
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
 
+from tgen.common.constants.anthropic_constants import ANTHROPIC_MAX_MODEL_TOKENS
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
@@ -256,6 +257,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
             a_id = artifact[ArtifactKeys.ID]
             artifact_content = artifact[ArtifactKeys.CONTENT]
             n_tokens = TokenCalculator.estimate_num_tokens(artifact_content)
-            if n_tokens > 100_000:
+            if n_tokens > ANTHROPIC_MAX_MODEL_TOKENS:
                 large_file_ids.add(a_id)
         return large_file_ids

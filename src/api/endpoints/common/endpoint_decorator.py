@@ -42,7 +42,7 @@ def endpoint_get(func) -> Callable:
     :return: Reference to decorated function
     """
 
-    def dec():
+    def dec(*args, **kwargs):
         """
         Creates a GET class decorator for function.
         :return: The class decorator

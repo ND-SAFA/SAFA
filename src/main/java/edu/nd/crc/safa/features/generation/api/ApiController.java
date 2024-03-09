@@ -63,7 +63,9 @@ public class ApiController {
             taskHandler.handleTask(task);
             TGenStatus status = task.getStatus();
             if (status.getStatus().hasFailed()) {
-                throw new SafaError(status.getMessage());
+                String message = status.getMessage();
+                message = message == null ? "Unknown GEN error occurred. Likely OOM." : message;
+                throw new SafaError(message);
             }
             return status.getStatus().hasCompleted();
         }, timeout, waitTime);

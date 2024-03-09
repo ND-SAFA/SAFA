@@ -1,9 +1,9 @@
 import json
 import threading
+from typing import Any, Callable, Dict, Type
 
 from celery import shared_task
 from django.http import JsonResponse
-from typing import Any, Callable, Dict, Type
 
 from api.endpoints.common.ihandler import IHandler
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
@@ -92,6 +92,7 @@ class AsyncEndpointHandler(IHandler):
             logger.exception(e)
             self.is_success = False
             self.exception = e
+        ModelCache.clear()
         self.is_running = False
 
     def pre_process(self) -> None:

@@ -69,7 +69,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         :param dataset: The original dataset (possible without summaries)
         :return: The summarized dataset
         """
-        if dataset.artifact_df is not None and not dataset.artifact_df.is_summarized(code_only=True):
+        if dataset.artifact_df is not None and not dataset.artifact_df.is_summarized(code_or_above_limit_only=True):
             summarizer = ArtifactsSummarizer(summarize_code_only=True,
                                              project_summary=dataset.project_summary)
             dataset.artifact_df.summarize_content(summarizer)  # summarize any artifacts that were not in existing summaries

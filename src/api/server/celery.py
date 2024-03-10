@@ -16,7 +16,8 @@ if "BROKER_USERNAME" in os.environ:
     CELERY_BROKER_URL = os.environ["BROKER_URL"]
 
     celery = Celery('server',
-                    broker=CELERY_BROKER_URL)
+                    broker=CELERY_BROKER_URL,
+                    broker_connection_retry_on_startup=True)
     celery.conf.broker_user = BROKER_USERNAME
     celery.conf.broker_password = BROKER_PASSWORD
 

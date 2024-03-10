@@ -21,6 +21,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The original dataset and a dataset with only the source layer
         """
         original_dataset_complete = args.dataset
+        args.dataset.artifact_df.drop_large_files()
         PipelineUtil.save_dataset_checkpoint(original_dataset_complete, state.export_dir, filename="initial_dataset_with_sources")
 
         seed_artifacts = self.get_seed_artifacts(args, state)

@@ -18,6 +18,7 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         :return: None
         """
         artifact_df = state.dataset.artifact_df
+        artifact_df.drop_large_files()
         should_filter = args.include_subset_by_type or args.include_subset_by_dir
         indices2remove = StepFilterDataset.identify_indices_with_duplicate_content(artifact_df)
         if should_filter:

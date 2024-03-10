@@ -1,6 +1,8 @@
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
 
+from tgen.common.constants.anthropic_constants import ANTHROPIC_MAX_MODEL_TOKENS
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
@@ -8,7 +10,9 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
+from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.summarizer_util import SummarizerUtil
 
 
 class ArtifactDataFrame(AbstractProjectDataFrame):
@@ -28,6 +32,10 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         super().process_data()
         if not self.empty and StructuredKeys.Artifact.SUMMARY.value not in self.columns:
             self[StructuredKeys.Artifact.SUMMARY.value] = [self._SUMMARY_DEFAULT for _ in self.index]
+        large_file_ids = self.identify_large_files(self)
+        if len(large_file_ids) > 0:
+            self.drop(index=large_file_ids, inplace=True)
+            logger.info(f"Files are too large for generations: {large_file_ids}")
 
     @classmethod
     def index_name(cls) -> str:
@@ -176,7 +184,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :param re_summarize: True if old summaries should be replaced
         :return: The summaries
         """
-        if re_summarize or not self.is_summarized(code_only=summarizer.code_or_above_limit_only):
+        if re_summarize or not self.is_summarized(code_or_above_limit_only=summarizer.code_or_above_limit_only):
             missing_all = self[ArtifactKeys.SUMMARY].isna().all() or re_summarize
             if missing_all:
                 summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
@@ -187,14 +195,14 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 self.update_values(ArtifactKeys.SUMMARY, ids, summaries)
         return self[ArtifactKeys.SUMMARY]
 
-    def is_summarized(self, layer_ids: Union[str, Iterable[str]] = None, code_only: bool = False) -> bool:
+    def is_summarized(self, layer_ids: Union[str, Iterable[str]] = None, code_or_above_limit_only: bool = False) -> bool:
         """
         Checks if the artifacts (or artifacts in given layer) are summarized
         :param layer_ids: The layer to check if it is summarized
-        :param code_only: If True, only checks that artifacts that are code are summarized
+        :param code_or_above_limit_only: If True, only checks that code artifacts are summarized.
         :return: True if the artifacts (or artifacts in given layer) are summarized
         """
-        if not layer_ids and code_only:
+        if not layer_ids and code_or_above_limit_only:
             layer_ids = self.get_code_layers()
         if not isinstance(layer_ids, set):
             layer_ids = set(layer_ids) if isinstance(layer_ids, list) else {layer_ids}
@@ -202,8 +210,14 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
             df = self if layer_id is None else self.get_artifacts_by_type(layer_id)
             summaries = df[ArtifactKeys.SUMMARY.value]
             missing_summaries = [self.get_row(i)[ArtifactKeys.ID] for i in DataFrameUtil.find_nan_empty_indices(summaries)]
-            missing_summaries = [a_id for a_id in missing_summaries if FileUtil.is_code(a_id) or not code_only]
+            missing_summaries = [a_id for a_id in missing_summaries if FileUtil.is_code(a_id) or not code_or_above_limit_only]
             if len(missing_summaries) > 0:
+                return False
+
+        for artifact in self.to_artifacts():
+            artifact_content = artifact[ArtifactKeys.CONTENT]
+            has_summary = isinstance(artifact[ArtifactKeys.SUMMARY], str)
+            if SummarizerUtil.is_above_limit(artifact_content) and not has_summary:
                 return False
         return True
 
@@ -230,3 +244,19 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 ids.append(i)
                 content.append(artifact[ArtifactKeys.CONTENT])
         return ids, content
+
+    @staticmethod
+    def identify_large_files(artifact_df: "ArtifactDataFrame") -> Set[int]:
+        """
+        Identifies and removes files from project that are too large for current models.
+        :param artifact_df: The artifact data frame to filter.
+        :return: Indices of files extending beyond model limit.
+        """
+        large_file_ids = set()
+        for artifact in artifact_df.to_artifacts():
+            a_id = artifact[ArtifactKeys.ID]
+            artifact_content = artifact[ArtifactKeys.CONTENT]
+            n_tokens = TokenCalculator.estimate_num_tokens(artifact_content)
+            if n_tokens > ANTHROPIC_MAX_MODEL_TOKENS:
+                large_file_ids.add(a_id)
+        return large_file_ids

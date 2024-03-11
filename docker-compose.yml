@@ -19,6 +19,8 @@ services:
     - BROKER_URL=amqp://guest:guest@rabbitmq/tgen_vhost
     - BROKER_USERNAME=guest
     - BROKER_PASSWORD=guest
+    - DEBUG=true
+    - ENV_MODE=local
 
   rabbitmq:
     container_name: rabbitmq

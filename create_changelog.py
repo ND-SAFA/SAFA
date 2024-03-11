@@ -1,7 +1,10 @@
 import os
 import subprocess
+import sys
 
 from packaging import version
+
+sys.path.append("../tgen")
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil

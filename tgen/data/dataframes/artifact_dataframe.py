@@ -32,10 +32,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         super().process_data()
         if not self.empty and StructuredKeys.Artifact.SUMMARY.value not in self.columns:
             self[StructuredKeys.Artifact.SUMMARY.value] = [self._SUMMARY_DEFAULT for _ in self.index]
-        large_file_ids = self.identify_large_files(self)
-        if len(large_file_ids) > 0:
-            self.drop(index=large_file_ids, inplace=True)
-            logger.info(f"Files are too large for generations: {large_file_ids}")
 
     @classmethod
     def index_name(cls) -> str:
@@ -244,6 +240,16 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 ids.append(i)
                 content.append(artifact[ArtifactKeys.CONTENT])
         return ids, content
+
+    def drop_large_files(self) -> None:
+        """
+        Removes files that are too large for prompt from data frame.
+        :return: None
+        """
+        large_file_ids = self.identify_large_files(self)
+        if len(large_file_ids) > 0:
+            self.drop(index=large_file_ids, inplace=True)
+            logger.info(f"Files are too large for generations: {large_file_ids}")
 
     @staticmethod
     def identify_large_files(artifact_df: "ArtifactDataFrame") -> Set[int]:

@@ -177,7 +177,7 @@ class ListUtil:
             return all([item1 == item2 for item1 in list_ for item2 in list_])
 
     @staticmethod
-    def add_if_exists(base_items: List[Any], new_possible_item: Optional[Any], as_new_list: bool = False) -> List[Any]:
+    def append_if_exists(base_items: List[Any], new_possible_item: Optional[Any], as_new_list: bool = False) -> List[Any]:
         """
         Appends new item to list if it exists.
         :param base_items: The base list to append to.
@@ -186,7 +186,7 @@ class ListUtil:
         :return: List of items which new item appended if it existed.
         """
         if as_new_list:
-            base_items = [*base_items]
+            base_items = [b for b in base_items]
         if new_possible_item:
-            base_items.append(base_items)
+            base_items.append(new_possible_item)
         return base_items

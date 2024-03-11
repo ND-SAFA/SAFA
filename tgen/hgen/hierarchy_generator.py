@@ -51,7 +51,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         summarizer_args = SummarizerArgs(
             summarize_code_only=True,
             do_resummarize_artifacts=False,
-            project_summary_sections=ListUtil.add_if_exists(
+            project_summary_sections=ListUtil.append_if_exists(
                 self.PROJECT_SUMMARY_SECTIONS,
                 args.seed_project_summary_section,
                 as_new_list=True

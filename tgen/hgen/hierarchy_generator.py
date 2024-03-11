@@ -1,4 +1,4 @@
-from typing import Dict, Type
+from typing import Dict, List, Type
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.pipeline_util import PipelineUtil
@@ -50,7 +50,7 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         summarizer_args = SummarizerArgs(
             summarize_code_only=True,
             do_resummarize_artifacts=False,
-            project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
+            project_summary_sections=self.get_project_summary_sections(args, self.PROJECT_SUMMARY_SECTIONS),
         )
         super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
@@ -79,7 +79,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         :return: Path to exported dataset of generated artifacts
         """
         super().run(**kwargs)
-
         dataset = self.state.final_dataset
         assert dataset is not None, f"Final dataset is not set."
         save_path = PipelineUtil.save_dataset_checkpoint(dataset, self.args.export_dir, filename=SAVE_DATASET_DIRNAME)
@@ -93,3 +92,15 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         """
         return {"N Input Artifact": len(self.state.source_dataset.artifact_df),
                 "N Output Artifacts": len(self.state.refined_content)}
+
+    @staticmethod
+    def get_project_summary_sections(hgen_args: HGenArgs, default_sections: List[str]) -> List[str]:
+        """
+        Returns project summary sections needed for HGEN run.
+        :param hgen_args: Hierarchy generator configuration.
+        :return: List of sections to generate.
+        """
+        project_summary_sections = default_sections
+        if hgen_args.seed_project_summary_section:
+            project_summary_sections.append(hgen_args.seed_project_summary_section)
+        return project_summary_sections

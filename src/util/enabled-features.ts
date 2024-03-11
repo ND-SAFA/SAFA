@@ -10,5 +10,5 @@ export const ENABLED_FEATURES = {
 
   ONBOARDING_PUBLIC_REPOS: false,
 
-  SIGN_UP: false,
+  SIGN_UP: true,
 };

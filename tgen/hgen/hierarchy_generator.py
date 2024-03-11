@@ -1,6 +1,7 @@
-from typing import Dict, List, Type
+from typing import Dict, Type
 
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -50,7 +51,11 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         summarizer_args = SummarizerArgs(
             summarize_code_only=True,
             do_resummarize_artifacts=False,
-            project_summary_sections=self.get_project_summary_sections(args, self.PROJECT_SUMMARY_SECTIONS),
+            project_summary_sections=ListUtil.add_if_exists(
+                self.PROJECT_SUMMARY_SECTIONS,
+                args.seed_project_summary_section,
+                as_new_list=True
+            )
         )
         super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
@@ -92,15 +97,3 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         """
         return {"N Input Artifact": len(self.state.source_dataset.artifact_df),
                 "N Output Artifacts": len(self.state.refined_content)}
-
-    @staticmethod
-    def get_project_summary_sections(hgen_args: HGenArgs, default_sections: List[str]) -> List[str]:
-        """
-        Returns project summary sections needed for HGEN run.
-        :param hgen_args: Hierarchy generator configuration.
-        :return: List of sections to generate.
-        """
-        project_summary_sections = default_sections
-        if hgen_args.seed_project_summary_section:
-            project_summary_sections.append(hgen_args.seed_project_summary_section)
-        return project_summary_sections

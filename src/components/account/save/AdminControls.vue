@@ -49,6 +49,17 @@
         @click="handleEnableGeneration"
       />
     </expansion-item>
+    <expansion-item label="Reset Password">
+      <text-input v-model="adminResetEmail" label="Email" />
+      <text-button
+        block
+        outlined
+        color="primary"
+        label="Reset Password"
+        icon="redo"
+        @click="handleResetPassword"
+      />
+    </expansion-item>
   </panel-card>
 </template>
 
@@ -81,6 +92,7 @@ import SelectInput from "@/components/common/input/SelectInput.vue";
 const adminCreateEmail = ref("");
 const adminCreatePassword = ref("");
 const adminSuperuserEmail = ref("");
+const adminResetEmail = ref("");
 
 /**
  * As an admin, creates a pre-verified account.
@@ -109,5 +121,12 @@ function handleAdminSuperuser() {
  */
 function handleEnableGeneration() {
   adminApiStore.updatePaymentTier(orgStore.org, "RECURRING");
+}
+
+/**
+ * As an admin, resets the password of the given account.
+ */
+function handleResetPassword() {
+  adminApiStore.handleAdminPasswordReset(adminResetEmail.value);
 }
 </script>

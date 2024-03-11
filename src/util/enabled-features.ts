@@ -9,4 +9,6 @@ export const ENABLED_FEATURES = {
   TRACE_MATRIX_TABLE: false,
 
   ONBOARDING_PUBLIC_REPOS: false,
+
+  SIGN_UP: true,
 };

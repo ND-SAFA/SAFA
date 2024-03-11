@@ -94,6 +94,21 @@ export async function createPasswordReset(
 }
 
 /**
+ * Requests to reset the password of the given user.
+ * - This is a special case for admin users.
+ * - The reset email is not sent to the user, but to the admin.
+ *
+ * @param user - The user to reset.
+ */
+export async function createAdminPasswordReset(
+  user: UserResetSchema
+): Promise<void> {
+  await buildRequest<void, string, UserResetSchema>("forgotPasswordAdmin").put(
+    user
+  );
+}
+
+/**
  * Requests to update a user's reset password.
  *
  * @param password - The password change information.

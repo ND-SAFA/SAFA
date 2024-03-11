@@ -26,4 +26,11 @@ export interface AdminApiHook {
     org: OrganizationSchema,
     tier: OrgPaymentTier
   ): Promise<void>;
+
+  /**
+   * As an admin, sends a password reset email, for the given account, to the admin's email.
+   *
+   * @param email - The email to reset the password of.
+   */
+  handleAdminPasswordReset(email: string): Promise<void>;
 }

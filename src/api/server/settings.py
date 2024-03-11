@@ -129,7 +129,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-logger.info(f"Static root path:{STATIC_ROOT}")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -143,7 +142,6 @@ CORS_ALLOWED_ORIGINS = [
     "https://dev.bend.safa.ai"
 ]
 ENV_NAME = os.environ.get("ENV_MODE", "development")
-logger.info(f"Environment: {ENV_NAME}")
 
 # Request Encoder/Decoer
 register('NpEncoder',
@@ -162,9 +160,9 @@ CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
 CELERYD_HIJACK_ROOT_LOGGER = False
 CELERY_TASK_ALWAYS_EAGER = ENV_NAME.lower() == "test"
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
-if CELERY_TASK_ALWAYS_EAGER:
-    logger.info("Running in EAGER mode.")
-DEBUG = CELERY_TASK_ALWAYS_EAGER
+
+DEBUG = True if "DEBUG" in os.environ else CELERY_TASK_ALWAYS_EAGER
+
 DATA_UPLOAD_MAX_MEMORY_SIZE = 25_000_000
 CELERY_ACCEPT_CONTENT = ['NpEncoder']
 CELERY_TASK_SERIALIZER = 'NpEncoder'
@@ -188,3 +186,10 @@ S3 Backend uses os.path.join on the bucket name, however, bucket name is in byte
 Therefore, to not have to re-write the s3 backend we are converting to bytes here since it is directly used without modification
 in their code.
 """
+if DEBUG:
+    BAR = "-" * 25
+    logger.info(f"{BAR}\tSystem Information\t{BAR}")
+    logger.info("Running in debug mode.")
+    logger.info(f"CELERY_TASK_ALWAYS_EAGER: {CELERY_TASK_ALWAYS_EAGER}")
+    logger.info(f"Environment: {ENV_NAME}")
+    logger.info(f"Static root path:{STATIC_ROOT}")

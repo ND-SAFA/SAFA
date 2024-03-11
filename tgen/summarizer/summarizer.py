@@ -39,6 +39,7 @@ class Summarizer(AbstractPipeline):
         :return: A dataset containing the summarized artifacts and project
         """
         self.state.dataset = self.dataset if self.state.dataset is None else self.state.dataset
+        self.state.dataset.artifact_df.drop_large_files()
         if not SummarizerUtil.needs_project_summary(self.state.dataset.project_summary, self.args) or self.args.no_project_summary:
             if self.args.do_resummarize_artifacts \
                     or not self.state.dataset.artifact_df.is_summarized(code_or_above_limit_only=self.args.summarize_code_only):

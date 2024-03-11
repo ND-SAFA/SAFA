@@ -1,4 +1,4 @@
-from typing import Iterable, List, Tuple, Union, Any
+from typing import Any, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -175,3 +175,18 @@ class ListUtil:
             return len(set(list_)) == 1
         except TypeError:  # not hashable
             return all([item1 == item2 for item1 in list_ for item2 in list_])
+
+    @staticmethod
+    def add_if_exists(base_items: List[Any], new_possible_item: Optional[Any], as_new_list: bool = False) -> List[Any]:
+        """
+        Appends new item to list if it exists.
+        :param base_items: The base list to append to.
+        :param new_possible_item: The possible item to add to list.
+        :param as_new_list: Whether to create a new list, leaving the original list unaffected.
+        :return: List of items which new item appended if it existed.
+        """
+        if as_new_list:
+            base_items = [*base_items]
+        if new_possible_item:
+            base_items.append(base_items)
+        return base_items

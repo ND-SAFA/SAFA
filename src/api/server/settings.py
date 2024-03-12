@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # TGEN Configuration
-anthropic_constants.ANTHROPIC_MAX_THREADS = 10
+anthropic_constants.ANTHROPIC_MAX_THREADS = os.environ.get("MAX_THREADS", 10)
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -142,17 +142,21 @@ CORS_ALLOWED_ORIGINS = [
     "https://dev.bend.safa.ai"
 ]
 ENV_NAME = os.environ.get("ENV_MODE", "development")
-
+FAILURE_PATHS = {"test": "~/desktop"}
+ENV_FAILURE_PATH = FAILURE_PATHS.get(ENV_NAME, "/")
 # Request Encoder/Decoer
 register('NpEncoder',
          encoder=lambda obj: json.dumps(obj, cls=NpEncoder),
          decoder=lambda obj: json.loads(obj),
          content_type='application/x-myjson',
          content_encoding='utf-8')
+"""
+Celery Configuration Options
 
-# Celery Configuration Options
-# https://docs.celeryq.dev/en/stable/index.html
-# TODO: broker_connection_retry_on_startup needs to be set
+https://docs.celeryq.dev/en/stable/index.html
+TODO: broker_connection_retry_on_startup needs to be set
+"""
+
 CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'  # 'api.celery.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
@@ -192,4 +196,5 @@ if DEBUG:
     logger.info("Running in debug mode.")
     logger.info(f"CELERY_TASK_ALWAYS_EAGER: {CELERY_TASK_ALWAYS_EAGER}")
     logger.info(f"Environment: {ENV_NAME}")
-    logger.info(f"Static root path:{STATIC_ROOT}")
+    logger.info(f"Static root path: {STATIC_ROOT}")
+    logger.info(f"Failure Path: {ENV_FAILURE_PATH}")

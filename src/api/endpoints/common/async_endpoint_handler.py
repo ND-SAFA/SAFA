@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Type
 from celery import shared_task
 from django.http import JsonResponse
 
+from api.constants.config import get_current_version
 from api.endpoints.common.ihandler import IHandler
 from api.endpoints.serializers.abstract_serializer import AbstractSerializer
 from tgen.common.logging.log_capture import LogCapture
@@ -52,6 +53,7 @@ class AsyncEndpointHandler(IHandler):
             :param data: The input data to the job.
             :return:
             """
+            logger.info(f"Welcome to GEN @ {get_current_version()}")
             self.is_running = True
             self.pre_process()
             self.poll_job(data)

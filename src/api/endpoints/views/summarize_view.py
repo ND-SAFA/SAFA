@@ -6,14 +6,14 @@ from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
 
 
-def perform_summarize_request(data: SummarizeRequest) -> SummaryResponse:
+def perform_summarize_request(data: SummarizeRequest, **kwargs) -> SummaryResponse:
     """
     Performs artifact summarization.
     :param data: Serialized data.
     :return: The same artifacts with content as summary.
     """
     dataset_creator = create_api_dataset(data.artifacts, project_summary=data.project_summary)
-    summarize_job = SummarizeJob(dataset_creator=dataset_creator)
+    summarize_job = SummarizeJob(dataset_creator=dataset_creator, **kwargs)
     summary_response = ViewUtil.run_job(summarize_job)
     return summary_response
 
@@ -25,7 +25,7 @@ def perform_summarization_sync(request_data: SummarizeRequest):
     :param request_data: The data containing dataset to summarize.
     :return: Summary output.
     """
-    return perform_summarize_request(request_data)
+    return perform_summarize_request(request_data, project_summary_sections=[])
 
 
 @endpoint(SummarizeSerializer, is_async=True)

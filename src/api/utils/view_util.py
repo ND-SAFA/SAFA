@@ -1,5 +1,5 @@
 import json
-from typing import Any, Type
+from typing import Any, Callable, Type
 from uuid import UUID
 
 from django.http import HttpRequest
@@ -15,16 +15,19 @@ class ViewUtil:
     """
 
     @staticmethod
-    def run_job(abstract_job: AbstractJob):
+    def run_job(abstract_job: AbstractJob, on_failure: Callable = None):
         """
         Runs job and performs error handling.
         :param abstract_job: The job to run.
+        :param on_failure: Callback called after failure has occurred and job has been stopped.
         :return: The result of the job.
         """
         job_result = abstract_job.run()
         job_status = job_result.status
         job_result = job_result.to_json(as_dict=True)
         if job_status == Status.FAILURE:
+            if on_failure:
+                on_failure()
             raise Exception(job_result["body"])
         job_body = job_result["body"]
         return job_body

@@ -59,6 +59,7 @@ public class FileUtilities {
             + "htm,"
             + "html,"
             + "hxx,"
+            + "ipynb,"
             + "java,"
             + "js,"
             + "json,"

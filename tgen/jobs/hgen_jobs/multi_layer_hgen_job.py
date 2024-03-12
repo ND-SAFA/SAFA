@@ -46,16 +46,16 @@ class MultiLayerHGenJob(AbstractJob):
         last_index = len(self.target_types) - 1
         add_seeds_as_artifacts = self.starting_hgen_job.hgen_args.add_seeds_as_artifacts
 
-        target_types = [None, *self.target_types]
+        global_target_types = [None, *self.target_types]
         res_body = None
         current_job = None
-        for i, target_type in enumerate(target_types):
+        for i, target_type in enumerate(global_target_types):
             if i == 0:
                 assert target_type is None
                 current_job = self.starting_hgen_job
             else:
                 current_job.hgen_args.add_seeds_as_artifacts = add_seeds_as_artifacts if i == last_index else False
-                target_type = self.target_types[i]
+                target_type = global_target_types[i]
                 current_job = self.get_next_hgen_job(current_job, target_type)
 
             res = current_job.run()

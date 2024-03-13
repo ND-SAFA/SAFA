@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class ArtifactSummaryApi {
-    private static final int SUMMARY_ARTIFACT_THRESHOLD = 50;
+    private static final int SUMMARY_ARTIFACT_THRESHOLD = 1;
     private final ApiController apiController;
     private final RequestService requestService;
 

@@ -268,7 +268,7 @@ export const transactionsColumns: TableColumn<TransactionSchema>[] = [
     field: (row) => row.status,
   },
   {
-    label: "Cost",
+    label: "Amount",
     name: "amount",
     align: "right",
     field: (row) => `$${row.amount}`,

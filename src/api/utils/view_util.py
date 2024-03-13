@@ -44,7 +44,7 @@ class ViewUtil:
         serializer = serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
-        return obj
+        return obj, data
 
     @staticmethod
     def is_uuid(model_id: str, version=4) -> bool:

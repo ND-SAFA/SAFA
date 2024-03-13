@@ -4,6 +4,7 @@ from typing import Callable, Dict, Type, Union
 
 from django.http import HttpRequest, JsonResponse
 
+from api.endpoints.auth_view import authorize_request
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.utils.view_util import ViewUtil
 from tgen.common.util.json_util import NpEncoder
@@ -35,11 +36,14 @@ class IHandler(ABC):
         :param request: The request to handle.
         :return: The response of the endpoint.
         """
-        data = ViewUtil.read_request(request, self.serializer)
+        serialized_data, raw_data = ViewUtil.read_request(request, self.serializer)
+        error = authorize_request(request, raw_data)
+        if error:
+            return JsonResponse({'error': str(error)}, status=400)
         if self.skip_serialization:
-            data = json.loads(request.body)  # will re-serialize but make sure serializer passes before starting job
+            serialized_data = json.loads(request.body)  # will re-serialize but make sure serializer passes before starting job
 
-        response = self._request_handler(data)
+        response = self._request_handler(serialized_data)
         if isinstance(response, JsonResponse):
             return response
         return JsonResponse(response, encoder=NpEncoder, safe=False)

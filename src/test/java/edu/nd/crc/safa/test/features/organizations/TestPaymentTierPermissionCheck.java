@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.summary.ProjectSummaryService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;

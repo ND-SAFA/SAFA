@@ -10,7 +10,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.summary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.summary.SummarizeArtifactRequestDTO;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -79,7 +79,8 @@ public class TestMaxGenerationArtifacts extends ApplicationBaseTest {
 
         return SafaRequest.withRoute(AppRoutes.Summarize.SUMMARIZE_ARTIFACTS)
             .withVersion(projectVersion)
-            .postAndParseResponse(body, new TypeReference<>(){});
+            .postAndParseResponse(body, new TypeReference<>() {
+            });
     }
 
     private JSONObject doFailedGeneration() {

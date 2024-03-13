@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.generation.api;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +21,8 @@ import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
 @Service
-public class ApiController {
+public class GenApiController {
+    private static final String GEN_COOKIE_KEY = "GEN_KEY";
     private static final int WAIT_SECONDS = 5;
     private static final int HOURS = 3600;
     private static final int MAX_DURATION = 4 * HOURS; // 4 hours
@@ -40,12 +43,30 @@ public class ApiController {
                                                   Object payload,
                                                   Class<T> responseClass,
                                                   JobLogger logger) {
-        TGenTask<T> task = this.requestService.sendPost(endpoint, payload, TGenTask.class);
+        TGenTask<T> task = sendGenRequest(endpoint, payload, TGenTask.class);
         task.setResponseClass(responseClass);
         setTaskId(logger, task.getTaskId());
         T result = pollTGenTask(task, t -> writeLogs(logger, t), MAX_DURATION, WAIT_SECONDS);
         setTaskId(logger, null);
         return result;
+    }
+
+    /**
+     * Sends authenticated request to GEN api.
+     *
+     * @param endpoint      The GEN endpoint.
+     * @param payload       The payload to endpoint.
+     * @param responseClass The response class to serialize output into.
+     * @param <T>           Type of response class.
+     * @return Serialized data.
+     */
+    public <T> T sendGenRequest(String endpoint,
+                                Object payload,
+                                Class<T> responseClass) {
+        // Step - Send request
+        Map<String, String> cookies = new HashMap<>();
+        cookies.put(GEN_COOKIE_KEY, TGenConfig.get().getGenKey());
+        return this.requestService.sendPost(endpoint, payload, cookies, responseClass);
     }
 
     /**
@@ -82,7 +103,7 @@ public class ApiController {
      */
     private <T> T getJobResult(TGenTask<T> task, Class<T> responseClass) {
         String resultEndpoint = TGenConfig.getEndpoint("results");
-        return this.requestService.sendPost(resultEndpoint, task, responseClass);
+        return this.sendGenRequest(resultEndpoint, task, responseClass);
     }
 
     /**
@@ -117,7 +138,7 @@ public class ApiController {
      */
     private void updateTaskStatus(TGenTask task) {
         String statusEndpoint = TGenConfig.getEndpoint("status");
-        TGenStatus tGenStatus = this.requestService.sendPost(statusEndpoint, task, TGenStatus.class);
+        TGenStatus tGenStatus = this.sendGenRequest(statusEndpoint, task, TGenStatus.class);
 
         if (tGenStatus.getStatus().hasFailed()) {
             throw new SafaError(tGenStatus.getMessage());
@@ -186,4 +207,5 @@ public class ApiController {
             this.jobService.setJobTask(logger.getJob(), taskID);
         }
     }
+
 }

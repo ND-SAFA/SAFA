@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class GenerateLinksApi {
-    private final ApiController apiController;
+    private final GenApiController genApiController;
 
     /**
      * Generates links using a deep learning model starting at a given state.
@@ -46,9 +46,9 @@ public class GenerateLinksApi {
     private TGenResponse sendTraceLinkRequest(TGenRequest payload, JobLogger logger) {
         String predictEndpoint;
         int candidates = payload.getDataset().getNumOfCandidates();
-        apiController.log(logger, String.format("Number of candidates: %s", candidates));
+        genApiController.log(logger, String.format("Number of candidates: %s", candidates));
         predictEndpoint = TGenConfig.getEndpoint("tgen");
-        return apiController.performJob(predictEndpoint, payload, TGenResponse.class, logger);
+        return genApiController.performJob(predictEndpoint, payload, TGenResponse.class, logger);
     }
 
     /**

@@ -15,7 +15,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class GenArtifactSummaryRequest {
+public class SummaryRequest {
     /**
      * The artifacts to summarize.
      */
@@ -27,7 +27,7 @@ public class GenArtifactSummaryRequest {
     @Nullable
     private String projectSummary = null;
 
-    public GenArtifactSummaryRequest(List<GenerationArtifact> artifacts) {
+    public SummaryRequest(List<GenerationArtifact> artifacts) {
         this.artifacts = artifacts;
     }
 }

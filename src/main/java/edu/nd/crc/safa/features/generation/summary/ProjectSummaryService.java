@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.generation.projectsummary;
+package edu.nd.crc.safa.features.generation.summary;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,6 @@ import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
-import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -54,7 +53,7 @@ public class ProjectSummaryService {
                 summaryService.addSummariesToCode(artifacts, projectSummary, logger);
             }
         } else {
-            ProjectSummaryResponse summarizationResponse = this.summarizeProject(artifacts, logger);
+            SummaryResponse summarizationResponse = this.summarizeProject(artifacts, logger);
 
             // Save project summary
             projectSummary = summarizationResponse.getSummary();
@@ -73,11 +72,14 @@ public class ProjectSummaryService {
      * @param jobLogger Optional. Job logger to store logs under.
      * @return The project summary.
      */
-    public ProjectSummaryResponse summarizeProject(List<ArtifactAppEntity> artifacts,
-                                                   JobLogger jobLogger) {
+    public SummaryResponse summarizeProject(List<ArtifactAppEntity> artifacts,
+                                            JobLogger jobLogger) {
         artifacts = artifacts.stream().filter(a -> a.getTraceString().length() > 0).collect(Collectors.toList());
-        ProjectSummaryRequest request = new ProjectSummaryRequest(artifacts.stream().map(GenerationArtifact::new)
-            .collect(Collectors.toList()));
+        List<GenerationArtifact> generationArtifacts = artifacts
+            .stream()
+            .map(GenerationArtifact::new)
+            .collect(Collectors.toList());
+        SummaryRequest request = new SummaryRequest(generationArtifacts);
         return this.genApi.generateProjectSummary(request, jobLogger);
     }
 
@@ -93,7 +95,7 @@ public class ProjectSummaryService {
     private void saveArtifactSummaries(SafaUser user,
                                        ProjectVersion projectVersion,
                                        List<ArtifactAppEntity> artifacts,
-                                       ProjectSummaryResponse summarizationResponse,
+                                       SummaryResponse summarizationResponse,
                                        JobLogger logger) {
         Map<String, ArtifactAppEntity> artifactMap = ProjectDataStructures.createArtifactNameMap(artifacts);
         List<GenerationArtifact> summarizedArtifacts = summarizationResponse.getArtifacts();

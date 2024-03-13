@@ -6,7 +6,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryResponse;
+import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.AbstractRemoteApiTest;
@@ -52,7 +52,7 @@ public abstract class GenerationalTest extends AbstractRemoteApiTest<TGenMockSer
     protected void mockProjectSummaryResponse(String projectSummary) {
         List<GenerationArtifact> artifacts = asGenArtifacts(this);
         GenTestService.addSummaries(artifacts);
-        ProjectSummaryResponse projectSummaryResponse = GenTestService.createProjectSummaryResponse(
+        SummaryResponse projectSummaryResponse = GenTestService.createProjectSummaryResponse(
             projectSummary,
             artifacts);
         getServer().setJobResponse(projectSummaryResponse);

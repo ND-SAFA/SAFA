@@ -47,7 +47,7 @@ public class SummaryService {
             request.getArtifacts());
         List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new)
             .collect(Collectors.toList());
-        GenArtifactSummaryRequest tgenRequest = new GenArtifactSummaryRequest(generationArtifacts,
+        SummaryRequest tgenRequest = new SummaryRequest(generationArtifacts,
             request.getProjectSummary());
         return performGenArtifactSummaryRequest(tgenRequest, jobLogger);
     }
@@ -89,7 +89,7 @@ public class SummaryService {
             .stream()
             .map(GenerationArtifact::new)
             .collect(Collectors.toList());
-        GenArtifactSummaryRequest request = new GenArtifactSummaryRequest(generationArtifacts, projectSummary);
+        SummaryRequest request = new SummaryRequest(generationArtifacts, projectSummary);
         List<GenerationArtifact> summarizedArtifacts = this.performGenArtifactSummaryRequest(request, logger);
 
         for (GenerationArtifact generationArtifact : summarizedArtifacts) {
@@ -108,7 +108,7 @@ public class SummaryService {
      * @param jobLogger The logger to store logs under.
      * @return The list of summaries.
      */
-    private List<GenerationArtifact> performGenArtifactSummaryRequest(GenArtifactSummaryRequest request,
+    private List<GenerationArtifact> performGenArtifactSummaryRequest(SummaryRequest request,
                                                                       JobLogger jobLogger) {
         SummaryResponse response = this.genApi.generateArtifactSummaries(request, jobLogger);
         return response.getArtifacts();

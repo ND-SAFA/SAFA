@@ -44,9 +44,10 @@ public class RequestService {
      */
     public <T> T sendPost(String endpoint,
                           Object payload,
+                          Map<String, String> additionalCookies,
                           Class<T> responseClass) {
         // Step - Send request
-        return sendPayload(endpoint, payload, responseClass, HttpMethod.POST);
+        return sendPayload(endpoint, payload, additionalCookies, responseClass, HttpMethod.POST);
     }
 
     /**
@@ -61,6 +62,7 @@ public class RequestService {
      */
     public <T> T sendPayload(String endpoint,
                              Object payload,
+                             Map<String, String> additionalCookies,
                              Class<T> responseClass,
                              HttpMethod method) {
         String requestLog = String.format("Starting request to %s", endpoint);
@@ -68,6 +70,11 @@ public class RequestService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+        if (additionalCookies != null && !additionalCookies.isEmpty()) {
+            headers.set(HttpHeaders.COOKIE, buildCookieString(additionalCookies));
+        }
+
         HttpEntity<Object> headerEntity = new HttpEntity<>(payload, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(endpoint, method, headerEntity, String.class);
@@ -86,6 +93,18 @@ public class RequestService {
             logger.error(error);
             throw new SafaError(responseBody);
         }
+    }
+
+    /**
+     * Builds the cookie string from a map of cookie name-value pairs.
+     *
+     * @param cookies Map containing cookie name-value pairs.
+     * @return String representing the cookie string.
+     */
+    private String buildCookieString(Map<String, String> cookies) {
+        StringBuilder cookieBuilder = new StringBuilder();
+        cookies.forEach((name, value) -> cookieBuilder.append(name).append("=").append(value).append("; "));
+        return cookieBuilder.toString();
     }
 
     @AllArgsConstructor

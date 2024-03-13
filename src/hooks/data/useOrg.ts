@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { OrganizationSchema } from "@/types";
+import { OrganizationSchema, TransactionSchema } from "@/types";
 import { buildOrg, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -17,6 +17,14 @@ export const useOrg = defineStore("org", {
      * All organizations the user has access to.
      */
     allOrgs: [] as OrganizationSchema[],
+    /**
+     * All transactions that the org has made.
+     */
+    allTransactions: [] as TransactionSchema[],
+    /**
+     * All transactions that the org has made in the last month.
+     */
+    monthlyTransactions: [] as TransactionSchema[],
   }),
   getters: {
     /**

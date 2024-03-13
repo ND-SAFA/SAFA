@@ -112,6 +112,19 @@ export async function getProjects(): Promise<IdentifierSchema[]> {
 }
 
 /**
+ * Returns all project identifiers for a given team.
+ *
+ * @return Team's project identifiers.
+ */
+export async function getTeamProjects(
+  teamId: string
+): Promise<IdentifierSchema[]> {
+  return buildRequest<IdentifierSchema[], "teamId">("getTeamProjects", {
+    teamId,
+  }).get();
+}
+
+/**
  * Deletes a project.
  *
  * @param projectId - The project ID to delete.

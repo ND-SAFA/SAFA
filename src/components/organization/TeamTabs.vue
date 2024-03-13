@@ -9,7 +9,7 @@
         <team-member-table />
       </template>
       <template #projects>
-        <project-version-stepper />
+        <project-version-stepper team-only />
       </template>
     </tab-list>
   </sidebar-grid>

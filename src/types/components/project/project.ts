@@ -50,9 +50,12 @@ export interface CreateVersionModalProps
 /**
  * The props for displaying a project table.
  */
-export interface ProjectSelectorTableProps
-  extends OpenableProps,
-    MinimalProps {}
+export interface ProjectSelectorTableProps extends OpenableProps, MinimalProps {
+  /**
+   * If true, only projects for the current team will be displayed.
+   */
+  teamOnly?: boolean;
+}
 
 /**
  * The props for displaying a project version table.

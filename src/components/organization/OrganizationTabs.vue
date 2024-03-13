@@ -11,6 +11,9 @@
       <template #teams>
         <team-tab />
       </template>
+      <template #billing>
+        <transaction-tab />
+      </template>
     </tab-list>
   </sidebar-grid>
 </template>
@@ -33,7 +36,7 @@ import {
   OrganizationDisplay,
 } from "@/components/organization/save";
 import { OrgMemberTable } from "@/components/members";
-import { TeamTab } from "@/components/organization/tabs";
+import { TeamTab, TransactionTab } from "@/components/organization/tabs";
 
 const tabs = organizationTabTypes();
 

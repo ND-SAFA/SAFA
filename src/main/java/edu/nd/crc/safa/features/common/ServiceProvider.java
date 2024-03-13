@@ -24,8 +24,8 @@ import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.search.SearchService;
+import edu.nd.crc.safa.features.generation.summary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
@@ -181,8 +181,6 @@ public class ServiceProvider {
     private final GithubGraphQlService githubGraphQlService;
     private final JobService jobService;
     private final JobDbRepository jobRepository;
-    // Jobs
-    private JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     private final JobLoggingService jobLoggingService;
     // Search
     private final SearchService searchService;
@@ -196,6 +194,8 @@ public class ServiceProvider {
     private final CostEstimationService costEstimationService;
     // Config
     private final Environment environment;
+    // Jobs
+    private JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     // Email
     private EmailService emailService;
 

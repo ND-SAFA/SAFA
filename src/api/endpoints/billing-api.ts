@@ -86,3 +86,27 @@ export function setOrgPaymentTier(
     tier,
   });
 }
+
+/**
+ * Returns all transactions for an organization.
+ * @param orgId - The organization to get transactions for.
+ */
+export function getAllBillingTransactions(
+  orgId: string
+): Promise<TransactionSchema[]> {
+  return buildRequest<TransactionSchema[], "orgId">("getAllTransactions", {
+    orgId,
+  }).get();
+}
+
+/**
+ * Returns all transactions for an organization, or the current month.
+ * @param orgId - The organization to get transactions for.
+ */
+export function getMonthlyBillingTransactions(
+  orgId: string
+): Promise<TransactionSchema[]> {
+  return buildRequest<TransactionSchema[], "orgId">("getMonthlyTransactions", {
+    orgId,
+  }).get();
+}

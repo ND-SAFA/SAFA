@@ -38,16 +38,17 @@ public class RequestService {
      *
      * @param endpoint      Where to send request to.
      * @param payload       The payload to send in body of request.
+     * @param cookies       Cookies to add to request.
      * @param responseClass The expected class response should be in.
      * @param <T>           The type associated with response to parse.
      * @return The parsed of generic type.
      */
     public <T> T sendPost(String endpoint,
                           Object payload,
-                          Map<String, String> additionalCookies,
+                          Map<String, String> cookies,
                           Class<T> responseClass) {
         // Step - Send request
-        return sendPayload(endpoint, payload, additionalCookies, responseClass, HttpMethod.POST);
+        return sendPayload(endpoint, payload, cookies, responseClass, HttpMethod.POST);
     }
 
     /**
@@ -55,6 +56,7 @@ public class RequestService {
      *
      * @param endpoint      The endpoint to send request to.
      * @param payload       The payload to send in request.
+     * @param cookies       Cookies to add to request.
      * @param responseClass The expected class to parse response to.
      * @param method        The type of HTTP method to make request with.
      * @param <T>           The generic type to parse response to.
@@ -62,7 +64,7 @@ public class RequestService {
      */
     public <T> T sendPayload(String endpoint,
                              Object payload,
-                             Map<String, String> additionalCookies,
+                             Map<String, String> cookies,
                              Class<T> responseClass,
                              HttpMethod method) {
         String requestLog = String.format("Starting request to %s", endpoint);
@@ -71,8 +73,8 @@ public class RequestService {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
-        if (additionalCookies != null && !additionalCookies.isEmpty()) {
-            headers.set(HttpHeaders.COOKIE, buildCookieString(additionalCookies));
+        if (cookies != null && !cookies.isEmpty()) {
+            headers.set(HttpHeaders.COOKIE, buildCookieString(cookies));
         }
 
         HttpEntity<Object> headerEntity = new HttpEntity<>(payload, headers);

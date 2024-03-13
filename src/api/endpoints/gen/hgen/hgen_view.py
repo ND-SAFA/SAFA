@@ -3,9 +3,9 @@ import shutil
 import uuid
 
 from api.cloud.s3_util import upload_to_s3
-from api.endpoints.common.dataset_converter import create_api_dataset
-from api.endpoints.common.endpoint_decorator import endpoint
-from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
+from api.endpoints.gen.hgen.hgen_serializer import HGenRequest, HGenSerializer
+from api.endpoints.handler.dataset_converter import create_api_dataset
+from api.endpoints.handler.endpoint_decorator import endpoint
 from api.server.settings import ENV_FAILURE_PATH, ENV_NAME
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE

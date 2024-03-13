@@ -1,4 +1,4 @@
-from api.endpoints.serializers.hgen_serializer import HGenRequest, HGenSerializer
+from api.endpoints.gen.hgen.hgen_serializer import HGenRequest, HGenSerializer
 from tests.base_test import BaseTest
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.testres.test_assertions import TestAssertions

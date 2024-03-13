@@ -3,7 +3,7 @@ from drf_yasg import openapi
 from rest_framework.fields import *
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, PrimaryKeyRelatedField, SlugRelatedField
 
-from api.endpoints.serializers.artifact_serializer import CleanCharField
+from api.endpoints.gen.serializers.artifact_serializer import CleanCharField
 
 """
 Maps Django fields to OpenAPI fields used for documentation generation.

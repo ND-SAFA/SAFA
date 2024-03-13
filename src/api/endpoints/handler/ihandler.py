@@ -1,10 +1,10 @@
 import json
 from abc import ABC, abstractmethod
-
-from django.http import HttpRequest, JsonResponse
 from typing import Callable, Dict, Type, Union
 
-from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from django.http import HttpRequest, JsonResponse
+
+from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.utils.view_util import ViewUtil
 from tgen.common.util.json_util import NpEncoder
 

@@ -3,7 +3,7 @@ from typing import Dict
 from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_LONG, TEXT_MEDIUM
-from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
 

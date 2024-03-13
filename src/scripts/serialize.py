@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from api.endpoints.serializers.artifact_serializer import ArtifactSerializer
+from api.endpoints.gen.serializers import ArtifactSerializer
 from tests.base_test import BaseTest
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import JsonUtil

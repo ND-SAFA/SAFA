@@ -1,6 +1,6 @@
 from typing import Dict
 
-from api.endpoints.common.ihandler import IHandler
+from api.endpoints.handler.ihandler import IHandler
 
 
 class SyncEndpointHandler(IHandler):

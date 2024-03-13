@@ -1,8 +1,8 @@
 import os.path
 from typing import List, Type, TypedDict, Union
 
-from api.endpoints.common.endpoint_decorator import endpoint
-from api.endpoints.views.predict_serializer import PredictionSerializer, TraceRequest
+from api.endpoints.gen.trace.trace_serializer import PredictionSerializer, TraceRequest
+from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SEARCH_FILTER

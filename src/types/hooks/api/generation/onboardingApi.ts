@@ -41,9 +41,8 @@ export interface OnboardingApiHook {
   handleEstimateCost(projectId: string): Promise<void>;
   /**
    * Generate documentation for the selected project.
-   * @param paymentConfirmed - Whether the user has confirmed payment.
    */
-  handleGenerateDocumentation(paymentConfirmed?: boolean): Promise<void>;
+  handleGenerateDocumentation(): Promise<void>;
 
   /**
    Proceeds to the next step of the onboarding workflow.

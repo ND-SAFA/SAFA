@@ -6,7 +6,7 @@ import {
   GenerateArtifactSchema,
   IOHandlerCallback,
 } from "@/types";
-import { onboardingApiStore, orgStore, projectStore, useApi } from "@/hooks";
+import { onboardingStore, orgStore, projectStore, useApi } from "@/hooks";
 import {
   createCheckoutSession,
   createCostEstimate,
@@ -47,8 +47,7 @@ export const useBillingApi = defineStore("billingApi", (): BillingApiHook => {
   }
 
   async function handleAcceptPayment(): Promise<void> {
-    await onboardingApiStore.handleLoadOnboardingState("open");
-    await onboardingApiStore.handleGenerateDocumentation(true);
+    onboardingStore.paymentConfirmed = true;
   }
 
   async function handleCancelPayment(sessionId: string): Promise<void> {

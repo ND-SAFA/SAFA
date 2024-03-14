@@ -3,7 +3,6 @@ import { PaymentStatus } from "@/types";
 import {
   billingApiStore,
   getVersionApiStore,
-  onboardingApiStore,
   sessionApiStore,
 } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
@@ -70,10 +69,6 @@ export const routerBeforeChecks: RouteChecks = {
           [QueryParams.LOGIN_PATH]: to.path,
         },
       };
-    } else if (to.path !== Routes.PAYMENT) {
-      // If logging in to a non-payment endpoint, reload onboarding state.
-      // This ensures that reloading onboarding is not duplicated when navigating to the payment page.
-      await onboardingApiStore.handleLoadOnboardingState();
     }
   },
   async closePanelsIfNotInGraph(to) {

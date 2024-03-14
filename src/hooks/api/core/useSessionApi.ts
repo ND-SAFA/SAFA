@@ -187,6 +187,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
       }
 
       await getOrgApiStore.handleLoadCurrent();
+      await onboardingApiStore.handleLoadOnboardingState();
       await getProjectApiStore.handleReload({});
     }, callbacks);
   }

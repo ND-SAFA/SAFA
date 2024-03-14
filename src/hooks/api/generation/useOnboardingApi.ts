@@ -115,11 +115,8 @@ export const useOnboardingApi = defineStore(
       );
     }
 
-    async function handleGenerateDocumentation(
-      paymentConfirmed?: boolean
-    ): Promise<void> {
+    async function handleGenerateDocumentation(): Promise<void> {
       const credits = onboardingStore.cost?.credits;
-      onboardingStore.paymentConfirmed = paymentConfirmed || false;
 
       if (!credits) {
         onboardingStore.error = true;

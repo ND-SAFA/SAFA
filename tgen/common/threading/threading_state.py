@@ -11,15 +11,15 @@ from tgen.common.logging.logger_manager import logger
 
 class MultiThreadState:
     def __init__(self, iterable: Iterable, title: str, retries: Set, collect_results: bool = False, max_attempts: int = 3,
-                 sleep_time: float = THREAD_SLEEP, rpm: int = None):
+                 sleep_time_on_error: float = THREAD_SLEEP, rpm: int = None):
         """
-        Creates the state to syncronize a multi-threaded job.
+        Creates the state to synchronize a multi-threaded job.
         :param iterable: List of items to perform work on.
         :param title: The title of the progress bar.
         :param retries: The indices of the iterable to retry.
-        :param collect_results: Whether to collect the resutls of the jobs.
+        :param collect_results: Whether to collect the results of the jobs.
         :param max_attempts: The maximum number of retries after exception is thrown.
-        :param sleep_time: The time to sleep after an exception has been thrown.
+        :param sleep_time_on_error: The time to sleep after an exception has been thrown.
         :param rpm: Maximum rate of items per minute.
         """
         self.title = title
@@ -33,7 +33,7 @@ class MultiThreadState:
         self.failed_responses: Set[int] = set()
         self.results: Optional[List[Any]] = None
         self.collect_results = collect_results
-        self.sleep_time = sleep_time
+        self.sleep_time_on_error = sleep_time_on_error
         self.max_attempts = max_attempts
         self._init_retries(retries)
         self._init_progress_bar()
@@ -56,7 +56,7 @@ class MultiThreadState:
 
     def rpm_wait(self):
         """
-        :return: Returns the amount of time to wait.
+        :return: Returns the amount of time to wait to respect rate limit.
         """
         if self.seconds_per_request:
             if self.last_request_time is None:
@@ -123,7 +123,7 @@ class MultiThreadState:
         """
         self.pause_work = True
         logger.exception(e)
-        logger.info(f"Request failed, retrying in {self.sleep_time} seconds.")
+        logger.info(f"Request failed, retrying in {self.sleep_time_on_error} seconds.")
 
     def _init_progress_bar(self) -> None:
         """

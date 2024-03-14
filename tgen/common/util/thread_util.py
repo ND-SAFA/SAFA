@@ -31,7 +31,7 @@ class ThreadUtil:
 
         global_state: MultiThreadState = MultiThreadState(iterable, title=title, retries=retries,
                                                           max_attempts=max_attempts, collect_results=collect_results,
-                                                          sleep_time=thread_sleep, rpm=rpm)
+                                                          sleep_time_on_error=thread_sleep, rpm=rpm)
 
         threads = []
         for i in range(n_threads):

@@ -42,7 +42,7 @@ class ChildThread(threading.Thread):
         has_performed_work = False
         while not has_performed_work and self.state.should_attempt_work(attempts):
             if self.state.pause_work:
-                time.sleep(self.state.sleep_time)
+                time.sleep(self.state.sleep_time_on_error)
             if attempts > 0:
                 logger.info(f"Re-trying request...")
             try:

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 
 import { GetOrgApiHook, OrganizationSchema } from "@/types";
-import { orgStore, sessionStore, teamApiStore, useApi } from "@/hooks";
+import { orgStore, sessionStore, teamStore, useApi } from "@/hooks";
 import {
   getAllBillingTransactions,
   getMonthlyBillingTransactions,
@@ -38,12 +38,10 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
     orgStore.allTransactions = await getAllBillingTransactions(org.id);
     orgStore.monthlyTransactions = await getMonthlyBillingTransactions(org.id);
 
-    const defaultTeam =
+    teamStore.team =
       orgStore.org.teams?.find(({ members = [] }) =>
         members.find(({ email }) => email === sessionStore.userEmail)
       ) || orgStore.org.teams[0];
-
-    await teamApiStore.handleSwitch(defaultTeam);
   }
 
   async function handleLoadCurrent(): Promise<void> {

@@ -14,11 +14,10 @@ export interface TeamApiHook {
    */
   deleteTeamApiLoading: ComputedRef<boolean>;
   /**
-   * Switches to the given team, and loads its projects.
-   * @param team - The team to switch to.
-   * @param callbacks - The callbacks to call after the action.
+   * Loads the projects for the given team.
+   * @param team - The team to load.
    */
-  handleSwitch(team: TeamSchema, callbacks?: IOHandlerCallback): Promise<void>;
+  handleLoadTeam(team: TeamSchema): Promise<void>;
   /**
    * Creates a new team or updates an existing one.
    *

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { IOHandlerCallback, TeamApiHook, TeamSchema } from "@/types";
 import { logStore, orgStore, teamStore, useApi } from "@/hooks";
 import { createTeam, deleteTeam, editTeam, getTeamProjects } from "@/api";
@@ -17,14 +17,12 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
   const saveTeamApiLoading = computed(() => saveTeamApi.loading);
   const deleteTeamApiLoading = computed(() => deleteTeamApi.loading);
 
-  async function handleSwitch(
-    team: TeamSchema,
-    callbacks: IOHandlerCallback = {}
-  ): Promise<void> {
+  async function handleLoadTeam(team: TeamSchema): Promise<void> {
+    if (!team.id) return;
+
     await getTeamApi.handleRequest(async () => {
-      teamStore.team = team;
       teamStore.allProjects = await getTeamProjects(team.id);
-    }, callbacks);
+    });
   }
 
   async function handleSave(
@@ -79,10 +77,15 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
     );
   }
 
+  watch(
+    () => teamStore.team,
+    (team) => handleLoadTeam(team)
+  );
+
   return {
     saveTeamApiLoading,
     deleteTeamApiLoading,
-    handleSwitch,
+    handleLoadTeam,
     handleSave,
     handleDelete,
   };

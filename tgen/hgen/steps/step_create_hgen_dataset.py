@@ -18,7 +18,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         trace_dataset = HGenDatasetBuilder.build(args, state)
-        self._remove_targets_without_children(args, state, trace_dataset)
+        # self._remove_targets_without_children(args, state, trace_dataset)
         dataset = PromptDataset(trace_dataset=trace_dataset, project_summary=args.dataset.project_summary)
         state.final_dataset = dataset
 

@@ -7,18 +7,24 @@ import { MembershipSchema, OrganizationSchema, OrgPaymentTier } from "@/types";
 export interface AdminApiHook {
   /**
    * Whether this superuser's powers are active.
-   * - Setting this value will update the user's saved superuser status.
+   *
+   * @reactive Updates the user's saved superuser status.
    */
   activeSuperuser: WritableComputedRef<boolean>;
   /**
    * Enables the superuser status of a member.
-   * - Must be a superuser yourself.
+   *
+   * @assumption Must be a superuser.
+   *
    * @param member - The member to toggle.
    */
   enableSuperuser(member: Pick<MembershipSchema, "email">): Promise<void>;
 
   /**
    * Updates the payment tier of an organization.
+   *
+   * @assumption Must be a superuser.
+   *
    * @param org - The organization to update.
    * @param tier - The new payment tier.
    */
@@ -29,6 +35,8 @@ export interface AdminApiHook {
 
   /**
    * As an admin, sends a password reset email, for the given account, to the admin's email.
+   *
+   * @assumption Must be a superuser.
    *
    * @param email - The email to reset the password of.
    */

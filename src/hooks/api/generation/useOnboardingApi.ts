@@ -71,6 +71,8 @@ export const useOnboardingApi = defineStore(
     async function handleOpenOnboarding(): Promise<void> {
       onboardingStore.projectId = null;
       onboardingStore.open = true;
+      onboardingStore.error = false;
+      onboardingStore.ignoreCurrentJobs = true;
       onboardingStore.step = 1;
       onboardingStore.steps.forEach((step) => (step.done = false));
       await handleUpdateOnboardingStatus({
@@ -82,7 +84,10 @@ export const useOnboardingApi = defineStore(
     async function handleImportAndSummarize(): Promise<void> {
       integrationsStore.gitHubConfig.summarize = true;
       await createProjectApiStore.handleGitHubImport({
-        onSuccess: () => jobApiStore.handleReload(),
+        onSuccess: () => {
+          jobApiStore.handleReload();
+          onboardingStore.ignoreCurrentJobs = false;
+        },
         onError: () => (onboardingStore.error = true),
       });
     }

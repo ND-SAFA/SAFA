@@ -43,11 +43,13 @@ export const useOnboarding = defineStore("useOnboarding", {
     paymentConfirmed: false,
     /** Whether the generation step has been completed. */
     generationCompleted: false,
+    /** Whether generation should ignore current jobs. */
+    ignoreCurrentJobs: false,
   }),
   getters: {
     /** @return The onboarding project's upload job, if the generation step is done. */
     uploadedJob(): JobSchema | undefined {
-      return jobStore.jobs[0];
+      return this.ignoreCurrentJobs ? undefined : jobStore.jobs[0];
     },
     /** @return Whether the onboarding project's upload job is uploading artifacts. */
     isUploadJob(): boolean {

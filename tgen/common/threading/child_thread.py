@@ -23,13 +23,12 @@ class ChildThread(threading.Thread):
         Performs work on the next available items until no more work is available.
         :return: None
         """
-        while True:
-            work = self.state.get_work()
-            if work is None:
-                break
+        work = self.state.get_work()
+        while work is not None:
             index, item = work
             work_result = self._perform_work(item, index)
             self.state.on_item_finished(work_result, index)
+            work = self.state.get_work()
 
     def _perform_work(self, item: Any, index: int) -> Any:
         """

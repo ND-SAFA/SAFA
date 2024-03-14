@@ -61,7 +61,7 @@ export default {
 <script setup lang="ts">
 import { ref } from "vue";
 import { ENABLED_FEATURES } from "@/util";
-import { sessionApiStore } from "@/hooks";
+import { onboardingStore, sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
   CardPage,
@@ -91,10 +91,11 @@ function handleForgotPassword() {
 /**
  * Attempts to log the user in.
  */
-function handleSubmit() {
-  sessionApiStore.handleLogin({
+async function handleSubmit() {
+  await sessionApiStore.handleLogin({
     email: email.value,
     password: password.value,
   });
+  await onboardingStore.handleReload();
 }
 </script>

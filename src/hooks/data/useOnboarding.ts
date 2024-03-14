@@ -262,7 +262,10 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (this.displayBilling) {
-        await billingApiStore.handleCheckoutSession(this.cost?.credits || 0);
+        await billingApiStore.handleCheckoutSession(
+          this.cost?.credits || 0,
+          `Artifact Generation: ${projectStore.project.name}`
+        );
       } else {
         await artifactGenerationApiStore.handleGenerateArtifacts(
           {

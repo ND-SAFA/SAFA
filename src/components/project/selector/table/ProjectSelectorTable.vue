@@ -87,6 +87,8 @@ import {
   permissionStore,
   projectStore,
   sessionStore,
+  teamApiStore,
+  teamStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
 import { InviteMemberModal } from "@/components/members";
@@ -109,7 +111,9 @@ const projectInviteId = ref<string>();
 const columns = computed(() =>
   props.minimal ? [projectNameColumn] : projectColumns
 );
-const rows = computed(() => projectStore.allProjects);
+const rows = computed(() =>
+  props.teamOnly ? teamStore.allProjects : projectStore.allProjects
+);
 
 const entity = computed(
   () =>
@@ -136,7 +140,11 @@ function handleReload() {
   selected.value = undefined;
   projectInviteId.value = undefined;
 
-  getProjectApiStore.handleReload();
+  if (props.teamOnly) {
+    teamApiStore.handleSwitch(teamStore.team);
+  } else {
+    getProjectApiStore.handleReload();
+  }
 }
 
 /**

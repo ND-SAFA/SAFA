@@ -9,6 +9,7 @@ import {
   JobSchema,
   MembershipSchema,
   TableColumn,
+  TransactionSchema,
   VersionSchema,
 } from "@/types";
 import { timestampToDisplay } from "@/util/string-helper";
@@ -251,4 +252,32 @@ export const teamColumns: TableColumn<Record<string, string>>[] = [
     field: (row) => row.projects.length,
   },
   actionsColumn,
+];
+
+export const transactionsColumns: TableColumn<TransactionSchema>[] = [
+  {
+    label: "Description",
+    name: "description",
+    align: "left",
+    field: (row) => row.description,
+  },
+  {
+    label: "Status",
+    name: "status",
+    align: "right",
+    field: (row) => row.status,
+  },
+  {
+    label: "Amount",
+    name: "amount",
+    align: "right",
+    field: (row) => `$${row.amount}`,
+  },
+  {
+    label: "Date",
+    name: "timestamp",
+    align: "right",
+    field: (row) => row.timestamp,
+    format: (timestamp: string) => timestampToDisplay(timestamp),
+  },
 ];

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { TeamSchema } from "@/types";
+import { IdentifierSchema, TeamSchema } from "@/types";
 import { buildTeam, removeMatches } from "@/util";
 import { orgStore, permissionStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -14,6 +14,10 @@ export const useTeam = defineStore("team", {
      * The currently loaded team.
      */
     team: buildTeam(),
+    /**
+     * The projects associated with the current team.
+     */
+    allProjects: [] as IdentifierSchema[],
   }),
   getters: {
     /**

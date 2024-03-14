@@ -7,7 +7,7 @@
           :key="t.id"
           text
           :label="t.name"
-          @click="teamStore.team = t"
+          @click="teamApiStore.handleSwitch(t)"
         />
       </flex-box>
     </q-btn-dropdown>

@@ -226,7 +226,11 @@ export function tableViewTabOptions(): SelectOption<ProjectTableTab>[] {
  * @return display names for organization tabs.
  */
 export function organizationTabTypes(): SelectOption<OrganizationTabTypes>[] {
-  return [createOption("members", "Members"), createOption("teams", "Teams")];
+  return [
+    createOption("members", "Members"),
+    createOption("teams", "Teams"),
+    createOption("billing", "Transactions"),
+  ];
 }
 
 /**

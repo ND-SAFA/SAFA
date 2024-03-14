@@ -70,7 +70,7 @@
           :name="`body-cell-${column.name}`"
           :row="props.row"
         />
-        <typography v-else :value="String(column.field(props.row))" />
+        <typography v-else :value="getColumnDisplayValue(column)" />
       </flex-box>
     </q-td>
   </q-tr>
@@ -92,7 +92,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
-import { GroupableTableRowProps } from "@/types";
+import { GroupableTableRowProps, TableColumn } from "@/types";
 import { camelcaseToDisplay } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
 import {
@@ -137,4 +137,15 @@ const groupHeaderDescription = computed(() =>
     ? artifactStore.getArtifactByName(groupValue.value)?.body
     : undefined
 );
+
+/**
+ * Returns the display value for a column on this row.
+ * @param column - The column to display.
+ * @return The display value.
+ */
+function getColumnDisplayValue(column: TableColumn): string {
+  return column.format
+    ? column.format(column.field(props.row))
+    : String(column.field(props.row));
+}
 </script>

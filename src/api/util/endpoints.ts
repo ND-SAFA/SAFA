@@ -63,6 +63,7 @@ export enum Endpoint {
   project = "projects",
   updateProject = "projects/:projectId",
   transferProject = "projects/:projectId/transfer",
+  getTeamProjects = "projects/team/:teamId",
 
   // Project Members
 
@@ -208,6 +209,8 @@ export enum Endpoint {
   createCheckoutSession = "billing/checkout",
   setOrgPaymentTier = "billing/update-payment-tier",
   deleteCheckoutSession = "stripe/cancel/:sessionId",
+  getAllTransactions = "billing/transactions/:orgId",
+  getMonthlyTransactions = "billing/transactions/:orgId/month",
 }
 
 /**

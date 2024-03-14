@@ -12,6 +12,7 @@
         <project-selector-table
           :minimal="props.minimal"
           :open="isProjectStep"
+          :team-only="props.teamOnly"
           @selected="handleProjectSelect"
         />
       </template>
@@ -60,7 +61,7 @@ import { Stepper, PanelCard } from "@/components/common";
 import FlexBox from "@/components/common/display/content/FlexBox.vue";
 import { ProjectSelectorTable, VersionSelectorTable } from "./table";
 
-const props = defineProps<MinimalProps>();
+const props = defineProps<MinimalProps & { teamOnly?: boolean }>();
 
 const defaultProjectStep = (): StepperStep => ({
   title: "Select a Project",
